@@ -7,11 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
+import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 
 export default function Navbar() {
     const t = useTranslations("Navigation");
+    const tCommon = useTranslations("Common");
     const locale = useLocale();
     const pathname = usePathname();
     const router = useRouter();
@@ -33,8 +35,21 @@ export default function Navbar() {
                 <div className="flex h-16 items-center justify-between">
 
                     {/* Logo */}
-                    <Link href={`/${locale}`} className="flex items-center space-x-2 rtl:space-x-reverse font-bold text-xl tracking-tighter text-white">
-                        <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">ALMSTKSHF</span>
+                    <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-xl tracking-tighter text-white group">
+                        <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-white/10 flex items-center justify-center p-1 transition-transform group-hover:scale-110">
+                            {/* Placeholder for the logo image - assuming logo.png in public folder */}
+                            <Image
+                                src="/logo.png"
+                                alt="ALMSTKSHF Logo"
+                                width={40}
+                                height={40}
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+                        <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+                            {tCommon('app_name')}
+                        </span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -168,7 +183,9 @@ export default function Navbar() {
                             )}
                         >
                             <div className="flex items-center justify-between mb-8">
-                                <span className="font-bold text-xl text-white">ALMSTKSHF</span>
+                                <span className="font-bold text-xl text-white">
+                                    {tCommon('app_name')}
+                                </span>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="p-2 text-slate-400 hover:text-white"

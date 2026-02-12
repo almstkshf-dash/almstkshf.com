@@ -16,6 +16,10 @@
     "crisis_management": "Crisis Management Plans"
   },
   "Common": {
+    "app_name": "ALMSTKSHF",
+    "slogan": "We Develop To Lead",
+    "description": "Strategic Media Advisor is an AI designed to provide strategic media monitoring and public opinion analysis for decision-makers, particularly within government, security, and public relations sectors in the Gulf and broader Arab world.",
+    "try_ai": "Try ALMSTKSHF Media Assist",
     "dashboard": "Dashboard",
     "status": "Status",
     "priority": "Priority",
