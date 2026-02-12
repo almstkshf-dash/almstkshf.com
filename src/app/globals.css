@@ -26,7 +26,6 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Status Colors */
   --color-status-success: #10B981;
   --color-status-alert: #F59E0B;
   --color-status-crisis: #F43F5E;
@@ -102,11 +101,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--color-border);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    @apply antialiased;
   }
 }
 
