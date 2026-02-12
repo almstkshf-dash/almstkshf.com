@@ -9,7 +9,7 @@ import { useState } from "react";
 import clsx from "clsx";
 
 export default function ReportLibrary() {
-    const reports = useQuery(api.queries.getMediaReports);
+    const reports = useQuery(api.queries.getMediaReports, {});
     const [searchTerm, setSearchTerm] = useState("");
 
     const filteredReports = reports?.filter((r: any) =>

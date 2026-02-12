@@ -15,7 +15,7 @@ export default function MediaMonitoringDashboard() {
     const [filter, setFilter] = useState<"TV" | "Radio" | "Press" | undefined>(undefined);
 
     const reports = useQuery(api.queries.getMediaReports, { source: filter });
-    const crisisPlans = useQuery(api.queries.getCrisisPlans);
+    const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
 
     const filters: { label: string; value: typeof filter; icon: any }[] = [
         { label: "All", value: undefined, icon: Filter },
