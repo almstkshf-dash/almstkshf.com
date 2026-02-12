@@ -1,0 +1,60 @@
+import React from "react";
+import clsx from "clsx";
+import { AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+interface CrisisPlanCardProps {
+    title: string;
+    priority: "Low" | "Medium" | "High";
+    actions: string[];
+    status: string;
+}
+
+export default function CrisisPlanCard({ title, priority, actions, status }: CrisisPlanCardProps) {
+    const t = useTranslations("Common");
+
+    const priorityColors = {
+        Low: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        Medium: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+        High: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+    };
+
+    const statusIcons = {
+        Low: CheckCircle,
+        Medium: Info,
+        High: AlertTriangle,
+    };
+
+    const Icon = statusIcons[priority];
+
+    return (
+        <div className={clsx("p-5 rounded-xl border bg-slate-900/50 backdrop-blur-sm transition-transform hover:-translate-y-1", priorityColors[priority])}>
+            <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                    <div className={clsx("p-2 rounded-lg bg-slate-950/30")}>
+                        <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-lg text-slate-100">{title}</h3>
+                        <span className="text-xs font-mono uppercase tracking-wider opacity-80">{priority} Priority</span>
+                    </div>
+                </div>
+                <span className="px-2 py-1 text-xs rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    {status}
+                </span>
+            </div>
+
+            <div className="space-y-2">
+                <div className="text-xs font-semibold text-slate-500 uppercase">Action Protocol</div>
+                <ul className="space-y-1">
+                    {actions.map((action, idx) => (
+                        <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
+                            <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-50" />
+                            {action}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+}

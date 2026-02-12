@@ -1,0 +1,25 @@
+{
+    "Navigation": {
+        "landing_page": "الرئيسية",
+        "case_studies": "دراسات الحالة",
+        "lexcura_lawyer": "محامي ليكسكورا",
+        "styling_assistant": "مساعد التصميم الذكي",
+        "technical_solutions": "الحلول التقنية",
+        "smart_media_assistant": "مساعد الوسائط الذكي",
+        "kyc_compliance": "التحقق من الهوية (KYC)",
+        "integration_hub": "مركز التكامل",
+        "media_monitoring": "رصد الوسائط",
+        "tv_radio_monitoring": "رصد التلفزيون والإذاعة",
+        "press_monitoring": "رصد الصحافة والنشر",
+        "periodic_reports": "التقارير الدورية",
+        "media_pulse": "نبض الإعلام",
+        "crisis_management": "خطط إدارة الأزمات"
+    },
+    "Common": {
+        "dashboard": "لوحة القيادة",
+        "status": "الحالة",
+        "priority": "الأولوية",
+        "download": "تحميل PDF",
+        "view_details": "عرض التفاصيل"
+    }
+}

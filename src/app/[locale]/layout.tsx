@@ -1,0 +1,53 @@
+import type { Metadata } from "next";
+import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
+import "../globals.css";
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { routing } from '@/i18n/config';
+
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
+    display: "swap",
+});
+
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+    subsets: ["arabic"],
+    weight: ["300", "400", "500", "700"],
+    variable: "--font-ibm-plex-arabic",
+    display: "swap",
+});
+
+export const metadata: Metadata = {
+    title: "ALMSTKSHF",
+    description: "Advanced Media & Legal Solutions",
+};
+
+export default async function RootLayout({
+    children,
+    params: { locale }
+}: Readonly<{
+    children: React.ReactNode;
+    params: { locale: string };
+}>) {
+
+    // Validate that the incoming `locale` parameter is valid
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!routing.locales.includes(locale as any)) {
+        notFound();
+    }
+
+    const messages = await getMessages();
+    const dir = locale === "ar" ? "rtl" : "ltr";
+
+    return (
+        <html lang={locale} dir={dir}>
+            <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
+                <NextIntlClientProvider messages={messages}>
+                    {children}
+                </NextIntlClientProvider>
+            </body>
+        </html>
+    );
+}

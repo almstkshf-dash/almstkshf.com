@@ -1,0 +1,25 @@
+{
+  "Navigation": {
+    "landing_page": "Home",
+    "case_studies": "Case Studies",
+    "lexcura_lawyer": "Lexcura Lawyer",
+    "styling_assistant": "Smart Styling Assistant",
+    "technical_solutions": "Technical Solutions",
+    "smart_media_assistant": "Smart Media Assistant",
+    "kyc_compliance": "KYC Compliance",
+    "integration_hub": "Integration Hub",
+    "media_monitoring": "Media Monitoring",
+    "tv_radio_monitoring": "TV & Radio Monitoring",
+    "press_monitoring": "Press Publication Monitoring",
+    "periodic_reports": "Periodic Reports",
+    "media_pulse": "Media Pulse",
+    "crisis_management": "Crisis Management Plans"
+  },
+  "Common": {
+    "dashboard": "Dashboard",
+    "status": "Status",
+    "priority": "Priority",
+    "download": "Download PDF",
+    "view_details": "View Details"
+  }
+}
