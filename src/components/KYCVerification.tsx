@@ -1,0 +1,118 @@
+"use client";
+
+import { useState } from "react";
+import { ShieldCheck, UserCheck, FileCheck, Upload, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
+import Button from "./ui/Button";
+import clsx from "clsx";
+import { motion } from "framer-motion";
+
+type StepStatus = "pending" | "completed" | "active" | "error";
+
+interface KYCStep {
+    id: number;
+    title: string;
+    description: string;
+    status: StepStatus;
+    icon: any;
+}
+
+const initialSteps: KYCStep[] = [
+    { id: 1, title: "Identity Document", description: "Passport or National ID scan.", status: "completed", icon: UserCheck },
+    { id: 2, title: "Liveness Detection", description: "Real-time facial verification.", status: "active", icon: ShieldCheck },
+    { id: 3, title: "Proof of Address", description: "Utility bill or bank statement.", status: "pending", icon: FileCheck },
+];
+
+export default function KYCVerification() {
+    return (
+        <div className="space-y-12">
+            <div className="bg-slate-900/50 border border-slate-800 p-8 rounded-3xl">
+                <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                        <UserCheck className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    <div>
+                        <h3 className="text-white font-bold text-xl">Verification Status: Tier 1</h3>
+                        <p className="text-slate-500 text-sm">You are currently verified for basic platform features.</p>
+                    </div>
+                    <div className="ml-auto px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-slate-400">
+                        PENDING FULL ACCESS
+                    </div>
+                </div>
+
+                <div className="relative space-y-4">
+                    <div className="absolute left-[27px] top-6 bottom-6 w-px bg-slate-800 hidden md:block"></div>
+
+                    {initialSteps.map((step, idx) => (
+                        <div key={step.id} className="relative flex items-start gap-6 group">
+                            <div className={clsx(
+                                "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 transition-all",
+                                step.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                                    step.status === "active" ? "bg-blue-500/10 text-blue-500 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)]" :
+                                        "bg-slate-950 text-slate-700 border border-slate-900"
+                            )}>
+                                <step.icon className="w-7 h-7" />
+                            </div>
+
+                            <div className="flex-1 py-1">
+                                <div className="flex justify-between items-center mb-1">
+                                    <h4 className={clsx(
+                                        "font-bold text-lg transition-colors",
+                                        step.status === "pending" ? "text-slate-600" : "text-white"
+                                    )}>
+                                        {step.title}
+                                    </h4>
+                                    {step.status === "completed" && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                                </div>
+                                <p className="text-slate-500 text-sm">{step.description}</p>
+
+                                {step.status === "active" && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="mt-6 p-6 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col items-center justify-center text-center gap-6"
+                                    >
+                                        <div className="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-slate-800 border-dashed animate-spin-slow">
+                                            <Upload className="w-5 h-5 text-blue-500" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-white text-sm font-bold">Ready for Scanned Document</p>
+                                            <p className="text-slate-500 text-xs">Maximum file size: 10MB (JPG, PNG, PDF)</p>
+                                        </div>
+                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-500">
+                                            Select File
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40">
+                    <h5 className="text-white font-bold mb-3 flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-amber-500" />
+                        Why verify?
+                    </h5>
+                    <p className="text-slate-500 text-sm leading-relaxed">
+                        Full verification (Tier 2) allows for automated legal drafting, API production access, and secure cloud storage exports.
+                    </p>
+                </div>
+                <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40">
+                    <h5 className="text-white font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-widest text-[10px] text-slate-600">
+                        Help Center
+                    </h5>
+                    <button className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm transition-colors">
+                        Read verification requirements
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    <button className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm mt-3 transition-colors">
+                        Enterprise onboarding guide
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}

@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { routing } from '@/i18n/config';
+import Footer from '@/components/Footer';
 
 const inter = Inter({
     subsets: ["latin"],
@@ -49,6 +50,7 @@ export default async function RootLayout({
                 <NextIntlClientProvider messages={messages}>
                     <ConvexClientProvider>
                         {children}
+                        <Footer />
                     </ConvexClientProvider>
                 </NextIntlClientProvider>
             </body>

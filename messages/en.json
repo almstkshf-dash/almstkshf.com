@@ -25,5 +25,37 @@
     "priority": "Priority",
     "download": "Download PDF",
     "view_details": "View Details"
+  },
+  "Footer": {
+    "about": "About ALMSTKSHF",
+    "description": "Innovative AI-driven solutions for media monitoring, legal intelligence, and strategic decision making.",
+    "links": "Quick Links",
+    "services": "Services",
+    "legal": "Legal",
+    "rights": "All rights reserved",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "CaseStudies": {
+    "lexcura": {
+      "title": "Lexcura Lawyer: AI Legal Intelligence",
+      "subtitle": "Transforming legal workflows with secure, context-aware AI",
+      "feature_analysis": "Smart Document Analysis",
+      "feature_analysis_desc": "Scan and understand thousands of pages of legal precedents in seconds.",
+      "feature_drafting": "Automated Legal Drafting",
+      "feature_drafting_desc": "Generate high-quality legal drafts based on specific case context.",
+      "feature_insights": "Predictive Legal Insights",
+      "feature_insights_desc": "Gain edge in litigation with data-driven outcome predictions."
+    },
+    "styling": {
+      "title": "Smart Styling Assistant",
+      "subtitle": "Personalized fashion intelligence for modern e-commerce",
+      "feature_wardrobe": "Digital Wardrobe Management",
+      "feature_wardrobe_desc": "Digitize and organize your style profile with 3D body mapping.",
+      "feature_recommendations": "AI Style Recommendations",
+      "feature_recommendations_desc": "Get event-specific outfit ideas tailored to your unique preferences.",
+      "feature_inventory": "Smart Inventory Sync",
+      "feature_inventory_desc": "Seamlessly integrate with your favorite retailers for real-time availability."
+    }
   }
 }
