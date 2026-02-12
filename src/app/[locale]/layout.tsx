@@ -44,7 +44,7 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <html lang={locale} dir={dir}>
+        <html lang={locale} dir={dir} suppressHydrationWarning>
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                 <NextIntlClientProvider messages={messages}>
                     <ConvexClientProvider>

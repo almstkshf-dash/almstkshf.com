@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar';
 import { useTranslations } from 'next-intl';
 
 export default function Home() {
-    const t = useTranslations('Navigation');
+    const t = useTranslations();
 
     return (
         <main className="min-h-screen">
@@ -20,7 +20,7 @@ export default function Home() {
                     </p>
                     <div className="flex gap-4 justify-center">
                         <button className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-transform hover:scale-105">
-                            {t('common.view_details', { fallback: 'Explore Solutions' })}
+                            {t('Common.view_details')}
                         </button>
                         <button className="px-8 py-3 border border-slate-600 hover:border-blue-400 text-slate-200 rounded-lg font-medium transition-colors">
                             Contact Us
