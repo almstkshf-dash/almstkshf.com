@@ -14,6 +14,7 @@ const routes = [
     '/media-monitoring/media-pulse',
     '/media-monitoring/crisis-management',
     '/contact',
+    '/behind-the-scene',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

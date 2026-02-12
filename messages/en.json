@@ -15,7 +15,8 @@
     "media_pulse": "Media Pulse",
     "crisis_management": "Crisis Management Plans",
     "get_started": "Get Started",
-    "contact": "Contact Us"
+    "contact": "Contact Us",
+    "behind_the_scene": "Behind the Scene"
   },
   "Common": {
     "app_name": "ALMSTKSHF",
@@ -128,7 +129,37 @@
       },
       "cta_pricing": "See pricing",
       "cta_case_studies": "View case studies",
-      "trusted": "Trusted by Industry Leaders"
+      "trusted": "Trusted by Industry Leaders",
+      "faq": {
+        "title": "Expert Insights",
+        "subtitle": "Everything you need to know about the LEXCORA legal ecosystem.",
+        "items": {
+          "what_is": {
+            "q": "What is LEXCORA?",
+            "a": "LEXCORA is a specialized ERP application built exclusively for law firms. It consolidates client files, court sessions, legal deadlines, client/opponent databases, accounting, and HR into one unified bilingual system."
+          },
+          "deadlines": {
+            "q": "How does it handle deadlines?",
+            "a": "LEXCORA uses automated tracking tied to case phases. Critical dates like appeals are generated on a clear timeline with smart alerts to ensure no court date is ever missed."
+          },
+          "database": {
+            "q": "How is the database managed?",
+            "a": "It provides a unified record for every entity (client, opponent, or prospect), linking them to relevant cases, meetings, and relationship history for a 360-degree overview."
+          },
+          "customization": {
+            "q": "Is it bilingual and customizable?",
+            "a": "Yes. LEXCORA is fully bilingual (Arabic/English) and offers 10 different themes for fonts and colors to align perfectly with your firm's visual identity."
+          },
+          "financials": {
+            "q": "What about Financials & HR?",
+            "a": "It features a specialized legal accounting tree and HR modules for team data management, task assignments, and resource utilization tracking."
+          },
+          "permissions": {
+            "q": "How are permissions managed?",
+            "a": "It uses a fine-grained Role-Based Access System. You can control view/edit rights for every module using templates like Managing Partner, Lawyer, or Accountant."
+          }
+        }
+      }
     },
     "styling": {
       "title": "Smart Styling Assistant",
@@ -151,5 +182,36 @@
     "send": "Send Message",
     "success": "Thank you! Your message has been sent.",
     "error": "Something went wrong. Please try again."
+  },
+  "WhyChooseUs": {
+    "title": "Why Choose Us?",
+    "dashboard": {
+      "title": "Comprehensive Dashboard",
+      "desc": "Our comprehensive dashboard brings everything together: monitoring, analysis, leadership insights — all at your fingertips."
+    },
+    "ai_agent": {
+      "title": "Almstkshf AI Agent",
+      "desc": "Our advanced AI capabilities allow you to generate content on demand. It’s your personal AI assistant — always ready to support your communication strategy."
+    },
+    "sentiment": {
+      "title": "Sentiment & Reputation",
+      "desc": "With our proprietary sentiment analysis algorithms, you can safeguard your brand’s reputation, detecting and neutralizing fake news before it spreads."
+    }
+  },
+  "Team": {
+    "title": "Behind the Scene",
+    "subtitle": "Meet the visionaries leading the Almstkshf intelligence ecosystem.",
+    "members": {
+      "tamer": {
+        "name": "Tamer Younes",
+        "role": "CEO",
+        "desc": "Tamer Gad is a seasoned PR and marketing consultant with over 20 years of experience in the GCC. He holds a Bachelor’s in Media, a Master’s in Social Marketing, a Diploma in Operations Management, and a Certificate in Prompt Engineering for Artificial Intelligence. Licensed by twofour54, he advises on AI-powered media monitoring, sentiment analysis, and strategic communication for public and private entities in the UAE."
+      },
+      "rami": {
+        "name": "Eng. Rami Kamel",
+        "role": "COO",
+        "desc": "Eng. Rami Kamel is a cybersecurity engineer and co-founder of the AlMstkshf media intelligence platform. With a strong background in secure systems design and AI integration, he leads the technical architecture behind real-time sentiment analysis and multi-source media monitoring. Rami is known for his ability to merge data security with smart decision-support tools, enabling government and enterprise clients across the UAE to act on media insights with confidence."
+      }
+    }
   }
 }

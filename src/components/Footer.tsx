@@ -34,7 +34,7 @@ export default function Footer() {
                             <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
                                 <Twitter className="w-5 h-5" />
                             </Link>
-                            <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
+                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
                                 <Linkedin className="w-5 h-5" />
                             </Link>
                             <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
@@ -91,15 +91,15 @@ export default function Footer() {
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-slate-400 text-sm hover:text-white transition-colors group cursor-pointer">
                                 <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                <span>Dubai, United Arab Emirates<br />Business Bay, AI District</span>
+                                <span>Dubai: One Central 9th Floor - Trade Center<br />Abu Dhabi: Al Khatem Tower - Al Maryah Island</span>
                             </li>
                             <li className="flex items-center gap-3 text-slate-400 text-sm hover:text-white transition-colors group">
                                 <Phone className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                <span>+971 (4) 000-0000</span>
+                                <span>+971 58 59 52 035</span>
                             </li>
                             <li className="flex items-center gap-3 text-slate-400 text-sm hover:text-white transition-colors group">
                                 <Mail className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                <span>contact@almstkshf.com</span>
+                                <span>k.account@almstkshf.com</span>
                             </li>
                         </ul>
                     </div>

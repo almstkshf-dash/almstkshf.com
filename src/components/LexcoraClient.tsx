@@ -14,10 +14,12 @@ import {
     MessageSquare,
     Briefcase,
     Globe,
-    ExternalLink
+    ExternalLink,
+    TrendingUp
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import clsx from "clsx";
 
 export default function LexcoraClient() {
     const t = useTranslations("CaseStudies.lexcora");
@@ -176,6 +178,86 @@ export default function LexcoraClient() {
                                     ))}
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                </Container>
+            </section>
+
+            {/* Expert Insights (FAQ) */}
+            <section className="py-24 bg-slate-900/20">
+                <Container>
+                    <div className="text-center space-y-4 mb-20">
+                        <h2 className="text-4xl md:text-6xl font-bold">{t("faq.title")}</h2>
+                        <p className="text-slate-400 text-lg max-w-2xl mx-auto font-light">
+                            {t("faq.subtitle")}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {["what_is", "deadlines", "database", "customization", "financials", "permissions"].map((key, idx) => (
+                            <motion.div
+                                key={key}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="p-8 bg-slate-900/50 border border-slate-800 rounded-[2.5rem] hover:bg-slate-900 transition-all group relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                                    <MessageSquare className="w-32 h-32" />
+                                </div>
+
+                                <div className="space-y-6 relative z-10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400 font-bold text-sm">
+                                            0{idx + 1}
+                                        </div>
+                                        <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                                            {t(`faq.items.${key}.q`)}
+                                        </h3>
+                                    </div>
+                                    <p className="text-slate-400 text-sm leading-relaxed font-light">
+                                        {t(`faq.items.${key}.a`)}
+                                    </p>
+
+                                    {/* Visual "Sign/Chart" placeholders per item */}
+                                    <div className="pt-4 border-t border-slate-800/50">
+                                        {key === "deadlines" && (
+                                            <div className="flex gap-1">
+                                                {[1, 2, 3, 4, 5].map(i => (
+                                                    <div key={i} className={clsx("h-1 flex-1 rounded-full", i < 4 ? "bg-blue-500" : "bg-slate-800")}></div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {key === "permissions" && (
+                                            <div className="flex -space-x-2">
+                                                {[1, 2, 3].map(i => (
+                                                    <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-900 bg-slate-800"></div>
+                                                ))}
+                                                <div className="w-6 h-6 rounded-full border-2 border-slate-900 bg-blue-600 flex items-center justify-center text-[8px] font-bold">+5</div>
+                                            </div>
+                                        )}
+                                        {key === "customization" && (
+                                            <div className="flex gap-2">
+                                                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                                <div className="w-4 h-4 rounded-full bg-indigo-500"></div>
+                                                <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+                                            </div>
+                                        )}
+                                        {key === "financials" && (
+                                            <div className="h-4 w-full bg-slate-800 rounded overflow-hidden">
+                                                <div className="h-full bg-emerald-500/50 w-2/3"></div>
+                                            </div>
+                                        )}
+                                        {(key === "what_is" || key === "database") && (
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                                                <TrendingUp className="w-3 h-3" />
+                                                Optimized System
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
                         ))}
                     </div>
                 </Container>

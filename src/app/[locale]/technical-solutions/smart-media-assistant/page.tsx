@@ -1,14 +1,18 @@
-import { useTranslations } from "next-intl";
-import Container from "@/components/ui/Container";
+import SmartMediaAssistantClient from "@/components/SmartMediaAssistantClient";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+
+    return {
+        title: isAr ? "مساعد الوسائط الذكي | قدرات الذكاء الاصطناعي المتقدمة" : "Smart Media Assistant | Advanced AI Capabilities",
+        description: isAr
+            ? "قدرات الذكاء الاصطناعي من المستكشف لإنشاء المحتوى عند الطلب ودعم استراتيجية الاتصال."
+            : "Almstkshf AI capabilities for on-demand content generation and communication strategy support.",
+    };
+}
 
 export default function SmartMediaAssistantPage() {
-    const t = useTranslations("Navigation");
-    return (
-        <Container className="py-20">
-            <h1 className="text-4xl font-bold text-white mb-6">{t("smart_media_assistant")}</h1>
-            <p className="text-slate-400 text-lg max-w-2xl">
-                Automated transcription and sentiment analysis for audio and video content, enabling rapid insight generation from media assets.
-            </p>
-        </Container>
-    );
+    return <SmartMediaAssistantClient />;
 }

@@ -10,7 +10,8 @@ import {
   FileText,
   Activity,
   ShieldAlert,
-  Home
+  Home,
+  Users
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -104,5 +105,10 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         description: "Strategic crisis response planning"
       }
     ]
+  },
+  {
+    label: "behind_the_scene",
+    href: "/behind-the-scene",
+    icon: Users,
   }
 ];
