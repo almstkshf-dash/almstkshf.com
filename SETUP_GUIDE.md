@@ -10,11 +10,23 @@ NEXT_PUBLIC_CONVEX_URL="https://your-project.convex.cloud"
 ```
 *Locally, run `npx convex dev` and choose "Configure this project with an existing one" to automatically set this up.*
 
-## 3. Deployment
-This project is configured for Vercel.
-1. Push to GitHub.
-2. Import in Vercel.
-3. In Vercel Settings -> Integrations, add **Convex**.
+## 3. Deployment & Integration
+This project is configured for Vercel with automated Convex deployments.
+
+1. **Link Convex to Vercel**:
+   - Go to your Vercel Project Settings -> Integrations.
+   - Add **Convex**.
+   - Ensure "Production" and "Preview" environments are enabled.
+   - Keep "Custom Prefix" empty.
+   
+2. **Build Configuration**:
+   - We have added a `vercel.json` file to the root.
+   - This automatically overrides the build command to: `npx convex deploy --cmd 'npm run build'`.
+   - **You do NOT need to manually change settings in Vercel dashboard.**
+
+3. **Deploy**:
+   - Push your changes to GitHub.
+   - Vercel will detect `vercel.json` and handle the rest.
 
 ## 4. Local Development
 ```bash
