@@ -4,6 +4,7 @@ import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { routing } from '@/i18n/config';
 
 const inter = Inter({
@@ -46,7 +47,9 @@ export default async function RootLayout({
         <html lang={locale} dir={dir}>
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                 <NextIntlClientProvider messages={messages}>
-                    {children}
+                    <ConvexClientProvider>
+                        {children}
+                    </ConvexClientProvider>
                 </NextIntlClientProvider>
             </body>
         </html>
