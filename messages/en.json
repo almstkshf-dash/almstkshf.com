@@ -27,7 +27,9 @@
     "status": "Status",
     "priority": "Priority",
     "download": "Download PDF",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "generate_report": "Generate Report",
+    "analyze_tone": "Analyze Tone"
   },
   "Footer": {
     "about": "About ALMSTKSHF",
@@ -37,7 +39,14 @@
     "legal": "Legal",
     "rights": "All rights reserved",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "support": "Support",
+    "sitemap": "Sitemap",
+    "status": "Status",
+    "global_network": "Global Network",
+    "coming_soon": "Coming Soon",
+    "address_dubai": "Dubai: One Central 9th Floor - Trade Center",
+    "address_abu_dhabi": "Abu Dhabi: Al Khatem Tower - Al Maryah Island"
   },
   "CaseStudies": {
     "lexcora": {
@@ -159,7 +168,13 @@
             "a": "It uses a fine-grained Role-Based Access System. You can control view/edit rights for every module using templates like Managing Partner, Lawyer, or Accountant."
           }
         }
-      }
+      },
+      "cta_visit": "Visit Website",
+      "cta_demo": "Book a Demo",
+      "cta_ready": "Ready to transform your practice?",
+      "cta_join": "Join the elite circle of law firms powered by LEXCORA governance and intelligence.",
+      "cta_start": "Get Started Now",
+      "badge_erp": "Advanced Legal ERP"
     },
     "styling": {
       "title": "Smart Styling Assistant",
@@ -212,6 +227,41 @@
         "role": "COO",
         "desc": "Eng. Rami Kamel is a cybersecurity engineer and co-founder of the AlMstkshf media intelligence platform. With a strong background in secure systems design and AI integration, he leads the technical architecture behind real-time sentiment analysis and multi-source media monitoring. Rami is known for his ability to merge data security with smart decision-support tools, enabling government and enterprise clients across the UAE to act on media insights with confidence."
       }
+    },
+    "badge": "Leadership Team",
+    "expertise": "Expertise",
+    "focus": "Focus",
+    "strategy": "Strategy & Leadership",
+    "innovation": "AI Innovation",
+    "quote": "At Almstkshf, we are not just analysts; we are architects of clarity in an era of information overload."
+  },
+  "AI": {
+    "badge": "Generative AI Leadership",
+    "deploy": "Deploy Agent",
+    "view_caps": "View Capabilities",
+    "status": "Agent Active",
+    "instruction": "awaiting_instruction...",
+    "prompt": "PROMPT",
+    "response": "AGENT RESPONSE",
+    "capabilities": {
+      "title": "On-Demand Intelligence",
+      "subtitle": "AI-Powered Workflow",
+      "s1": {
+        "title": "Speech-to-Strategy",
+        "desc": "Convert press conferences and broadcasts into actionable strategy drafts instantly."
+      },
+      "s2": {
+        "title": "Multi-Channel Briefs",
+        "desc": "Generate tailored content for Twitter, LinkedIn, and Official Statements in one click."
+      },
+      "s3": {
+        "title": "Tactical Response",
+        "desc": "On-demand counter-messaging based on real-time sentiment shifts."
+      }
+    },
+    "integration": {
+      "title": "Integrated directly into your leadership workflow",
+      "desc": "The Almstkshf AI Agent doesn't just talk — it acts. It connects with your monitoring data to provide insights that are contextually accurate and tactically sound."
     }
   }
 }

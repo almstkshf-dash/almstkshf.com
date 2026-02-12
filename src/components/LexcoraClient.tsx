@@ -67,7 +67,7 @@ export default function LexcoraClient() {
                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold uppercase tracking-widest"
                             >
                                 <Scale className="w-4 h-4" />
-                                <span>Advanced Legal ERP</span>
+                                <span>{t("badge_erp")}</span>
                             </motion.div>
 
                             <motion.h1
@@ -98,11 +98,11 @@ export default function LexcoraClient() {
                                     target="_blank"
                                     className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-1 flex items-center gap-2"
                                 >
-                                    Visit Website
+                                    {t("cta_visit")}
                                     <ExternalLink className="w-4 h-4" />
                                 </Link>
                                 <button className="px-8 py-4 bg-slate-900 border border-slate-800 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">
-                                    Book a Demo
+                                    {t("cta_demo")}
                                 </button>
                             </motion.div>
                         </div>
@@ -284,16 +284,16 @@ export default function LexcoraClient() {
                 <Container>
                     <div className="relative rounded-[3rem] overflow-hidden bg-blue-600 p-12 md:p-24 text-center space-y-8">
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"></div>
-                        <h2 className="text-4xl md:text-6xl font-bold relative z-10">Ready to transform your practice?</h2>
+                        <h2 className="text-4xl md:text-6xl font-bold relative z-10">{t("cta_ready")}</h2>
                         <p className="text-blue-100 text-lg max-w-2xl mx-auto relative z-10">
-                            Join the elite circle of law firms powered by LEXCORA governance and intelligence.
+                            {t("cta_join")}
                         </p>
                         <div className="flex justify-center gap-4 relative z-10">
                             <Link
                                 href="https://lexcora-mbh.com"
                                 className="px-10 py-5 bg-white text-blue-600 rounded-2xl font-bold hover:scale-105 transition-transform"
                             >
-                                Get Started Now
+                                {t("cta_start")}
                             </Link>
                         </div>
                     </div>

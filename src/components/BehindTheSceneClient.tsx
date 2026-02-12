@@ -37,7 +37,7 @@ export default function BehindTheSceneClient() {
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold uppercase tracking-widest"
                     >
                         <Award className="w-4 h-4" />
-                        <span>Leadership Team</span>
+                        <span>{t("badge")}</span>
                     </motion.div>
 
                     <motion.h1
@@ -112,13 +112,13 @@ export default function BehindTheSceneClient() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-2">
                                         <GraduationCap className="w-5 h-5 text-slate-500" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Expertise</p>
-                                        <p className="text-sm text-slate-300">Strategy & Leadership</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("expertise")}</p>
+                                        <p className="text-sm text-slate-300">{t("strategy")}</p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-2">
                                         <Award className="w-5 h-5 text-slate-500" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Focus</p>
-                                        <p className="text-sm text-slate-300">AI Innovation</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("focus")}</p>
+                                        <p className="text-sm text-slate-300">{t("innovation")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +136,7 @@ export default function BehindTheSceneClient() {
                     <div className="relative inline-block">
                         <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-blue-500">"</span>
                         <h2 className="text-3xl md:text-5xl font-light italic text-white max-w-4xl mx-auto leading-tight">
-                            At Almstkshf, we are not just analysts; we are architects of clarity in an era of information overload.
+                            {t("quote")}
                         </h2>
                         <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-blue-500">"</span>
                     </div>

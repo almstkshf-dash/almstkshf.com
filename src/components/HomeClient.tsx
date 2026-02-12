@@ -170,8 +170,8 @@ export default function HomeClient() {
 
                                 {feature.id === 'ai_agent' && (
                                     <div className="mt-8 flex gap-3">
-                                        <div className="px-4 py-2 bg-slate-950/50 border border-slate-800 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-500">Generate Report</div>
-                                        <div className="px-4 py-2 bg-slate-950/50 border border-slate-800 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-500">Analyze Tone</div>
+                                        <div className="px-4 py-2 bg-slate-950/50 border border-slate-800 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Common.generate_report')}</div>
+                                        <div className="px-4 py-2 bg-slate-950/50 border border-slate-800 rounded-xl text-[10px] font-bold uppercase tracking-widest text-slate-500">{t('Common.analyze_tone')}</div>
                                     </div>
                                 )}
 

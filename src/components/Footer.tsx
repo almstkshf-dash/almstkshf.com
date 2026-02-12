@@ -91,7 +91,7 @@ export default function Footer() {
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-slate-400 text-sm hover:text-white transition-colors group cursor-pointer">
                                 <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                <span>Dubai: One Central 9th Floor - Trade Center<br />Abu Dhabi: Al Khatem Tower - Al Maryah Island</span>
+                                <span>{t('address_dubai')}<br />{t('address_abu_dhabi')}</span>
                             </li>
                             <li className="flex items-center gap-3 text-slate-400 text-sm hover:text-white transition-colors group">
                                 <Phone className="w-5 h-5 text-blue-500 flex-shrink-0" />
@@ -125,10 +125,10 @@ export default function Footer() {
 
                         {/* Domain Switcher Placeholder */}
                         <div className="mt-8 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
-                            <p className="text-xs text-slate-500 mb-3 uppercase font-bold tracking-widest">Global Network</p>
+                            <p className="text-xs text-slate-500 mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-300 rounded font-medium border border-slate-700">UAE</span>
-                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-500 rounded font-medium border border-slate-700/50 opacity-50">KSA (Coming Soon)</span>
+                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-500 rounded font-medium border border-slate-700/50 opacity-50">KSA ({t('coming_soon')})</span>
                             </div>
                         </div>
                     </div>
@@ -138,9 +138,9 @@ export default function Footer() {
                 <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 uppercase tracking-widest font-medium">
                     <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
-                        <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">Support</Link>
-                        <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
-                        <button className="hover:text-white transition-colors">Status</button>
+                        <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">{t('support')}</Link>
+                        <Link href="/sitemap.xml" className="hover:text-white transition-colors">{t('sitemap')}</Link>
+                        <button className="hover:text-white transition-colors">{t('status')}</button>
                     </div>
                 </div>
             </Container>

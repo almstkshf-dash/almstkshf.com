@@ -169,8 +169,8 @@ export default function Navbar() {
                             exit={{ x: isRTL ? "100%" : "-100%" }}
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
                             className={clsx(
-                                "fixed top-0 bottom-0 w-[80%] max-w-sm bg-slate-950 border-r border-slate-800 z-50 p-6 overflow-y-auto",
-                                isRTL ? "right-0 border-l border-r-0" : "left-0"
+                                "fixed top-0 bottom-0 w-[80%] max-w-sm bg-slate-950 border-e border-slate-800 z-50 p-6 overflow-y-auto",
+                                isRTL ? "right-0" : "left-0"
                             )}
                         >
                             <div className="flex items-center justify-between mb-8">
@@ -193,7 +193,7 @@ export default function Navbar() {
                                                 <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                     {t(item.label)}
                                                 </div>
-                                                <div className="pl-4 border-l border-slate-800 space-y-3">
+                                                <div className="ps-4 border-s border-slate-800 space-y-3">
                                                     {item.children.map(child => (
                                                         <Link
                                                             key={child.label}
