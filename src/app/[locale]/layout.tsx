@@ -21,10 +21,48 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
     display: "swap",
 });
 
-export const metadata: Metadata = {
-    title: "ALMSTKSHF",
-    description: "Advanced Media & Legal Solutions",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+
+    return {
+        title: {
+            default: isAr ? "المستكشف - حلول إعلامية وقانونية متقدمة" : "ALMSTKSHF - Advanced Media & Legal Solutions",
+            template: `%s | ${isAr ? "المستكشف" : "ALMSTKSHF"}`
+        },
+        description: isAr
+            ? "المستكشف هو شريكك الاستراتيجي للرصد الإعلامي الذكي والحلول القانونية المبنية على البيانات."
+            : "ALMSTKSHF is your strategic partner for intelligent media monitoring and data-driven legal solutions.",
+        keywords: ["AI", "Media Monitoring", "Legal Tech", "UAE", "Data Analysis", "Strategic Advisor"],
+        openGraph: {
+            type: "website",
+            locale: locale === "ar" ? "ar_AE" : "en_US",
+            url: `https://almstkshf.com/${locale}`,
+            siteName: "ALMSTKSHF",
+            images: [
+                {
+                    url: "/og-image.jpg", // Make sure to add this image
+                    width: 1200,
+                    height: 630,
+                    alt: "ALMSTKSHF",
+                }
+            ],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "ALMSTKSHF",
+            description: "Advanced Media & Legal Solutions",
+            images: ["/og-image.jpg"],
+        },
+        alternates: {
+            canonical: `https://almstkshf.com/${locale}`,
+            languages: {
+                en: "https://almstkshf.com/en",
+                ar: "https://almstkshf.com/ar",
+            },
+        },
+    };
+}
 
 export default async function RootLayout({
     children,

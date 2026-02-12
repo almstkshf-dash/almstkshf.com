@@ -1,16 +1,16 @@
-import { 
-  Building2, 
-  Scale, 
-  Wand2, 
-  Microscope, 
-  Settings, 
-  BarChart3, 
-  Mic2, 
-  Newspaper, 
-  FileText, 
-  Activity, 
-  ShieldAlert, 
-  Home 
+import {
+  Building2,
+  Scale,
+  Wand2,
+  Microscope,
+  Settings,
+  BarChart3,
+  Mic2,
+  Newspaper,
+  FileText,
+  Activity,
+  ShieldAlert,
+  Home
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -32,10 +32,10 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: Building2,
     children: [
       {
-        label: "lexcura_lawyer",
-        href: "/case-studies/lexcura-lawyer",
+        label: "lexcora",
+        href: "/case-studies/lexcora",
         icon: Scale,
-        description: "AI-powered legal assistance platform"
+        description: "Premier ERP suite for high-net-worth law firms"
       },
       {
         label: "styling_assistant",

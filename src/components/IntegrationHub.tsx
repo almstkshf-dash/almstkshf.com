@@ -16,7 +16,7 @@ interface Integration {
 
 const initialIntegrations: Integration[] = [
     { id: "1", name: "Media Pulse API", description: "Connect to live sentiment data streams.", status: "connected", apiKey: "mk_live_51P...xxxxxxxxxxxxxx" },
-    { id: "2", name: "Lexcura Core", description: "Legal document processing engine integration.", status: "connected", apiKey: "lc_prod_v2...xxxxxxxxxxxxxx" },
+    { id: "2", name: "LEXCORA Suite", description: "Legal ERP and document processing engine integration.", status: "connected", apiKey: "lc_prod_v2...xxxxxxxxxxxxxx" },
     { id: "3", name: "Strategic Advisor Webhooks", description: "Trigger events based on AI insights.", status: "disconnected" },
 ];
 

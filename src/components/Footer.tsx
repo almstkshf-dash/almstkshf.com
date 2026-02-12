@@ -61,14 +61,22 @@ export default function Footer() {
                                     </Link>
                                 </li>
                             ))}
-                            {/* Static links if needed */}
                             <li>
                                 <Link
-                                    href={`/${locale}/case-studies/lexcura-lawyer`}
+                                    href={`/${locale}/case-studies/lexcora`}
                                     className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
-                                    {tNav('lexcura_lawyer')}
+                                    {tNav('lexcora')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={`/${locale}/contact`}
+                                    className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
+                                    {tNav('contact')}
                                 </Link>
                             </li>
                         </ul>
@@ -130,8 +138,8 @@ export default function Footer() {
                 <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 uppercase tracking-widest font-medium">
                     <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
-                        <button className="hover:text-white transition-colors">Security</button>
-                        <button className="hover:text-white transition-colors">Sitemap</button>
+                        <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">Support</Link>
+                        <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
                         <button className="hover:text-white transition-colors">Status</button>
                     </div>
                 </div>

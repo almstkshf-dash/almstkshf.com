@@ -1,0 +1,222 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import Container from "@/components/ui/Container";
+import {
+    Scale,
+    ShieldCheck,
+    LayoutGrid,
+    Users,
+    Lock,
+    Zap,
+    Search,
+    CheckCircle2,
+    MessageSquare,
+    Briefcase,
+    Globe,
+    ExternalLink
+} from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+
+export default function LexcoraClient() {
+    const t = useTranslations("CaseStudies.lexcora");
+
+    const categories = [
+        {
+            id: "productivity",
+            icon: Briefcase,
+            items: ["case_files", "deadlines", "vault"]
+        },
+        {
+            id: "client",
+            icon: Users,
+            items: ["portal", "transparency", "booking"]
+        },
+        {
+            id: "governance",
+            icon: ShieldCheck,
+            items: ["approvals", "audit", "security"]
+        },
+        {
+            id: "intelligence",
+            icon: Zap,
+            items: ["assistant", "ui"]
+        },
+        {
+            id: "integrations",
+            icon: Globe,
+            items: ["comm", "workspace"]
+        }
+    ];
+
+    return (
+        <main className="min-h-screen pb-20 bg-slate-950 text-white">
+            {/* Hero Section */}
+            <section className="relative pt-32 pb-20 overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-blue-600/10 to-transparent blur-3xl rounded-full opacity-30"></div>
+
+                <Container>
+                    <div className="flex flex-col lg:flex-row items-center gap-16">
+                        <div className="flex-1 space-y-8 text-center lg:text-left rtl:lg:text-right">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold uppercase tracking-widest"
+                            >
+                                <Scale className="w-4 h-4" />
+                                <span>Advanced Legal ERP</span>
+                            </motion.div>
+
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-6xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400"
+                            >
+                                {t("title")}
+                            </motion.h1>
+
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
+                            >
+                                {t("subtitle")}
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex flex-wrap gap-4 justify-center lg:justify-start"
+                            >
+                                <Link
+                                    href="https://lexcora-mbh.com"
+                                    target="_blank"
+                                    className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-1 flex items-center gap-2"
+                                >
+                                    Visit Website
+                                    <ExternalLink className="w-4 h-4" />
+                                </Link>
+                                <button className="px-8 py-4 bg-slate-900 border border-slate-800 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">
+                                    Book a Demo
+                                </button>
+                            </motion.div>
+                        </div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex-1 w-full max-w-xl aspect-[4/3] relative rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/50 backdrop-blur-xl group"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-purple-500/20 opacity-50"></div>
+                            <div className="relative h-full flex items-center justify-center p-8">
+                                <div className="grid grid-cols-2 gap-4 w-full h-full opacity-60">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <div key={i} className="bg-slate-950/50 border border-slate-800 rounded-2xl animate-pulse"></div>
+                                    ))}
+                                </div>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-9xl font-black text-white/5 select-none uppercase tracking-tighter">
+                                    LEXCORA
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                </Container>
+            </section>
+
+            {/* Detailed Features */}
+            <section className="py-24">
+                <Container>
+                    <div className="space-y-32">
+                        {categories.map((cat, catIdx) => (
+                            <div key={cat.id} className="space-y-12">
+                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-900 pb-12">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3 text-blue-500 font-bold uppercase tracking-[0.2em] text-sm">
+                                            <cat.icon className="w-5 h-5" />
+                                            <span>{t(`sections.${cat.id}.title`)}</span>
+                                        </div>
+                                        <h2 className="text-4xl md:text-5xl font-bold">{t(`sections.${cat.id}.subtitle`)}</h2>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {cat.items.map((item, itemIdx) => (
+                                        <motion.div
+                                            key={item}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: itemIdx * 0.1 }}
+                                            className="group p-8 bg-slate-900/30 border border-slate-800 rounded-3xl hover:bg-slate-900/50 transition-all hover:border-blue-500/30"
+                                        >
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                    <CheckCircle2 className="w-6 h-6 text-blue-400" />
+                                                </div>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <button className="text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-blue-400 transition-colors">
+                                                        {t("cta_pricing")}
+                                                    </button>
+                                                    <button className="text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-blue-400 transition-colors">
+                                                        {t("cta_case_studies")}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-bold mb-3 group-hover:text-blue-400 transition-colors">
+                                                {t(`sections.${cat.id}.items.${item}.title`)}
+                                            </h3>
+                                            <p className="text-slate-400 text-sm leading-relaxed">
+                                                {t(`sections.${cat.id}.items.${item}.desc`)}
+                                            </p>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Container>
+            </section>
+
+            {/* Trusted By */}
+            <section className="py-24 border-t border-slate-900 bg-slate-950">
+                <Container>
+                    <div className="text-center space-y-12">
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-slate-500">{t("trusted")}</h2>
+                        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
+                            {/* Placeholder Logos */}
+                            <div className="text-2xl font-black italic">LAW FIRM ALPHA</div>
+                            <div className="text-2xl font-black italic">GLOBAL LEGAL CO</div>
+                            <div className="text-2xl font-black italic">EMIRATES COUNSEL</div>
+                            <div className="text-2xl font-black italic">ZED & ASSOCIATES</div>
+                        </div>
+                    </div>
+                </Container>
+            </section>
+
+            {/* CTA Final */}
+            <section className="py-24">
+                <Container>
+                    <div className="relative rounded-[3rem] overflow-hidden bg-blue-600 p-12 md:p-24 text-center space-y-8">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"></div>
+                        <h2 className="text-4xl md:text-6xl font-bold relative z-10">Ready to transform your practice?</h2>
+                        <p className="text-blue-100 text-lg max-w-2xl mx-auto relative z-10">
+                            Join the elite circle of law firms powered by LEXCORA governance and intelligence.
+                        </p>
+                        <div className="flex justify-center gap-4 relative z-10">
+                            <Link
+                                href="https://lexcora-mbh.com"
+                                className="px-10 py-5 bg-white text-blue-600 rounded-2xl font-bold hover:scale-105 transition-transform"
+                            >
+                                Get Started Now
+                            </Link>
+                        </div>
+                    </div>
+                </Container>
+            </section>
+        </main>
+    );
+}

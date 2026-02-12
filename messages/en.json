@@ -2,7 +2,7 @@
   "Navigation": {
     "landing_page": "Home",
     "case_studies": "Case Studies",
-    "lexcura_lawyer": "Lexcura Lawyer",
+    "lexcora": "LEXCORA",
     "styling_assistant": "Smart Styling Assistant",
     "technical_solutions": "Technical Solutions",
     "smart_media_assistant": "Smart Media Assistant",
@@ -13,12 +13,14 @@
     "press_monitoring": "Press Publication Monitoring",
     "periodic_reports": "Periodic Reports",
     "media_pulse": "Media Pulse",
-    "crisis_management": "Crisis Management Plans"
+    "crisis_management": "Crisis Management Plans",
+    "get_started": "Get Started",
+    "contact": "Contact Us"
   },
   "Common": {
     "app_name": "ALMSTKSHF",
     "slogan": "We Develop To Lead",
-    "description": "Strategic Media Advisor is an AI designed to provide strategic media monitoring and public opinion analysis for decision-makers, particularly within government, security, and public relations sectors in the Gulf and broader Arab world.",
+    "description": "Almstkshf is a UAE-based firm specialized in building intelligent solutions for executive-level institutions. We deliver advanced platforms for media monitoring and public sentiment analysis, along with custom-built ERP/CRM/BI systems tailored to critical sectors such as government, legal, security, and public services. We don’t build disconnected tools. We develop integrated ecosystems that generate clarity, connect insight to execution, and empower leadership to act with precision and confidence.",
     "try_ai": "Try ALMSTKSHF Media Assist",
     "dashboard": "Dashboard",
     "status": "Status",
@@ -37,15 +39,96 @@
     "terms": "Terms of Service"
   },
   "CaseStudies": {
-    "lexcura": {
-      "title": "Lexcura Lawyer: AI Legal Intelligence",
-      "subtitle": "Transforming legal workflows with secure, context-aware AI",
-      "feature_analysis": "Smart Document Analysis",
-      "feature_analysis_desc": "Scan and understand thousands of pages of legal precedents in seconds.",
-      "feature_drafting": "Automated Legal Drafting",
-      "feature_drafting_desc": "Generate high-quality legal drafts based on specific case context.",
-      "feature_insights": "Predictive Legal Insights",
-      "feature_insights_desc": "Gain edge in litigation with data-driven outcome predictions."
+    "lexcora": {
+      "title": "LEXCORA",
+      "subtitle": "The premier ERP suite designed for high-net-worth law firms. Seamlessly integrate productivity, governance, and client experience.",
+      "sections": {
+        "productivity": {
+          "title": "Productivity & Case Management",
+          "subtitle": "Streamline operations with fully expandable modules.",
+          "items": {
+            "case_files": {
+              "title": "Smart Case Files",
+              "desc": "Cross-referencing, linking, and deep file attachments."
+            },
+            "deadlines": {
+              "title": "Judicial Deadlines",
+              "desc": "Automated countdown timers for appeals and objections."
+            },
+            "vault": {
+              "title": "Confidential Vault",
+              "desc": "Restricted access sections for sensitive case materials."
+            }
+          }
+        },
+        "client": {
+          "title": "Client Experience & Collaboration",
+          "subtitle": "A dedicated portal to elevate your client relationships.",
+          "items": {
+            "portal": {
+              "title": "Client Portal",
+              "desc": "Secure access for requests, uploads, and viewing case status."
+            },
+            "transparency": {
+              "title": "Financial Transparency",
+              "desc": "Real-time balance tracking and expense summaries."
+            },
+            "booking": {
+              "title": "Appointment Booking",
+              "desc": "Integrated scheduling for seamless consultations."
+            }
+          }
+        },
+        "governance": {
+          "title": "Governance, Control & Security",
+          "subtitle": "Uncompromising security and audit trails.",
+          "items": {
+            "approvals": {
+              "title": "Approvals Center",
+              "desc": "Centralized control for invoices, custody, and expenses."
+            },
+            "audit": {
+              "title": "Audit Logs",
+              "desc": "Timestamped tracking of every system action by user."
+            },
+            "security": {
+              "title": "Enterprise Security",
+              "desc": "Private backend database with remote secure access."
+            }
+          }
+        },
+        "intelligence": {
+          "title": "Intelligence & Customization",
+          "subtitle": "Tailored for the modern legal professional.",
+          "items": {
+            "assistant": {
+              "title": "Legal Text Assistant",
+              "desc": "Retrieve verified UAE statutory material instantly."
+            },
+            "ui": {
+              "title": "Customizable UI",
+              "desc": "12 themes with tailored fonts and color palettes."
+            }
+          }
+        },
+        "integrations": {
+          "title": "Seamless Integrations",
+          "subtitle": "Connect with the tools you use daily.",
+          "items": {
+            "comm": {
+              "title": "Communication",
+              "desc": "WhatsApp Business & Microsoft 365 integration."
+            },
+            "workspace": {
+              "title": "Workspace",
+              "desc": "Full Google Workspace connectivity."
+            }
+          }
+        }
+      },
+      "cta_pricing": "See pricing",
+      "cta_case_studies": "View case studies",
+      "trusted": "Trusted by Industry Leaders"
     },
     "styling": {
       "title": "Smart Styling Assistant",
@@ -57,5 +140,16 @@
       "feature_inventory": "Smart Inventory Sync",
       "feature_inventory_desc": "Seamlessly integrate with your favorite retailers for real-time availability."
     }
+  },
+  "Contact": {
+    "title": "Get in Touch",
+    "subtitle": "Have questions about our AI-driven solutions? Our team of experts is ready to assist you.",
+    "name": "Full Name",
+    "email": "Email Address",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Thank you! Your message has been sent.",
+    "error": "Something went wrong. Please try again."
   }
 }

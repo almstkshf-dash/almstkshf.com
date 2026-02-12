@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, Search } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
@@ -22,7 +22,6 @@ export default function Navbar() {
 
     const toggleLocale = () => {
         const newLocale = locale === "en" ? "ar" : "en";
-        // Simple way to switch locale by replacing the path segment
         const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
         router.push(newPath);
     };
@@ -36,16 +35,8 @@ export default function Navbar() {
 
                     {/* Logo */}
                     <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-xl tracking-tighter text-white group">
-                        <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-white/10 flex items-center justify-center p-1 transition-transform group-hover:scale-110">
-                            {/* Placeholder for the logo image - assuming logo.png in public folder */}
-                            <Image
-                                src="/logo.png"
-                                alt="ALMSTKSHF Logo"
-                                width={40}
-                                height={40}
-                                className="object-contain"
-                                priority
-                            />
+                        <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform group-hover:scale-110 border border-blue-500/20">
+                            <Search className="w-6 h-6 text-blue-400" />
                         </div>
                         <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
                             {tCommon('app_name')}
@@ -95,6 +86,7 @@ export default function Navbar() {
                                                                 key={child.label}
                                                                 href={`/${locale}${child.href}`}
                                                                 className="block p-3 rounded-lg hover:bg-slate-800 transition-colors group/item"
+                                                                onClick={() => setActiveDropdown(null)}
                                                             >
                                                                 <div className="flex items-start gap-3">
                                                                     <div className="mt-1 p-1.5 bg-slate-800 rounded-md group-hover/item:bg-blue-500/20 group-hover/item:text-blue-400 transition-colors">
@@ -146,7 +138,7 @@ export default function Navbar() {
                         </button>
                         <div className="h-6 w-px bg-slate-800"></div>
                         <button className="px-4 py-2 text-sm font-semibold bg-white text-slate-950 rounded-full hover:bg-slate-200 transition-colors">
-                            Get Started
+                            {t('get_started')}
                         </button>
                     </div>
 
@@ -159,7 +151,6 @@ export default function Navbar() {
                     </button>
                 </div>
             </Container>
-
 
             {/* Mobile Drawer */}
             <AnimatePresence>

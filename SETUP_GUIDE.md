@@ -28,7 +28,25 @@ This project is configured for Vercel with automated Convex deployments.
    - Push your changes to GitHub.
    - Vercel will detect `vercel.json` and handle the rest.
 
-## 4. Local Development
+## 4. Authentication (Clerk + Convex)
+This project uses **Clerk** for identity and **Convex** for the backend database.
+
+1. **Create a Clerk App**:
+   - Go to [clerk.com](https://clerk.com) and create a new application.
+   - Copy `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` to your `.env.local`.
+
+2. **Connect Clerk to Convex**:
+   - In Convex Dashboard, go to **Settings** -> **Auth**.
+   - Click **Add Configuration**.
+   - Choose **Clerk**.
+   - Enter your **Issuer URL** (found in Clerk -> Auth -> JWT Templates -> Convex).
+   - Click **Create Config**.
+
+3. **Vercel Setup**:
+   - Add your Clerk keys to Vercel Environment Variables.
+   - The app is already configured to use these keys in `ConvexClientProvider.tsx`.
+
+## 5. Local Development
 ```bash
 npm install
 npm run dev
@@ -71,5 +89,5 @@ If you encounter `postcss` or `tailwindcss` errors during build:
 ### 🔒 Phase 4: Technical Solutions & Identity
 - [x] **Integration Hub**: API Key management UI
 - [x] **KYC Compliance**: Status checks and verification flow
-- [ ] **Authentication**: Link with Clerk or Convex Auth (if required)
+- [x] **Authentication**: Integrated with Clerk & Convex Auth
 
