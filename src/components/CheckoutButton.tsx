@@ -47,25 +47,15 @@ export default function CheckoutButton({
                 throw new Error(data.error || 'Failed to create checkout session');
             }
 
-            // Redirect to Stripe Checkout
-            const stripe = await getStripe();
-
-            if (!stripe) {
-                throw new Error('Failed to load Stripe');
-            }
-
-            const { error } = await stripe.redirectToCheckout({
-                sessionId: data.sessionId,
-            });
-
-            if (error) {
-                console.error('Stripe redirect error:', error);
-                alert('Failed to redirect to checkout. Please try again.');
+            // Redirect to Stripe Checkout URL
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                throw new Error('No checkout URL returned');
             }
         } catch (error) {
             console.error('Checkout error:', error);
             alert('An error occurred. Please try again.');
-        } finally {
             setLoading(false);
         }
     };
