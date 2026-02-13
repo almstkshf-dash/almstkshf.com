@@ -88,10 +88,10 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         description: "Print and digital publication tracking"
       },
       {
-        label: "periodic_reports",
-        href: "/media-monitoring/reports",
+        label: "central_media_repository",
+        href: "/media-monitoring/central-media-repository",
         icon: FileText,
-        description: "Comprehensive analytical reports"
+        description: "Centralized digital asset management"
       },
       {
         label: "media_pulse",

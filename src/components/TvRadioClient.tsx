@@ -50,7 +50,7 @@ export default function TvRadioClient() {
                             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest"
                         >
                             <Radio className="w-3 h-3" />
-                            <span>Global Coverage</span>
+                            <span>{t("cover_label")}</span>
                         </motion.div>
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
@@ -200,6 +200,59 @@ export default function TvRadioClient() {
                             </div>
                         </motion.div>
                     </div>
+                </Container>
+            </section>
+
+            {/* Use Case Scenarios Section */}
+            <section className="py-24 border-t border-slate-900">
+                <Container>
+                    <div className="max-w-4xl mx-auto text-center mb-16 space-y-4">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                            {t("use_cases.title")}
+                        </h2>
+                        <p className="text-slate-400 text-lg leading-relaxed">
+                            {t("use_cases.intro")}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {["case1", "case2", "case3", "case4"].map((caseId, idx) => (
+                            <motion.div
+                                key={caseId}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-slate-800/50 hover:bg-slate-900/60 transition-all group relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full group-hover:bg-blue-500/10 transition-colors"></div>
+                                <div className="space-y-6 relative z-10">
+                                    <div className="space-y-2">
+                                        <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                                            {t(`use_cases.items.${caseId}.title`)}
+                                        </h3>
+                                        <p className="inline-block px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                                            {t(`use_cases.items.${caseId}.role`)}
+                                        </p>
+                                    </div>
+                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                        {t(`use_cases.items.${caseId}.scenario`)}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mt-16 p-8 rounded-[2rem] bg-blue-600/5 border border-blue-500/20 text-center"
+                    >
+                        <p className="text-blue-100/80 italic leading-relaxed max-w-4xl mx-auto">
+                            "{t("use_cases.conclusion")}"
+                        </p>
+                    </motion.div>
                 </Container>
             </section>
 

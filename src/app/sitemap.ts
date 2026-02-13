@@ -10,7 +10,7 @@ const routes = [
     '/technical-solutions/integration',
     '/media-monitoring/tv-radio',
     '/media-monitoring/press',
-    '/media-monitoring/reports',
+    '/media-monitoring/central-media-repository',
     '/media-monitoring/media-pulse',
     '/media-monitoring/crisis-management',
     '/contact',

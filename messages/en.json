@@ -11,7 +11,7 @@
     "media_monitoring": "Media Monitoring",
     "tv_radio_monitoring": "TV & Radio Monitoring",
     "press_monitoring": "Press Publication Monitoring",
-    "periodic_reports": "Periodic Reports",
+    "central_media_repository": "Central Media Repository",
     "media_pulse": "Media Pulse",
     "crisis_management": "Crisis Management Plans",
     "get_started": "Get Started",
@@ -331,6 +331,7 @@
   "MediaMonitoring": {
     "tv_radio": {
       "title": "Worldwide Broadcast Monitoring",
+      "cover_label": "Global Coverage",
       "description": "ALMSTKSHF provides you with all broadcast information you need for fact-based decisions, reputation management, strategy improvements and more. Keep an eye on the media coverage of all the topics relevant to you: your own business, your competition, or other keywords of interest.",
       "analytics": "Track, share and analyze media content of more than 3400 channels worldwide in corresponding languages with the most comprehensive media monitoring solution available – 24/7, with real-time alerts. 5 continents, multiple languages, 75+ countries",
       "alerts": {
@@ -348,6 +349,127 @@
       "custom_profiles": {
         "title": "Custom Search Profiles",
         "description": "As one of the best media monitoring services, MEDIA PULSE allows you to create custom search profiles and track the topics that matter most to your business. You can view your latest clips in real time, analyzing, and editing them with ease. Whenever clips matching your search terms are broadcast, you receive immediate alerts, empowering you to act quickly. The MEDIA PULSE system is among the best media monitoring tools for staying ahead in the rapid media landscape"
+      },
+      "use_cases": {
+        "title": "Use Case Scenarios",
+        "intro": "To illustrate how different users derive value from ALMSTKSHF, here are a few realistic use case scenarios:",
+        "items": {
+          "case1": {
+            "title": "Use Case 1: Brand Reputation Crisis Management",
+            "role": "Role: PR Manager",
+            "scenario": "A PR manager at a large company uses ALMSTKSHF to monitor mentions of their brand and products. One morning, the platform’s alert system notifies her (via WhatsApp and email) that there’s a sudden surge in negative sentiment related to a new product launch. She logs into the dashboard and sees a spike in mentions and a flurry of negative tweets citing a product malfunction. Using ALMSTKSHF, she drills down into the social listening insights: the sentiment analysis confirms a high negativity score, and theme extraction shows the word “fire hazard” trending. She activates a crisis case workspace and invites product team members and customer support to collaborate. Together, they review the top mentions and identify an originating post (a video of the product catching fire) that went viral. The PR manager quickly uses the Media Publisher to draft an official statement and schedule it across social media and to press contacts. As responses come in, the team tracks media coverage of the incident via the monitoring module. The platform’s real-time updates show when sentiment starts to recover after their statement. Later, they generate a crisis report covering the timeline of the event, key influencers who drove the story, and how the crisis was resolved."
+          },
+          "case2": {
+            "title": "Use Case 2: Criminal Network Investigation",
+            "role": "Role: Intelligence Analyst (Government)",
+            "scenario": "An intelligence analyst is investigating an online extremist group. He creates a new Case in ALMSTKSHF for “Operation Eastern Falcon” and lists a set of keywords to monitor across social media, forums, and the dark web. The platform immediately begins pulling historical data and sets up continuous monitoring. The analyst uses the link analysis graph visualization to map connections between profiles talking about the group. He discovers through the platform’s analysis that several seemingly unrelated individuals are actually connected via mutual followers and shared content – revealing a potential cell. One particular Twitter account stands out as highly influential in spreading the group’s propaganda. The analyst uses the data enrichment tools to extract more info on that account: Social Links integration helps find associated profiles on other platforms and even uncovers an email address reuse via a breach database. The analyst also takes advantage of the TOR integration to anonymously browse a dark web forum where the group’s members congregate. Once enough intelligence is gathered, the analyst compiles a case report with all key findings using the platform’s reporting engine."
+          },
+          "case3": {
+            "title": "Use Case 3: Media Outreach and Coverage Tracking",
+            "role": "Role: Communications Director",
+            "scenario": "A communications director at a tech firm is planning a major product announcement. Using ALMSTKSHF’s Media Publisher, she drafts a press release complete with embedded images and video links. She selects a list of 50 journalists in the tech industry and schedules the press release to be sent at 9 AM next day. The release goes out automatically; using the Track News feature, she checks which journalists opened the email and downloaded the media kit. Throughout the day, she monitors the platform as news articles begin to appear. ALMSTKSHF’s media monitoring catches each mention of the product in online news and blogs. By evening, she generates an Analytics Report showing the day’s media coverage: number of articles published, estimated readership, overall sentiment of the coverage, and social media buzz. She shares a summarized dashboard with the executive team via a secure link. A week later, she also receives the platform’s automated Weekly Round-up Report that highlights the main media narratives for that week – her product launch is at the top, confirming the success of their campaign."
+          },
+          "case4": {
+            "title": "Use Case 4: Social Media Content Strategy",
+            "role": "Role: Social Media Manager",
+            "scenario": "A social media manager for a retail brand is planning next month’s content. Inside ALMSTKSHF, she uses the Post Scheduler to lay out a content calendar for multiple platforms. With the help of AI suggestions, she identifies the best times to post each day and even gets hashtag suggestions that are currently trending in her niche. She drafts posts for the first week, including images from last month’s photoshoot which she quickly found in the Media Center by searching the tag “summer collection”. She invites her team into the platform – they comment and tweak the copy right there, ensuring all feedback is consolidated. Once finalized, she schedules the posts. As they go live, ALMSTKSHF pulls in the engagement metrics. Halfway through the month, the manager reviews the Social Performance Dashboard: one particular post underperformed. Using the platform’s listening module, she checks if there was any negative conversation around it. She decides to swap out a planned post for a response addressing that feedback. By the end of the month, she uses ALMSTKSHF to generate a Monthly Engagement Report that informs next month’s strategy."
+          }
+        },
+        "conclusion": "Each scenario above demonstrates how ALMSTKSHF supports fast, informed decision-making: catching issues early, digging deep into data, and coordinating responses – whether it’s mitigating a crisis, uncovering hidden links in an investigation, amplifying a product launch, or refining social strategy."
+      }
+    },
+    "press": {
+      "title": "Press Publication Monitoring",
+      "cover_label": "Digital & Print Press",
+      "description": "ALMSTKSHF provides comprehensive monitoring of newspapers, magazines, and digital news portals. Stay informed about every mention of your brand in the press, track distribution, and measure the impact of your PR campaigns.",
+      "features": {
+        "digital_print": {
+          "title": "Digital & Print Coverage",
+          "desc": "Access a vast database of global and local press sources, including major newspapers and niche publications."
+        },
+        "publisher": {
+          "title": "Media Publisher",
+          "desc": "Distribute your press releases to a curated list of journalists and track pickup in real-time."
+        },
+        "analytics": {
+          "title": "ROI Analytics",
+          "desc": "Calculate Advertising Value Equivalency (AVE) and other key metrics to demonstrate the value of your media coverage."
+        },
+        "alerts": {
+          "title": "Automated Alerts",
+          "desc": "Get notified the moment your brand is mentioned or when a potential PR crisis is detected."
+        }
+      },
+      "use_cases": {
+        "title": "Meet our Users",
+        "intro": "Discover how professionals use Almstkshf to streamline their press monitoring and distribution workflows.",
+        "noor": {
+          "title": "Noor – PR/Communications Manager",
+          "role": "Business Owner / PR Manager",
+          "scenario": "Noor is responsible for her company’s public image and press relations. She values timely alerts on emerging news about her company, an easy way to distribute press releases, and simple reports she can share with executives.\n\nHow AlMstkshf helps: Noor uses Media Monitoring to keep track of brand mentions and competitor news. The Alerts notify her of any potential PR crises. She uses the Media Publisher to maintain a journalist contacts list and schedule press releases at optimal times. Post-campaign, she leverages one-click analytics reports (with metrics like advertising value equivalent of media coverage) to show ROI.\n\nThe intuitive dashboards and the fact that everything is in one place (media monitoring, social listening, and distribution) make it easy for Noor to manage her workflow without juggling multiple tools. Daily, weekly, monthly reports about your press release."
+        }
+      }
+    },
+    "central_media_repository": {
+      "title": "Central Media Repository",
+      "cover_label": "Media Intelligence Center",
+      "description": "AlMstkshf includes a Media Center which serves as a central repository for all digital assets – images, videos, audio files, documents – relevant to media and investigations. All files are stored securely and organized in a hierarchical folder structure with a clean, searchable interface.",
+      "intro": "The repository is organization-wide, preventing scattered content in emails or personal drives. Users no longer need to worry about lost or mismanaged files, as everything is in one place.",
+      "features": {
+        "smart_search": {
+          "title": "Smart Search & Tags",
+          "desc": "Every file in the Media Center can be tagged and has metadata (e.g. title, description, date, source). The system uses smart tagging to make assets easily searchable. For example, if a photo is uploaded, the system might automatically tag it with detected keywords using image recognition."
+        },
+        "bulk_upload": {
+          "title": "Bulk Upload & Ingestion",
+          "desc": "The Media Center supports bulk uploading of files. Whether importing an archive of thousands of images or ingesting daily batches of news clips, users can drag-and-drop large sets of files. The system will process them in the background, extracting text via OCR and generating metadata."
+        },
+        "facial_recognition": {
+          "title": "AI-Powered Facial Recognition",
+          "desc": "A standout feature is integrated facial recognition on images. When photos are added, the AI scans for human faces, cross-references with databases, and tags the person's name. You can even subscribe to face tags for real-time alerts."
+        },
+        "labeling_rating": {
+          "title": "Asset Labeling & Rating",
+          "desc": "Apply custom labels or ratings for organizational purposes. mark images as 'Approved' or rate them for quality. Labels help in workflow (e.g. 'Needs editing') and in strategic filtering."
+        },
+        "sharing_access": {
+          "title": "Secure Sharing & Access",
+          "desc": "Simple sharing of files or collections with secure links. External sharing can be password-protected. Manage permissions within teams to ensure a single source of truth and eliminate version confusion."
+        },
+        "versioning_audit": {
+          "title": "Versioning & Audit Log",
+          "desc": "Keep track of asset versions and maintain a full audit log of who accessed or downloaded files. Essential for security and ensuring sensitive material is handled correctly."
+        },
+        "secure_storage": {
+          "title": "Enterprise Storage",
+          "desc": "Server-side storage with full backups and redundancy. Designed to replace ad-hoc solutions like USB drives, mitigating security threats and accidental data loss."
+        }
+      },
+      "enterprise_hub": {
+        "title": "One Unified Hub for All Your Digital Assets",
+        "description": "The repository is organization-wide, preventing scattered content in emails or personal drives. Users no longer need to worry about lost or mismanaged files, as everything is in one place.",
+        "items": [
+          "Hierarchical folder structure",
+          "Organization-wide access control",
+          "Eliminate scattered content in emails",
+          "Encrypted military-grade storage"
+        ]
+      },
+      "visual_labels": {
+        "secure_vault": "SECURE_VAULT_ACTIVE",
+        "encrypting": "ENCRYPTING ASSETS..."
+      },
+      "advanced_capabilities": {
+        "title": "Advanced Capabilities",
+        "subtitle": "Every tool you need to manage, search, and secure your media intelligence.",
+        "transparency": "Full Transparency",
+        "backup_title": "Continuous Backup & Redundancy",
+        "learn_more": "Learn more about security"
+      },
+      "cta": {
+        "title": "Ready to centralize your media intelligence?",
+        "subtitle": "Join elite government and media organizations using AlMstkshf to secure their digital history.",
+        "button": "Request a Demo"
       }
     }
   },
@@ -502,7 +624,28 @@
           "desc": "Precise Risk Identification: The ability to classify entities and individuals (individual, entity, terrorist entity) based on the list source (automatic or manual) facilitates effective risk management."
         }
       },
-      "cta": "Don't let compliance be Turn it into a burden. Make it a competitive advantage. Media Pulse frees your legal team from routine tasks so they can focus on their core business. See how our system can transform the KYC/AML challenge into a seamless, fully automated process."
+      "cta": "Don't just adapt to compliance—master it. Media Pulse transforms regulatory burdens into a seamless, automated advantage for your firm."
+    },
+    "integration": {
+      "title": "Seamless API Integration",
+      "subtitle": "Amplify your existing systems with our intelligence engines.",
+      "intro": "Already have a media monitoring dashboard or ERP? You don't need to rebuild. Enhance your current infrastructure by integrating specific ALMSTKSHF capabilities directly via our robust API. Whether you need TV/Radio broadcasting data, press release monitoring, or advanced sentiment analysis, our modular approach allows you to plug in only what you lack.",
+      "features": {
+        "modular": {
+          "title": "Modular Architecture",
+          "desc": "Select specific services—like Broadcast Monitoring or Crisis Alerts—and integrate them without disrupting your existing workflow."
+        },
+        "realtime": {
+          "title": "Real-Time Synchronization",
+          "desc": "Receive instant data streams via Webhooks or REST API, keeping your internal dashboards up-to-the-second."
+        },
+        "compatibility": {
+          "title": "Universal Compatibility",
+          "desc": "Built on standard JSON/REST protocols, compatible with any modern tech stack (Python, Node.js, .NET, etc.)."
+        }
+      },
+      "cta_docs": "Read API Documentation",
+      "cta_contact": "Start Integration"
     }
   },
   "Legal": {

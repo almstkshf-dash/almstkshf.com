@@ -1,15 +1,13 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import Image from "next/image";
 import Container from "@/components/ui/Container";
 import {
     Scale,
     ShieldCheck,
-    LayoutGrid,
     Users,
-    Lock,
     Zap,
-    Search,
     CheckCircle2,
     MessageSquare,
     Briefcase,
@@ -23,6 +21,7 @@ import clsx from "clsx";
 
 export default function LexcoraClient() {
     const t = useTranslations("CaseStudies.lexcora");
+    const locale = useLocale();
 
     const categories = [
         {
@@ -56,9 +55,9 @@ export default function LexcoraClient() {
         <main className="min-h-screen pb-20 bg-slate-950 text-white">
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-blue-600/10 to-transparent blur-3xl rounded-full opacity-30"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-blue-600/10 to-transparent blur-3xl rounded-full opacity-30 pointer-events-none"></div>
 
-                <Container>
+                <Container className="relative z-10">
                     <div className="flex flex-col lg:flex-row items-center gap-16">
                         <div className="flex-1 space-y-8 text-center lg:text-left rtl:lg:text-right">
                             <motion.div
@@ -96,14 +95,17 @@ export default function LexcoraClient() {
                                 <Link
                                     href="https://lexcora-mbh.com"
                                     target="_blank"
-                                    className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-1 flex items-center gap-2"
+                                    className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-500/25 transition-all outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-950 hover:-translate-y-1 flex items-center gap-2"
                                 >
                                     {t("cta_visit")}
                                     <ExternalLink className="w-4 h-4" />
                                 </Link>
-                                <button className="px-8 py-4 bg-slate-900 border border-slate-800 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">
+                                <Link
+                                    href={`/${locale}/contact`}
+                                    className="px-8 py-4 bg-slate-900 border border-slate-800 text-white rounded-xl font-bold hover:bg-slate-800 transition-all outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 focus:ring-offset-slate-950 flex items-center justify-center"
+                                >
                                     {t("cta_demo")}
-                                </button>
+                                </Link>
                             </motion.div>
                         </div>
 
@@ -111,19 +113,16 @@ export default function LexcoraClient() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="flex-1 w-full max-w-xl aspect-[4/3] relative rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/50 backdrop-blur-xl group"
+                            className="flex-1 w-full max-w-xl aspect-video relative rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/50 backdrop-blur-xl group shadow-2xl shadow-blue-900/20"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-transparent to-purple-500/20 opacity-50"></div>
-                            <div className="relative h-full flex items-center justify-center p-8">
-                                <div className="grid grid-cols-2 gap-4 w-full h-full opacity-60">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className="bg-slate-950/50 border border-slate-800 rounded-2xl animate-pulse"></div>
-                                    ))}
-                                </div>
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-9xl font-black text-white/5 select-none uppercase tracking-tighter">
-                                    LEXCORA
-                                </div>
-                            </div>
+                            <Image
+                                src="/lexcora-digital-transformation.jpg"
+                                alt="LexCora Digital Transformation"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                priority
+                            />
                         </motion.div>
                     </div>
                 </Container>
@@ -288,12 +287,18 @@ export default function LexcoraClient() {
                         <p className="text-blue-100 text-lg max-w-2xl mx-auto relative z-10">
                             {t("cta_join")}
                         </p>
-                        <div className="flex justify-center gap-4 relative z-10">
+                        <div className="flex justify-center flex-wrap gap-4 relative z-10">
                             <Link
                                 href="https://lexcora-mbh.com"
                                 className="px-10 py-5 bg-white text-blue-600 rounded-2xl font-bold hover:scale-105 transition-transform"
                             >
                                 {t("cta_start")}
+                            </Link>
+                            <Link
+                                href={`/${locale}/contact`}
+                                className="px-10 py-5 bg-blue-700 text-white border border-blue-500 rounded-2xl font-bold hover:scale-105 transition-transform"
+                            >
+                                {t("cta_demo")}
                             </Link>
                         </div>
                     </div>
