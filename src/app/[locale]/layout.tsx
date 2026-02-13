@@ -65,6 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
                 ar: "https://almstkshf.com/ar",
             },
         },
+        metadataBase: new URL("https://almstkshf.com"),
     };
 }
 

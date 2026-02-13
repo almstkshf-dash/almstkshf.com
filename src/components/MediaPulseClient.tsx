@@ -170,7 +170,210 @@ export default function MediaPulseClient() {
                         </div>
                     </div>
                 </div>
+
+                {/* New Detailed Content Sections */}
+                <div className="mt-32 space-y-32">
+                    <MediaPulseDetailedContent />
+                    <AnalyticsStrategySection />
+                </div>
             </Container>
         </main>
     );
 }
+
+function AnalyticsStrategySection() {
+    const t = useTranslations("MediaPulseDetail.analytics");
+
+    const sections = [
+        {
+            key: "reputation",
+            icon: ShieldCheck,
+            color: "text-emerald-400",
+            border: "hover:border-emerald-500/30",
+        },
+        {
+            key: "benchmarking",
+            icon: TrendingUp,
+            color: "text-blue-400",
+            border: "hover:border-blue-500/30",
+        },
+        {
+            key: "social_analytics",
+            icon: Activity,
+            color: "text-indigo-400",
+            border: "hover:border-indigo-500/30",
+        },
+    ];
+
+    return (
+        <section className="space-y-20 border-t border-slate-900 pt-32">
+            <div className="max-w-4xl space-y-6">
+                <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+                    Strategy & Insights
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                    {t("intro.title")}
+                </h2>
+                <p className="text-slate-400 text-lg leading-relaxed">
+                    {t("intro.description")}
+                </p>
+            </div>
+
+            <div className="space-y-12">
+                {sections.map((s) => (
+                    <motion.div
+                        key={s.key}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className={clsx(
+                            "p-10 rounded-[3rem] bg-slate-900/30 border border-slate-800 transition-all group",
+                            s.border
+                        )}
+                    >
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            <div className="lg:col-span-5 space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className={clsx("p-3 rounded-xl bg-slate-800/50", s.color)}>
+                                        <s.icon className="w-6 h-6" />
+                                    </div>
+                                    <h3 className="text-3xl font-bold text-white tracking-tight">{t(`${s.key}.title`)}</h3>
+                                </div>
+                                <p className="text-slate-400 leading-relaxed font-light">
+                                    {t(`${s.key}.description`)}
+                                </p>
+                            </div>
+                            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {(t.raw(`${s.key}.items`) as any[]).map((item: any, idx: number) => (
+                                    <div key={idx} className="p-6 rounded-2xl bg-slate-950/50 border border-slate-800 space-y-3 group/item hover:bg-slate-900 transition-colors">
+                                        <h4 className={clsx("font-bold text-sm uppercase tracking-wider", s.color)}>
+                                            {item.title}
+                                        </h4>
+                                        <p className="text-slate-500 text-xs leading-relaxed group-hover/item:text-slate-400 transition-colors">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </section>
+    );
+}
+
+function MediaPulseDetailedContent() {
+    const t = useTranslations("MediaPulseDetail");
+
+    const features = [
+        { key: "omni_channel", icon: Globe, color: "text-blue-400", bg: "bg-blue-500/10" },
+        { key: "ai_analytics", icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10" },
+        { key: "alerts", icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-500/10" },
+        { key: "dashboards", icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+    ];
+
+    return (
+        <>
+            {/* Intro & Core Features */}
+            <section className="space-y-16">
+                <div className="max-w-4xl space-y-6">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                        {t("intro.title")}
+                    </h2>
+                    <p className="text-slate-400 text-lg leading-relaxed">
+                        {t("intro.description")}
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {features.map((f) => (
+                        <motion.div
+                            key={f.key}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-blue-500/30 transition-all group"
+                        >
+                            <div className="flex gap-6">
+                                <div className={clsx("p-4 rounded-2xl shrink-0 h-fit", f.bg, f.color)}>
+                                    <f.icon className="w-8 h-8" />
+                                </div>
+                                <div className="space-y-3">
+                                    <h3 className="text-xl font-bold text-white uppercase tracking-wider text-sm">
+                                        {t(`features.${f.key}.title`)}
+                                    </h3>
+                                    <p className="text-slate-400 text-sm leading-relaxed">
+                                        {t(`features.${f.key}.description`)}
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="p-8 rounded-3xl bg-blue-500/5 border border-blue-500/10 text-center text-slate-300 italic"
+                >
+                    {t("conclusion")}
+                </motion.p>
+            </section>
+
+            {/* Services Sections */}
+            <section className="space-y-24">
+                <div className="space-y-6">
+                    <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+                        Specialized Services
+                    </div>
+                    <h2 className="text-4xl font-bold text-white">Advanced Solutions</h2>
+                </div>
+
+                {/* Media Monitoring & Social Listening */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div className="space-y-6">
+                        <h3 className="text-2xl font-bold text-white border-l-4 border-blue-500 pl-4">
+                            {t("services.monitoring.title")}
+                        </h3>
+                        <p className="text-slate-400 leading-relaxed text-sm">
+                            {t("services.monitoring.description")}
+                        </p>
+                    </div>
+                    <div className="space-y-6">
+                        <h3 className="text-2xl font-bold text-white border-l-4 border-emerald-500 pl-4">
+                            {t("services.listening.title")}
+                        </h3>
+                        <p className="text-slate-400 leading-relaxed text-sm">
+                            {t("services.listening.description")}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Web Monitoring Detail */}
+                <div className="p-12 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 space-y-12">
+                    <div className="max-w-3xl space-y-6">
+                        <h3 className="text-3xl font-bold text-white">{t("services.web.title")}</h3>
+                        <p className="text-slate-400 leading-relaxed">
+                            {t("services.web.description")}
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {["multi_platform", "sentiment", "keywords", "competitor"].map((fKey) => (
+                            <div key={fKey} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
+                                <h4 className="font-bold text-blue-400 uppercase tracking-widest text-[10px]">
+                                    {t(`services.web.features.${fKey}.title`)}
+                                </h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">
+                                    {t(`services.web.features.${fKey}.description`)}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        </>
+    );
+}
+

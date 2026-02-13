@@ -233,9 +233,18 @@
     "expertise": "Expertise",
     "focus": "Focus",
     "strategy": "Strategy & Leadership",
-    "innovation": "AI Innovation",
+    "innovation": "Continuous Innovation",
     "quote": "At Almstkshf, we are not just analysts; we are architects of clarity in an era of information overload."
   },
+  "WhoWeAre": {
+    "title": "Who We Are & What We Do",
+    "intro": "We offer solutions that are second to none. Our customers are professionals in their field: marketing, PR, politics, analytics and many more. As such, they rely on nothing but the world’s best and most flexible solutions available. ALMSTKSHF combines the most innovative technologies with the most extensive broadcast channel coverage, high quality service and the highest levels of security. This way, media monitoring can contribute to its users achieving outstanding performance.",
+    "tech_driven": {
+      "title": "We are tech-driven",
+      "desc": "Technology is the engine that drives us and that makes our system so unique. In-house developed solutions based on speech-to-text and deep learning enable us to react flexibly to the needs of our customers - quickly and easily. By adding innovative technologies such as fingerprint we are able to offer a technically sophisticated range of advanced yet user-friendly products."
+    }
+  },
+  "Services": {},
   "AI": {
     "badge": "Generative AI Leadership",
     "deploy": "Deploy Agent",
@@ -329,6 +338,135 @@
       "custom_profiles": {
         "title": "Custom Search Profiles",
         "description": "As one of the best media monitoring services, MEDIA PULSE allows you to create custom search profiles and track the topics that matter most to your business. You can view your latest clips in real time, analyzing, and editing them with ease. Whenever clips matching your search terms are broadcast, you receive immediate alerts, empowering you to act quickly. The MEDIA PULSE system is among the best media monitoring tools for staying ahead in the rapid media landscape"
+      }
+    }
+  },
+  "MediaPulseDetail": {
+    "intro": {
+      "title": "Intelligent Media Insights",
+      "description": "Media Pulse is a leading media monitoring and insights platform that delivers real-time intelligence across all media channels. It continuously tracks print, online, and broadcast media outputs, aggregating any content that mentions your brand, products, or topics of interest. Our platform uses advanced analytics and AI-powered sentiment analysis to surface trends and opportunities from this data. Clients benefit from instant alerts and comprehensive dashboards that highlight key metrics (mentions, share of voice, sentiment, reach) in one unified interface. By transforming disparate media data into clear insights, ALMSTKSHF empowers decision-makers to protect their brand reputation and make proactive, data-driven decisions."
+    },
+    "features": {
+      "omni_channel": {
+        "title": "Omni-Channel Coverage",
+        "description": "Tracks news sites, blogs, social media, TV, and radio for any mention of your brand or industry."
+      },
+      "ai_analytics": {
+        "title": "AI-Driven Analytics",
+        "description": "Uses machine learning to identify topics, perform sentiment analysis, and flag emerging issues. Our tools monitor and analyze online conversations about your brand, including hashtags, keywords and competitor mentions."
+      },
+      "alerts": {
+        "title": "Real-Time Alerts & Reports",
+        "description": "Sends targeted email/SMS alerts the moment relevant coverage appears. Customizable newsletters and daily briefs filter priority stories so you can stay focused on results that matter, with personalized charts to highlight your media impact."
+      },
+      "dashboards": {
+        "title": "Executive Dashboards",
+        "description": "Provides leadership-ready reports and summaries. Each morning, key executives can open their inbox to a curated briefing with the most influential coverage from social, broadcast, print, and online. Detailed, executive-ready custom reports packed with critical media insights help you leverage this data for strategic decisions."
+      }
+    },
+    "conclusion": "Through this comprehensive, technology-driven approach, ALMSTKSHF offers a clear, concise value proposition: we turn nonstop media noise into timely insight, helping businesses stay ahead of the conversation and maintain a strong public image.",
+    "services": {
+      "monitoring": {
+        "title": "Media Monitoring",
+        "description": "Our Media Monitoring service delivers comprehensive tracking of traditional and digital media. We systematically scan newspapers, TV and radio broadcasts, websites, blogs, and forums to capture any mention of your organization or topics of interest. This automated monitoring is based on industry best practices – including the systematic recording of broadcasts, social media, and web, alongside the collection of press clippings from print media. The collected content is indexed into searchable archives and presented in intuitive dashboards. Users can query mentions by keyword, entity or source, and apply filters for region or media type. Our dashboards display key metrics (number of mentions, share of voice, estimated reach, sentiment) over time, giving PR and comms teams a clear view of coverage and impact."
+      },
+      "listening": {
+        "title": "Social Media Listening",
+        "description": "The Social Media Listening service focuses on social platforms and online communities. It monitors major social networks (Twitter, Facebook, LinkedIn, Instagram, etc.), blogs, forums (e.g. Reddit, Quora), and review sites for conversations about your brand, competitors, products or industry. By design, listening tools monitor and analyze online conversations about your brand, capturing both direct mentions and indirect discussions (e.g. hashtags and keywords). This real-time listening detects sentiment and emerging trends among your audience. The system also identifies key influencers and gauges overall brand mood. By monitoring mentions of competitors, you can gain insights into their performance – for example, understanding their customer feedback helps you differentiate your own strategy. Alerts can be triggered on spikes in social activity or viral posts, so your team can respond immediately."
+      },
+      "web": {
+        "title": "Web Monitoring",
+        "description": "Beyond social media, our Web Monitoring service covers the broader Internet: news websites, industry blogs, discussion forums, podcasts, and video channels (e.g. YouTube). It ensures you never miss important conversations that happen outside mainstream social networks. Effective reputation monitoring involves a wide variety of channels – including news, forums, social, video, and review sites. Our platform aggregates all these sources so you have a complete picture of your brand’s online footprint.",
+        "features": {
+          "multi_platform": {
+            "title": "Multi-Platform Coverage",
+            "description": "Monitors conversations across social networks, blogs, forums and review sites in real time."
+          },
+          "sentiment": {
+            "title": "Sentiment & Topic Analysis",
+            "description": "Applies sentiment analysis to determine whether mentions are positive, negative or neutral. Identifies trending themes and FAQs in user conversations."
+          },
+          "keywords": {
+            "title": "Keyword & Hashtag Tracking",
+            "description": "Continuously tracks relevant keywords, hashtags and phrases to capture all related discussions."
+          },
+          "competitor": {
+            "title": "Competitor Insights",
+            "description": "Benchmarks your social activity against rivals by tracking their brand mentions and sentiment."
+          }
+        }
+      }
+    },
+    "analytics": {
+      "intro": {
+        "title": "Analytics to Guide Strategy",
+        "description": "The Media Pulse platform delivers more than raw coverage counts – it provides analytics to guide strategy. We offer three main insight areas: Reputation, Competitive Benchmarking, and Social Analytics. Each tool converts the collected media data into actionable knowledge. Reputation analytics measure brand perception; benchmarking compares performance against rivals; social analytics optimizes content strategy. All insights are accessible via interactive dashboards with charts and graphs, so you can quickly spot trends and compare outcomes."
+      },
+      "reputation": {
+        "title": "Reputation",
+        "description": "Monitoring alone isn’t enough; you need to understand how the public sees you. Reputation analytics assess the tone and impact of media coverage. Modern reputation management is more important than ever, and our tools help track it systematically. We aggregate sentiment from all channels (news, social, forums, reviews) and quantify it over time. For example, we flag spikes in negative sentiment or sudden drops in share of voice. Our reputation monitoring identifies customer sentiment and trends across diverse channels, scoring your media coverage and alerting you to emerging crises.",
+        "items": [
+          {
+            "title": "Sentiment Trends",
+            "desc": "Tracks positive vs. negative mentions to measure brand health."
+          },
+          {
+            "title": "Reputation Scorecards",
+            "desc": "Dashboards that show your reputation score over time and by region or channel."
+          },
+          {
+            "title": "Issue Alerts",
+            "desc": "Automated alerts for surges in negative coverage or damaging content."
+          },
+          {
+            "title": "Benchmark against Expectations",
+            "desc": "Compare current reputation metrics with your past campaigns or industry norms."
+          }
+        ]
+      },
+      "benchmarking": {
+        "title": "Competitive Benchmarking",
+        "description": "Understanding your competition is critical. Competitive Benchmarking compares your media performance to that of your top rivals. This tells you where you stand in share of voice and highlights competitor strategies. Our analytics show when a competitor is receiving unusually high media attention or positive buzz, and if their campaigns are generating more engagement. By monitoring mentions of competitors, you can gain insights into their performance and customer feedback to adjust your own strategy.",
+        "items": [
+          {
+            "title": "Share-of-Voice Comparison",
+            "desc": "See what percentage of total industry/media coverage belongs to you versus each competitor."
+          },
+          {
+            "title": "Topic Gap Analysis",
+            "desc": "Identify subjects or keywords where competitors are mentioned more often."
+          },
+          {
+            "title": "Trend Alerts",
+            "desc": "Get notified if a competitor suddenly spikes in coverage or enters your market with a new campaign."
+          },
+          {
+            "title": "Best-Practice Insights",
+            "desc": "Learn what competitor messaging or channels are resonating so you can adapt or differentiate."
+          }
+        ]
+      },
+      "social_analytics": {
+        "title": "Social Analytics",
+        "description": "Social Analytics transforms social media data into strategic insights. It aggregates data from platforms like Facebook, X, Instagram and LinkedIn and measures performance. Our tools quantify engagement metrics (likes, shares, comments, impressions) and correlate them with content types and posting times. Dashboards highlight your top-performing posts and audience demographics, helping refine your content calendar and targeting to ensure campaigns are data-driven.",
+        "items": [
+          {
+            "title": "Content Performance",
+            "desc": "Identify which posts, videos, or ads drive the highest engagement and conversions."
+          },
+          {
+            "title": "Audience Insights",
+            "desc": "Break down who is engaging by demographics and geography to tailor your messaging."
+          },
+          {
+            "title": "Sentiment & Trends",
+            "desc": "Analyze sentiment on social conversations and spot rising topics."
+          },
+          {
+            "title": "ROI Measurement",
+            "desc": "Relate social metrics to website traffic, leads or sales for full marketing attribution."
+          }
+        ]
       }
     }
   }

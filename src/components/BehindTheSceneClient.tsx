@@ -144,7 +144,64 @@ export default function BehindTheSceneClient() {
                         <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-blue-500">"</span>
                     </div>
                 </motion.section>
+
+                {/* Who We Are & Tech Driven Section */}
+                <div className="mt-40 space-y-32">
+                    <WhoWeAreSection />
+                </div>
             </Container>
         </main>
     );
 }
+
+function WhoWeAreSection() {
+    const t = useTranslations("WhoWeAre");
+
+    return (
+        <section className="space-y-24">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                <div className="space-y-8">
+                    <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
+                        Values & Mission
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                        {t("title")}
+                    </h2>
+                    <p className="text-slate-400 text-lg leading-relaxed font-light">
+                        {t("intro")}
+                    </p>
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="p-10 lg:p-14 rounded-[3.5rem] bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500"
+                >
+                    <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                        <Cpu className="w-64 h-64" />
+                    </div>
+                    <div className="relative z-10 space-y-8">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                            <Cpu className="w-8 h-8 text-blue-400" />
+                        </div>
+                        <h3 className="text-3xl font-bold text-white tracking-tight">
+                            {t("tech_driven.title")}
+                        </h3>
+                        <p className="text-slate-400 leading-relaxed font-light">
+                            {t("tech_driven.desc")}
+                        </p>
+                        <div className="flex flex-wrap gap-4">
+                            {["Speech-to-Text", "Deep Learning", "Fingerprinting", "Secure Architecture"].map((tag) => (
+                                <span key={tag} className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        </section>
+    );
+}
+
