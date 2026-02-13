@@ -1,0 +1,132 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
+
+// This is your Stripe CLI webhook secret for testing your endpoint locally.
+// In production, use your actual webhook secret from Stripe Dashboard
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+export async function POST(request: NextRequest) {
+    const body = await request.text();
+    const signature = request.headers.get('stripe-signature');
+
+    if (!signature) {
+        return NextResponse.json(
+            { error: 'No signature provided' },
+            { status: 400 }
+        );
+    }
+
+    let event: Stripe.Event;
+
+    try {
+        // Verify webhook signature
+        if (webhookSecret) {
+            event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        } else {
+            // For development without webhook secret
+            event = JSON.parse(body);
+        }
+    } catch (err) {
+        console.error('Webhook signature verification failed:', err);
+        return NextResponse.json(
+            { error: 'Webhook signature verification failed' },
+            { status: 400 }
+        );
+    }
+
+    // Handle the event
+    try {
+        switch (event.type) {
+            case 'checkout.session.completed': {
+                const session = event.data.object as Stripe.Checkout.Session;
+                console.log('✅ Payment successful:', session.id);
+
+                // TODO: Fulfill the purchase
+                // - Send confirmation email
+                // - Grant access to product/service
+                // - Update database
+                // - etc.
+
+                break;
+            }
+
+            case 'checkout.session.async_payment_succeeded': {
+                const session = event.data.object as Stripe.Checkout.Session;
+                console.log('✅ Async payment successful:', session.id);
+
+                // TODO: Fulfill the purchase
+
+                break;
+            }
+
+            case 'checkout.session.async_payment_failed': {
+                const session = event.data.object as Stripe.Checkout.Session;
+                console.log('❌ Async payment failed:', session.id);
+
+                // TODO: Handle failed payment
+                // - Send notification email
+                // - Log the failure
+
+                break;
+            }
+
+            case 'payment_intent.succeeded': {
+                const paymentIntent = event.data.object as Stripe.PaymentIntent;
+                console.log('✅ PaymentIntent successful:', paymentIntent.id);
+                break;
+            }
+
+            case 'payment_intent.payment_failed': {
+                const paymentIntent = event.data.object as Stripe.PaymentIntent;
+                console.log('❌ PaymentIntent failed:', paymentIntent.id);
+                break;
+            }
+
+            case 'customer.subscription.created':
+            case 'customer.subscription.updated': {
+                const subscription = event.data.object as Stripe.Subscription;
+                console.log('📝 Subscription updated:', subscription.id);
+
+                // TODO: Update user's subscription status in database
+
+                break;
+            }
+
+            case 'customer.subscription.deleted': {
+                const subscription = event.data.object as Stripe.Subscription;
+                console.log('🗑️ Subscription cancelled:', subscription.id);
+
+                // TODO: Revoke access to subscription features
+
+                break;
+            }
+
+            case 'invoice.paid': {
+                const invoice = event.data.object as Stripe.Invoice;
+                console.log('✅ Invoice paid:', invoice.id);
+                break;
+            }
+
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object as Stripe.Invoice;
+                console.log('❌ Invoice payment failed:', invoice.id);
+
+                // TODO: Send payment failed notification
+
+                break;
+            }
+
+            default:
+                console.log(`Unhandled event type: ${event.type}`);
+        }
+
+        return NextResponse.json({ received: true });
+    } catch (err) {
+        console.error('Error processing webhook:', err);
+        return NextResponse.json(
+            { error: 'Webhook processing failed' },
+            { status: 500 }
+        );
+    }
+}
