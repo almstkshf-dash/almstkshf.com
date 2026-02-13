@@ -13,6 +13,7 @@ import type * as contact from "../contact.js";
 import type * as init from "../init.js";
 import type * as media from "../media.js";
 import type * as queries from "../queries.js";
+import type * as waitlist from "../waitlist.js";
 
 import type {
   ApiFromModules,
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   init: typeof init;
   media: typeof media;
   queries: typeof queries;
+  waitlist: typeof waitlist;
 }>;
 
 /**

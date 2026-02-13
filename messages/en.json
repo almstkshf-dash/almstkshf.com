@@ -178,14 +178,24 @@
       "badge_erp": "Advanced Legal ERP"
     },
     "styling": {
-      "title": "Smart Styling Assistant",
-      "subtitle": "Personalized fashion intelligence for modern e-commerce",
-      "feature_wardrobe": "Digital Wardrobe Management",
-      "feature_wardrobe_desc": "Digitize and organize your style profile with 3D body mapping.",
-      "feature_recommendations": "AI Style Recommendations",
-      "feature_recommendations_desc": "Get event-specific outfit ideas tailored to your unique preferences.",
-      "feature_inventory": "Smart Inventory Sync",
-      "feature_inventory_desc": "Seamlessly integrate with your favorite retailers for real-time availability."
+      "title": "Elevate Your Style with Virtual-Stylist",
+      "subtitle": "Experience the future of personal fashion.",
+      "intro": "Virtual-Stylist is an AI-powered style companion designed to curate the perfect look tailored to your unique body shape and the specific vibe of any occasion.",
+      "desc1": "Our proprietary AI doesn't just suggest clothes—it understands your aesthetic. By analyzing global fashion trends and learning from your personal preferences, Virtual-Stylist crafts complete outfits, right down to the accessories.",
+      "desc2": "Ready to shop the look? We’ll bridge the gap between digital inspiration and reality by pinpointing the nearest boutiques carrying your favorite pieces.",
+      "cta_join": "Don’t just follow trends—define yours.",
+      "cta_button": "Join the waitlist today",
+      "form": {
+        "title": "Join the Waitlist",
+        "name": "Full Name",
+        "email": "Email Address",
+        "placeholder_name": "Enter your name",
+        "placeholder_email": "Enter your email",
+        "submit": "Join Waitlist",
+        "submitting": "Joining...",
+        "success": "You're on the list!",
+        "error": "Something went wrong. Please try again."
+      }
     }
   },
   "Contact": {
@@ -467,6 +477,85 @@
             "desc": "Relate social metrics to website traffic, leads or sales for full marketing attribution."
           }
         ]
+      }
+    }
+  },
+  "TechnicalSolutions": {
+    "kyc": {
+      "title": "KYC Compliance",
+      "intro": "In today's world, legal compliance is no longer an option; it's your company's first line of defense. With increasing regulatory pressure, many businesses are now required to implement Know Your Customer (KYC) systems and comply with Anti-Money Laundering (AML) requirements, most notably the GoAML lists. The Media Pulse system eliminates the need for manual review and the risk of human error. The system offers a unique solution combining intelligent automation with full human control. It automatically updates GoAML lists from official sources, ensuring your data is always up-to-date and compliant with the latest legislation.",
+      "features": {
+        "goaml": {
+          "title": "Automatic GoAML List Updates",
+          "desc": "Immediate and Continuous Compliance: Ensures all your records are subject to the latest blocking and monitoring lists without manual intervention, minimizing the risk of fines and penalties."
+        },
+        "control": {
+          "title": "Full Human Control (Add, Edit, Delete)",
+          "desc": "Flexibility and Control: Empowers the responsible attorney to add private records, modify risk classifications (Safe, Compliant, Under Review), or delete irrelevant records at their professional discretion."
+        },
+        "audit": {
+          "title": "Digital Audit Trail",
+          "desc": "Transparency and Accountability: Documents every update, whether automatic or manual (with username and date), providing conclusive evidence for auditors."
+        },
+        "risk": {
+          "title": "Advanced Risk Classification",
+          "desc": "Precise Risk Identification: The ability to classify entities and individuals (individual, entity, terrorist entity) based on the list source (automatic or manual) facilitates effective risk management."
+        }
+      },
+      "cta": "Don't let compliance be Turn it into a burden. Make it a competitive advantage. Media Pulse frees your legal team from routine tasks so they can focus on their core business. See how our system can transform the KYC/AML challenge into a seamless, fully automated process."
+    }
+  },
+  "Legal": {
+    "Privacy": {
+      "title": "Privacy Policy",
+      "intro": "Almstkshf respects your privacy and is committed to protecting the personal and sensitive data processed through our specialized platforms, including LEXCORA, Media Pulse, and Smart Styling Assistant. This policy outlines how we handle data in compliance with UAE regulations and global standards.",
+      "sections": {
+        "collection": {
+          "title": "Information Collection",
+          "content": "We collect data necessary for our services: (1) Account Information via Clerk authentication; (2) Legal & Case Data uploaded to LEXCORA (processed securely as a Data Processor); (3) Media Search Profiles & Keywords for Media Pulse; (4) Body mapping parameters for the Smart Styling Assistant."
+        },
+        "use": {
+          "title": "Use of Information",
+          "content": "Data is used to: deliver ERP and CRM functionalities; execute AI-driven media sentiment analysis; provide personalized styling recommendations; and ensure compliance with TDRA regulations. We do not use client legal data for model training without explicit consent."
+        },
+        "sharing": {
+          "title": "Data Sharing & Subprocessors",
+          "content": "We utilize trusted infrastructure providers including Convex (Database) and Vercel (Hosting). Identity management is handled by Clerk. We do not sell data. Disclosure may occur only if required by UAE law or court order."
+        },
+        "security": {
+          "title": "Security Measures",
+          "content": "We implement SOC2-aligned security controls, including encryption at rest and in transit, role-based access control (RBAC) within LEXCORA, and continuous monitoring to protect sensitive government and legal data."
+        },
+        "contact": {
+          "title": "Contact & DPO",
+          "content": "For privacy inquiries or data subject requests under UAE Data Protection Law, contact our Data Protection Office at rased@almstkshf.com or visit our Dubai/Abu Dhabi offices."
+        }
+      }
+    },
+    "Terms": {
+      "title": "Terms of Service",
+      "intro": "These Terms govern your access to the Almstkshf ecosystem, including LEXCORA, Media Pulse, and related AI services. By using our platforms, you agree to these terms.",
+      "sections": {
+        "acceptance": {
+          "title": "Service Usage",
+          "content": "You are granted a limited, non-exclusive license to use our tools. For LEXCORA users, you are responsible for maintaining the confidentiality of case files and client portals. For Media Pulse users, you agree to use media insights in compliance with copyright laws."
+        },
+        "services": {
+          "title": "AI Disclaimer",
+          "content": "Our services (Media Pulse, Smart Styling Assistant) utilize Generative AI. While we strive for accuracy, AI outputs should be verified by professional judgment before being used for critical legal or strategic decisions."
+        },
+        "accounts": {
+          "title": "Account Security",
+          "content": "Authentication is managed via Clerk. You are responsible for safeguarding your credentials. Suspicious activity must be reported immediately to our security team."
+        },
+        "intellectual_property": {
+          "title": "Intellectual Property",
+          "content": "The Almstkshf platform, algorithms, and proprietary datasets are owned by Almstkshf. Client data uploaded to LEXCORA remains the property of the client/law firm."
+        },
+        "termination": {
+          "title": "Governing Law",
+          "content": "These terms are governed by the laws of the United Arab Emirates. Any disputes shall be subject to the exclusive jurisdiction of the courts in Abu Dhabi or Dubai."
+        }
       }
     }
   }

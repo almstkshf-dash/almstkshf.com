@@ -11,7 +11,8 @@ import {
   Activity,
   ShieldAlert,
   Home,
-  Users
+  Users,
+
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -103,7 +104,8 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         href: "/media-monitoring/crisis-management",
         icon: ShieldAlert,
         description: "Strategic crisis response planning"
-      }
+      },
+
     ]
   },
   {

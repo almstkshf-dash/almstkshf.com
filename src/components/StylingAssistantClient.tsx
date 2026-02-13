@@ -1,126 +1,230 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import Container from "@/components/ui/Container";
-import { Sparkles, ShoppingBag, Shirt, Heart } from "lucide-react";
+import { Sparkles, ArrowRight, CheckCircle2, Loader2, Mail, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export default function StylingAssistantClient() {
     const t = useTranslations("CaseStudies.styling");
+    const joinWaitlist = useMutation(api.waitlist.joinWaitlist);
 
-    const features = [
-        {
-            title: t("feature_wardrobe"),
-            desc: t("feature_wardrobe_desc"),
-            icon: Shirt
-        },
-        {
-            title: t("feature_recommendations"),
-            desc: t("feature_recommendations_desc"),
-            icon: Sparkles
-        },
-        {
-            title: t("feature_inventory"),
-            desc: t("feature_inventory_desc"),
-            icon: ShoppingBag
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [errorMsg, setErrorMsg] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus("submitting");
+        setErrorMsg("");
+
+        try {
+            await joinWaitlist({
+                email,
+                name,
+                service: "styling_assistant"
+            });
+            setStatus("success");
+            setName("");
+            setEmail("");
+        } catch (error) {
+            console.error(error);
+            setStatus("error");
+            setErrorMsg(t("form.error"));
         }
-    ];
+    };
 
     return (
-        <main className="min-h-screen pb-20">
+        <main className="min-h-screen pb-20 bg-slate-950">
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-purple-500/10 to-transparent blur-3xl rounded-full opacity-50"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-purple-600/20 via-pink-600/10 to-transparent blur-[120px] opacity-60 pointer-events-none"></div>
 
                 <Container>
-                    <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
-                        <div className="flex-1 space-y-8 text-center lg:text-left rtl:lg:text-right">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-semibold uppercase tracking-widest"
-                            >
-                                <Sparkles className="w-4 h-4" />
-                                <span>Dynamic Fashion AI</span>
-                            </motion.div>
-
-                            <motion.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="text-5xl lg:text-7xl font-bold text-white tracking-tight"
-                            >
-                                {t("title")}
-                            </motion.h1>
-
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0"
-                            >
-                                {t("subtitle")}
-                            </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="flex flex-wrap gap-4 justify-center lg:justify-start"
-                            >
-                                <button className="px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold shadow-lg shadow-purple-500/25 transition-all hover:-translate-y-1">
-                                    Try AI Stylist
-                                </button>
-                                <button className="px-8 py-4 bg-slate-900 border border-slate-800 text-white rounded-xl font-bold hover:bg-slate-800 transition-all">
-                                    Retailer Integration
-                                </button>
-                            </motion.div>
-                        </div>
-
+                    <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
                         <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="flex-1 w-full max-w-xl aspect-square relative"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/50 border border-purple-500/30 text-purple-300 text-sm font-semibold uppercase tracking-widest backdrop-blur-md shadow-xl"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl animate-pulse"></div>
-                            <div className="relative h-full bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl flex items-center justify-center p-12">
-                                <Shirt className="w-1/2 h-1/2 text-purple-400 opacity-20 absolute" />
-                                <div className="grid grid-cols-2 gap-4 w-full">
-                                    {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className="aspect-square bg-slate-950/50 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-3 group cursor-pointer hover:border-purple-500/50 transition-colors">
-                                            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
-                                                <Heart className="w-5 h-5 text-slate-600 group-hover:text-pink-500 transition-colors" />
-                                            </div>
-                                            <div className="h-2 w-1/2 bg-slate-800 rounded"></div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            <span>{t("title")}</span>
                         </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight"
+                        >
+                            {t("subtitle")}
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-xl md:text-2xl text-slate-300 leading-relaxed max-w-3xl mx-auto"
+                        >
+                            {t("intro")}
+                        </motion.p>
                     </div>
                 </Container>
             </section>
 
-            {/* Features Grid */}
-            <section className="py-20 bg-slate-950">
+            {/* Content & Form Split */}
+            <section className="py-12 md:py-24">
                 <Container>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {features.map((feature, idx) => (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        {/* Text Content */}
+                        <div className="space-y-12">
                             <motion.div
-                                key={idx}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="p-8 bg-slate-900/50 border border-slate-800 rounded-2xl hover:bg-slate-900 transition-all hover:border-purple-500/50 group"
+                                className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-purple-900/20"
                             >
-                                <div className="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                    <feature.icon className="w-7 h-7 text-purple-400" />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent pointer-events-none z-10"></div>
+                                <Image
+                                    src="/virtual-stylist.png"
+                                    alt="Virtual Stylist Interface"
+                                    width={800}
+                                    height={600}
+                                    className="w-full h-auto object-cover"
+                                />
                             </motion.div>
-                        ))}
+
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                className="space-y-6"
+                            >
+                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                                    <Sparkles className="w-6 h-6 text-white" />
+                                </div>
+                                <p className="text-lg text-slate-400 leading-relaxed">
+                                    {t("desc1")}
+                                </p>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2 }}
+                                className="space-y-6"
+                            >
+                                <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                                    <ArrowRight className="w-6 h-6 text-purple-400" />
+                                </div>
+                                <p className="text-lg text-slate-400 leading-relaxed">
+                                    {t("desc2")}
+                                </p>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                className="p-6 rounded-3xl bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/20"
+                            >
+                                <p className="text-xl font-bold text-white text-center">
+                                    {t("cta_join")}
+                                </p>
+                            </motion.div>
+                        </div>
+
+                        {/* Waitlist Form */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+                        >
+                            {/* Decorative background elements */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+                            <div className="relative z-10 space-y-8">
+                                <div>
+                                    <h3 className="text-3xl font-bold text-white mb-2">{t("form.title")}</h3>
+                                    <p className="text-slate-400">{t("cta_button")}</p>
+                                </div>
+
+                                {status === "success" ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="py-12 text-center space-y-4"
+                                    >
+                                        <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+                                            <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+                                        </div>
+                                        <h4 className="text-2xl font-bold text-white">{t("form.success")}</h4>
+                                        <p className="text-slate-400">We'll let you know as soon as we launch.</p>
+                                    </motion.div>
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">{t("form.name")}</label>
+                                            <div className="relative group">
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={name}
+                                                    onChange={(e) => setName(e.target.value)}
+                                                    placeholder={t("form.placeholder_name")}
+                                                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-300 ml-1">{t("form.email")}</label>
+                                            <div className="relative group">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <input
+                                                    type="email"
+                                                    required
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder={t("form.placeholder_email")}
+                                                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {status === "error" && (
+                                            <p className="text-rose-400 text-sm text-center bg-rose-500/10 py-2 rounded-lg">{errorMsg}</p>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={status === "submitting"}
+                                            className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {status === "submitting" ? (
+                                                <>
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                    <span>{t("form.submitting")}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>{t("form.submit")}</span>
+                                                    <ArrowRight className="w-5 h-5" />
+                                                </>
+                                            )}
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </motion.div>
                     </div>
                 </Container>
             </section>

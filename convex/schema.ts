@@ -54,4 +54,11 @@ export default defineSchema({
         recommendation: v.string(),
         timestamp: v.number(),
     }),
+
+    waitlist: defineTable({
+        email: v.string(),
+        name: v.optional(v.string()), // Optional name
+        service: v.string(),          // e.g., "styling_assistant"
+        timestamp: v.number(),
+    }).index("by_email", ["email"]),
 });

@@ -126,12 +126,12 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-4">
                             <li>
-                                <Link href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
+                                <Link href={`/${locale}/privacy`} className="text-slate-400 hover:text-white transition-colors text-sm">
                                     {t('privacy')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
+                                <Link href={`/${locale}/terms`} className="text-slate-400 hover:text-white transition-colors text-sm">
                                     {t('terms')}
                                 </Link>
                             </li>
