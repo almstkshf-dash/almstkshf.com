@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Send, CheckCircle2, AlertCircle } from "lucide-react";
 import Button from "./ui/Button";
@@ -20,13 +20,25 @@ export default function ContactForm() {
     });
 
     const submitContact = useMutation(api.contact.submit);
+    const sendContactEmail = useAction(api.contact.sendContactEmail);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setStatus("loading");
 
         try {
-            await submitContact(formData);
+            // First, save to database
+            const submissionId = await submitContact(formData);
+
+            // Then, send email (don't await - fire and forget)
+            sendContactEmail({
+                ...formData,
+                submissionId: submissionId as string,
+            }).catch(error => {
+                console.error("Failed to send email:", error);
+                // Email failure doesn't affect form submission success
+            });
+
             setStatus("success");
             setFormData({ name: "", email: "", subject: "", message: "" });
         } catch (error) {

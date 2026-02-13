@@ -6,12 +6,13 @@ import Container from "@/components/ui/Container";
 import { Sparkles, ArrowRight, CheckCircle2, Loader2, Mail, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function StylingAssistantClient() {
     const t = useTranslations("CaseStudies.styling");
     const joinWaitlist = useMutation(api.waitlist.joinWaitlist);
+    const sendWaitlistEmails = useAction(api.waitlist.sendWaitlistEmails);
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -24,11 +25,24 @@ export default function StylingAssistantClient() {
         setErrorMsg("");
 
         try {
-            await joinWaitlist({
+            const result = await joinWaitlist({
                 email,
                 name,
                 service: "styling_assistant"
             });
+
+            // Only send emails if this is a new signup (not already exists)
+            if (result && !result.alreadyExists) {
+                sendWaitlistEmails({
+                    email,
+                    name,
+                    service: "Styling Assistant"
+                }).catch(error => {
+                    console.error("Failed to send emails:", error);
+                    // Email failure doesn't affect form submission success
+                });
+            }
+
             setStatus("success");
             setName("");
             setEmail("");
