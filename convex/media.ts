@@ -1,141 +1,122 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { api } from "./_generated/api";
 
 /**
  * Expert Media & Reputation Intelligence Action
- * Analyzes text for sentiment, risk, and strategic recommendations.
+ * Analyzes text for sentiment, risk, and strategic recommendations using Gemini AI.
  */
-const handler = async (ctx: any, { text }: { text: string }): Promise<any> => {
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    // --- STEP 1: If API Key is missing, provide a "Smart Simulation" ---
-    // This ensures the service works for prospective customers even during setup.
-    if (!apiKey) {
-        console.warn("GEMINI_API_KEY is missing. Using Smart Simulation mode.");
-
-        const lowerText = text.toLowerCase();
-        let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
-        let score = 50;
-        let risk: "Low" | "Medium" | "High" = "Low";
-        let tone = "Inquisitive";
-        let recommendation = "To unlock high-precision AI analysis, please configure the ALMSTKSHF Intelligence Core.";
-
-        // Simple Keyword Heuristics
-        const posWords = ["نجاح", "ممتاز", "فوز", "جائزة", "نمو", "تطوير", "success", "excellent", "win", "award", "growth", "launch"];
-        const negWords = ["فشل", "خطر", "أزمة", "انفجار", "تراجع", "شكوى", "fail", "danger", "crisis", "explosion", "decline", "complaint"];
-        const riskWords = ["عاجل", "تهديد", "تسريب", "قانوني", "urgent", "threat", "leak", "legal", "lawsuit"];
-
-        const posCount = posWords.filter(w => lowerText.includes(w)).length;
-        const negCount = negWords.filter(w => lowerText.includes(w)).length;
-        const riskCount = riskWords.filter(w => lowerText.includes(w)).length;
-
-        if (posCount > negCount) {
-            sentiment = "Positive";
-            score = Math.min(75 + posCount * 5, 98);
-        } else if (negCount > posCount) {
-            sentiment = "Negative";
-            score = Math.max(25 - negCount * 5, 5);
-        }
-
-        if (riskCount > 1 || negCount > 2) risk = "High";
-        else if (riskCount > 0 || negCount > 0) risk = "Medium";
-
-        tone = sentiment === "Positive" ? "Optimistic" : sentiment === "Negative" ? "Critical" : "Neutral/Objective";
-
-        if (sentiment === "Negative" && risk === "High") {
-            recommendation = "Immediate response required: Activate the ALMSTKSHF Crisis Protocol to neutralize emerging narratives.";
-        } else if (sentiment === "Positive") {
-            recommendation = "Amplification opportunity: Capitalize on this positive momentum across regional distribution channels.";
-        } else {
-            recommendation = "Continuous monitoring advised. No immediate strategic pivot required based on current indicators.";
-        }
-
-        return await ctx.runMutation((api as any).analyses.saveAnalysis, {
-            inputText: text,
-            sentiment,
-            score,
-            risk,
-            tone,
-            recommendation: `[Simulated] ${recommendation}`,
-        });
-    }
-
-    // --- STEP 2: Real AI Analysis using Gemini 1.5 Flash ---
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
-        generationConfig: { responseMimeType: "application/json" } // Force JSON response
-    });
-
-    const prompt = `
-    You are the ALMSTKSHF Intelligence Engine, an elite Media & Reputation Risk analyst.
-    INPUT TEXT (can be English or Arabic):
-    "${text}"
-
-    TASK:
-    1. Detect the language and analyze the sentiment (Positive, Neutral, Negative).
-    2. Calculate a confidence/sentiment score (0-100).
-    3. Assess the reputation risk (Low, Medium, High).
-    4. Identify the emotional tone (e.g., Alarming, Promotional, Objective, Hostile).
-    5. Provide ONE surgical strategic recommendation for a CEO or Minister.
-
-    OUTPUT FORMAT (MUST BE VALID JSON):
-    {
-        "sentiment": "Positive" | "Neutral" | "Negative",
-        "score": number,
-        "risk": "Low" | "Medium" | "High",
-        "tone": "string",
-        "recommendation": "string"
-    }
-    `;
-
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const responseText = response.text();
-
-        // Robust JSON extraction (Gemini sometimes adds markdown blocks)
-        const cleanText = responseText.replace(/```json|```/g, "").trim();
-        const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-
-        if (!jsonMatch) {
-            throw new Error("Could not find JSON in AI response");
-        }
-
-        const analysis = JSON.parse(jsonMatch[0]);
-
-        // Validate structure
-        const validated = {
-            sentiment: ["Positive", "Neutral", "Negative"].includes(analysis.sentiment) ? analysis.sentiment : "Neutral",
-            score: typeof analysis.score === 'number' ? analysis.score : 50,
-            risk: ["Low", "Medium", "High"].includes(analysis.risk) ? analysis.risk : "Medium",
-            tone: analysis.tone || "Neutral",
-            recommendation: analysis.recommendation || "Strategic analysis complete. Follow monitoring protocols."
-        };
-
-        return await ctx.runMutation((api as any).analyses.saveAnalysis, {
-            inputText: text,
-            ...validated
-        });
-
-    } catch (error: any) {
-        console.error("ALMSTKSHF AI Engine Error:", error);
-
-        // Fail-safe Resilience: Return a plausible analysis if the API fails
-        return await ctx.runMutation((api as any).analyses.saveAnalysis, {
-            inputText: text,
-            sentiment: "Neutral",
-            score: 50,
-            risk: "Medium",
-            tone: "Analytic (Recovery Mode)",
-            recommendation: "Our AI engine is currently processing a high volume of global data. Professional human review is advised while service restores.",
-        });
-    }
-};
-
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler,
+    handler: async (ctx, { text }): Promise<{
+        id: string;
+        inputText: string;
+        sentiment: string;
+        score: number;
+        risk: string;
+        tone: string;
+        recommendation: string;
+    }> => {
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            console.error("GEMINI_API_KEY is not set in Convex environment variables.");
+            throw new Error("AI service is not configured. Please contact support.");
+        }
+
+        // Build a precise prompt that forces unique, input-specific analysis
+        const prompt = `You are an expert Media & Reputation Risk analyst for the ALMSTKSHF Intelligence platform.
+
+Analyze the following text carefully. Your analysis MUST be specific to the actual content provided — do NOT give generic answers.
+
+TEXT TO ANALYZE:
+"""
+${text}
+"""
+
+Provide your analysis as a JSON object with these exact fields:
+- "sentiment": exactly one of "Positive", "Neutral", or "Negative"
+- "score": a number from 0 to 100 representing sentiment confidence (0 = extremely negative, 50 = neutral, 100 = extremely positive)
+- "risk": exactly one of "Low", "Medium", or "High" — assess reputational risk for an organization
+- "tone": a single word or short phrase describing the emotional tone (e.g. "Alarming", "Promotional", "Hostile", "Optimistic", "Analytical", "Sarcastic")
+- "recommendation": one specific, actionable strategic recommendation for a CEO based on THIS specific text (2-3 sentences max)
+
+IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown, no explanation.`;
+
+        try {
+            // Call Gemini API directly via REST to avoid SDK issues
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            responseMimeType: "application/json",
+                        },
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                const errorBody = await response.text();
+                console.error("Gemini API error:", response.status, errorBody);
+                throw new Error(`Gemini API returned ${response.status}: ${errorBody}`);
+            }
+
+            const data = await response.json();
+
+            // Extract text from Gemini response
+            const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!responseText) {
+                console.error("Empty Gemini response:", JSON.stringify(data));
+                throw new Error("Empty response from AI");
+            }
+
+            // Parse JSON - clean any markdown fences just in case
+            const cleanText = responseText.replace(/```json|```/g, "").trim();
+            const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+
+            if (!jsonMatch) {
+                console.error("Could not extract JSON from response:", cleanText);
+                throw new Error("Invalid AI response format");
+            }
+
+            const analysis = JSON.parse(jsonMatch[0]);
+
+            // Validate and sanitize
+            const validated = {
+                sentiment: ["Positive", "Neutral", "Negative"].includes(analysis.sentiment)
+                    ? analysis.sentiment
+                    : "Neutral",
+                score: typeof analysis.score === "number"
+                    ? Math.max(0, Math.min(100, Math.round(analysis.score)))
+                    : 50,
+                risk: ["Low", "Medium", "High"].includes(analysis.risk)
+                    ? analysis.risk
+                    : "Medium",
+                tone: typeof analysis.tone === "string" && analysis.tone.length > 0
+                    ? analysis.tone
+                    : "Analytical",
+                recommendation: typeof analysis.recommendation === "string" && analysis.recommendation.length > 0
+                    ? analysis.recommendation
+                    : "Further analysis recommended.",
+            };
+
+            // Save to database and return
+            return await ctx.runMutation(api.analyses.saveAnalysis, {
+                inputText: text,
+                ...validated,
+            });
+        } catch (error: any) {
+            console.error("ALMSTKSHF AI Engine Error:", error.message || error);
+            // Re-throw so the client sees the actual error instead of getting fake data
+            throw new Error(
+                "Analysis failed. Please try again in a moment."
+            );
+        }
+    },
 });

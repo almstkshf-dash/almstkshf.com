@@ -24,6 +24,7 @@ export default function FreeInsightTool() {
         tone: string;
         recommendation: string;
     } | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const analyzeMedia = useAction(api.media.analyzeMedia);
 
@@ -32,6 +33,7 @@ export default function FreeInsightTool() {
 
         setIsAnalyzing(true);
         setResult(null);
+        setError(null);
 
         try {
             const data = await analyzeMedia({ text: input });
@@ -42,8 +44,9 @@ export default function FreeInsightTool() {
                 tone: data.tone,
                 recommendation: data.recommendation
             });
-        } catch (error) {
-            console.error(error);
+        } catch (err: any) {
+            console.error(err);
+            setError(err?.message || "Analysis failed. Please try again.");
         } finally {
             setIsAnalyzing(false);
         }
@@ -97,6 +100,19 @@ export default function FreeInsightTool() {
                                     </Button>
                                 </div>
                             </div>
+
+                            <AnimatePresence mode="wait">
+                                {error && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0 }}
+                                        className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 text-sm"
+                                    >
+                                        {error}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             <AnimatePresence mode="wait">
                                 {result && (
