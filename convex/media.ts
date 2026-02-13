@@ -6,22 +6,19 @@ import { api } from "./_generated/api";
  * Expert Media & Reputation Intelligence Action
  * Analyzes text for sentiment, risk, and strategic recommendations using Gemini AI.
  */
+
+import { ConvexError } from "convex/values";
+
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler: async (ctx, { text }): Promise<{
-        id: string;
-        inputText: string;
-        sentiment: string;
-        score: number;
-        risk: string;
-        tone: string;
-        recommendation: string;
-    }> => {
+    handler: async (ctx, { text }): Promise<any> => {
         const apiKey = process.env.GEMINI_API_KEY;
 
+        console.log(`Analyzing text: "${text.substring(0, 50)}..."`);
+
         if (!apiKey) {
-            console.error("GEMINI_API_KEY is not set in Convex environment variables.");
-            throw new Error("AI service is not configured. Please contact support.");
+            console.error("GEMINI_API_KEY is missing via process.env");
+            throw new ConvexError("AI service configuration error. Please contact support.");
         }
 
         // Build a precise prompt that forces unique, input-specific analysis
@@ -45,8 +42,9 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
 
         try {
             // Call Gemini API directly via REST to avoid SDK issues
+            // Using gemini-1.5-flash for maximum stability
             const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -62,8 +60,8 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                console.error("Gemini API error:", response.status, errorBody);
-                throw new Error(`Gemini API returned ${response.status}: ${errorBody}`);
+                console.error(`Gemini API Error (${response.status}):`, errorBody);
+                throw new Error(`AI Service Provider Error: ${response.statusText}`);
             }
 
             const data = await response.json();
@@ -72,8 +70,8 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
             const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!responseText) {
-                console.error("Empty Gemini response:", JSON.stringify(data));
-                throw new Error("Empty response from AI");
+                console.error("Empty Gemini response structure:", JSON.stringify(data));
+                throw new Error("Received empty response from AI service");
             }
 
             // Parse JSON - clean any markdown fences just in case
@@ -82,7 +80,7 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
 
             if (!jsonMatch) {
                 console.error("Could not extract JSON from response:", cleanText);
-                throw new Error("Invalid AI response format");
+                throw new Error("Invalid response format from AI service");
             }
 
             const analysis = JSON.parse(jsonMatch[0]);
@@ -111,12 +109,14 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
                 inputText: text,
                 ...validated,
             });
+
         } catch (error: any) {
-            console.error("ALMSTKSHF AI Engine Error:", error.message || error);
-            // Re-throw so the client sees the actual error instead of getting fake data
-            throw new Error(
-                "Analysis failed. Please try again in a moment."
-            );
+            console.error("ALMSTKSHF AI Engine Error:", error);
+            // Throw ConvexError to expose specific message to client
+            if (error instanceof ConvexError) {
+                throw error;
+            }
+            throw new ConvexError(error.message || "Analysis failed. Please try again.");
         }
     },
 });

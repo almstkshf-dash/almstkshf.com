@@ -46,7 +46,8 @@ export default function FreeInsightTool() {
             });
         } catch (err: any) {
             console.error(err);
-            setError(err?.message || "Analysis failed. Please try again.");
+            const message = err?.data || err?.message || "Analysis failed. Please try again.";
+            setError(message);
         } finally {
             setIsAnalyzing(false);
         }
