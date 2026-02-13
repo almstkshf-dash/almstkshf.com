@@ -73,7 +73,12 @@ export default function FreeInsightTool() {
 
                         <div className="space-y-6">
                             <div className="relative">
+                                <label htmlFor="media-analysis-input" className="sr-only">
+                                    {t("placeholder")}
+                                </label>
                                 <textarea
+                                    id="media-analysis-input"
+                                    name="media-text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={t("placeholder")}

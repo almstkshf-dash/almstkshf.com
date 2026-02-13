@@ -60,38 +60,46 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                    <label htmlFor="name" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
                         {t("name")}
                     </label>
                     <input
+                        id="name"
+                        name="name"
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="John Doe"
+                        autoComplete="name"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                    <label htmlFor="email" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
                         {t("email")}
                     </label>
                     <input
+                        id="email"
+                        name="email"
                         type="email"
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="john@example.com"
+                        autoComplete="email"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                <label htmlFor="subject" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
                     {t("subject")}
                 </label>
                 <input
+                    id="subject"
+                    name="subject"
                     type="text"
                     required
                     value={formData.subject}
@@ -102,10 +110,12 @@ export default function ContactForm() {
             </div>
 
             <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                <label htmlFor="message" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
                     {t("message")}
                 </label>
                 <textarea
+                    id="message"
+                    name="message"
                     rows={6}
                     required
                     value={formData.message}

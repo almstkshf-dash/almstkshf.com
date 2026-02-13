@@ -171,30 +171,36 @@ export default function StylingAssistantClient() {
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-300 ml-1">{t("form.name")}</label>
+                                            <label htmlFor="styling-name" className="text-sm font-medium text-slate-300 ml-1">{t("form.name")}</label>
                                             <div className="relative group">
                                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
                                                 <input
+                                                    id="styling-name"
+                                                    name="name"
                                                     type="text"
                                                     required
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
                                                     placeholder={t("form.placeholder_name")}
+                                                    autoComplete="name"
                                                     className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-300 ml-1">{t("form.email")}</label>
+                                            <label htmlFor="styling-email" className="text-sm font-medium text-slate-300 ml-1">{t("form.email")}</label>
                                             <div className="relative group">
                                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
                                                 <input
+                                                    id="styling-email"
+                                                    name="email"
                                                     type="email"
                                                     required
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder={t("form.placeholder_email")}
+                                                    autoComplete="email"
                                                     className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>

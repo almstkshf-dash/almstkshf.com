@@ -21,7 +21,10 @@ export default function ReportLibrary() {
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
                 <div className="relative w-full md:max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <label htmlFor="report-search" className="sr-only">Search reports</label>
                     <input
+                        id="report-search"
+                        name="q"
                         type="text"
                         placeholder="Search reports..."
                         className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
