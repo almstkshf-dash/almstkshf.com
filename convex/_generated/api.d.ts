@@ -8,8 +8,10 @@
  * @module
  */
 
+import type * as analyses from "../analyses.js";
 import type * as contact from "../contact.js";
 import type * as init from "../init.js";
+import type * as media from "../media.js";
 import type * as queries from "../queries.js";
 
 import type {
@@ -19,8 +21,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  analyses: typeof analyses;
   contact: typeof contact;
   init: typeof init;
+  media: typeof media;
   queries: typeof queries;
 }>;
 

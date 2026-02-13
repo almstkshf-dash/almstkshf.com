@@ -7,6 +7,7 @@ import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
 import Image from 'next/image';
+import FreeInsightTool from '@/components/FreeInsightTool';
 
 export default function HomeClient() {
     const t = useTranslations();
@@ -163,6 +164,8 @@ export default function HomeClient() {
                     </div>
                 </Container>
             </section>
+
+            <FreeInsightTool />
 
             {/* Why Choose Us Section */}
             <section className="py-32 relative overflow-hidden bg-slate-950">

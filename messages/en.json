@@ -282,5 +282,54 @@
       "adma": "Abu Dhabi Media Authority",
       "sea": "Saudi Entertainment Authority"
     }
+  },
+  "FreeTool": {
+    "title": "AI Media Pulse",
+    "subtitle": "Analyze sentiment and risk in real-time. Paste a headline or statement below.",
+    "placeholder": "e.g., Brand X receives major environmental award in Dubai...",
+    "button": "Analyze Impact",
+    "analyzing": "ALMSTKSHF AI is analyzing...",
+    "results_title": "AI Insight Report",
+    "sentiment": "Public Sentiment",
+    "risk": "Reputation Risk",
+    "recommendation": "Strategic Suggestion",
+    "risk_levels": {
+      "low": "Stable - No immediate action required.",
+      "medium": "Caution - Monitor social mentions closely.",
+      "high": "Crisis Warning - Activation of response protocols recommended."
+    },
+    "risk_labels": {
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    }
+  },
+  "MediaMonitoring": {
+    "tv_radio": {
+      "title": "Worldwide Broadcast Monitoring",
+      "description": "ALMSTKSHF provides you with all broadcast information you need for fact-based decisions, reputation management, strategy improvements and more. Keep an eye on the media coverage of all the topics relevant to you: your own business, your competition, or other keywords of interest.",
+      "analytics": "Track, share and analyze media content of more than 3400 channels worldwide in corresponding languages with the most comprehensive media monitoring solution available – 24/7, with real-time alerts. 5 continents, multiple languages, 75+ countries",
+      "alerts": {
+        "title": "Instant Intelligence",
+        "description": "Personalized real-time alerts via e-mail or web"
+      },
+      "clips": {
+        "title": "Advanced Clip Management",
+        "description": "High quality videos easy to edit with the clip editor. With ALMSTKSHF you can track your campaigns automatically, analyze all the collected data, and easily manage all clips with our intuitive web application."
+      },
+      "media_pulse_integration": {
+        "title": "Powered by MEDIA PULSE",
+        "description": "With the powerful media monitoring platform MEDIA PULSE, offers a worldwide broadcast media tracking solution. Our precise media monitoring system gives users access to TV, radio, and web TV content from all over the world. More than 3,400 channels from 85+ countries are available and these numbers are steadily growing."
+      },
+      "custom_profiles": {
+        "title": "Custom Search Profiles",
+        "description": "As one of the best media monitoring services, MEDIA PULSE allows you to create custom search profiles and track the topics that matter most to your business. You can view your latest clips in real time, analyzing, and editing them with ease. Whenever clips matching your search terms are broadcast, you receive immediate alerts, empowering you to act quickly. The MEDIA PULSE system is among the best media monitoring tools for staying ahead in the rapid media landscape"
+      }
+    }
   }
 }

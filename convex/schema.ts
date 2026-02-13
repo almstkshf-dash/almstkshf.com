@@ -44,4 +44,14 @@ export default defineSchema({
         message: v.string(),
         timestamp: v.number(),
     }),
+
+    free_analyses: defineTable({
+        inputText: v.string(),
+        sentiment: v.string(),
+        score: v.number(),
+        risk: v.string(),
+        tone: v.string(),
+        recommendation: v.string(),
+        timestamp: v.number(),
+    }),
 });
