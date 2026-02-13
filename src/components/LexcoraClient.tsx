@@ -113,15 +113,16 @@ export default function LexcoraClient() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="flex-1 w-full max-w-xl aspect-video relative rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/50 backdrop-blur-xl group shadow-2xl shadow-blue-900/20"
+                            className="flex-1 w-full max-w-xl relative rounded-3xl border border-slate-800 bg-slate-900/50 backdrop-blur-xl group shadow-2xl shadow-blue-900/20"
                         >
                             <Image
-                                src="/lexcora-digital-transformation.jpg"
-                                alt="LexCora Digital Transformation"
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                src="/lexcora_dashboard.png"
+                                alt="LexCora Digital Transformation Dashboard"
+                                width={1920}
+                                height={1080}
+                                className="w-full h-auto rounded-3xl transition-transform duration-700"
                                 priority
+                                unoptimized
                             />
                         </motion.div>
                     </div>

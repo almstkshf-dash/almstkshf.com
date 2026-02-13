@@ -645,6 +645,37 @@
         "title": "Competitive Benchmarking",
         "desc": "An analytical tool that places you within the context of the global market. Comparing 'Share of Voice' and analyzing the gaps between your brand's performance and competitors, while calculating the economic values of media coverage (AVE) to ensure maximum return on investment in strategic campaigns."
       }
+    },
+    "advanced_infrastructure": {
+      "title": "Advanced Intelligence Infrastructure",
+      "subtitle": "Redefining how information is collected and analyzed on a global scale.",
+      "items": {
+        "global_entity": {
+          "title": "Global Entity-Based Monitoring",
+          "desc": "A continuous (24/7) monitoring system that tracks entities, keywords, and tags across a global matrix encompassing social media platforms, digital media, forums, and extending to television, radio, and print publications. Real-time indexing ensures no time gap between events and their analysis.",
+          "sub": "Continuous, multi-channel indexing for real-time situational awareness."
+        },
+        "transnational": {
+          "title": "Transnational Coverage",
+          "desc": "Comprehensive coverage spanning all continents, with a particular focus on regional and local platforms in the Middle East, Europe, and North America. The platform integrates specialized Natural Language Processing (NLP) (specifically for Arabic) to ensure accurate analysis and overcome language barriers through advanced machine translation.",
+          "sub": "Eliminating language barriers through region-specific NLP and global crawling."
+        },
+        "query_eng": {
+          "title": "Advanced Query Engineering",
+          "desc": "An intelligence search interface that supports Boolean operators and complex filters (source, time range, geography, author, and sentiment type). This architecture allows analysts to move from general exploratory search to surgically precise targeted lookup.",
+          "sub": "Precision searching through complex metadata and Boolean-logic filters."
+        },
+        "data_extraction": {
+          "title": "Seamless Data Extraction",
+          "desc": "Eliminating the technical complexities of API key management or multiple accounts. The platform acts as a \"technical intermediary\" that handles linking, extraction, and bypassing access restrictions through a unified infrastructure, giving analysts structured data flow in a single environment.",
+          "sub": "Unified, zero-friction access to hundreds of global data sources."
+        },
+        "stealth_collection": {
+          "title": "Stealth & Anonymized Collection System",
+          "desc": "For security situations and sensitive investigations, the platform operates using advanced anonymity protocols, including proxy networks and the Tor network. This technology ensures non-attributable monitoring and activates anti-blocking mechanisms to guarantee the continuity of the investigation without alerting the targeted parties.",
+          "sub": "High-anonymity collection for sensitive investigations and OSINT operations."
+        }
+      }
     }
   },
   "TechnicalSolutions": {
