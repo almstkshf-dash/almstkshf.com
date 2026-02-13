@@ -35,8 +35,14 @@ export default function Navbar() {
 
                     {/* Logo */}
                     <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-xl tracking-tighter text-white group">
-                        <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform group-hover:scale-110 border border-blue-500/20">
-                            <Search className="w-6 h-6 text-blue-400" />
+                        <div className="relative w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
+                            <Image
+                                src="/logo.png"
+                                alt="ALMSTKSHF Logo"
+                                width={40}
+                                height={40}
+                                className="object-contain"
+                            />
                         </div>
                         <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
                             {tCommon('app_name')}

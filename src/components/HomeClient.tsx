@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 export default function HomeClient() {
     const t = useTranslations();
@@ -103,6 +104,64 @@ export default function HomeClient() {
                     transition={{ delay: 1, duration: 2 }}
                     className="absolute bottom-0 left-0 right-0 h-[300px] border-t border-blue-500/20 bg-gradient-to-t from-blue-500/5 to-transparent"
                 ></motion.div>
+            </section>
+
+            {/* Clients Carousel Section */}
+            <section className="py-20 bg-slate-950 border-y border-slate-900 overflow-hidden">
+                <div className="mb-10 text-center">
+                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500">{t('Clients.title')}</p>
+                </div>
+
+                <div className="relative flex overflow-x-hidden">
+                    <motion.div
+                        initial={{ x: 0 }}
+                        animate={{ x: "-50%" }}
+                        transition={{
+                            duration: 40,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }}
+                        className="flex whitespace-nowrap gap-12 items-center"
+                    >
+                        {/* Double the items for seamless loop */}
+                        {[...Array(2)].map((_, outerIdx) => (
+                            <div key={outerIdx} className="flex gap-12 items-center">
+                                {Object.keys(t.raw('Clients.list')).map((key) => (
+                                    <span
+                                        key={`${outerIdx}-${key}`}
+                                        className="text-2xl md:text-3xl font-bold text-slate-700 hover:text-blue-500/50 transition-colors cursor-default select-none tracking-tight"
+                                    >
+                                        {t(`Clients.list.${key}`)}
+                                    </span>
+                                ))}
+                            </div>
+                        ))}
+                    </motion.div>
+
+                    {/* Gradient Fades for the edges */}
+                    <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-950 to-transparent z-10"></div>
+                    <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-950 to-transparent z-10"></div>
+                </div>
+            </section>
+
+            {/* Trust & Compliance Row */}
+            <section className="py-12 bg-slate-900/10 border-b border-slate-900">
+                <Container>
+                    <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
+                        <div className="relative w-32 h-12">
+                            <Image src="/tdra.png" alt="TDRA Approved" fill className="object-contain" />
+                        </div>
+                        <div className="relative w-16 h-16">
+                            <Image src="/soc2.png" alt="SOC2 Compliance" fill className="object-contain" />
+                        </div>
+                        <div className="relative w-32 h-12">
+                            <Image src="/secure.png" alt="Secure App" fill className="object-contain" />
+                        </div>
+                        <div className="relative w-32 h-12">
+                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill className="object-contain" />
+                        </div>
+                    </div>
+                </Container>
             </section>
 
             {/* Why Choose Us Section */}

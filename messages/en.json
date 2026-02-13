@@ -16,7 +16,8 @@
     "crisis_management": "Crisis Management Plans",
     "get_started": "Get Started",
     "contact": "Contact Us",
-    "behind_the_scene": "Behind the Scene"
+    "behind_the_scene": "Behind the Scene",
+    "faq": "FAQ"
   },
   "Common": {
     "app_name": "ALMSTKSHF",
@@ -262,6 +263,24 @@
     "integration": {
       "title": "Integrated directly into your leadership workflow",
       "desc": "The Almstkshf AI Agent doesn't just talk — it acts. It connects with your monitoring data to provide insights that are contextually accurate and tactically sound."
+    }
+  },
+  "Clients": {
+    "title": "Trusted by Leaders",
+    "list": {
+      "moi": "Ministry of Interior",
+      "ajman_police": "Ajman Police General Command",
+      "adib": "Abu Dhabi Islamic Bank",
+      "amc": "AMC - Advertising & Marketing Consultants",
+      "dubai_chamber": "Dubai Chamber of Commerce",
+      "mbh": "MBH Law Firm",
+      "wework": "WE WORK",
+      "al_ayam": "Al Ayam Media Production Company",
+      "raheem": "Raheem Media Production",
+      "miacom": "Mia Com for 5G Technology",
+      "al_majd": "Al Majd Satellite Channels Group",
+      "adma": "Abu Dhabi Media Authority",
+      "sea": "Saudi Entertainment Authority"
     }
   }
 }

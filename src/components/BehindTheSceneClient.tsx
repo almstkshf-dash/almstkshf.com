@@ -15,14 +15,16 @@ export default function BehindTheSceneClient() {
             icon: Award,
             color: "text-blue-400",
             bg: "bg-blue-500/10",
-            border: "border-blue-500/20"
+            border: "border-blue-500/20",
+            image: "/tamer.png"
         },
         {
             key: "rami",
             icon: ShieldCheck,
             color: "text-indigo-400",
             bg: "bg-indigo-500/10",
-            border: "border-indigo-500/20"
+            border: "border-indigo-500/20",
+            image: "/rami.jpg"
         }
     ];
 
@@ -69,15 +71,16 @@ export default function BehindTheSceneClient() {
                             transition={{ delay: idx * 0.2 }}
                             className="relative group lg:flex items-center gap-16 p-8 lg:p-12 rounded-[3.5rem] bg-slate-900/30 border border-slate-800 backdrop-blur-xl hover:bg-slate-900/50 transition-all duration-700"
                         >
-                            {/* Photo Placeholder */}
+                            {/* Photo Container */}
                             <div className="flex-shrink-0 w-full lg:w-[400px] h-[500px] rounded-[2.5rem] overflow-hidden bg-slate-950 border border-slate-800 relative group-hover:border-blue-500/30 transition-all duration-700">
+                                <Image
+                                    src={member.image}
+                                    alt={t(`members.${member.key}.name`)}
+                                    fill
+                                    className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="p-12 rounded-full bg-blue-500/5 border border-blue-500/10 group-hover:scale-110 transition-transform duration-700">
-                                        <member.icon className={`w-32 h-32 ${member.color} opacity-20`} />
-                                    </div>
-                                </div>
-                                <div className="absolute bottom-8 left-8 right-8 flex justify-center gap-4">
+                                <div className="absolute bottom-8 left-8 right-8 flex justify-center gap-4 relative z-10">
                                     <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all">
                                         <Linkedin className="w-5 h-5 text-white" />
                                     </button>

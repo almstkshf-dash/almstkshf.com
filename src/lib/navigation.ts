@@ -110,5 +110,10 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     label: "behind_the_scene",
     href: "/behind-the-scene",
     icon: Users,
+  },
+  {
+    label: "faq",
+    href: "/case-studies/lexcora#faq",
+    icon: FileText,
   }
 ];

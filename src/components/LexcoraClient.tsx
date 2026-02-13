@@ -184,7 +184,7 @@ export default function LexcoraClient() {
             </section>
 
             {/* Expert Insights (FAQ) */}
-            <section className="py-24 bg-slate-900/20">
+            <section id="faq" className="py-24 bg-slate-900/20">
                 <Container>
                     <div className="text-center space-y-4 mb-20">
                         <h2 className="text-4xl md:text-6xl font-bold">{t("faq.title")}</h2>

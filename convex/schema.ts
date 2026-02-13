@@ -36,4 +36,12 @@ export default defineSchema({
         })),
         preferences: v.optional(v.any()),
     }).index("by_user_id", ["userId"]),
+
+    contact_submissions: defineTable({
+        name: v.string(),
+        email: v.string(),
+        subject: v.string(),
+        message: v.string(),
+        timestamp: v.number(),
+    }),
 });

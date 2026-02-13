@@ -34,6 +34,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             ? "المستكشف هو شريكك الاستراتيجي للرصد الإعلامي الذكي والحلول القانونية المبنية على البيانات."
             : "ALMSTKSHF is your strategic partner for intelligent media monitoring and data-driven legal solutions.",
         keywords: ["AI", "Media Monitoring", "Legal Tech", "UAE", "Data Analysis", "Strategic Advisor"],
+        icons: {
+            icon: "/favicon.png",
+            apple: "/favicon.png",
+        },
         openGraph: {
             type: "website",
             locale: locale === "ar" ? "ar_AE" : "en_US",
@@ -41,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             siteName: "ALMSTKSHF",
             images: [
                 {
-                    url: "/og-image.jpg", // Make sure to add this image
+                    url: "/logo.png",
                     width: 1200,
                     height: 630,
                     alt: "ALMSTKSHF",
@@ -52,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             card: "summary_large_image",
             title: "ALMSTKSHF",
             description: "Advanced Media & Legal Solutions",
-            images: ["/og-image.jpg"],
+            images: ["/logo.png"],
         },
         alternates: {
             canonical: `https://almstkshf.com/${locale}`,
@@ -83,7 +87,7 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <html lang={locale} dir={dir} suppressHydrationWarning>
+        <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                 <NextIntlClientProvider messages={messages}>
                     <ConvexClientProvider>

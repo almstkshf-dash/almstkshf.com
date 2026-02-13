@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { Send, CheckCircle2, AlertCircle } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
@@ -10,15 +12,27 @@ import clsx from "clsx";
 export default function ContactForm() {
     const t = useTranslations("Contact");
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+    });
+
+    const submitContact = useMutation(api.contact.submit);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setStatus("loading");
 
-        // Mocking an API call
-        setTimeout(() => {
+        try {
+            await submitContact(formData);
             setStatus("success");
-        }, 1500);
+            setFormData({ name: "", email: "", subject: "", message: "" });
+        } catch (error) {
+            console.error(error);
+            setStatus("error");
+        }
     };
 
     if (status === "success") {
@@ -52,6 +66,8 @@ export default function ContactForm() {
                     <input
                         type="text"
                         required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="John Doe"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
@@ -63,6 +79,8 @@ export default function ContactForm() {
                     <input
                         type="email"
                         required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="john@example.com"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
@@ -76,6 +94,8 @@ export default function ContactForm() {
                 <input
                     type="text"
                     required
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder="Inquiry about Media Monitoring"
                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                 />
@@ -88,6 +108,8 @@ export default function ContactForm() {
                 <textarea
                     rows={6}
                     required
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="How can we help you represent your brand?"
                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
                 />

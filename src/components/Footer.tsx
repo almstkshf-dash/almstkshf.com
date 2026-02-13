@@ -3,6 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import Container from "./ui/Container";
 import Link from "next/link";
+import Image from "next/image";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
 
@@ -28,18 +29,20 @@ export default function Footer() {
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
-                                <Facebook className="w-5 h-5" />
-                            </Link>
-                            <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
-                                <Twitter className="w-5 h-5" />
-                            </Link>
                             <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
                                 <Linkedin className="w-5 h-5" />
                             </Link>
-                            <Link href="#" className="p-2 bg-slate-900 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-all">
-                                <Instagram className="w-5 h-5" />
-                            </Link>
+                        </div>
+                        <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                            <div className="relative w-20 h-8">
+                                <Image src="/tdra.png" alt="TDRA" fill className="object-contain" />
+                            </div>
+                            <div className="relative w-8 h-8">
+                                <Image src="/soc2.png" alt="SOC2" fill className="object-contain" />
+                            </div>
+                            <div className="relative w-20 h-8">
+                                <Image src="/secure.png" alt="Secure App" fill className="object-contain" />
+                            </div>
                         </div>
                     </div>
 
@@ -50,7 +53,9 @@ export default function Footer() {
                             {t('links')}
                         </h4>
                         <ul className="space-y-4">
-                            {NAVIGATION_ITEMS.filter(item => !item.children).map((item) => (
+                            {/* Filter out items that are already top-level or have children, 
+                                and ensure we don't duplicate items that are explicitly listed below */}
+                            {NAVIGATION_ITEMS.filter(item => !item.children && !['lexcora', 'contact', 'faq'].includes(item.label)).map((item) => (
                                 <li key={item.label}>
                                     <Link
                                         href={`/${locale}${item.href}`}
@@ -77,6 +82,15 @@ export default function Footer() {
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
                                     {tNav('contact')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href={`/${locale}/case-studies/lexcora#faq`}
+                                    className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
+                                    {tNav('faq')}
                                 </Link>
                             </li>
                         </ul>
