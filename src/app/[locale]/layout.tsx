@@ -7,6 +7,8 @@ import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { routing } from '@/i18n/config';
 import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import ChatbaseWidget from '@/components/ChatbaseWidget';
 
 const inter = Inter({
     subsets: ["latin"],
@@ -34,10 +36,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             ? "المستكشف هو شريكك الاستراتيجي للرصد الإعلامي الذكي والحلول القانونية المبنية على البيانات."
             : "ALMSTKSHF is your strategic partner for intelligent media monitoring and data-driven legal solutions.",
         keywords: ["AI", "Media Monitoring", "Legal Tech", "UAE", "Data Analysis", "Strategic Advisor"],
-        icons: {
-            icon: "/favicon.png",
-            apple: "/favicon.png",
-        },
         openGraph: {
             type: "website",
             locale: locale === "ar" ? "ar_AE" : "en_US",
@@ -92,8 +90,10 @@ export default async function RootLayout({
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                 <NextIntlClientProvider messages={messages}>
                     <ConvexClientProvider>
+                        <Navbar />
                         {children}
                         <Footer />
+                        <ChatbaseWidget />
                     </ConvexClientProvider>
                 </NextIntlClientProvider>
             </body>

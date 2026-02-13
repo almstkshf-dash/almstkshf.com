@@ -1,5 +1,4 @@
 "use client";
-import Navbar from '@/components/Navbar';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -38,8 +37,6 @@ export default function HomeClient() {
 
     return (
         <main className="min-h-screen bg-slate-950">
-            <Navbar />
-
             {/* Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center text-white overflow-hidden">
                 <div className="absolute inset-0 opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
