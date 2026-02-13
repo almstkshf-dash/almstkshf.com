@@ -33,20 +33,25 @@ export async function GET(request: NextRequest) {
         // Set session cookie if it doesn't exist
         const response = NextResponse.json({ token });
 
-        if (!request.cookies.get('session_id')) {
-            response.cookies.set('session_id', sessionId, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 60 * 60 * 24 * 30, // 30 days
-            });
+        try {
+            if (!request.cookies.get('session_id')) {
+                response.cookies.set('session_id', sessionId, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'lax',
+                    maxAge: 60 * 60 * 24 * 30, // 30 days
+                });
+            }
+        } catch (cookieError) {
+            console.warn('Error setting session cookie:', cookieError);
+            // Verify we can still return the token even if cookie setting fails
         }
 
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error generating chatbase token:', error);
         return NextResponse.json(
-            { error: 'Failed to generate token' },
+            { error: 'Failed to generate token', details: error.message },
             { status: 500 }
         );
     }

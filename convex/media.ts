@@ -1,17 +1,34 @@
 import { action } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
+
+// Define the expected structure from Gemini API
+interface GeminiResponse {
+    candidates?: {
+        content?: {
+            parts?: {
+                text?: string;
+            }[];
+        };
+    }[];
+}
+
+// Define the expected analysis structure
+interface AnalysisResult {
+    sentiment: "Positive" | "Neutral" | "Negative";
+    score: number;
+    risk: "Low" | "Medium" | "High";
+    tone: string;
+    recommendation: string;
+}
 
 /**
  * Expert Media & Reputation Intelligence Action
  * Analyzes text for sentiment, risk, and strategic recommendations using Gemini AI.
  */
-
-import { ConvexError } from "convex/values";
-
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler: async (ctx, { text }): Promise<any> => {
+    handler: async (ctx, { text }): Promise<AnalysisResult & { id: string; inputText: string }> => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         console.log(`Analyzing text: "${text.substring(0, 50)}..."`);
@@ -61,32 +78,30 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
             if (!response.ok) {
                 const errorBody = await response.text();
                 console.error(`Gemini API Error (${response.status}):`, errorBody);
-                throw new Error(`AI Service Provider Error: ${response.statusText}`);
+                throw new ConvexError(`AI Service Provider Error: ${response.statusText} (${response.status})`);
             }
 
-            const data = await response.json();
+            const data = (await response.json()) as GeminiResponse;
 
             // Extract text from Gemini response
             const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!responseText) {
                 console.error("Empty Gemini response structure:", JSON.stringify(data));
-                throw new Error("Received empty response from AI service");
+                throw new ConvexError("Received empty response from AI service");
             }
 
-            // Parse JSON - clean any markdown fences just in case
-            const cleanText = responseText.replace(/```json|```/g, "").trim();
-            const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-
-            if (!jsonMatch) {
-                console.error("Could not extract JSON from response:", cleanText);
-                throw new Error("Invalid response format from AI service");
+            let analysis: any;
+            try {
+                // Parse JSON directly since responseMimeType ensures JSON format
+                analysis = JSON.parse(responseText.trim());
+            } catch (jsonError) {
+                console.error("JSON Parse Error:", jsonError, "Response Text:", responseText);
+                throw new ConvexError("Invalid response format from AI service");
             }
 
-            const analysis = JSON.parse(jsonMatch[0]);
-
-            // Validate and sanitize
-            const validated = {
+            // Validate and sanitize deeply to ensure type safety
+            const validated: AnalysisResult = {
                 sentiment: ["Positive", "Neutral", "Negative"].includes(analysis.sentiment)
                     ? analysis.sentiment
                     : "Neutral",
@@ -105,17 +120,34 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
             };
 
             // Save to database and return
-            return await ctx.runMutation(api.analyses.saveAnalysis, {
+            const saved = await ctx.runMutation(api.analyses.saveAnalysis, {
                 inputText: text,
                 ...validated,
             });
 
+            return {
+                ...validated,
+                inputText: text,
+                id: saved.id,
+            };
+
         } catch (error: any) {
             console.error("ALMSTKSHF AI Engine Error:", error);
-            // Throw ConvexError to expose specific message to client
+
+            // If it's already a ConvexError (from our explicit throws), re-throw it
             if (error instanceof ConvexError) {
                 throw error;
             }
+
+            // For unknown errors, provide a generic message to the client but log the real error
+            // Ensure we log the full error object, stack, and any response details if available
+            console.error("ALMSTKSHF AI Engine Unhandled Error:", {
+                message: error.message,
+                stack: error.stack,
+                name: error.name,
+                cause: error.cause,
+                fullError: error
+            });
             throw new ConvexError(error.message || "Analysis failed. Please try again.");
         }
     },
