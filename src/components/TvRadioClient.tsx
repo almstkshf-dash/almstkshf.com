@@ -263,7 +263,7 @@ export default function TvRadioClient() {
                         <h2 className="text-3xl font-bold text-white mb-4">Media Monitoring Console</h2>
                         <p className="text-slate-500">Access your latest reports and crisis management plans below.</p>
                     </div>
-                    <MediaMonitoringDashboard />
+                    <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>
             </section>
         </div>

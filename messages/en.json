@@ -14,6 +14,10 @@
     "central_media_repository": "Central Media Repository",
     "media_pulse": "Media Pulse",
     "crisis_management": "Crisis Management Plans",
+    "all": "All",
+    "tv": "TV",
+    "radio": "Radio",
+    "press": "Press",
     "get_started": "Get Started",
     "contact": "Contact Us",
     "behind_the_scene": "Behind the Scene",
@@ -599,6 +603,47 @@
             "desc": "Relate social metrics to website traffic, leads or sales for full marketing attribution."
           }
         ]
+      }
+    }
+  },
+  "CrisisManagementDetail": {
+    "title": "Crisis Management Plans",
+    "cover_label": "Strategic Defense",
+    "description": "In a complex intelligence and information environment, we don't just 'collect data' but 'divide it.' The AlMstkshf platform provides a sophisticated infrastructure based on artificial intelligence (AI) and machine learning (ML) to extract the strategic value inherent in digital content.",
+    "features": {
+      "intelligence_sentiment": {
+        "title": "Intelligence & Sentiment Analysis",
+        "desc": "We move beyond superficial monitoring of posts to complex tone analysis. We use advanced natural language processing (NLP) to understand the cultural and linguistic context, enabling us to measure public opinion with high statistical accuracy and transform 'noise' into measurable performance indicators."
+      },
+      "trend_anomaly": {
+        "title": "Trend & Anomaly Detection",
+        "desc": "Our system doesn't just monitor trends; it analyzes the underlying mechanisms of trends. We identify anomalies in data flows and uncover the root causes of shifts in digital narratives, supporting evidence-based, rather than speculative, strategic decision-making."
+      },
+      "audience_mapping": {
+        "title": "Audience & Network Mapping",
+        "desc": "Demographic analysis and influence networks. This involves deconstructing digital entities and analyzing hidden connections between accounts and influencers. The platform provides social network link analysis to identify key nodes driving public opinion, with precise definitions of target audience characteristics, professional profiles, and geographic locations."
+      },
+      "multimedia_osint": {
+        "title": "Multimedia OSINT",
+        "desc": "Powerful analytical capabilities extending to images and video:",
+        "items": [
+          {
+            "title": "Facial Recognition",
+            "desc": "Identifying influential figures in visual content."
+          },
+          {
+            "title": "Object & Scene Detection",
+            "desc": "Automatically detecting objects, logos, and scenes (such as gatherings or symbols)."
+          },
+          {
+            "title": "Automated Transcription",
+            "desc": "Converting audio content and speeches into searchable text for immediate analysis."
+          }
+        ]
+      },
+      "benchmarking": {
+        "title": "Competitive Benchmarking",
+        "desc": "An analytical tool that places you within the context of the global market. Comparing 'Share of Voice' and analyzing the gaps between your brand's performance and competitors, while calculating the economic values of media coverage (AVE) to ensure maximum return on investment in strategic campaigns."
       }
     }
   },

@@ -143,9 +143,12 @@ export default function Navbar() {
                             <Globe className="w-5 h-5" />
                         </button>
                         <div className="h-6 w-px bg-slate-800"></div>
-                        <button className="px-4 py-2 text-sm font-semibold bg-white text-slate-950 rounded-full hover:bg-slate-200 transition-colors">
+                        <Link
+                            href={`/${locale}/contact`}
+                            className="px-4 py-2 text-sm font-semibold bg-white text-slate-950 rounded-full hover:bg-slate-200 transition-colors"
+                        >
                             {t('get_started')}
-                        </button>
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Toggle */}

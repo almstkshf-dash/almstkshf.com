@@ -92,7 +92,10 @@ export default function HomeClient() {
                             {t('Common.try_ai')}
                         </Link>
 
-                        <button className="px-10 py-5 bg-slate-900/50 border border-slate-800 backdrop-blur-xl hover:border-slate-600 text-slate-300 rounded-2xl font-semibold transition-all hover:text-white">
+                        <button
+                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="px-10 py-5 bg-slate-900/50 border border-slate-800 backdrop-blur-xl hover:border-slate-600 text-slate-300 rounded-2xl font-semibold transition-all hover:text-white"
+                        >
                             {t('Common.view_details')}
                         </button>
                     </motion.div>
@@ -168,7 +171,7 @@ export default function HomeClient() {
             <FreeInsightTool />
 
             {/* Why Choose Us Section */}
-            <section className="py-32 relative overflow-hidden bg-slate-950">
+            <section id="features" className="py-32 relative overflow-hidden bg-slate-950">
                 <Container>
                     <div className="text-center mb-24 space-y-4">
                         <motion.h2
