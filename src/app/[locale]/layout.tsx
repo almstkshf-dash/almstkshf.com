@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
+import { ClerkProvider } from '@clerk/nextjs';
 import { routing } from '@/i18n/config';
 import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -88,19 +89,21 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
-            <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
-                <NextIntlClientProvider locale={locale} messages={messages}>
-                    <ConvexClientProvider>
-                        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-                            <Navbar />
-                            {children}
-                            <Footer />
-                            <ChatbaseWidget />
-                        </ThemeProvider>
-                    </ConvexClientProvider>
-                </NextIntlClientProvider>
-            </body>
-        </html>
+        <ClerkProvider>
+            <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
+                <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
+                    <NextIntlClientProvider locale={locale} messages={messages}>
+                        <ConvexClientProvider>
+                            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+                                <Navbar />
+                                {children}
+                                <Footer />
+                                <ChatbaseWidget />
+                            </ThemeProvider>
+                        </ConvexClientProvider>
+                    </NextIntlClientProvider>
+                </body>
+            </html>
+        </ClerkProvider>
     );
 }

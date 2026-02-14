@@ -9,10 +9,10 @@ export function DetailedContent() {
     const t = useTranslations("MediaPulseDetail");
 
     const features = [
-        { key: "omni_channel", icon: Globe, color: "text-blue-400", bg: "bg-blue-500/10" },
-        { key: "ai_analytics", icon: Zap, color: "text-amber-400", bg: "bg-amber-500/10" },
-        { key: "alerts", icon: AlertCircle, color: "text-rose-400", bg: "bg-rose-500/10" },
-        { key: "dashboards", icon: BarChart3, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+        { key: "omni_channel", icon: Globe, color: "text-primary", bg: "bg-primary/10" },
+        { key: "ai_analytics", icon: Zap, color: "text-amber-500 dark:text-amber-400", bg: "bg-amber-500/10" },
+        { key: "alerts", icon: AlertCircle, color: "text-destructive", bg: "bg-destructive/10" },
+        { key: "dashboards", icon: BarChart3, color: "text-emerald-500 dark:text-emerald-400", bg: "bg-emerald-500/10" },
     ];
 
     return (

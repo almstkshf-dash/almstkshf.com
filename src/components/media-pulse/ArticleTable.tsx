@@ -17,7 +17,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
     if (articles === undefined) {
-        return <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-8 w-8 text-blue-600" /></div>;
+        return <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div>;
     }
 
     if (articles.length === 0) {
@@ -150,7 +150,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                 </td>
                                 <td className="p-4 max-w-sm">
                                     <div className="flex flex-col gap-1">
-                                        <a href={article.resolvedUrl || article.url} target="_blank" rel="noreferrer" className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                                        <a href={article.resolvedUrl || article.url} target="_blank" rel="noreferrer" className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform">
                                             <span className="truncate">{article.title}</span>
                                             <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
                                         </a>

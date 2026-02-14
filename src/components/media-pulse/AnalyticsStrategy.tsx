@@ -17,19 +17,19 @@ export function AnalyticsStrategy() {
         {
             key: "reputation",
             icon: ShieldCheck,
-            color: "text-emerald-400",
+            color: "text-emerald-500 dark:text-emerald-400",
             border: "hover:border-emerald-500/30",
         },
         {
             key: "benchmarking",
             icon: TrendingUp,
-            color: "text-blue-400",
-            border: "hover:border-blue-500/30",
+            color: "text-primary",
+            border: "hover:border-primary/30",
         },
         {
             key: "social_analytics",
             icon: Activity,
-            color: "text-indigo-400",
+            color: "text-indigo-500 dark:text-indigo-400",
             border: "hover:border-indigo-500/30",
         },
     ];

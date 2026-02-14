@@ -213,22 +213,22 @@ function MultiSelectDropdown({
                 aria-labelledby={ariaLabelledBy}
                 onClick={() => setIsOpen(!isOpen)}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOpen(!isOpen); } }}
-                className={`w-full flex items-center gap-2 bg-slate-900/80 rounded-xl px-4 py-3 text-left transition-all border cursor-pointer ${error
-                    ? 'border-rose-500/60 ring-2 ring-rose-500/20'
+                className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-left transition-all border cursor-pointer ${error
+                    ? 'border-destructive/60 ring-2 ring-destructive/20'
                     : isOpen
-                        ? 'border-amber-500/50 ring-2 ring-amber-500/20'
-                        : 'border-slate-700/60 hover:border-slate-600'
+                        ? 'border-primary/50 ring-2 ring-primary/20 bg-card'
+                        : 'border-border hover:border-primary/40'
                     }`}
             >
-                <span className="text-slate-500 flex-shrink-0">{icon}</span>
+                <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>
                 <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px]">
                     {selected.length === 0 ? (
-                        <span className="text-slate-500 text-sm">{placeholder}</span>
+                        <span className="text-muted-foreground text-sm transition-colors">{placeholder}</span>
                     ) : (
                         selected.map((id) => (
                             <span
                                 key={id}
-                                className="inline-flex items-center gap-1 bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded-lg px-2 py-0.5 text-xs font-medium"
+                                className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
                                 {renderTag(id)}
                                 <span
@@ -236,7 +236,7 @@ function MultiSelectDropdown({
                                     tabIndex={0}
                                     onClick={(e) => { e.stopPropagation(); toggle(id); }}
                                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(id); } }}
-                                    className="hover:text-amber-100 ml-0.5 cursor-pointer"
+                                    className="hover:text-primary/70 ml-0.5 cursor-pointer transition-colors"
                                 >
                                     <X className="w-3 h-3" />
                                 </span>
@@ -244,24 +244,24 @@ function MultiSelectDropdown({
                         ))
                     )}
                 </div>
-                <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
             {/* Error Message */}
             {error && (
-                <p className="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-in fade-in duration-300">
                     <AlertTriangle className="w-3 h-3" /> {error}
                 </p>
             )}
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute z-50 mt-2 w-full bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute z-50 mt-2 w-full bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {/* Search */}
-                    <div className="p-2 border-b border-slate-800">
+                    <div className="p-2 border-b border-border bg-muted/30">
                         <div className="relative">
                             <label htmlFor="dropdown-search" className="sr-only">{searchPlaceholder}</label>
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <input
                                 id="dropdown-search"
                                 name="dropdown-search"
@@ -269,16 +269,16 @@ function MultiSelectDropdown({
                                 placeholder={searchPlaceholder}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full bg-slate-800/80 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder:text-slate-600 outline-none focus:ring-1 focus:ring-amber-500/30 border border-slate-700/50"
+                                className="w-full bg-background rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/30 border border-border transition-all"
                                 autoFocus
                             />
                         </div>
                     </div>
 
                     {/* Items List */}
-                    <div className="max-h-56 overflow-y-auto scrollbar-thin">
+                    <div className="max-h-56 overflow-y-auto scrollbar-thin transition-colors">
                         {filtered.length === 0 ? (
-                            <div className="py-6 text-center text-slate-500 text-sm">{noResultsText || 'No results found'}</div>
+                            <div className="py-6 text-center text-muted-foreground text-sm transition-colors">{noResultsText || 'No results found'}</div>
                         ) : (
                             filtered.map((item) => (
                                 <button
@@ -286,16 +286,16 @@ function MultiSelectDropdown({
                                     type="button"
                                     onClick={() => toggle(item.id)}
                                     className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${selected.includes(item.id)
-                                        ? 'bg-amber-500/10 text-amber-200'
-                                        : 'text-slate-300 hover:bg-slate-800/80'
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-foreground hover:bg-muted'
                                         }`}
                                 >
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${selected.includes(item.id)
-                                        ? 'bg-amber-500 border-amber-500'
-                                        : 'border-slate-600'
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${selected.includes(item.id)
+                                        ? 'bg-primary border-primary'
+                                        : 'border-border'
                                         }`}>
                                         {selected.includes(item.id) && (
-                                            <CheckCircle2 className="w-3 h-3 text-white" />
+                                            <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
                                         )}
                                     </div>
                                     {renderItem(item)}
@@ -305,15 +305,15 @@ function MultiSelectDropdown({
                     </div>
 
                     {/* Footer */}
-                    <div className="p-2 border-t border-slate-800 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider">
+                    <div className="p-2 border-t border-border bg-muted/30 flex items-center justify-between transition-colors">
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider transition-colors px-2">
                             {selected.length} {selectedText || 'selected'}
                         </span>
                         {selected.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => onChange([])}
-                                className="text-[10px] text-rose-400 hover:text-rose-300 uppercase tracking-wider font-bold"
+                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-wider font-bold transition-colors px-2"
                             >
                                 {clearAllText || 'Clear All'}
                             </button>
@@ -630,8 +630,8 @@ export default function NewsGenerator() {
 
                 {/* Success Result */}
                 {result && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3.5 flex items-center gap-3 animate-in fade-in duration-300">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3.5 flex items-center gap-3 animate-in fade-in duration-300 transition-colors">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 transition-colors" />
                         <span className="text-emerald-700 dark:text-emerald-300 text-sm font-medium transition-colors">
                             {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
                         </span>

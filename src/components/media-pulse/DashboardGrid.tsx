@@ -83,7 +83,7 @@ export function DashboardGrid({ articles = [] }: DashboardGridProps) {
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    className="p-8 bg-gradient-to-br from-primary to-indigo-800 rounded-[2rem] text-primary-foreground shadow-2xl shadow-primary/40 relative overflow-hidden group"
+                    className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2rem] text-primary-foreground shadow-2xl shadow-primary/40 relative overflow-hidden group transition-all"
                 >
                     <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
                         <Globe className="w-32 h-32" />

@@ -24,9 +24,8 @@ export default clerkMiddleware(async (auth, req) => {
 
     // For dashboard and other protected routes, enforce authentication
     // We use a cast to any to resolve a TypeScript mismatch in Next.js 16 environments
-    const authObj = await auth();
     if (req.nextUrl.pathname.includes('/dashboard')) {
-        (authObj as any).protect();
+        (auth as any).protect();
     }
 
     return intlMiddleware(req);

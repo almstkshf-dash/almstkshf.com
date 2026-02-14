@@ -9,11 +9,14 @@
     "smart_media_assistant": "Smart Media Assistant",
     "kyc_compliance": "KYC Compliance",
     "integration_hub": "Integration Hub",
+    "api_key": "API Key",
+    "secure_layer": "Secure Integration Layer",
     "media_monitoring": "Media Monitoring",
     "tv_radio_monitoring": "TV & Radio Monitoring",
     "press_monitoring": "Press Publication Monitoring",
     "central_media_repository": "Central Media Repository",
     "media_pulse": "Media Pulse",
+    "system_status": "System Status",
     "crisis_management": "Crisis Management Plans",
     "all": "All",
     "tv": "TV",
@@ -23,6 +26,11 @@
     "contact": "Contact Us",
     "behind_the_scene": "Behind the Scene",
     "pricing": "Pricing",
+    "smart_assistant_input_placeholder": "Generate a press response...",
+    "whatsapp": "WHATSAPP",
+    "teams": "TEAMS",
+    "slack": "SLACK",
+    "outlook": "OUTLOOK",
     "faq": "FAQ",
     "lexcora_desc": "Premier ERP suite for high-net-worth law firms",
     "styling_assistant_desc": "Smart fashion and styling recommendations",
@@ -46,7 +54,12 @@
     "download": "Download PDF",
     "view_details": "View Details",
     "generate_report": "Generate Report",
-    "analyze_tone": "Analyze Tone"
+    "analyze_tone": "Analyze Tone",
+    "toggle_theme": "Toggle theme",
+    "ai_badge": "AI",
+    "image_unavailable": "Image Unavailable",
+    "copied": "Copied",
+    "copy": "Copy"
   },
   "Footer": {
     "about": "About ALMSTKSHF",
@@ -798,6 +811,10 @@
           "title": "Digital Audit Trail",
           "desc": "Transparency and Accountability: Documents every update, whether automatic or manual (with username and date), providing conclusive evidence for auditors."
         },
+        "status_tier_1": "Verification Status: Tier 1",
+        "verified_msg": "You are currently verified for basic platform features.",
+        "ready_scan": "Ready for Scanned Document",
+        "max_file_size": "Maximum file size: 10MB (JPG, PNG, PDF)",
         "risk": {
           "title": "Advanced Risk Classification",
           "desc": "Precise Risk Identification: The ability to classify entities and individuals (individual, entity, terrorist entity) based on the list source (automatic or manual) facilitates effective risk management."
