@@ -1,6 +1,7 @@
 {
   "Navigation": {
     "landing_page": "Home",
+    "dashboard": "Dashboard",
     "case_studies": "Case Studies",
     "lexcora": "LEXCORA",
     "styling_assistant": "Smart Styling Assistant",
@@ -681,7 +682,10 @@
       "automated_alerts": "Automated Alerts",
       "alerts_desc": "Critical shifts in public perception trigger instant notifications to your leadership war room.",
       "specialized_services": "Specialized Services",
-      "advanced_solutions": "Advanced Solutions"
+      "advanced_solutions": "Advanced Solutions",
+      "total_ave": "Total AVE",
+      "articles_count": "Articles",
+      "positive_sent": "Positive Sent."
     }
   },
   "CrisisManagementDetail": {
@@ -876,5 +880,152 @@
         }
       }
     }
+  },
+  "Settings": {
+    "title": "System Settings",
+    "logo_upload": "Client Logo Upload",
+    "logo_desc": "Upload the logo to be used in PDF/Excel reports.",
+    "api_keys": "API Configuration",
+    "gemini_key": "Gemini API Key",
+    "instagram_key": "Instagram API Key",
+    "twitter_key": "Twitter API Key",
+    "defaults": "Default Metrics",
+    "target_countries": "Target Countries",
+    "ave_multiplier": "AVE Multiplier",
+    "save": "Save Changes",
+    "saved_success": "Settings saved successfully",
+    "save_failed": "Failed to save settings. Please try again.",
+    "iso_hint": "Comma separated ISO codes (e.g. AE, SA)",
+    "default_value": "Default",
+    "upload_placeholder": "Click to upload or drag and drop"
+  },
+  "ManualEntry": {
+    "title": "Add Manual Coverage",
+    "article_title": "Title",
+    "title_placeholder": "Article Headline",
+    "source_name": "Source Name",
+    "source_placeholder": "e.g. Gulf News",
+    "date": "Date",
+    "url_optional": "URL (Optional)",
+    "type": "Type",
+    "sentiment": "Sentiment",
+    "reach": "Reach",
+    "reach_placeholder": "0 = Auto",
+    "country": "Country",
+    "content": "Content / Snippet",
+    "content_placeholder": "Paste the article text or summary here...",
+    "evidence_image": "Evidence Image (Optional)",
+    "cancel": "Cancel",
+    "save": "Save Entry",
+    "types": {
+      "print": "Print",
+      "online_news": "Online News",
+      "social_media": "Social Media",
+      "blog": "Blog",
+      "press_release": "Press Release"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "save_failed": "Failed to save article. Please try again."
+  },
+  "ArticleTable": {
+    "no_articles": "No articles found. Start monitoring or add manually.",
+    "showing": "Showing {count} of {total} articles",
+    "export_excel": "Export Excel",
+    "export_pdf": "Export PDF",
+    "col_date": "Date",
+    "col_title": "Title / Source",
+    "col_sentiment": "Sentiment",
+    "col_reach": "Reach",
+    "col_ave": "AVE ($)",
+    "col_status": "Status",
+    "manual": "Manual",
+    "confirm_delete": "Are you sure you want to delete this article?",
+    "confirm_delete_selected": "Are you sure you want to delete {count} selected articles?",
+    "delete_selected": "Delete Selected ({count})",
+    "items_selected": "{count} items selected",
+    "delete": "Delete",
+    "types": {
+      "print": "Print",
+      "online_news": "Online News",
+      "social_media": "Social Media",
+      "blog": "Blog",
+      "press_release": "Press Release"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    }
+  },
+  "Dashboard": {
+    "title": "Media Intelligence Center",
+    "subtitle": "Real-time monitoring, AI analysis, and strategic insights.",
+    "manual_entry": "Manual Entry",
+    "clear_all": "Clear All",
+    "confirm_clear_all": "Are you sure you want to PERMANENTLY delete ALL log entries? This cannot be undone.",
+    "cleared_success": "Successfully cleared {count} articles.",
+    "clear_failed": "Failed to clear articles. Please try again.",
+    "coverage_log": "Coverage Log",
+    "search_placeholder": "Search articles, keywords, sources...",
+    "no_results": "No articles matching your criteria.",
+    "no_results_hint": "Try a different search or generate a new report above.",
+    "export_success": "Report exported successfully.",
+    "export_failed": "Export failed. Please try again.",
+    "export_empty": "No articles to export.",
+    "filters": {
+      "all": "All",
+      "online": "Online News",
+      "social": "Social Media",
+      "press": "Press Release",
+      "blog": "Blog",
+      "print": "Print"
+    }
+  },
+  "NewsGenerator": {
+    "monitor_keyword": "Monitor Keyword",
+    "subtitle": "Search across global news sources in real-time.",
+    "placeholder": "Enter brand, topic, or full phrase to monitor...",
+    "region": "Target Countries",
+    "language": "Content Language",
+    "select_countries": "Select target countries...",
+    "search_countries": "Search countries...",
+    "select_languages": "Select content language...",
+    "search_languages": "Search languages...",
+    "date_range": "Date Range (Optional)",
+    "select_dates": "Select date period...",
+    "date_from": "From",
+    "date_to": "To",
+    "apply": "Apply",
+    "clear": "Clear",
+    "analyzing": "Analyzing...",
+    "generate_report": "Generate Report",
+    "fetch_failed": "Failed to fetch news. Check console for details.",
+    "result_success": "Successfully fetched {count} articles across {feeds} feed(s). {skipped} skipped.",
+    "error_title": "Something went wrong",
+    "error_keyword_required": "Please enter a keyword or phrase to monitor.",
+    "error_country_required": "Select at least one target country.",
+    "error_language_required": "Select at least one content language.",
+    "no_results": "No results found",
+    "selected": "selected",
+    "clear_all": "Clear All"
+  },
+  "SentimentTracker": {
+    "title": "Live Pulse: Public Sentiment",
+    "live": "Live Updates",
+    "awaiting_data": "Awaiting Data",
+    "no_data_message": "Run a monitoring report to see live sentiment analysis.",
+    "source_analysis": "Source Analysis",
+    "articles": "articles",
+    "shift": "Shift",
+    "reach": "Reach",
+    "ai_recommendation": "AI Recommendation",
+    "ai_rec_high_negative": "High negative sentiment detected across sources. Recommend activating crisis management protocols and preparing official statements immediately.",
+    "ai_rec_moderate_negative": "Moderate negative coverage detected in local news. Consider proactive outreach and monitoring the trend closely before it intensifies.",
+    "ai_rec_positive_trend": "Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.",
+    "ai_rec_default": "Coverage sentiment is balanced. Continue current media strategy and monitor for shifts."
   }
 }

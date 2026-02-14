@@ -1,106 +1,210 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus, Activity, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Activity, AlertCircle, Zap } from "lucide-react";
 import clsx from "clsx";
+import { useTranslations } from "next-intl";
 
-interface SentimentData {
-    source: string;
-    sentiment: "positive" | "negative" | "neutral";
-    score: number;
-    trend: number;
+interface Article {
+    title: string;
+    sentiment: string;
+    sourceType: string;
+    reach: number;
+    ave: number;
+    content?: string;
+    [key: string]: any;
 }
 
-const mockSentimentData: SentimentData[] = [
-    { source: "Twitter / X", sentiment: "positive", score: 78, trend: 12 },
-    { source: "LinkedIn", sentiment: "neutral", score: 52, trend: -2 },
-    { source: "Local News", sentiment: "negative", score: 32, trend: -15 },
-    { source: "International Press", sentiment: "positive", score: 85, trend: 5 },
-];
+interface SentimentTrackerProps {
+    articles?: Article[];
+}
 
-export default function SentimentTracker() {
+// Derive real source analysis from actual data
+function analyzeBySource(articles: Article[]) {
+    const sourceMap: Record<string, { positive: number; neutral: number; negative: number; total: number; reach: number }> = {
+        'Twitter / X': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
+        'LinkedIn': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
+        'Local News': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
+        'International Press': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
+    };
+
+    articles.forEach(a => {
+        // Map article sourceType → tracker category
+        let category = 'Local News';
+        if (a.sourceType === 'Social Media') category = 'Twitter / X';
+        else if (a.sourceType === 'Blog') category = 'LinkedIn';
+        else if (a.sourceType === 'Press Release') category = 'International Press';
+        else if (a.sourceType === 'Online News' || a.sourceType === 'Print') {
+            // Rough heuristic — international vs local
+            const intSources = ['reuters', 'bbc', 'cnn', 'bloomberg', 'guardian', 'nytimes', 'wsj', 'ft.com', 'aljazeera'];
+            const isInternational = intSources.some(s => (a.title?.toLowerCase() || '').includes(s) || (a.content?.toLowerCase() || '').includes(s));
+            category = isInternational ? 'International Press' : 'Local News';
+        }
+
+        if (!sourceMap[category]) {
+            sourceMap[category] = { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 };
+        }
+
+        sourceMap[category].total++;
+        sourceMap[category].reach += a.reach || 0;
+        if (a.sentiment === 'Positive') sourceMap[category].positive++;
+        else if (a.sentiment === 'Negative') sourceMap[category].negative++;
+        else sourceMap[category].neutral++;
+    });
+
+    return Object.entries(sourceMap).map(([source, data]) => {
+        if (data.total === 0) {
+            return { source, sentiment: 'neutral' as const, score: 0, trend: 0, count: 0, reach: 0 };
+        }
+
+        const positiveRatio = data.positive / data.total;
+        const negativeRatio = data.negative / data.total;
+        const score = Math.round((positiveRatio * 100 + (data.neutral / data.total) * 50));
+
+        let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
+        if (positiveRatio > 0.5) sentiment = 'positive';
+        else if (negativeRatio > 0.4) sentiment = 'negative';
+
+        const trend = Math.round((positiveRatio - negativeRatio) * 100);
+
+        return { source, sentiment, score: Math.min(score, 100), trend, count: data.total, reach: data.reach };
+    });
+}
+
+// Build AI recommendation from data
+function buildRecommendation(articles: Article[]): string {
+    if (articles.length === 0) return '';
+    const neg = articles.filter(a => a.sentiment === 'Negative').length;
+    const pos = articles.filter(a => a.sentiment === 'Positive').length;
+    const negRatio = neg / articles.length;
+
+    if (negRatio > 0.5) {
+        return 'ai_rec_high_negative';
+    } else if (negRatio > 0.3) {
+        return 'ai_rec_moderate_negative';
+    } else if (pos / articles.length > 0.6) {
+        return 'ai_rec_positive_trend';
+    }
+    return 'ai_rec_default';
+}
+
+export default function SentimentTracker({ articles = [] }: SentimentTrackerProps) {
+    const t = useTranslations('SentimentTracker');
+
+    const hasData = articles.length > 0;
+    const sourceAnalysis = analyzeBySource(articles);
+    const recKey = buildRecommendation(articles);
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-blue-500" />
-                    Live Pulse: Public Sentiment
+                    <Activity className="w-5 h-5 text-amber-500" />
+                    {t('title')}
                 </h3>
                 <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        <span className={clsx(
+                            "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
+                            hasData ? "bg-emerald-400" : "bg-slate-500"
+                        )}></span>
+                        <span className={clsx(
+                            "relative inline-flex rounded-full h-2 w-2",
+                            hasData ? "bg-emerald-500" : "bg-slate-600"
+                        )}></span>
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Live Updates</span>
+                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                        {hasData ? t('live') : t('awaiting_data')}
+                    </span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {mockSentimentData.map((data, idx) => (
-                    <motion.div
-                        key={data.source}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="p-4 bg-slate-900 border border-slate-800 rounded-xl hover:border-slate-700 transition-all hover:bg-slate-800/50 group"
-                    >
-                        <div className="flex justify-between items-start mb-4">
+            {!hasData && (
+                <div className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center">
+                    <Zap className="w-6 h-6 text-amber-500/50 mx-auto mb-2" />
+                    <p className="text-slate-500 text-sm">{t('no_data_message')}</p>
+                </div>
+            )}
+
+            {hasData && (
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sourceAnalysis.map((data, idx) => (
+                            <motion.div
+                                key={data.source}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="p-4 bg-slate-800/40 border border-slate-700/40 rounded-2xl hover:border-slate-600/50 transition-all hover:bg-slate-800/60 group"
+                            >
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4 className="text-slate-200 font-semibold text-sm">{data.source}</h4>
+                                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">
+                                            {t('source_analysis')} · {data.count} {t('articles')}
+                                        </p>
+                                    </div>
+                                    <div className={clsx(
+                                        "p-2 rounded-lg",
+                                        data.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-400" :
+                                            data.sentiment === "negative" ? "bg-rose-500/10 text-rose-400" :
+                                                "bg-amber-500/10 text-amber-400"
+                                    )}>
+                                        {data.sentiment === "positive" ? <TrendingUp className="w-4 h-4" /> :
+                                            data.sentiment === "negative" ? <TrendingDown className="w-4 h-4" /> :
+                                                <Minus className="w-4 h-4" />}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-3xl font-bold text-white tracking-tighter">
+                                            {data.score}%
+                                        </span>
+                                        <span className={clsx(
+                                            "text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1",
+                                            data.trend > 0 ? "bg-emerald-500/10 text-emerald-400" :
+                                                data.trend < 0 ? "bg-rose-500/10 text-rose-400" :
+                                                    "bg-slate-700/50 text-slate-400"
+                                        )}>
+                                            {data.trend > 0 ? "+" : ""}{data.trend}% {t('shift')}
+                                        </span>
+                                    </div>
+
+                                    <div className="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${data.score}%` }}
+                                            transition={{ duration: 1, delay: 0.5 + idx * 0.1 }}
+                                            className={clsx(
+                                                "h-full rounded-full transition-all duration-1000",
+                                                data.sentiment === "positive" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
+                                                    data.sentiment === "negative" ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" :
+                                                        "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="text-[10px] text-slate-500">
+                                        {t('reach')}: {data.reach.toLocaleString()}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* AI Recommendation */}
+                    {recKey && (
+                        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex gap-4 items-start">
+                            <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
                             <div>
-                                <h4 className="text-slate-200 font-semibold text-sm">{data.source}</h4>
-                                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Source Analysis</p>
-                            </div>
-                            <div className={clsx(
-                                "p-2 rounded-lg",
-                                data.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-400" :
-                                    data.sentiment === "negative" ? "bg-rose-500/10 text-rose-400" :
-                                        "bg-amber-500/10 text-amber-400"
-                            )}>
-                                {data.sentiment === "positive" ? <TrendingUp className="w-4 h-4" /> :
-                                    data.sentiment === "negative" ? <TrendingDown className="w-4 h-4" /> :
-                                        <Minus className="w-4 h-4" />}
+                                <h5 className="text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
+                                <p className="text-amber-300/80 text-xs leading-relaxed">{t(recKey)}</p>
                             </div>
                         </div>
-
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-end">
-                                <span className="text-3xl font-bold text-white tracking-tighter">
-                                    {data.score}%
-                                </span>
-                                <span className={clsx(
-                                    "text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1",
-                                    data.trend > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
-                                )}>
-                                    {data.trend > 0 ? "+" : ""}{data.trend}% Shift
-                                </span>
-                            </div>
-
-                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${data.score}%` }}
-                                    transition={{ duration: 1, delay: 0.5 + idx * 0.1 }}
-                                    className={clsx(
-                                        "h-full rounded-full transition-all duration-1000",
-                                        data.sentiment === "positive" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
-                                            data.sentiment === "negative" ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" :
-                                                "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                                    )}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-
-            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex gap-4 items-start">
-                <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5" />
-                <div>
-                    <h5 className="text-blue-200 text-xs font-bold uppercase tracking-wider mb-1">AI Recommendation</h5>
-                    <p className="text-blue-300/80 text-xs leading-relaxed">
-                        Significant sentiment drop detected in Local News. Consider activating Crisis Plan #4 (Reputation Management) to mitigate impact before International Press catches up.
-                    </p>
-                </div>
-            </div>
+                    )}
+                </>
+            )}
         </div>
     );
 }

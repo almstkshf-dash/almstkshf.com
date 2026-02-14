@@ -10,6 +10,7 @@ export default defineSchema({
         content: v.optional(v.string()),
     }),
 
+    // Legacy table, keeping for now but new "media_monitoring_articles" is the main one
     media_reports: defineTable({
         reportName: v.string(),
         source: v.union(v.literal("TV"), v.literal("Radio"), v.literal("Press")),
@@ -18,6 +19,40 @@ export default defineSchema({
         summary: v.optional(v.string()),
         pdfUrl: v.optional(v.string()),
     }).index("by_source", ["source"]),
+
+    // PART 1: THE DATA SCHEMA (NON-NEGOTIABLE)
+    media_monitoring_articles: defineTable({
+        keyword: v.string(),
+        url: v.string(),
+        resolvedUrl: v.optional(v.string()), // The tracked final URL
+        publishedDate: v.string(), // Format: DD/MM/YYYY
+        title: v.string(),
+        content: v.string(), // Short summary/snippet
+        language: v.union(v.literal("EN"), v.literal("AR")),
+        sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
+        sourceType: v.union(v.literal("Online News"), v.literal("Social Media"), v.literal("Blog"), v.literal("Print"), v.literal("Press Release")),
+        sourceCountry: v.string(), // ISO Code
+        reach: v.number(),
+        ave: v.number(),
+        imageUrl: v.optional(v.string()), // For PDF thumbnails
+        isManual: v.optional(v.boolean()), // To distinguish manual entries
+        createdAt: v.number(),
+    }).index("by_date", ["publishedDate"]),
+
+    // PART 3: SETTINGS
+    app_settings: defineTable({
+        type: v.literal("global"), // Singleton pattern
+        logoUrl: v.optional(v.string()),
+        apiKeys: v.object({
+            gemini: v.optional(v.string()),
+            instagram: v.optional(v.string()),
+            twitter: v.optional(v.string()),
+        }),
+        defaults: v.object({
+            targetCountries: v.array(v.string()),
+            aveMultiplier: v.number(),
+        }),
+    }),
 
     crisis_plans: defineTable({
         title: v.string(),
@@ -60,5 +95,6 @@ export default defineSchema({
         name: v.optional(v.string()), // Optional name
         service: v.string(),          // e.g., "styling_assistant"
         timestamp: v.number(),
+        timestamp_ms: v.optional(v.number()),
     }).index("by_email", ["email"]),
 });

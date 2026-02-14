@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import Container from "./ui/Container";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
@@ -20,7 +20,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Column 1: About */}
                     <div className="space-y-6">
-                        <Link href={`/${locale}`} className="flex items-center gap-3">
+                        <Link href="/" className="flex items-center gap-3">
                             <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
                                 {tCommon('app_name')}
                             </span>
@@ -58,7 +58,7 @@ export default function Footer() {
                             {NAVIGATION_ITEMS.filter(item => !item.children && !['lexcora', 'contact', 'faq'].includes(item.label)).map((item) => (
                                 <li key={item.label}>
                                     <Link
-                                        href={`/${locale}${item.href}`}
+                                        href={item.href as any}
                                         className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
                                     >
                                         <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
@@ -68,7 +68,7 @@ export default function Footer() {
                             ))}
                             <li>
                                 <Link
-                                    href={`/${locale}/case-studies/lexcora`}
+                                    href="/case-studies/lexcora"
                                     className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
@@ -77,7 +77,7 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link
-                                    href={`/${locale}/contact`}
+                                    href="/contact"
                                     className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
@@ -86,7 +86,7 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link
-                                    href={`/${locale}/case-studies/lexcora#faq`}
+                                    href="/case-studies/lexcora#faq"
                                     className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover:bg-blue-500 transition-colors"></span>
@@ -126,12 +126,12 @@ export default function Footer() {
                         </h4>
                         <ul className="space-y-4">
                             <li>
-                                <Link href={`/${locale}/privacy`} className="text-slate-400 hover:text-white transition-colors text-sm">
+                                <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors text-sm">
                                     {t('privacy')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href={`/${locale}/terms`} className="text-slate-400 hover:text-white transition-colors text-sm">
+                                <Link href="/terms" className="text-slate-400 hover:text-white transition-colors text-sm">
                                     {t('terms')}
                                 </Link>
                             </li>
@@ -152,7 +152,7 @@ export default function Footer() {
                 <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 uppercase tracking-widest font-medium">
                     <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
-                        <Link href={`/${locale}/contact`} className="hover:text-white transition-colors">{t('support')}</Link>
+                        <Link href="/contact" className="hover:text-white transition-colors">{t('support')}</Link>
                         <Link href="/sitemap.xml" className="hover:text-white transition-colors">{t('sitemap')}</Link>
                         <button className="hover:text-white transition-colors">{t('status')}</button>
                     </div>

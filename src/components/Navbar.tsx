@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, ChevronDown } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
-import Link from "next/link";
 import clsx from "clsx";
 
 export default function Navbar() {
@@ -22,8 +21,7 @@ export default function Navbar() {
 
     const toggleLocale = () => {
         const newLocale = locale === "en" ? "ar" : "en";
-        const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
-        router.push(newPath);
+        router.replace(pathname, { locale: newLocale });
     };
 
     const isRTL = locale === "ar";
@@ -34,7 +32,7 @@ export default function Navbar() {
                 <Container>
                     <div className="flex h-20 items-center justify-between">
                         {/* Logo */}
-                        <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-white group z-50 relative">
+                        <Link href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-white group z-50 relative">
                             <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-105">
                                 <Image
                                     src="/logo.png"
@@ -90,7 +88,7 @@ export default function Navbar() {
                                                             {item.children.map((child) => (
                                                                 <Link
                                                                     key={child.label}
-                                                                    href={`/${locale}${child.href}`}
+                                                                    href={child.href as any}
                                                                     className="block p-3 rounded-lg hover:bg-white/5 transition-all group/item"
                                                                     onClick={() => setActiveDropdown(null)}
                                                                 >
@@ -120,7 +118,7 @@ export default function Navbar() {
                                 return (
                                     <Link
                                         key={item.label}
-                                        href={`/${locale}${item.href}`}
+                                        href={item.href as any}
                                         className={clsx(
                                             "text-sm font-medium transition-colors hover:text-primary flex items-center gap-2",
                                             isActive ? "text-primary" : "text-slate-300"
@@ -144,7 +142,7 @@ export default function Navbar() {
                                 <span>{isRTL ? "English" : "العربية"}</span>
                             </button>
                             <Link
-                                href={`/${locale}/contact`}
+                                href="/contact"
                                 className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
                             >
                                 {t('get_started')}
@@ -174,7 +172,7 @@ export default function Navbar() {
                         <Container>
                             <div className="flex flex-col min-h-screen py-6">
                                 <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
-                                    <Link href={`/${locale}`} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                                    <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
                                         <div className="relative w-10 h-10 overflow-hidden rounded-lg">
                                             <Image
                                                 src="/logo.png"
@@ -208,7 +206,7 @@ export default function Navbar() {
                                                         {item.children.map(child => (
                                                             <Link
                                                                 key={child.label}
-                                                                href={`/${locale}${child.href}`}
+                                                                href={child.href as any}
                                                                 className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group"
                                                                 onClick={() => setMobileMenuOpen(false)}
                                                             >
@@ -226,7 +224,7 @@ export default function Navbar() {
                                                 </div>
                                             ) : (
                                                 <Link
-                                                    href={`/${locale}${item.href}`}
+                                                    href={item.href as any}
                                                     className="flex items-center gap-4 p-3 text-lg font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all"
                                                     onClick={() => setMobileMenuOpen(false)}
                                                 >
@@ -250,7 +248,7 @@ export default function Navbar() {
                                     </button>
 
                                     <Link
-                                        href={`/${locale}/contact`}
+                                        href="/contact"
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
                                     >

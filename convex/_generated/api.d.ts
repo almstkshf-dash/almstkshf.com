@@ -12,7 +12,10 @@ import type * as analyses from "../analyses.js";
 import type * as contact from "../contact.js";
 import type * as init from "../init.js";
 import type * as media from "../media.js";
+import type * as monitoring from "../monitoring.js";
+import type * as monitoringAction from "../monitoringAction.js";
 import type * as queries from "../queries.js";
+import type * as settings from "../settings.js";
 import type * as waitlist from "../waitlist.js";
 
 import type {
@@ -26,7 +29,10 @@ declare const fullApi: ApiFromModules<{
   contact: typeof contact;
   init: typeof init;
   media: typeof media;
+  monitoring: typeof monitoring;
+  monitoringAction: typeof monitoringAction;
   queries: typeof queries;
+  settings: typeof settings;
   waitlist: typeof waitlist;
 }>;
 

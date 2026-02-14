@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Mic2, Radio, Newspaper, Filter, Download, FileText } from "lucide-react";
+import { Filter, Mic2, Radio, Newspaper, FileText, Download } from "lucide-react";
 import Button from "./ui/Button";
-import Link from "next/link";
 import clsx from "clsx";
 import CrisisPlanCard from "./CrisisPlanCard";
 import { SkeletonReportRow, SkeletonCard } from "./ui/Skeleton";
@@ -29,10 +28,10 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const locale = useLocale();
 
     const filters: { label: string; value: "TV" | "Radio" | "Press" | undefined; icon: any; href: string }[] = [
-        { label: "all", value: undefined, icon: Filter, href: `/${locale}/media-monitoring/central-media-repository` },
-        { label: "tv", value: "TV", icon: Mic2, href: `/${locale}/media-monitoring/tv-radio` },
-        { label: "radio", value: "Radio", icon: Radio, href: `/${locale}/media-monitoring/tv-radio` },
-        { label: "press", value: "Press", icon: Newspaper, href: `/${locale}/media-monitoring/press` },
+        { label: "all", value: undefined, icon: Filter, href: "/media-monitoring/central-media-repository" },
+        { label: "tv", value: "TV", icon: Mic2, href: "/media-monitoring/tv-radio" },
+        { label: "radio", value: "Radio", icon: Radio, href: "/media-monitoring/tv-radio" },
+        { label: "press", value: "Press", icon: Newspaper, href: "/media-monitoring/press" },
     ];
 
     return (

@@ -6,8 +6,29 @@ import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
 
-export function DashboardGrid() {
+interface DashboardGridProps {
+    articles?: any[];
+}
+
+export function DashboardGrid({ articles = [] }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
+
+    // Calculate Stats
+    const totalReach = articles.reduce((sum, a) => sum + (a.reach || 0), 0);
+    const totalAVE = articles.reduce((sum, a) => sum + (a.ave || 0), 0);
+
+    // Sentiment Stats
+    const sentimentCounts = articles.reduce((acc, a) => {
+        acc[a.sentiment] = (acc[a.sentiment] || 0) + 1;
+        return acc;
+    }, { Positive: 0, Neutral: 0, Negative: 0 });
+
+    const total = articles.length || 1;
+    const sentimentPcts = {
+        Positive: Math.round((sentimentCounts.Positive / total) * 100),
+        Neutral: Math.round((sentimentCounts.Neutral / total) * 100),
+        Negative: Math.round((sentimentCounts.Negative / total) * 100),
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -25,7 +46,7 @@ export function DashboardGrid() {
                                 <div className="px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">{t('global')}</div>
                             </div>
                         </div>
-                        <SentimentTracker />
+                        <SentimentTracker articles={articles} />
                     </div>
                 </section>
 
@@ -40,16 +61,17 @@ export function DashboardGrid() {
                             {t('reputation_desc')}
                         </p>
                         <div className="flex gap-4">
-                            <div className="px-4 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-rose-500/20">{t('anti_bot')}</div>
-                            <div className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-emerald-500/20">{t('verification')}</div>
+                            <div className="px-4 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-rose-500/20">{t('total_ave')}: ${(totalAVE / 1000).toFixed(1)}k</div>
+                            <div className="px-4 py-2 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-emerald-500/20">{articles.length} {t('articles_count')}</div>
                         </div>
                     </div>
                     <div className="w-full md:w-64 h-64 relative flex items-center justify-center">
                         <div className="absolute inset-0 border-[16px] border-slate-800 rounded-full"></div>
-                        <div className="absolute inset-0 border-[16px] border-emerald-500 rounded-full border-t-transparent border-l-transparent rotate-[45deg]"></div>
+                        {/* Dynamic safety score based on Positive %? */}
+                        <div className="absolute inset-0 border-[16px] border-emerald-500 rounded-full border-t-transparent border-l-transparent rotate-[45deg]" style={{ clipPath: `polygon(0 0, 100% 0, 100% ${sentimentPcts.Positive}%, 0 ${sentimentPcts.Positive}%)` }}></div>
                         <div className="text-center">
-                            <p className="text-4xl font-bold text-white">99.8%</p>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('safety_score')}</p>
+                            <p className="text-4xl font-bold text-white">{sentimentPcts.Positive}%</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('positive_sent')}</p>
                         </div>
                     </div>
                 </section>
@@ -67,7 +89,9 @@ export function DashboardGrid() {
                         <Globe className="w-32 h-32" />
                     </div>
                     <h4 className="font-bold text-sm uppercase tracking-[0.2em] mb-6 opacity-80 italic">{t('scope')}</h4>
-                    <div className="text-6xl font-bold mb-4 tracking-tighter">1.2M+</div>
+                    <div className="text-5xl font-bold mb-4 tracking-tighter">
+                        {(totalReach / 1000000).toFixed(1)}M+
+                    </div>
                     <p className="text-blue-100 text-sm font-light leading-relaxed">{t('scope_desc')}</p>
                 </motion.div>
 
@@ -84,9 +108,9 @@ export function DashboardGrid() {
                     </div>
                     <div className="space-y-6">
                         {[
-                            { label: t('ToneLabels.positive'), value: 65, color: "bg-emerald-500", icon: ShieldCheck },
-                            { label: t('ToneLabels.neutral'), value: 25, color: "bg-blue-500", icon: Activity },
-                            { label: t('ToneLabels.negative'), value: 10, color: "bg-rose-500", icon: AlertCircle },
+                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-emerald-500", icon: ShieldCheck },
+                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-blue-500", icon: Activity },
+                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-rose-500", icon: AlertCircle },
                         ].map((item) => (
                             <div key={item.label} className="space-y-3">
                                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">

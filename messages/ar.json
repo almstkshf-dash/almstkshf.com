@@ -32,7 +32,8 @@
         "contact": "اتصل بنا",
         "pricing": "الأسعار",
         "behind_the_scene": "خلف الكواليس",
-        "faq": "الأسئلة الشائعة"
+        "faq": "الأسئلة الشائعة",
+        "dashboard": "لوحة التحكم"
     },
     "Common": {
         "app_name": "المستكشف",
@@ -46,6 +47,73 @@
         "view_details": "عرض التفاصيل",
         "generate_report": "إنشاء تقرير",
         "analyze_tone": "تحليل النبرة"
+    },
+    "ArticleTable": {
+        "export_excel": "تصدير Excel",
+        "export_pdf": "تصدير PDF",
+        "col_date": "التاريخ",
+        "col_title": "العنوان / المصدر",
+        "col_sentiment": "المشاعر",
+        "col_reach": "الوصول",
+        "col_ave": "القيمة الإعلانية ($)",
+        "col_status": "الحالة",
+        "manual": "يدوي",
+        "confirm_delete": "هل أنت متأكد من حذف هذا المقال؟",
+        "confirm_delete_selected": "هل أنت متأكد من حذف {count} مقالات مختارة؟",
+        "delete_selected": "حذف المختار ({count})",
+        "items_selected": "{count} عناصر مختارة",
+        "delete": "حذف",
+        "types": {
+            "print": "صحافة مطبوعة",
+            "online_news": "أخبار إلكترونية",
+            "social_media": "وسائل التواصل",
+            "blog": "مدونة",
+            "press_release": "بيان صحفي"
+        },
+        "sentiments": {
+            "positive": "إيجابي",
+            "neutral": "محايد",
+            "negative": "سلبي"
+        }
+    },
+    "Dashboard": {
+        "title": "مركز الاستخبارات الإعلامية",
+        "subtitle": "رصد فوري، تحليل ذكي، ورؤى استراتيجية.",
+        "manual_entry": "إدخال يدوي",
+        "clear_all": "مسح الكل",
+        "confirm_clear_all": "هل أنت متأكد من حذف جميع إدخالات السجل بشكل نهائي؟ لا يمكن التراجع عن هذا الإجراء.",
+        "cleared_success": "تم مسح {count} مقالات بنجاح",
+        "clear_failed": "فشل في مسح السجلات",
+        "coverage_log": "سجل التغطية",
+        "search_placeholder": "ابحث في المقالات، الكلمات الرئيسية، أو المصادر...",
+        "no_results": "لا توجد مقالات تطابق معاييرك.",
+        "no_results_hint": "جرب بحثاً مختلفاً أو أنشئ تقريراً جديداً أعلاه.",
+        "export_success": "تم تصدير التقرير بنجاح.",
+        "export_failed": "فشل في تصدير التقرير. حاول مرة أخرى.",
+        "export_empty": "لا توجد مقالات للتصدير.",
+        "filters": {
+            "all": "الكل",
+            "online": "أخبار إلكترونية",
+            "social": "وسائل التواصل",
+            "press": "بيان صحفي",
+            "blog": "مدونة",
+            "print": "صحافة مطبوعة"
+        }
+    },
+    "SentimentTracker": {
+        "title": "النبض المباشر: الرأي العام",
+        "live": "تحديثات مباشرة",
+        "awaiting_data": "بانتظار البيانات",
+        "no_data_message": "قم بتشغيل تقرير المراقبة لمشاهدة تحليل المشاعر المباشر.",
+        "source_analysis": "تحليل المصادر",
+        "articles": "مقالات",
+        "shift": "تحول",
+        "reach": "الوصول",
+        "ai_recommendation": "توصية الذكاء الاصطناعي",
+        "ai_rec_high_negative": "تم رصد مشاعر سلبية عالية عبر المصادر. يوصى بتفعيل بروتوكولات إدارة الأزمات وإعداد بيانات رسمية فوراً.",
+        "ai_rec_moderate_negative": "تم رصد تغطية سلبية معتدلة في الأخبار المحلية. يُنصح بالتواصل الاستباقي ومراقبة الاتجاه عن كثب.",
+        "ai_rec_positive_trend": "تم رصد اتجاه إيجابي في المشاعر. استفد من هذا الزخم لإعلانات استراتيجية وتفاعل إعلامي.",
+        "ai_rec_default": "مشاعر التغطية متوازنة. استمر في الاستراتيجية الإعلامية الحالية وراقب التحولات."
     },
     "Footer": {
         "about": "عن المستكشف",
@@ -682,7 +750,10 @@
             "automated_alerts": "تنبيهات آلية",
             "alerts_desc": "تؤدي التحولات الحرجة في التصور العام إلى إطلاق إشعارات فورية لغرفة عمليات القيادة الخاصة بك.",
             "specialized_services": "خدمات متخصصة",
-            "advanced_solutions": "حلول متقدمة"
+            "advanced_solutions": "حلول متقدمة",
+            "total_ave": "إجمالي قيمة الإعلان",
+            "articles_count": "مقال",
+            "positive_sent": "نبرة إيجابية"
         }
     },
     "CrisisManagementDetail": {
@@ -877,5 +948,83 @@
                 }
             }
         }
+    },
+    "Settings": {
+        "title": "إعدادات النظام",
+        "logo_upload": "شعار العميل",
+        "logo_desc": "قم برفع الشعار لاستخدامه في تقارير PDF و Excel.",
+        "api_keys": "تكوين واجهة برمجة التطبيقات (API)",
+        "gemini_key": "مفتاح Gemini API",
+        "instagram_key": "مفتاح Instagram API",
+        "twitter_key": "مفتاح Twitter API",
+        "defaults": "المقاييس الافتراضية",
+        "target_countries": "الدول المستهدفة",
+        "ave_multiplier": "مضاعف قيمة الإعلان (AVE)",
+        "save": "حفظ التغييرات",
+        "saved_success": "تم حفظ الإعدادات بنجاح",
+        "save_failed": "فشل في حفظ الإعدادات. يرجى المحاولة مرة أخرى.",
+        "iso_hint": "رموز ISO مفصولة بفاصلة (مثال: AE، SA)",
+        "default_value": "الافتراضي",
+        "upload_placeholder": "اضغط للرفع أو اسحب الملف هنا"
+    },
+    "ManualEntry": {
+        "title": "إضافة تغطية يدوية",
+        "article_title": "العنوان",
+        "title_placeholder": "عنوان المقال",
+        "source_name": "اسم المصدر",
+        "source_placeholder": "مثال: جلف نيوز",
+        "date": "التاريخ",
+        "url_optional": "الرابط (اختياري)",
+        "type": "النوع",
+        "sentiment": "المشاعر",
+        "reach": "الوصول",
+        "reach_placeholder": "0 = تلقائي",
+        "country": "البلد",
+        "content": "المحتوى / الملخص",
+        "content_placeholder": "الصق نص المقال أو الملخص هنا...",
+        "evidence_image": "صورة الدليل (اختياري)",
+        "cancel": "إلغاء",
+        "save": "حفظ",
+        "types": {
+            "print": "صحافة مطبوعة",
+            "online_news": "أخبار إلكترونية",
+            "social_media": "وسائل التواصل",
+            "blog": "مدونة",
+            "press_release": "بيان صحفي"
+        },
+        "sentiments": {
+            "positive": "إيجابي",
+            "neutral": "محايد",
+            "negative": "سلبي"
+        },
+        "save_failed": "فشل في حفظ المقال. يرجى المحاولة مرة أخرى."
+    },
+    "NewsGenerator": {
+        "monitor_keyword": "مراقبة الكلمات المفتاحية",
+        "subtitle": "البحث في مصادر الأخبار العالمية في الوقت الفعلي.",
+        "placeholder": "أدخل العلامة التجارية أو الموضوع أو العبارة الكاملة للمراقبة...",
+        "region": "الدول المستهدفة",
+        "language": "لغة المحتوى",
+        "select_countries": "اختر الدول المستهدفة...",
+        "search_countries": "البحث عن الدول...",
+        "select_languages": "اختر لغة المحتوى...",
+        "search_languages": "البحث عن اللغات...",
+        "date_range": "النطاق الزمني (اختياري)",
+        "select_dates": "اختر فترة التاريخ...",
+        "date_from": "من",
+        "date_to": "إلى",
+        "apply": "تطبيق",
+        "clear": "مسح",
+        "analyzing": "جاري التحليل...",
+        "generate_report": "إنشاء التقرير",
+        "fetch_failed": "فشل في جلب الأخبار. تحقق من وحدة التحكم لمزيد من التفاصيل.",
+        "result_success": "تم جلب {count} مقالاً بنجاح عبر {feeds} خلاصة. تم تخطي {skipped}.",
+        "error_title": "حدث خطأ ما",
+        "error_keyword_required": "يرجى إدخال كلمة مفتاحية أو عبارة للمراقبة.",
+        "error_country_required": "اختر دولة مستهدفة واحدة على الأقل.",
+        "error_language_required": "اختر لغة محتوى واحدة على الأقل.",
+        "no_results": "لم يتم العثور على نتائج",
+        "selected": "مختارة",
+        "clear_all": "مسح الكل"
     }
 }

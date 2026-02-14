@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "../globals.css";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { routing } from '@/i18n/config';
@@ -82,13 +82,14 @@ export default async function RootLayout({
         notFound();
     }
 
+    setRequestLocale(locale);
     const messages = await getMessages();
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
         <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
-                <NextIntlClientProvider messages={messages}>
+                <NextIntlClientProvider locale={locale} messages={messages}>
                     <ConvexClientProvider>
                         <Navbar />
                         {children}
