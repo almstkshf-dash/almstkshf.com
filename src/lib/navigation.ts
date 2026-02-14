@@ -12,7 +12,11 @@ import {
   ShieldAlert,
   Home,
   Users,
-
+  CreditCard,
+  Tv,
+  Radio,
+  Database,
+  Search,
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -54,7 +58,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
       {
         label: "smart_media_assistant",
         href: "/technical-solutions/smart-media-assistant",
-        icon: Mic2,
+        icon: Search,
         description: "Advanced media analysis tools"
       },
       {
@@ -78,7 +82,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
       {
         label: "tv_radio_monitoring",
         href: "/media-monitoring/tv-radio",
-        icon: Mic2,
+        icon: Tv,
         description: "Real-time broadcast tracking"
       },
       {
@@ -90,7 +94,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
       {
         label: "central_media_repository",
         href: "/media-monitoring/central-media-repository",
-        icon: FileText,
+        icon: Database,
         description: "Centralized digital asset management"
       },
       {
@@ -112,6 +116,11 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     label: "behind_the_scene",
     href: "/behind-the-scene",
     icon: Users,
+  },
+  {
+    label: "pricing",
+    href: "/pricing",
+    icon: CreditCard,
   },
   {
     label: "faq",

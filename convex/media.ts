@@ -29,7 +29,7 @@ interface AnalysisResult {
 export const analyzeMedia = action({
     args: { text: v.string() },
     handler: async (ctx, { text }): Promise<AnalysisResult & { id: string; inputText: string }> => {
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         console.log(`Analyzing text: "${text.substring(0, 50)}..."`);
 
@@ -60,25 +60,58 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
         try {
             // Call Gemini API directly via REST to avoid SDK issues
             // Using gemini-1.5-flash for maximum stability
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.7,
-                            responseMimeType: "application/json",
-                        },
-                    }),
+            // Helper function to call Gemini API
+            const callGemini = async (model: string) => {
+                console.log(`Attempting analysis with model: ${model}`);
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature: 0.7,
+                                responseMimeType: "application/json",
+                            },
+                        }),
+                    }
+                );
+                return response;
+            };
+
+            // Try primary model (Flash 2.5) first, fallback to Flash 2.0, then Flash Latest
+            // Models confirmed available via listModels debug tool
+            let response = await callGemini("gemini-2.5-flash");
+
+            if (!response.ok && response.status === 404) {
+                console.warn("Primary model (gemini-2.5-flash) not found, attempting fallback to gemini-2.0-flash...");
+                response = await callGemini("gemini-2.0-flash");
+
+                if (!response.ok && response.status === 404) {
+                    console.warn("Fallback model (gemini-2.0-flash) not found, attempting final fallback to gemini-flash-latest...");
+                    response = await callGemini("gemini-flash-latest");
                 }
-            );
+            }
+
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                console.error(`Gemini API Error (${response.status}):`, errorBody);
-                throw new ConvexError(`AI Service Provider Error: ${response.statusText} (${response.status})`);
+                const RequestUrl = response.url;
+
+                console.error(`Gemini API Error details:
+                    Status: ${response.status} ${response.statusText}
+                    URL: ${RequestUrl}
+                    Body: ${errorBody}
+                    Key Prefix: ${apiKey?.substring(0, 5)}...
+                `);
+
+                // Check for common issues
+                if (response.status === 404) {
+                    throw new ConvexError(`AI Service Error: Models (2.5-flash, 2.0-flash, flash-latest) not found. Please run 'npx convex run media:listModels' to see available models.`);
+                }
+
+                throw new ConvexError(`AI Service Provider Error: ${response.statusText} (${response.status}) - ${errorBody.substring(0, 100)}`);
             }
 
             const data = (await response.json()) as GeminiResponse;
@@ -150,5 +183,37 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
             });
             throw new ConvexError(error.message || "Analysis failed. Please try again.");
         }
+    },
+});
+
+/**
+ * Debug Action: List all available Gemini models for the current API Key.
+ * Run this to verify which models are accessible.
+ */
+export const listModels = action({
+    args: {},
+    handler: async (ctx) => {
+        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        if (!apiKey) {
+            throw new ConvexError("GEMINI_API_KEY is missing via process.env");
+        }
+
+        console.log("Listing available Gemini models...");
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
+            { method: "GET" }
+        );
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Failed to list models: ${response.status} ${response.statusText}`, errorText);
+            throw new ConvexError(`Failed to list models: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        const models = data.models?.map((m: any) => m.name.replace('models/', '')) || [];
+
+        console.log("Available Models:", models);
+        return models;
     },
 });

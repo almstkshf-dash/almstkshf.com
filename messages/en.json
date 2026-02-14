@@ -21,7 +21,18 @@
     "get_started": "Get Started",
     "contact": "Contact Us",
     "behind_the_scene": "Behind the Scene",
-    "faq": "FAQ"
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "lexcora_desc": "Premier ERP suite for high-net-worth law firms",
+    "styling_assistant_desc": "Smart fashion and styling recommendations",
+    "smart_media_assistant_desc": "Advanced media analysis tools",
+    "kyc_compliance_desc": "Automated identity verification",
+    "integration_hub_desc": "Seamless API integrations",
+    "tv_radio_monitoring_desc": "Real-time broadcast tracking",
+    "press_monitoring_desc": "Print and digital publication tracking",
+    "central_media_repository_desc": "Centralized digital asset management",
+    "media_pulse_desc": "Live media sentiment analysis",
+    "crisis_management_desc": "Strategic crisis response planning"
   },
   "Common": {
     "app_name": "ALMSTKSHF",

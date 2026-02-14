@@ -29,28 +29,28 @@ export default function Navbar() {
     const isRTL = locale === "ar";
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/70 backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/60">
+        <header className="sticky top-0 z-50 w-full border-b border-border bg-slate-950/90 backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/80">
             <Container>
-                <div className="flex h-16 items-center justify-between">
+                <div className="flex h-20 items-center justify-between">
 
                     {/* Logo */}
-                    <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-xl tracking-tighter text-white group">
-                        <div className="relative w-10 h-10 overflow-hidden rounded-lg flex items-center justify-center transition-transform group-hover:scale-110">
+                    <Link href={`/${locale}`} className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-white group z-50 relative">
+                        <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-transform group-hover:scale-105">
                             <Image
                                 src="/logo.png"
                                 alt="ALMSTKSHF Logo"
-                                width={40}
-                                height={40}
-                                className="object-contain"
+                                width={48}
+                                height={48}
+                                className="object-contain p-1"
                             />
                         </div>
-                        <span className="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">
+                        <span className="hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                             {tCommon('app_name')}
                         </span>
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center gap-6">
+                    <nav className="hidden md:flex items-center gap-6 ml-auto mr-8">
                         {NAVIGATION_ITEMS.map((item) => {
                             const isActive = pathname.includes(item.href || item.label);
 
@@ -64,26 +64,26 @@ export default function Navbar() {
                                     >
                                         <button
                                             className={clsx(
-                                                "flex items-center gap-1 text-sm font-medium transition-colors hover:text-blue-400 py-2",
-                                                isActive ? "text-blue-400" : "text-slate-300"
+                                                "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary py-2",
+                                                isActive ? "text-primary" : "text-slate-300"
                                             )}
                                         >
-                                            {item.icon && <item.icon className="w-4 h-4" />}
+                                            {item.icon && <item.icon className="w-4 h-4 opacity-70 group-hover:opacity-100" />}
                                             <span>{t(item.label)}</span>
-                                            <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                            <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180 opacity-50" />
                                         </button>
 
                                         {/* Dropdown Menu */}
                                         <AnimatePresence>
                                             {activeDropdown === item.label && (
                                                 <motion.div
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: 10 }}
+                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                     transition={{ duration: 0.2 }}
                                                     className={clsx(
-                                                        "absolute top-full w-64 p-2 bg-slate-900 border border-slate-800 rounded-xl shadow-xl",
-                                                        isRTL ? "right-0" : "left-0"
+                                                        "absolute top-full w-72 p-2 bg-slate-900/95 border border-slate-700/50 rounded-xl shadow-2xl backdrop-blur-xl z-50",
+                                                        isRTL ? "right-0 origin-top-right" : "left-0 origin-top-left"
                                                     )}
                                                 >
                                                     <div className="grid gap-1">
@@ -91,19 +91,19 @@ export default function Navbar() {
                                                             <Link
                                                                 key={child.label}
                                                                 href={`/${locale}${child.href}`}
-                                                                className="block p-3 rounded-lg hover:bg-slate-800 transition-colors group/item"
+                                                                className="block p-3 rounded-lg hover:bg-slate-800/80 transition-all group/item"
                                                                 onClick={() => setActiveDropdown(null)}
                                                             >
                                                                 <div className="flex items-start gap-3">
-                                                                    <div className="mt-1 p-1.5 bg-slate-800 rounded-md group-hover/item:bg-blue-500/20 group-hover/item:text-blue-400 transition-colors">
+                                                                    <div className="mt-1 p-2 bg-slate-800 rounded-md group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors text-slate-400">
                                                                         {child.icon && <child.icon className="w-4 h-4" />}
                                                                     </div>
                                                                     <div>
-                                                                        <div className="text-sm font-medium text-slate-200 group-hover/item:text-white">
+                                                                        <div className="text-sm font-semibold text-slate-200 group-hover/item:text-primary">
                                                                             {t(child.label)}
                                                                         </div>
-                                                                        <div className="text-xs text-slate-500 mt-0.5 line-clamp-1">
-                                                                            {child.description}
+                                                                        <div className="text-xs text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+                                                                            {t(`${child.label}_desc` as any)}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -122,11 +122,11 @@ export default function Navbar() {
                                     key={item.label}
                                     href={`/${locale}${item.href}`}
                                     className={clsx(
-                                        "text-sm font-medium transition-colors hover:text-blue-400 flex items-center gap-2",
-                                        isActive ? "text-blue-400" : "text-slate-300"
+                                        "text-sm font-medium transition-colors hover:text-primary flex items-center gap-2",
+                                        isActive ? "text-primary" : "text-slate-300"
                                     )}
                                 >
-                                    {item.icon && <item.icon className="w-4 h-4" />}
+                                    {item.icon && <item.icon className="w-4 h-4 opacity-70 group-hover:opacity-100" />}
                                     {t(item.label)}
                                 </Link>
                             );
@@ -137,15 +137,15 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center gap-4">
                         <button
                             onClick={toggleLocale}
-                            className="p-2 text-slate-400 hover:text-white transition-colors rounded-full hover:bg-slate-800"
+                            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors rounded-full hover:bg-white/5 border border-transparent hover:border-white/10"
                             aria-label="Switch Language"
                         >
-                            <Globe className="w-5 h-5" />
+                            <Globe className="w-3.5 h-3.5" />
+                            <span>{isRTL ? "English" : "العربية"}</span>
                         </button>
-                        <div className="h-6 w-px bg-slate-800"></div>
                         <Link
                             href={`/${locale}/contact`}
-                            className="px-4 py-2 text-sm font-semibold bg-white text-slate-950 rounded-full hover:bg-slate-200 transition-colors"
+                            className="px-5 py-2.5 text-sm font-semibold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
                         >
                             {t('get_started')}
                         </Link>
@@ -153,92 +153,110 @@ export default function Navbar() {
 
                     {/* Mobile Menu Toggle */}
                     <button
-                        className="md:hidden p-2 text-slate-300"
+                        className="md:hidden p-2 text-slate-300 hover:text-white"
                         onClick={() => setMobileMenuOpen(true)}
                     >
-                        <Menu className="w-6 h-6" />
+                        <Menu className="w-7 h-7" />
                     </button>
                 </div>
             </Container>
 
-            {/* Mobile Drawer */}
+            {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {mobileMenuOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/50 z-50 md:hidden backdrop-blur-sm"
-                            onClick={() => setMobileMenuOpen(false)}
-                        />
-                        <motion.div
-                            initial={{ x: isRTL ? "100%" : "-100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: isRTL ? "100%" : "-100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className={clsx(
-                                "fixed top-0 bottom-0 w-[80%] max-w-sm bg-slate-950 border-e border-slate-800 z-50 p-6 overflow-y-auto",
-                                isRTL ? "right-0" : "left-0"
-                            )}
-                        >
-                            <div className="flex items-center justify-between mb-8">
-                                <span className="font-bold text-xl text-white">
-                                    {tCommon('app_name')}
-                                </span>
-                                <button
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-white"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                            </div>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-slate-950/98 backdrop-blur-xl md:hidden overflow-y-auto"
+                    >
+                        <Container>
+                            <div className="flex flex-col min-h-screen py-6">
+                                <div className="flex items-center justify-between mb-12">
+                                    <Link href={`/${locale}`} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                                        <div className="relative w-10 h-10 overflow-hidden rounded-lg">
+                                            <Image
+                                                src="/logo.png"
+                                                alt="ALMSTKSHF Logo"
+                                                width={40}
+                                                height={40}
+                                                className="object-contain"
+                                            />
+                                        </div>
+                                        <span className="font-bold text-xl text-white">
+                                            {tCommon('app_name')}
+                                        </span>
+                                    </Link>
+                                    <button
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10"
+                                    >
+                                        <X className="w-8 h-8" />
+                                    </button>
+                                </div>
 
-                            <div className="space-y-6">
-                                {NAVIGATION_ITEMS.map((item) => (
-                                    <div key={item.label} className="space-y-3">
-                                        {item.children ? (
-                                            <>
-                                                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <div className="flex-1 space-y-8">
+                                    {NAVIGATION_ITEMS.map((item) => (
+                                        <div key={item.label} className="space-y-4">
+                                            {item.children ? (
+                                                <div className="space-y-4">
+                                                    <div className="text-sm font-bold text-primary uppercase tracking-widest px-2">
+                                                        {t(item.label)}
+                                                    </div>
+                                                    <div className="grid grid-cols-1 gap-2">
+                                                        {item.children.map(child => (
+                                                            <Link
+                                                                key={child.label}
+                                                                href={`/${locale}${child.href}`}
+                                                                className="flex items-center gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors group"
+                                                                onClick={() => setMobileMenuOpen(false)}
+                                                            >
+                                                                <div className="p-2 bg-slate-900 rounded-lg text-slate-400 group-hover:text-primary group-hover:scale-110 transition-all">
+                                                                    {child.icon && <child.icon className="w-5 h-5" />}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-medium text-slate-200 group-hover:text-white">
+                                                                        {t(child.label)}
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    href={`/${locale}${item.href}`}
+                                                    className="flex items-center gap-4 p-2 text-lg font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    {item.icon && <item.icon className="w-5 h-5" />}
                                                     {t(item.label)}
-                                                </div>
-                                                <div className="ps-4 border-s border-slate-800 space-y-3">
-                                                    {item.children.map(child => (
-                                                        <Link
-                                                            key={child.label}
-                                                            href={`/${locale}${child.href}`}
-                                                            className="block text-slate-300 hover:text-blue-400"
-                                                            onClick={() => setMobileMenuOpen(false)}
-                                                        >
-                                                            {t(child.label)}
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <Link
-                                                href={`/${locale}${item.href}`}
-                                                className="block font-medium text-slate-200 hover:text-blue-400"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                {t(item.label)}
-                                            </Link>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+                                                </Link>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
 
-                            <div className="mt-8 pt-8 border-t border-slate-800">
-                                <button
-                                    onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
-                                    className="flex items-center gap-2 text-slate-400 hover:text-white"
-                                >
-                                    <Globe className="w-5 h-5" />
-                                    <span>{isRTL ? "English" : "العربية"}</span>
-                                </button>
+                                <div className="mt-12 pt-8 border-t border-white/10 flex flex-col gap-4">
+                                    <button
+                                        onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
+                                        className="flex items-center justify-center gap-2 p-4 text-slate-300 hover:text-white bg-white/5 rounded-xl transition-colors"
+                                    >
+                                        <Globe className="w-5 h-5" />
+                                        <span>Change Language to {isRTL ? "English" : "العربية"}</span>
+                                    </button>
+
+                                    <Link
+                                        href={`/${locale}/contact`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="w-full p-4 text-center font-bold bg-primary text-primary-foreground rounded-xl"
+                                    >
+                                        {t('get_started')}
+                                    </Link>
+                                </div>
                             </div>
-                        </motion.div>
-                    </>
+                        </Container>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </header>

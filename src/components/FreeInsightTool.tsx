@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ShieldAlert, TrendingUp, Search, ArrowRight, Loader2, Info } from "lucide-react";
+import { Sparkles, ShieldAlert, TrendingUp, ArrowRight, Info } from "lucide-react";
 import Container from "./ui/Container";
 import Button from "./ui/Button";
 import Link from "next/link";
@@ -14,7 +14,6 @@ import { api } from "../../convex/_generated/api";
 export default function FreeInsightTool() {
     const t = useTranslations("FreeTool");
     const locale = useLocale();
-    const isRTL = locale === "ar";
     const [input, setInput] = useState("");
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [result, setResult] = useState<{
@@ -61,18 +60,18 @@ export default function FreeInsightTool() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             whileInView={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest"
                         >
                             <Sparkles className="w-3 h-3" />
                             <span>Free Service</span>
                         </motion.div>
-                        <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight">{t("title")}</h2>
-                        <p className="text-slate-400 text-lg max-w-2xl mx-auto">{t("subtitle")}</p>
+                        <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">{t("title")}</h2>
+                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("subtitle")}</p>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-[2.5rem] p-6 md:p-10 backdrop-blur-xl shadow-2xl relative">
+                    <div className="bg-card/40 border border-border rounded-[2.5rem] p-6 md:p-10 backdrop-blur-xl shadow-2xl relative">
                         <div className="absolute top-0 right-10 -translate-y-1/2">
-                            <div className="w-20 h-20 bg-blue-600/20 blur-3xl rounded-full"></div>
+                            <div className="w-20 h-20 bg-primary/20 blur-3xl rounded-full"></div>
                         </div>
 
                         <div className="space-y-6">
@@ -86,7 +85,7 @@ export default function FreeInsightTool() {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={t("placeholder")}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-8 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors min-h-[160px] resize-none text-lg"
+                                    className="w-full bg-background border border-border rounded-3xl p-6 md:p-8 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors min-h-[160px] resize-none text-lg"
                                 />
                                 <div className="absolute bottom-6 right-6 flex gap-2">
                                     <Button
@@ -94,7 +93,7 @@ export default function FreeInsightTool() {
                                         disabled={isAnalyzing || !input.trim()}
                                         variant="primary"
                                         size="lg"
-                                        className="rounded-2xl shadow-xl shadow-blue-500/20"
+                                        className="rounded-2xl shadow-xl shadow-primary/20"
                                         isLoading={isAnalyzing}
                                     >
                                         {isAnalyzing ? t("analyzing") : t("button")}
@@ -108,7 +107,7 @@ export default function FreeInsightTool() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
-                                        className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 text-sm"
+                                        className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl text-destructive text-sm"
                                     >
                                         {error}
                                     </motion.div>
@@ -121,12 +120,12 @@ export default function FreeInsightTool() {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
-                                        className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-800"
+                                        className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-border"
                                     >
                                         {/* Sentiment Card */}
-                                        <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-4">
+                                        <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t("sentiment")}</p>
+                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("sentiment")}</p>
                                                 <TrendingUp className={clsx(
                                                     "w-4 h-4",
                                                     result.sentiment.toLowerCase() === "positive" ? "text-emerald-400" :
@@ -134,7 +133,7 @@ export default function FreeInsightTool() {
                                                 )} />
                                             </div>
                                             <div className="flex items-end gap-2">
-                                                <span className="text-3xl font-bold text-white">{result.score}%</span>
+                                                <span className="text-3xl font-bold text-foreground">{result.score}%</span>
                                                 <span className={clsx(
                                                     "text-sm font-medium mb-1",
                                                     result.sentiment.toLowerCase() === "positive" ? "text-emerald-400" :
@@ -143,7 +142,7 @@ export default function FreeInsightTool() {
                                                     {t(`sentiments.${result.sentiment.toLowerCase()}`)}
                                                 </span>
                                             </div>
-                                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${result.score}%` }}
@@ -157,9 +156,9 @@ export default function FreeInsightTool() {
                                         </div>
 
                                         {/* Risk Card */}
-                                        <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-4">
+                                        <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t("risk")}</p>
+                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("risk")}</p>
                                                 <ShieldAlert className={clsx(
                                                     "w-4 h-4",
                                                     result.risk.toLowerCase() === "low" ? "text-emerald-400" :
@@ -173,26 +172,26 @@ export default function FreeInsightTool() {
                                             )}>
                                                 {t(`risk_labels.${result.risk.toLowerCase()}`)}
                                             </p>
-                                            <p className="text-xs text-slate-400 leading-relaxed italic">
+                                            <p className="text-xs text-muted-foreground leading-relaxed italic">
                                                 {t(`risk_levels.${result.risk.toLowerCase()}`)}
                                             </p>
                                         </div>
 
                                         {/* Strategy Card */}
-                                        <div className="p-6 rounded-3xl bg-blue-600/10 border border-blue-500/20 space-y-3">
+                                        <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 space-y-3">
                                             <div className="flex items-center gap-2">
-                                                <Info className="w-4 h-4 text-blue-400" />
-                                                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">{t("recommendation")}</p>
+                                                <Info className="w-4 h-4 text-primary" />
+                                                <p className="text-xs font-bold text-primary uppercase tracking-widest">{t("recommendation")}</p>
                                             </div>
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded uppercase font-bold">{result.tone}</span>
+                                                    <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded uppercase font-bold">{result.tone}</span>
                                                 </div>
-                                                <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                                                <p className="text-sm text-foreground/80 leading-relaxed font-medium">
                                                     {result.recommendation}
                                                 </p>
                                             </div>
-                                            <Link href={`/${locale}/contact`} className="inline-flex items-center gap-2 text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase pt-2">
+                                            <Link href={`/${locale}/contact`} className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase pt-2">
                                                 Full Strategy <ArrowRight className="w-3 h-3" />
                                             </Link>
                                         </div>
