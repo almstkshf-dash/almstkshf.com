@@ -236,15 +236,15 @@ export default function CrisisManagementClient() {
 
                             <div className="relative z-10 space-y-8 w-full">
                                 <div className="space-y-2">
-                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Global Network Status</span>
-                                    <h3 className="text-3xl font-bold text-white tracking-tight">Real-Time Extraction</h3>
+                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{t('visual_data.global_status')}</span>
+                                    <h3 className="text-3xl font-bold text-white tracking-tight">{t('visual_data.extraction')}</h3>
                                 </div>
 
                                 {/* Mock Data Chart / Visual */}
                                 <div className="w-full bg-slate-950/50 rounded-2xl p-6 border border-slate-800 space-y-4">
                                     <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase">
-                                        <span>Data Flow</span>
-                                        <span className="text-emerald-400">98.4% Efficiency</span>
+                                        <span>{t('visual_data.flow')}</span>
+                                        <span className="text-emerald-400">98.4% {t('visual_data.efficiency')}</span>
                                     </div>
                                     <div className="flex items-end justify-between h-20 gap-1">
                                         {[40, 70, 45, 90, 65, 80, 55, 95, 75, 60].map((h, i) => (
@@ -260,19 +260,19 @@ export default function CrisisManagementClient() {
                                     <div className="grid grid-cols-2 gap-4 pt-2">
                                         <div className="text-left">
                                             <div className="text-lg font-bold text-white">12.4M</div>
-                                            <div className="text-[8px] text-slate-500 uppercase tracking-wider">Entries / Hour</div>
+                                            <div className="text-[8px] text-slate-500 uppercase tracking-wider">{t('visual_data.entries')}</div>
                                         </div>
                                         <div className="text-right">
                                             <div className="text-lg font-bold text-white">~45ms</div>
-                                            <div className="text-[8px] text-slate-500 uppercase tracking-wider">Latency Delay</div>
+                                            <div className="text-[8px] text-slate-500 uppercase tracking-wider">{t('visual_data.latency')}</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-4">
-                                    {['Social', 'TV/Radio', 'Forums'].map((tag) => (
+                                    {['social', 'tv_radio', 'forums'].map((tag) => (
                                         <div key={tag} className="px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                            {tag}
+                                            {t(`visual_data.tags.${tag}`)}
                                         </div>
                                     ))}
                                 </div>
@@ -315,9 +315,9 @@ export default function CrisisManagementClient() {
                 <Container>
                     <div className="mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">
-                            Operational Intelligence
+                            {t("dashboard_section.title")}
                         </h2>
-                        <p className="text-slate-500 text-lg">Real-time monitoring and active crisis plans in your jurisdiction.</p>
+                        <p className="text-slate-500 text-lg">{t("dashboard_section.subtitle")}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>

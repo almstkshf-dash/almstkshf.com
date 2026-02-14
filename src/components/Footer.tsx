@@ -141,8 +141,8 @@ export default function Footer() {
                         <div className="mt-8 p-4 bg-slate-900/50 rounded-xl border border-slate-800">
                             <p className="text-xs text-slate-500 mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
                             <div className="flex flex-wrap gap-2">
-                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-300 rounded font-medium border border-slate-700">UAE</span>
-                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-500 rounded font-medium border border-slate-700/50 opacity-50">KSA ({t('coming_soon')})</span>
+                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-300 rounded font-medium border border-slate-700">{t('regions.uae')}</span>
+                                <span className="px-2 py-1 bg-slate-800 text-[10px] text-slate-500 rounded font-medium border border-slate-700/50 opacity-50">{t('regions.ksa')} ({t('coming_soon')})</span>
                             </div>
                         </div>
                     </div>

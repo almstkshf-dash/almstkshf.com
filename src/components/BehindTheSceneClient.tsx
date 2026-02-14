@@ -162,7 +162,7 @@ function WhoWeAreSection() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                 <div className="space-y-8">
                     <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
-                        Values & Mission
+                        {t("badge")}
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
                         {t("title")}
@@ -192,9 +192,9 @@ function WhoWeAreSection() {
                             {t("tech_driven.desc")}
                         </p>
                         <div className="flex flex-wrap gap-4">
-                            {["Speech-to-Text", "Deep Learning", "Fingerprinting", "Secure Architecture"].map((tag) => (
+                            {["speech_to_text", "deep_learning", "fingerprinting", "secure_architecture"].map((tag) => (
                                 <span key={tag} className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                                    {tag}
+                                    {t(`tech_driven.tags.${tag}`)}
                                 </span>
                             ))}
                         </div>

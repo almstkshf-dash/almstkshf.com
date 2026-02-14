@@ -8,7 +8,11 @@ import { SkeletonReportRow } from "./ui/Skeleton";
 import { useState } from "react";
 import clsx from "clsx";
 
+import { useTranslations } from "next-intl";
+
 export default function ReportLibrary() {
+    const t = useTranslations("MediaMonitoring.central_media_repository.library");
+    const tCommon = useTranslations("Common");
     const reports = useQuery(api.queries.getMediaReports, {});
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -21,12 +25,12 @@ export default function ReportLibrary() {
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
                 <div className="relative w-full md:max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <label htmlFor="report-search" className="sr-only">Search reports</label>
+                    <label htmlFor="report-search" className="sr-only">{t('search_label')}</label>
                     <input
                         id="report-search"
                         name="q"
                         type="text"
-                        placeholder="Search reports..."
+                        placeholder={t('search_placeholder')}
                         className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -34,10 +38,10 @@ export default function ReportLibrary() {
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" leftIcon={<Filter className="w-4 h-4" />}>
-                        Filter
+                        {t('filter')}
                     </Button>
                     <Button variant="outline" size="sm">
-                        Recent First
+                        {t('recent_first')}
                     </Button>
                 </div>
             </div>
@@ -50,7 +54,7 @@ export default function ReportLibrary() {
                 ) : filteredReports?.length === 0 ? (
                     <div className="py-20 text-center space-y-4">
                         <FileText className="w-12 h-12 text-slate-800 mx-auto" />
-                        <p className="text-slate-500 font-medium">No reports found matching your search.</p>
+                        <p className="text-slate-500 font-medium">{t('no_results')}</p>
                     </div>
                 ) : (
                     filteredReports?.map((report: any) => (
@@ -90,7 +94,7 @@ export default function ReportLibrary() {
                                     size="sm"
                                     className="border-slate-800 hover:bg-slate-800"
                                 >
-                                    Preview
+                                    {t('preview')}
                                 </Button>
                                 <Button
                                     variant="primary"
@@ -98,7 +102,7 @@ export default function ReportLibrary() {
                                     leftIcon={<Download className="w-3 h-3" />}
                                     className="bg-blue-600 hover:bg-blue-500"
                                 >
-                                    Download PDF
+                                    {tCommon('download')}
                                 </Button>
                             </div>
                         </div>

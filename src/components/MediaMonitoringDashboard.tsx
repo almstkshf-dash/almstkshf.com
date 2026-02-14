@@ -18,6 +18,8 @@ interface DashboardProps {
 
 export default function MediaMonitoringDashboard({ defaultFilter }: DashboardProps) {
     const t = useTranslations("Navigation");
+    const tMedia = useTranslations("MediaMonitoring.dashboard");
+    const tCommon = useTranslations("Common");
     const [filter, setFilter] = useState<"TV" | "Radio" | "Press" | undefined>(defaultFilter);
 
     const reports = useQuery(api.queries.getMediaReports, { source: filter });
@@ -72,12 +74,12 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                 ) : reports.length === 0 ? (
                     <div className="col-span-full py-12 text-center bg-slate-900/50 border border-slate-800 border-dashed rounded-3xl">
                         <FileText className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-                        <p className="text-slate-400 font-medium">No reports found for this category.</p>
+                        <p className="text-slate-400 font-medium">{tMedia('no_reports')}</p>
                         <Link
                             href={`/${locale}/media-monitoring/central-media-repository`}
                             className="text-blue-400 text-sm hover:underline mt-2 inline-block"
                         >
-                            Visit Central Repository
+                            {tMedia('visit_repository')}
                         </Link>
                     </div>
                 ) : (
@@ -103,7 +105,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                 <span>{new Date(report.timestamp).toLocaleDateString()}</span>
                             </div>
                             <Button variant="outline" size="sm" className="w-full" leftIcon={<Download className="w-3 h-3" />}>
-                                Download PDF
+                                {tCommon('download')}
                             </Button>
                         </div>
                     ))
@@ -114,7 +116,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
             <div>
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                     <span className="w-1 h-8 bg-rose-500 rounded-full block"></span>
-                    Crisis Management Plans
+                    {t('crisis_management')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {crisisPlans === undefined ? (

@@ -62,7 +62,7 @@ export default function ContactForm() {
                     onClick={() => setStatus("idle")}
                     className="text-emerald-400 font-medium hover:underline text-sm"
                 >
-                    Send another message
+                    {t("send_another")}
                 </button>
             </motion.div>
         );
@@ -82,7 +82,7 @@ export default function ContactForm() {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="John Doe"
+                        placeholder={t("placeholders.name")}
                         autoComplete="name"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
@@ -98,7 +98,7 @@ export default function ContactForm() {
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
+                        placeholder={t("placeholders.email")}
                         autoComplete="email"
                         className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                     />
@@ -116,7 +116,7 @@ export default function ContactForm() {
                     required
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="Inquiry about Media Monitoring"
+                    placeholder={t("placeholders.subject")}
                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
                 />
             </div>
@@ -132,7 +132,7 @@ export default function ContactForm() {
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="How can we help you represent your brand?"
+                    placeholder={t("placeholders.message")}
                     className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
                 />
             </div>

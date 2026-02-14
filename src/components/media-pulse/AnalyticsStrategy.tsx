@@ -38,7 +38,7 @@ export function AnalyticsStrategy() {
         <section className="space-y-20 border-t border-slate-900 pt-32">
             <div className="max-w-4xl space-y-6">
                 <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                    Strategy & Insights
+                    {t('strategy_badge')}
                 </div>
                 <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
                     {t("intro.title")}

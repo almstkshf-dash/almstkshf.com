@@ -146,11 +146,11 @@ export default function PressClient() {
                                 <div className="flex flex-wrap gap-4 pt-4">
                                     <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
                                         <Clock className="w-4 h-4 text-emerald-400" />
-                                        <span>Daily/Weekly/Monthly Reports</span>
+                                        <span>{t('daily_reports')}</span>
                                     </div>
                                     <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
                                         <Users className="w-4 h-4 text-emerald-400" />
-                                        <span>Journalist Contact List</span>
+                                        <span>{t('journalist_list')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -163,17 +163,17 @@ export default function PressClient() {
                                             <Newspaper className="w-20 h-20 text-emerald-400 relative z-10" />
                                         </div>
                                         <div className="space-y-2">
-                                            <span className="text-xs font-bold uppercase tracking-[0.2em] block">Press Intelligence</span>
-                                            <p className="text-sm text-slate-500 italic">"Everything in one place: monitoring, social listening, and distribution."</p>
+                                            <span className="text-xs font-bold uppercase tracking-[0.2em] block">{t('press_intelligence')}</span>
+                                            <p className="text-sm text-slate-500 italic">{t('everything_in_one')}</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 w-full pt-4">
                                             <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700">
                                                 <div className="text-emerald-400 font-bold text-lg">98%</div>
-                                                <div className="text-[10px] uppercase text-slate-500">Pick-up Rate</div>
+                                                <div className="text-[10px] uppercase text-slate-500">{t('pickup_rate')}</div>
                                             </div>
                                             <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700">
                                                 <div className="text-emerald-400 font-bold text-lg">24/7</div>
-                                                <div className="text-[10px] uppercase text-slate-500">Monitoring</div>
+                                                <div className="text-[10px] uppercase text-slate-500">{t('monitoring')}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -189,8 +189,8 @@ export default function PressClient() {
             <section className="bg-slate-950 py-24 border-t border-slate-900">
                 <Container>
                     <div className="mb-12">
-                        <h2 className="text-3xl font-bold text-white mb-4">Media Monitoring Console</h2>
-                        <p className="text-slate-500">Access your latest reports and crisis management plans below.</p>
+                        <h2 className="text-3xl font-bold text-white mb-4">{t('console_title')}</h2>
+                        <p className="text-slate-500">{t('console_desc')}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="Press" />
                 </Container>

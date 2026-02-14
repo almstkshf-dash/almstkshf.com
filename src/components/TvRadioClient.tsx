@@ -88,7 +88,7 @@ export default function TvRadioClient() {
                                     <Globe className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-white tracking-tight">3,400+ Channels Globally</h3>
+                                    <h3 className="text-xl font-bold text-white tracking-tight">{t('channels_stats')}</h3>
                                     <p className="text-slate-400 leading-relaxed text-sm">
                                         {t("analytics")}
                                     </p>
@@ -179,11 +179,11 @@ export default function TvRadioClient() {
                                     <div className="flex flex-wrap gap-4 pt-4">
                                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
                                             <Monitor className="w-4 h-4 text-blue-400" />
-                                            <span>Real-time Clips</span>
+                                            <span>{t('real_time_clips')}</span>
                                         </div>
                                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
                                             <Zap className="w-4 h-4 text-amber-400" />
-                                            <span>Immediate Alerts</span>
+                                            <span>{t('immediate_alerts')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -191,7 +191,7 @@ export default function TvRadioClient() {
                                     <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
                                         <div className="flex flex-col items-center gap-4 text-slate-500">
                                             <Radio className="w-12 h-12 animate-pulse" />
-                                            <span className="text-xs font-bold uppercase tracking-widest">Global Broadcast Stream</span>
+                                            <span className="text-xs font-bold uppercase tracking-widest">{t('global_stream')}</span>
                                         </div>
                                     </div>
                                     {/* Overlay Gradient */}
@@ -260,8 +260,8 @@ export default function TvRadioClient() {
             <section className="bg-slate-950 py-24 border-t border-slate-900">
                 <Container>
                     <div className="mb-12">
-                        <h2 className="text-3xl font-bold text-white mb-4">Media Monitoring Console</h2>
-                        <p className="text-slate-500">Access your latest reports and crisis management plans below.</p>
+                        <h2 className="text-3xl font-bold text-white mb-4">{t('console_title')}</h2>
+                        <p className="text-slate-500">{t('console_desc')}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>

@@ -67,9 +67,9 @@ export function DetailedContent() {
             <section className="space-y-24">
                 <div className="space-y-6">
                     <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                        Specialized Services
+                        {t("dashboard_grid.specialized_services")}
                     </div>
-                    <h2 className="text-4xl font-bold text-white">Advanced Solutions</h2>
+                    <h2 className="text-4xl font-bold text-white">{t("dashboard_grid.advanced_solutions")}</h2>
                 </div>
 
                 {/* Media Monitoring & Social Listening */}

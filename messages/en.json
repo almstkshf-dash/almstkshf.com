@@ -62,7 +62,11 @@
     "global_network": "Global Network",
     "coming_soon": "Coming Soon",
     "address_dubai": "Dubai: One Central 9th Floor - Trade Center",
-    "address_abu_dhabi": "Abu Dhabi: Al Khatem Tower - Al Maryah Island"
+    "address_abu_dhabi": "Abu Dhabi: Al Khatem Tower - Al Maryah Island",
+    "regions": {
+      "uae": "UAE",
+      "ksa": "KSA"
+    }
   },
   "CaseStudies": {
     "lexcora": {
@@ -222,7 +226,14 @@
     "message": "Message",
     "send": "Send Message",
     "success": "Thank you! Your message has been sent.",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "send_another": "Send another message",
+    "placeholders": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "subject": "Inquiry about Media Monitoring",
+      "message": "How can we help you represent your brand?"
+    }
   },
   "WhyChooseUs": {
     "title": "Why Choose Us?",
@@ -263,10 +274,17 @@
   },
   "WhoWeAre": {
     "title": "Who We Are & What We Do",
+    "badge": "Values & Mission",
     "intro": "We offer solutions that are second to none. Our customers are professionals in their field: marketing, PR, politics, analytics and many more. As such, they rely on nothing but the world’s best and most flexible solutions available. ALMSTKSHF combines the most innovative technologies with the most extensive broadcast channel coverage, high quality service and the highest levels of security. This way, media monitoring can contribute to its users achieving outstanding performance.",
     "tech_driven": {
       "title": "We are tech-driven",
-      "desc": "Technology is the engine that drives us and that makes our system so unique. In-house developed solutions based on speech-to-text and deep learning enable us to react flexibly to the needs of our customers - quickly and easily. By adding innovative technologies such as fingerprint we are able to offer a technically sophisticated range of advanced yet user-friendly products."
+      "desc": "Technology is the engine that drives us and that makes our system so unique. In-house developed solutions based on speech-to-text and deep learning enable us to react flexibly to the needs of our customers - quickly and easily. By adding innovative technologies such as fingerprint we are able to offer a technically sophisticated range of advanced yet user-friendly products.",
+      "tags": {
+        "speech_to_text": "Speech-to-Text",
+        "deep_learning": "Deep Learning",
+        "fingerprinting": "Fingerprinting",
+        "secure_architecture": "Secure Architecture"
+      }
     }
   },
   "Services": {},
@@ -353,6 +371,12 @@
         "title": "Instant Intelligence",
         "description": "Personalized real-time alerts via e-mail or web"
       },
+      "console_title": "Media Monitoring Console",
+      "console_desc": "Access your latest reports and crisis management plans below.",
+      "real_time_clips": "Real-time Clips",
+      "immediate_alerts": "Immediate Alerts",
+      "global_stream": "Global Broadcast Stream",
+      "channels_stats": "3,400+ Channels Globally",
       "clips": {
         "title": "Advanced Clip Management",
         "description": "High quality videos easy to edit with the clip editor. With ALMSTKSHF you can track your campaigns automatically, analyze all the collected data, and easily manage all clips with our intuitive web application."
@@ -415,6 +439,14 @@
           "desc": "Get notified the moment your brand is mentioned or when a potential PR crisis is detected."
         }
       },
+      "console_title": "Media Monitoring Console",
+      "console_desc": "Access your latest reports and crisis management plans below.",
+      "daily_reports": "Daily/Weekly/Monthly Reports",
+      "journalist_list": "Journalist Contact List",
+      "press_intelligence": "Press Intelligence",
+      "pickup_rate": "Pick-up Rate",
+      "monitoring": "Monitoring",
+      "everything_in_one": "\"Everything in one place: monitoring, social listening, and distribution.\"",
       "use_cases": {
         "title": "Meet our Users",
         "intro": "Discover how professionals use Almstkshf to streamline their press monitoring and distribution workflows.",
@@ -485,7 +517,19 @@
         "title": "Ready to centralize your media intelligence?",
         "subtitle": "Join elite government and media organizations using AlMstkshf to secure their digital history.",
         "button": "Request a Demo"
+      },
+      "library": {
+        "search_placeholder": "Search reports...",
+        "search_label": "Search reports",
+        "filter": "Filter",
+        "recent_first": "Recent First",
+        "no_results": "No reports found matching your search.",
+        "preview": "Preview"
       }
+    },
+    "dashboard": {
+      "no_reports": "No reports found for this category.",
+      "visit_repository": "Visit Central Repository"
     }
   },
   "MediaPulseDetail": {
@@ -545,6 +589,7 @@
       }
     },
     "analytics": {
+      "strategy_badge": "Strategy & Insights",
       "intro": {
         "title": "Analytics to Guide Strategy",
         "description": "The Media Pulse platform delivers more than raw coverage counts – it provides analytics to guide strategy. We offer three main insight areas: Reputation, Competitive Benchmarking, and Social Analytics. Each tool converts the collected media data into actionable knowledge. Reputation analytics measure brand perception; benchmarking compares performance against rivals; social analytics optimizes content strategy. All insights are accessible via interactive dashboards with charts and graphs, so you can quickly spot trends and compare outcomes."
@@ -615,6 +660,28 @@
           }
         ]
       }
+    },
+    "dashboard_grid": {
+      "live_stream": "Live Intelligence Stream",
+      "real_time": "Real-time",
+      "global": "Global",
+      "reputation_safeguard": "Reputation Safeguard",
+      "reputation_desc": "Automatic detection of coordinated disinformation campaigns. Our AI identifies pattern anomalies that precede \"fake news\" spikes, allowing for immediate neutralization.",
+      "anti_bot": "Anti-Bot Protocol",
+      "verification": "Verification Engine",
+      "safety_score": "Safety Score",
+      "scope": "Intelligence Scope",
+      "scope_desc": "Daily deep-source analysis across 40+ high-impact jurisdictions.",
+      "tone_distribution": "Tone Distribution",
+      "ToneLabels": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      },
+      "automated_alerts": "Automated Alerts",
+      "alerts_desc": "Critical shifts in public perception trigger instant notifications to your leadership war room.",
+      "specialized_services": "Specialized Services",
+      "advanced_solutions": "Advanced Solutions"
     }
   },
   "CrisisManagementDetail": {
@@ -687,6 +754,27 @@
           "sub": "High-anonymity collection for sensitive investigations and OSINT operations."
         }
       }
+    },
+    "visual_data": {
+      "global_status": "Global Network Status",
+      "extraction": "Real-Time Extraction",
+      "flow": "Data Flow",
+      "efficiency": "Efficiency",
+      "entries": "Entries / Hour",
+      "latency": "Latency Delay",
+      "tags": {
+        "social": "Social",
+        "tv_radio": "TV/Radio",
+        "forums": "Forums"
+      }
+    },
+    "dashboard_section": {
+      "title": "Operational Intelligence",
+      "subtitle": "Real-time monitoring and active crisis plans in your jurisdiction."
+    },
+    "card": {
+      "priority": "Priority",
+      "action_protocol": "Action Protocol"
     }
   },
   "TechnicalSolutions": {

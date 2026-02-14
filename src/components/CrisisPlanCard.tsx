@@ -11,7 +11,7 @@ interface CrisisPlanCardProps {
 }
 
 export default function CrisisPlanCard({ title, priority, actions, status }: CrisisPlanCardProps) {
-    const t = useTranslations("Common");
+    const t = useTranslations("CrisisManagementDetail.card");
 
     const priorityColors = {
         Low: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -36,7 +36,7 @@ export default function CrisisPlanCard({ title, priority, actions, status }: Cri
                     </div>
                     <div>
                         <h3 className="font-semibold text-lg text-slate-100">{title}</h3>
-                        <span className="text-xs font-mono uppercase tracking-wider opacity-80">{priority} Priority</span>
+                        <span className="text-xs font-mono uppercase tracking-wider opacity-80">{priority} {t('priority')}</span>
                     </div>
                 </div>
                 <span className="px-2 py-1 text-xs rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -45,7 +45,7 @@ export default function CrisisPlanCard({ title, priority, actions, status }: Cri
             </div>
 
             <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase">Action Protocol</div>
+                <div className="text-xs font-semibold text-slate-500 uppercase">{t('action_protocol')}</div>
                 <ul className="space-y-1">
                     {actions.map((action, idx) => (
                         <li key={idx} className="text-sm text-slate-300 flex items-start gap-2">
