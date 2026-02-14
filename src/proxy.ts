@@ -17,16 +17,16 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // If it's not a public route, protect it
-    if (!isPublicRoute(req)) {
-        // Only protect if it's not internal or static
-        const isInternal = req.nextUrl.pathname.startsWith('/_next') ||
-            req.nextUrl.pathname.startsWith('/api') ||
-            req.nextUrl.pathname.includes('.');
+    // If it's a public route, just run intl middleware
+    if (isPublicRoute(req)) {
+        return intlMiddleware(req);
+    }
 
-        if (!isInternal && req.nextUrl.pathname.includes('/dashboard')) {
-            await (await auth()).protect();
-        }
+    // For dashboard and other protected routes, enforce authentication
+    // We use a cast to any to resolve a TypeScript mismatch in Next.js 16 environments
+    const authObj = await auth();
+    if (req.nextUrl.pathname.includes('/dashboard')) {
+        (authObj as any).protect();
     }
 
     return intlMiddleware(req);

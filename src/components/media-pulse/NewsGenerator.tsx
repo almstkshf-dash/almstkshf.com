@@ -433,7 +433,7 @@ export default function NewsGenerator() {
     };
 
     return (
-        <section className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/40 rounded-2xl overflow-visible backdrop-blur-sm">
+        <section className="relative z-20 bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/40 rounded-2xl overflow-visible backdrop-blur-sm">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-700/40 flex items-center justify-between bg-slate-900/40">
                 <div className="flex items-center gap-3">
