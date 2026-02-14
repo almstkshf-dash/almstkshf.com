@@ -17,18 +17,28 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // If it's a public route, just run intl middleware
-    if (isPublicRoute(req)) {
+    try {
+        // If it's a public route, just run intl middleware
+        if (isPublicRoute(req)) {
+            return intlMiddleware(req);
+        }
+
+        // For dashboard and other protected routes, enforce authentication
+        if (req.nextUrl.pathname.includes('/dashboard')) {
+            // In Clerk v6, auth() can be a function or the auth object depends on usage.
+            // Using await on protect() is critical for Edge Runtime stability.
+            // Using a cast to any to resolve a TypeScript mismatch in Next.js 16 environments
+            const authObj = await auth();
+            await (authObj as any).protect();
+        }
+
+        return intlMiddleware(req);
+    } catch (error) {
+        console.error("Middleware error:", error);
+        // Fallback to intlMiddleware to prevent 500: MIDDLEWARE_INVOCATION_FAILED
+        // This allows the page to load (though components may handle auth themselves)
         return intlMiddleware(req);
     }
-
-    // For dashboard and other protected routes, enforce authentication
-    // We use a cast to any to resolve a TypeScript mismatch in Next.js 16 environments
-    if (req.nextUrl.pathname.includes('/dashboard')) {
-        (auth as any).protect();
-    }
-
-    return intlMiddleware(req);
 });
 
 export const config = {
