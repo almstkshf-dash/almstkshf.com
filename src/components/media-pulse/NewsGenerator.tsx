@@ -433,20 +433,20 @@ export default function NewsGenerator() {
     };
 
     return (
-        <section className="relative z-20 bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/40 rounded-2xl overflow-visible backdrop-blur-sm">
+        <section className="relative z-20 bg-card border border-border rounded-2xl overflow-visible backdrop-blur-sm shadow-sm transition-all">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-700/40 flex items-center justify-between bg-slate-900/40">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center">
-                        <Search className="w-4.5 h-4.5 text-amber-400" />
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center transition-colors">
+                        <Search className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                        <h3 className="text-white font-bold text-sm">{t('monitor_keyword')}</h3>
-                        <p className="text-slate-500 text-[11px]">{t('subtitle')}</p>
+                        <h3 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h3>
+                        <p className="text-muted-foreground text-[11px] transition-colors">{t('subtitle')}</p>
                     </div>
                 </div>
                 {(keyword || result || errorMsg) && (
-                    <button onClick={clearForm} className="text-xs text-slate-500 hover:text-slate-300 transition-colors flex items-center gap-1 border border-slate-700/50 rounded-lg px-3 py-1.5 hover:bg-slate-800/50">
+                    <button onClick={clearForm} className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50">
                         <X className="w-3 h-3" />
                         {t('clear')}
                     </button>
@@ -458,7 +458,7 @@ export default function NewsGenerator() {
                 <div>
                     <label htmlFor="monitor_keyword" className="sr-only">{t('monitor_keyword')}</label>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <input
                             id="monitor_keyword"
                             name="monitor_keyword"
@@ -466,12 +466,12 @@ export default function NewsGenerator() {
                             placeholder={t('placeholder')}
                             value={keyword}
                             onChange={(e) => { setKeyword(e.target.value); setErrors(prev => ({ ...prev, keyword: undefined })); }}
-                            className={`w-full bg-slate-900/80 rounded-xl pl-11 pr-4 py-3.5 text-white text-sm focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 outline-none transition-all placeholder:text-slate-600 border ${errors.keyword ? 'border-rose-500/60 ring-2 ring-rose-500/20' : 'border-slate-700/60'
+                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground border ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
                                 }`}
                         />
                     </div>
                     {errors.keyword && (
-                        <p className="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
+                        <p className="mt-1.5 text-xs text-destructive flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" /> {errors.keyword}
                         </p>
                     )}
@@ -481,7 +481,7 @@ export default function NewsGenerator() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Countries Dropdown */}
                     <div>
-                        <label id="region-label" className="block text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-2">{t('region')}</label>
+                        <label id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('region')}</label>
                         <MultiSelectDropdown
                             aria-labelledby="region-label"
                             items={countryItems}
@@ -496,7 +496,7 @@ export default function NewsGenerator() {
                             clearAllText={t('clear_all')}
                             renderItem={(item) => {
                                 const c = getCountryByCode(item.id);
-                                return <span>{c?.flag} {item.label}</span>;
+                                return <span className="text-foreground">{c?.flag} {item.label}</span>;
                             }}
                             renderTag={(id) => {
                                 const c = getCountryByCode(id);
@@ -507,7 +507,7 @@ export default function NewsGenerator() {
 
                     {/* Languages Dropdown */}
                     <div>
-                        <label id="language-label" className="block text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-2">{t('language')}</label>
+                        <label id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('language')}</label>
                         <MultiSelectDropdown
                             aria-labelledby="language-label"
                             items={languageItems}
@@ -519,7 +519,7 @@ export default function NewsGenerator() {
                             noResultsText={t('no_results')}
                             selectedText={t('selected')}
                             clearAllText={t('clear_all')}
-                            renderItem={(item) => <span>{item.label}</span>}
+                            renderItem={(item) => <span className="text-foreground">{item.label}</span>}
                             renderTag={(id) => {
                                 const l = getLangByCode(id);
                                 return <>{isAr ? l?.ar : l?.en}</>;
@@ -532,16 +532,16 @@ export default function NewsGenerator() {
                 <div className="flex flex-col md:flex-row gap-4 items-end">
                     {/* Date Range Popup */}
                     <div className="flex-1" ref={dateRef}>
-                        <label className="block text-[11px] text-slate-400 font-bold uppercase tracking-widest mb-2">{t('date_range')}</label>
+                        <label className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('date_range')}</label>
                         <div
                             role="button"
                             tabIndex={0}
                             onClick={() => setShowDatePicker(!showDatePicker)}
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowDatePicker(!showDatePicker); } }}
-                            className="w-full flex items-center gap-2 bg-slate-900/80 border border-slate-700/60 rounded-xl px-4 py-3 text-left hover:border-slate-600 transition-all cursor-pointer"
+                            className="w-full flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-4 py-3 text-left hover:border-primary/50 transition-all cursor-pointer"
                         >
-                            <Calendar className="w-4 h-4 text-slate-500" />
-                            <span className={`text-sm ${dateFrom || dateTo ? 'text-white' : 'text-slate-500'}`}>
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
+                            <span className={`text-sm ${dateFrom || dateTo ? 'text-foreground' : 'text-muted-foreground'}`}>
                                 {dateFrom || dateTo
                                     ? `${dateFrom ? formatDateDisplay(dateFrom) : '...'} — ${dateTo ? formatDateDisplay(dateTo) : '...'}`
                                     : t('select_dates')
@@ -553,7 +553,7 @@ export default function NewsGenerator() {
                                     tabIndex={0}
                                     onClick={(e) => { e.stopPropagation(); setDateFrom(''); setDateTo(''); }}
                                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setDateFrom(''); setDateTo(''); } }}
-                                    className="ml-auto text-slate-500 hover:text-slate-300 cursor-pointer"
+                                    className="ml-auto text-muted-foreground hover:text-foreground cursor-pointer"
                                 >
                                     <X className="w-3.5 h-3.5" />
                                 </span>
@@ -562,28 +562,28 @@ export default function NewsGenerator() {
 
                         {/* Date Picker Panel */}
                         {showDatePicker && (
-                            <div className="absolute z-50 mt-2 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl shadow-black/40 p-4 space-y-4 w-80 animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div className="absolute z-50 mt-2 bg-card border border-border rounded-xl shadow-2xl p-4 space-y-4 w-80 animate-in fade-in slide-in-from-top-2 duration-200">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label htmlFor="date_from" className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">{t('date_from')}</label>
+                                        <label htmlFor="date_from" className="block text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1.5 transition-colors">{t('date_from')}</label>
                                         <input
                                             id="date_from"
                                             name="date_from"
                                             type="date"
                                             value={dateFrom}
                                             onChange={(e) => setDateFrom(e.target.value)}
-                                            className="w-full bg-slate-800/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-amber-500/30 [color-scheme:dark]"
+                                            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-all [color-scheme:light] dark:[color-scheme:dark]"
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="date_to" className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">{t('date_to')}</label>
+                                        <label htmlFor="date_to" className="block text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1.5 transition-colors">{t('date_to')}</label>
                                         <input
                                             id="date_to"
                                             name="date_to"
                                             type="date"
                                             value={dateTo}
                                             onChange={(e) => setDateTo(e.target.value)}
-                                            className="w-full bg-slate-800/80 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white outline-none focus:ring-1 focus:ring-amber-500/30 [color-scheme:dark]"
+                                            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-all [color-scheme:light] dark:[color-scheme:dark]"
                                         />
                                     </div>
                                 </div>
@@ -591,7 +591,7 @@ export default function NewsGenerator() {
                                     <button
                                         type="button"
                                         onClick={() => setShowDatePicker(false)}
-                                        className="text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 px-4 py-1.5 rounded-lg hover:bg-amber-500/25 transition-colors font-bold"
+                                        className="text-xs bg-primary/10 text-primary border border-primary/30 px-4 py-1.5 rounded-lg hover:bg-primary/20 transition-colors font-bold"
                                     >
                                         {t('apply')}
                                     </button>
@@ -604,7 +604,7 @@ export default function NewsGenerator() {
                     <button
                         onClick={handleGenerate}
                         disabled={loading}
-                        className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 disabled:from-slate-600 disabled:to-slate-700 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-xl shadow-amber-900/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
+                        className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground font-bold px-8 py-3.5 rounded-xl transition-all shadow-xl shadow-primary/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
                     >
                         {loading ? (
                             <><Loader2 className="w-4 h-4 animate-spin" /> {t('analyzing')}</>
@@ -616,13 +616,13 @@ export default function NewsGenerator() {
 
                 {/* Error Message */}
                 {errorMsg && (
-                    <div className="bg-rose-500/10 border border-rose-500/25 rounded-xl p-3.5 flex items-start gap-3 animate-in fade-in duration-300">
-                        <AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+                    <div className="bg-destructive/10 border border-destructive/25 rounded-xl p-3.5 flex items-start gap-3 animate-in fade-in duration-300">
+                        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-rose-300 text-sm font-medium">{t('error_title')}</p>
-                            <p className="text-rose-400/80 text-xs mt-0.5">{errorMsg}</p>
+                            <p className="text-destructive text-sm font-medium">{t('error_title')}</p>
+                            <p className="text-destructive/80 text-xs mt-0.5 transition-colors">{errorMsg}</p>
                         </div>
-                        <button onClick={() => setErrorMsg('')} className="ml-auto text-rose-500 hover:text-rose-300">
+                        <button onClick={() => setErrorMsg('')} className="ml-auto text-destructive hover:text-destructive/80 transition-colors">
                             <X className="w-4 h-4" />
                         </button>
                     </div>
@@ -631,11 +631,11 @@ export default function NewsGenerator() {
                 {/* Success Result */}
                 {result && (
                     <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3.5 flex items-center gap-3 animate-in fade-in duration-300">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                        <span className="text-emerald-300 text-sm font-medium">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        <span className="text-emerald-700 dark:text-emerald-300 text-sm font-medium transition-colors">
                             {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
                         </span>
-                        <button onClick={() => setResult(null)} className="ml-auto text-emerald-500 hover:text-emerald-300">
+                        <button onClick={() => setResult(null)} className="ml-auto text-emerald-600 dark:text-emerald-400 hover:opacity-80 transition-all">
                             <X className="w-4 h-4" />
                         </button>
                     </div>

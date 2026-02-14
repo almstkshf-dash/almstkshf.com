@@ -128,21 +128,21 @@ export default function FreeInsightTool() {
                                                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("sentiment")}</p>
                                                 <TrendingUp className={clsx(
                                                     "w-4 h-4",
-                                                    result.sentiment.toLowerCase() === "positive" ? "text-emerald-400" :
-                                                        result.sentiment.toLowerCase() === "neutral" ? "text-amber-400" : "text-rose-400"
+                                                    result.sentiment.toLowerCase() === "positive" ? "text-emerald-600 dark:text-emerald-400" :
+                                                        result.sentiment.toLowerCase() === "neutral" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )} />
                                             </div>
                                             <div className="flex items-end gap-2">
-                                                <span className="text-3xl font-bold text-foreground">{result.score}%</span>
+                                                <span className="text-3xl font-bold text-foreground transition-colors">{result.score}%</span>
                                                 <span className={clsx(
-                                                    "text-sm font-medium mb-1",
-                                                    result.sentiment.toLowerCase() === "positive" ? "text-emerald-400" :
-                                                        result.sentiment.toLowerCase() === "neutral" ? "text-amber-400" : "text-rose-400"
+                                                    "text-sm font-medium mb-1 transition-colors",
+                                                    result.sentiment.toLowerCase() === "positive" ? "text-emerald-600 dark:text-emerald-400" :
+                                                        result.sentiment.toLowerCase() === "neutral" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )}>
                                                     {t(`sentiments.${result.sentiment.toLowerCase()}`)}
                                                 </span>
                                             </div>
-                                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden transition-colors">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${result.score}%` }}
@@ -156,29 +156,29 @@ export default function FreeInsightTool() {
                                         </div>
 
                                         {/* Risk Card */}
-                                        <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4">
+                                        <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4 transition-all duration-300">
                                             <div className="flex justify-between items-center">
                                                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("risk")}</p>
                                                 <ShieldAlert className={clsx(
                                                     "w-4 h-4",
-                                                    result.risk.toLowerCase() === "low" ? "text-emerald-400" :
-                                                        result.risk.toLowerCase() === "medium" ? "text-amber-400" : "text-rose-400"
+                                                    result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
+                                                        result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )} />
                                             </div>
                                             <p className={clsx(
-                                                "text-xl font-bold uppercase tracking-tight",
-                                                result.risk.toLowerCase() === "low" ? "text-emerald-400" :
-                                                    result.risk.toLowerCase() === "medium" ? "text-amber-400" : "text-rose-400"
+                                                "text-xl font-bold uppercase tracking-tight transition-colors",
+                                                result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
+                                                    result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                             )}>
                                                 {t(`risk_labels.${result.risk.toLowerCase()}`)}
                                             </p>
-                                            <p className="text-xs text-muted-foreground leading-relaxed italic">
+                                            <p className="text-xs text-muted-foreground leading-relaxed italic transition-colors">
                                                 {t(`risk_levels.${result.risk.toLowerCase()}`)}
                                             </p>
                                         </div>
 
                                         {/* Strategy Card */}
-                                        <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 space-y-3">
+                                        <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 space-y-3 transition-all duration-300">
                                             <div className="flex items-center gap-2">
                                                 <Info className="w-4 h-4 text-primary" />
                                                 <p className="text-xs font-bold text-primary uppercase tracking-widest">{t("recommendation")}</p>
@@ -187,7 +187,7 @@ export default function FreeInsightTool() {
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded uppercase font-bold">{result.tone}</span>
                                                 </div>
-                                                <p className="text-sm text-foreground/80 leading-relaxed font-medium">
+                                                <p className="text-sm text-foreground/80 leading-relaxed font-medium transition-colors">
                                                     {result.recommendation}
                                                 </p>
                                             </div>

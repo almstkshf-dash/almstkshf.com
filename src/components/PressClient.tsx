@@ -42,16 +42,16 @@ export default function PressClient() {
     ];
 
     return (
-        <div className="space-y-20 pb-20">
+        <div className="space-y-20 pb-20 bg-background text-foreground transition-colors duration-300">
             {/* Hero Section */}
-            <section className="relative pt-12">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-emerald-600/10 blur-[120px] rounded-full -z-10"></div>
+            <section className="relative pt-12 overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/10 blur-[120px] rounded-full -z-10 transition-opacity"></div>
                 <Container>
                     <div className="max-w-4xl mx-auto text-center space-y-6">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest"
                         >
                             <Newspaper className="w-3 h-3" />
                             <span>{t("cover_label")}</span>
@@ -60,7 +60,7 @@ export default function PressClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-bold text-white tracking-tight"
+                            className="text-4xl md:text-6xl font-bold text-foreground tracking-tight transition-colors"
                         >
                             {t("title")}
                         </motion.h1>
@@ -68,7 +68,7 @@ export default function PressClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-slate-400 text-lg leading-relaxed max-w-3xl mx-auto"
+                            className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto transition-colors"
                         >
                             {t("description")}
                         </motion.p>
@@ -87,15 +87,15 @@ export default function PressClient() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-emerald-500/30 transition-all group"
+                                className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group hover:shadow-xl"
                             >
                                 <div className="flex items-start gap-6">
                                     <div className={`p-4 rounded-2xl ${feature.bg} ${feature.color} group-hover:scale-110 transition-transform`}>
                                         <feature.icon className="w-8 h-8" />
                                     </div>
                                     <div className="space-y-4">
-                                        <h3 className="text-xl font-bold text-white tracking-tight">{t(feature.titleKey)}</h3>
-                                        <p className="text-slate-400 leading-relaxed text-sm">
+                                        <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t(feature.titleKey)}</h3>
+                                        <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                             {t(feature.descKey)}
                                         </p>
                                     </div>
@@ -107,13 +107,13 @@ export default function PressClient() {
             </section>
 
             {/* Persona Section (Noor) */}
-            <section className="py-24 border-t border-slate-900">
+            <section className="py-24 border-t border-border transition-colors duration-300">
                 <Container>
                     <div className="max-w-4xl mx-auto text-center mb-16 space-y-4">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                        <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                             {t("use_cases.title")}
                         </h2>
-                        <p className="text-slate-400 text-lg leading-relaxed">
+                        <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
                             {t("use_cases.intro")}
                         </p>
                     </div>
@@ -122,63 +122,63 @@ export default function PressClient() {
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="max-w-5xl mx-auto p-10 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 relative overflow-hidden group"
+                        className="max-w-5xl mx-auto p-10 rounded-[3rem] bg-card border border-border relative overflow-hidden group shadow-lg transition-all"
                     >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl rounded-full group-hover:bg-emerald-500/10 transition-colors"></div>
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors"></div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
                             <div className="space-y-8">
                                 <div className="space-y-4">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
                                         {t("use_cases.noor.role")}
                                     </div>
-                                    <h3 className="text-3xl font-bold text-white group-hover:text-emerald-400 transition-colors">
+                                    <h3 className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors">
                                         {t("use_cases.noor.title")}
                                     </h3>
                                 </div>
 
-                                <div className="prose prose-invert prose-emerald max-w-none text-slate-400 leading-relaxed">
+                                <div className="prose prose-invert prose-emerald max-w-none text-muted-foreground leading-relaxed transition-colors">
                                     {t("use_cases.noor.scenario").split('\n\n').map((paragraph, i) => (
                                         <p key={i} className="mb-4">{paragraph}</p>
                                     ))}
                                 </div>
 
                                 <div className="flex flex-wrap gap-4 pt-4">
-                                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
-                                        <Clock className="w-4 h-4 text-emerald-400" />
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                        <Clock className="w-4 h-4 text-primary" />
                                         <span>{t('daily_reports')}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
-                                        <Users className="w-4 h-4 text-emerald-400" />
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                        <Users className="w-4 h-4 text-primary" />
                                         <span>{t('journalist_list')}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 shadow-2xl">
-                                <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                                    <div className="flex flex-col items-center gap-6 text-slate-500 p-8 text-center">
+                            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted border border-border shadow-2xl">
+                                <div className="absolute inset-0 flex items-center justify-center bg-card">
+                                    <div className="flex flex-col items-center gap-6 text-muted-foreground p-8 text-center transition-colors">
                                         <div className="relative">
-                                            <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
-                                            <Newspaper className="w-20 h-20 text-emerald-400 relative z-10" />
+                                            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
+                                            <Newspaper className="w-20 h-20 text-primary relative z-10" />
                                         </div>
                                         <div className="space-y-2">
                                             <span className="text-xs font-bold uppercase tracking-[0.2em] block">{t('press_intelligence')}</span>
-                                            <p className="text-sm text-slate-500 italic">{t('everything_in_one')}</p>
+                                            <p className="text-sm text-muted-foreground italic">{t('everything_in_one')}</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 w-full pt-4">
-                                            <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700">
-                                                <div className="text-emerald-400 font-bold text-lg">98%</div>
-                                                <div className="text-[10px] uppercase text-slate-500">{t('pickup_rate')}</div>
+                                            <div className="p-3 rounded-xl bg-muted border border-border transition-colors">
+                                                <div className="text-primary font-bold text-lg">98%</div>
+                                                <div className="text-[10px] uppercase text-muted-foreground">{t('pickup_rate')}</div>
                                             </div>
-                                            <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700">
-                                                <div className="text-emerald-400 font-bold text-lg">24/7</div>
-                                                <div className="text-[10px] uppercase text-slate-500">{t('monitoring')}</div>
+                                            <div className="p-3 rounded-xl bg-muted border border-border transition-colors">
+                                                <div className="text-primary font-bold text-lg">24/7</div>
+                                                <div className="text-[10px] uppercase text-muted-foreground">{t('monitoring')}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
                             </div>
                         </div>
                     </motion.div>
@@ -186,11 +186,11 @@ export default function PressClient() {
             </section>
 
             {/* Interactive Dashboard Section */}
-            <section className="bg-slate-950 py-24 border-t border-slate-900">
+            <section className="bg-background py-24 border-t border-border transition-colors duration-300">
                 <Container>
                     <div className="mb-12">
-                        <h2 className="text-3xl font-bold text-white mb-4">{t('console_title')}</h2>
-                        <p className="text-slate-500">{t('console_desc')}</p>
+                        <h2 className="text-3xl font-bold text-foreground mb-4 transition-colors">{t('console_title')}</h2>
+                        <p className="text-muted-foreground transition-colors">{t('console_desc')}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="Press" />
                 </Container>

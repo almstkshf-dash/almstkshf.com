@@ -8,7 +8,7 @@ export default function Skeleton({ className }: SkeletonProps) {
     return (
         <div
             className={clsx(
-                "animate-pulse rounded-md bg-slate-800/50",
+                "animate-pulse rounded-md bg-muted",
                 className
             )}
         />
@@ -17,7 +17,7 @@ export default function Skeleton({ className }: SkeletonProps) {
 
 export function SkeletonCard() {
     return (
-        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
+        <div className="p-6 bg-card border border-border rounded-2xl space-y-4 transition-colors duration-300">
             <Skeleton className="h-4 w-1/4" />
             <Skeleton className="h-6 w-3/4" />
             <div className="space-y-2">
@@ -34,7 +34,7 @@ export function SkeletonCard() {
 
 export function SkeletonReportRow() {
     return (
-        <div className="flex items-center justify-between p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
+        <div className="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl transition-colors duration-300">
             <div className="flex items-center gap-4 flex-1">
                 <Skeleton className="w-10 h-10 rounded-lg" />
                 <div className="space-y-2 flex-1">

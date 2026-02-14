@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "primary" | "secondary" | "ghost" | "outline" | "danger";
-    size?: "sm" | "md" | "lg";
+    size?: "sm" | "md" | "lg" | "icon";
     isLoading?: boolean;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
@@ -25,16 +25,17 @@ export default function Button({
 
     const variants = {
         primary: "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-primary/50",
-        secondary: "bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700",
-        ghost: "bg-transparent hover:bg-slate-800/50 text-slate-300 hover:text-white",
-        outline: "bg-transparent border border-slate-600 hover:border-blue-400 text-slate-300 hover:text-blue-400",
-        danger: "bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/30",
+        secondary: "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border",
+        ghost: "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground",
+        outline: "bg-transparent border border-border hover:border-primary text-muted-foreground hover:text-primary",
+        danger: "bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/30",
     };
 
     const sizes = {
         sm: "px-3 py-1.5 text-xs",
         md: "px-5 py-2.5 text-sm",
         lg: "px-7 py-3.5 text-base",
+        icon: "h-9 w-9 p-0",
     };
 
     return (

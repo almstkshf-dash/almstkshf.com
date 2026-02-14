@@ -100,14 +100,14 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-800 flex flex-col">
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <Plus className="w-5 h-5 text-blue-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all">
+            <div className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border flex flex-col transition-all">
+                <div className="p-6 border-b border-border flex justify-between items-center bg-muted/50 transition-colors">
+                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2 transition-colors">
+                        <Plus className="w-5 h-5 text-primary" />
                         {t('title')}
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
                         <X className="h-6 w-6" />
                     </button>
                 </div>
@@ -115,7 +115,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="article_title" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('article_title')}</label>
+                            <label htmlFor="article_title" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('article_title')}</label>
                             <input
                                 id="article_title"
                                 name="article_title"
@@ -124,11 +124,11 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder={t('title_placeholder')}
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
                         <div>
-                            <label htmlFor="source_name" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('source_name')}</label>
+                            <label htmlFor="source_name" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('source_name')}</label>
                             <input
                                 id="source_name"
                                 name="source_name"
@@ -137,14 +137,14 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder={t('source_placeholder')}
                                 value={formData.source}
                                 onChange={e => setFormData({ ...formData, source: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="pub_date" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('date')}</label>
+                            <label htmlFor="pub_date" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('date')}</label>
                             <input
                                 id="pub_date"
                                 name="pub_date"
@@ -152,11 +152,11 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 type="date"
                                 value={formData.date}
                                 onChange={e => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground [color-scheme:light] dark:[color-scheme:dark]"
                             />
                         </div>
                         <div>
-                            <label htmlFor="article_url" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('url_optional')}</label>
+                            <label htmlFor="article_url" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('url_optional')}</label>
                             <input
                                 id="article_url"
                                 name="article_url"
@@ -164,20 +164,20 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder="https://..."
                                 value={formData.url}
                                 onChange={e => setFormData({ ...formData, url: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label htmlFor="source_type" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('type')}</label>
+                            <label htmlFor="source_type" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('type')}</label>
                             <select
                                 id="source_type"
                                 name="source_type"
                                 value={formData.sourceType}
                                 onChange={e => setFormData({ ...formData, sourceType: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white text-sm"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"
                             >
                                 <option value="Print">{t('types.print')}</option>
                                 <option value="Online News">{t('types.online_news')}</option>
@@ -187,13 +187,13 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="sentiment" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('sentiment')}</label>
+                            <label htmlFor="sentiment" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('sentiment')}</label>
                             <select
                                 id="sentiment"
                                 name="sentiment"
                                 value={formData.sentiment}
                                 onChange={e => setFormData({ ...formData, sentiment: e.target.value })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white text-sm"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"
                             >
                                 <option value="Positive">{t('sentiments.positive')}</option>
                                 <option value="Neutral">{t('sentiments.neutral')}</option>
@@ -201,7 +201,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="reach" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('reach')}</label>
+                            <label htmlFor="reach" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('reach')}</label>
                             <input
                                 id="reach"
                                 name="reach"
@@ -209,11 +209,11 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder={t('reach_placeholder')}
                                 value={formData.reach}
                                 onChange={e => setFormData({ ...formData, reach: Number(e.target.value) })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
                         <div>
-                            <label htmlFor="source_country" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('country')}</label>
+                            <label htmlFor="source_country" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('country')}</label>
                             <input
                                 id="source_country"
                                 name="source_country"
@@ -222,13 +222,13 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 maxLength={2}
                                 value={formData.sourceCountry}
                                 onChange={e => setFormData({ ...formData, sourceCountry: e.target.value.toUpperCase() })}
-                                className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="content" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('content')}</label>
+                        <label htmlFor="content" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('content')}</label>
                         <textarea
                             id="content"
                             name="content"
@@ -237,46 +237,46 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             placeholder={t('content_placeholder')}
                             value={formData.content}
                             onChange={e => setFormData({ ...formData, content: e.target.value })}
-                            className="w-full p-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all dark:text-white"
+                            className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="evidence_image" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('evidence_image')}</label>
-                        <div className="flex items-center gap-4 p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+                        <label htmlFor="evidence_image" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('evidence_image')}</label>
+                        <div className="flex items-center gap-4 p-4 border-2 border-dashed border-border rounded-xl bg-muted/50 transition-colors">
                             <input
                                 id="evidence_image"
                                 name="evidence_image"
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageUpload}
-                                className="block w-full text-sm text-slate-500
+                                className="block w-full text-sm text-muted-foreground transition-colors
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-xs file:font-bold file:uppercase file:tracking-wider
-                    file:bg-blue-100 file:text-blue-700
-                    hover:file:bg-blue-200 dark:file:bg-blue-900/30 dark:file:text-blue-200"
+                    file:bg-primary/10 file:text-primary
+                    hover:file:bg-primary/20 dark:file:bg-primary/10 dark:file:text-primary-foreground"
                             />
                             {formData.imageUrl && (
-                                <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                                <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
                                     <img src={formData.imageUrl} alt="Preview" className="h-full w-full object-cover" />
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-border transition-colors">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-3 rounded-xl text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-medium transition-colors"
+                            className="px-6 py-3 rounded-xl text-muted-foreground hover:text-foreground font-medium transition-colors"
                         >
                             {t('cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 font-bold shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.02]"
+                            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
                         >
                             {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
                             {t('save')}

@@ -38,16 +38,16 @@ export default function TvRadioClient() {
     ];
 
     return (
-        <div className="space-y-20 pb-20">
+        <div className="space-y-20 pb-20 bg-background text-foreground transition-colors duration-300">
             {/* Hero Section */}
-            <section className="relative pt-12">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-blue-600/10 blur-[120px] rounded-full -z-10"></div>
+            <section className="relative pt-12 overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/10 blur-[120px] rounded-full -z-10 transition-opacity"></div>
                 <Container>
                     <div className="max-w-4xl mx-auto text-center space-y-6">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest"
                         >
                             <Radio className="w-3 h-3" />
                             <span>{t("cover_label")}</span>
@@ -56,7 +56,7 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-4xl md:text-6xl font-bold text-white tracking-tight"
+                            className="text-4xl md:text-6xl font-bold text-foreground tracking-tight transition-colors"
                         >
                             {t("title")}
                         </motion.h1>
@@ -64,7 +64,7 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-slate-400 text-lg leading-relaxed max-w-3xl mx-auto"
+                            className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto transition-colors"
                         >
                             {t("description")}
                         </motion.p>
@@ -81,15 +81,15 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-blue-500/30 transition-all group"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-primary/10 text-primary group-hover:scale-110 transition-transform">
                                     <Globe className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-white tracking-tight">{t('channels_stats')}</h3>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                    <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t('channels_stats')}</h3>
+                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                         {t("analytics")}
                                     </p>
                                 </div>
@@ -101,15 +101,15 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-amber-500/30 transition-all group"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-amber-500/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
                                     <Bell className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-white tracking-tight">{t("alerts.title")}</h3>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                    <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("alerts.title")}</h3>
+                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                         {t("alerts.description")}
                                     </p>
                                 </div>
@@ -121,15 +121,15 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-emerald-500/30 transition-all group"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-emerald-500/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                                     <Scissors className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-white tracking-tight">{t("clips.title")}</h3>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                    <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("clips.title")}</h3>
+                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                         {t("clips.description")}
                                     </p>
                                 </div>
@@ -141,15 +141,15 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-slate-900/50 border border-slate-800 hover:border-indigo-500/30 transition-all group"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-indigo-500/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-indigo-500/10 text-indigo-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                                     <Zap className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
-                                    <h3 className="text-xl font-bold text-white tracking-tight">{t("media_pulse_integration.title")}</h3>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                    <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("media_pulse_integration.title")}</h3>
+                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                         {t("media_pulse_integration.description")}
                                     </p>
                                 </div>
@@ -163,39 +163,39 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="p-10 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800"
+                            className="p-10 rounded-[3rem] bg-card border border-border shadow-lg transition-all"
                         >
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
-                                        <div className="p-3 rounded-xl bg-blue-500/20 text-blue-400">
+                                        <div className="p-3 rounded-xl bg-primary/10 text-primary">
                                             <Target className="w-6 h-6" />
                                         </div>
-                                        <h3 className="text-2xl font-bold text-white">{t("custom_profiles.title")}</h3>
+                                        <h3 className="text-2xl font-bold text-foreground transition-colors">{t("custom_profiles.title")}</h3>
                                     </div>
-                                    <p className="text-slate-400 leading-relaxed">
+                                    <p className="text-muted-foreground leading-relaxed transition-colors">
                                         {t("custom_profiles.description")}
                                     </p>
                                     <div className="flex flex-wrap gap-4 pt-4">
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
-                                            <Monitor className="w-4 h-4 text-blue-400" />
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                            <Monitor className="w-4 h-4 text-primary" />
                                             <span>{t('real_time_clips')}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700 text-xs text-slate-300">
-                                            <Zap className="w-4 h-4 text-amber-400" />
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                            <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                                             <span>{t('immediate_alerts')}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 shadow-2xl">
-                                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                                        <div className="flex flex-col items-center gap-4 text-slate-500">
+                                <div className="relative aspect-video rounded-2xl overflow-hidden bg-muted border border-border shadow-2xl">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-card">
+                                        <div className="flex flex-col items-center gap-4 text-muted-foreground">
                                             <Radio className="w-12 h-12 animate-pulse" />
                                             <span className="text-xs font-bold uppercase tracking-widest">{t('global_stream')}</span>
                                         </div>
                                     </div>
                                     {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
                                 </div>
                             </div>
                         </motion.div>
@@ -204,13 +204,13 @@ export default function TvRadioClient() {
             </section>
 
             {/* Use Case Scenarios Section */}
-            <section className="py-24 border-t border-slate-900">
+            <section className="py-24 border-t border-border transition-colors duration-300">
                 <Container>
                     <div className="max-w-4xl mx-auto text-center mb-16 space-y-4">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                        <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                             {t("use_cases.title")}
                         </h2>
-                        <p className="text-slate-400 text-lg leading-relaxed">
+                        <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
                             {t("use_cases.intro")}
                         </p>
                     </div>
@@ -223,19 +223,19 @@ export default function TvRadioClient() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="p-8 rounded-[2.5rem] bg-slate-900/40 border border-slate-800/50 hover:bg-slate-900/60 transition-all group relative overflow-hidden"
+                                className="p-8 rounded-[2.5rem] bg-card border border-border hover:bg-muted/50 transition-all group relative overflow-hidden shadow-sm hover:shadow-md"
                             >
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full group-hover:bg-blue-500/10 transition-colors"></div>
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors"></div>
                                 <div className="space-y-6 relative z-10">
                                     <div className="space-y-2">
-                                        <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                                        <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
                                             {t(`use_cases.items.${caseId}.title`)}
                                         </h3>
-                                        <p className="inline-block px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                                        <p className="inline-block px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
                                             {t(`use_cases.items.${caseId}.role`)}
                                         </p>
                                     </div>
-                                    <p className="text-slate-400 leading-relaxed text-sm">
+                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
                                         {t(`use_cases.items.${caseId}.scenario`)}
                                     </p>
                                 </div>
@@ -247,9 +247,9 @@ export default function TvRadioClient() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mt-16 p-8 rounded-[2rem] bg-blue-600/5 border border-blue-500/20 text-center"
+                        className="mt-16 p-8 rounded-[2rem] bg-primary/5 border border-primary/20 text-center transition-colors"
                     >
-                        <p className="text-blue-100/80 italic leading-relaxed max-w-4xl mx-auto">
+                        <p className="text-primary/80 italic leading-relaxed max-w-4xl mx-auto">
                             "{t("use_cases.conclusion")}"
                         </p>
                     </motion.div>
@@ -257,11 +257,11 @@ export default function TvRadioClient() {
             </section>
 
             {/* Interactive Dashboard Section */}
-            <section className="bg-slate-950 py-24 border-t border-slate-900">
+            <section className="bg-background py-24 border-t border-border transition-colors duration-300">
                 <Container>
                     <div className="mb-12">
-                        <h2 className="text-3xl font-bold text-white mb-4">{t('console_title')}</h2>
-                        <p className="text-slate-500">{t('console_desc')}</p>
+                        <h2 className="text-3xl font-bold text-foreground mb-4 transition-colors">{t('console_title')}</h2>
+                        <p className="text-muted-foreground transition-colors">{t('console_desc')}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>

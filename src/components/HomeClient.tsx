@@ -39,7 +39,7 @@ export default function HomeClient() {
         <main className="min-h-screen bg-background">
             {/* Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center text-foreground overflow-hidden">
-                <div className="absolute inset-0 opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+                <div className="absolute inset-0 opacity-10 dark:opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] transition-opacity duration-300"></div>
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-primary/10 via-transparent to-background blur-3xl opacity-50"></div>
 
                 <div className="z-10 text-center max-w-4xl px-4">
@@ -83,15 +83,15 @@ export default function HomeClient() {
                             className="px-10 py-5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary/30 flex items-center gap-3 group"
                         >
                             <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-foreground"></span>
                             </span>
                             {t('Common.try_ai')}
                         </Link>
 
                         <button
                             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="px-10 py-5 bg-card/50 border border-border backdrop-blur-xl hover:border-primary text-muted-foreground rounded-2xl font-semibold transition-all hover:text-foreground"
+                            className="px-10 py-5 bg-card border border-border backdrop-blur-xl hover:border-primary text-muted-foreground rounded-2xl font-semibold transition-all hover:text-foreground"
                         >
                             {t('Common.view_details')}
                         </button>
@@ -130,7 +130,7 @@ export default function HomeClient() {
                                 {Object.keys(t.raw('Clients.list')).map((key) => (
                                     <span
                                         key={`${outerIdx}-${key}`}
-                                        className="text-2xl md:text-3xl font-bold text-muted-foreground hover:text-primary/50 transition-colors cursor-default select-none tracking-tight"
+                                        className="text-2xl md:text-3xl font-bold text-muted-foreground hover:text-primary transition-colors cursor-default select-none tracking-tight"
                                     >
                                         {t(`Clients.list.${key}`)}
                                     </span>
@@ -146,20 +146,20 @@ export default function HomeClient() {
             </section>
 
             {/* Trust & Compliance Row */}
-            <section className="py-12 bg-muted/10 border-b border-border">
+            <section className="py-12 bg-muted/30 border-b border-border transition-colors duration-300">
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
                         <div className="relative w-32 h-12">
-                            <Image src="/tdra.png" alt="TDRA Approved" fill className="object-contain" />
+                            <Image src="/tdra.png" alt="TDRA Approved" fill className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-16 h-16">
-                            <Image src="/soc2.png" alt="SOC2 Compliance" fill className="object-contain" />
+                            <Image src="/soc2.png" alt="SOC2 Compliance" fill className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/secure.png" alt="Secure App" fill className="object-contain" />
+                            <Image src="/secure.png" alt="Secure App" fill className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill className="object-contain" />
+                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill className="object-contain dark:brightness-110" />
                         </div>
                     </div>
                 </Container>
@@ -191,9 +191,9 @@ export default function HomeClient() {
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.2 }}
                                 className={clsx(
-                                    "relative p-10 rounded-[2.5rem] border transition-all h-full group overflow-hidden",
+                                    "relative p-10 rounded-[2.5rem] border transition-all h-full group overflow-hidden shadow-sm hover:shadow-xl",
                                     feature.border,
-                                    "bg-card/30 hover:bg-card/50 backdrop-blur-2xl"
+                                    "bg-card hover:bg-card/80 backdrop-blur-2xl"
                                 )}
                             >
                                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -214,7 +214,7 @@ export default function HomeClient() {
 
                                 {/* Mock Action/Visual per feature */}
                                 {feature.id === 'dashboard' && (
-                                    <div className="mt-8 p-4 bg-background/50 rounded-2xl border border-border space-y-3">
+                                    <div className="mt-8 p-4 bg-muted/30 rounded-2xl border border-border space-y-3">
                                         <div className="flex gap-2">
                                             <div className="h-1.5 w-1/3 bg-primary rounded-full"></div>
                                             <div className="h-1.5 w-1/2 bg-muted rounded-full"></div>
@@ -232,8 +232,8 @@ export default function HomeClient() {
 
                                 {feature.id === 'ai_agent' && (
                                     <div className="mt-8 flex gap-3">
-                                        <div className="px-4 py-2 bg-background/50 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.generate_report')}</div>
-                                        <div className="px-4 py-2 bg-background/50 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.analyze_tone')}</div>
+                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.generate_report')}</div>
+                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.analyze_tone')}</div>
                                     </div>
                                 )}
 
@@ -256,6 +256,7 @@ export default function HomeClient() {
                     </div>
                 </Container>
             </section>
+
         </main>
     );
 }

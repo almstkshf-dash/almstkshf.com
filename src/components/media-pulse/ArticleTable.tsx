@@ -89,16 +89,16 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
         <div className="space-y-4">
             {/* Batch Actions Bar */}
             {selectedIds.size > 0 && (
-                <div className="flex items-center justify-between px-6 py-3 bg-blue-500/10 border-y border-blue-500/20 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border-y border-primary/20 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-blue-400">
+                        <span className="text-sm font-bold text-primary">
                             {t('items_selected', { count: selectedIds.size })}
                         </span>
                     </div>
                     <button
                         onClick={handleBatchDelete}
                         disabled={isBatchDeleting}
-                        className="flex items-center gap-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-rose-500/25 disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold transition-all shadow-lg shadow-destructive/25 disabled:opacity-50"
                     >
                         {isBatchDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         {t('delete_selected', { count: selectedIds.size })}
@@ -110,13 +110,13 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-[0.2em] bg-slate-50/50 dark:bg-slate-900/50">
+                        <tr className="border-b border-border text-muted-foreground text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
                             <th className="p-4 w-10">
                                 <input
                                     type="checkbox"
                                     checked={selectedIds.size === displayedArticles.length && displayedArticles.length > 0}
                                     onChange={toggleSelectAll}
-                                    className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                                    className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                                 />
                             </th>
                             <th className="p-4 font-bold">{t('col_date')}</th>
@@ -128,13 +128,13 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                             <th className="p-4 font-bold text-center w-12"></th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    <tbody className="divide-y divide-border/50">
                         {displayedArticles.map((article: any) => (
                             <tr
                                 key={article._id}
                                 className={clsx(
-                                    "hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group",
-                                    selectedIds.has(article._id) && "bg-blue-500/5 dark:bg-blue-500/5"
+                                    "hover:bg-muted/30 transition-colors group",
+                                    selectedIds.has(article._id) && "bg-primary/5"
                                 )}
                             >
                                 <td className="p-4">
@@ -142,20 +142,20 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                         type="checkbox"
                                         checked={selectedIds.has(article._id)}
                                         onChange={() => toggleSelect(article._id)}
-                                        className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                                        className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                                     />
                                 </td>
-                                <td className="p-4 whitespace-nowrap text-xs font-mono text-slate-500 dark:text-slate-400">
+                                <td className="p-4 whitespace-nowrap text-xs font-mono text-muted-foreground transition-colors">
                                     {article.publishedDate}
                                 </td>
                                 <td className="p-4 max-w-sm">
                                     <div className="flex flex-col gap-1">
-                                        <a href={article.resolvedUrl || article.url} target="_blank" rel="noreferrer" className="font-semibold text-slate-900 dark:text-white hover:text-blue-600 transition-colors flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                                        <a href={article.resolvedUrl || article.url} target="_blank" rel="noreferrer" className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 transition-transform">
                                             <span className="truncate">{article.title}</span>
                                             <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
                                         </a>
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getSourceBadgeColor(article.sourceType)}`}>
+                                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${getSourceBadgeColor(article.sourceType)}`}>
                                                 {article.sourceType === 'Press Release' ? t('types.press_release') :
                                                     article.sourceType === 'Online News' ? t('types.online_news') :
                                                         article.sourceType === 'Social Media' ? t('types.social_media') :
@@ -163,29 +163,29 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                                                 article.sourceType === 'Print' ? t('types.print') :
                                                                     article.sourceType}
                                             </span>
-                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1">
-                                                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
+                                                <span className="w-1 h-1 rounded-full bg-border" />
                                                 {article.sourceCountry || article.country}
                                             </span>
-                                            {article.imageUrl && <ImageIcon className="w-3 h-3 text-blue-500/50" />}
-                                            {article.isManual && <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter">{t('manual')}</span>}
+                                            {article.imageUrl && <ImageIcon className="w-3 h-3 text-primary/50" />}
+                                            {article.isManual && <span className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
                                         </div>
                                     </div>
                                 </td>
                                 <td className="p-4">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest
-                                        ${article.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                                            article.sentiment === 'Negative' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
-                                                'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors
+                                        ${article.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
+                                            article.sentiment === 'Negative' ? 'bg-destructive/10 text-destructive border border-destructive/20' :
+                                                'bg-primary/10 text-primary border border-primary/20'}`}>
                                         {article.sentiment === 'Positive' ? t('sentiments.positive') :
                                             article.sentiment === 'Negative' ? t('sentiments.negative') :
                                                 t('sentiments.neutral')}
                                     </span>
                                 </td>
-                                <td className="p-4 text-right text-xs font-mono text-slate-500 dark:text-slate-400">
+                                <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
                                     {article.reach.toLocaleString()}
                                 </td>
-                                <td className="p-4 text-right text-xs font-mono font-bold text-slate-900 dark:text-white">
+                                <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors">
                                     ${article.ave.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </td>
                                 <td className="p-4 text-center">
@@ -195,7 +195,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     <button
                                         onClick={() => handleDelete(article._id)}
                                         disabled={deletingId === article._id}
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 disabled:opacity-50"
+                                        className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-50"
                                         title={t('delete')}
                                     >
                                         {deletingId === article._id ? (

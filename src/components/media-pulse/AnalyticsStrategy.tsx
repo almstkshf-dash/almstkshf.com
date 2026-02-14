@@ -35,15 +35,15 @@ export function AnalyticsStrategy() {
     ];
 
     return (
-        <section className="space-y-20 border-t border-slate-900 pt-32">
+        <section className="space-y-20 border-t border-border pt-32 transition-colors">
             <div className="max-w-4xl space-y-6">
-                <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+                <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
                     {t('strategy_badge')}
                 </div>
-                <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+                <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                     {t("intro.title")}
                 </h2>
-                <p className="text-slate-400 text-lg leading-relaxed">
+                <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
                     {t("intro.description")}
                 </p>
             </div>
@@ -56,29 +56,29 @@ export function AnalyticsStrategy() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         className={clsx(
-                            "p-10 rounded-[3rem] bg-slate-900/30 border border-slate-800 transition-all group",
+                            "p-10 rounded-[3rem] bg-card border border-border transition-all group shadow-lg",
                             s.border
                         )}
                     >
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                             <div className="lg:col-span-5 space-y-6">
                                 <div className="flex items-center gap-4">
-                                    <div className={clsx("p-3 rounded-xl bg-slate-800/50", s.color)}>
+                                    <div className={clsx("p-3 rounded-xl bg-muted transition-colors", s.color)}>
                                         <s.icon className="w-6 h-6" />
                                     </div>
-                                    <h3 className="text-3xl font-bold text-white tracking-tight">{t(`${s.key}.title`)}</h3>
+                                    <h3 className="text-3xl font-bold text-foreground tracking-tight transition-colors">{t(`${s.key}.title`)}</h3>
                                 </div>
-                                <p className="text-slate-400 leading-relaxed font-light">
+                                <p className="text-muted-foreground leading-relaxed font-light transition-colors">
                                     {t(`${s.key}.description`)}
                                 </p>
                             </div>
                             <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {(t.raw(`${s.key}.items`) as StrategyItem[]).map((item, idx) => (
-                                    <div key={idx} className="p-6 rounded-2xl bg-slate-950/50 border border-slate-800 space-y-3 group/item hover:bg-slate-900 transition-colors">
-                                        <h4 className={clsx("font-bold text-sm uppercase tracking-wider", s.color)}>
+                                    <div key={idx} className="p-6 rounded-2xl bg-muted/30 border border-border space-y-3 group/item hover:bg-muted/50 transition-colors shadow-sm">
+                                        <h4 className={clsx("font-bold text-sm uppercase tracking-wider transition-colors", s.color)}>
                                             {item.title}
                                         </h4>
-                                        <p className="text-slate-500 text-xs leading-relaxed group-hover/item:text-slate-400 transition-colors">
+                                        <p className="text-muted-foreground text-xs leading-relaxed group-hover/item:text-foreground transition-colors">
                                             {item.desc}
                                         </p>
                                     </div>

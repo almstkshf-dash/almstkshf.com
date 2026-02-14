@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { routing } from '@/i18n/config';
 import Footer from '@/components/Footer';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import ChatbaseWidget from '@/components/ChatbaseWidget';
 
@@ -91,10 +92,12 @@ export default async function RootLayout({
             <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <ConvexClientProvider>
-                        <Navbar />
-                        {children}
-                        <Footer />
-                        <ChatbaseWidget />
+                        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+                            <Navbar />
+                            {children}
+                            <Footer />
+                            <ChatbaseWidget />
+                        </ThemeProvider>
                     </ConvexClientProvider>
                 </NextIntlClientProvider>
             </body>
