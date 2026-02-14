@@ -896,6 +896,13 @@
     "saved_success": "Settings saved successfully",
     "save_failed": "Failed to save settings. Please try again.",
     "iso_hint": "Comma separated ISO codes (e.g. AE, SA)",
+    "billing": "Billing History",
+    "billing_desc": "View and manage your recent transactions.",
+    "no_payments": "No payments found.",
+    "col_date": "Date",
+    "col_product": "Product",
+    "col_amount": "Amount",
+    "col_status": "Status",
     "default_value": "Default",
     "upload_placeholder": "Click to upload or drag and drop"
   },

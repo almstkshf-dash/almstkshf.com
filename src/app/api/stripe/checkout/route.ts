@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
         const checkoutSession = await stripe.checkout.sessions.create({
             mode: 'payment',
             payment_method_types: ['card'],
+            client_reference_id: body.userId || undefined,
             line_items: [
                 {
                     price_data: {
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
                 productName,
                 amount: amount.toString(),
                 currency,
+                userId: body.userId || '',
             },
         });
 

@@ -4,13 +4,16 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { Save, Upload, Loader2 } from 'lucide-react';
+import { Save, Upload, Loader2, CreditCard } from 'lucide-react';
 import Image from 'next/image';
+import { useAuth } from '@clerk/nextjs';
 
 export default function SettingsPage() {
     const t = useTranslations('Settings');
+    const { userId } = useAuth();
     const settings = useQuery(api.settings.getSettings);
     const updateSettings = useMutation(api.settings.updateSettings);
+    const payments = useQuery(api.payments.getUserPayments, { userId: userId || '' });
 
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');
@@ -197,6 +200,59 @@ export default function SettingsPage() {
                     </div>
                 </section>
             </div>
+
+            {/* Billing History Section */}
+            <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 mb-6">
+                    <CreditCard className="h-6 w-6 text-blue-600" />
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{t('billing')}</h2>
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t('billing_desc')}</p>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-200 dark:border-slate-700">
+                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_date')}</th>
+                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_product')}</th>
+                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_amount')}</th>
+                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_status')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {!payments || payments.length === 0 ? (
+                                <tr>
+                                    <td colSpan={4} className="py-8 text-center text-slate-400 dark:text-slate-500 italic">
+                                        {t('no_payments')}
+                                    </td>
+                                </tr>
+                            ) : (
+                                payments.map((payment) => (
+                                    <tr key={payment._id} className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
+                                        <td className="py-4 px-4 text-sm text-slate-700 dark:text-slate-300">
+                                            {new Date(payment.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td className="py-4 px-4 text-sm font-medium text-slate-800 dark:text-slate-200">
+                                            {payment.productName}
+                                        </td>
+                                        <td className="py-4 px-4 text-sm text-slate-700 dark:text-slate-300">
+                                            {payment.amount} {payment.currency.toUpperCase()}
+                                        </td>
+                                        <td className="py-4 px-4 text-sm">
+                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${payment.status === 'paid'
+                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                }`}>
+                                                {payment.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     );
 }

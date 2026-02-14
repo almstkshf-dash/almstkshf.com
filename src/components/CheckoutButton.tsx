@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { getStripe } from '@/lib/stripe-client';
+import { useAuth } from '@clerk/nextjs';
 
 interface CheckoutButtonProps {
     amount: number;
@@ -22,6 +23,7 @@ export default function CheckoutButton({
     children = 'Checkout',
 }: CheckoutButtonProps) {
     const [loading, setLoading] = useState(false);
+    const { userId } = useAuth();
 
     const handleCheckout = async () => {
         setLoading(true);
@@ -38,6 +40,7 @@ export default function CheckoutButton({
                     currency,
                     productName,
                     productDescription,
+                    userId,
                 }),
             });
 

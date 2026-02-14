@@ -97,4 +97,16 @@ export default defineSchema({
         timestamp: v.number(),
         timestamp_ms: v.optional(v.number()),
     }).index("by_email", ["email"]),
+
+    payments: defineTable({
+        stripeSessionId: v.string(),
+        userId: v.optional(v.string()),
+        amount: v.number(),
+        currency: v.string(),
+        status: v.string(),
+        productName: v.string(),
+        customerEmail: v.optional(v.string()),
+        createdAt: v.number(),
+    }).index("by_session_id", ["stripeSessionId"])
+        .index("by_user_id", ["userId"]),
 });

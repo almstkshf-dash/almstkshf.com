@@ -14,6 +14,7 @@ import type * as init from "../init.js";
 import type * as media from "../media.js";
 import type * as monitoring from "../monitoring.js";
 import type * as monitoringAction from "../monitoringAction.js";
+import type * as payments from "../payments.js";
 import type * as queries from "../queries.js";
 import type * as settings from "../settings.js";
 import type * as waitlist from "../waitlist.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   media: typeof media;
   monitoring: typeof monitoring;
   monitoringAction: typeof monitoringAction;
+  payments: typeof payments;
   queries: typeof queries;
   settings: typeof settings;
   waitlist: typeof waitlist;

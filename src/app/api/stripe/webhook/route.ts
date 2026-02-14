@@ -42,11 +42,21 @@ export async function POST(request: NextRequest) {
                 const session = event.data.object as Stripe.Checkout.Session;
                 console.log('✅ Payment successful:', session.id);
 
-                // TODO: Fulfill the purchase
-                // - Send confirmation email
-                // - Grant access to product/service
-                // - Update database
-                // - etc.
+                // Initialize Convex Client
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                // Record the payment in Convex
+                await convex.mutation(api.payments.recordPayment, {
+                    stripeSessionId: session.id,
+                    userId: session.client_reference_id || session.metadata?.userId,
+                    amount: (session.amount_total || 0) / 100, // Convert back from cents
+                    currency: session.currency || 'usd',
+                    status: 'paid',
+                    productName: session.metadata?.productName || 'Default Product',
+                    customerEmail: session.customer_details?.email || undefined,
+                });
 
                 break;
             }
