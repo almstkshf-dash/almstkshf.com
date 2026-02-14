@@ -11,6 +11,7 @@ import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import ChatbaseWidget from '@/components/ChatbaseWidget';
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({
     subsets: ["latin"],
@@ -97,6 +98,7 @@ export default async function RootLayout({
                             <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
                                 <Navbar />
                                 {children}
+                                <Analytics />
                                 <Footer />
                                 <ChatbaseWidget />
                             </ThemeProvider>
