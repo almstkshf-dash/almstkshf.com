@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, ChevronDown } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, LayoutDashboard } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
@@ -143,6 +143,15 @@ export default function Navbar() {
                                 <Globe className="w-3.5 h-3.5" />
                                 <span>{isRTL ? "English" : "العربية"}</span>
                             </button>
+
+                            <Link
+                                href="/dashboard"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border"
+                            >
+                                <LayoutDashboard className="w-4 h-4" />
+                                {t('dashboard')}
+                            </Link>
+
                             <Link
                                 href="/contact"
                                 className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
@@ -251,6 +260,15 @@ export default function Navbar() {
                                         <Globe className="w-5 h-5" />
                                         <span className="font-medium">{isRTL ? "English" : "العربية"}</span>
                                     </button>
+
+                                    <Link
+                                        href="/dashboard"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 p-4 font-bold text-lg text-foreground bg-muted/50 hover:bg-muted rounded-xl transition-all border border-border"
+                                    >
+                                        <LayoutDashboard className="w-5 h-5" />
+                                        {t('dashboard')}
+                                    </Link>
 
                                     <Link
                                         href="/contact"
