@@ -76,6 +76,15 @@ export default clerkMiddleware(async (auth, req) => {
 
         return response;
     } catch (error: any) {
+        // IMPORTANT: Re-throw NEXT_REDIRECT warnings/errors so that Next.js helper methods (like auth.protect()) work properly
+        if (
+            error?.message?.includes('NEXT_REDIRECT') ||
+            error?.digest?.includes('NEXT_REDIRECT') ||
+            error?.message === 'NEXT_REDIRECT'
+        ) {
+            throw error;
+        }
+
         console.error(`[Middleware Critical Error] ${pathname}:`, {
             message: error?.message,
             stack: error?.stack,
