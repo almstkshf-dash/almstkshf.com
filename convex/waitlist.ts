@@ -11,15 +11,16 @@ export const joinWaitlist = mutation({
     },
     handler: async (ctx, args) => {
         // Validate email format
+        const email = args.email.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(args.email)) {
+        if (!emailRegex.test(email)) {
             throw new Error("Invalid email address.");
         }
 
         // Check if already in waitlist for this service
         const existing = await ctx.db
             .query("waitlist")
-            .withIndex("by_email", (q) => q.eq("email", args.email))
+            .withIndex("by_email", (q) => q.eq("email", email))
             .filter((q) => q.eq(q.field("service"), args.service))
             .first();
 
@@ -30,7 +31,7 @@ export const joinWaitlist = mutation({
 
         // Insert into database
         await ctx.db.insert("waitlist", {
-            email: args.email,
+            email: email,
             name: args.name,
             service: args.service,
             timestamp: Date.now(),

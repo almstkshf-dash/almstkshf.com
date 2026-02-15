@@ -1001,6 +1001,7 @@
     "export_failed": "Export failed. Please try again.",
     "export_empty": "No articles to export.",
     "filters": {
+      "all_countries": "All Countries",
       "all": "All",
       "online": "Online News",
       "social": "Social Media",

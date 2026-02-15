@@ -183,6 +183,7 @@ function MultiSelectDropdown({
     selectedText?: string;
     clearAllText?: string;
     "aria-labelledby"?: string;
+    id?: string;
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -260,11 +261,11 @@ function MultiSelectDropdown({
                     {/* Search */}
                     <div className="p-2 border-b border-border bg-muted/30">
                         <div className="relative">
-                            <label htmlFor="dropdown-search" className="sr-only">{searchPlaceholder}</label>
+                            <label htmlFor={`${id || 'dropdown'}-search`} className="sr-only">{searchPlaceholder}</label>
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <input
-                                id="dropdown-search"
-                                name="dropdown-search"
+                                id={`${id || 'dropdown'}-search`}
+                                name={`${id || 'dropdown'}-search`}
                                 type="text"
                                 placeholder={searchPlaceholder}
                                 value={search}
@@ -481,8 +482,9 @@ export default function NewsGenerator() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Countries Dropdown */}
                     <div>
-                        <label id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('region')}</label>
+                        <span id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('region')}</span>
                         <MultiSelectDropdown
+                            id="countries-dropdown"
                             aria-labelledby="region-label"
                             items={countryItems}
                             selected={selectedCountries}
@@ -507,8 +509,9 @@ export default function NewsGenerator() {
 
                     {/* Languages Dropdown */}
                     <div>
-                        <label id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('language')}</label>
+                        <span id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('language')}</span>
                         <MultiSelectDropdown
+                            id="languages-dropdown"
                             aria-labelledby="language-label"
                             items={languageItems}
                             selected={selectedLanguages}
@@ -532,7 +535,7 @@ export default function NewsGenerator() {
                 <div className="flex flex-col md:flex-row gap-4 items-end">
                     {/* Date Range Popup */}
                     <div className="flex-1" ref={dateRef}>
-                        <label className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('date_range')}</label>
+                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('date_range')}</span>
                         <div
                             role="button"
                             tabIndex={0}

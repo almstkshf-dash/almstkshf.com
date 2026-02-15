@@ -196,6 +196,8 @@ export default function DashboardPage() {
                                     <select
                                         value={selectedCountry}
                                         onChange={(e) => setSelectedCountry(e.target.value)}
+                                        id="country-select"
+                                        name="country"
                                         className="w-full appearance-none bg-muted/50 border border-border rounded-xl pl-10 pr-8 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-muted font-medium"
                                     >
                                         <option value="All">{t('filters.all_countries')}</option>
@@ -216,6 +218,8 @@ export default function DashboardPage() {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                     <input
                                         type="text"
+                                        name="search"
+                                        id="search-input"
                                         placeholder={t('search_placeholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
