@@ -153,7 +153,7 @@ export default function Footer() {
                     <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>
-                        <Link href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</Link>
+                        <a href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</a>
                         <button className="hover:text-foreground transition-colors">{t('status')}</button>
                     </div>
                 </div>

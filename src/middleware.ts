@@ -74,7 +74,7 @@ export default clerkMiddleware(async (auth, req) => {
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "img-src 'self' blob: data: https://*.clerk.com https://img.clerk.com https://*.google.com https://*.gstatic.com https://*.chatbase.co https://grainy-gradients.vercel.app",
             "font-src 'self' https://fonts.gstatic.com",
-            "connect-src 'self' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.convex.cloud https://*.convex.site https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.chatbase.co https://api.stripe.com https://vercel.live",
+            "connect-src 'self' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.convex.cloud wss://*.convex.cloud https://*.convex.site https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.chatbase.co https://api.stripe.com https://vercel.live",
             "frame-src 'self' https://*.chatbase.co"
         ].join('; ');
 
@@ -104,7 +104,7 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
     matcher: [
         // Skip Next.js internals and all static files, unless found in search params
-        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',
     ],
