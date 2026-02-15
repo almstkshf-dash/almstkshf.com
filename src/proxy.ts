@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
+import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -17,21 +18,35 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // 1. Run Intl Middleware First for Public Routes
-    if (isPublicRoute(req)) {
-        return intlMiddleware(req);
-    }
+    const url = req.nextUrl.pathname;
+    console.log(`[Middleware] Processing request for: ${url}`);
 
-    // 2. Protect Dashboard Routes
-    if (req.nextUrl.pathname.includes('/dashboard')) {
-        const { userId, redirectToSignIn } = await auth();
-        if (!userId) {
-            return redirectToSignIn();
+    try {
+        // 1. Run Intl Middleware First for Public Routes
+        if (isPublicRoute(req)) {
+            console.log(`[Middleware] Public route detected: ${url}`);
+            return intlMiddleware(req);
         }
-    }
 
-    // 3. Continue with Intl Middleware for protected routes (after auth check passed)
-    return intlMiddleware(req);
+        // 2. Protect Dashboard Routes
+        if (url.includes('/dashboard')) {
+            console.log(`[Middleware] Protected route detected: ${url}`);
+            const { userId, redirectToSignIn } = await auth();
+
+            if (!userId) {
+                console.log(`[Middleware] Unauthorized access to dashboard. Redirecting to sign-in.`);
+                return redirectToSignIn();
+            }
+            console.log(`[Middleware] User authenticated for dashboard: ${userId}`);
+        }
+
+        // 3. Continue with Intl Middleware for protected routes (after auth check passed)
+        console.log(`[Middleware] Passing to intlMiddleware: ${url}`);
+        return intlMiddleware(req);
+    } catch (error) {
+        console.error(`[Middleware] Error processing request ${url}:`, error);
+        return NextResponse.next();
+    }
 });
 
 export const config = {
