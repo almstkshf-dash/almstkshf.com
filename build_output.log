@@ -1,0 +1,54 @@
+
+> almstkshf.com@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 29.0s
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/9) ...
+  Generating static pages using 3 workers (2/9) 
+  Generating static pages using 3 workers (4/9) 
+  Generating static pages using 3 workers (6/9) 
+✓ Generating static pages using 3 workers (9/9) in 461.2ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /_not-found
+├ ƒ /[locale]
+├ ƒ /[locale]/behind-the-scene
+├ ƒ /[locale]/case-studies/lexcora
+├ ƒ /[locale]/case-studies/styling-assistant
+├ ƒ /[locale]/contact
+├ ƒ /[locale]/dashboard
+├ ƒ /[locale]/dashboard/settings
+├ ƒ /[locale]/media-monitoring/central-media-repository
+├ ƒ /[locale]/media-monitoring/crisis-management
+├ ƒ /[locale]/media-monitoring/media-pulse
+├ ƒ /[locale]/media-monitoring/press
+├ ƒ /[locale]/media-monitoring/tv-radio
+├ ƒ /[locale]/payment/cancelled
+├ ƒ /[locale]/payment/success
+├ ƒ /[locale]/pricing
+├ ƒ /[locale]/privacy
+├ ƒ /[locale]/technical-solutions/integration
+├ ƒ /[locale]/technical-solutions/kyc
+├ ƒ /[locale]/technical-solutions/smart-media-assistant
+├ ƒ /[locale]/terms
+├ ƒ /api/chatbase/token
+├ ƒ /api/monitor
+├ ƒ /api/stripe/checkout
+├ ƒ /api/stripe/webhook
+├ ○ /icon.png
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
