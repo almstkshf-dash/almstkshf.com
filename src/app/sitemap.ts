@@ -15,6 +15,10 @@ const routes = [
     '/media-monitoring/crisis-management',
     '/contact',
     '/behind-the-scene',
+    '/pricing',
+    '/privacy',
+    '/terms',
+    '/dashboard'
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

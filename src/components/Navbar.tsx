@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { usePathname, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, ChevronDown, LayoutDashboard } from "lucide-react";
@@ -10,6 +11,7 @@ import Container from "@/components/ui/Container";
 import Image from "next/image";
 import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink"; // Import custom link
 
 export default function Navbar() {
     const t = useTranslations("Navigation");
@@ -33,7 +35,7 @@ export default function Navbar() {
                 <Container>
                     <div className="flex h-20 items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
+                        <HoverPrefetchLink href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
                             <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105">
                                 <Image
                                     src="/logo.png"
@@ -46,7 +48,7 @@ export default function Navbar() {
                             <span className="hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                 {tCommon('app_name')}
                             </span>
-                        </Link>
+                        </HoverPrefetchLink>
 
                         {/* Desktop Navigation - Hidden on tablet, visible on large screens */}
                         <nav className="hidden lg:flex items-center gap-8 ms-auto me-8">
@@ -87,7 +89,7 @@ export default function Navbar() {
                                                     >
                                                         <div className="grid gap-1">
                                                             {item.children.map((child) => (
-                                                                <Link
+                                                                <HoverPrefetchLink
                                                                     key={child.label}
                                                                     href={child.href as any}
                                                                     className="block p-3 rounded-lg hover:bg-muted/50 transition-all group/item"
@@ -106,7 +108,7 @@ export default function Navbar() {
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </Link>
+                                                                </HoverPrefetchLink>
                                                             ))}
                                                         </div>
                                                     </motion.div>
@@ -117,7 +119,7 @@ export default function Navbar() {
                                 }
 
                                 return (
-                                    <Link
+                                    <HoverPrefetchLink
                                         key={item.label}
                                         href={item.href as any}
                                         className={clsx(
@@ -127,7 +129,7 @@ export default function Navbar() {
                                     >
                                         {item.icon && <item.icon className="w-4 h-4 opacity-70 group-hover:opacity-100" />}
                                         {t(item.label)}
-                                    </Link>
+                                    </HoverPrefetchLink>
                                 );
                             })}
                         </nav>
@@ -144,20 +146,20 @@ export default function Navbar() {
                                 <span>{isRTL ? "English" : "العربية"}</span>
                             </button>
 
-                            <Link
+                            <HoverPrefetchLink
                                 href="/dashboard"
                                 className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border"
                             >
                                 <LayoutDashboard className="w-4 h-4" />
                                 {t('dashboard')}
-                            </Link>
+                            </HoverPrefetchLink>
 
-                            <Link
+                            <HoverPrefetchLink
                                 href="/contact"
                                 className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
                             >
                                 {t('get_started')}
-                            </Link>
+                            </HoverPrefetchLink>
                         </div>
 
                         {/* Mobile Menu Toggle - Visible on Tablet and below */}
@@ -186,7 +188,7 @@ export default function Navbar() {
                         <Container>
                             <div className="flex flex-col min-h-screen py-6">
                                 <div className="flex items-center justify-between mb-8 pb-6 border-b border-border">
-                                    <Link href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
+                                    <HoverPrefetchLink href="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3">
                                         <div className="relative w-10 h-10 overflow-hidden rounded-lg bg-background border border-border flex items-center justify-center">
                                             <Image
                                                 src="/logo.png"
@@ -199,7 +201,7 @@ export default function Navbar() {
                                         <span className="font-bold text-xl text-foreground">
                                             {tCommon('app_name')}
                                         </span>
-                                    </Link>
+                                    </HoverPrefetchLink>
                                     <button
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
@@ -218,7 +220,7 @@ export default function Navbar() {
                                                     </div>
                                                     <div className="grid grid-cols-1 gap-2 ps-4 border-s-2 border-border">
                                                         {item.children.map(child => (
-                                                            <Link
+                                                            <HoverPrefetchLink
                                                                 key={child.label}
                                                                 href={child.href as any}
                                                                 className="flex items-center gap-4 p-3 rounded-xl hover:bg-muted transition-colors group"
@@ -232,12 +234,12 @@ export default function Navbar() {
                                                                         {t(child.label)}
                                                                     </div>
                                                                 </div>
-                                                            </Link>
+                                                            </HoverPrefetchLink>
                                                         ))}
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <Link
+                                                <HoverPrefetchLink
                                                     href={item.href as any}
                                                     className="flex items-center gap-4 p-3 text-lg font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all"
                                                     onClick={() => setMobileMenuOpen(false)}
@@ -246,7 +248,7 @@ export default function Navbar() {
                                                         {item.icon && <item.icon className="w-6 h-6" />}
                                                     </div>
                                                     {t(item.label)}
-                                                </Link>
+                                                </HoverPrefetchLink>
                                             )}
                                         </div>
                                     ))}
@@ -261,22 +263,22 @@ export default function Navbar() {
                                         <span className="font-medium">{isRTL ? "English" : "العربية"}</span>
                                     </button>
 
-                                    <Link
+                                    <HoverPrefetchLink
                                         href="/dashboard"
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 p-4 font-bold text-lg text-foreground bg-muted/50 hover:bg-muted rounded-xl transition-all border border-border"
                                     >
                                         <LayoutDashboard className="w-5 h-5" />
                                         {t('dashboard')}
-                                    </Link>
+                                    </HoverPrefetchLink>
 
-                                    <Link
+                                    <HoverPrefetchLink
                                         href="/contact"
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
                                     >
                                         {t('get_started')}
-                                    </Link>
+                                    </HoverPrefetchLink>
                                 </div>
                             </div>
                         </Container>

@@ -42,7 +42,20 @@ export default clerkMiddleware(async (auth, req) => {
 
         // 3. Continue with Intl Middleware for protected routes (after auth check passed)
         console.log(`[Middleware] Passing to intlMiddleware: ${url}`);
-        return intlMiddleware(req);
+
+        const response = intlMiddleware(req);
+
+        // Add Security Headers
+        response.headers.set('X-XSS-Protection', '1; mode=block');
+        response.headers.set('X-Frame-Options', 'DENY');
+        response.headers.set('X-Content-Type-Options', 'nosniff');
+        response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+        response.headers.set(
+            'Content-Security-Policy',
+            "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.google.com https://*.gstatic.com https://*.googletagmanager.com https://*.chatbase.co https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' blob: data: https://*.clerk.com https://img.clerk.com https://*.google.com https://*.gstatic.com https://*.chatbase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.convex.cloud https://*.convex.site https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.chatbase.co https://api.stripe.com;"
+        );
+
+        return response;
     } catch (error) {
         console.error(`[Middleware] Error processing request ${url}:`, error);
         return NextResponse.next();

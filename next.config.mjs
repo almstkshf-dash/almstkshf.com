@@ -8,6 +8,7 @@ const nextConfig = {
         webpackMemoryOptimizations: true,
         optimizePackageImports: ['lucide-react', 'framer-motion', 'cheerio', 'jspdf'],
     },
+    poweredByHeader: false,
 };
 
 export default withNextIntl(nextConfig);

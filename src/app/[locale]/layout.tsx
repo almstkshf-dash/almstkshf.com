@@ -26,6 +26,16 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
     display: "swap",
 });
 
+export const viewport = {
+    themeColor: [
+        { media: "(prefers-color-scheme: light)", color: "white" },
+        { media: "(prefers-color-scheme: dark)", color: "black" },
+    ],
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
     const isAr = locale === "ar";
@@ -104,6 +114,22 @@ export default async function RootLayout({
                             </ThemeProvider>
                         </ConvexClientProvider>
                     </NextIntlClientProvider>
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify({
+                                "@context": "https://schema.org",
+                                "@type": "Organization",
+                                "name": "ALMSTKSHF",
+                                "url": "https://almstkshf.com",
+                                "logo": "https://almstkshf.com/logo.png",
+                                "sameAs": [
+                                    "https://twitter.com/almstkshf",
+                                    "https://linkedin.com/company/almstkshf"
+                                ]
+                            })
+                        }}
+                    />
                 </body>
             </html>
         </ClerkProvider>
