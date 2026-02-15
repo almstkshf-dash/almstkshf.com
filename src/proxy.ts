@@ -45,9 +45,16 @@ export default clerkMiddleware(async (auth, req) => {
         }
 
         // 3. Run Intl Middleware
+        console.log(`[Middleware] Running Intl Middleware for: ${pathname}`);
         const response = intlMiddleware(req);
 
+        if (!response) {
+            console.error(`[Middleware Error] Intl Middleware returned no response for: ${pathname}`);
+            return NextResponse.next();
+        }
+
         // 4. Add Security Headers
+        console.log(`[Middleware] Adding Security Headers for: ${pathname}`);
         response.headers.set('X-XSS-Protection', '1; mode=block');
         response.headers.set('X-Frame-Options', 'DENY');
         response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -56,19 +63,24 @@ export default clerkMiddleware(async (auth, req) => {
         // Slightly optimized CSP
         const csp = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.google.com https://*.gstatic.com https://*.googletagmanager.com https://*.chatbase.co https://va.vercel-scripts.com",
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.google.com https://*.gstatic.com https://*.googletagmanager.com https://*.chatbase.co https://va.vercel-scripts.com https://vercel.live",
+            "worker-src 'self' blob: https://*.clerk.accounts.dev https://clerk.almstkshf.com",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "img-src 'self' blob: data: https://*.clerk.com https://img.clerk.com https://*.google.com https://*.gstatic.com https://*.chatbase.co",
+            "img-src 'self' blob: data: https://*.clerk.com https://img.clerk.com https://*.google.com https://*.gstatic.com https://*.chatbase.co https://grainy-gradients.vercel.app",
             "font-src 'self' https://fonts.gstatic.com",
-            "connect-src 'self' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.convex.cloud https://*.convex.site https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.chatbase.co https://api.stripe.com",
+            "connect-src 'self' https://*.clerk.accounts.dev https://clerk.almstkshf.com https://*.convex.cloud https://*.convex.site https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.chatbase.co https://api.stripe.com https://vercel.live",
             "frame-src 'self' https://*.chatbase.co"
         ].join('; ');
 
         response.headers.set('Content-Security-Policy', csp);
 
         return response;
-    } catch (error) {
-        console.error(`[Middleware Error] ${pathname}:`, error);
+    } catch (error: any) {
+        console.error(`[Middleware Critical Error] ${pathname}:`, {
+            message: error?.message,
+            stack: error?.stack,
+            name: error?.name
+        });
         // Fallback to safety if something goes wrong to avoid 500
         return NextResponse.next();
     }
