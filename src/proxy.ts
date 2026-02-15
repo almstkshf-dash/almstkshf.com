@@ -24,10 +24,11 @@ export default clerkMiddleware(async (auth, req) => {
 
     // 2. Protect Dashboard Routes
     if (req.nextUrl.pathname.includes('/dashboard')) {
-        const authObj = await auth();
-        // protect() throws a redirect if not authenticated.
-        // DO NOT wrap in try/catch unless you rethrow redirects.
-        await (authObj as any).protect();
+        const { userId, redirectToSignIn } = await auth();
+
+        if (!userId) {
+            return redirectToSignIn();
+        }
     }
 
     // 3. Continue with Intl Middleware for protected routes (after auth check passed)
