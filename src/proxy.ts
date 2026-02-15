@@ -22,7 +22,18 @@ export default clerkMiddleware(async (auth, req) => {
     console.log(`[Middleware] Processing request for: ${pathname}`);
 
     // 1. Bypass all check for API and internal routes
-    if (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')) {
+    // Handle localized API routes (e.g., /en/api/...) by rewriting them to non-localized paths
+    const localizedApiMatch = pathname.match(/^\/(en|ar)(\/api\/.*)$/);
+    if (localizedApiMatch) {
+        const targetPath = localizedApiMatch[2];
+        console.log(`[Middleware] Rewriting localized API request: ${pathname} -> ${targetPath}`);
+        return NextResponse.rewrite(new URL(targetPath, req.url));
+    }
+
+    // IMPORTANT: Do NOT bypass requests starting with /api/__clerk as these are handled by Clerk Proxy
+    const isClerkProxy = pathname.startsWith('/api/__clerk');
+
+    if (!isClerkProxy && (pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.'))) {
         return NextResponse.next();
     }
 
@@ -61,7 +72,7 @@ export default clerkMiddleware(async (auth, req) => {
         // Fallback to safety if something goes wrong to avoid 500
         return NextResponse.next();
     }
-});
+}, { proxyUrl: process.env.NEXT_PUBLIC_CLERK_PROXY_URL });
 
 export const config = {
     matcher: [
