@@ -169,6 +169,7 @@ function MultiSelectDropdown({
     selectedText,
     clearAllText,
     "aria-labelledby": ariaLabelledBy,
+    id,
 }: {
     items: { id: string; label: string; searchStr: string }[];
     selected: string[];

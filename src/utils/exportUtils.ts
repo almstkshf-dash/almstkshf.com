@@ -182,6 +182,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // Title
     doc.setFontSize(28);
     doc.setTextColor(...BRAND_DARK);
+    try { doc.setFont('Amiri'); } catch (e) { /* ignore */ }
     doc.text(reportTitle.toUpperCase(), pageWidth / 2, pageHeight / 2 - 10, { align: 'center' });
 
     // Decorative line
@@ -199,7 +200,10 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     const keyword = articles[0]?.keyword || 'N/A';
     const countries = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
     const langs = [...new Set(articles.map(a => a.content))].length > 0 ? 'EN / AR' : 'EN';
+
+    // Switch to Arabic font for this line if available
     doc.setFontSize(9);
+    try { doc.setFont('Amiri'); } catch (e) { /* ignore */ }
     doc.text(`Keyword: "${keyword}"  |  Region: ${countries}  |  Languages: ${langs}`, pageWidth / 2, pageHeight / 2 + 36, { align: 'center' });
 
     // Footer branding
@@ -344,7 +348,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         margin: { top: 22, bottom: 18 },
         styles: {
             fontSize: 7,
-            font: hasArabic ? 'Amiri' : 'helvetica',
+            font: 'Amiri',
             cellPadding: 3,
         },
         headStyles: {
