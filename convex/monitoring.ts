@@ -6,13 +6,19 @@ export const getArticles = query({
     args: {
         limit: v.optional(v.number()),
         sourceType: v.optional(v.string()),
+        sourceCountry: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         let q = ctx.db.query("media_monitoring_articles").order("desc");
 
-        if (args.sourceType) {
+        if (args.sourceType && args.sourceType !== "All") {
             // @ts-ignore
             q = q.filter((q) => q.eq(q.field("sourceType"), args.sourceType));
+        }
+
+        if (args.sourceCountry && args.sourceCountry !== "All") {
+            // @ts-ignore
+            q = q.filter((q) => q.eq(q.field("sourceCountry"), args.sourceCountry));
         }
 
         return await q.take(args.limit || 100);

@@ -9,7 +9,7 @@ import { useLocale, useTranslations } from 'next-intl';
 // ═══════════════════════════════════════════════════════════════
 // FULL WORLD COUNTRIES LIST
 // ═══════════════════════════════════════════════════════════════
-const ALL_COUNTRIES = [
+export const ALL_COUNTRIES = [
     { code: 'AE', flag: '🇦🇪', en: 'United Arab Emirates', ar: 'الإمارات العربية المتحدة' },
     { code: 'SA', flag: '🇸🇦', en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
     { code: 'EG', flag: '🇪🇬', en: 'Egypt', ar: 'مصر' },
