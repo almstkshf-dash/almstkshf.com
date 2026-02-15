@@ -30,12 +30,7 @@ export default clerkMiddleware(async (auth, req) => {
         // 2. Protect Dashboard Routes
         if (pathname.includes('/dashboard')) {
             console.log(`[Middleware] Protected route detected: ${pathname}`);
-            const { userId, redirectToSignIn } = await auth();
-
-            if (!userId) {
-                console.log(`[Middleware] Unauthorized access. Redirecting.`);
-                return redirectToSignIn();
-            }
+            await auth.protect();
         }
 
         // 3. Run Intl Middleware
