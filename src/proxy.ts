@@ -24,11 +24,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // 2. Protect Dashboard Routes
     if (req.nextUrl.pathname.includes('/dashboard')) {
-        const { userId, redirectToSignIn } = await auth();
-
-        if (!userId) {
-            return redirectToSignIn();
-        }
+        await auth.protect();
     }
 
     // 3. Continue with Intl Middleware for protected routes (after auth check passed)

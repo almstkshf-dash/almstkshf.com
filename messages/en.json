@@ -1052,5 +1052,15 @@
     "ai_rec_moderate_negative": "Moderate negative coverage detected in local news. Consider proactive outreach and monitoring the trend closely before it intensifies.",
     "ai_rec_positive_trend": "Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.",
     "ai_rec_default": "Coverage sentiment is balanced. Continue current media strategy and monitor for shifts."
+  },
+  "Error": {
+    "title": "Something went wrong!",
+    "description": "We apologize for the inconvenience. An unexpected error has occurred.",
+    "retry": "Try again"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "Sorry, we couldn’t find the page you’re looking for.",
+    "home_button": "Go back home"
   }
 }
