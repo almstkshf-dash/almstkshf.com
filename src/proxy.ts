@@ -42,6 +42,12 @@ export default clerkMiddleware(async (auth, req) => {
         if (pathname.includes('/dashboard')) {
             console.log(`[Middleware] Protected route detected: ${pathname}`);
             await auth.protect();
+
+            // Explicitly redirect /dashboard to /en/dashboard to avoid 404
+            if (pathname === '/dashboard') {
+                console.log(`[Middleware] Redirecting /dashboard to /en/dashboard`);
+                return NextResponse.redirect(new URL('/en/dashboard', req.url));
+            }
         }
 
         // 3. Run Intl Middleware
