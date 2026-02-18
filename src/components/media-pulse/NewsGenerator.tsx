@@ -413,11 +413,16 @@ export default function NewsGenerator() {
                 languages: selectedLanguages.join(','),
                 dateFrom: dateFrom ? formatDateForBackend(dateFrom) : undefined,
                 dateTo: dateTo ? formatDateForBackend(dateTo) : undefined,
-            });
-            setResult(res as any);
+            }) as any;
+
+            if (res.success) {
+                setResult(res);
+            } else {
+                setErrorMsg(res.error || t('fetch_failed'));
+            }
         } catch (error: any) {
-            console.error(error);
-            setErrorMsg(error?.message || t('fetch_failed'));
+            console.error("News fetch internal error:", error);
+            setErrorMsg(t('fetch_failed'));
         } finally {
             setLoading(false);
         }

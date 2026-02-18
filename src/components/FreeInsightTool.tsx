@@ -39,22 +39,26 @@ export default function FreeInsightTool() {
         setError(null);
 
         try {
-            const data = await analyzeMedia({ text: input });
-            setResult({
-                sentiment: data.sentiment.toLowerCase(),
-                risk: data.risk.toLowerCase(),
-                riskScore: data.riskScore,
-                score: data.score,
-                tone: data.tone,
-                recommendation: data.recommendation,
-                emotions: data.emotions,
-                topics: data.topics,
-                entities: data.entities
-            });
+            const res = await analyzeMedia({ text: input });
+            if (res.success && res.data) {
+                const data = res.data;
+                setResult({
+                    sentiment: data.sentiment.toLowerCase(),
+                    risk: data.risk.toLowerCase(),
+                    riskScore: data.riskScore,
+                    score: data.score,
+                    tone: data.tone,
+                    recommendation: data.recommendation,
+                    emotions: data.emotions,
+                    topics: data.topics,
+                    entities: data.entities
+                });
+            } else {
+                setError(res.error || "Analysis failed. Please try again.");
+            }
         } catch (err: any) {
-            console.error(err);
-            const message = err?.data || err?.message || "Analysis failed. Please try again.";
-            setError(message);
+            console.error("FreeInsightTool internal error:", err);
+            setError("A system error occurred. Please try again later.");
         } finally {
             setIsAnalyzing(false);
         }

@@ -154,138 +154,149 @@ export const fetchNews = action({
         dateTo: v.optional(v.string()),    // DD/MM/YYYY
     },
     handler: async (ctx, args) => {
-        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        try {
+            const apiKey = process.env.GEMINI_API_KEY?.trim();
 
-        if (!apiKey) {
-            console.error("❌ GEMINI_API_KEY is missing from Convex environment variables");
-            throw new Error("AI service not configured. Set GEMINI_API_KEY in Convex Dashboard → Settings → Environment Variables.");
-        }
-
-        const parser = new Parser();
-
-        // Parse multi-values
-        const countryList = args.countries.split(',').map(c => c.trim().toUpperCase()).filter(Boolean);
-        const languageList = args.languages.split(',').map(l => l.trim().toLowerCase()).filter(Boolean);
-
-        // Parse date range if provided (DD/MM/YYYY → Date object)
-        let dateFromObj: Date | null = null;
-        let dateToObj: Date | null = null;
-        if (args.dateFrom) {
-            const [d, m, y] = args.dateFrom.split('/');
-            dateFromObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-        }
-        if (args.dateTo) {
-            const [d, m, y] = args.dateTo.split('/');
-            dateToObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-            dateToObj.setHours(23, 59, 59, 999); // End of day
-        }
-
-        // Full-phrase search — wrap in quotes for exact match on Google News
-        const searchQuery = args.keyword.includes(' ')
-            ? `"${args.keyword}"`
-            : args.keyword;
-
-        // Build RSS URL combos for each country × language pair
-        const rssCombos: { url: string; country: string; lang: string }[] = [];
-
-        for (const country of countryList) {
-            for (const lang of languageList) {
-                const hl = `${lang}-${country}`;
-                const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchQuery)}&hl=${hl}&gl=${country}&ceid=${country}:${lang}`;
-                rssCombos.push({ url: rssUrl, country, lang });
+            if (!apiKey) {
+                console.error("❌ GEMINI_API_KEY is missing from Convex environment variables");
+                return {
+                    success: false,
+                    error: "Media analysis service is not fully configured. Please check environment variables."
+                };
             }
-        }
 
-        let totalSuccess = 0;
-        let totalSkipped = 0;
+            const parser = new Parser();
 
-        for (const combo of rssCombos) {
-            console.log(`📡 Fetching RSS [${combo.lang}/${combo.country}]: ${combo.url}`);
+            // Parse multi-values
+            const countryList = args.countries.split(',').map(c => c.trim().toUpperCase()).filter(Boolean);
+            const languageList = args.languages.split(',').map(l => l.trim().toLowerCase()).filter(Boolean);
 
-            try {
-                const feed = await parser.parseURL(combo.url);
-                const items = feed.items.slice(0, 10);
-                console.log(`📰 Found ${feed.items.length} items for ${combo.lang}-${combo.country}, processing ${items.length}`);
+            // Parse date range if provided (DD/MM/YYYY → Date object)
+            let dateFromObj: Date | null = null;
+            let dateToObj: Date | null = null;
+            if (args.dateFrom) {
+                const [d, m, y] = args.dateFrom.split('/');
+                dateFromObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+            }
+            if (args.dateTo) {
+                const [d, m, y] = args.dateTo.split('/');
+                dateToObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                dateToObj.setHours(23, 59, 59, 999); // End of day
+            }
 
-                for (const item of items) {
-                    if (!item.link || !item.title) {
-                        totalSkipped++;
-                        continue;
-                    }
+            // Full-phrase search — wrap in quotes for exact match on Google News
+            const searchQuery = args.keyword.includes(' ')
+                ? `"${args.keyword}"`
+                : args.keyword;
 
-                    try {
-                        // Date range filter
-                        if (dateFromObj || dateToObj) {
-                            const pubDate = item.pubDate ? new Date(item.pubDate) : null;
-                            if (pubDate) {
-                                if (dateFromObj && pubDate < dateFromObj) { totalSkipped++; continue; }
-                                if (dateToObj && pubDate > dateToObj) { totalSkipped++; continue; }
-                            }
-                        }
+            // Build RSS URL combos for each country × language pair
+            const rssCombos: { url: string; country: string; lang: string }[] = [];
 
-                        // SPIDER — Resolve URL
-                        console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
-                        const resolved = await resolveUrl(item.link);
-
-                        if (!resolved) {
-                            // Still save with the original Google News URL — don't skip
-                            console.log(`⚠️ Could not resolve, saving with original URL: ${item.link}`);
-                        }
-
-                        // BRAIN — AI Analysis via Gemini
-                        const aiData = await callGeminiForAnalysis(
-                            apiKey,
-                            item.title,
-                            item.contentSnippet || item.title,
-                            args.keyword
-                        );
-
-                        // AVE Calculation — Formula: Reach × 0.02 × $5
-                        const reach = aiData.reach_estimate || 50000;
-                        const ave = Math.round(reach * 0.02 * 5);
-
-                        // Format Date (DD/MM/YYYY)
-                        const d = item.pubDate ? new Date(item.pubDate) : new Date();
-                        const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-
-                        // Detect Language (Arabic character check)
-                        const isArabic = /[\u0600-\u06FF]/.test(item.title + (item.contentSnippet || ""));
-                        const language = isArabic ? "AR" : (combo.lang === "ar" ? "AR" : "EN");
-
-                        // Save to Database
-                        await ctx.runMutation(api.monitoring.saveArticle, {
-                            keyword: args.keyword,
-                            url: item.link,
-                            resolvedUrl: resolved?.finalUrl || item.link,
-                            publishedDate: formattedDate,
-                            title: item.title,
-                            content: aiData.summary || item.title,
-                            language: language as "EN" | "AR",
-                            sentiment: aiData.sentiment,
-                            sourceType: aiData.sourceType,
-                            sourceCountry: combo.country,
-                            tone: aiData.tone,
-                            risk: aiData.risk,
-                            reach: reach,
-                            ave: ave,
-                            imageUrl: resolved?.imageUrl || undefined,
-                        });
-
-                        totalSuccess++;
-                        console.log(`✅ Saved: ${item.title.substring(0, 40)}... [${aiData.sentiment}] [${language}] AVE=$${ave}`);
-
-                    } catch (itemError) {
-                        console.error(`❌ Failed to process article: ${item.title?.substring(0, 40)}`, itemError);
-                        totalSkipped++;
-                    }
+            for (const country of countryList) {
+                for (const lang of languageList) {
+                    const hl = `${lang}-${country}`;
+                    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchQuery)}&hl=${hl}&gl=${country}&ceid=${country}:${lang}`;
+                    rssCombos.push({ url: rssUrl, country, lang });
                 }
-            } catch (feedError: any) {
-                console.error(`❌ RSS fetch failed for ${combo.lang}-${combo.country}:`, feedError?.message);
-                totalSkipped++;
             }
-        }
 
-        console.log(`📊 Done: ${totalSuccess} saved, ${totalSkipped} skipped across ${rssCombos.length} feed(s)`);
-        return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: rssCombos.length };
+            let totalSuccess = 0;
+            let totalSkipped = 0;
+
+            for (const combo of rssCombos) {
+                console.log(`📡 Fetching RSS [${combo.lang}/${combo.country}]: ${combo.url}`);
+
+                try {
+                    const feed = await parser.parseURL(combo.url);
+                    const items = feed.items.slice(0, 10);
+                    console.log(`📰 Found ${feed.items.length} items for ${combo.lang}-${combo.country}, processing ${items.length}`);
+
+                    for (const item of items) {
+                        if (!item.link || !item.title) {
+                            totalSkipped++;
+                            continue;
+                        }
+
+                        try {
+                            // Date range filter
+                            if (dateFromObj || dateToObj) {
+                                const pubDate = item.pubDate ? new Date(item.pubDate) : null;
+                                if (pubDate) {
+                                    if (dateFromObj && pubDate < dateFromObj) { totalSkipped++; continue; }
+                                    if (dateToObj && pubDate > dateToObj) { totalSkipped++; continue; }
+                                }
+                            }
+
+                            // SPIDER — Resolve URL
+                            console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
+                            const resolved = await resolveUrl(item.link);
+
+                            if (!resolved) {
+                                // Still save with the original Google News URL — don't skip
+                                console.log(`⚠️ Could not resolve, saving with original URL: ${item.link}`);
+                            }
+
+                            // BRAIN — AI Analysis via Gemini
+                            const aiData = await callGeminiForAnalysis(
+                                apiKey,
+                                item.title,
+                                item.contentSnippet || item.title,
+                                args.keyword
+                            );
+
+                            // AVE Calculation — Formula: Reach × 0.02 × $5
+                            const reach = aiData.reach_estimate || 50000;
+                            const ave = Math.round(reach * 0.02 * 5);
+
+                            // Format Date (DD/MM/YYYY)
+                            const d = item.pubDate ? new Date(item.pubDate) : new Date();
+                            const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+
+                            // Detect Language (Arabic character check)
+                            const isArabic = /[\u0600-\u06FF]/.test(item.title + (item.contentSnippet || ""));
+                            const language = isArabic ? "AR" : (combo.lang === "ar" ? "AR" : "EN");
+
+                            // Save to Database
+                            await ctx.runMutation(api.monitoring.saveArticle, {
+                                keyword: args.keyword,
+                                url: item.link,
+                                resolvedUrl: resolved?.finalUrl || item.link,
+                                publishedDate: formattedDate,
+                                title: item.title,
+                                content: aiData.summary || item.title,
+                                language: language as "EN" | "AR",
+                                sentiment: aiData.sentiment,
+                                sourceType: aiData.sourceType,
+                                sourceCountry: combo.country,
+                                tone: aiData.tone,
+                                risk: aiData.risk,
+                                reach: reach,
+                                ave: ave,
+                                imageUrl: resolved?.imageUrl || undefined,
+                            });
+
+                            totalSuccess++;
+                            console.log(`✅ Saved: ${item.title.substring(0, 40)}... [${aiData.sentiment}] [${language}] AVE=$${ave}`);
+
+                        } catch (itemError) {
+                            console.error(`❌ Failed to process article: ${item.title?.substring(0, 40)}`, itemError);
+                            totalSkipped++;
+                        }
+                    }
+                } catch (feedError: any) {
+                    console.error(`❌ RSS fetch failed for ${combo.lang}-${combo.country}:`, feedError?.message);
+                    totalSkipped++;
+                }
+            }
+
+            console.log(`📊 Done: ${totalSuccess} saved, ${totalSkipped} skipped across ${rssCombos.length} feed(s)`);
+            return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: rssCombos.length };
+        } catch (globalError: any) {
+            console.error("🏁 CRITICAL: Global fetchNews failure", globalError);
+            return {
+                success: false,
+                error: "Unable to process news monitoring at this time. Please try again later."
+            };
+        }
     },
 });

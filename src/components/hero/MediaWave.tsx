@@ -127,7 +127,25 @@ function Scene() {
 export default function MediaWave() {
     return (
         <div className="absolute inset-0 z-0 opacity-40 dark:opacity-60 pointer-events-none select-none">
-            <Canvas camera={{ position: [0, 0, 8], fov: 50 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+            <Canvas
+                camera={{ position: [0, 0, 8], fov: 50 }}
+                dpr={[1, 2]}
+                gl={{
+                    antialias: true,
+                    alpha: true,
+                    powerPreference: "high-performance",
+                    preserveDrawingBuffer: false,
+                }}
+                onCreated={({ gl }) => {
+                    gl.domElement.addEventListener("webglcontextlost", (event) => {
+                        event.preventDefault();
+                        console.warn("⚠️ WebGL Context Lost in MediaWave. Scene will be restored by the browser if possible.");
+                    }, false);
+                    gl.domElement.addEventListener("webglcontextrestored", () => {
+                        console.log("✅ WebGL Context Restored in MediaWave. Scene reinitialized.");
+                    }, false);
+                }}
+            >
                 <Scene />
             </Canvas>
         </div>

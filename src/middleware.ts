@@ -70,18 +70,12 @@ function applyCSP(response: NextResponse | Response) {
 
     const CSP_HEADER = [
         "default-src 'self';",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-        "https://clerk.com",
-        "https://*.clerk.accounts.dev",
-        "https://*.clerkjs.dev",
-        "https://js.stripe.com",
-        "https://www.chatbase.co",
-        "https://va.vercel-scripts.com;",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-        "img-src 'self' data: https://img.clerk.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://grainy-gradients.vercel.app;",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live blob:;",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.live;",
+        "img-src 'self' data: https://img.clerk.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://grainy-gradients.vercel.app https://*.vercel.live;",
         "font-src 'self' data: https://fonts.gstatic.com;",
-        "connect-src 'self' https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://api.stripe.com https://www.chatbase.co https://va.vercel-scripts.com;",
-        "frame-src 'self' https://js.stripe.com https://www.chatbase.co;",
+        "connect-src 'self' https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://api.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live wss://*.vercel.live;",
+        "frame-src 'self' https://js.stripe.com https://www.chatbase.co https://*.vercel.live;",
         "worker-src 'self' blob: https://*.clerkjs.dev;",
         "base-uri 'self';",
         "form-action 'self';"

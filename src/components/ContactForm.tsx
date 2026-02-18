@@ -28,21 +28,25 @@ export default function ContactForm() {
 
         try {
             // First, save to database
-            const submissionId = await submitContact(formData);
+            const res = await submitContact(formData);
 
-            // Then, send email (don't await - fire and forget)
-            sendContactEmail({
-                ...formData,
-                submissionId: submissionId as string,
-            }).catch(error => {
-                console.error("Failed to send email:", error);
-                // Email failure doesn't affect form submission success
-            });
+            if (res.success && res.submissionId) {
+                // Then, send email
+                sendContactEmail({
+                    ...formData,
+                    submissionId: res.submissionId as string,
+                }).catch(error => {
+                    console.error("Failed to send email:", error);
+                });
 
-            setStatus("success");
-            setFormData({ name: "", email: "", subject: "", message: "" });
+                setStatus("success");
+                setFormData({ name: "", email: "", subject: "", message: "" });
+            } else {
+                console.error("Contact submission failed:", res.error);
+                setStatus("error");
+            }
         } catch (error) {
-            console.error(error);
+            console.error("ContactForm internal error:", error);
             setStatus("error");
         }
     };

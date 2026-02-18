@@ -11,13 +11,17 @@ export const submit = mutation({
         message: v.string(),
     },
     handler: async (ctx, args) => {
-        // Store in database
-        const submissionId = await ctx.db.insert("contact_submissions", {
-            ...args,
-            timestamp: Date.now(),
-        });
+        try {
+            const submissionId = await ctx.db.insert("contact_submissions", {
+                ...args,
+                timestamp: Date.now(),
+            });
 
-        return submissionId;
+            return { success: true, submissionId };
+        } catch (error) {
+            console.error("Contact submission error:", error);
+            return { success: false, error: "Failed to store message." };
+        }
     },
 });
 

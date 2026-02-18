@@ -31,12 +31,12 @@ interface AnalysisResult {
  */
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler: async (ctx, { text }): Promise<AnalysisResult & { id: string; inputText: string }> => {
+    handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string }> => {
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {
             console.error("GEMINI_API_KEY is missing via process.env");
-            throw new ConvexError("AI service configuration error. Please contact support.");
+            return { success: false, error: "AI service configuration error. Please contact support." };
         }
 
         const prompt = `You are an expert Media & Reputation Risk analyst.
@@ -62,8 +62,6 @@ Return valid JSON ONLY:
 
 
         try {
-            // Call Gemini API directly via REST to avoid SDK issues
-            // Using gemini-1.5-flash for maximum stability
             // Helper function to call Gemini API
             const callGemini = async (model: string) => {
                 console.log(`Attempting analysis with model: ${model}`);
@@ -84,8 +82,7 @@ Return valid JSON ONLY:
                 return response;
             };
 
-            // Try primary model (Flash 2.5) first, fallback to Flash 2.0, then Flash Latest
-            // Models confirmed available via listModels debug tool
+            // Try models in sequence
             let response = await callGemini("gemini-2.5-flash");
 
             if (!response.ok && response.status === 404) {
@@ -101,40 +98,24 @@ Return valid JSON ONLY:
 
             if (!response.ok) {
                 const errorBody = await response.text();
-                const RequestUrl = response.url;
-
-                console.error(`Gemini API Error details:
-                    Status: ${response.status} ${response.statusText}
-                    URL: ${RequestUrl}
-                    Body: ${errorBody}
-                    Key Prefix: ${apiKey?.substring(0, 5)}...
-                `);
-
-                // Check for common issues
-                if (response.status === 404) {
-                    throw new ConvexError(`AI Service Error: Models (2.5-flash, 2.0-flash, flash-latest) not found. Please run 'npx convex run media:listModels' to see available models.`);
-                }
-
-                throw new ConvexError(`AI Service Provider Error: ${response.statusText} (${response.status}) - ${errorBody.substring(0, 100)}`);
+                console.error(`Gemini API Error: ${response.status} ${response.statusText} - ${errorBody}`);
+                return { success: false, error: "The AI service is currently unavailable. Please try again in a few moments." };
             }
 
             const data = (await response.json()) as GeminiResponse;
-
-            // Extract text from Gemini response
             const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!responseText) {
                 console.error("Empty Gemini response structure:", JSON.stringify(data));
-                throw new ConvexError("Received empty response from AI service");
+                return { success: false, error: "Received an empty response from our analysis engine." };
             }
 
             let analysis: any;
             try {
-                // Parse JSON directly since responseMimeType ensures JSON format
                 analysis = JSON.parse(responseText.trim());
             } catch (jsonError) {
                 console.error("JSON Parse Error:", jsonError, "Response Text:", responseText);
-                throw new ConvexError("Invalid response format from AI service");
+                return { success: false, error: "Our analysis engine returned an unexpected format. Please try again." };
             }
 
             // Validate and sanitize deeply to ensure type safety
@@ -162,36 +143,24 @@ Return valid JSON ONLY:
                     : "Further analysis recommended.",
             };
 
-            // Save to database and return
+            // Save to database
             const saved = await ctx.runMutation(api.analyses.saveAnalysis, {
                 inputText: text,
                 ...validated,
             });
 
             return {
-                ...validated,
-                inputText: text,
-                id: (saved as any).id,
+                success: true,
+                data: {
+                    ...validated,
+                    inputText: text,
+                    id: (saved as any).id,
+                }
             };
 
         } catch (error: any) {
-            console.error("ALMSTKSHF AI Engine Error:", error);
-
-            // If it's already a ConvexError (from our explicit throws), re-throw it
-            if (error instanceof ConvexError) {
-                throw error;
-            }
-
-            // For unknown errors, provide a generic message to the client but log the real error
-            // Ensure we log the full error object, stack, and any response details if available
-            console.error("ALMSTKSHF AI Engine Unhandled Error:", {
-                message: error.message,
-                stack: error.stack,
-                name: error.name,
-                cause: error.cause,
-                fullError: error
-            });
-            throw new ConvexError(error.message || "Analysis failed. Please try again.");
+            console.error("ALMSTKSHF AI Engine Global Error:", error);
+            return { success: false, error: "Analysis failed due to a system error. Our team has been notified." };
         }
     },
 });
