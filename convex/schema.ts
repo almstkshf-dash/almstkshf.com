@@ -31,6 +31,8 @@ export default defineSchema({
         language: v.union(v.literal("EN"), v.literal("AR")),
         sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
         sourceType: v.union(v.literal("Online News"), v.literal("Social Media"), v.literal("Blog"), v.literal("Print"), v.literal("Press Release")),
+        tone: v.optional(v.string()),
+        risk: v.optional(v.string()),
         sourceCountry: v.string(), // ISO Code
         reach: v.number(),
         ave: v.number(),
@@ -85,7 +87,11 @@ export default defineSchema({
         sentiment: v.string(),
         score: v.number(),
         risk: v.string(),
+        riskScore: v.optional(v.number()),
         tone: v.string(),
+        emotions: v.optional(v.any()), // Map of emotions
+        topics: v.optional(v.array(v.string())),
+        entities: v.optional(v.array(v.string())),
         recommendation: v.string(),
         timestamp: v.number(),
     }),

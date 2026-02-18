@@ -1,6 +1,7 @@
 {
   "Navigation": {
     "landing_page": "Home",
+    "search": "Search",
     "dashboard": "Dashboard",
     "case_studies": "Case Studies",
     "lexcora": "LEXCORA",
@@ -373,6 +374,16 @@
       "positive": "Positive",
       "neutral": "Neutral",
       "negative": "Negative"
+    },
+    "emotions": {
+      "Joy": "Joy",
+      "Anger": "Anger",
+      "Fear": "Fear",
+      "Sadness": "Sadness",
+      "Surprise": "Surprise",
+      "Disgust": "Disgust",
+      "Neutral": "Neutral",
+      "Analytical": "Analytical"
     }
   },
   "MediaMonitoring": {
@@ -543,7 +554,8 @@
     },
     "dashboard": {
       "no_reports": "No reports found for this category.",
-      "visit_repository": "Visit Central Repository"
+      "visit_repository": "Visit Central Repository",
+      "reports_overview": "Reports Overview"
     }
   },
   "MediaPulseDetail": {
@@ -698,7 +710,10 @@
       "advanced_solutions": "Advanced Solutions",
       "total_ave": "Total AVE",
       "articles_count": "Articles",
-      "positive_sent": "Positive Sent."
+      "positive_sent": "Positive Sent.",
+      "emotional_pulse": "Emotional Pulse",
+      "top_topics": "Top Topics",
+      "intensity": "Intensity"
     }
   },
   "CrisisManagementDetail": {
@@ -1062,5 +1077,8 @@
     "title": "Page not found",
     "description": "Sorry, we couldn’t find the page you’re looking for.",
     "home_button": "Go back home"
+  },
+  "Pricing": {
+    "title": "Plans & Pricing"
   }
 }

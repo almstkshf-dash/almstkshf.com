@@ -1,8 +1,13 @@
+const clerkDomain = process.env.CLERK_FRONTEND_API_URL;
+
+if (!clerkDomain) {
+    throw new Error("CLERK_FRONTEND_API_URL is missing. Please set it in Convex environment variables.");
+}
+
 export default {
     providers: [
         {
-            // Use the Clerk Issuer URL. Fallback logic to prevent deployment failure if env var is missing.
-            domain: process.env.CLERK_FRONTEND_API_URL || "https://integral-bulldog-65.clerk.accounts.dev",
+            domain: clerkDomain,
             applicationID: "convex",
         },
     ],

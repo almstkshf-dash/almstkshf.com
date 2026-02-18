@@ -9,6 +9,7 @@
  */
 
 import type * as analyses from "../analyses.js";
+import type * as case_studies from "../case_studies.js";
 import type * as contact from "../contact.js";
 import type * as init from "../init.js";
 import type * as media from "../media.js";
@@ -27,6 +28,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   analyses: typeof analyses;
+  case_studies: typeof case_studies;
   contact: typeof contact;
   init: typeof init;
   media: typeof media;

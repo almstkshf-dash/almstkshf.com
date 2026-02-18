@@ -11,7 +11,9 @@ import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import ChatbaseWidget from '@/components/ChatbaseWidget';
+import ChatbotTrigger from '@/components/ChatbotTrigger';
 import { Analytics } from "@vercel/analytics/next"
+import { CommandMenu } from "@/components/CommandMenu";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -25,6 +27,10 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
     variable: "--font-ibm-plex-arabic",
     display: "swap",
 });
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
 
 export const viewport = {
     themeColor: [
@@ -76,6 +82,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
                 ar: "https://almstkshf.com/ar",
             },
         },
+        icons: {
+            icon: "/favicon.ico",
+            shortcut: "/favicon.ico",
+            apple: "/logo.png",
+        },
         metadataBase: new URL("https://almstkshf.com"),
     };
 }
@@ -101,16 +112,18 @@ export default async function RootLayout({
 
     return (
         <ClerkProvider>
-            <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
+            <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
                 <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                     <NextIntlClientProvider locale={locale} messages={messages}>
                         <ConvexClientProvider>
                             <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
                                 <Navbar />
                                 {children}
+                                <CommandMenu />
                                 <Analytics />
                                 <Footer />
                                 <ChatbaseWidget />
+                                <ChatbotTrigger />
                             </ThemeProvider>
                         </ConvexClientProvider>
                     </NextIntlClientProvider>

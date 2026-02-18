@@ -8,27 +8,33 @@ import { useTranslations } from "next-intl";
 
 interface DashboardGridProps {
     articles?: any[];
+    analytics?: {
+        nss: number;
+        riskScore: number;
+        velocity: number;
+        totalReach: number;
+        sentimentDistribution: Record<string, number>;
+        crisisProbability: number;
+        emotions?: Record<string, number>;
+        geography?: Record<string, number>;
+    };
 }
 
-export function DashboardGrid({ articles = [] }: DashboardGridProps) {
+export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
 
-    // Calculate Stats
-    const totalReach = articles.reduce((sum, a) => sum + (a.reach || 0), 0);
+    // Use aggregate analytics if available, fallback to manual logic
+    const totalReach = analytics?.totalReach ?? articles.reduce((sum, a) => sum + (a.reach || 0), 0);
     const totalAVE = articles.reduce((sum, a) => sum + (a.ave || 0), 0);
 
-    // Sentiment Stats
-    const sentimentCounts = articles.reduce((acc, a) => {
-        acc[a.sentiment] = (acc[a.sentiment] || 0) + 1;
-        return acc;
-    }, { Positive: 0, Neutral: 0, Negative: 0 });
-
-    const total = articles.length || 1;
-    const sentimentPcts = {
-        Positive: Math.round((sentimentCounts.Positive / total) * 100),
-        Neutral: Math.round((sentimentCounts.Neutral / total) * 100),
-        Negative: Math.round((sentimentCounts.Negative / total) * 100),
+    const sentimentPcts = analytics?.sentimentDistribution ?? {
+        Positive: 0,
+        Neutral: 0,
+        Negative: 0
     };
+
+    const riskScore = analytics?.riskScore ?? 0;
+    const nss = analytics?.nss ?? 0;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -70,8 +76,12 @@ export function DashboardGrid({ articles = [] }: DashboardGridProps) {
                         {/* Dynamic safety score based on Positive %? */}
                         <div className="absolute inset-0 border-[16px] border-emerald-500 rounded-full border-t-transparent border-l-transparent rotate-[45deg]" style={{ clipPath: `polygon(0 0, 100% 0, 100% ${sentimentPcts.Positive}%, 0 ${sentimentPcts.Positive}%)` }}></div>
                         <div className="text-center">
-                            <p className="text-4xl font-bold text-foreground transition-colors">{sentimentPcts.Positive}%</p>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest transition-colors">{t('positive_sent')}</p>
+                            <p className="text-4xl font-bold text-foreground transition-colors">{nss >= 0 ? '+' : ''}{nss}</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest transition-colors">NSS Index</p>
+                            <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
+                                <ShieldAlert className="w-3 h-3" />
+                                Risk: {riskScore}%
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -132,6 +142,57 @@ export function DashboardGrid({ articles = [] }: DashboardGridProps) {
                             </div>
                         ))}
                     </div>
+                </motion.div>
+
+                {/* Emotional Pulse Section */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 }}
+                    className="p-8 bg-card border border-border rounded-[2rem] space-y-6 shadow-md transition-all relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Zap className="w-12 h-12 text-primary" />
+                    </div>
+                    <h4 className="text-foreground font-bold text-sm tracking-wider transition-colors">{t('emotional_pulse')}</h4>
+
+                    <div className="flex flex-wrap gap-2">
+                        {Object.entries(analytics?.emotions || {}).slice(0, 6).map(([emotion, count]) => (
+                            <div key={emotion} className="flex flex-col gap-1 w-[45%]">
+                                <div className="flex justify-between text-[8px] font-bold uppercase tracking-tighter opacity-70">
+                                    <span>{emotion}</span>
+                                    <span>{count as number}</span>
+                                </div>
+                                <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-primary/40 transition-all duration-1000"
+                                        style={{ width: `${Math.min(100, (count as number) * 5)}%` }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {analytics?.geography && Object.keys(analytics.geography).length > 0 && (
+                        <div className="pt-4 border-t border-border mt-4">
+                            <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <Globe className="w-3 h-3" />
+                                Top Regions
+                            </h5>
+                            <div className="space-y-2">
+                                {Object.entries(analytics.geography).slice(0, 3).map(([code, count]) => (
+                                    <div key={code} className="flex items-center justify-between text-xs transition-colors">
+                                        <span className="font-bold flex items-center gap-2">
+                                            <span className="w-4 h-3 bg-muted rounded-sm text-[8px] flex items-center justify-center">{code}</span>
+                                            {code}
+                                        </span>
+                                        <span className="text-muted-foreground">{count as number} articles</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </motion.div>
 
                 <div className="p-8 rounded-[2rem] border border-primary/20 bg-primary/5 space-y-4 shadow-sm transition-all">

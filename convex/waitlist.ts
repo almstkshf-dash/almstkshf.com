@@ -11,10 +11,11 @@ export const joinWaitlist = mutation({
     },
     handler: async (ctx, args) => {
         // Validate email format
-        const email = args.email.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const email = args.email.trim().toLowerCase();
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email)) {
-            throw new Error("Invalid email address.");
+            console.error(`❌ Validation failed for email: "${email}"`);
+            throw new Error("Invalid email address format. Please check and try again.");
         }
 
         // Check if already in waitlist for this service

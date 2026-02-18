@@ -60,6 +60,8 @@ async function callGeminiForAnalysis(
     summary: string;
     sourceType: "Online News" | "Blog" | "Press Release" | "Social Media" | "Print";
     reach_estimate: number;
+    tone?: string;
+    risk?: "Low" | "Medium" | "High";
 }> {
     const prompt = `Analyze this news article for media monitoring.
 
@@ -70,9 +72,11 @@ Monitoring Keyword: "${keyword}"
 Return valid JSON ONLY with these exact fields:
 {
   "sentiment": "Positive" | "Neutral" | "Negative",
-  "summary": "One concise sentence summary of the article.",
-  "sourceType": "Online News" | "Blog" | "Press Release",
-  "reach_estimate": number (estimated audience reach, default 50000 if unknown)
+  "summary": "One concise sentence summary.",
+  "sourceType": "Online News" | "Blog" | "Press Release" | "Social Media" | "Print",
+  "reach_estimate": number,
+  "tone": "short phrase describing tone",
+  "risk": "Low" | "Medium" | "High"
 }`;
 
     const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
@@ -119,6 +123,8 @@ Return valid JSON ONLY with these exact fields:
                 summary: typeof parsed.summary === "string" ? parsed.summary : title,
                 sourceType: validSourceTypes.includes(parsed.sourceType) ? parsed.sourceType : "Online News",
                 reach_estimate: typeof parsed.reach_estimate === "number" ? parsed.reach_estimate : 50000,
+                tone: typeof parsed.tone === "string" ? parsed.tone : "Analytical",
+                risk: ["Low", "Medium", "High"].includes(parsed.risk) ? parsed.risk : "Medium",
             };
         } catch (error) {
             console.warn(`Gemini ${model} failed:`, error);
@@ -258,6 +264,8 @@ export const fetchNews = action({
                             sentiment: aiData.sentiment,
                             sourceType: aiData.sourceType,
                             sourceCountry: combo.country,
+                            tone: aiData.tone,
+                            risk: aiData.risk,
                             reach: reach,
                             ave: ave,
                             imageUrl: resolved?.imageUrl || undefined,

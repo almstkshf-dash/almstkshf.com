@@ -10,6 +10,7 @@ import Button from "./ui/Button";
 import clsx from "clsx";
 import CrisisPlanCard from "./CrisisPlanCard";
 import { SkeletonReportRow, SkeletonCard } from "./ui/Skeleton";
+import ReportsChart from "./ReportsChart";
 
 interface DashboardProps {
     defaultFilter?: "TV" | "Radio" | "Press";
@@ -36,6 +37,9 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
 
     return (
         <div className="space-y-8">
+            {/* Chart Section */}
+            {reports && reports.length > 0 && <ReportsChart data={reports} />}
+
             {/* Filters */}
             <div className="flex flex-wrap gap-2">
                 {filters.map((f) => (

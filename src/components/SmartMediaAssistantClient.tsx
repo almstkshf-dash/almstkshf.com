@@ -1,15 +1,20 @@
 "use client";
 
+import React from 'react';
 import { useTranslations } from "next-intl";
 import Container from "@/components/ui/Container";
 import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 
 export default function SmartMediaAssistantClient() {
     const t = useTranslations("Navigation");
     const tWhy = useTranslations("WhyChooseUs");
     const tAi = useTranslations("AI");
+
+    const [prompt, setPrompt] = React.useState("");
+    const [response, setResponse] = React.useState("");
+    const [isGenerating, setIsGenerating] = React.useState(false);
 
     const capabilities = [
         {
@@ -32,6 +37,25 @@ export default function SmartMediaAssistantClient() {
         }
     ];
 
+    const handleGenerate = async () => {
+        if (!prompt) return;
+        setIsGenerating(true);
+        setResponse("");
+
+        // Mock generation delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        const mockResponses = [
+            "Based on recent media analysis, here is a suggested press response...",
+            "Sentiment dip detected in energy sector. Recommended tactical response...",
+            "Drafting official statement for executive review...",
+            "Sentiment trend analyzed. Public perception shift identified."
+        ];
+
+        setResponse(mockResponses[Math.floor(Math.random() * mockResponses.length)]);
+        setIsGenerating(false);
+    };
+
     return (
         <main className="min-h-screen pt-32 pb-20 bg-slate-950 text-white overflow-hidden">
             <Container>
@@ -50,7 +74,7 @@ export default function SmartMediaAssistantClient() {
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl lg:text-7xl font-bold tracking-tight"
+                            className="text-5xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent"
                         >
                             {tWhy("ai_agent.title")}
                         </motion.h1>
@@ -68,13 +92,21 @@ export default function SmartMediaAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex gap-4"
+                            className="flex flex-col sm:flex-row gap-4"
                         >
-                            <button className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20">
-                                {tAi("deploy")}
-                            </button>
-                            <button className="px-8 py-4 bg-slate-900 border border-slate-800 rounded-xl font-bold hover:bg-slate-800 transition-all">
-                                {tAi("view_caps")}
+                            <input
+                                type="text"
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                placeholder={tAi("instruction")}
+                                className="flex-1 px-6 py-4 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white placeholder:text-slate-600"
+                            />
+                            <button
+                                onClick={handleGenerate}
+                                disabled={isGenerating || !prompt}
+                                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20 whitespace-nowrap"
+                            >
+                                {isGenerating ? "..." : tAi("deploy")}
                             </button>
                         </motion.div>
                     </div>
@@ -83,10 +115,10 @@ export default function SmartMediaAssistantClient() {
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="flex-1 relative"
+                        className="flex-1 relative w-full max-w-xl"
                     >
-                        <div className="absolute inset-0 bg-indigo-500/20 blur-[100px] rounded-full"></div>
-                        <div className="relative p-8 bg-slate-900/50 border border-indigo-500/30 rounded-[3rem] backdrop-blur-2xl shadow-2xl">
+                        <div className="absolute inset-0 bg-indigo-500/20 blur-[100px] rounded-full animate-pulse-slow"></div>
+                        <div className="relative p-8 bg-slate-900/50 border border-indigo-500/30 rounded-[3rem] backdrop-blur-2xl shadow-2xl overflow-hidden">
                             <div className="space-y-6">
                                 <div className="flex items-center gap-4 border-b border-indigo-500/20 pb-6">
                                     <div className="w-12 h-12 rounded-2xl bg-indigo-500 flex items-center justify-center">
@@ -94,22 +126,43 @@ export default function SmartMediaAssistantClient() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold uppercase tracking-widest text-indigo-400">{tAi("status")}</p>
-                                        <p className="text-white font-bold italic">{tAi("instruction")}</p>
+                                        <p className="text-white font-bold italic">{isGenerating ? "processing_input..." : tAi("instruction")}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-4">
-                                    <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
-                                        <p className="text-xs text-slate-500 mb-2">{tAi("prompt")}</p>
-                                        <p className="text-sm">Generate a press response for the recent sentiment dip in energy sector.</p>
-                                    </div>
-                                    <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
-                                        <p className="text-xs text-indigo-400 mb-2">{tAi("response")}</p>
-                                        <div className="space-y-2">
-                                            <div className="h-2 bg-indigo-400/30 rounded-full w-full"></div>
-                                            <div className="h-2 bg-indigo-400/30 rounded-full w-5/6"></div>
-                                            <div className="h-2 bg-indigo-400/30 rounded-full w-4/6"></div>
-                                        </div>
-                                    </div>
+                                    <AnimatePresence mode="wait">
+                                        {(prompt || response) && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="space-y-4"
+                                            >
+                                                <div className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl">
+                                                    <p className="text-xs text-slate-500 mb-2">{tAi("prompt")}</p>
+                                                    <p className="text-sm font-medium">{prompt || "..."}</p>
+                                                </div>
+
+                                                <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl min-h-[100px] flex flex-col justify-center">
+                                                    <p className="text-xs text-indigo-400 mb-2">{tAi("response")}</p>
+                                                    {isGenerating ? (
+                                                        <div className="space-y-2">
+                                                            <div className="h-2 bg-indigo-400/30 rounded-full w-full animate-pulse"></div>
+                                                            <div className="h-2 bg-indigo-400/30 rounded-full w-5/6 animate-pulse" style={{ animationDelay: "200ms" }}></div>
+                                                            <div className="h-2 bg-indigo-400/30 rounded-full w-4/6 animate-pulse" style={{ animationDelay: "400ms" }}></div>
+                                                        </div>
+                                                    ) : (
+                                                        <motion.p
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            className="text-sm leading-relaxed"
+                                                        >
+                                                            {response || "Awaiting instruction..."}
+                                                        </motion.p>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                         </div>

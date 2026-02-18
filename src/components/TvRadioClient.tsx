@@ -250,7 +250,7 @@ export default function TvRadioClient() {
                         className="mt-16 p-8 rounded-[2rem] bg-primary/5 border border-primary/20 text-center transition-colors"
                     >
                         <p className="text-primary/80 italic leading-relaxed max-w-4xl mx-auto">
-                            "{t("use_cases.conclusion")}"
+                            &quot;{t("use_cases.conclusion")}&quot;
                         </p>
                     </motion.div>
                 </Container>

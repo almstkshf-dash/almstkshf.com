@@ -6,7 +6,16 @@ import { useTheme } from "next-themes";
 import Button from "@/components/ui/Button";
 
 export function ThemeToggle() {
+    const [mounted, setMounted] = React.useState(false);
     const { theme, setTheme } = useTheme();
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return <div className="w-9 h-9 rounded-full border border-border bg-background/50 animate-pulse" />;
+    }
 
     return (
         <Button

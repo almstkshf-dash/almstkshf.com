@@ -1,3 +1,4 @@
+import 'server-only';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface MediaAnalysis {
@@ -7,10 +8,10 @@ interface MediaAnalysis {
 }
 
 export async function analyzeContent(text: string, title?: string): Promise<MediaAnalysis> {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-        console.error("Gemini API Key missing");
+        console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
         return { sentiment: "Neutral", brandName: "Unknown", sourceCountry: "AE" }; // Fallback
     }
 

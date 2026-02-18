@@ -31,89 +31,64 @@ export default function Navbar() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-300">
+            <header
+                className="sticky top-0 z-50 w-full border-b border-border bg-background transition-all duration-300"
+                onMouseLeave={() => setActiveDropdown(null)}
+            >
                 <Container>
                     <div className="flex h-20 items-center justify-between">
                         {/* Logo */}
-                        <HoverPrefetchLink href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
-                            <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105">
-                                <Image
-                                    src="/logo.png"
-                                    alt={tCommon('app_name')}
-                                    width={48}
-                                    height={48}
-                                    className="object-contain p-1 invert dark:invert-0 transition-all duration-300"
-                                />
-                            </div>
-                            <span className="hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                {tCommon('app_name')}
-                            </span>
-                        </HoverPrefetchLink>
+                        <div onMouseEnter={() => setActiveDropdown(null)}>
+                            <HoverPrefetchLink href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
+                                <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105">
+                                    <Image
+                                        src="/logo.png"
+                                        alt={tCommon('app_name')}
+                                        width={48}
+                                        height={48}
+                                        className="object-contain p-1 invert dark:invert-0 transition-all duration-300"
+                                    />
+                                </div>
+                                <span className="hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                                    {tCommon('app_name')}
+                                </span>
+                            </HoverPrefetchLink>
+                        </div>
 
                         {/* Desktop Navigation - Hidden on tablet, visible on large screens */}
                         <nav className="hidden lg:flex items-center gap-8 ms-auto me-8">
                             {NAVIGATION_ITEMS.map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
+                                const hasChildren = !!item.children;
 
-                                if (item.children) {
+                                if (hasChildren) {
                                     return (
                                         <div
                                             key={item.label}
-                                            className="relative group py-4"
+                                            className="relative py-4"
                                             onMouseEnter={() => setActiveDropdown(item.label)}
-                                            onMouseLeave={() => setActiveDropdown(null)}
+                                            onFocus={() => setActiveDropdown(item.label)}
                                         >
                                             <button
                                                 className={clsx(
-                                                    "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary",
-                                                    isActive ? "text-primary" : "text-muted-foreground"
+                                                    "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary group",
+                                                    isActive || activeDropdown === item.label ? "text-primary" : "text-muted-foreground"
                                                 )}
+                                                aria-expanded={activeDropdown === item.label}
+                                                aria-haspopup="true"
                                             >
-                                                {item.icon && <item.icon className="w-4 h-4 opacity-70 group-hover:opacity-100" />}
-                                                <span>{t(item.label)}</span>
-                                                <ChevronDown className="w-3.5 h-3.5 transition-transform group-hover:rotate-180 opacity-50" />
-                                            </button>
-
-                                            {/* Dropdown Menu */}
-                                            <AnimatePresence>
-                                                {activeDropdown === item.label && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        transition={{ duration: 0.2 }}
-                                                        className={clsx(
-                                                            "absolute top-[80%] w-80 p-2 bg-popover/95 border border-border rounded-xl shadow-2xl backdrop-blur-xl z-50",
-                                                            "start-0 ltr:origin-top-left rtl:origin-top-right"
-                                                        )}
-                                                    >
-                                                        <div className="grid gap-1">
-                                                            {item.children.map((child) => (
-                                                                <HoverPrefetchLink
-                                                                    key={child.label}
-                                                                    href={child.href as any}
-                                                                    className="block p-3 rounded-lg hover:bg-muted/50 transition-all group/item"
-                                                                    onClick={() => setActiveDropdown(null)}
-                                                                >
-                                                                    <div className="flex items-start gap-3">
-                                                                        <div className="mt-1 p-2 bg-muted rounded-md group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors text-muted-foreground border border-border group-hover/item:border-primary/20">
-                                                                            {child.icon && <child.icon className="w-4 h-4" />}
-                                                                        </div>
-                                                                        <div>
-                                                                            <div className="text-sm font-semibold text-foreground group-hover/item:text-primary">
-                                                                                {t(child.label)}
-                                                                            </div>
-                                                                            <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed opacity-80">
-                                                                                {t(`${child.label}_desc` as any)}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </HoverPrefetchLink>
-                                                            ))}
-                                                        </div>
-                                                    </motion.div>
+                                                {item.icon && (
+                                                    <item.icon className={clsx(
+                                                        "w-4 h-4 transition-all duration-200",
+                                                        isActive || activeDropdown === item.label ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100 group-hover:scale-110"
+                                                    )} />
                                                 )}
-                                            </AnimatePresence>
+                                                <span>{t(item.label)}</span>
+                                                <ChevronDown className={clsx(
+                                                    "w-3.5 h-3.5 transition-transform duration-300 opacity-50",
+                                                    activeDropdown === item.label && "rotate-180 opacity-100"
+                                                )} />
+                                            </button>
                                         </div>
                                     );
                                 }
@@ -123,11 +98,18 @@ export default function Navbar() {
                                         key={item.label}
                                         href={item.href as any}
                                         className={clsx(
-                                            "text-sm font-medium transition-colors hover:text-primary flex items-center gap-2",
+                                            "text-sm font-medium transition-colors hover:text-primary flex items-center gap-2 group",
                                             isActive ? "text-primary" : "text-muted-foreground"
                                         )}
+                                        onMouseEnter={() => setActiveDropdown(null)}
+                                        onFocus={() => setActiveDropdown(null)}
                                     >
-                                        {item.icon && <item.icon className="w-4 h-4 opacity-70 group-hover:opacity-100" />}
+                                        {item.icon && (
+                                            <item.icon className={clsx(
+                                                "w-4 h-4 transition-all duration-200",
+                                                isActive ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100 group-hover:scale-110"
+                                            )} />
+                                        )}
                                         {t(item.label)}
                                     </HoverPrefetchLink>
                                 );
@@ -135,7 +117,21 @@ export default function Navbar() {
                         </nav>
 
                         {/* Action Buttons - Visible on Desktop */}
-                        <div className="hidden lg:flex items-center gap-4">
+                        <div
+                            className="hidden lg:flex items-center gap-4"
+                            onMouseEnter={() => setActiveDropdown(null)}
+                        >
+                            <button
+                                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border bg-muted/30"
+                            >
+                                <span className="flex items-center gap-1">
+                                    <span className="text-[10px] border border-border px-1 rounded bg-background">Ctrl</span>
+                                    <span className="text-[10px] border border-border px-1 rounded bg-background">K</span>
+                                </span>
+                                <span>{t('search')}</span>
+                            </button>
+
                             <ThemeToggle />
                             <button
                                 onClick={toggleLocale}
@@ -173,6 +169,49 @@ export default function Navbar() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Dropdown Menu Row - Pushes content down */}
+                    <AnimatePresence>
+                        {activeDropdown && NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                className="overflow-hidden"
+                            >
+                                <div
+                                    className="py-8 border-t border-border/50"
+                                    onMouseEnter={() => setActiveDropdown(activeDropdown)}
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children?.map((child) => (
+                                            <HoverPrefetchLink
+                                                key={child.label}
+                                                href={child.href as any}
+                                                className="block p-4 rounded-xl hover:bg-muted/50 transition-all group/item border border-transparent hover:border-border/50"
+                                                onClick={() => setActiveDropdown(null)}
+                                            >
+                                                <div className="flex items-start gap-4">
+                                                    <div className="mt-1 p-2.5 bg-muted rounded-lg group-hover/item:bg-primary/20 group-hover/item:text-primary transition-colors text-muted-foreground border border-border group-hover/item:border-primary/20">
+                                                        {child.icon && <child.icon className="w-5 h-5" />}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
+                                                            {t(child.label)}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed opacity-80">
+                                                            {t(`${child.label}_desc` as any)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </HoverPrefetchLink>
+                                        ))}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </Container>
             </header>
 

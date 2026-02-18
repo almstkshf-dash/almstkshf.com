@@ -180,7 +180,7 @@ export default function StylingAssistantClient() {
                                             <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                                         </div>
                                         <h4 className="text-2xl font-bold text-white">{t("form.success")}</h4>
-                                        <p className="text-slate-400">We'll let you know as soon as we launch.</p>
+                                        <p className="text-slate-400">We&apos;ll let you know as soon as we launch.</p>
                                     </motion.div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">

@@ -71,6 +71,10 @@ export default function ChatbaseWidget() {
                                 }
                             })
                         }
+                        const style = document.createElement("style");
+                        style.innerHTML = '#chatbase-bubble-button { display: none !important; }';
+                        document.head.appendChild(style);
+
                         const onLoad = function() {
                             const script = document.createElement("script");
                             script.src = "https://www.chatbase.co/embed.min.js";

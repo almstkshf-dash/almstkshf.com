@@ -7,7 +7,11 @@ export const saveAnalysis = mutation({
         sentiment: v.string(),
         score: v.number(),
         risk: v.string(),
+        riskScore: v.optional(v.number()),
         tone: v.string(),
+        emotions: v.optional(v.any()),
+        topics: v.optional(v.array(v.string())),
+        entities: v.optional(v.array(v.string())),
         recommendation: v.string(),
     },
     handler: async (ctx, args) => {

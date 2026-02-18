@@ -1,0 +1,105 @@
+
+> almstkshf.com@0.1.0 build
+> next build
+
+   Γû▓ Next.js 15.5.12
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ┬╖ optimizePackageImports
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (187kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ Γ£ô Compiled successfully in 42s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/45) ...
+   Generating static pages (11/45) 
+   Generating static pages (22/45) 
+   Generating static pages (33/45) 
+ Γ£ô Generating static pages (45/45)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                 Size  First Load JS
+Γöî Γùï /_not-found                                            163 B         102 kB
+Γö£ ΓùÅ /[locale]                                             285 kB         473 kB
+Γö£   Γö£ /en
+Γö£   Γöö /ar
+Γö£ ΓùÅ /[locale]/behind-the-scene                            3.2 kB         162 kB
+Γö£   Γö£ /en/behind-the-scene
+Γö£   Γöö /ar/behind-the-scene
+Γö£ ΓùÅ /[locale]/case-studies/lexcora                       3.84 kB         166 kB
+Γö£   Γö£ /en/case-studies/lexcora
+Γö£   Γöö /ar/case-studies/lexcora
+Γö£ ΓùÅ /[locale]/case-studies/styling-assistant             3.19 kB         186 kB
+Γö£   Γö£ /en/case-studies/styling-assistant
+Γö£   Γöö /ar/case-studies/styling-assistant
+Γö£ ΓùÅ /[locale]/contact                                    2.18 kB         179 kB
+Γö£   Γö£ /en/contact
+Γö£   Γöö /ar/contact
+Γö£ ΓùÅ /[locale]/dashboard                                   408 kB         589 kB
+Γö£   Γö£ /en/dashboard
+Γö£   Γöö /ar/dashboard
+Γö£ ΓùÅ /[locale]/dashboard/settings                         3.75 kB         176 kB
+Γö£   Γö£ /en/dashboard/settings
+Γö£   Γöö /ar/dashboard/settings
+Γö£ ΓùÅ /[locale]/media-monitoring/central-media-repository  3.17 kB         157 kB
+Γö£   Γö£ /en/media-monitoring/central-media-repository
+Γö£   Γöö /ar/media-monitoring/central-media-repository
+Γö£ ΓùÅ /[locale]/media-monitoring/crisis-management         3.45 kB         300 kB
+Γö£   Γö£ /en/media-monitoring/crisis-management
+Γö£   Γöö /ar/media-monitoring/crisis-management
+Γö£ ΓùÅ /[locale]/media-monitoring/media-pulse               3.15 kB         184 kB
+Γö£   Γö£ /en/media-monitoring/media-pulse
+Γö£   Γöö /ar/media-monitoring/media-pulse
+Γö£ ΓùÅ /[locale]/media-monitoring/press                     2.42 kB         299 kB
+Γö£   Γö£ /en/media-monitoring/press
+Γö£   Γöö /ar/media-monitoring/press
+Γö£ ΓùÅ /[locale]/media-monitoring/tv-radio                  2.42 kB         299 kB
+Γö£   Γö£ /en/media-monitoring/tv-radio
+Γö£   Γöö /ar/media-monitoring/tv-radio
+Γö£ ΓùÅ /[locale]/payment/cancelled                          1.71 kB         107 kB
+Γö£   Γö£ /en/payment/cancelled
+Γö£   Γöö /ar/payment/cancelled
+Γö£ ΓùÅ /[locale]/payment/success                            2.24 kB         108 kB
+Γö£   Γö£ /en/payment/success
+Γö£   Γöö /ar/payment/success
+Γö£ ΓùÅ /[locale]/pricing                                    3.17 kB         186 kB
+Γö£   Γö£ /en/pricing
+Γö£   Γöö /ar/pricing
+Γö£ ΓùÅ /[locale]/privacy                                      163 B         102 kB
+Γö£   Γö£ /en/privacy
+Γö£   Γöö /ar/privacy
+Γö£ ΓùÅ /[locale]/technical-solutions/integration            2.62 kB         160 kB
+Γö£   Γö£ /en/technical-solutions/integration
+Γö£   Γöö /ar/technical-solutions/integration
+Γö£ ΓùÅ /[locale]/technical-solutions/kyc                    1.99 kB         159 kB
+Γö£   Γö£ /en/technical-solutions/kyc
+Γö£   Γöö /ar/technical-solutions/kyc
+Γö£ ΓùÅ /[locale]/technical-solutions/smart-media-assistant  5.22 kB         159 kB
+Γö£   Γö£ /en/technical-solutions/smart-media-assistant
+Γö£   Γöö /ar/technical-solutions/smart-media-assistant
+Γö£ ΓùÅ /[locale]/terms                                        163 B         102 kB
+Γö£   Γö£ /en/terms
+Γö£   Γöö /ar/terms
+Γö£ ╞Æ /api/chatbase/token                                    163 B         102 kB
+Γö£ ╞Æ /api/monitor                                           163 B         102 kB
+Γö£ ╞Æ /api/sentiment/overview                                163 B         102 kB
+Γö£ ╞Æ /api/sentiment/risk                                    163 B         102 kB
+Γö£ ╞Æ /api/stripe/checkout                                   163 B         102 kB
+Γö£ ╞Æ /api/stripe/webhook                                    163 B         102 kB
+Γö£ Γùï /robots.txt                                            163 B         102 kB
+Γöö Γùï /sitemap.xml                                           163 B         102 kB
++ First Load JS shared by all                             102 kB
+  Γö£ chunks/1255-31341e05e682b6b5.js                      45.5 kB
+  Γö£ chunks/4bd1b696-182b6b13bdad92e3.js                  54.2 kB
+  Γöö other shared chunks (total)                          2.16 kB
+
+
+╞Æ Middleware                                             98.7 kB
+
+Γùï  (Static)   prerendered as static content
+ΓùÅ  (SSG)      prerendered as static HTML (uses generateStaticParams)
+╞Æ  (Dynamic)  server-rendered on demand
+

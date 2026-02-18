@@ -57,6 +57,28 @@ export const seed = mutation({
             await ctx.db.insert("crisis_plans", plan);
         }
 
+        // Seed Case Studies
+        const caseStudies = [
+            {
+                title: "Legal Document Automation",
+                description: "Streamlining contract review for a leading law firm.",
+                category: "lexcura_lawyer",
+                imageUrl: "/lexcora_dashboard.png",
+                content: "Detailed analysis of how AI automated 80% of contract review tasks."
+            },
+            {
+                title: "AI-Powered Fashion Stylist",
+                description: "Personalized fashion recommendations using computer vision.",
+                category: "styling_assistant",
+                imageUrl: "/virtual_stylist_image.png",
+                content: "Case study on building a virtual assistant that understands personal style."
+            }
+        ];
+
+        for (const study of caseStudies) {
+            await ctx.db.insert("case_studies", study);
+        }
+
         return "Database seeded successfully!";
     }
 });

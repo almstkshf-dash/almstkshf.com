@@ -1,7 +1,7 @@
 # ALMSTKSHF - Setup Guide
 
 ## 1. Project Initialization
-This project uses **Next.js 16 (App Router)**, **Tailwind CSS v4**, **Convex**, and **next-intl**.
+This project uses **Next.js 15 (App Router)**, **Tailwind CSS v4**, **Convex**, and **next-intl**.
 
 ## 2. Environment Variables
 Ensure your `.env.local` contains:

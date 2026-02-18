@@ -7,6 +7,7 @@ import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from
 import clsx from 'clsx';
 import Image from 'next/image';
 import FreeInsightTool from '@/components/FreeInsightTool';
+import MediaWave from '@/components/hero/MediaWave';
 
 export default function HomeClient() {
     const t = useTranslations();
@@ -39,8 +40,9 @@ export default function HomeClient() {
         <main className="min-h-screen bg-background">
             {/* Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center text-foreground overflow-hidden">
-                <div className="absolute inset-0 opacity-10 dark:opacity-30 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] transition-opacity duration-300"></div>
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-gradient-to-b from-primary/10 via-transparent to-background blur-3xl opacity-50"></div>
+                <MediaWave />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 brightness-100 contrast-150 pointer-events-none mix-blend-overlay"></div>
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
 
                 <div className="z-10 text-center max-w-4xl px-4">
                     <motion.h1
@@ -150,16 +152,16 @@ export default function HomeClient() {
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
                         <div className="relative w-32 h-12">
-                            <Image src="/tdra.png" alt="TDRA Approved" fill className="object-contain dark:brightness-110" />
+                            <Image src="/tdra.png" alt="TDRA Approved" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-16 h-16">
-                            <Image src="/soc2.png" alt="SOC2 Compliance" fill className="object-contain dark:brightness-110" />
+                            <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 64px, 64px" className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/secure.png" alt="Secure App" fill className="object-contain dark:brightness-110" />
+                            <Image src="/secure.png" alt="Secure App" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110" />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill className="object-contain dark:brightness-110" />
+                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110" />
                         </div>
                     </div>
                 </Container>

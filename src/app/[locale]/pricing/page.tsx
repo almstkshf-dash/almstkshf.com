@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Check, Info } from "lucide-react";
 import Container from "@/components/ui/Container";
 import CheckoutButton from "@/components/CheckoutButton";
@@ -100,6 +101,7 @@ const customSolutions = [
 ];
 
 export default function PricingPage() {
+    const t = useTranslations("Pricing");
     return (
         <div className="min-h-screen bg-background py-20 relative overflow-hidden">
             {/* Background Gradients */}
@@ -113,7 +115,7 @@ export default function PricingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
                     >
-                        Plans & Pricing
+                        {t("title")}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}

@@ -28,7 +28,6 @@ export async function resolveUrl(originalUrl: string): Promise<ResolvedArticle |
 
         const html = await response.text();
         const finalUrl = response.url;
-        // @ts-ignore
         const $ = cheerio.load(html);
 
         // Extract Image and Site Name

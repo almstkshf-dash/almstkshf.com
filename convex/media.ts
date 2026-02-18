@@ -18,44 +18,48 @@ interface AnalysisResult {
     sentiment: "Positive" | "Neutral" | "Negative";
     score: number;
     risk: "Low" | "Medium" | "High";
+    riskScore: number; // 0-100
     tone: string;
+    emotions: Record<string, number>; // e.g. { joy: 0.1, anger: 0.8 }
+    topics: string[];
+    entities: string[];
     recommendation: string;
 }
 
 /**
  * Expert Media & Reputation Intelligence Action
- * Analyzes text for sentiment, risk, and strategic recommendations using Gemini AI.
  */
 export const analyzeMedia = action({
     args: { text: v.string() },
     handler: async (ctx, { text }): Promise<AnalysisResult & { id: string; inputText: string }> => {
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
-        console.log(`Analyzing text: "${text.substring(0, 50)}..."`);
-
         if (!apiKey) {
             console.error("GEMINI_API_KEY is missing via process.env");
             throw new ConvexError("AI service configuration error. Please contact support.");
         }
 
-        // Build a precise prompt that forces unique, input-specific analysis
-        const prompt = `You are an expert Media & Reputation Risk analyst for the ALMSTKSHF Intelligence platform.
+        const prompt = `You are an expert Media & Reputation Risk analyst.
+Analyze the following text for sentiment, risk, emotions, and strategic impact.
 
-Analyze the following text carefully. Your analysis MUST be specific to the actual content provided — do NOT give generic answers.
-
-TEXT TO ANALYZE:
+TEXT:
 """
 ${text}
 """
 
-Provide your analysis as a JSON object with these exact fields:
-- "sentiment": exactly one of "Positive", "Neutral", or "Negative"
-- "score": a number from 0 to 100 representing sentiment confidence (0 = extremely negative, 50 = neutral, 100 = extremely positive)
-- "risk": exactly one of "Low", "Medium", or "High" — assess reputational risk for an organization
-- "tone": a single word or short phrase describing the emotional tone (e.g. "Alarming", "Promotional", "Hostile", "Optimistic", "Analytical", "Sarcastic")
-- "recommendation": one specific, actionable strategic recommendation for a CEO based on THIS specific text (2-3 sentences max)
+Return valid JSON ONLY:
+{
+  "sentiment": "Positive" | "Neutral" | "Negative",
+  "score": number (0-100, 100=most positive),
+  "risk": "Low" | "Medium" | "High",
+  "riskScore": number (0-100, 100=extreme risk),
+  "tone": "short phrase describing tone",
+  "emotions": { "joy": 0.x, "anger": 0.x, "sadness": 0.x, "fear": 0.x, "disgust": 0.x, "surprise": 0.x, "trust": 0.x, "anticipation": 0.x },
+  "topics": ["topic1", "topic2"],
+  "entities": ["entity1", "entity2"],
+  "recommendation": "strategic advice (2 sentences)"
+}`;
 
-IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown, no explanation.`;
 
         try {
             // Call Gemini API directly via REST to avoid SDK issues
@@ -144,9 +148,15 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
                 risk: ["Low", "Medium", "High"].includes(analysis.risk)
                     ? analysis.risk
                     : "Medium",
+                riskScore: typeof analysis.riskScore === "number"
+                    ? Math.max(0, Math.min(100, Math.round(analysis.riskScore)))
+                    : 50,
                 tone: typeof analysis.tone === "string" && analysis.tone.length > 0
                     ? analysis.tone
                     : "Analytical",
+                emotions: typeof analysis.emotions === "object" ? analysis.emotions : {},
+                topics: Array.isArray(analysis.topics) ? analysis.topics : [],
+                entities: Array.isArray(analysis.entities) ? analysis.entities : [],
                 recommendation: typeof analysis.recommendation === "string" && analysis.recommendation.length > 0
                     ? analysis.recommendation
                     : "Further analysis recommended.",
@@ -161,7 +171,7 @@ IMPORTANT: Your response must be ONLY the JSON object, nothing else. No markdown
             return {
                 ...validated,
                 inputText: text,
-                id: saved.id,
+                id: (saved as any).id,
             };
 
         } catch (error: any) {

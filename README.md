@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📡 ALMSTKSHF (المستكشف)
 
-## Getting Started
+**ALMSTKSHF** is a cutting-edge Media Monitoring and Analysis platform designed to provide real-time insights, sentiment analysis, and crisis management solutions. Built with a focus on speed, security, and scalability.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org) - React 19
+- **Backend**: [Convex](https://convex.dev) - Real-time serverless database and functions
+- **Authentication**: [Clerk](https://clerk.com) - Secure identity management
+- **Internationalization**: [next-intl](https://next-intl-docs.vercel.app/) - RTL/LTR support (English & Arabic)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com) - Modern, utility-first CSS
+- **AI Integration**: Google Gemini & Chatbase
+- **Payments**: Stripe (Embedded Checkout)
+- **Monitoring**: Vercel Analytics & OpenTelemetry
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📂 Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Media Pulse Dashboard**: Real-time tracking of media mentions and sentiment.
+- **Lexcura Lawyer**: AI-powered legal document analysis and assistance.
+- **Smart Media Assistant**: Automated crisis management and strategic communication plans.
+- **Multi-locale Support**: Seamless Arabic and English user experience.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Getting Started
 
-## Learn More
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Run Development Mode**:
+   ```bash
+   npm run dev
+   ```
+   *This starts both the Next.js frontend and the Convex backend concurrently.*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Environment Setup**:
+   Copy `.env.local.example` (if available) or ensure Clerk and Convex keys are set correctly.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 Documentation
 
-## Deploy on Vercel
+- [Setup Guide](./SETUP_GUIDE.md)
+- [Architecture Overview](./docs/ARCHITECTURE.md)
+- [Development Speed](./docs/DEVELOPMENT_SPEED.md)
+- [Stripe Integration](./STRIPE_INTEGRATION_GUIDE.md)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## ⚖️ License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private - All rights reserved.

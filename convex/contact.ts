@@ -80,7 +80,13 @@ export const sendContactEmail = action({
             const responseData = await response.text();
 
             if (!response.ok) {
-                console.error("Failed to send email:", responseData);
+                const errorData = JSON.parse(responseData);
+                if (errorData.name === "validation_error" && errorData.message.includes("testing emails")) {
+                    console.error("❌ RESEND ERROR: You are in testing mode. You can ONLY send emails to the email address associated with your Resend account (e.g., almstkshfuae@gmail.com).");
+                    console.error("👉 ACTION REQUIRED: Go to Convex Dashboard > Settings > Environment Variables and set CONTACT_EMAIL to your authorized Resend email.");
+                } else {
+                    console.error("Failed to send email:", responseData);
+                }
                 return { success: false, error: responseData };
             }
 

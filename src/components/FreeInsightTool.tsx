@@ -19,9 +19,13 @@ export default function FreeInsightTool() {
     const [result, setResult] = useState<{
         sentiment: string;
         risk: string;
+        riskScore: number;
         score: number;
         tone: string;
         recommendation: string;
+        emotions?: Record<string, number>;
+        topics?: string[];
+        entities?: string[];
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -39,9 +43,13 @@ export default function FreeInsightTool() {
             setResult({
                 sentiment: data.sentiment.toLowerCase(),
                 risk: data.risk.toLowerCase(),
+                riskScore: data.riskScore,
                 score: data.score,
                 tone: data.tone,
-                recommendation: data.recommendation
+                recommendation: data.recommendation,
+                emotions: data.emotions,
+                topics: data.topics,
+                entities: data.entities
             });
         } catch (err: any) {
             console.error(err);
@@ -51,6 +59,7 @@ export default function FreeInsightTool() {
             setIsAnalyzing(false);
         }
     };
+
 
     return (
         <section className="py-24 relative overflow-hidden">
@@ -155,7 +164,7 @@ export default function FreeInsightTool() {
                                             </div>
                                         </div>
 
-                                        {/* Risk Card */}
+                                        {/* Risk & Velocity Card */}
                                         <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4 transition-all duration-300">
                                             <div className="flex justify-between items-center">
                                                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("risk")}</p>
@@ -165,35 +174,52 @@ export default function FreeInsightTool() {
                                                         result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )} />
                                             </div>
-                                            <p className={clsx(
-                                                "text-xl font-bold uppercase tracking-tight transition-colors",
-                                                result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
-                                                    result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
-                                            )}>
-                                                {t(`risk_labels.${result.risk.toLowerCase()}`)}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground leading-relaxed italic transition-colors">
-                                                {t(`risk_levels.${result.risk.toLowerCase()}`)}
-                                            </p>
+                                            <div className="flex items-center justify-between">
+                                                <p className={clsx(
+                                                    "text-xl font-bold uppercase tracking-tight transition-colors",
+                                                    result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
+                                                        result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
+                                                )}>
+                                                    {t(`risk_labels.${result.risk.toLowerCase()}`)}
+                                                </p>
+                                                <span className="text-xs font-bold bg-muted px-2 py-1 rounded-md">{result.riskScore}%</span>
+                                            </div>
+
+                                            {/* Emotions Mini-Grid */}
+                                            {result.emotions && (
+                                                <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border/50">
+                                                    {Object.entries(result.emotions).slice(0, 4).map(([emotion, value]) => (
+                                                        <div key={emotion} className="text-center">
+                                                            <div className="h-1 bg-muted rounded-full overflow-hidden">
+                                                                <div
+                                                                    className="h-full bg-primary"
+                                                                    style={{ width: `${(value as number) * 100}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-[8px] uppercase tracking-tighter opacity-50">{emotion}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {/* Strategy Card */}
+                                        {/* Strategy & Topics Card */}
                                         <div className="p-6 rounded-3xl bg-primary/10 border border-primary/20 space-y-3 transition-all duration-300">
                                             <div className="flex items-center gap-2">
                                                 <Info className="w-4 h-4 text-primary" />
                                                 <p className="text-xs font-bold text-primary uppercase tracking-widest">{t("recommendation")}</p>
                                             </div>
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded uppercase font-bold">{result.tone}</span>
+                                            <p className="text-sm text-foreground/80 leading-relaxed font-medium transition-colors">
+                                                {result.recommendation}
+                                            </p>
+
+                                            {(result.topics && result.topics.length > 0) && (
+                                                <div className="flex flex-wrap gap-1.5 pt-2">
+                                                    {result.topics.map(topic => (
+                                                        <span key={topic} className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-bold">#{topic}</span>
+                                                    ))}
                                                 </div>
-                                                <p className="text-sm text-foreground/80 leading-relaxed font-medium transition-colors">
-                                                    {result.recommendation}
-                                                </p>
-                                            </div>
-                                            <Link href={`/${locale}/contact`} className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase pt-2">
-                                                Full Strategy <ArrowRight className="w-3 h-3" />
-                                            </Link>
+                                            )}
                                         </div>
                                     </motion.div>
                                 )}

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUrl } from "@/utils/linkResolver";
 import { analyzeContent } from "@/lib/gemini";

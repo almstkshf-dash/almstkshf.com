@@ -1,0 +1,135 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
+interface ReportsChartProps {
+    data: any[];
+}
+
+export default function ReportsChart({ data }: ReportsChartProps) {
+    const t = useTranslations("MediaMonitoring.dashboard");
+
+    // Process data to group by date
+    const processedData = data?.reduce((acc: any[], report: any) => {
+        const date = new Date(report.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const existing = acc.find(item => item.date === date);
+        if (existing) {
+            existing.count += 1;
+        } else {
+            acc.push({ date, count: 1 });
+        }
+        return acc;
+    }, []) || [];
+
+    // Sort by date (assuming rough chronological order or needing explicit sort)
+    // For simplicity, we'll assume data comes or is mapped somewhat chronologically, 
+    // or we could sort it here if needed.
+
+    // Fill in missing days if needed? For now, let's just show active days.
+
+    if (processedData.length === 0) {
+        // Mock data for empty state to show the visual
+        const mockData = [
+            { date: 'Mon', count: 4 },
+            { date: 'Tue', count: 3 },
+            { date: 'Wed', count: 7 },
+            { date: 'Thu', count: 5 },
+            { date: 'Fri', count: 8 },
+            { date: 'Sat', count: 2 },
+            { date: 'Sun', count: 6 },
+        ];
+
+        return (
+            <div className="w-full h-[300px] p-4 bg-card border border-border rounded-2xl mb-8">
+                <h3 className="text-lg font-bold mb-4 px-2">{t('reports_overview')} (Demo)</h3>
+                <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={mockData}>
+                        <defs>
+                            <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                        <XAxis
+                            dataKey="date"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                            dy={10}
+                        />
+                        <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                        />
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: 'hsl(var(--popover))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                            }}
+                            itemStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
+                        <Area
+                            type="monotone"
+                            dataKey="count"
+                            stroke="hsl(var(--primary))"
+                            fillOpacity={1}
+                            fill="url(#colorCount)"
+                            strokeWidth={3}
+                        />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full h-[300px] p-4 bg-card border border-border rounded-2xl mb-8">
+            <h3 className="text-lg font-bold mb-4 px-2">{t('reports_overview')}</h3>
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={processedData}>
+                    <defs>
+                        <linearGradient id="colorCountReal" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                    <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                        dy={10}
+                    />
+                    <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <Tooltip
+                        contentStyle={{
+                            backgroundColor: 'hsl(var(--popover))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                        }}
+                        itemStyle={{ color: 'hsl(var(--foreground))' }}
+                    />
+                    <Area
+                        type="monotone"
+                        dataKey="count"
+                        stroke="hsl(var(--primary))"
+                        fillOpacity={1}
+                        fill="url(#colorCountReal)"
+                        strokeWidth={3}
+                    />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
+    );
+}

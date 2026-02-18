@@ -1,6 +1,7 @@
 {
     "Navigation": {
         "landing_page": "الرئيسية",
+        "search": "بحث",
         "case_studies": "دراسات الحالة",
         "lexcora": "ليكسكورا",
         "styling_assistant": "مساعد التنسيق الذكي",
@@ -8,11 +9,14 @@
         "smart_media_assistant": "المساعد الإعلامي الذكي",
         "kyc_compliance": "الامتثال لـ KYC",
         "integration_hub": "مركز التكامل",
+        "api_key": "مفتاح API",
+        "secure_layer": "طبقة التكامل الآمنة",
         "media_monitoring": "رصد الوسائط",
         "tv_radio_monitoring": "رصد التلفزيون والراديو",
         "press_monitoring": "رصد الصحافة",
         "central_media_repository": "مستودع الوسائط المركزي",
         "media_pulse": "نبض الاعلام",
+        "system_status": "حالة النظام",
         "crisis_management": "خطط إدارة الأزمات",
         "crisis_management_desc": "تخطيط استراتيجي للاستجابة للأزمات",
         "media_pulse_desc": "تحليل مشاعر الوسائط المباشر",
@@ -31,6 +35,11 @@
         "get_started": "ابدأ الآن",
         "contact": "اتصل بنا",
         "pricing": "الأسعار",
+        "smart_assistant_input_placeholder": "أنتج رداً صحفياً...",
+        "whatsapp": "واتساب",
+        "teams": "تيمز",
+        "slack": "سلاك",
+        "outlook": "أوتلوك",
         "behind_the_scene": "خلف الكواليس",
         "faq": "الأسئلة الشائعة",
         "dashboard": "لوحة التحكم"
@@ -46,7 +55,12 @@
         "download": "تحميل PDF",
         "view_details": "عرض التفاصيل",
         "generate_report": "إنشاء تقرير",
-        "analyze_tone": "تحليل النبرة"
+        "analyze_tone": "تحليل النبرة",
+        "toggle_theme": "تبديل المظهر",
+        "ai_badge": "ذكاء اصطناعي",
+        "image_unavailable": "الصورة غير متوفرة",
+        "copied": "تم النسخ",
+        "copy": "نسخ"
     },
     "ArticleTable": {
         "export_excel": "تصدير Excel",
@@ -429,6 +443,16 @@
             "positive": "إيجابي",
             "neutral": "محايد",
             "negative": "سلبي"
+        },
+        "emotions": {
+            "Joy": "بهجة",
+            "Anger": "غضب",
+            "Fear": "خوف",
+            "Sadness": "حزن",
+            "Surprise": "دهشة",
+            "Disgust": "اشمئزاز",
+            "Neutral": "حيادي",
+            "Analytical": "تحليلي"
         }
     },
     "MediaMonitoring": {
@@ -599,7 +623,8 @@
         },
         "dashboard": {
             "no_reports": "لا توجد تقارير لهذه الفئة.",
-            "visit_repository": "زيارة المستودع المركزي"
+            "visit_repository": "زيارة المستودع المركزي",
+            "reports_overview": "نظرة عامة على التقارير"
         }
     },
     "MediaPulseDetail": {
@@ -754,7 +779,10 @@
             "advanced_solutions": "حلول متقدمة",
             "total_ave": "إجمالي قيمة الإعلان",
             "articles_count": "مقال",
-            "positive_sent": "نبرة إيجابية"
+            "positive_sent": "نبرة إيجابية",
+            "emotional_pulse": "نبض المشاعر",
+            "top_topics": "أهم المواضيع",
+            "intensity": "الكثافة"
         }
     },
     "CrisisManagementDetail": {
@@ -1044,5 +1072,8 @@
         "title": "الصفحة غير موجودة",
         "description": "عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها.",
         "home_button": "العودة للصفحة الرئيسية"
+    },
+    "Pricing": {
+        "title": "الخطط والأسعار"
     }
 }
