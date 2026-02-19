@@ -3,9 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import Stripe from 'stripe';
 
-// This is your Stripe CLI webhook secret for testing your endpoint locally.
-// In production, use your actual webhook secret from Stripe Dashboard
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+// Stripe webhook secret (required in production)
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: NextRequest) {
     const body = await request.text();
@@ -18,15 +17,26 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    if (!webhookSecret) {
+        const isProd = process.env.NODE_ENV === 'production';
+        if (isProd) {
+            console.error('CRITICAL: STRIPE_WEBHOOK_SECRET is missing in production.');
+            return NextResponse.json(
+                { error: 'Webhook secret not configured' },
+                { status: 500 }
+            );
+        }
+    }
+
     let event: Stripe.Event;
 
     try {
         // Verify webhook signature
-        if (webhookSecret) {
-            event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        } else {
-            // For development without webhook secret
+        if (!webhookSecret) {
+            // Allow local development without signature verification
             event = JSON.parse(body);
+        } else {
+            event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
         }
     } catch (err) {
         console.error('Webhook signature verification failed:', err);

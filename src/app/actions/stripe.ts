@@ -1,51 +1,10 @@
 'use server';
 
 import { stripe, formatAmountForStripe } from '@/lib/stripe';
+import { getStripeProduct } from '@/lib/stripe-products';
 import { auth } from '@clerk/nextjs/server';
 
-export interface Product {
-    id: string;
-    name: string;
-    description: string;
-    priceInCents: number;
-    currency?: string;
-}
-
-// Example product catalog - Replace with your actual product lookup
-async function getProduct(productId: string): Promise<Product> {
-    // TODO: Replace with your actual product database/catalog lookup
-    const products: Record<string, Product> = {
-        'basic-plan': {
-            id: 'basic-plan',
-            name: 'Basic Plan',
-            description: 'Perfect for small businesses',
-            priceInCents: 2900, // $29.00
-            currency: 'usd',
-        },
-        'pro-plan': {
-            id: 'pro-plan',
-            name: 'Professional Plan',
-            description: 'For growing organizations',
-            priceInCents: 9900, // $99.00
-            currency: 'usd',
-        },
-        'enterprise-plan': {
-            id: 'enterprise-plan',
-            name: 'Enterprise Plan',
-            description: 'For large enterprises',
-            priceInCents: 29900, // $299.00
-            currency: 'usd',
-        },
-    };
-
-    const product = products[productId];
-
-    if (!product) {
-        throw new Error(`Product not found: ${productId}`);
-    }
-
-    return product;
-}
+export type Product = ReturnType<typeof getStripeProduct>;
 
 /**
  * Create an embedded checkout session
@@ -54,7 +13,7 @@ async function getProduct(productId: string): Promise<Product> {
 export async function startCheckoutSession(productId: string): Promise<string> {
     try {
         // Get product details
-        const product = await getProduct(productId);
+        const product = getStripeProduct(productId);
 
         // Create Checkout Session with embedded UI
         const session = await stripe.checkout.sessions.create({

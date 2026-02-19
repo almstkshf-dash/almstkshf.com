@@ -1,24 +1,45 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, formatAmountForStripe } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
+import { getStripeProduct } from '@/lib/stripe-products';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const limit = await rateLimit(`stripe:checkout:${ip}`, 20, 60);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded' },
+                { status: 429, headers: { 'Retry-After': String(limit.resetSeconds) } }
+            );
+        }
+
         const body = await request.json();
-        const { amount, currency = 'usd', productName, productDescription } = body;
+        const { productId, userId } = body;
 
         // Validate required fields
-        if (!amount || amount <= 0) {
+        if (!productId) {
             return NextResponse.json(
-                { error: 'Invalid amount' },
+                { error: 'productId is required' },
                 { status: 400 }
             );
         }
 
-        if (!productName) {
+        let product;
+        try {
+            product = getStripeProduct(productId);
+        } catch {
             return NextResponse.json(
-                { error: 'Product name is required' },
+                { error: 'Invalid productId' },
                 { status: 400 }
+            );
+        }
+        const baseUrl = process.env.APP_URL || request.headers.get('origin');
+        if (!baseUrl) {
+            return NextResponse.json(
+                { error: 'APP_URL is not configured' },
+                { status: 500 }
             );
         }
 
@@ -26,27 +47,27 @@ export async function POST(request: NextRequest) {
         const checkoutSession = await stripe.checkout.sessions.create({
             mode: 'payment',
             payment_method_types: ['card'],
-            client_reference_id: body.userId || undefined,
+            client_reference_id: userId || undefined,
             line_items: [
                 {
                     price_data: {
-                        currency: currency,
+                        currency: product.currency,
                         product_data: {
-                            name: productName,
-                            description: productDescription || '',
+                            name: product.name,
+                            description: product.description,
                         },
-                        unit_amount: formatAmountForStripe(amount, currency),
+                        unit_amount: product.priceInCents,
                     },
                     quantity: 1,
                 },
             ],
-            success_url: `${request.headers.get('origin')}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${request.headers.get('origin')}/payment/cancelled`,
+            success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/payment/cancelled`,
             metadata: {
-                productName,
-                amount: amount.toString(),
-                currency,
-                userId: body.userId || '',
+                productId: product.id,
+                amount: product.priceInCents.toString(),
+                currency: product.currency,
+                userId: userId || '',
             },
         });
 

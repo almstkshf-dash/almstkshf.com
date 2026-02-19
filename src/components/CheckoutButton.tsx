@@ -6,19 +6,13 @@ import { getStripe } from '@/lib/stripe-client';
 import { useAuth } from '@clerk/nextjs';
 
 interface CheckoutButtonProps {
-    amount: number;
-    currency?: string;
-    productName: string;
-    productDescription?: string;
+    productId: string;
     className?: string;
     children?: React.ReactNode;
 }
 
 export default function CheckoutButton({
-    amount,
-    currency = 'usd',
-    productName,
-    productDescription,
+    productId,
     className = '',
     children = 'Checkout',
 }: CheckoutButtonProps) {
@@ -36,10 +30,7 @@ export default function CheckoutButton({
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    amount,
-                    currency,
-                    productName,
-                    productDescription,
+                    productId,
                     userId,
                 }),
             });

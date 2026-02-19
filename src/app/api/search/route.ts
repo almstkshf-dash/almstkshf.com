@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { performSearch } from '@/lib/upstash';
+import { rateLimit } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(req: Request) {
     try {
+        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const limit = await rateLimit(`search:${ip}`, 30, 60);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded' },
+                { status: 429, headers: { 'Retry-After': String(limit.resetSeconds) } }
+            );
+        }
+
         const { query, index = "articles" } = await req.json();
 
         if (!query) {

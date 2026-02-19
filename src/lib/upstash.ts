@@ -1,25 +1,43 @@
 import { Search } from '@upstash/search';
 import { Redis } from '@upstash/redis';
 
-// Initialize Search Client
-// Note: We use process.env here which works in both Edge and Node runtimes
-export const searchClient = new Search({
-    url: process.env.UPSTASH_SEARCH_REST_URL || 'https://placeholder.upstash.io',
-    token: process.env.UPSTASH_SEARCH_REST_TOKEN || 'placeholder',
-});
+let cachedSearch: Search | null = null;
+let cachedRedis: Redis | null = null;
 
-// Initialize Redis Client (For Rate Limiting or Caching)
-export const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL || 'https://placeholder.upstash.io',
-    token: process.env.UPSTASH_REDIS_REST_TOKEN || 'placeholder',
-});
+function getSearchClient(): Search {
+    if (cachedSearch) return cachedSearch;
+
+    const url = process.env.UPSTASH_SEARCH_REST_URL;
+    const token = process.env.UPSTASH_SEARCH_REST_TOKEN;
+
+    if (!url || !token) {
+        throw new Error('Upstash Search is not configured.');
+    }
+
+    cachedSearch = new Search({ url, token });
+    return cachedSearch;
+}
+
+function getRedisClient(): Redis {
+    if (cachedRedis) return cachedRedis;
+
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    if (!url || !token) {
+        throw new Error('Upstash Redis is not configured.');
+    }
+
+    cachedRedis = new Redis({ url, token });
+    return cachedRedis;
+}
 
 /**
  * Perform a search across a specific index.
  */
 export async function performSearch(indexName: string, query: string, options = {}) {
     try {
-        const index = searchClient.index(indexName);
+        const index = getSearchClient().index(indexName);
         const result = await index.search({
             query,
             ...options
@@ -29,4 +47,8 @@ export async function performSearch(indexName: string, query: string, options = 
         console.error(`Upstash Search Error [${indexName}]:`, error);
         throw error;
     }
+}
+
+export function getRedis() {
+    return getRedisClient();
 }

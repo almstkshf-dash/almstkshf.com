@@ -15,7 +15,9 @@ const isPublicRoute = createRouteMatcher([
     "/(en|ar)/styling-assistant",
     "/(en|ar)/contact",
     "/(en|ar)/pricing",
-    "/api/(.*)"
+    "/api/stripe/webhook",
+    "/api/stripe/checkout",
+    "/api/chatbase/token"
 ]);
 
 const CSP_HEADER = [

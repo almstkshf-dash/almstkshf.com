@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 
 const plans = [
     {
+        productId: "monthly-analysis-report",
         name: "Monthly Analysis Report",
         description: "Tailor-made reports tailored to your specifications.",
         price: 2900,
@@ -25,6 +26,7 @@ const plans = [
         contactOnly: false,
     },
     {
+        productId: "broadcast-monitoring",
         name: "Broadcast Monitoring",
         description: "Ongoing monitoring for Radio & TV channels.",
         price: 2990,
@@ -40,6 +42,7 @@ const plans = [
         contactOnly: false,
     },
     {
+        productId: "online-media-monitoring",
         name: "Online Media Monitoring",
         description: "Comprehensive coverage for Gulf & UAE regions.",
         price: 3200,
@@ -55,6 +58,7 @@ const plans = [
         contactOnly: false,
     },
     {
+        productId: "social-media-monitoring",
         name: "Social Media Monitoring",
         description: "Curated tracking for major social platforms.",
         price: 5300,
@@ -70,6 +74,7 @@ const plans = [
         contactOnly: false,
     },
     {
+        productId: null,
         name: "Business Suite",
         description: "The complete monitoring and archiving solution.",
         price: null,
@@ -191,10 +196,7 @@ export default function PricingPage() {
                                     </Link>
                                 ) : (
                                     <CheckoutButton
-                                        amount={plan.price}
-                                        currency={plan.currency}
-                                        productName={`${plan.name} Plan`}
-                                        productDescription={plan.description}
+                                        productId={plan.productId as string}
                                         className={`w-full ${plan.highlight ? 'bg-primary hover:bg-primary/90' : 'bg-slate-800 hover:bg-slate-700'}`}
                                     >
                                         Subscribe Now

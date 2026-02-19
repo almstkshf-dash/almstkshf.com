@@ -5,11 +5,21 @@ import { analyzeContent } from "@/lib/gemini";
 import { calculateMetrics } from "@/lib/metrics";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
+import { rateLimit } from "@/lib/rateLimit";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: NextRequest) {
     try {
+        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const limit = await rateLimit(`monitor:post:${ip}`, 15, 60);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { error: "Rate limit exceeded" },
+                { status: 429, headers: { 'Retry-After': String(limit.resetSeconds) } }
+            );
+        }
+
         const body = await req.json();
         const { url, keyword = "General", manualData } = body;
 
@@ -118,6 +128,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rl = await rateLimit(`monitor:get:${ip}`, 60, 60);
+    if (!rl.allowed) {
+        return NextResponse.json(
+            { error: "Rate limit exceeded" },
+            { status: 429, headers: { 'Retry-After': String(rl.resetSeconds) } }
+        );
+    }
+
     const { searchParams } = new URL(req.url);
     const limit = Number(searchParams.get("limit")) || 50;
     const sourceType = searchParams.get("sourceType") || undefined;

@@ -22,6 +22,7 @@ export default function Navbar() {
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const loginLabel = (t as any).has?.('login') ? t('login' as any) : "Sign In";
 
     const toggleLocale = () => {
         const newLocale = locale === "en" ? "ar" : "en";
@@ -150,7 +151,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-2">
                                     <SignInButton mode="modal">
                                         <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full">
-                                            {t('login' as any) || "Sign In"}
+                                            {loginLabel}
                                         </button>
                                     </SignInButton>
                                     <HoverPrefetchLink

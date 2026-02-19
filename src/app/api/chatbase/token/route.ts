@@ -1,9 +1,19 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
     try {
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+        const limit = await rateLimit(`chatbase:token:${ip}`, 60, 60);
+        if (!limit.allowed) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded' },
+                { status: 429, headers: { 'Retry-After': String(limit.resetSeconds) } }
+            );
+        }
+
         const secret = process.env.CHATBOT_IDENTITY_SECRET;
 
         if (!secret) {
@@ -59,5 +69,6 @@ export async function GET(request: NextRequest) {
 }
 
 function generateSessionId(): string {
-    return `guest_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+    const rand = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+    return `guest_${Date.now()}_${rand}`;
 }
