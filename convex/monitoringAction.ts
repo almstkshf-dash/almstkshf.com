@@ -54,7 +54,8 @@ async function callGeminiForAnalysis(
     apiKey: string,
     title: string,
     snippet: string,
-    keyword: string
+    keyword: string,
+    intendedCategories: string[] = []
 ): Promise<{
     sentiment: "Positive" | "Neutral" | "Negative";
     summary: string;
@@ -64,6 +65,8 @@ async function callGeminiForAnalysis(
     risk?: "Low" | "Medium" | "High";
 }> {
     const prompt = `Analyze this news article for media monitoring.
+IMPORTANT: Return the "summary" in the same language as the article (if Arabic, summary must be in Arabic).
+Intended Categories (User Filter): ${intendedCategories.join(', ')}
 
 Title: "${title}"
 Snippet: "${snippet}"
@@ -72,7 +75,7 @@ Monitoring Keyword: "${keyword}"
 Return valid JSON ONLY with these exact fields:
 {
   "sentiment": "Positive" | "Neutral" | "Negative",
-  "summary": "One concise sentence summary.",
+  "summary": "One concise sentence summary in the article's primary language.",
   "sourceType": "Online News" | "Blog" | "Press Release" | "Social Media" | "Print",
   "reach_estimate": number,
   "tone": "short phrase describing tone",
@@ -150,20 +153,27 @@ export const fetchNews = action({
         keyword: v.string(),
         countries: v.string(),     // comma-separated: "AE,SA,EG"
         languages: v.string(),     // comma-separated: "en,ar"
+        sourceTypes: v.optional(v.string()), // comma-separated: "Online News,Press Release"
         dateFrom: v.optional(v.string()),  // DD/MM/YYYY
         dateTo: v.optional(v.string()),    // DD/MM/YYYY
     },
     handler: async (ctx, args) => {
         try {
-            const apiKey = process.env.GEMINI_API_KEY?.trim();
+            const settings = await ctx.runQuery(api.settings.getSettings);
+            const geminiKeyFromSettings = settings?.apiKeys?.gemini?.trim();
+            const apiKey = geminiKeyFromSettings || process.env.GEMINI_API_KEY?.trim();
 
             if (!apiKey) {
-                console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
-                console.log("💡 Tip: Set this in the Convex Dashboard > Settings > Environment Variables.");
+                console.error("❌ CONFIG ERROR: No Gemini API Key found in Settings or Environment.");
                 return {
                     success: false,
-                    error: "Media analysis service is not fully configured. Our team has been notified. (Error: CFG_MISSING)"
+                    error: "Media analysis service is not configured. Please add your Gemini API Key in the Settings page."
                 };
+            }
+
+            // Log if we are using a user-provided key
+            if (geminiKeyFromSettings) {
+                console.log("🔑 Using user-provided Gemini API Key from Settings.");
             }
 
             const parser = new Parser();
@@ -186,9 +196,25 @@ export const fetchNews = action({
             }
 
             // Full-phrase search — wrap in quotes for exact match on Google News
-            const searchQuery = args.keyword.includes(' ')
-                ? `"${args.keyword}"`
-                : args.keyword;
+            let enrichedQuery = args.keyword.includes(' ') ? `"${args.keyword}"` : args.keyword;
+
+            // Source Type targeting
+            const stList = args.sourceTypes ? args.sourceTypes.split(',').map(s => s.trim()) : [];
+            if (stList.includes('Press Release')) {
+                enrichedQuery += ' (site:prnewswire.com OR site:businesswire.com OR site:zawya.com OR site:wam.ae)';
+            } else if (stList.includes('Social Media')) {
+                enrichedQuery += ' (site:twitter.com OR site:reddit.com OR site:linkedin.com)';
+            }
+
+            // Enhance query with date operators for exact matching
+            if (dateFromObj) {
+                const after = dateFromObj.toISOString().split('T')[0];
+                enrichedQuery += ` after:${after}`;
+            }
+            if (dateToObj) {
+                const before = dateToObj.toISOString().split('T')[0];
+                enrichedQuery += ` before:${before}`;
+            }
 
             // Build RSS URL combos for each country × language pair
             const rssCombos: { url: string; country: string; lang: string }[] = [];
@@ -196,11 +222,11 @@ export const fetchNews = action({
             for (const country of countryList) {
                 for (const lang of languageList) {
                     const hl = `${lang}-${country}`;
-                    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(searchQuery)}&hl=${hl}&gl=${country}&ceid=${country}:${lang}`;
+                    // Using gl and ceid for localized results
+                    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(enrichedQuery)}&hl=${hl}&gl=${country}&ceid=${country}:${lang}`;
                     rssCombos.push({ url: rssUrl, country, lang });
                 }
             }
-
             let totalSuccess = 0;
             let totalSkipped = 0;
 
@@ -242,7 +268,8 @@ export const fetchNews = action({
                                 apiKey,
                                 item.title,
                                 item.contentSnippet || item.title,
-                                args.keyword
+                                args.keyword,
+                                stList
                             );
 
                             // AVE Calculation — Formula: Reach × 0.02 × $5

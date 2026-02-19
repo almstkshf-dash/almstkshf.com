@@ -1061,6 +1061,10 @@
         "error_language_required": "اختر لغة محتوى واحدة على الأقل.",
         "no_results": "لم يتم العثور على نتائج",
         "selected": "مختارة",
+        "sources_selected": "عناصر مختارة",
+        "source_types": "أنواع المصادر",
+        "select_sources": "اختر المصادر...",
+        "search_sources": "البحث في المصادر...",
         "clear_all": "مسح الكل"
     },
     "Error": {

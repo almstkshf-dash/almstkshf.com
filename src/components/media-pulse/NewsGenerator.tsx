@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Search, Loader2, Globe, Languages, Calendar, CheckCircle2, ChevronDown, X, AlertTriangle } from 'lucide-react';
+import { Search, Loader2, Globe, Languages, Calendar, CheckCircle2, ChevronDown, X, AlertTriangle, Filter } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
@@ -176,9 +176,9 @@ function MultiSelectDropdown({
     onChange: (selected: string[]) => void;
     placeholder: string;
     searchPlaceholder: string;
-    renderItem: (item: { id: string; label: string }) => React.ReactNode;
-    renderTag: (id: string) => React.ReactNode;
-    icon: React.ReactNode;
+    renderItem?: (item: { id: string; label: string }) => React.ReactNode;
+    renderTag?: (id: string) => React.ReactNode;
+    icon?: React.ReactNode;
     error?: string;
     noResultsText?: string;
     selectedText?: string;
@@ -186,6 +186,14 @@ function MultiSelectDropdown({
     "aria-labelledby"?: string;
     id?: string;
 }) {
+    const defaultRenderItem = (item: { id: string; label: string }) => <span>{item.label}</span>;
+    const defaultRenderTag = (id: string) => {
+        const item = items.find(i => i.id === id);
+        return <span>{item?.label || id}</span>;
+    };
+
+    const finalRenderItem = renderItem || defaultRenderItem;
+    const finalRenderTag = renderTag || defaultRenderTag;
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const ref = useRef<HTMLDivElement>(null);
@@ -222,7 +230,7 @@ function MultiSelectDropdown({
                         : 'border-border hover:border-primary/40'
                     }`}
             >
-                <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>
+                {icon && <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>}
                 <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px]">
                     {selected.length === 0 ? (
                         <span className="text-muted-foreground text-sm transition-colors">{placeholder}</span>
@@ -232,7 +240,7 @@ function MultiSelectDropdown({
                                 key={id}
                                 className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
-                                {renderTag(id)}
+                                {finalRenderTag(id)}
                                 <span
                                     role="button"
                                     tabIndex={0}
@@ -258,12 +266,12 @@ function MultiSelectDropdown({
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute z-50 mt-2 w-full bg-card border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute z-[90] mt-2 w-full bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ring-1 ring-black/5">
                     {/* Search */}
-                    <div className="p-2 border-b border-border bg-muted/30">
+                    <div className="p-3 border-b border-border/50 bg-muted/20">
                         <div className="relative">
                             <label htmlFor={`${id || 'dropdown'}-search`} className="sr-only">{searchPlaceholder}</label>
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" />
                             <input
                                 id={`${id || 'dropdown'}-search`}
                                 name={`${id || 'dropdown'}-search`}
@@ -271,51 +279,56 @@ function MultiSelectDropdown({
                                 placeholder={searchPlaceholder}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full bg-background rounded-lg pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/30 border border-border transition-all"
+                                className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
                                 autoFocus
                             />
                         </div>
                     </div>
 
                     {/* Items List */}
-                    <div className="max-h-56 overflow-y-auto scrollbar-thin transition-colors">
+                    <div className="max-h-64 overflow-y-auto scrollbar-thin transition-colors">
                         {filtered.length === 0 ? (
-                            <div className="py-6 text-center text-muted-foreground text-sm transition-colors">{noResultsText || 'No results found'}</div>
+                            <div className="py-10 text-center">
+                                <Search className="w-8 h-8 text-muted-foreground/20 mx-auto mb-2" />
+                                <p className="text-muted-foreground text-xs font-medium">{noResultsText || 'No results found'}</p>
+                            </div>
                         ) : (
-                            filtered.map((item) => (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => toggle(item.id)}
-                                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${selected.includes(item.id)
-                                        ? 'bg-primary/10 text-primary'
-                                        : 'text-foreground hover:bg-muted'
-                                        }`}
-                                >
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${selected.includes(item.id)
-                                        ? 'bg-primary border-primary'
-                                        : 'border-border'
-                                        }`}>
-                                        {selected.includes(item.id) && (
-                                            <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
-                                        )}
-                                    </div>
-                                    {renderItem(item)}
-                                </button>
-                            ))
+                            <div className="p-1.5 grid grid-cols-1 gap-0.5">
+                                {filtered.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => toggle(item.id)}
+                                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-lg transition-all ${selected.includes(item.id)
+                                            ? 'bg-primary/10 text-primary font-semibold'
+                                            : 'text-foreground hover:bg-muted font-medium'
+                                            }`}
+                                    >
+                                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${selected.includes(item.id)
+                                            ? 'bg-primary border-primary shadow-lg shadow-primary/20'
+                                            : 'border-border bg-background'
+                                            }`}>
+                                            {selected.includes(item.id) && (
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" />
+                                            )}
+                                        </div>
+                                        <div className="flex-1 truncate">{finalRenderItem(item)}</div>
+                                    </button>
+                                ))}
+                            </div>
                         )}
                     </div>
 
                     {/* Footer */}
-                    <div className="p-2 border-t border-border bg-muted/30 flex items-center justify-between transition-colors">
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider transition-colors px-2">
+                    <div className="p-3 border-t border-border/50 bg-muted/10 flex items-center justify-between transition-colors">
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-2">
                             {selected.length} {selectedText || 'selected'}
                         </span>
                         {selected.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => onChange([])}
-                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-wider font-bold transition-colors px-2"
+                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
                             >
                                 {clearAllText || 'Clear All'}
                             </button>
@@ -342,7 +355,16 @@ export default function NewsGenerator() {
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>(isAr ? ['ar', 'en'] : ['en', 'ar']);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
+    const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>(['Online News', 'Press Release']);
     const [loading, setLoading] = useState(false);
+
+    const sourceTypes = [
+        { id: 'Online News', label: isAr ? 'أخبار عبر الإنترنت' : 'Online News', searchStr: 'Online News أخبار عبر الإنترنت' },
+        { id: 'Press Release', label: isAr ? 'بيان صحفي' : 'Press Release', searchStr: 'Press Release بيان صحفي' },
+        { id: 'Blog', label: isAr ? 'مدونة' : 'Blog', searchStr: 'Blog مدونة' },
+        { id: 'Social Media', label: isAr ? 'وسائل التواصل الاجتماعي' : 'Social Media', searchStr: 'Social Media وسائل التواصل الاجتماعي' },
+        { id: 'Print', label: isAr ? 'صحافة مطبوعة' : 'Print', searchStr: 'Print صحافة مطبوعة' },
+    ];
     const [result, setResult] = useState<{ count: number; skipped: number; feeds: number } | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -411,6 +433,7 @@ export default function NewsGenerator() {
                 keyword: keyword.trim(),
                 countries: selectedCountries.join(','),
                 languages: selectedLanguages.join(','),
+                sourceTypes: selectedSourceTypes.join(','),
                 dateFrom: dateFrom ? formatDateForBackend(dateFrom) : undefined,
                 dateTo: dateTo ? formatDateForBackend(dateTo) : undefined,
             }) as any;
@@ -460,7 +483,7 @@ export default function NewsGenerator() {
                 )}
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-6">
                 {/* Keyword Input */}
                 <div>
                     <label htmlFor="monitor_keyword" className="sr-only">{t('monitor_keyword')}</label>
@@ -477,143 +500,112 @@ export default function NewsGenerator() {
                                 }`}
                         />
                     </div>
-                    {errors.keyword && (
-                        <p className="mt-1.5 text-xs text-destructive flex items-center gap-1">
-                            <AlertTriangle className="w-3 h-3" /> {errors.keyword}
-                        </p>
-                    )}
                 </div>
 
-                {/* Countries & Languages Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Countries Dropdown */}
-                    <div>
-                        <span id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('region')}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Countries */}
+                    <div className="space-y-2">
+                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</span>
                         <MultiSelectDropdown
-                            id="countries-dropdown"
-                            aria-labelledby="region-label"
                             items={countryItems}
                             selected={selectedCountries}
-                            onChange={(v) => { setSelectedCountries(v); setErrors(prev => ({ ...prev, countries: undefined })); }}
+                            onChange={(v) => setSelectedCountries(v)}
                             placeholder={t('select_countries')}
                             searchPlaceholder={t('search_countries')}
-                            icon={<Globe className="w-4 h-4" />}
-                            error={errors.countries}
-                            noResultsText={t('no_results')}
                             selectedText={t('selected')}
-                            clearAllText={t('clear_all')}
-                            renderItem={(item) => {
-                                const c = getCountryByCode(item.id);
-                                return <span className="text-foreground">{c?.flag} {item.label}</span>;
-                            }}
-                            renderTag={(id) => {
-                                const c = getCountryByCode(id);
-                                return <>{c?.flag} {c?.code}</>;
-                            }}
+                            icon={<Globe className="w-4 h-4" />}
+                            renderItem={(item) => (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg">{getCountryByCode(item.id)?.flag}</span>
+                                    <span>{item.label}</span>
+                                </div>
+                            )}
+                            renderTag={(id) => (
+                                <div className="flex items-center gap-1.5">
+                                    <span>{getCountryByCode(id)?.flag}</span>
+                                    <span>{id}</span>
+                                </div>
+                            )}
                         />
                     </div>
 
-                    {/* Languages Dropdown */}
-                    <div>
-                        <span id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('language')}</span>
+                    {/* Languages */}
+                    <div className="space-y-2">
+                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</span>
                         <MultiSelectDropdown
-                            id="languages-dropdown"
-                            aria-labelledby="language-label"
                             items={languageItems}
                             selected={selectedLanguages}
-                            onChange={(v) => { setSelectedLanguages(v); setErrors(prev => ({ ...prev, languages: undefined })); }}
+                            onChange={(v) => setSelectedLanguages(v)}
                             placeholder={t('select_languages')}
                             searchPlaceholder={t('search_languages')}
-                            icon={<Languages className="w-4 h-4" />}
-                            noResultsText={t('no_results')}
                             selectedText={t('selected')}
-                            clearAllText={t('clear_all')}
-                            renderItem={(item) => <span className="text-foreground">{item.label}</span>}
-                            renderTag={(id) => {
-                                const l = getLangByCode(id);
-                                return <>{isAr ? l?.ar : l?.en}</>;
-                            }}
+                            icon={<Languages className="w-4 h-4" />}
+                            renderItem={(item) => (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-bold opacity-60 uppercase">{item.id}</span>
+                                    <span>{item.label}</span>
+                                </div>
+                            )}
+                            renderTag={(id) => (
+                                <span className="uppercase text-[10px] font-black">{id}</span>
+                            )}
                         />
+                    </div>
+
+                    {/* Source Types */}
+                    <div className="space-y-2">
+                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</span>
+                        <MultiSelectDropdown
+                            items={sourceTypes}
+                            selected={selectedSourceTypes}
+                            onChange={(v) => setSelectedSourceTypes(v)}
+                            placeholder={t('select_sources') || 'Select sources...'}
+                            searchPlaceholder={t('search_sources') || 'Search sources...'}
+                            selectedText={t('sources_selected') || 'selected'}
+                            icon={<Filter className="w-4 h-4" />}
+                        />
+                    </div>
+
+                    {/* Dates */}
+                    <div className="space-y-2">
+                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</span>
+                        <div className="grid grid-cols-2 gap-2">
+                            <input
+                                type="date"
+                                value={dateFrom}
+                                onChange={(e) => setDateFrom(e.target.value)}
+                                className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                            />
+                            <input
+                                type="date"
+                                value={dateTo}
+                                onChange={(e) => setDateTo(e.target.value)}
+                                className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* Date Range + Action Row */}
-                <div className="flex flex-col md:flex-row gap-4 items-end">
-                    {/* Date Range Popup */}
-                    <div className="flex-1" ref={dateRef}>
-                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest mb-2 transition-colors">{t('date_range')}</span>
-                        <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => setShowDatePicker(!showDatePicker)}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setShowDatePicker(!showDatePicker); } }}
-                            className="w-full flex items-center gap-2 bg-muted/50 border border-border rounded-xl px-4 py-3 text-left hover:border-primary/50 transition-all cursor-pointer"
-                        >
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span className={`text-sm ${dateFrom || dateTo ? 'text-foreground' : 'text-muted-foreground'}`}>
-                                {dateFrom || dateTo
-                                    ? `${dateFrom ? formatDateDisplay(dateFrom) : '...'} — ${dateTo ? formatDateDisplay(dateTo) : '...'}`
-                                    : t('select_dates')
-                                }
-                            </span>
-                            {(dateFrom || dateTo) && (
-                                <span
-                                    role="button"
-                                    tabIndex={0}
-                                    onClick={(e) => { e.stopPropagation(); setDateFrom(''); setDateTo(''); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setDateFrom(''); setDateTo(''); } }}
-                                    className="ml-auto text-muted-foreground hover:text-foreground cursor-pointer"
-                                >
-                                    <X className="w-3.5 h-3.5" />
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Date Picker Panel */}
-                        {showDatePicker && (
-                            <div className="absolute z-50 mt-2 bg-card border border-border rounded-xl shadow-2xl p-4 space-y-4 w-80 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label htmlFor="date_from" className="block text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1.5 transition-colors">{t('date_from')}</label>
-                                        <input
-                                            id="date_from"
-                                            name="date_from"
-                                            type="date"
-                                            value={dateFrom}
-                                            onChange={(e) => setDateFrom(e.target.value)}
-                                            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="date_to" className="block text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1.5 transition-colors">{t('date_to')}</label>
-                                        <input
-                                            id="date_to"
-                                            name="date_to"
-                                            type="date"
-                                            value={dateTo}
-                                            onChange={(e) => setDateTo(e.target.value)}
-                                            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground outline-none focus:ring-1 focus:ring-primary/30 transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowDatePicker(false)}
-                                        className="text-xs bg-primary/10 text-primary border border-primary/30 px-4 py-1.5 rounded-lg hover:bg-primary/20 transition-colors font-bold"
-                                    >
-                                        {t('apply')}
-                                    </button>
-                                </div>
+                <div className="pt-4 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="flex-1">
+                        {errorMsg && (
+                            <div className="text-destructive text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
+                                <AlertTriangle className="w-3.5 h-3.5" />
+                                {errorMsg}
+                            </div>
+                        )}
+                        {result && (
+                            <div className="text-emerald-500 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
                             </div>
                         )}
                     </div>
 
-                    {/* Generate Button */}
                     <button
                         onClick={handleGenerate}
                         disabled={loading}
-                        className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground font-bold px-8 py-3.5 rounded-xl transition-all shadow-xl shadow-primary/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
+                        className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground font-bold px-10 py-3.5 rounded-xl transition-all shadow-xl shadow-primary/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
                     >
                         {loading ? (
                             <><Loader2 className="w-4 h-4 animate-spin" /> {t('analyzing')}</>
@@ -622,33 +614,6 @@ export default function NewsGenerator() {
                         )}
                     </button>
                 </div>
-
-                {/* Error Message */}
-                {errorMsg && (
-                    <div className="bg-destructive/10 border border-destructive/25 rounded-xl p-3.5 flex items-start gap-3 animate-in fade-in duration-300">
-                        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                        <div>
-                            <p className="text-destructive text-sm font-medium">{t('error_title')}</p>
-                            <p className="text-destructive/80 text-xs mt-0.5 transition-colors">{errorMsg}</p>
-                        </div>
-                        <button onClick={() => setErrorMsg('')} className="ml-auto text-destructive hover:text-destructive/80 transition-colors">
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-                )}
-
-                {/* Success Result */}
-                {result && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-xl p-3.5 flex items-center gap-3 animate-in fade-in duration-300 transition-colors">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 transition-colors" />
-                        <span className="text-emerald-700 dark:text-emerald-300 text-sm font-medium transition-colors">
-                            {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
-                        </span>
-                        <button onClick={() => setResult(null)} className="ml-auto text-emerald-600 dark:text-emerald-400 hover:opacity-80 transition-all">
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-                )}
             </div>
         </section>
     );

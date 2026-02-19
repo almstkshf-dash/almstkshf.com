@@ -22,7 +22,10 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const tCommon = useTranslations("Common");
     const [filter, setFilter] = useState<"TV" | "Radio" | "Press" | undefined>(defaultFilter);
 
-    const reports = useQuery(api.queries.getMediaReports, { source: filter });
+    const articles = useQuery(api.monitoring.getArticles, {
+        limit: 10,
+        sourceType: filter === "all" ? undefined : filter
+    });
     const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
 
     const router = useRouter();
@@ -38,7 +41,12 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     return (
         <div className="space-y-8">
             {/* Chart Section */}
-            {reports && reports.length > 0 && <ReportsChart data={reports} />}
+            {articles && articles.length > 0 && <ReportsChart data={articles.map(a => ({
+                reportName: a.title,
+                source: a.sourceType,
+                timestamp: a.createdAt,
+                sentiment: a.sentiment
+            }))} />}
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2">
@@ -68,13 +76,13 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
 
             {/* Reports Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {reports === undefined ? (
+                {articles === undefined ? (
                     Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="p-4 bg-card border border-border rounded-xl transition-colors duration-300">
                             <SkeletonReportRow />
                         </div>
                     ))
-                ) : reports.length === 0 ? (
+                ) : articles.length === 0 ? (
                     <div className="col-span-full py-12 text-center bg-muted/30 border border-border border-dashed rounded-3xl transition-colors duration-300">
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                         <p className="text-muted-foreground font-medium">{tMedia('no_reports')}</p>
@@ -86,29 +94,37 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         </Link>
                     </div>
                 ) : (
-                    reports.map((report: any) => (
-                        <div key={report._id} className="p-4 bg-card border border-border rounded-xl hover:border-primary/50 transition-all duration-300 group">
+                    articles.map((article: any) => (
+                        <div key={article._id} className="p-4 bg-card border border-border rounded-xl hover:border-primary/50 transition-all duration-300 group">
                             <div className="flex justify-between items-start mb-3">
                                 <div className="p-2 bg-muted rounded-lg text-primary group-hover:text-primary/80 transition-colors">
                                     <FileText className="w-5 h-5" />
                                 </div>
                                 <span className={clsx(
                                     "px-2 py-0.5 text-xs rounded-full border transition-colors",
-                                    report.status === "Published"
+                                    article.sentiment === "Positive"
                                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                        : article.sentiment === "Negative"
+                                            ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                 )}>
-                                    {report.status}
+                                    {article.sentiment}
                                 </span>
                             </div>
-                            <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName}</h3>
+                            <h3 className="font-medium text-foreground mb-1 transition-colors line-clamp-1">{article.title}</h3>
                             <div className="text-xs text-muted-foreground mb-4 flex gap-2 transition-colors">
-                                <span>{report.source}</span>
+                                <span>{article.sourceType}</span>
                                 <span>•</span>
-                                <span>{new Date(report.timestamp).toLocaleDateString()}</span>
+                                <span>{article.publishedDate}</span>
                             </div>
-                            <Button variant="outline" size="sm" className="w-full" leftIcon={<Download className="w-3 h-3" />}>
-                                {tCommon('download')}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                leftIcon={<Download className="w-3 h-3" />}
+                                onClick={() => window.open(article.url, '_blank')}
+                            >
+                                {tCommon('view_source')}
                             </Button>
                         </div>
                     ))

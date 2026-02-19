@@ -10,15 +10,6 @@ export default defineSchema({
         content: v.optional(v.string()),
     }),
 
-    // Legacy table, keeping for now but new "media_monitoring_articles" is the main one
-    media_reports: defineTable({
-        reportName: v.string(),
-        source: v.union(v.literal("TV"), v.literal("Radio"), v.literal("Press")),
-        status: v.union(v.literal("Draft"), v.literal("Published")),
-        timestamp: v.number(),
-        summary: v.optional(v.string()),
-        pdfUrl: v.optional(v.string()),
-    }).index("by_source", ["source"]),
 
     // PART 1: THE DATA SCHEMA (NON-NEGOTIABLE)
     media_monitoring_articles: defineTable({
@@ -61,7 +52,7 @@ export default defineSchema({
         priority: v.union(v.literal("Low"), v.literal("Medium"), v.literal("High")),
         actions: v.array(v.string()),
         status: v.string(),
-        monitor_id: v.optional(v.id("media_reports")),
+        monitor_id: v.optional(v.id("media_monitoring_articles")),
     }),
 
     user_settings: defineTable({
@@ -115,4 +106,16 @@ export default defineSchema({
         createdAt: v.number(),
     }).index("by_session_id", ["stripeSessionId"])
         .index("by_user_id", ["userId"]),
+
+    subscriptions: defineTable({
+        userId: v.string(),
+        stripeSubscriptionId: v.string(),
+        stripePriceId: v.string(),
+        stripeCustomerId: v.string(),
+        status: v.string(), // active, trialing, canceled, etc.
+        currentPeriodEnd: v.number(),
+        cancelAtPeriodEnd: v.boolean(),
+        updatedAt: v.number(),
+    }).index("by_user_id", ["userId"])
+        .index("by_subscription_id", ["stripeSubscriptionId"]),
 });

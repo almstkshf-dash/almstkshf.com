@@ -4,7 +4,7 @@ import { v } from "convex/values";
 export const getCaseStudies = query({
     args: { category: v.optional(v.string()) },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("case_studies");
+        const q = ctx.db.query("case_studies");
         if (args.category) {
             return await q.filter((q) => q.eq(q.field("category"), args.category)).collect();
         }

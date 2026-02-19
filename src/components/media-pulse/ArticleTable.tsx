@@ -149,12 +149,18 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     {article.publishedDate}
                                 </td>
                                 <td className="p-4 max-w-sm">
-                                    <div className="flex flex-col gap-1">
-                                        <a href={article.resolvedUrl || article.url} target="_blank" rel="noreferrer" className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform">
-                                            <span className="truncate">{article.title}</span>
+                                    <div className="flex flex-col gap-1 items-start rtl:items-end">
+                                        <a
+                                            href={article.resolvedUrl || article.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
+                                            dir="auto"
+                                        >
+                                            <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
                                             <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
                                         </a>
-                                        <div className="flex items-center gap-2 flex-wrap">
+                                        <div className="flex items-center gap-2 flex-wrap" dir="auto">
                                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${getSourceBadgeColor(article.sourceType)}`}>
                                                 {article.sourceType === 'Press Release' ? t('types.press_release') :
                                                     article.sourceType === 'Online News' ? t('types.online_news') :

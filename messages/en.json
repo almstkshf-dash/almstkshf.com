@@ -1051,6 +1051,10 @@
     "error_language_required": "Select at least one content language.",
     "no_results": "No results found",
     "selected": "selected",
+    "sources_selected": "items selected",
+    "source_types": "Source Types",
+    "select_sources": "Select sources...",
+    "search_sources": "Search sources...",
     "clear_all": "Clear All"
   },
   "SentimentTracker": {

@@ -1,6 +1,7 @@
 'use server';
 
 import { stripe, formatAmountForStripe } from '@/lib/stripe';
+import { auth } from '@clerk/nextjs/server';
 
 export interface Product {
     id: string;
@@ -75,6 +76,7 @@ export async function startCheckoutSession(productId: string): Promise<string> {
             mode: 'payment',
             metadata: {
                 productId: product.id,
+                userId: (await auth()).userId || null,
             },
         });
 
@@ -120,6 +122,7 @@ export async function startCustomCheckoutSession(
                 productName,
                 amount: amount.toString(),
                 currency,
+                userId: (await auth()).userId || null,
             },
         });
 

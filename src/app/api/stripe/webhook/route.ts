@@ -99,7 +99,25 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('📝 Subscription updated:', subscription.id);
 
-                // TODO: Update user's subscription status in database
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                const userId = subscription.metadata?.userId;
+                if (!userId) {
+                    console.error('❌ No userId found in subscription metadata:', subscription.id);
+                    break;
+                }
+
+                await convex.mutation(api.payments.syncSubscription, {
+                    userId,
+                    stripeSubscriptionId: subscription.id,
+                    stripePriceId: subscription.items.data[0].price.id,
+                    stripeCustomerId: subscription.customer as string,
+                    status: subscription.status,
+                    currentPeriodEnd: subscription.current_period_end * 1000, // Stripe uses seconds
+                    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                });
 
                 break;
             }
@@ -108,7 +126,22 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('🗑️ Subscription cancelled:', subscription.id);
 
-                // TODO: Revoke access to subscription features
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                const userId = subscription.metadata?.userId;
+                if (userId) {
+                    await convex.mutation(api.payments.syncSubscription, {
+                        userId,
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: subscription.items.data[0].price.id,
+                        stripeCustomerId: subscription.customer as string,
+                        status: 'canceled',
+                        currentPeriodEnd: subscription.current_period_end * 1000,
+                        cancelAtPeriodEnd: true,
+                    });
+                }
 
                 break;
             }
@@ -123,7 +156,8 @@ export async function POST(request: NextRequest) {
                 const invoice = event.data.object as Stripe.Invoice;
                 console.log('❌ Invoice payment failed:', invoice.id);
 
-                // TODO: Send payment failed notification
+                // For subscriptions, this will eventually trigger customer.subscription.updated with status 'unpaid' or 'past_due'
+                // But we can proactively log or notify here if needed.
 
                 break;
             }

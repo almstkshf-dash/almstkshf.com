@@ -40,3 +40,45 @@ export const getUserPayments = query({
             .collect();
     },
 });
+export const syncSubscription = mutation({
+    args: {
+        userId: v.string(),
+        stripeSubscriptionId: v.string(),
+        stripePriceId: v.string(),
+        stripeCustomerId: v.string(),
+        status: v.string(),
+        currentPeriodEnd: v.number(),
+        cancelAtPeriodEnd: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const existing = await ctx.db
+            .query("subscriptions")
+            .withIndex("by_subscription_id", (q) => q.eq("stripeSubscriptionId", args.stripeSubscriptionId))
+            .first();
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                status: args.status,
+                stripePriceId: args.stripePriceId,
+                currentPeriodEnd: args.currentPeriodEnd,
+                cancelAtPeriodEnd: args.cancelAtPeriodEnd,
+                updatedAt: Date.now(),
+            });
+        } else {
+            await ctx.db.insert("subscriptions", {
+                ...args,
+                updatedAt: Date.now(),
+            });
+        }
+    },
+});
+
+export const getSubscription = query({
+    args: { userId: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("subscriptions")
+            .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+            .first();
+    },
+});

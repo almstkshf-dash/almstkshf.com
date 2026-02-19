@@ -328,12 +328,12 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
 
     doc.setFontSize(14);
     doc.setTextColor(...BRAND_DARK);
-    doc.text('Coverage Log', 14, 28);
+    try { doc.setFont('Amiri'); } catch { /* */ }
+    doc.text('Coverage Log / سجل التغطية', pageWidth - 14, 28, { align: 'right' });
 
-    const hasArabic = articles.some(a => /[\u0600-\u06FF]/.test(a.title));
     const tableData = articles.map(a => [
         a.publishedDate,
-        a.title.length > 55 ? a.title.substring(0, 52) + "..." : a.title,
+        a.title,
         a.sourceType,
         a.sourceCountry,
         a.sentiment,
@@ -350,6 +350,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
             fontSize: 7,
             font: 'Amiri',
             cellPadding: 3,
+            halign: 'right'
         },
         headStyles: {
             fillColor: [31, 78, 120],
@@ -360,7 +361,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         alternateRowStyles: { fillColor: [245, 247, 250] },
         columnStyles: {
             0: { cellWidth: 20 },
-            1: { cellWidth: 65, halign: hasArabic ? 'right' : 'left' },
+            1: { cellWidth: 65 },
             2: { cellWidth: 22 },
             3: { cellWidth: 15, halign: 'center' },
             4: { cellWidth: 18, halign: 'center' },

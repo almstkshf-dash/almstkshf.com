@@ -13,11 +13,12 @@ import { useTranslations } from "next-intl";
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
-    const reports = useQuery(api.queries.getMediaReports, {});
+    const articles = useQuery(api.monitoring.getArticles, { limit: 50 });
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredReports = reports?.filter((r: any) =>
-        r.reportName.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredArticles = articles?.filter((a: any) =>
+        a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        a.keyword.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -47,43 +48,45 @@ export default function ReportLibrary() {
             </div>
 
             <div className="space-y-3">
-                {reports === undefined ? (
+                {articles === undefined ? (
                     Array.from({ length: 5 }).map((_, i) => (
                         <SkeletonReportRow key={i} />
                     ))
-                ) : filteredReports?.length === 0 ? (
+                ) : filteredArticles?.length === 0 ? (
                     <div className="py-20 text-center space-y-4">
                         <FileText className="w-12 h-12 text-slate-800 mx-auto" />
                         <p className="text-slate-500 font-medium">{t('no_results')}</p>
                     </div>
                 ) : (
-                    filteredReports?.map((report: any) => (
+                    filteredArticles?.map((article: any) => (
                         <div
-                            key={report._id}
+                            key={article._id}
                             className="bg-slate-900/40 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:bg-slate-900/60 group"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                                     <FileText className="w-6 h-6" />
                                 </div>
-                                <div>
-                                    <h4 className="text-white font-semibold group-hover:text-blue-400 transition-colors">
-                                        {report.reportName}
+                                <div className="min-w-0 flex-1">
+                                    <h4 className="text-white font-semibold group-hover:text-blue-400 transition-colors line-clamp-1">
+                                        {article.title}
                                     </h4>
                                     <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
-                                            {new Date(report.timestamp).toLocaleDateString()}
+                                            {article.publishedDate}
                                         </span>
                                         <span>•</span>
                                         <span className={clsx(
                                             "px-2 py-0.5 rounded-full border",
-                                            report.source === "TV" ? "border-purple-500/20 text-purple-400 bg-purple-500/5" :
-                                                report.source === "Press" ? "border-cyan-500/20 text-cyan-400 bg-cyan-500/5" :
-                                                    "border-rose-500/20 text-rose-400 bg-rose-500/5"
+                                            article.sentiment === "Positive" ? "border-emerald-500/20 text-emerald-400 bg-emerald-500/5" :
+                                                article.sentiment === "Negative" ? "border-rose-500/20 text-rose-400 bg-rose-500/5" :
+                                                    "border-amber-500/20 text-amber-400 bg-amber-500/5"
                                         )}>
-                                            {report.source}
+                                            {article.sentiment}
                                         </span>
+                                        <span>•</span>
+                                        <span className="text-slate-400">{article.sourceType}</span>
                                     </div>
                                 </div>
                             </div>
@@ -93,6 +96,7 @@ export default function ReportLibrary() {
                                     variant="outline"
                                     size="sm"
                                     className="border-slate-800 hover:bg-slate-800"
+                                    onClick={() => window.open(article.url, '_blank')}
                                 >
                                     {t('preview')}
                                 </Button>

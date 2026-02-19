@@ -21,25 +21,10 @@ interface SentimentTrackerProps {
 
 // Derive real source analysis from actual data
 function analyzeBySource(articles: Article[]) {
-    const sourceMap: Record<string, { positive: number; neutral: number; negative: number; total: number; reach: number }> = {
-        'Twitter / X': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
-        'LinkedIn': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
-        'Local News': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
-        'International Press': { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 },
-    };
+    const sourceMap: Record<string, { positive: number; neutral: number; negative: number; total: number; reach: number }> = {};
 
     articles.forEach(a => {
-        // Map article sourceType → tracker category
-        let category = 'Local News';
-        if (a.sourceType === 'Social Media') category = 'Twitter / X';
-        else if (a.sourceType === 'Blog') category = 'LinkedIn';
-        else if (a.sourceType === 'Press Release') category = 'International Press';
-        else if (a.sourceType === 'Online News' || a.sourceType === 'Print') {
-            // Rough heuristic — international vs local
-            const intSources = ['reuters', 'bbc', 'cnn', 'bloomberg', 'guardian', 'nytimes', 'wsj', 'ft.com', 'aljazeera'];
-            const isInternational = intSources.some(s => (a.title?.toLowerCase() || '').includes(s) || (a.content?.toLowerCase() || '').includes(s));
-            category = isInternational ? 'International Press' : 'Local News';
-        }
+        const category = a.sourceType || 'Other';
 
         if (!sourceMap[category]) {
             sourceMap[category] = { positive: 0, neutral: 0, negative: 0, total: 0, reach: 0 };
@@ -53,13 +38,9 @@ function analyzeBySource(articles: Article[]) {
     });
 
     return Object.entries(sourceMap).map(([source, data]) => {
-        if (data.total === 0) {
-            return { source, sentiment: 'neutral' as const, score: 0, trend: 0, count: 0, reach: 0 };
-        }
-
-        const positiveRatio = data.positive / data.total;
-        const negativeRatio = data.negative / data.total;
-        const score = Math.round((positiveRatio * 100 + (data.neutral / data.total) * 50));
+        const positiveRatio = data.total > 0 ? data.positive / data.total : 0;
+        const negativeRatio = data.total > 0 ? data.negative / data.total : 0;
+        const score = Math.round((positiveRatio * 100 + ((data.total - data.positive - data.negative) / data.total) * 50));
 
         let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
         if (positiveRatio > 0.5) sentiment = 'positive';

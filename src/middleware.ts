@@ -5,15 +5,14 @@ import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
-// Routes that are publicly accessible without authentication
+// Routes that are strictly public (Marketing, Pricing, Landing)
+// Removed broad (.*) patterns for technical-solutions and media-monitoring to restore mandatory login
 const isPublicRoute = createRouteMatcher([
     "/",
-    "/(en|ar)", // Landing Page
+    "/(en|ar)",
     "/(en|ar)/case-studies",
     "/(en|ar)/lexcora",
     "/(en|ar)/styling-assistant",
-    "/(en|ar)/technical-solutions/(.*)",
-    "/(en|ar)/media-monitoring/(.*)",
     "/(en|ar)/contact",
     "/(en|ar)/pricing",
     "/api/(.*)"
@@ -22,24 +21,28 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
 
-    // 1. Specialized Redirect for /dashboard to Avoid 404 (Root to Locale)
+    // 1. Root Dashboard Redirect
     if (pathname === '/dashboard') {
         return NextResponse.redirect(new URL('/en/dashboard', req.url));
     }
 
     // 2. Authentication Protection
-    // Note: We don't use try-catch here because Clerk v6 uses internal exceptions 
-    // for redirects which should not be caught and swallowed.
+    // This will now catch /dashboard, /technical-solutions, and /media-monitoring
     if (!isPublicRoute(req)) {
         await auth.protect();
     }
 
-    // 3. Localization (next-intl)
-    const response = intlMiddleware(req);
+    // 3. Skip i18n for API routes to avoid overhead/failure in Edge Runtime
+    if (pathname.startsWith('/api')) {
+        return NextResponse.next();
+    }
 
-    // 4. Apply Content Security Policy (CSP) to valid page responses
-    // Only apply to HTML pages, not static assets or API routes
-    if (response && !pathname.startsWith('/api') && !pathname.includes('.')) {
+    // 4. Localization (next-intl)
+    const response = intlMiddleware(req) || NextResponse.next();
+
+    // 5. Apply Content Security Policy (CSP)
+    // Only apply to HTML pages (Status 200), not redirects or static assets
+    if (response.status === 200 && !pathname.includes('.')) {
         const CSP_HEADER = [
             "default-src 'self';",
             "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://clerk.almstkshf.com https://*.clerk.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://*.stripe.com https://www.chatbase.co https://*.chatbase.co https://va.vercel-scripts.com https://*.vercel.live https://cdn.jsdelivr.net blob:;",
@@ -62,11 +65,11 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
     matcher: [
         // Match all paths except Static Assets and Next.js internals
-        // Using a more robust negative lookahead for Clerk stability in production
         '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',
     ],
 };
+
 
 

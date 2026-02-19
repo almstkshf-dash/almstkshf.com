@@ -32,7 +32,7 @@ export default function Navbar() {
     return (
         <>
             <header
-                className="sticky top-0 z-50 w-full border-b border-border bg-background transition-all duration-300"
+                className="sticky top-0 z-[100] w-full border-b border-border bg-background transition-all duration-300"
                 onMouseLeave={() => setActiveDropdown(null)}
             >
                 <Container>
@@ -49,14 +49,14 @@ export default function Navbar() {
                                         className="object-contain p-1 invert dark:invert-0 transition-all duration-300"
                                     />
                                 </div>
-                                <span className="hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                                <span className="hidden xl:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                     {tCommon('app_name')}
                                 </span>
                             </HoverPrefetchLink>
                         </div>
 
                         {/* Desktop Navigation - Hidden on tablet, visible on large screens */}
-                        <nav className="hidden lg:flex items-center lg:gap-4 xl:gap-8 ms-auto lg:me-4 xl:me-8">
+                        <nav className="hidden lg:flex items-center lg:gap-2 xl:gap-8 ms-auto lg:me-2 xl:me-8">
                             {NAVIGATION_ITEMS.map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;
@@ -147,15 +147,15 @@ export default function Navbar() {
 
                             <HoverPrefetchLink
                                 href="/dashboard"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-3 lg:gap-1.5 xl:px-4 xl:gap-2"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-2.5 lg:gap-1.5 xl:px-4 xl:gap-2"
                             >
                                 <LayoutDashboard className="w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4" />
-                                <span className="whitespace-nowrap">{t('dashboard')}</span>
+                                <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
                             </HoverPrefetchLink>
 
                             <HoverPrefetchLink
                                 href="/contact"
-                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-4 xl:px-6 whitespace-nowrap"
+                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-3.5 lg:py-2 xl:px-6 xl:py-2.5 whitespace-nowrap"
                             >
                                 {t('get_started')}
                             </HoverPrefetchLink>

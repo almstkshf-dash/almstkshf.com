@@ -8,33 +8,54 @@ export const seed = mutation({
         //     await ctx.db.delete(report._id);
         // }
 
-        // Seed Media Reports
-        const reports = [
+        // Seed Media Monitoring Articles (New Model)
+        const articles = [
             {
-                reportName: "Daily Media Monitoring - morning session",
-                source: "TV" as const,
-                status: "Published" as const,
-                timestamp: Date.now() - 3600000,
-                summary: "Analysis of prime time news coverage in the Gulf region."
+                keyword: "Economy",
+                url: "https://example.com/news1",
+                publishedDate: "19/02/2026",
+                title: "Daily Media Monitoring - morning session",
+                content: "Analysis of prime time news coverage in the Gulf region.",
+                language: "EN" as const,
+                sentiment: "Neutral" as const,
+                sourceType: "Online News" as const,
+                sourceCountry: "AE",
+                reach: 50000,
+                ave: 1200,
+                createdAt: Date.now() - 3600000,
             },
             {
-                reportName: "Economic Analysis Report",
-                source: "Press" as const,
-                status: "Published" as const,
-                timestamp: Date.now() - 7200000,
-                summary: "Sentiment analysis on recent market policy changes."
+                keyword: "Policy",
+                url: "https://example.com/news2",
+                publishedDate: "18/02/2026",
+                title: "Economic Analysis Report",
+                content: "Sentiment analysis on recent market policy changes.",
+                language: "EN" as const,
+                sentiment: "Positive" as const,
+                sourceType: "Blog" as const,
+                sourceCountry: "SA",
+                reach: 25000,
+                ave: 800,
+                createdAt: Date.now() - 7200000,
             },
             {
-                reportName: "Radio Talk Show Summary",
-                source: "Radio" as const,
-                status: "Draft" as const,
-                timestamp: Date.now() - 500000,
-                summary: "Compilation of call-in comments regarding public services."
+                keyword: "Public Opinion",
+                url: "https://example.com/news3",
+                publishedDate: "19/02/2026",
+                title: "Radio Talk Show Summary",
+                content: "Compilation of call-in comments regarding public services.",
+                language: "AR" as const,
+                sentiment: "Negative" as const,
+                sourceType: "Social Media" as const,
+                sourceCountry: "AE",
+                reach: 15000,
+                ave: 450,
+                createdAt: Date.now() - 500000,
             }
         ];
 
-        for (const report of reports) {
-            await ctx.db.insert("media_reports", report);
+        for (const article of articles) {
+            await ctx.db.insert("media_monitoring_articles", article);
         }
 
         // Seed Crisis Plans
