@@ -15,6 +15,7 @@ import ChatbotTrigger from "@/components/ChatbotTrigger";
 import { Analytics } from "@vercel/analytics/next";
 import { CommandMenu } from "@/components/CommandMenu";
 import { Toaster } from "sonner";
+import type { ReactNode } from "react";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -100,7 +101,7 @@ export default async function RootLayout({
     children,
     params,
 }: Readonly<{
-    children: React.ReactNode;
+    children: ReactNode;
     params: Promise<{ locale: string }>;
 }>) {
     const { locale } = await params;
