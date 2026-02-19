@@ -113,7 +113,7 @@ export default async function RootLayout({
     setRequestLocale(locale);
     const messages = await getMessages();
     const dir = locale === "ar" ? "rtl" : "ltr";
-    const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    const configuredClerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
     const isProduction = process.env.NODE_ENV === "production";
 
     const appTree = (
@@ -150,7 +150,7 @@ export default async function RootLayout({
         </html>
     );
 
-    if (!publishableKey) {
+    if (!configuredClerkPublishableKey) {
         if (isProduction) {
             throw new Error("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production.");
         }
@@ -159,5 +159,5 @@ export default async function RootLayout({
         return appTree;
     }
 
-    return <ClerkProvider publishableKey={publishableKey}>{appTree}</ClerkProvider>;
+    return <ClerkProvider publishableKey={configuredClerkPublishableKey}>{appTree}</ClerkProvider>;
 }
