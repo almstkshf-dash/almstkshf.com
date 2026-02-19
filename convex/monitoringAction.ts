@@ -158,10 +158,11 @@ export const fetchNews = action({
             const apiKey = process.env.GEMINI_API_KEY?.trim();
 
             if (!apiKey) {
-                console.error("❌ GEMINI_API_KEY is missing from Convex environment variables");
+                console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
+                console.log("💡 Tip: Set this in the Convex Dashboard > Settings > Environment Variables.");
                 return {
                     success: false,
-                    error: "Media analysis service is not fully configured. Please check environment variables."
+                    error: "Media analysis service is not fully configured. Our team has been notified. (Error: CFG_MISSING)"
                 };
             }
 

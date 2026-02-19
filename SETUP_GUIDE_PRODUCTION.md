@@ -2,27 +2,31 @@
 
 This guide ensures that the **ALMSTKSHF** platform is correctly configured for production environments (Vercel, Convex, Clerk, Stripe).
 
-## 1. Authentication (Clerk)
-**Issue**: Using Development keys in production causes strict rate limits and instability.
+### 1. Environment Variable Standardization
+Ensure the following variables are set correctly in their respective dashboards.
 
-### Checklist:
-- [ ] **Instance Type**: Ensure you have switched to a "Production" instance in the [Clerk Dashboard](https://dashboard.clerk.com).
-- [ ] **API Keys**: Use keys starting with `pk_live_` and `sk_live_`.
-- [ ] **Environment Variables** (Vercel):
-  - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-  - `CLERK_SECRET_KEY`
-- [ ] **Middleware Warning**: If you see "CRITICAL SECURITY WARNING" in your logs, you are still using test keys.
+#### Vercel Dashboard (Project Settings > Environment Variables)
+| Variable | Value | Notes |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_live_Y2xlcmsuYWxtc3Rrc2hmLmNvbSQ` | Clerk Production Key |
+| `CLERK_SECRET_KEY` | `sk_live_MB3vomMXSXgJV2ynPA40D9v1A5JusPloH8zbjR9xq5` | Clerk Production Secret |
+| `CONVEX_DEPLOY_KEY` | `prod:flexible-anaconda-162|...` | Provided by `npx convex deploy-key` |
+| `NEXT_PUBLIC_CONVEX_URL` | `https://flexible-anaconda-162.convex.cloud` | Your Production Convex URL |
 
-## 2. Backend (Convex)
-**Requirement**: Dedicated production deployment URL.
+#### Convex Dashboard (Settings > Environment Variables)
+| Variable | Value | Notes |
+| :--- | :--- | :--- |
+| `GEMINI_API_KEY` | `AIzaSyByJa5app8Wlrd...` | Gemini API Access |
+| `RESEND_API_KEY` | `re_iUQ9ahfx_8VBdJny...` | For Emailing Reports/Waitlist |
+| `CONTACT_EMAIL` | `k.account@almstkshf.com` | Destination for leads |
+| `CLERK_FRONTEND_API_URL` | `https://integral-bulldog-65.clerk.accounts.dev` | Clerk OIDC Sync |
 
-### Checklist:
-- [ ] **Deployment**: Run `npx convex deploy` to push schema and functions to the production environment.
-- [ ] **Environment Variables** (Convex Dashboard):
-  - `GEMINI_API_KEY`: Required for Media Monitoring and Analysis.
-  - `RESEND_API_KEY`: Required for Contact/Waitlist emails.
-  - `STRIPE_SECRET_KEY`: Required for payments.
-  - `CONTACT_EMAIL`: Set to your authorized Resend email (e.g., `k.account@almstkshf.com`).
+### 2. Authentication (Clerk + Convex)
+1. In Convex Dashboard, go to **Settings** > **Auth**.
+2. Add a new **OIDC Provider**:
+   - **Issuer URL**: `https://integral-bulldog-65.clerk.accounts.dev`
+   - **Application ID**: `convex`
+3. Ensure **Domain** in Clerk is verified: `clerk.almstkshf.com`.
 
 ## 3. Payments (Stripe)
 **Checklist**:

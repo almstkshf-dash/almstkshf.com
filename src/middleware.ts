@@ -20,42 +20,57 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    const { pathname } = req.nextUrl;
+    try {
+        const { pathname } = req.nextUrl;
 
-    // 1. Specialized Redirect for /dashboard to Avoid 404 (Root to Locale)
-    if (pathname === '/dashboard') {
-        return NextResponse.redirect(new URL('/en/dashboard', req.url));
+        // 1. Specialized Redirect for /dashboard to Avoid 404 (Root to Locale)
+        if (pathname === '/dashboard') {
+            return NextResponse.redirect(new URL('/en/dashboard', req.url));
+        }
+
+        // 2. Specialized Bypass for API Routes (including localized /en/api)
+        if (pathname.startsWith('/api') || pathname.match(/\/(en|ar)\/api/)) {
+            const response = NextResponse.next();
+            return applyCSP(response);
+        }
+
+        // 3. Authentication Protection
+        if (!isPublicRoute(req)) {
+            try {
+                const authResponse = await auth.protect();
+                if (authResponse instanceof Response) return authResponse;
+            } catch (authError) {
+                console.error("MIDDLEWARE_AUTH_PROTECT_FAILED:", authError);
+                // In production, we don't want to crash. We might redirect to sign-in or let it pass with warning.
+                throw authError; // Re-throw to see if it's the source of 500
+            }
+        }
+
+        // 4. Localization (next-intl)
+        const intlResponse = intlMiddleware(req);
+
+        // 5. Handle potential redirects from intlMiddleware
+        if (intlResponse?.status >= 300 && intlResponse?.status < 400) {
+            return intlResponse;
+        }
+
+        // 6. Apply Content Security Policy (CSP)
+        const finalResponse = intlResponse || NextResponse.next();
+        return applyCSP(finalResponse);
+    } catch (globalError: any) {
+        console.error("MIDDLEWARE_GLOBAL_CRASH:", globalError?.message || globalError);
+        // Fallback to a standard next response to avoid MIDDLEWARE_INVOCATION_FAILED if possible
+        const fallback = NextResponse.next();
+        return applyCSP(fallback);
     }
-
-    // 2. Specialized Bypass for API Routes
-    if (pathname.startsWith('/api')) {
-        const response = NextResponse.next();
-        return applyCSP(response);
-    }
-
-    // 3. Authentication Protection
-    if (!isPublicRoute(req)) {
-        const authResponse = await auth.protect();
-        if (authResponse instanceof Response) return authResponse;
-    }
-
-    // 4. Localization (next-intl)
-    const intlResponse = intlMiddleware(req);
-
-    // 5. Handle potential redirects from intlMiddleware
-    if (intlResponse?.status >= 300 && intlResponse?.status < 400) {
-        return intlResponse;
-    }
-
-    // 6. Apply Content Security Policy (CSP)
-    const finalResponse = intlResponse || NextResponse.next();
-    return applyCSP(finalResponse);
 });
 
 /**
  * Safely applies Content Security Policy to a response.
  */
 function applyCSP(response: NextResponse | Response) {
+    if (!response) return NextResponse.next();
+
     // Skip CSP for redirect responses as they are often immutable and don't need it
     if (response.status >= 300 && response.status < 400) {
         return response;
@@ -70,11 +85,11 @@ function applyCSP(response: NextResponse | Response) {
 
     const CSP_HEADER = [
         "default-src 'self';",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live blob:;",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://clerk.almstkshf.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live blob:;",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.live;",
         "img-src 'self' data: https://img.clerk.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://grainy-gradients.vercel.app https://*.vercel.live;",
         "font-src 'self' data: https://fonts.gstatic.com;",
-        "connect-src 'self' https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://api.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live wss://*.vercel.live;",
+        "connect-src 'self' https://clerk.almstkshf.com https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://api.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live wss://*.vercel.live;",
         "frame-src 'self' https://js.stripe.com https://www.chatbase.co https://*.vercel.live;",
         "worker-src 'self' blob: https://*.clerkjs.dev;",
         "base-uri 'self';",
@@ -82,13 +97,22 @@ function applyCSP(response: NextResponse | Response) {
     ].join(' ');
 
     try {
-        response.headers.set('Content-Security-Policy', CSP_HEADER);
-        return response;
+        // Use Headers.append or set if possible
+        if (response.headers instanceof Headers) {
+            response.headers.set('Content-Security-Policy', CSP_HEADER);
+            return response;
+        }
     } catch (e) {
-        // Fallback for immutable headers: only clone if absolutely necessary
+        console.warn("CSP_HEADER_SET_FAILED, attempting clone...");
+    }
+
+    try {
         const newResponse = new NextResponse(response.body, response);
         newResponse.headers.set('Content-Security-Policy', CSP_HEADER);
         return newResponse;
+    } catch (cloneError) {
+        console.error("MIDDLEWARE_CLONE_FAILED:", cloneError);
+        return response; // Return original even if it lacks CSP
     }
 }
 

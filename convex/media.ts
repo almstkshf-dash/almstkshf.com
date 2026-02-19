@@ -35,8 +35,11 @@ export const analyzeMedia = action({
         const apiKey = process.env.GEMINI_API_KEY?.trim();
 
         if (!apiKey) {
-            console.error("GEMINI_API_KEY is missing via process.env");
-            return { success: false, error: "AI service configuration error. Please contact support." };
+            console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
+            return {
+                success: false,
+                error: "Media analysis service is not fully configured. Our team has been notified. (Error: CFG_MISSING)"
+            };
         }
 
         const prompt = `You are an expert Media & Reputation Risk analyst.
@@ -83,15 +86,15 @@ Return valid JSON ONLY:
             };
 
             // Try models in sequence
-            let response = await callGemini("gemini-2.5-flash");
+            let response = await callGemini("gemini-2.0-flash");
 
             if (!response.ok && response.status === 404) {
-                console.warn("Primary model (gemini-2.5-flash) not found, attempting fallback to gemini-2.0-flash...");
-                response = await callGemini("gemini-2.0-flash");
+                console.warn("Primary model (gemini-2.0-flash) not found, attempting fallback to gemini-1.5-flash-latest...");
+                response = await callGemini("gemini-1.5-flash-latest");
 
                 if (!response.ok && response.status === 404) {
-                    console.warn("Fallback model (gemini-2.0-flash) not found, attempting final fallback to gemini-flash-latest...");
-                    response = await callGemini("gemini-flash-latest");
+                    console.warn("Fallback model (gemini-1.5-flash-latest) not found, attempting final fallback to gemini-pro...");
+                    response = await callGemini("gemini-pro");
                 }
             }
 
