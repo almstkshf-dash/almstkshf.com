@@ -42,7 +42,9 @@
         "outlook": "أوتلوك",
         "behind_the_scene": "خلف الكواليس",
         "faq": "الأسئلة الشائعة",
-        "dashboard": "لوحة التحكم"
+        "dashboard": "لوحة التحكم",
+        "login": "تسجيل الدخول",
+        "signup": "تسجيل جديد"
     },
     "Common": {
         "app_name": "المستكشف",

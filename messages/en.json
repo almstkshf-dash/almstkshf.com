@@ -42,7 +42,9 @@
     "press_monitoring_desc": "Print and digital publication tracking",
     "central_media_repository_desc": "Centralized digital asset management",
     "media_pulse_desc": "Live media sentiment analysis",
-    "crisis_management_desc": "Strategic crisis response planning"
+    "crisis_management_desc": "Strategic crisis response planning",
+    "login": "Sign In",
+    "signup": "Sign Up"
   },
   "Common": {
     "app_name": "ALMSTKSHF",

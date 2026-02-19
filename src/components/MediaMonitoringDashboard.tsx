@@ -68,10 +68,10 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     return (
         <div className="space-y-8">
             {/* Chart Section */}
-            {articles && articles.length > 0 && <ReportsChart data={articles.map(a => ({
-                reportName: a.title,
-                source: a.sourceType,
-                timestamp: a.createdAt,
+            {reports && reports.length > 0 && <ReportsChart data={reports.map((a: any) => ({
+                reportName: a.title || a.reportName,
+                source: a.sourceType || a.source,
+                timestamp: a.publishedDate || a.createdAt || a.timestamp,
                 sentiment: a.sentiment
             }))} />}
 
@@ -102,13 +102,13 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
 
             {/* Reports Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {articles === undefined ? (
+                {reports === undefined ? (
                     Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="p-4 bg-card border border-border rounded-xl transition-colors duration-300">
                             <SkeletonReportRow />
                         </div>
                     ))
-                ) : articles.length === 0 ? (
+                ) : reports.length === 0 ? (
                     <div className="col-span-full py-12 text-center bg-muted/30 border border-border border-dashed rounded-3xl transition-colors duration-300">
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                         <p className="text-muted-foreground font-medium">{tMedia('no_reports')}</p>
@@ -135,20 +135,20 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                     {report.status}
                                 </span>
                             </div>
-                            <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName}</h3>
+                            <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName || report.title}</h3>
                             <div className="text-xs text-muted-foreground mb-4 flex gap-2 transition-colors">
-                                <span>{report.source}</span>
+                                <span>{report.source || report.sourceType}</span>
                                 <span>•</span>
-                                <span>{new Date(report.timestamp).toLocaleDateString()}</span>
+                                <span>{new Date(report.timestamp || report.publishedDate || report.createdAt).toLocaleDateString()}</span>
                             </div>
                             <Button
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
                                 leftIcon={<Download className="w-3 h-3" />}
-                                onClick={() => window.open(article.url, '_blank')}
+                                onClick={() => report.url && window.open(report.url, '_blank')}
                             >
-                                {tCommon('view_source')}
+                                {tCommon('view_details')}
                             </Button>
                         </div>
                     ))
