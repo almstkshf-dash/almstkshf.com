@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useMutation } from 'convex/react';
+import { useMutation, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { X, Loader2, Plus } from 'lucide-react';
+import { X, Loader2, Plus, Wand2 } from 'lucide-react';
 
 interface ManualEntryModalProps {
     isOpen: boolean;
@@ -15,7 +15,10 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     const t = useTranslations('ManualEntry');
 
     const saveArticle = useMutation(api.monitoring.saveArticle);
+    const extractArticle = useAction(api.monitoringAction.extractArticle);
+
     const [isLoading, setIsLoading] = useState(false);
+    const [isExtracting, setIsExtracting] = useState(false);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -85,6 +88,35 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
             alert(t('save_failed'));
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleExtract = async () => {
+        if (!formData.url) return;
+        setIsExtracting(true);
+
+        try {
+            const result = await extractArticle({ url: formData.url, analyze: true });
+            if (result.success && result.data) {
+                const data = result.data;
+                const d = data.publish_date ? new Date(data.publish_date) : new Date();
+
+                setFormData(prev => ({
+                    ...prev,
+                    title: data.title || prev.title,
+                    content: data.text || prev.content,
+                    date: d.toISOString().split('T')[0],
+                    imageUrl: data.image || prev.imageUrl,
+                    sentiment: data.sentiment || prev.sentiment,
+                }));
+            } else {
+                alert(t('extract_failed'));
+            }
+        } catch (error) {
+            console.error("Extraction error:", error);
+            alert(t('extract_failed'));
+        } finally {
+            setIsExtracting(false);
         }
     };
 
@@ -159,16 +191,34 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         </div>
                         <div>
                             <label htmlFor="article_url" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('url_optional')}</label>
-                            <input
-                                id="article_url"
-                                name="article_url"
-                                type="url"
-                                placeholder="https://..."
-                                value={formData.url}
-                                onChange={e => setFormData({ ...formData, url: e.target.value })}
-                                autoComplete="off"
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
-                            />
+                            <div className="flex gap-2">
+                                <input
+                                    id="article_url"
+                                    name="article_url"
+                                    type="url"
+                                    placeholder="https://..."
+                                    value={formData.url}
+                                    onChange={e => setFormData({ ...formData, url: e.target.value })}
+                                    autoComplete="off"
+                                    className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleExtract}
+                                    disabled={!formData.url || isExtracting}
+                                    className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0"
+                                    title={t('fetch_article')}
+                                >
+                                    {isExtracting ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Wand2 className="w-4 h-4" />
+                                    )}
+                                    <span className="hidden sm:inline">
+                                        {isExtracting ? t('extracting') : t('fetch_article')}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -289,7 +339,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

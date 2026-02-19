@@ -7,6 +7,8 @@ import { api } from '../../../../../convex/_generated/api';
 import { Save, Upload, Loader2, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
+import PhylloConnectButton from '@/components/PhylloConnect';
+import { Link2 } from 'lucide-react';
 
 export default function SettingsPage() {
     const t = useTranslations('Settings');
@@ -20,6 +22,15 @@ export default function SettingsPage() {
     const [geminiKey, setGeminiKey] = useState('');
     const [instagramKey, setInstagramKey] = useState('');
     const [twitterKey, setTwitterKey] = useState('');
+    const [twitterBearer, setTwitterBearer] = useState('');
+    const [twitterConsumerKey, setTwitterConsumerKey] = useState('');
+    const [twitterConsumerSecret, setTwitterConsumerSecret] = useState('');
+    const [newsdataKey, setNewsdataKey] = useState('');
+    const [newsapiKey, setNewsapiKey] = useState('');
+    const [gnewsKey, setGnewsKey] = useState('');
+    const [worldnewsKey, setWorldnewsKey] = useState('');
+    const [phylloClientId, setPhylloClientId] = useState('');
+    const [phylloClientSecret, setPhylloClientSecret] = useState('');
     const [targetCountries, setTargetCountries] = useState('AE,SA');
     const [aveMultiplier, setAveMultiplier] = useState(0.005);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -30,6 +41,15 @@ export default function SettingsPage() {
             setGeminiKey(settings.apiKeys?.gemini || '');
             setInstagramKey(settings.apiKeys?.instagram || '');
             setTwitterKey(settings.apiKeys?.twitter || '');
+            setTwitterBearer(settings.apiKeys?.twitterBearer || '');
+            setTwitterConsumerKey(settings.apiKeys?.twitterConsumerKey || '');
+            setTwitterConsumerSecret(settings.apiKeys?.twitterConsumerSecret || '');
+            setNewsdataKey(settings.apiKeys?.newsdata || '');
+            setNewsapiKey(settings.apiKeys?.newsapi || '');
+            setGnewsKey(settings.apiKeys?.gnews || '');
+            setWorldnewsKey(settings.apiKeys?.worldnews || '');
+            setPhylloClientId(settings.apiKeys?.phylloClientId || '');
+            setPhylloClientSecret(settings.apiKeys?.phylloClientSecret || '');
             setTargetCountries(settings.defaults?.targetCountries?.join(',') || 'AE,SA');
             setAveMultiplier(settings.defaults?.aveMultiplier || 0.005);
         }
@@ -56,6 +76,15 @@ export default function SettingsPage() {
                     gemini: geminiKey,
                     instagram: instagramKey,
                     twitter: twitterKey,
+                    twitterBearer: twitterBearer,
+                    twitterConsumerKey: twitterConsumerKey,
+                    twitterConsumerSecret: twitterConsumerSecret,
+                    newsdata: newsdataKey,
+                    newsapi: newsapiKey,
+                    gnews: gnewsKey,
+                    worldnews: worldnewsKey,
+                    phylloClientId: phylloClientId,
+                    phylloClientSecret: phylloClientSecret,
                 },
                 defaults: {
                     targetCountries: targetCountries.split(',').map(c => c.trim().toUpperCase()),
@@ -164,6 +193,105 @@ export default function SettingsPage() {
                                 className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
                             />
                         </div>
+                        <div>
+                            <label htmlFor="twitter-bearer" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_bearer')}</label>
+                            <input
+                                id="twitter-bearer"
+                                name="twitter_bearer"
+                                type="password"
+                                value={twitterBearer}
+                                onChange={(e) => setTwitterBearer(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="twitter-consumer-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_consumer_key')}</label>
+                            <input
+                                id="twitter-consumer-key"
+                                name="twitter_consumer_key"
+                                type="password"
+                                value={twitterConsumerKey}
+                                onChange={(e) => setTwitterConsumerKey(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="twitter-consumer-secret" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_consumer_secret')}</label>
+                            <input
+                                id="twitter-consumer-secret"
+                                name="twitter_consumer_secret"
+                                type="password"
+                                value={twitterConsumerSecret}
+                                onChange={(e) => setTwitterConsumerSecret(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="newsdata-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('newsdata_key')}</label>
+                            <input
+                                id="newsdata-key"
+                                name="newsdata_key"
+                                type="password"
+                                value={newsdataKey}
+                                onChange={(e) => setNewsdataKey(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="newsapi-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('newsapi_key')}</label>
+                            <input
+                                id="newsapi-key"
+                                name="newsapi_key"
+                                type="password"
+                                value={newsapiKey}
+                                onChange={(e) => setNewsapiKey(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="gnews-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('gnews_key')}</label>
+                            <input
+                                id="gnews-key"
+                                name="gnews_key"
+                                type="password"
+                                value={gnewsKey}
+                                onChange={(e) => setGnewsKey(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="worldnews-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('worldnews_key')}</label>
+                            <input
+                                id="worldnews-key"
+                                name="worldnews_key"
+                                type="password"
+                                value={worldnewsKey}
+                                onChange={(e) => setWorldnewsKey(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="phyllo-client-id" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('phyllo_client_id')}</label>
+                            <input
+                                id="phyllo-client-id"
+                                name="phyllo_client_id"
+                                type="text"
+                                value={phylloClientId}
+                                onChange={(e) => setPhylloClientId(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="phyllo-client-secret" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('phyllo_client_secret')}</label>
+                            <input
+                                id="phyllo-client-secret"
+                                name="phyllo_client_secret"
+                                type="password"
+                                value={phylloClientSecret}
+                                onChange={(e) => setPhylloClientSecret(e.target.value)}
+                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
+                            />
+                        </div>
                     </div>
                 </section>
 
@@ -201,8 +329,25 @@ export default function SettingsPage() {
                 </section>
             </div>
 
-            {/* Billing History Section */}
+            {/* Social Integrations Section */}
             <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2 mb-6">
+                    <Link2 className="h-6 w-6 text-indigo-600" />
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Social Integrations</h2>
+                </div>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-900/20">
+                    <div>
+                        <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-1">Creator Account Connection</h3>
+                        <p className="text-sm text-indigo-700/70 dark:text-indigo-300/60 max-w-md">
+                            Connect your social accounts via Phyllo to track engagement, audience insights, and performance metrics directly in your dashboard.
+                        </p>
+                    </div>
+                    <PhylloConnectButton className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 dark:shadow-none whitespace-nowrap" />
+                </div>
+            </section>
+
+            {/* Billing History Section */}
+            < section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700" >
                 <div className="flex items-center gap-2 mb-6">
                     <CreditCard className="h-6 w-6 text-blue-600" />
                     <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{t('billing')}</h2>
@@ -240,8 +385,8 @@ export default function SettingsPage() {
                                         </td>
                                         <td className="py-4 px-4 text-sm">
                                             <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${payment.status === 'paid'
-                                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                                                 }`}>
                                                 {payment.status}
                                             </span>
@@ -252,7 +397,7 @@ export default function SettingsPage() {
                         </tbody>
                     </table>
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
     );
 }

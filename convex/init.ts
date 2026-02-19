@@ -100,6 +100,41 @@ export const seed = mutation({
             await ctx.db.insert("case_studies", study);
         }
 
+        // 4. Seed/Update Global App Settings
+        const existingSettings = await ctx.db.query("app_settings").filter(q => q.eq(q.field("type"), "global")).first();
+        if (existingSettings) {
+            await ctx.db.patch(existingSettings._id, {
+                apiKeys: {
+                    ...existingSettings.apiKeys,
+                    phylloClientId: "8100b456-be56-4ef9-b0c3-054ad8bdc664",
+                    phylloClientSecret: "f975fba7-e7b7-4110-ae4e-ce004e00d3e1"
+                }
+            });
+        } else {
+            await ctx.db.insert("app_settings", {
+                type: "global",
+                logoUrl: "",
+                apiKeys: {
+                    gemini: "",
+                    instagram: "",
+                    twitter: "",
+                    twitterBearer: "",
+                    twitterConsumerKey: "",
+                    twitterConsumerSecret: "",
+                    newsdata: "",
+                    newsapi: "",
+                    gnews: "",
+                    worldnews: "",
+                    phylloClientId: "8100b456-be56-4ef9-b0c3-054ad8bdc664",
+                    phylloClientSecret: "f975fba7-e7b7-4110-ae4e-ce004e00d3e1"
+                },
+                defaults: {
+                    targetCountries: ["AE", "SA"],
+                    aveMultiplier: 0.005
+                }
+            });
+        }
+
         return "Database seeded successfully!";
     }
 });

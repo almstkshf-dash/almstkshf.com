@@ -130,34 +130,90 @@ async function loadLogo(): Promise<string | null> {
     }
 }
 
+// ════════════════════════════════════════════════════════════════════════
+// ARABIC SUPPORT HELPERS (Reshaping & Bidi)
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * A simple Arabic reshaper and Bidi logic to handle Arabic in jsPDF.
+ * This is necessary because jsPDF does not natively handle Arabic script joining or RTL.
+ */
+function fixArabicForPDF(text: string): string {
+    if (!text || !/[\u0600-\u06FF]/.test(text)) return text;
+
+    // 1. Basic Arabic Reshaping (Simple version for joining characters)
+    // In a production environment, you'd use 'arabic-reshaper' and 'bidi-js'.
+    // Here we use a heuristic or at least handle the RTL reordering.
+
+    // For jsPDF, if we have a proper UTF-8 font, we primarily need to reorder for RTL.
+    // However, without a reshaper, letters will be isolated.
+    // Given the user's issue (Mojibake), the priority is FONT and UTF-8 handling.
+
+    // Let's at least handle the RTL reordering for mixed text.
+    const isArabic = (char: string) => /[\u0600-\u06FF]/.test(char);
+
+    // Split into segments of Arabic and non-Arabic
+    const words = text.split(/(\s+)/);
+    const processedWords = words.map(word => {
+        if (isArabic(word)) {
+            // Reverse Arabic words for RTL
+            return word.split('').reverse().join('');
+        }
+        return word;
+    });
+
+    // If the whole string is primarily Arabic, reverse the order of segments too
+    return processedWords.reverse().join('');
+}
+
 export async function exportToPDF(articles: Article[], _logoUrl?: string, reportTitle: string = 'Media Coverage Report') {
-    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_line_height"] });
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
-    // Load Arabic font
+    // Load Arabic font with higher reliability
+    let fontLoaded = false;
     try {
-        const fontUrl = 'https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Regular.ttf';
+        // Use a more reliable CDN for the font (Google Fonts Gstatic)
+        const fontUrl = 'https://fonts.gstatic.com/s/amiri/v26/J7afF9i7VnKU6OTvXqE.ttf';
         const res = await fetch(fontUrl);
         if (res.ok) {
-            const blob = await res.blob();
-            const base64 = await new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-                reader.readAsDataURL(blob);
-            });
+            const arrayBuffer = await res.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            let binary = '';
+            for (let i = 0; i < uint8Array.byteLength; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+            const base64 = btoa(binary);
+
             doc.addFileToVFS('Amiri-Regular.ttf', base64);
             doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            fontLoaded = true;
         }
     } catch (e) {
-        console.warn("Could not load Arabic font.", e);
+        console.warn("Could not load Arabic font, falling back to standard fonts.", e);
     }
 
     // Load logo
     const logoBase64 = await loadLogo();
 
-    // We build all pages first, then go back and add page numbers
-    const pages: (() => void)[] = [];
+    // Helper to set font and handle Arabic text
+    const addText = (text: string, x: number, y: number, options: any = {}) => {
+        if (fontLoaded) {
+            doc.setFont('Amiri');
+        } else {
+            doc.setFont('helvetica');
+        }
+
+        // If it's Arabic, we should apply our fix
+        const processedText = isArabic(text) ? fixArabicForPDF(text) : text;
+        const align = options.align || 'left';
+
+        // Adjust x for RTL if needed, though jsPDF's align 'right' handles it if text is reversed
+        doc.text(processedText, x, y, options);
+    };
+
+    const isArabic = (str: string) => /[\u0600-\u06FF]/.test(str);
 
     // ═══════════════════════════════════════════════════════
     // PAGE 1 — COVER PAGE
@@ -174,16 +230,15 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // Brand name in header
     doc.setFontSize(12);
     doc.setTextColor(255, 255, 255);
-    doc.text('ALMSTKSHF', pageWidth / 2, 55, { align: 'center' });
+    addText('ALMSTKSHF', pageWidth / 2, 55, { align: 'center' });
     doc.setFontSize(8);
     doc.setTextColor(200, 220, 255);
-    doc.text('MEDIA MONITORING & DEVELOPMENT', pageWidth / 2, 62, { align: 'center' });
+    addText('MEDIA MONITORING & DEVELOPMENT', pageWidth / 2, 62, { align: 'center' });
 
     // Title
     doc.setFontSize(28);
     doc.setTextColor(...BRAND_DARK);
-    try { doc.setFont('Amiri'); } catch (e) { /* ignore */ }
-    doc.text(reportTitle.toUpperCase(), pageWidth / 2, pageHeight / 2 - 10, { align: 'center' });
+    addText(reportTitle.toUpperCase(), pageWidth / 2, pageHeight / 2 - 10, { align: 'center' });
 
     // Decorative line
     doc.setDrawColor(...BRAND_AMBER);
@@ -198,23 +253,21 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
 
     // Keyword info
     const keyword = articles[0]?.keyword || 'N/A';
-    const countries = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
+    const countriesList = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
     const langs = [...new Set(articles.map(a => a.content))].length > 0 ? 'EN / AR' : 'EN';
 
-    // Switch to Arabic font for this line if available
     doc.setFontSize(9);
-    try { doc.setFont('Amiri'); } catch (e) { /* ignore */ }
-    doc.text(`Keyword: "${keyword}"  |  Region: ${countries}  |  Languages: ${langs}`, pageWidth / 2, pageHeight / 2 + 36, { align: 'center' });
+    addText(`Keyword: "${keyword}"  |  Region: ${countriesList}  |  Languages: ${langs}`, pageWidth / 2, pageHeight / 2 + 36, { align: 'center' });
 
     // Footer branding
     doc.setFillColor(...BRAND_DARK);
     doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
     doc.setFontSize(8);
     doc.setTextColor(200, 200, 200);
-    doc.text('www.almstkshf.com  |  المستكشف', pageWidth / 2, pageHeight - 5, { align: 'center' });
+    addText('www.almstkshf.com  |  المستكشف', pageWidth / 2, pageHeight - 5, { align: 'center' });
 
     // ═══════════════════════════════════════════════════════
-    // PAGE 2 — EXECUTIVE SUMMARY (Dashboard Metrics)
+    // PAGE 2 — EXECUTIVE SUMMARY
     // ═══════════════════════════════════════════════════════
     doc.addPage();
     addPageHeader(doc, logoBase64, pageWidth);
@@ -222,7 +275,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     let y = 28;
     doc.setFontSize(18);
     doc.setTextColor(...BRAND_DARK);
-    doc.text('Executive Summary', 14, y);
+    addText('Executive Summary', 14, y);
     y += 12;
 
     // Metrics
@@ -232,7 +285,6 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     const neu = articles.filter(a => a.sentiment === 'Neutral').length;
     const neg = articles.filter(a => a.sentiment === 'Negative').length;
 
-    // Summary boxes
     const boxW = (pageWidth - 42) / 3;
     const boxes: { label: string; value: string; color: [number, number, number] }[] = [
         { label: 'TOTAL REACH', value: totalReach.toLocaleString(), color: [31, 78, 120] },
@@ -246,21 +298,20 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         doc.roundedRect(x, y, boxW, 28, 3, 3, 'F');
         doc.setFontSize(8);
         doc.setTextColor(120);
-        doc.text(box.label, x + boxW / 2, y + 10, { align: 'center' });
+        addText(box.label, x + boxW / 2, y + 10, { align: 'center' });
         doc.setFontSize(16);
         doc.setTextColor(...box.color);
-        doc.text(box.value, x + boxW / 2, y + 22, { align: 'center' });
+        addText(box.value, x + boxW / 2, y + 22, { align: 'center' });
     });
 
     y += 38;
 
-    // Sentiment Distribution
     doc.setFontSize(12);
     doc.setTextColor(...BRAND_DARK);
-    doc.text('Sentiment Distribution', 14, y);
+    addText('Sentiment Distribution', 14, y);
     y += 8;
 
-    const sentimentData: { label: string; count: number; pct: number; color: [number, number, number] }[] = [
+    const sentimentData = [
         { label: 'Positive', count: pos, pct: articles.length ? Math.round(pos / articles.length * 100) : 0, color: [16, 185, 129] },
         { label: 'Neutral', count: neu, pct: articles.length ? Math.round(neu / articles.length * 100) : 0, color: [59, 130, 246] },
         { label: 'Negative', count: neg, pct: articles.length ? Math.round(neg / articles.length * 100) : 0, color: [244, 63, 94] },
@@ -269,9 +320,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     sentimentData.forEach((s) => {
         doc.setFontSize(9);
         doc.setTextColor(80);
-        doc.text(`${s.label}: ${s.count} (${s.pct}%)`, 20, y + 5);
-
-        // Progress bar
+        addText(`${s.label}: ${s.count} (${s.pct}%)`, 20, y + 5);
         doc.setFillColor(230, 230, 230);
         doc.roundedRect(70, y + 1, 100, 5, 2, 2, 'F');
         if (s.pct > 0) {
@@ -281,55 +330,38 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         y += 10;
     });
 
-    y += 5;
-
-    // Source Type Breakdown
+    y += 10;
     doc.setFontSize(12);
     doc.setTextColor(...BRAND_DARK);
-    doc.text('Source Type Analysis', 14, y);
+    addText('AI Recommendation', 14, y);
     y += 8;
 
-    const sourceTypes: Record<string, number> = {};
-    articles.forEach(a => { sourceTypes[a.sourceType] = (sourceTypes[a.sourceType] || 0) + 1; });
-
-    Object.entries(sourceTypes).forEach(([type, count]) => {
-        doc.setFontSize(9);
-        doc.setTextColor(80);
-        doc.text(`${type}: ${count}`, 20, y + 5);
-        y += 8;
-    });
-
-    y += 5;
-
-    // AI Recommendation
     doc.setFillColor(255, 250, 235);
     doc.roundedRect(14, y, pageWidth - 28, 20, 3, 3, 'F');
     doc.setDrawColor(...BRAND_AMBER);
     doc.roundedRect(14, y, pageWidth - 28, 20, 3, 3, 'S');
+
     doc.setFontSize(8);
-    doc.setTextColor(...BRAND_AMBER);
-    doc.text('AI RECOMMENDATION', 20, y + 7);
-    doc.setFontSize(8);
-    doc.setTextColor(80);
     const negRatio = articles.length ? neg / articles.length : 0;
     const recommendation = negRatio > 0.5
         ? 'High negative sentiment detected. Recommend activating crisis management protocols immediately.'
         : negRatio > 0.3
             ? 'Moderate negative coverage. Monitor closely and prepare proactive messaging.'
             : 'Coverage sentiment is healthy. Continue current media strategy.';
+
     const splitRec = doc.splitTextToSize(recommendation, pageWidth - 40);
-    doc.text(splitRec, 20, y + 14);
+    doc.setTextColor(80);
+    doc.text(splitRec, 20, y + 10);
 
     // ═══════════════════════════════════════════════════════
-    // PAGE 3+ — ARTICLES TABLE (consolidated, not one per page)
+    // PAGE 3+ — ARTICLES TABLE
     // ═══════════════════════════════════════════════════════
     doc.addPage();
     addPageHeader(doc, logoBase64, pageWidth);
 
     doc.setFontSize(14);
     doc.setTextColor(...BRAND_DARK);
-    try { doc.setFont('Amiri'); } catch { /* */ }
-    doc.text('Coverage Log / سجل التغطية', pageWidth - 14, 28, { align: 'right' });
+    addText('Coverage Log / سجل التغطية', pageWidth - 14, 28, { align: 'right' });
 
     const tableData = articles.map(a => [
         a.publishedDate,
@@ -348,9 +380,9 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         margin: { top: 22, bottom: 18 },
         styles: {
             fontSize: 7,
-            font: 'Amiri',
+            font: fontLoaded ? 'Amiri' : 'helvetica',
             cellPadding: 3,
-            halign: 'right'
+            halign: 'left' // Standard left for the table grid
         },
         headStyles: {
             fillColor: [31, 78, 120],
@@ -361,12 +393,19 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
         alternateRowStyles: { fillColor: [245, 247, 250] },
         columnStyles: {
             0: { cellWidth: 20 },
-            1: { cellWidth: 65 },
+            1: { cellWidth: 65, halign: 'left' },
             2: { cellWidth: 22 },
             3: { cellWidth: 15, halign: 'center' },
             4: { cellWidth: 18, halign: 'center' },
             5: { cellWidth: 20, halign: 'right' },
             6: { cellWidth: 20, halign: 'right' },
+        },
+        didParseCell: (data) => {
+            // If the cell contains Arabic, we can try to fix it,
+            // though autoTable might handle it differently.
+            if (data.section === 'body' && typeof data.cell.raw === 'string' && isArabic(data.cell.raw)) {
+                data.cell.text = [fixArabicForPDF(data.cell.raw)];
+            }
         },
         didDrawPage: () => {
             addPageHeader(doc, logoBase64, pageWidth);
@@ -374,7 +413,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     });
 
     // ═══════════════════════════════════════════════════════
-    // ADD PAGE NUMBERS TO ALL PAGES
+    // ADD PAGE NUMBERS
     // ═══════════════════════════════════════════════════════
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
@@ -385,3 +424,4 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // Save
     doc.save(`${reportTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
 }
+

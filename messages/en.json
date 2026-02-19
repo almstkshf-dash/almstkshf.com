@@ -920,7 +920,16 @@
     "api_keys": "API Configuration",
     "gemini_key": "Gemini API Key",
     "instagram_key": "Instagram API Key",
-    "twitter_key": "Twitter API Key",
+    "twitter_key": "Twitter API Key (Legacy)",
+    "twitter_bearer": "Twitter Bearer Token",
+    "twitter_consumer_key": "Twitter Consumer Key",
+    "twitter_consumer_secret": "Twitter Consumer Secret",
+    "newsdata_key": "NewsData.io API Key",
+    "newsapi_key": "NewsAPI.org API Key",
+    "gnews_key": "GNews.io API Key",
+    "worldnews_key": "World News API Key",
+    "phyllo_client_id": "Phyllo Client ID",
+    "phyllo_client_secret": "Phyllo Client Secret",
     "defaults": "Default Metrics",
     "target_countries": "Target Countries",
     "ave_multiplier": "AVE Multiplier",
@@ -968,7 +977,10 @@
       "neutral": "Neutral",
       "negative": "Negative"
     },
-    "save_failed": "Failed to save article. Please try again."
+    "save_failed": "Failed to save article. Please try again.",
+    "fetch_article": "Fetch & Auto-Analyze",
+    "extracting": "Extracting...",
+    "extract_failed": "Failed to extract content. Please check the URL or fulfill manually."
   },
   "ArticleTable": {
     "no_articles": "No articles found. Start monitoring or add manually.",

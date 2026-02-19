@@ -985,7 +985,16 @@
         "api_keys": "تكوين واجهة برمجة التطبيقات (API)",
         "gemini_key": "مفتاح Gemini API",
         "instagram_key": "مفتاح Instagram API",
-        "twitter_key": "مفتاح Twitter API",
+        "twitter_key": "مفتاح Twitter API (قديم)",
+        "twitter_bearer": "Bearer Token لنظام X/Twitter",
+        "twitter_consumer_key": "Consumer Key لنظام X/Twitter",
+        "twitter_consumer_secret": "Consumer Secret لنظام X/Twitter",
+        "newsdata_key": "مفتاح NewsData.io API",
+        "newsapi_key": "مفتاح NewsAPI.org API",
+        "gnews_key": "مفتاح GNews.io API",
+        "worldnews_key": "مفتاح World News API",
+        "phyllo_client_id": "معرف العميل (Phyllo Client ID)",
+        "phyllo_client_secret": "سر العميل (Phyllo Client Secret)",
         "defaults": "المقاييس الافتراضية",
         "target_countries": "الدول المستهدفة",
         "ave_multiplier": "مضاعف قيمة الإعلان (AVE)",
@@ -1033,7 +1042,10 @@
             "neutral": "محايد",
             "negative": "سلبي"
         },
-        "save_failed": "فشل في حفظ المقال. يرجى المحاولة مرة أخرى."
+        "save_failed": "فشل في حفظ المقال. يرجى المحاولة مرة أخرى.",
+        "fetch_article": "جلب وتحليل تلقائي",
+        "extracting": "جاري الاستخراج...",
+        "extract_failed": "فشل استخراج المحتوى. يرجى التحقق من الرابط أو التعبئة يدوياً."
     },
     "NewsGenerator": {
         "monitor_keyword": "مراقبة الكلمات المفتاحية",

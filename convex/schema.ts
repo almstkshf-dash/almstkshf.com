@@ -39,7 +39,16 @@ export default defineSchema({
         apiKeys: v.object({
             gemini: v.optional(v.string()),
             instagram: v.optional(v.string()),
-            twitter: v.optional(v.string()),
+            twitter: v.optional(v.string()), // Deprecated, keeping for safety
+            twitterBearer: v.optional(v.string()),
+            twitterConsumerKey: v.optional(v.string()),
+            twitterConsumerSecret: v.optional(v.string()),
+            newsdata: v.optional(v.string()),
+            newsapi: v.optional(v.string()),
+            gnews: v.optional(v.string()),
+            worldnews: v.optional(v.string()),
+            phylloClientId: v.optional(v.string()),
+            phylloClientSecret: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -58,6 +67,7 @@ export default defineSchema({
     user_settings: defineTable({
         userId: v.string(),
         kycStatus: v.union(v.literal("Pending"), v.literal("Verified"), v.literal("Rejected")),
+        phylloUserId: v.optional(v.string()),
         integrationApiKeys: v.optional(v.object({
             serviceA: v.string(),
             serviceB: v.string(),
