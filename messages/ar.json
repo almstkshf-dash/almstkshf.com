@@ -56,8 +56,8 @@
         "priority": "الأولوية",
         "download": "تحميل PDF",
         "view_details": "عرض التفاصيل",
-        "generate_report": "إنشاء تقرير",
-        "analyze_tone": "تحليل النبرة",
+    "generate_report": "إنشاء تقرير",
+    "analyze_tone": "تحليل النبرة",
         "toggle_theme": "تبديل المظهر",
         "ai_badge": "ذكاء اصطناعي",
         "image_unavailable": "الصورة غير متوفرة",
@@ -1093,5 +1093,35 @@
     },
     "Pricing": {
         "title": "الخطط والأسعار"
+    },
+    "Osint": {
+        "title": "مصادر OSINT",
+        "subtitle": "روابط منسقة مجانية أو بواجهة تسجيل فقط. يرجى احترام شروط الاستخدام وملف robots.",
+        "filters": {
+            "category": "الفئة",
+            "label": "التصنيف",
+            "language": "اللغة",
+            "free": "متاح مجاناً",
+            "free_label": "مجاني/يحوي باقة مجانية",
+            "search": "بحث",
+            "search_placeholder": "ابحث في المصادر"
+        },
+        "legend": {
+            "title": "الدليل",
+            "notice": "الروابط لطرف ثالث. احترم شروطهم وملف robots.txt. لا للزحف الآلي.",
+            "T": "أداة للتثبيت المحلي",
+            "R": "يتطلب تسجيل",
+            "M": "تعديل الرابط يدوياً",
+            "D": "بحث جوجل متقدم"
+        },
+        "badges": {
+            "free": "باقة مجانية"
+        },
+        "pagination": {
+            "showing": "عرض {count} من {total}",
+            "page": "الصفحة {page} / {total}",
+            "prev": "السابق",
+            "next": "التالي"
+        }
     }
 }

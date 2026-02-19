@@ -46,6 +46,36 @@
     "login": "Sign In",
     "signup": "Sign Up"
   },
+  "Osint": {
+    "title": "OSINT Resources",
+    "subtitle": "Curated, free/registration-friendly links. Respect ToS/robots.",
+    "filters": {
+      "category": "Category",
+      "label": "Label",
+      "language": "Language",
+      "free": "Free tier",
+      "free_label": "Free/has free tier",
+      "search": "Search",
+      "search_placeholder": "Search resources"
+    },
+    "legend": {
+      "title": "Legend",
+      "notice": "Links are third-party. Respect their ToS/robots. No automated scraping.",
+      "T": "Tool (local install)",
+      "R": "Registration required",
+      "M": "Manual URL edit",
+      "D": "Google dork"
+    },
+    "badges": {
+      "free": "Free tier"
+    },
+    "pagination": {
+      "showing": "Showing {count} of {total}",
+      "page": "Page {page} / {total}",
+      "prev": "Prev",
+      "next": "Next"
+    }
+  },
   "Common": {
     "app_name": "ALMSTKSHF",
     "slogan": "We Develop To Lead",

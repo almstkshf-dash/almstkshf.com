@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
             sentiment: analysis.sentiment,
             sourceType: manualData?.sourceType || "Online News",
             sourceCountry: analysis.sourceCountry,
+            source: publisherName,
             reach: metrics.reach,
             ave: metrics.ave,
             imageUrl: imageUrl || undefined,
@@ -139,14 +140,16 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const limit = Number(searchParams.get("limit")) || 50;
+    const skip = Number(searchParams.get("skip")) || 0;
     const sourceType = searchParams.get("sourceType") || undefined;
 
     try {
-        const articles = await convex.query(api.monitoring.getArticles, {
+        const result = await convex.query(api.monitoring.getArticles, {
             limit,
+            skip,
             sourceType
-        });
-        return NextResponse.json({ success: true, count: articles.length, data: articles });
+        }) as any;
+        return NextResponse.json({ success: true, count: result?.items?.length || 0, total: result?.total || 0, nextSkip: result?.nextSkip ?? null, data: result?.items || [] });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

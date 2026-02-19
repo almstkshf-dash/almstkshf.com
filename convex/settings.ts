@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./utils/auth";
 
 export const getSettings = query({
     args: {},
@@ -41,6 +42,7 @@ export const updateSettings = mutation({
         }),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx.auth);
         const existing = await ctx.db
             .query("app_settings")
             .filter((q) => q.eq(q.field("type"), "global"))

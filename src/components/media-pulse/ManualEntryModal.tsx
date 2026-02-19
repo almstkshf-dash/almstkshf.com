@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useMutation, useAction } from 'convex/react';
+import { useMutation, useAction, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { X, Loader2, Plus, Wand2 } from 'lucide-react';
 
@@ -16,6 +16,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
     const saveArticle = useMutation(api.monitoring.saveArticle);
     const extractArticle = useAction(api.monitoringAction.extractArticle);
+    const settings = useQuery(api.settings.getSettings);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
@@ -44,9 +45,11 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
             const [year, month, day] = formData.date.split('-');
             const formattedDate = `${day}/${month}/${year}`;
 
-            // Calculate AVE: Reach × 0.02 × $5
-            const reach = formData.reach || 50000;
-            const ave = Math.round(reach * 0.02 * 5);
+            const aveMultiplier = settings?.defaults?.aveMultiplier ?? 0.005;
+            const reachValue = (formData.reach === null || formData.reach === undefined || Number.isNaN(formData.reach))
+                ? 50000
+                : formData.reach;
+            const ave = Math.round(reachValue * aveMultiplier * 5);
 
             // Detect language
             const isArabic = /[\u0600-\u06FF]/.test(formData.title + formData.content);
@@ -62,7 +65,8 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 sentiment: formData.sentiment as 'Positive' | 'Neutral' | 'Negative',
                 sourceType: formData.sourceType,
                 sourceCountry: formData.sourceCountry,
-                reach: reach,
+                source: formData.source || 'Manual Source',
+                reach: reachValue,
                 ave: ave,
                 imageUrl: formData.imageUrl || undefined,
                 isManual: true,
@@ -261,7 +265,14 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 type="number"
                                 placeholder={t('reach_placeholder')}
                                 value={formData.reach}
-                                onChange={e => setFormData({ ...formData, reach: Number(e.target.value) })}
+                                onChange={e => {
+                                    const raw = e.target.value;
+                                    if (raw === '') {
+                                        setFormData({ ...formData, reach: NaN as any });
+                                    } else {
+                                        setFormData({ ...formData, reach: Number(raw) });
+                                    }
+                                }}
                                 autoComplete="off"
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />

@@ -6,6 +6,7 @@ import Parser from 'rss-parser';
 import * as cheerio from 'cheerio';
 // @ts-ignore
 import NewsAPI from 'newsapi';
+import { requireAdmin } from "./utils/auth";
 
 // ═══════════════════════════════════════════════════════════════════
 // THE SPIDER — Inlined link resolver for Convex Node Runtime
@@ -161,37 +162,23 @@ export const fetchNews = action({
     },
     handler: async (ctx, args) => {
         try {
+            await requireAdmin(ctx.auth);
             const settings = await ctx.runQuery(api.settings.getSettings);
-            const geminiKeyFromSettings = settings?.apiKeys?.gemini?.trim();
-            const apiKey = geminiKeyFromSettings || process.env.GEMINI_API_KEY?.trim();
+            const apiKey = settings?.apiKeys?.gemini?.trim() || process.env.GEMINI_API_KEY?.trim();
 
             if (!apiKey) {
-                console.error("❌ CONFIG ERROR: No Gemini API Key found in Settings or Environment.");
-                return {
-                    success: false,
-                    error: "Media analysis service is not configured. Please add your Gemini API Key in the Settings page."
-                };
+                return { success: false, error: "Missing Gemini API key. Configure in Settings." };
             }
 
-            // Log if we are using a user-provided key
-            if (geminiKeyFromSettings) {
-                console.log("🔑 Using user-provided Gemini API Key from Settings.");
+            const newsdataKey = settings?.apiKeys?.newsdata?.trim() || process.env.NEWSDATA_API_KEY?.trim();
+            const newsapiKey = settings?.apiKeys?.newsapi?.trim() || process.env.NEWSAPI_API_KEY?.trim();
+            const gnewsKey = settings?.apiKeys?.gnews?.trim() || process.env.GNEWS_API_KEY?.trim();
+            const worldnewsKey = settings?.apiKeys?.worldnews?.trim() || process.env.WORLDNEWS_API_KEY?.trim();
+            const twitterBearer = settings?.apiKeys?.twitterBearer?.trim() || process.env.TWITTER_BEARER?.trim();
+
+            if (!newsdataKey || !newsapiKey || !gnewsKey || !worldnewsKey) {
+                return { success: false, error: "Missing news provider API keys. Configure in Settings." };
             }
-
-            const newsdataKeyFromSettings = settings?.apiKeys?.newsdata?.trim();
-            const newsdataKey = newsdataKeyFromSettings || "pub_c953d1a30bf0401cac72d59a57f25267";
-
-            const newsapiKeyFromSettings = settings?.apiKeys?.newsapi?.trim();
-            const newsapiKey = newsapiKeyFromSettings || "ade4d132366549959f24a22f7d5ae67b";
-
-            const gnewsKeyFromSettings = settings?.apiKeys?.gnews?.trim();
-            const gnewsKey = gnewsKeyFromSettings || "14c55959cbbbfc1cec343d13f8ab4f74";
-
-            const worldnewsKeyFromSettings = settings?.apiKeys?.worldnews?.trim();
-            const worldnewsKey = worldnewsKeyFromSettings || "ed054ea1d25f4064bf08cde3af94c623";
-
-            const twitterBearerFromSettings = settings?.apiKeys?.twitterBearer?.trim();
-            const twitterBearer = twitterBearerFromSettings || "AAAAAAAAAAAAAAAAAAAAAJHf7gEAAAAAKmyD9hYf6pd5ZA3MnKlws67ONMU%3DbWSTlEsCU1FHSpwctgg5Ub7CSaRdeI2QJeA46a2bvDu7HWDAfn";
 
             const parser = new Parser();
 
@@ -442,40 +429,40 @@ export const fetchNews = action({
                 }
             } catch (e) { console.error(`❌ WorldNews fail`, e); }
 
-            // 6. FETCH FROM TWITTER (X)
-            console.log(`📡 Fetching Twitter for: ${args.keyword}`);
-            try {
-                // Twitter v2 Recent Search: supports query, max_results, tweet.fields, expansions
-                const txQuery = encodeURIComponent(args.keyword);
-                let txUrl = `https://api.twitter.com/2/tweets/search/recent?query=${txQuery}&max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
+            // 6. FETCH FROM TWITTER (X) if configured
+            if (twitterBearer) {
+                console.log(`📡 Fetching Twitter for: ${args.keyword}`);
+                try {
+                    const txQuery = encodeURIComponent(args.keyword);
+                    let txUrl = `https://api.twitter.com/2/tweets/search/recent?query=${txQuery}&max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
 
-                const txRes = await fetch(txUrl, {
-                    headers: { 'Authorization': `Bearer ${twitterBearer}` }
-                });
+                    const txRes = await fetch(txUrl, {
+                        headers: { 'Authorization': `Bearer ${twitterBearer}` }
+                    });
 
-                if (txRes.ok) {
-                    const txData = await txRes.json();
-                    if (txData.data) {
-                        console.log(`📰 Found ${txData.data.length} tweets from X`);
-                        for (const tweet of txData.data) {
-                            // Map author_id to username if possible (simplified here)
-                            const author = txData.includes?.users?.find((u: any) => u.id === tweet.author_id)?.username || tweet.author_id;
+                    if (txRes.ok) {
+                        const txData = await txRes.json();
+                        if (txData.data) {
+                            console.log(`📰 Found ${txData.data.length} tweets from X`);
+                            for (const tweet of txData.data) {
+                                const author = txData.includes?.users?.find((u: any) => u.id === tweet.author_id)?.username || tweet.author_id;
 
-                            const success = await processArticle(ctx, {
-                                title: `Tweet by @${author}`,
-                                link: `https://twitter.com/${author}/status/${tweet.id}`,
-                                pubDate: tweet.created_at,
-                                contentSnippet: `Source: Twitter (@${author}). ${tweet.text}`,
-                                imageUrl: null // Twitter v2 requires more fields for media
-                            }, (countryList[0] || 'ae').toUpperCase(), languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false, "Social Media");
-                            if (success) totalSuccess++; else totalSkipped++;
+                                const success = await processArticle(ctx, {
+                                    title: `Tweet by @${author}`,
+                                    link: `https://twitter.com/${author}/status/${tweet.id}`,
+                                    pubDate: tweet.created_at,
+                                    contentSnippet: `Source: Twitter (@${author}). ${tweet.text}`,
+                                    imageUrl: null
+                                }, (countryList[0] || 'ae').toUpperCase(), languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false, "Social Media");
+                                if (success) totalSuccess++; else totalSkipped++;
+                            }
                         }
+                    } else {
+                        const txErr = await txRes.text();
+                        console.warn(`⚠️ Twitter API error: ${txRes.status}`, txErr);
                     }
-                } else {
-                    const txErr = await txRes.text();
-                    console.warn(`⚠️ Twitter API error: ${txRes.status}`, txErr);
-                }
-            } catch (e) { console.error(`❌ Twitter fail`, e); }
+                } catch (e) { console.error(`❌ Twitter fail`, e); }
+            }
 
             console.log(`📊 Done: ${totalSuccess} saved, ${totalSkipped} skipped`);
             return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: rssCombos.length + 1 + languageList.length + (languageList.length * countryList.length) + 1 + 1 };
@@ -497,8 +484,10 @@ export const extractArticle = action({
     handler: async (ctx, args) => {
         try {
             const settings = await ctx.runQuery(api.settings.getSettings);
-            const worldnewsKeyFromSettings = settings?.apiKeys?.worldnews?.trim();
-            const worldnewsKey = worldnewsKeyFromSettings || "ed054ea1d25f4064bf08cde3af94c623";
+            const worldnewsKey = settings?.apiKeys?.worldnews?.trim() || process.env.WORLDNEWS_API_KEY?.trim();
+            if (!worldnewsKey) {
+                return { success: false, error: "Missing WorldNews API key. Configure in Settings." };
+            }
 
             const result = await extractWithWorldNews(args.url, worldnewsKey, args.analyze || false);
             return { success: !!result, data: result };
@@ -548,8 +537,9 @@ async function processArticle(
         }
 
         // SPIDER — Resolve URL if needed (RSS redirects)
-        let resolvedUrl = item.link;
-        let imageUrl = item.imageUrl;
+    let resolvedUrl = item.link;
+    let imageUrl = item.imageUrl;
+    let sourceName = item.source || item.creator;
 
         if (shouldResolve) {
             console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
@@ -557,6 +547,7 @@ async function processArticle(
             if (resolved) {
                 resolvedUrl = resolved.finalUrl;
                 imageUrl = resolved.imageUrl || imageUrl;
+                sourceName = resolved.source || sourceName;
             }
         }
 
@@ -588,6 +579,7 @@ async function processArticle(
             sentiment: aiData.sentiment,
             sourceType: (forceSourceType || aiData.sourceType) as any,
             sourceCountry: country,
+            source: sourceName || new URL(resolvedUrl || item.link).hostname,
             tone: aiData.tone,
             risk: aiData.risk,
             reach: reach,

@@ -1,15 +1,21 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requireAdmin } from "./utils/auth";
 
 // 1. QUERY: Get all articles for the dashboard
 export const getArticles = query({
     args: {
         limit: v.optional(v.number()),
+        skip: v.optional(v.number()),
         sourceType: v.optional(v.string()),
         sourceCountry: v.optional(v.string()),
+        depth: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles").order("desc");
+        const limit = args.limit ?? 50;
+        const skip = args.skip ?? 0;
+
+        let q = ctx.db.query("media_monitoring_articles");
 
         if (args.sourceType && args.sourceType !== "All") {
             // @ts-ignore
@@ -20,8 +26,31 @@ export const getArticles = query({
             // @ts-ignore
             q = q.filter((q) => q.eq(q.field("sourceCountry"), args.sourceCountry));
         }
+        if (args.depth && args.depth !== "All") {
+            // @ts-ignore
+            q = q.filter((q) => q.eq(q.field("depth"), args.depth));
+        }
 
-        return await q.take(args.limit || 100);
+        const all = await q.collect();
+
+        const parseDate = (d: string) => {
+            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
+            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
+        };
+
+        all.sort((a: any, b: any) => {
+            const da = parseDate(a.publishedDate);
+            const db = parseDate(b.publishedDate);
+            if (db !== da) return db - da;
+            return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+        const slice = all.slice(skip, skip + limit);
+        return {
+            items: slice,
+            total: all.length,
+            nextSkip: skip + slice.length < all.length ? skip + slice.length : null,
+        };
     },
 });
 
@@ -38,6 +67,9 @@ export const saveArticle = mutation({
         sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
         sourceType: v.string(),
         sourceCountry: v.string(),
+        source: v.optional(v.string()),
+        depth: v.optional(v.string()),
+        ingestMethod: v.optional(v.string()),
         tone: v.optional(v.string()),
         risk: v.optional(v.string()),
         reach: v.number(),
@@ -46,6 +78,7 @@ export const saveArticle = mutation({
         isManual: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx.auth);
         // Ensure sourceType matches schema validator
         const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
         const sourceType = validSourceTypes.includes(args.sourceType)
@@ -69,6 +102,8 @@ export const saveArticle = mutation({
                 ...args,
                 createdAt: Date.now(),
                 sourceType: finalSourceType,
+                depth: args.depth ?? "standard",
+                ingestMethod: args.ingestMethod,
             });
         }
     },
@@ -78,6 +113,7 @@ export const saveArticle = mutation({
 export const deleteArticle = mutation({
     args: { id: v.id("media_monitoring_articles") },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx.auth);
         await ctx.db.delete(args.id);
     },
 });
@@ -86,6 +122,7 @@ export const deleteArticle = mutation({
 export const deleteAllArticles = mutation({
     args: {},
     handler: async (ctx) => {
+        await requireAdmin(ctx.auth);
         const articles = await ctx.db
             .query("media_monitoring_articles")
             .collect();
@@ -99,6 +136,7 @@ export const deleteAllArticles = mutation({
 export const deleteArticles = mutation({
     args: { ids: v.array(v.id("media_monitoring_articles")) },
     handler: async (ctx, args) => {
+        await requireAdmin(ctx.auth);
         for (const id of args.ids) {
             await ctx.db.delete(id);
         }

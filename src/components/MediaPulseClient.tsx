@@ -10,7 +10,8 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function MediaPulseClient() {
-    const articles = useQuery(api.monitoring.getArticles, { limit: 50 }) || [];
+    const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 }) as any;
+    const articles = articlesResult?.items || [];
     const analytics = useQuery(api.monitoring.getAnalyticsOverview, {}) || {
         nss: 0,
         riskScore: 0,

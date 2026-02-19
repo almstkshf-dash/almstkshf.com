@@ -22,6 +22,9 @@ export default defineSchema({
         language: v.union(v.literal("EN"), v.literal("AR")),
         sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
         sourceType: v.union(v.literal("Online News"), v.literal("Social Media"), v.literal("Blog"), v.literal("Print"), v.literal("Press Release")),
+        source: v.optional(v.string()),
+        depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
+        ingestMethod: v.optional(v.union(v.literal("api"), v.literal("rss"), v.literal("headless"))),
         tone: v.optional(v.string()),
         risk: v.optional(v.string()),
         sourceCountry: v.string(), // ISO Code
@@ -31,6 +34,14 @@ export default defineSchema({
         isManual: v.optional(v.boolean()), // To distinguish manual entries
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
+
+    ingestion_runs_deep: defineTable({
+        startedAt: v.number(),
+        status: v.union(v.literal("success"), v.literal("error")),
+        source: v.string(),
+        itemCount: v.number(),
+        error: v.optional(v.string()),
+    }).index("by_started_at", ["startedAt"]),
 
     // PART 3: SETTINGS
     app_settings: defineTable({

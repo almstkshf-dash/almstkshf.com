@@ -13,7 +13,8 @@ import { useTranslations } from "next-intl";
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
-    const articles = useQuery(api.monitoring.getArticles, { limit: 50 });
+    const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 }) as any;
+    const articles = articlesResult?.items;
     const [searchTerm, setSearchTerm] = useState("");
 
     const filteredArticles = articles?.filter((a: any) =>

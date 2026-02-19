@@ -11,6 +11,7 @@
 import type * as analyses from "../analyses.js";
 import type * as case_studies from "../case_studies.js";
 import type * as contact from "../contact.js";
+import type * as deepSources from "../deepSources.js";
 import type * as init from "../init.js";
 import type * as media from "../media.js";
 import type * as monitoring from "../monitoring.js";
@@ -19,6 +20,7 @@ import type * as payments from "../payments.js";
 import type * as phyllo from "../phyllo.js";
 import type * as queries from "../queries.js";
 import type * as settings from "../settings.js";
+import type * as utils_auth from "../utils/auth.js";
 import type * as waitlist from "../waitlist.js";
 
 import type {
@@ -31,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   analyses: typeof analyses;
   case_studies: typeof case_studies;
   contact: typeof contact;
+  deepSources: typeof deepSources;
   init: typeof init;
   media: typeof media;
   monitoring: typeof monitoring;
@@ -39,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   phyllo: typeof phyllo;
   queries: typeof queries;
   settings: typeof settings;
+  "utils/auth": typeof utils_auth;
   waitlist: typeof waitlist;
 }>;
 

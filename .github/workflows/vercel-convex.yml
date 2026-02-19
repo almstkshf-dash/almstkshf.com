@@ -1,4 +1,4 @@
-name: CI and Deploy (Convex only)
+name: CI and Deploy (Vercel + Convex)
 
 on:
   pull_request:
@@ -22,6 +22,9 @@ jobs:
       - run: npm run lint --if-present
       - run: npm run test --if-present
       - run: npm run build
+      - run: npx vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Convex (preview)
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY_PREVIEW }}
@@ -41,6 +44,9 @@ jobs:
       - run: npm run lint --if-present
       - run: npm run test --if-present
       - run: npm run build
+      - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Convex (production)
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY_PRODUCTION }}

@@ -1,6 +1,4 @@
 import ExcelJS from 'exceljs';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 interface Article {
     title: string;
@@ -9,6 +7,7 @@ interface Article {
     resolvedUrl?: string;
     sourceType: string;
     sourceCountry: string;
+    source?: string;
     sentiment: string;
     reach: number;
     ave: number;
@@ -29,6 +28,8 @@ export async function exportToExcel(articles: Article[], reportName: string = 'M
         { header: 'Title', key: 'title', width: 50 },
         { header: 'URL', key: 'url', width: 40 },
         { header: 'Type', key: 'type', width: 15 },
+        { header: 'Source', key: 'source', width: 18 },
+        { header: 'Depth', key: 'depth', width: 10 },
         { header: 'Country', key: 'country', width: 10 },
         { header: 'Sentiment', key: 'sentiment', width: 12 },
         { header: 'Reach', key: 'reach', width: 15 },
@@ -47,6 +48,8 @@ export async function exportToExcel(articles: Article[], reportName: string = 'M
             title: article.title,
             url: article.resolvedUrl || article.url,
             type: article.sourceType,
+            source: (article as any).source || '',
+            depth: (article as any).depth || 'standard',
             country: article.sourceCountry,
             sentiment: article.sentiment,
             reach: article.reach,
@@ -167,6 +170,19 @@ function fixArabicForPDF(text: string): string {
 }
 
 export async function exportToPDF(articles: Article[], _logoUrl?: string, reportTitle: string = 'Media Coverage Report') {
+    if (typeof window === 'undefined') throw new Error('PDF export is client-only');
+
+    // Dynamically load jspdf to avoid SSR bundling issues and provide a fallback path.
+    let jsPDF: any;
+    try {
+        const mod = await import('jspdf');
+        jsPDF = (mod as any).jsPDF || (mod as any).default;
+    } catch (err) {
+        const mod = await import('jspdf/dist/jspdf.umd.min.js');
+        jsPDF = (mod as any).jsPDF || (mod as any).default;
+    }
+    const autoTable = (await import('jspdf-autotable')).default;
+
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_line_height"] });
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
