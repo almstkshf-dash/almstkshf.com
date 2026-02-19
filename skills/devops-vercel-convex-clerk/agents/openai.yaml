@@ -1,0 +1,6 @@
+interface:
+  display_name: "DevOps: Vercel + Convex + Clerk"
+  short_description: "Set up CI/CD for GitHub → Vercel with Convex backend and Clerk auth."
+  default_prompt: "Use $devops-vercel-convex-clerk to wire GitHub Actions, Vercel, Convex deploy keys, and Clerk envs for this repo."
+policy:
+  allow_implicit_invocation: true
