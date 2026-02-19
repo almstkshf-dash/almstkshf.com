@@ -4,8 +4,13 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
+interface ReportsChartPoint {
+    timestamp?: number;
+    publishedDate?: string;
+}
+
 interface ReportsChartProps {
-    data: any[];
+    data: ReportsChartPoint[];
 }
 
 export default function ReportsChart({ data }: ReportsChartProps) {
@@ -16,9 +21,28 @@ export default function ReportsChart({ data }: ReportsChartProps) {
         setMounted(true);
     }, []);
 
+    const parsePublishedDate = (publishedDate?: string) => {
+        if (!publishedDate) return null;
+        const [day, month, year] = publishedDate.split("/");
+        if (!day || !month || !year) return null;
+
+        const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+        if (Number.isNaN(parsed.getTime())) return null;
+
+        return parsed;
+    };
+
     // Process data to group by date
-    const processedData = data?.reduce((acc: any[], report: any) => {
-        const date = new Date(report.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const processedData = data?.reduce((acc: { date: string; count: number }[], report) => {
+        const reportDate = typeof report.timestamp === "number"
+            ? new Date(report.timestamp)
+            : parsePublishedDate(report.publishedDate);
+
+        if (!reportDate || Number.isNaN(reportDate.getTime())) {
+            return acc;
+        }
+
+        const date = reportDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
         const existing = acc.find(item => item.date === date);
         if (existing) {
             existing.count += 1;

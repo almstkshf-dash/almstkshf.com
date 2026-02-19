@@ -110,10 +110,10 @@ export default async function RootLayout({
     setRequestLocale(locale);
     const messages = await getMessages();
     const dir = locale === "ar" ? "rtl" : "ltr";
+    const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-    return (
-        <ClerkProvider>
-            <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
+    const appTree = (
+        <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
                 <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                     <NextIntlClientProvider locale={locale} messages={messages}>
                         <ConvexClientProvider>
@@ -146,7 +146,17 @@ export default async function RootLayout({
                         }}
                     />
                 </body>
-            </html>
+        </html>
+    );
+
+    if (!publishableKey) {
+        console.warn("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing. Rendering without ClerkProvider for non-auth routes.");
+        return appTree;
+    }
+
+    return (
+        <ClerkProvider publishableKey={publishableKey}>
+            {appTree}
         </ClerkProvider>
     );
 }

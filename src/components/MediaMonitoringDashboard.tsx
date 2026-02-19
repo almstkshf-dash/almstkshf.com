@@ -1,39 +1,73 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
-import { Filter, Mic2, Radio, Newspaper, FileText, Download } from "lucide-react";
+import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
 import CrisisPlanCard from "./CrisisPlanCard";
 import { SkeletonReportRow, SkeletonCard } from "./ui/Skeleton";
 import ReportsChart from "./ReportsChart";
 
+type LegacyFilter = "TV" | "Radio" | "Press";
+type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
+
+type DashboardFilter = LegacyFilter | ArticleFilter;
+
 interface DashboardProps {
-    defaultFilter?: "TV" | "Radio" | "Press";
+    defaultFilter?: DashboardFilter;
+}
+
+interface DashboardArticle {
+    _id: string;
+    title: string;
+    sentiment: "Positive" | "Neutral" | "Negative";
+    sourceType: string;
+    publishedDate: string;
+}
+
+interface FilterOption {
+    label: string;
+    value: ArticleFilter;
+    icon: LucideIcon;
+    href: string;
+}
+
+function normalizeFilter(filter?: DashboardFilter): ArticleFilter {
+    if (!filter) return "All";
+
+    if (filter === "Press") return "Press Release";
+    if (filter === "TV" || filter === "Radio") return "All";
+
+    return filter;
 }
 
 export default function MediaMonitoringDashboard({ defaultFilter }: DashboardProps) {
     const t = useTranslations("Navigation");
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
-    const [filter, setFilter] = useState<"TV" | "Radio" | "Press" | undefined>(defaultFilter);
 
-    const reports = useQuery(api.queries.getMediaReports, { source: filter });
+    const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
+
+    const reports = useQuery(api.monitoring.getArticles, {
+        limit: 100,
+        sourceType: filter === "All" ? undefined : filter,
+    }) as DashboardArticle[] | undefined;
+
     const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
 
     const router = useRouter();
     const locale = useLocale();
 
-    const filters: { label: string; value: "TV" | "Radio" | "Press" | undefined; icon: any; href: string }[] = [
-        { label: "all", value: undefined, icon: Filter, href: "/media-monitoring/central-media-repository" },
-        { label: "tv", value: "TV", icon: Mic2, href: "/media-monitoring/tv-radio" },
-        { label: "radio", value: "Radio", icon: Radio, href: "/media-monitoring/tv-radio" },
-        { label: "press", value: "Press", icon: Newspaper, href: "/media-monitoring/press" },
-    ];
+    const filters = useMemo<FilterOption[]>(() => [
+        { label: "All", value: "All", icon: Filter, href: "/media-monitoring/central-media-repository" },
+        { label: "Online News", value: "Online News", icon: Newspaper, href: "/media-monitoring/press" },
+        { label: "Social Media", value: "Social Media", icon: Globe, href: "/media-monitoring/media-pulse" },
+        { label: "Press Release", value: "Press Release", icon: FileText, href: "/media-monitoring/press" },
+    ], []);
 
     return (
         <div className="space-y-8">
@@ -46,8 +80,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                     <button
                         key={f.label}
                         onClick={() => {
-                            if (filter === f.value) {
-                                // If already selected and user clicks again, maybe navigate to the full page?
+                            if (filter === f.value && f.value !== "All") {
                                 router.push(f.href);
                             } else {
                                 setFilter(f.value);
@@ -61,7 +94,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         )}
                     >
                         <f.icon className="w-4 h-4" />
-                        <span className="capitalize">{t(f.label)}</span>
+                        <span className="capitalize">{f.label}</span>
                     </button>
                 ))}
             </div>
@@ -86,7 +119,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         </Link>
                     </div>
                 ) : (
-                    reports.map((report: any) => (
+                    reports.map((report) => (
                         <div key={report._id} className="p-4 bg-card border border-border rounded-xl hover:border-primary/50 transition-all duration-300 group">
                             <div className="flex justify-between items-start mb-3">
                                 <div className="p-2 bg-muted rounded-lg text-primary group-hover:text-primary/80 transition-colors">
@@ -94,18 +127,20 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                 </div>
                                 <span className={clsx(
                                     "px-2 py-0.5 text-xs rounded-full border transition-colors",
-                                    report.status === "Published"
+                                    report.sentiment === "Positive"
                                         ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                                        : report.sentiment === "Negative"
+                                            ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
                                 )}>
-                                    {report.status}
+                                    {report.sentiment}
                                 </span>
                             </div>
-                            <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName}</h3>
+                            <h3 className="font-medium text-foreground mb-1 transition-colors line-clamp-2">{report.title}</h3>
                             <div className="text-xs text-muted-foreground mb-4 flex gap-2 transition-colors">
-                                <span>{report.source}</span>
+                                <span>{report.sourceType}</span>
                                 <span>•</span>
-                                <span>{new Date(report.timestamp).toLocaleDateString()}</span>
+                                <span>{report.publishedDate}</span>
                             </div>
                             <Button variant="outline" size="sm" className="w-full" leftIcon={<Download className="w-3 h-3" />}>
                                 {tCommon('download')}
