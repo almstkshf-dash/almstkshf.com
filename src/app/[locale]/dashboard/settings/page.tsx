@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { Save, Upload, Loader2, CreditCard } from 'lucide-react';
+import { Save, Upload, Loader2, CreditCard, Link2, Settings, Key, Share2, MessageSquare, Shield, Zap, BarChart3, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import PhylloConnectButton from '@/components/PhylloConnect';
-import { Link2 } from 'lucide-react';
+import clsx from 'clsx';
 
 export default function SettingsPage() {
     const t = useTranslations('Settings');
@@ -31,8 +31,14 @@ export default function SettingsPage() {
     const [worldnewsKey, setWorldnewsKey] = useState('');
     const [phylloClientId, setPhylloClientId] = useState('');
     const [phylloClientSecret, setPhylloClientSecret] = useState('');
+    const [chatbaseId, setChatbaseId] = useState('');
+    const [chatbaseHost, setChatbaseHost] = useState('');
+    const [stripePublishableKey, setStripePublishableKey] = useState('');
+    const [stripeSecretKey, setStripeSecretKey] = useState('');
+    const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
     const [targetCountries, setTargetCountries] = useState('AE,SA');
     const [aveMultiplier, setAveMultiplier] = useState(0.005);
+    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>('general');
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     useEffect(() => {
@@ -50,6 +56,11 @@ export default function SettingsPage() {
             setWorldnewsKey(settings.apiKeys?.worldnews || '');
             setPhylloClientId(settings.apiKeys?.phylloClientId || '');
             setPhylloClientSecret(settings.apiKeys?.phylloClientSecret || '');
+            setChatbaseId(settings.apiKeys?.chatbaseId || '');
+            setChatbaseHost(settings.apiKeys?.chatbaseHost || '');
+            setStripePublishableKey(settings.apiKeys?.stripePublishableKey || '');
+            setStripeSecretKey(settings.apiKeys?.stripeSecretKey || '');
+            setStripeWebhookSecret(settings.apiKeys?.stripeWebhookSecret || '');
             setTargetCountries(settings.defaults?.targetCountries?.join(',') || 'AE,SA');
             setAveMultiplier(settings.defaults?.aveMultiplier || 0.005);
         }
@@ -85,6 +96,11 @@ export default function SettingsPage() {
                     worldnews: worldnewsKey,
                     phylloClientId: phylloClientId,
                     phylloClientSecret: phylloClientSecret,
+                    chatbaseId: chatbaseId,
+                    chatbaseHost: chatbaseHost,
+                    stripePublishableKey: stripePublishableKey,
+                    stripeSecretKey: stripeSecretKey,
+                    stripeWebhookSecret: stripeWebhookSecret,
                 },
                 defaults: {
                     targetCountries: targetCountries.split(',').map(c => c.trim().toUpperCase()),
@@ -101,303 +117,390 @@ export default function SettingsPage() {
     };
 
     if (settings === undefined) {
-        return <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-8 w-8 text-blue-600" /></div>;
+        return (
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+                    <p className="text-sm font-medium text-slate-500 animate-pulse">Loading settings...</p>
+                </div>
+            </div>
+        );
     }
 
+    const tabs = [
+        { id: 'general', label: t('general' as any) || 'General', icon: Settings },
+        { id: 'ai', label: t('ai_data' as any) || 'AI & Data', icon: Key },
+        { id: 'social', label: t('social' as any) || 'Social', icon: Share2 },
+        { id: 'integrations', label: t('integrations' as any) || 'Integrations', icon: Shield },
+    ];
+
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-8">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+        <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-10">
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-8">
+                <div className="space-y-1">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                        {t('title')}
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400">
+                        {t('subtitle' as any) || 'Manage your application configurations and third-party integrations.'}
+                    </p>
+                </div>
                 <button
                     onClick={handleSave}
                     disabled={isLoading}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-200 dark:hover:shadow-none disabled:opacity-50 active:scale-95"
                 >
-                    {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+                    {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
                     {t('save')}
                 </button>
             </div>
 
             {message && (
-                <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <div className={clsx(
+                    "p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300",
+                    message.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/30 dark:text-rose-400'
+                )}>
+                    <div className={clsx("w-2 h-2 rounded-full", message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500')} />
                     {message.text}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Logo Section */}
-                <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 md:col-span-2">
-                    <h2 className="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-100">{t('logo_upload')}</h2>
-                    <div className="flex items-start gap-6">
-                        <div className="flex-shrink-0 w-32 h-32 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden relative">
-                            {logoUrl ? (
-                                <Image src={logoUrl} alt="Company Logo" fill className="object-contain p-2" />
-                            ) : (
-                                <Upload className="h-8 w-8 text-slate-400" />
+            <div className="flex flex-col lg:flex-row gap-10">
+                {/* Sidebar Navigation */}
+                <nav className="lg:w-64 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-none">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={clsx(
+                                "flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap",
+                                activeTab === tab.id
+                                    ? "bg-blue-600 text-white shadow-md shadow-blue-100 dark:shadow-none"
+                                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                             )}
-                        </div>
-                        <div className="flex-1 space-y-4">
-                            <label htmlFor="logo-upload" className="text-sm text-slate-600 dark:text-slate-400">{t('logo_desc')}</label>
-                            <input
-                                id="logo-upload"
-                                name="logo-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleLogoUpload}
-                                className="block w-full text-sm text-slate-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-full file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-200"
-                            />
-                        </div>
-                    </div>
-                </section>
+                        >
+                            <tab.icon className="h-5 w-5" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
 
-                {/* API Keys Section */}
-                <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <h2 className="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-100">{t('api_keys')}</h2>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="gemini-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('gemini_key')}</label>
-                            <input
-                                id="gemini-key"
-                                name="gemini_key"
-                                type="password"
-                                value={geminiKey}
-                                onChange={(e) => setGeminiKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                                placeholder="AIzaSy..."
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="instagram-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('instagram_key')}</label>
-                            <input
-                                id="instagram-key"
-                                name="instagram_key"
-                                type="password"
-                                value={instagramKey}
-                                onChange={(e) => setInstagramKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="twitter-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_key')}</label>
-                            <input
-                                id="twitter-key"
-                                name="twitter_key"
-                                type="password"
-                                value={twitterKey}
-                                onChange={(e) => setTwitterKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="twitter-bearer" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_bearer')}</label>
-                            <input
-                                id="twitter-bearer"
-                                name="twitter_bearer"
-                                type="password"
-                                value={twitterBearer}
-                                onChange={(e) => setTwitterBearer(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="twitter-consumer-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_consumer_key')}</label>
-                            <input
-                                id="twitter-consumer-key"
-                                name="twitter_consumer_key"
-                                type="password"
-                                value={twitterConsumerKey}
-                                onChange={(e) => setTwitterConsumerKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="twitter-consumer-secret" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('twitter_consumer_secret')}</label>
-                            <input
-                                id="twitter-consumer-secret"
-                                name="twitter_consumer_secret"
-                                type="password"
-                                value={twitterConsumerSecret}
-                                onChange={(e) => setTwitterConsumerSecret(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="newsdata-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('newsdata_key')}</label>
-                            <input
-                                id="newsdata-key"
-                                name="newsdata_key"
-                                type="password"
-                                value={newsdataKey}
-                                onChange={(e) => setNewsdataKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="newsapi-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('newsapi_key')}</label>
-                            <input
-                                id="newsapi-key"
-                                name="newsapi_key"
-                                type="password"
-                                value={newsapiKey}
-                                onChange={(e) => setNewsapiKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="gnews-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('gnews_key')}</label>
-                            <input
-                                id="gnews-key"
-                                name="gnews_key"
-                                type="password"
-                                value={gnewsKey}
-                                onChange={(e) => setGnewsKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="worldnews-key" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('worldnews_key')}</label>
-                            <input
-                                id="worldnews-key"
-                                name="worldnews_key"
-                                type="password"
-                                value={worldnewsKey}
-                                onChange={(e) => setWorldnewsKey(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="phyllo-client-id" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('phyllo_client_id')}</label>
-                            <input
-                                id="phyllo-client-id"
-                                name="phyllo_client_id"
-                                type="text"
-                                value={phylloClientId}
-                                onChange={(e) => setPhylloClientId(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="phyllo-client-secret" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('phyllo_client_secret')}</label>
-                            <input
-                                id="phyllo-client-secret"
-                                name="phyllo_client_secret"
-                                type="password"
-                                value={phylloClientSecret}
-                                onChange={(e) => setPhylloClientSecret(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                        </div>
-                    </div>
-                </section>
+                {/* Main Content Area */}
+                <div className="flex-1 space-y-8 animate-in fade-in duration-500">
+                    {activeTab === 'general' && (
+                        <div className="space-y-8">
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Upload className="h-5 w-5 text-blue-500" />
+                                    {t('logo_upload')}
+                                </h2>
+                                <div className="flex flex-col sm:flex-row items-center gap-8">
+                                    <div className="relative w-40 h-40 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl flex items-center justify-center bg-slate-50 dark:bg-slate-950 overflow-hidden group">
+                                        {logoUrl ? (
+                                            <Image src={logoUrl} alt="Company Logo" fill className="object-contain p-4 transition-transform group-hover:scale-105" />
+                                        ) : (
+                                            <Upload className="h-10 w-10 text-slate-300 dark:text-slate-700" />
+                                        )}
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Upload className="text-white w-6 h-6" />
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleLogoUpload}
+                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                        />
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <p className="font-medium text-slate-900 dark:text-white">{t('logo_desc')}</p>
+                                        <p className="text-sm text-slate-500">Recommended size: 512x512px. Transparent PNG or SVG preferred.</p>
+                                    </div>
+                                </div>
+                            </section>
 
-                {/* Defaults Section */}
-                <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                    <h2 className="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-100">{t('defaults')}</h2>
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="target-countries" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('target_countries')}</label>
-                            <input
-                                id="target-countries"
-                                name="target_countries"
-                                type="text"
-                                value={targetCountries}
-                                onChange={(e) => setTargetCountries(e.target.value)}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                                placeholder="AE, SA, EG"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">{t('iso_hint')}</p>
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 font-poppins">
+                                    <Settings className="h-5 w-5 text-blue-500" />
+                                    {t('defaults')}
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('target_countries')}</label>
+                                        <input
+                                            value={targetCountries}
+                                            onChange={(e) => setTargetCountries(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder="AE, SA, EG"
+                                        />
+                                        <p className="text-xs text-slate-500">{t('iso_hint')}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('ave_multiplier')}</label>
+                                        <input
+                                            type="number"
+                                            step="0.001"
+                                            value={aveMultiplier}
+                                            onChange={(e) => setAveMultiplier(parseFloat(e.target.value))}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                        <p className="text-xs text-slate-500">{t('default_value')}: 0.005</p>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
-                        <div>
-                            <label htmlFor="ave-multiplier" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{t('ave_multiplier')}</label>
-                            <input
-                                id="ave-multiplier"
-                                name="ave_multiplier"
-                                type="number"
-                                step="0.001"
-                                value={aveMultiplier}
-                                onChange={(e) => setAveMultiplier(parseFloat(e.target.value))}
-                                className="w-full p-2 border border-slate-300 dark:border-slate-600 rounded-md bg-transparent dark:text-white"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">{t('default_value')}: 0.005</p>
+                    )}
+
+                    {activeTab === 'ai' && (
+                        <div className="space-y-8">
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Zap className="h-5 w-5 text-amber-500" />
+                                    Artificial Intelligence
+                                </h2>
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">{t('gemini_key')}</label>
+                                        <input
+                                            type="password"
+                                            value={geminiKey}
+                                            onChange={(e) => setGeminiKey(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                                            placeholder="AIzaSy..."
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Globe className="h-5 w-5 text-blue-500" />
+                                    News & Data Services
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {[
+                                        { id: 'newsdata', label: t('newsdata_key'), value: newsdataKey, set: setNewsdataKey },
+                                        { id: 'newsapi', label: t('newsapi_key'), value: newsapiKey, set: setNewsapiKey },
+                                        { id: 'gnews', label: t('gnews_key'), value: gnewsKey, set: setGnewsKey },
+                                        { id: 'worldnews', label: t('worldnews_key'), value: worldnewsKey, set: setWorldnewsKey },
+                                    ].map((field) => (
+                                        <div key={field.id} className="space-y-2">
+                                            <label className="text-sm font-bold">{field.label}</label>
+                                            <input
+                                                type="password"
+                                                value={field.value}
+                                                onChange={(e) => field.set(e.target.value)}
+                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
-                    </div>
-                </section>
+                    )}
+
+                    {activeTab === 'social' && (
+                        <div className="space-y-8">
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-xl font-bold flex items-center gap-2">
+                                        <Share2 className="h-5 w-5 text-pink-500" />
+                                        Social Media APIs
+                                    </h2>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">{t('instagram_key')}</label>
+                                        <input
+                                            type="password"
+                                            value={instagramKey}
+                                            onChange={(e) => setInstagramKey(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">{t('twitter_bearer')}</label>
+                                        <input
+                                            type="password"
+                                            value={twitterBearer}
+                                            onChange={(e) => setTwitterBearer(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-10 -mt-10" />
+                                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                                    <Link2 className="h-5 w-5 text-indigo-500" />
+                                    Phyllo Integration
+                                </h2>
+                                <p className="text-sm text-slate-500 mb-8 max-w-lg">Advanced creator economy connection. Manage your client credentials and authorize users accounts.</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-indigo-900 dark:text-indigo-400">{t('phyllo_client_id')}</label>
+                                        <input
+                                            value={phylloClientId}
+                                            onChange={(e) => setPhylloClientId(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-indigo-900 dark:text-indigo-400">{t('phyllo_client_secret')}</label>
+                                        <input
+                                            type="password"
+                                            value={phylloClientSecret}
+                                            onChange={(e) => setPhylloClientSecret(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="space-y-1">
+                                        <h3 className="font-bold text-lg">Test Connection</h3>
+                                        <p className="text-indigo-100 text-sm">Initiate the Phyllo Connect flow with your current credentials.</p>
+                                    </div>
+                                    <PhylloConnectButton className="px-8 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {activeTab === 'integrations' && (
+                        <div className="space-y-8">
+                            {/* Chatbase Integration */}
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl -mr-6 -mt-6" />
+                                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                                    <MessageSquare className="h-5 w-5 text-emerald-500" />
+                                    Chatbase AI Support
+                                </h2>
+                                <p className="text-sm text-slate-500 mb-8">Manage your Chatbase widget which provides 24/7 AI-powered support in the bottom-right corner.</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">Chatbot ID</label>
+                                        <input
+                                            value={chatbaseId}
+                                            onChange={(e) => setChatbaseId(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
+                                            placeholder="WGKAf1CTH..."
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">Host URL</label>
+                                        <input
+                                            value={chatbaseHost}
+                                            onChange={(e) => setChatbaseHost(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                            placeholder="https://www.chatbase.co/"
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Stripe Integration */}
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 blur-2xl -mr-6 -mt-6" />
+                                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                                    <CreditCard className="h-5 w-5 text-violet-500" />
+                                    Stripe Payments
+                                </h2>
+                                <p className="text-sm text-slate-500 mb-8">Configure your payment gateway for subscriptions and one-time purchases.</p>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold">Publishable Key</label>
+                                        <input
+                                            type="password"
+                                            value={stripePublishableKey}
+                                            onChange={(e) => setStripePublishableKey(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                            placeholder="pk_live_..."
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold">Secret Key</label>
+                                            <input
+                                                type="password"
+                                                value={stripeSecretKey}
+                                                onChange={(e) => setStripeSecretKey(e.target.value)}
+                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                                placeholder="sk_live_..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold">Webhook Secret</label>
+                                            <input
+                                                type="password"
+                                                value={stripeWebhookSecret}
+                                                onChange={(e) => setStripeWebhookSecret(e.target.value)}
+                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                                placeholder="whsec_..."
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Billing History Section */}
+                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <BarChart3 className="h-5 w-5 text-blue-500" />
+                                    {t('billing')}
+                                </h2>
+                                <div className="overflow-x-auto -mx-8">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50 dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800">
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_date')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_product')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_amount')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_status')}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {!payments || payments.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={4} className="py-12 text-center text-slate-400 dark:text-slate-600 italic">
+                                                        {t('no_payments')}
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                payments.map((payment) => (
+                                                    <tr key={payment._id} className="border-b border-slate-50 dark:border-slate-800 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                                                        <td className="py-4 px-8 text-sm text-slate-600 dark:text-slate-400">
+                                                            {new Date(payment.createdAt).toLocaleDateString()}
+                                                        </td>
+                                                        <td className="py-4 px-8 text-sm font-bold text-slate-900 dark:text-white">
+                                                            {payment.productName}
+                                                        </td>
+                                                        <td className="py-4 px-8 text-sm text-slate-600 dark:text-slate-400">
+                                                            {payment.amount} {payment.currency.toUpperCase()}
+                                                        </td>
+                                                        <td className="py-4 px-8 text-sm">
+                                                            <span className={clsx(
+                                                                "inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
+                                                                payment.status === 'paid' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                                            )}>
+                                                                {payment.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section >
+                        </div>
+                    )}
+                </div>
             </div>
-
-            {/* Social Integrations Section */}
-            <section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-2 mb-6">
-                    <Link2 className="h-6 w-6 text-indigo-600" />
-                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Social Integrations</h2>
-                </div>
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-900/20">
-                    <div>
-                        <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-100 mb-1">Creator Account Connection</h3>
-                        <p className="text-sm text-indigo-700/70 dark:text-indigo-300/60 max-w-md">
-                            Connect your social accounts via Phyllo to track engagement, audience insights, and performance metrics directly in your dashboard.
-                        </p>
-                    </div>
-                    <PhylloConnectButton className="flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 dark:shadow-none whitespace-nowrap" />
-                </div>
-            </section>
-
-            {/* Billing History Section */}
-            < section className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700" >
-                <div className="flex items-center gap-2 mb-6">
-                    <CreditCard className="h-6 w-6 text-blue-600" />
-                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{t('billing')}</h2>
-                </div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{t('billing_desc')}</p>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-slate-200 dark:border-slate-700">
-                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_date')}</th>
-                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_product')}</th>
-                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_amount')}</th>
-                                <th className="py-3 px-4 text-sm font-medium text-slate-600 dark:text-slate-400">{t('col_status')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {!payments || payments.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="py-8 text-center text-slate-400 dark:text-slate-500 italic">
-                                        {t('no_payments')}
-                                    </td>
-                                </tr>
-                            ) : (
-                                payments.map((payment) => (
-                                    <tr key={payment._id} className="border-b border-slate-100 dark:border-slate-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
-                                        <td className="py-4 px-4 text-sm text-slate-700 dark:text-slate-300">
-                                            {new Date(payment.createdAt).toLocaleDateString()}
-                                        </td>
-                                        <td className="py-4 px-4 text-sm font-medium text-slate-800 dark:text-slate-200">
-                                            {payment.productName}
-                                        </td>
-                                        <td className="py-4 px-4 text-sm text-slate-700 dark:text-slate-300">
-                                            {payment.amount} {payment.currency.toUpperCase()}
-                                        </td>
-                                        <td className="py-4 px-4 text-sm">
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${payment.status === 'paid'
-                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                                }`}>
-                                                {payment.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </section >
-        </div >
+        </div>
     );
 }

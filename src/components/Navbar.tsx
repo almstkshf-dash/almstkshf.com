@@ -11,7 +11,8 @@ import Container from "@/components/ui/Container";
 import Image from "next/image";
 import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink"; // Import custom link
+import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
     const t = useTranslations("Navigation");
@@ -145,20 +146,34 @@ export default function Navbar() {
                                 <span className="xl:hidden uppercase">{locale === "en" ? "AR" : "EN"}</span>
                             </button>
 
-                            <HoverPrefetchLink
-                                href="/dashboard"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-2.5 lg:gap-1.5 xl:px-4 xl:gap-2"
-                            >
-                                <LayoutDashboard className="w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4" />
-                                <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
-                            </HoverPrefetchLink>
+                            <SignedOut>
+                                <div className="flex items-center gap-2">
+                                    <SignInButton mode="modal">
+                                        <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full">
+                                            {t('login' as any) || "Sign In"}
+                                        </button>
+                                    </SignInButton>
+                                    <HoverPrefetchLink
+                                        href="/contact"
+                                        className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-3.5 lg:py-2 xl:px-6 xl:py-2.5 whitespace-nowrap"
+                                    >
+                                        {t('get_started')}
+                                    </HoverPrefetchLink>
+                                </div>
+                            </SignedOut>
 
-                            <HoverPrefetchLink
-                                href="/contact"
-                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-3.5 lg:py-2 xl:px-6 xl:py-2.5 whitespace-nowrap"
-                            >
-                                {t('get_started')}
-                            </HoverPrefetchLink>
+                            <SignedIn>
+                                <div className="flex items-center gap-3">
+                                    <HoverPrefetchLink
+                                        href="/dashboard"
+                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-2.5 lg:gap-1.5 xl:px-4 xl:gap-2"
+                                    >
+                                        <LayoutDashboard className="w-4 h-4" />
+                                        <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
+                                    </HoverPrefetchLink>
+                                    <UserButton afterSignOutUrl="/" />
+                                </div>
+                            </SignedIn>
                         </div>
 
                         {/* Mobile Menu Toggle - Visible on Tablet and below */}
@@ -297,6 +312,30 @@ export default function Navbar() {
                                 </div>
 
                                 <div className="mt-8 pt-8 border-t border-border flex flex-col gap-4 sticky bottom-0 bg-background pb-6">
+                                    <SignedOut>
+                                        <SignInButton mode="modal">
+                                            <button className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 transition-all">
+                                                {t('get_started')}
+                                            </button>
+                                        </SignInButton>
+                                    </SignedOut>
+
+                                    <SignedIn>
+                                        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border">
+                                            <div className="flex items-center gap-3">
+                                                <UserButton afterSignOutUrl="/" />
+                                                <span className="font-bold text-foreground">Account</span>
+                                            </div>
+                                            <HoverPrefetchLink
+                                                href="/dashboard"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                            >
+                                                <LayoutDashboard className="w-6 h-6" />
+                                            </HoverPrefetchLink>
+                                        </div>
+                                    </SignedIn>
+
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-3 p-4 text-muted-foreground hover:text-foreground bg-muted rounded-xl transition-all border border-border"
@@ -304,23 +343,6 @@ export default function Navbar() {
                                         <Globe className="w-5 h-5" />
                                         <span className="font-medium">{isRTL ? "English" : "العربية"}</span>
                                     </button>
-
-                                    <HoverPrefetchLink
-                                        href="/dashboard"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex items-center justify-center gap-2 p-4 font-bold text-lg text-foreground bg-muted/50 hover:bg-muted rounded-xl transition-all border border-border"
-                                    >
-                                        <LayoutDashboard className="w-5 h-5" />
-                                        {t('dashboard')}
-                                    </HoverPrefetchLink>
-
-                                    <HoverPrefetchLink
-                                        href="/contact"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
-                                    >
-                                        {t('get_started')}
-                                    </HoverPrefetchLink>
                                 </div>
                             </div>
                         </Container>

@@ -29,6 +29,11 @@ export const updateSettings = mutation({
             worldnews: v.optional(v.string()),
             phylloClientId: v.optional(v.string()),
             phylloClientSecret: v.optional(v.string()),
+            chatbaseId: v.optional(v.string()),
+            chatbaseHost: v.optional(v.string()),
+            stripePublishableKey: v.optional(v.string()),
+            stripeSecretKey: v.optional(v.string()),
+            stripeWebhookSecret: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
