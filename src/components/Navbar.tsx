@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "@/i18n/routing";
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, LayoutDashboard, Search } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
@@ -56,7 +56,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Desktop Navigation - Hidden on tablet, visible on large screens */}
-                        <nav className="hidden lg:flex items-center gap-8 ms-auto me-8">
+                        <nav className="hidden lg:flex items-center lg:gap-4 xl:gap-8 ms-auto lg:me-4 xl:me-8">
                             {NAVIGATION_ITEMS.map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;
@@ -118,41 +118,44 @@ export default function Navbar() {
 
                         {/* Action Buttons - Visible on Desktop */}
                         <div
-                            className="hidden lg:flex items-center gap-4"
+                            className="hidden lg:flex items-center lg:gap-2 xl:gap-4"
                             onMouseEnter={() => setActiveDropdown(null)}
                         >
                             <button
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border bg-muted/30"
+                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border bg-muted/30 lg:px-2 xl:px-3"
+                                title={t('search')}
                             >
-                                <span className="flex items-center gap-1">
+                                <Search className="w-3.5 h-3.5" />
+                                <span className="hidden xl:flex items-center gap-1">
                                     <span className="text-[10px] border border-border px-1 rounded bg-background">Ctrl</span>
                                     <span className="text-[10px] border border-border px-1 rounded bg-background">K</span>
                                 </span>
-                                <span>{t('search')}</span>
+                                <span className="hidden xl:inline-block">{t('search')}</span>
                             </button>
 
                             <ThemeToggle />
                             <button
                                 onClick={toggleLocale}
-                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border"
+                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border lg:px-2 xl:px-3"
                                 aria-label="Switch Language"
                             >
                                 <Globe className="w-3.5 h-3.5" />
-                                <span>{isRTL ? "English" : "العربية"}</span>
+                                <span className="hidden xl:inline-block">{isRTL ? "English" : "العربية"}</span>
+                                <span className="xl:hidden uppercase">{locale === "en" ? "AR" : "EN"}</span>
                             </button>
 
                             <HoverPrefetchLink
                                 href="/dashboard"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-3 lg:gap-1.5 xl:px-4 xl:gap-2"
                             >
-                                <LayoutDashboard className="w-4 h-4" />
-                                {t('dashboard')}
+                                <LayoutDashboard className="w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4" />
+                                <span className="whitespace-nowrap">{t('dashboard')}</span>
                             </HoverPrefetchLink>
 
                             <HoverPrefetchLink
                                 href="/contact"
-                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
+                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-4 xl:px-6 whitespace-nowrap"
                             >
                                 {t('get_started')}
                             </HoverPrefetchLink>

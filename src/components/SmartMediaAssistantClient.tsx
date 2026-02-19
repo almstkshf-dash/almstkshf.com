@@ -6,6 +6,9 @@ import Container from "@/components/ui/Container";
 import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
+import { useAction } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { toast } from "sonner";
 
 export default function SmartMediaAssistantClient() {
     const t = useTranslations("Navigation");
@@ -13,8 +16,9 @@ export default function SmartMediaAssistantClient() {
     const tAi = useTranslations("AI");
 
     const [prompt, setPrompt] = React.useState("");
-    const [response, setResponse] = React.useState("");
+    const [analysis, setAnalysis] = React.useState<any>(null);
     const [isGenerating, setIsGenerating] = React.useState(false);
+    const analyzeAction = useAction(api.media.analyzeMedia);
 
     const capabilities = [
         {
@@ -40,20 +44,31 @@ export default function SmartMediaAssistantClient() {
     const handleGenerate = async () => {
         if (!prompt) return;
         setIsGenerating(true);
-        setResponse("");
+        setAnalysis(null);
 
-        // Mock generation delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
+            const result = await analyzeAction({ text: prompt });
+            console.log("Analysis Result:", result);
 
-        const mockResponses = [
-            "Based on recent media analysis, here is a suggested press response...",
-            "Sentiment dip detected in energy sector. Recommended tactical response...",
-            "Drafting official statement for executive review...",
-            "Sentiment trend analyzed. Public perception shift identified."
-        ];
-
-        setResponse(mockResponses[Math.floor(Math.random() * mockResponses.length)]);
-        setIsGenerating(false);
+            if (result && result.success && result.data) {
+                const analysisData = result.data;
+                // Backend already returns 0-100 values
+                const mappedResult = {
+                    ...analysisData,
+                    score: Math.round(analysisData.score || 70),
+                    riskScore: Math.round(analysisData.riskScore || 15)
+                };
+                setAnalysis(mappedResult);
+                toast.success("Analysis complete!");
+            } else {
+                toast.error(result?.error || "Received an empty response from our analysis engine.");
+            }
+        } catch (error) {
+            console.error("AI Assistant Error:", error);
+            toast.error("An unexpected error occurred during analysis.");
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     return (
@@ -132,7 +147,7 @@ export default function SmartMediaAssistantClient() {
                                 </div>
                                 <div className="space-y-4">
                                     <AnimatePresence mode="wait">
-                                        {(prompt || response) && (
+                                        {(prompt || analysis) && (
                                             <motion.div
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
@@ -152,13 +167,34 @@ export default function SmartMediaAssistantClient() {
                                                             <div className="h-2 bg-indigo-400/30 rounded-full w-4/6 animate-pulse" style={{ animationDelay: "400ms" }}></div>
                                                         </div>
                                                     ) : (
-                                                        <motion.p
+                                                        <motion.div
                                                             initial={{ opacity: 0 }}
                                                             animate={{ opacity: 1 }}
-                                                            className="text-sm leading-relaxed"
+                                                            className="text-sm space-y-4"
                                                         >
-                                                            {response || "Awaiting instruction..."}
-                                                        </motion.p>
+                                                            {analysis ? (
+                                                                <>
+                                                                    <div className="flex flex-wrap gap-2 mb-2">
+                                                                        <span className={clsx(
+                                                                            "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
+                                                                            analysis.risk === "High" ? "bg-red-500/20 text-red-400" :
+                                                                                analysis.risk === "Medium" ? "bg-amber-500/20 text-amber-400" :
+                                                                                    "bg-emerald-500/20 text-emerald-400"
+                                                                        )}>
+                                                                            Risk: {analysis.risk}
+                                                                        </span>
+                                                                        <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                                                                            Sentiment: {analysis.sentiment}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="leading-relaxed border-l-2 border-indigo-500/30 pl-3 italic text-indigo-100">
+                                                                        {analysis.recommendation}
+                                                                    </p>
+                                                                </>
+                                                            ) : (
+                                                                <p className="text-slate-500 italic">Awaiting instruction...</p>
+                                                            )}
+                                                        </motion.div>
                                                     )}
                                                 </div>
                                             </motion.div>

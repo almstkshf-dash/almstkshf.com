@@ -12,6 +12,8 @@ Ensure the following variables are set correctly in their respective dashboards.
 | `CLERK_SECRET_KEY` | `sk_live_MB3vomMXSXgJV2ynPA40D9v1A5JusPloH8zbjR9xq5` | Clerk Production Secret |
 | `CONVEX_DEPLOY_KEY` | `prod:flexible-anaconda-162|...` | Provided by `npx convex deploy-key` |
 | `NEXT_PUBLIC_CONVEX_URL` | `https://flexible-anaconda-162.convex.cloud` | Your Production Convex URL |
+| `UPSTASH_REDIS_REST_URL` | `https://xxxx.upstash.io` | Upstash Redis REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | `xxxxx` | Upstash Redis REST Token |
 
 #### Convex Dashboard (Settings > Environment Variables)
 | Variable | Value | Notes |

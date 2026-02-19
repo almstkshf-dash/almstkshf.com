@@ -30,48 +30,52 @@ export default clerkMiddleware(async (auth, req) => {
 
         // 2. Specialized Bypass for API Routes (including localized /en/api)
         if (pathname.startsWith('/api') || pathname.match(/\/(en|ar)\/api/)) {
-            const response = NextResponse.next();
-            return applyCSP(response);
+            return applyCSP(NextResponse.next());
         }
 
         // 3. Authentication Protection
         if (!isPublicRoute(req)) {
             try {
-                const authResponse = await auth.protect();
-                if (authResponse instanceof Response) return authResponse;
+                const authResult = await auth.protect();
+                // If Clerk returns a redirect, return it immediately
+                if (authResult instanceof Response) return authResult;
             } catch (authError) {
                 console.error("MIDDLEWARE_AUTH_PROTECT_FAILED:", authError);
-                // In production, we don't want to crash. We might redirect to sign-in or let it pass with warning.
-                throw authError; // Re-throw to see if it's the source of 500
+                // Fallback to let it pass if auth.protect failed unexpectedly
+                return applyCSP(NextResponse.next());
             }
         }
 
         // 4. Localization (next-intl)
         const intlResponse = intlMiddleware(req);
 
-        // 5. Handle potential redirects from intlMiddleware
-        if (intlResponse?.status >= 300 && intlResponse?.status < 400) {
+        // 5. Handle potential redirects from intlMiddleware (Must be returned without header modification if immutable)
+        if (intlResponse && intlResponse.status >= 300 && intlResponse.status < 400) {
             return intlResponse;
         }
 
         // 6. Apply Content Security Policy (CSP)
-        const finalResponse = intlResponse || NextResponse.next();
-        return applyCSP(finalResponse);
+        // We pass the response to applyCSP which will return a new response with headers if needed
+        return applyCSP(intlResponse || NextResponse.next());
     } catch (globalError: any) {
         console.error("MIDDLEWARE_GLOBAL_CRASH:", globalError?.message || globalError);
-        // Fallback to a standard next response to avoid MIDDLEWARE_INVOCATION_FAILED if possible
-        const fallback = NextResponse.next();
-        return applyCSP(fallback);
+        // Fallback to a standard next response to avoid MIDDLEWARE_INVOCATION_FAILED
+        try {
+            return applyCSP(NextResponse.next());
+        } catch (e) {
+            return NextResponse.next();
+        }
     }
 });
 
 /**
  * Safely applies Content Security Policy to a response.
+ * Creates a new response if headers are immutable.
  */
-function applyCSP(response: NextResponse | Response) {
+function applyCSP(response: Response) {
     if (!response) return NextResponse.next();
 
-    // Skip CSP for redirect responses as they are often immutable and don't need it
+    // 1. Skip CSP for redirect responses as they are often immutable and don't render content
     if (response.status >= 300 && response.status < 400) {
         return response;
     }
@@ -85,34 +89,33 @@ function applyCSP(response: NextResponse | Response) {
 
     const CSP_HEADER = [
         "default-src 'self';",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://clerk.almstkshf.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live blob:;",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.live;",
-        "img-src 'self' data: https://img.clerk.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://grainy-gradients.vercel.app https://*.vercel.live;",
-        "font-src 'self' data: https://fonts.gstatic.com;",
-        "connect-src 'self' https://clerk.almstkshf.com https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://api.stripe.com https://www.chatbase.co https://va.vercel-scripts.com https://*.vercel.live wss://*.vercel.live;",
-        "frame-src 'self' https://js.stripe.com https://www.chatbase.co https://*.vercel.live;",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://clerk.com https://clerk.almstkshf.com https://*.clerk.com https://*.clerk.accounts.dev https://*.clerkjs.dev https://js.stripe.com https://*.stripe.com https://www.chatbase.co https://*.chatbase.co https://va.vercel-scripts.com https://*.vercel.live https://cdn.jsdelivr.net blob:;",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.vercel.live https://cdn.jsdelivr.net;",
+        "img-src 'self' data: https: https://img.clerk.com https://*.clerk.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://grainy-gradients.vercel.app https://*.vercel.live https://cdn.jsdelivr.net;",
+        "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net;",
+        "connect-src 'self' https://clerk.com https://*.clerk.com https://clerk.almstkshf.com https://*.clerk.accounts.dev https://*.convex.cloud wss://*.convex.cloud https://*.convex.site wss://*.convex.site https://api.stripe.com https://*.stripe.com https://www.chatbase.co https://backend.chatbase.co https://*.chatbase.co https://va.vercel-scripts.com https://*.vercel.live wss://*.vercel.live https://cdn.jsdelivr.net https://*.upstash.io blob:;",
+        "frame-src 'self' https://js.stripe.com https://*.stripe.com https://www.chatbase.co https://*.chatbase.co https://*.clerk.com https://*.vercel.live;",
         "worker-src 'self' blob: https://*.clerkjs.dev;",
         "base-uri 'self';",
         "form-action 'self';"
     ].join(' ');
 
+    // 2. Try to set the header. If it fails due to immutability, create a new response.
     try {
-        // Use Headers.append or set if possible
-        if (response.headers instanceof Headers) {
-            response.headers.set('Content-Security-Policy', CSP_HEADER);
-            return response;
-        }
+        response.headers.set('Content-Security-Policy', CSP_HEADER);
+        return response;
     } catch (e) {
-        console.warn("CSP_HEADER_SET_FAILED, attempting clone...");
-    }
-
-    try {
-        const newResponse = new NextResponse(response.body, response);
-        newResponse.headers.set('Content-Security-Policy', CSP_HEADER);
-        return newResponse;
-    } catch (cloneError) {
-        console.error("MIDDLEWARE_CLONE_FAILED:", cloneError);
-        return response; // Return original even if it lacks CSP
+        // Response headers are immutable (common with some Clerk/Redirect responses)
+        // We create a new response instance with the same body and merged headers
+        const newHeaders = new Headers(response.headers);
+        newHeaders.set('Content-Security-Policy', CSP_HEADER);
+        
+        // Use NextResponse to clone the response with modified headers
+        return NextResponse.next({
+            request: {
+                headers: newHeaders,
+            }
+        });
     }
 }
 

@@ -14,6 +14,7 @@ import ChatbaseWidget from '@/components/ChatbaseWidget';
 import ChatbotTrigger from '@/components/ChatbotTrigger';
 import { Analytics } from "@vercel/analytics/next"
 import { CommandMenu } from "@/components/CommandMenu";
+import { Toaster } from "sonner";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -120,6 +121,7 @@ export default async function RootLayout({
                                 <Navbar />
                                 {children}
                                 <CommandMenu />
+                                <Toaster richColors position="top-center" />
                                 <Analytics />
                                 <Footer />
                                 <ChatbaseWidget />
