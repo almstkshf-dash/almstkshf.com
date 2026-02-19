@@ -114,7 +114,6 @@ export default async function RootLayout({
     const messages = await getMessages();
     const dir = locale === "ar" ? "rtl" : "ltr";
     const configuredClerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-    const isProduction = process.env.NODE_ENV === "production";
 
     const appTree = (
         <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
@@ -151,11 +150,7 @@ export default async function RootLayout({
     );
 
     if (!configuredClerkPublishableKey) {
-        if (isProduction) {
-            throw new Error("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required in production.");
-        }
-
-        console.warn("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing. Rendering without ClerkProvider in development.");
+        console.warn("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing. Rendering without ClerkProvider.");
         return appTree;
     }
 
