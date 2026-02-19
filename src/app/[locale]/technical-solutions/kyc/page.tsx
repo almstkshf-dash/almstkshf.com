@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import Container from "@/components/ui/Container";
 import { UserCheck, RefreshCw, ShieldCheck, Database, FileText } from "lucide-react";
 import { motion } from "framer-motion";
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 
 export default function KYCPage() {

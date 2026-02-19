@@ -16,7 +16,7 @@ import {
     TrendingUp
 } from "lucide-react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import clsx from "clsx";
 
 export default function LexcoraClient() {

@@ -54,7 +54,7 @@ export default function StylingAssistantClient() {
     };
 
     return (
-        <main className="min-h-screen pb-20 bg-slate-950">
+        <main className="min-h-screen pb-20 bg-background text-foreground">
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-purple-600/20 via-pink-600/10 to-transparent blur-[120px] opacity-60 pointer-events-none"></div>
@@ -64,7 +64,7 @@ export default function StylingAssistantClient() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/50 border border-purple-500/30 text-purple-300 text-sm font-semibold uppercase tracking-widest backdrop-blur-md shadow-xl"
+                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-purple-500/30 text-purple-600 dark:text-purple-300 text-sm font-semibold uppercase tracking-widest backdrop-blur-md shadow-xl"
                         >
                             <Sparkles className="w-4 h-4 text-purple-400" />
                             <span>{t("title")}</span>
@@ -74,7 +74,7 @@ export default function StylingAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight"
+                            className="text-5xl md:text-7xl font-bold text-foreground tracking-tight leading-tight"
                         >
                             {t("subtitle")}
                         </motion.h1>
@@ -83,7 +83,7 @@ export default function StylingAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-xl md:text-2xl text-slate-300 leading-relaxed max-w-3xl mx-auto"
+                            className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto"
                         >
                             {t("intro")}
                         </motion.p>
@@ -101,7 +101,7 @@ export default function StylingAssistantClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-purple-900/20"
+                                className="relative rounded-3xl overflow-hidden border border-border shadow-2xl shadow-purple-900/10"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent pointer-events-none z-10"></div>
                                 <Image
@@ -122,7 +122,7 @@ export default function StylingAssistantClient() {
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
                                     <Sparkles className="w-6 h-6 text-white" />
                                 </div>
-                                <p className="text-lg text-slate-400 leading-relaxed">
+                                <p className="text-lg text-muted-foreground leading-relaxed">
                                     {t("desc1")}
                                 </p>
                             </motion.div>
@@ -134,10 +134,10 @@ export default function StylingAssistantClient() {
                                 transition={{ delay: 0.2 }}
                                 className="space-y-6"
                             >
-                                <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center">
                                     <ArrowRight className="w-6 h-6 text-purple-400" />
                                 </div>
-                                <p className="text-lg text-slate-400 leading-relaxed">
+                                <p className="text-lg text-muted-foreground leading-relaxed">
                                     {t("desc2")}
                                 </p>
                             </motion.div>
@@ -146,9 +146,9 @@ export default function StylingAssistantClient() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
-                                className="p-6 rounded-3xl bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/20"
+                                className="p-6 rounded-3xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20"
                             >
-                                <p className="text-xl font-bold text-white text-center">
+                                <p className="text-xl font-bold text-foreground text-center">
                                     {t("cta_join")}
                                 </p>
                             </motion.div>
@@ -159,15 +159,15 @@ export default function StylingAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+                            className="bg-card border border-border rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden"
                         >
                             {/* Decorative background elements */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full pointer-events-none"></div>
 
                             <div className="relative z-10 space-y-8">
                                 <div>
-                                    <h3 className="text-3xl font-bold text-white mb-2">{t("form.title")}</h3>
-                                    <p className="text-slate-400">{t("cta_button")}</p>
+                                    <h3 className="text-3xl font-bold text-foreground mb-2">{t("form.title")}</h3>
+                                    <p className="text-muted-foreground">{t("cta_button")}</p>
                                 </div>
 
                                 {status === "success" ? (
@@ -179,15 +179,15 @@ export default function StylingAssistantClient() {
                                         <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
                                             <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                                         </div>
-                                        <h4 className="text-2xl font-bold text-white">{t("form.success")}</h4>
-                                        <p className="text-slate-400">We&apos;ll let you know as soon as we launch.</p>
+                                        <h4 className="text-2xl font-bold text-foreground">{t("form.success")}</h4>
+                                        <p className="text-muted-foreground">We&apos;ll let you know as soon as we launch.</p>
                                     </motion.div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-name" className="text-sm font-medium text-slate-300 ml-1">{t("form.name")}</label>
+                                            <label htmlFor="styling-name" className="text-sm font-medium text-muted-foreground ml-1">{t("form.name")}</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
                                                 <input
                                                     id="styling-name"
                                                     name="name"
@@ -197,15 +197,15 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setName(e.target.value)}
                                                     placeholder={t("form.placeholder_name")}
                                                     autoComplete="name"
-                                                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-email" className="text-sm font-medium text-slate-300 ml-1">{t("form.email")}</label>
+                                            <label htmlFor="styling-email" className="text-sm font-medium text-muted-foreground ml-1">{t("form.email")}</label>
                                             <div className="relative group">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
                                                 <input
                                                     id="styling-email"
                                                     name="email"
@@ -215,7 +215,7 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder={t("form.placeholder_email")}
                                                     autoComplete="email"
-                                                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>

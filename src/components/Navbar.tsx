@@ -128,8 +128,8 @@ export default function Navbar() {
                             >
                                 <Search className="w-3.5 h-3.5" />
                                 <span className="hidden xl:flex items-center gap-1">
-                                    <span className="text-[10px] border border-border px-1 rounded bg-background">Ctrl</span>
-                                    <span className="text-[10px] border border-border px-1 rounded bg-background">K</span>
+                                    <span className="text-[10px] border border-border px-1 rounded bg-muted/50">Ctrl</span>
+                                    <span className="text-[10px] border border-border px-1 rounded bg-muted/50">K</span>
                                 </span>
                                 <span className="hidden xl:inline-block">{t('search')}</span>
                             </button>
@@ -192,7 +192,7 @@ export default function Navbar() {
                                             <HoverPrefetchLink
                                                 key={child.label}
                                                 href={child.href as any}
-                                                className="block p-4 rounded-xl hover:bg-muted/50 transition-all group/item border border-transparent hover:border-border/50"
+                                                className="block p-4 rounded-xl hover:bg-muted/50 transition-all group/item border border-transparent hover:border-border/50 shadow-sm hover:shadow-md"
                                                 onClick={() => setActiveDropdown(null)}
                                             >
                                                 <div className="flex items-start gap-4">

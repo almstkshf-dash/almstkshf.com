@@ -40,7 +40,7 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Pulse View */}
             <div className="lg:col-span-2 space-y-8">
-                <section className="p-8 bg-card border border-border rounded-[2.5rem] backdrop-blur-3xl relative overflow-hidden group shadow-lg transition-all">
+                <section className="p-8 bg-card border border-border rounded-[2.5rem] backdrop-blur-3xl relative overflow-hidden group shadow-lg transition-colors">
                     <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
                         <Activity className="w-64 h-64" />
                     </div>
@@ -57,7 +57,7 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
                 </section>
 
                 {/* Reputation Defense Chart */}
-                <section className="p-10 rounded-[2.5rem] bg-card border border-border transition-all flex flex-col md:flex-row gap-12 items-center shadow-lg">
+                <section className="p-10 rounded-[2.5rem] bg-card border border-border transition-colors flex flex-col md:flex-row gap-12 items-center shadow-lg">
                     <div className="flex-1 space-y-6">
                         <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center transition-colors">
                             <ShieldAlert className="w-8 h-8 text-destructive" />
@@ -93,7 +93,7 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2rem] text-primary-foreground shadow-2xl shadow-primary/40 relative overflow-hidden group transition-all"
+                    className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2rem] text-primary-foreground shadow-2xl shadow-primary/40 relative overflow-hidden group transition-colors"
                 >
                     <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
                         <Globe className="w-32 h-32" />
@@ -110,7 +110,7 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
-                    className="p-8 bg-card border border-border rounded-[2rem] space-y-8 shadow-md transition-all"
+                    className="p-8 bg-card border border-border rounded-[2rem] space-y-8 shadow-md transition-colors"
                 >
                     <div className="flex items-center justify-between">
                         <h4 className="text-foreground font-bold text-sm tracking-wider transition-colors">{t('tone_distribution')}</h4>
@@ -150,7 +150,7 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="p-8 bg-card border border-border rounded-[2rem] space-y-6 shadow-md transition-all relative overflow-hidden"
+                    className="p-8 bg-card border border-border rounded-[2rem] space-y-6 shadow-md transition-colors relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                         <Zap className="w-12 h-12 text-primary" />

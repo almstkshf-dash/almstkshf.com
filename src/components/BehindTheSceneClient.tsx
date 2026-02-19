@@ -29,7 +29,7 @@ export default function BehindTheSceneClient() {
     ];
 
     return (
-        <main className="min-h-screen pt-32 pb-20 bg-slate-950 text-white overflow-hidden">
+        <main className="min-h-screen pt-32 pb-20 bg-background text-foreground overflow-hidden">
             <Container>
                 {/* Header Section */}
                 <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
@@ -54,7 +54,7 @@ export default function BehindTheSceneClient() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-xl text-slate-400 font-light leading-relaxed"
+                        className="text-xl text-muted-foreground font-light leading-relaxed"
                     >
                         {t("subtitle")}
                     </motion.p>
@@ -69,17 +69,17 @@ export default function BehindTheSceneClient() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.2 }}
-                            className="relative group lg:flex items-center gap-16 p-8 lg:p-12 rounded-[3.5rem] bg-slate-900/30 border border-slate-800 backdrop-blur-xl hover:bg-slate-900/50 transition-all duration-700"
+                            className="relative group lg:flex items-center gap-16 p-8 lg:p-12 rounded-[3.5rem] bg-card border border-border backdrop-blur-xl hover:bg-muted/30 transition-all duration-700 shadow-sm hover:shadow-xl"
                         >
                             {/* Photo Container */}
-                            <div className="flex-shrink-0 w-full lg:w-[400px] h-[500px] rounded-[2.5rem] overflow-hidden bg-slate-950 border border-slate-800 relative group-hover:border-blue-500/30 transition-all duration-700">
+                            <div className="flex-shrink-0 w-full lg:w-[400px] h-[500px] rounded-[2.5rem] overflow-hidden bg-muted border border-border relative group-hover:border-primary/30 transition-all duration-700">
                                 <Image
                                     src={member.image}
                                     alt={t(`members.${member.key}.name`)}
                                     fill
                                     className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60"></div>
                                 <div className="absolute bottom-8 left-8 right-8 flex justify-center gap-4 relative z-10">
                                     <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all">
                                         <Linkedin className="w-5 h-5 text-white" />
@@ -96,7 +96,7 @@ export default function BehindTheSceneClient() {
                                     <div className={`w-12 h-12 rounded-2xl ${member.bg} flex items-center justify-center mx-auto lg:mx-0`}>
                                         <member.icon className={`w-6 h-6 ${member.color}`} />
                                     </div>
-                                    <h2 className="text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                                    <h2 className="text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
                                         {t(`members.${member.key}.name`)}
                                     </h2>
                                     <p className={`text-xl font-bold uppercase tracking-widest ${member.color}`}>
@@ -107,21 +107,21 @@ export default function BehindTheSceneClient() {
                                 <div className="relative">
                                     <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-transparent opacity-30 rounded-full hidden lg:block rtl:hidden"></div>
                                     <div className="absolute -right-6 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-transparent opacity-30 rounded-full hidden lg:block ltr:hidden"></div>
-                                    <p className="text-lg text-slate-400 leading-relaxed font-light">
+                                    <p className="text-lg text-muted-foreground leading-relaxed font-light">
                                         {t(`members.${member.key}.desc`)}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-2">
-                                        <GraduationCap className="w-5 h-5 text-slate-500" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("expertise")}</p>
-                                        <p className="text-sm text-slate-300">{t("strategy")}</p>
+                                    <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
+                                        <GraduationCap className="w-5 h-5 text-muted-foreground" />
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t("expertise")}</p>
+                                        <p className="text-sm text-foreground/80">{t("strategy")}</p>
                                     </div>
-                                    <div className="p-6 rounded-3xl bg-slate-950/50 border border-slate-800 space-y-2">
-                                        <Award className="w-5 h-5 text-slate-500" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500">{t("focus")}</p>
-                                        <p className="text-sm text-slate-300">{t("innovation")}</p>
+                                    <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
+                                        <Award className="w-5 h-5 text-muted-foreground" />
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t("focus")}</p>
+                                        <p className="text-sm text-foreground/80">{t("innovation")}</p>
                                     </div>
                                 </div>
                             </div>
@@ -138,7 +138,7 @@ export default function BehindTheSceneClient() {
                 >
                     <div className="relative inline-block">
                         <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-blue-500">"</span>
-                        <h2 className="text-3xl md:text-5xl font-light italic text-white max-w-4xl mx-auto leading-tight">
+                        <h2 className="text-3xl md:text-5xl font-light italic text-foreground max-w-4xl mx-auto leading-tight">
                             {t("quote")}
                         </h2>
                         <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-blue-500">"</span>
@@ -164,10 +164,10 @@ function WhoWeAreSection() {
                     <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
                         {t("badge")}
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                    <h2 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
                         {t("title")}
                     </h2>
-                    <p className="text-slate-400 text-lg leading-relaxed font-light">
+                    <p className="text-muted-foreground text-lg leading-relaxed font-light">
                         {t("intro")}
                     </p>
                 </div>
@@ -176,7 +176,7 @@ function WhoWeAreSection() {
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    className="p-10 lg:p-14 rounded-[3.5rem] bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 relative overflow-hidden group hover:border-blue-500/30 transition-all duration-500"
+                    className="p-10 lg:p-14 rounded-[3.5rem] bg-card border border-border relative overflow-hidden group hover:border-primary/30 transition-all duration-500 shadow-sm hover:shadow-xl"
                 >
                     <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
                         <Cpu className="w-64 h-64" />
@@ -185,15 +185,15 @@ function WhoWeAreSection() {
                         <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                             <Cpu className="w-8 h-8 text-blue-400" />
                         </div>
-                        <h3 className="text-3xl font-bold text-white tracking-tight">
+                        <h3 className="text-3xl font-bold text-foreground tracking-tight">
                             {t("tech_driven.title")}
                         </h3>
-                        <p className="text-slate-400 leading-relaxed font-light">
+                        <p className="text-muted-foreground leading-relaxed font-light">
                             {t("tech_driven.desc")}
                         </p>
                         <div className="flex flex-wrap gap-4">
                             {["speech_to_text", "deep_learning", "fingerprinting", "secure_architecture"].map((tag) => (
-                                <span key={tag} className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                <span key={tag} className="px-4 py-2 rounded-xl bg-muted border border-border text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
                                     {t(`tech_driven.tags.${tag}`)}
                                 </span>
                             ))}

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import Container from '@/components/ui/Container';
 
@@ -65,13 +65,13 @@ function PaymentSuccessContent() {
 
                             <div className="flex gap-4 justify-center pt-4">
                                 <Link
-                                    href="/en"
+                                    href="/"
                                     className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-colors"
                                 >
                                     Return to Home
                                 </Link>
                                 <Link
-                                    href="/en/contact"
+                                    href="/contact"
                                     className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors"
                                 >
                                     Contact Support

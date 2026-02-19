@@ -98,7 +98,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                <h3 className="text-foreground font-bold text-lg flex items-center gap-2">
                     <Activity className="w-5 h-5 text-amber-500" />
                     {t('title')}
                 </h3>
@@ -110,7 +110,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                         )}></span>
                         <span className={clsx(
                             "relative inline-flex rounded-full h-2 w-2",
-                            hasData ? "bg-emerald-500" : "bg-slate-600"
+                            hasData ? "bg-emerald-500" : "bg-muted-foreground/30"
                         )}></span>
                     </span>
                     <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
@@ -120,9 +120,9 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
             </div>
 
             {!hasData && (
-                <div className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center">
+                <div className="p-6 bg-muted/30 border border-border rounded-2xl text-center">
                     <Zap className="w-6 h-6 text-amber-500/50 mx-auto mb-2" />
-                    <p className="text-slate-500 text-sm">{t('no_data_message')}</p>
+                    <p className="text-muted-foreground text-sm">{t('no_data_message')}</p>
                 </div>
             )}
 
@@ -135,12 +135,12 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="p-4 bg-slate-800/40 border border-slate-700/40 rounded-2xl hover:border-slate-600/50 transition-all hover:bg-slate-800/60 group"
+                                className="p-4 bg-card border border-border rounded-2xl hover:border-primary/30 transition-all hover:bg-muted/30 group shadow-sm"
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h4 className="text-slate-200 font-semibold text-sm">{data.source}</h4>
-                                        <p className="text-[10px] text-slate-500 uppercase tracking-wider">
+                                        <h4 className="text-foreground font-semibold text-sm">{data.source}</h4>
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
                                             {t('source_analysis')} · {data.count} {t('articles')}
                                         </p>
                                     </div>
@@ -158,20 +158,20 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-end">
-                                        <span className="text-3xl font-bold text-white tracking-tighter">
+                                        <span className="text-3xl font-bold text-foreground tracking-tighter">
                                             {data.score}%
                                         </span>
                                         <span className={clsx(
                                             "text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1",
                                             data.trend > 0 ? "bg-emerald-500/10 text-emerald-400" :
                                                 data.trend < 0 ? "bg-rose-500/10 text-rose-400" :
-                                                    "bg-slate-700/50 text-slate-400"
+                                                    "bg-muted text-muted-foreground"
                                         )}>
                                             {data.trend > 0 ? "+" : ""}{data.trend}% {t('shift')}
                                         </span>
                                     </div>
 
-                                    <div className="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${data.score}%` }}
@@ -185,7 +185,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                         />
                                     </div>
 
-                                    <div className="text-[10px] text-slate-500">
+                                    <div className="text-[10px] text-muted-foreground">
                                         {t('reach')}: {data.reach.toLocaleString()}
                                     </div>
                                 </div>
@@ -195,11 +195,11 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
                     {/* AI Recommendation */}
                     {recKey && (
-                        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex gap-4 items-start">
-                            <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex gap-4 items-start shadow-sm">
+                            <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
                             <div>
-                                <h5 className="text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
-                                <p className="text-amber-300/80 text-xs leading-relaxed">{t(recKey)}</p>
+                                <h5 className="text-amber-600 dark:text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
+                                <p className="text-amber-700 dark:text-amber-300/80 text-xs leading-relaxed">{t(recKey)}</p>
                             </div>
                         </div>
                     )}

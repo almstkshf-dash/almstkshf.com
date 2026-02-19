@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ShieldAlert, TrendingUp, ArrowRight, Info } from "lucide-react";
 import Container from "./ui/Container";
 import Button from "./ui/Button";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import clsx from "clsx";
 import { useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";

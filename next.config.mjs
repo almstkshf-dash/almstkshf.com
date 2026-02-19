@@ -5,7 +5,10 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     experimental: {
-        optimizePackageImports: ['lucide-react', 'framer-motion', '@clerk/nextjs'],
+        optimizePackageImports: [
+            'lucide-react',
+            'framer-motion'
+        ],
     },
     transpilePackages: ['three', 'troika-three-text', 'troika-worker-utils'],
     poweredByHeader: false,

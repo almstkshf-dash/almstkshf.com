@@ -4,6 +4,7 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { Check, Info } from "lucide-react";
 import Container from "@/components/ui/Container";
+import { Link } from "@/i18n/routing";
 import CheckoutButton from "@/components/CheckoutButton";
 import { motion } from "framer-motion";
 
@@ -182,12 +183,12 @@ export default function PricingPage() {
 
                             <div className="mt-auto">
                                 {plan.contactOnly || !plan.price ? (
-                                    <a
+                                    <Link
                                         href="/contact"
                                         className="inline-flex items-center justify-center w-full px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-all"
                                     >
                                         Contact Sales
-                                    </a>
+                                    </Link>
                                 ) : (
                                     <CheckoutButton
                                         amount={plan.price}
@@ -219,9 +220,9 @@ export default function PricingPage() {
                         <p className="text-muted-foreground mb-4">
                             Looking for KYC, GO-AML compliance, or Dark Web specialized monitoring?
                         </p>
-                        <a href="/contact" className="text-primary font-semibold hover:underline">
+                        <Link href="/contact" className="text-primary font-semibold hover:underline">
                             Contact our Enterprise Team &rarr;
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </Container>

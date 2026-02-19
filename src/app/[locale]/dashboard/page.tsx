@@ -97,7 +97,7 @@ export default function DashboardPage() {
     };
 
     return (
-        <main className="min-h-screen bg-background text-foreground transition-colors duration-300">
+        <main className="min-h-screen bg-background text-foreground">
             <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8">
 
                 {/* Toast Notification */}
@@ -128,7 +128,7 @@ export default function DashboardPage() {
                         {/* Add Manual Entry */}
                         <button
                             onClick={() => setManualModalOpen(true)}
-                            className="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/25 text-amber-600 dark:text-amber-300 px-4 py-2.5 rounded-xl transition-all font-bold text-xs"
+                            className="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-border text-amber-600 dark:text-amber-300 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs"
                         >
                             <Plus className="w-3.5 h-3.5" />
                             {t('manual_entry')}
@@ -139,7 +139,7 @@ export default function DashboardPage() {
                             <button
                                 onClick={handleClearAll}
                                 disabled={isClearing}
-                                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive px-4 py-2.5 rounded-xl transition-all font-bold text-xs disabled:opacity-40"
+                                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive px-4 py-2.5 rounded-xl transition-colors font-bold text-xs disabled:opacity-40"
                             >
                                 {isClearing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                                 {t('clear_all')}

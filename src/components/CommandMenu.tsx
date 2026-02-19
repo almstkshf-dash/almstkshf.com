@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { Command } from "cmdk";
 import { useTranslations } from "next-intl";
 import {
@@ -21,7 +21,7 @@ import { clsx } from "clsx";
 export function CommandMenu() {
     const [open, setOpen] = React.useState(false);
     const router = useRouter();
-    const t = useTranslations("Common"); // Assuming common translations exist
+    const t = useTranslations("Common");
     const { setTheme } = useTheme();
 
     React.useEffect(() => {

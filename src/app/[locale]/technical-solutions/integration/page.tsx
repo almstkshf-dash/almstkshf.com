@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import Container from "@/components/ui/Container";
 import { Key, Code2, Database, Zap, ArrowRight, CheckCircle2, Server, Globe } from "lucide-react";
 import { motion } from "framer-motion";
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 export default function IntegrationPage() {
     const t = useTranslations("TechnicalSolutions.integration");

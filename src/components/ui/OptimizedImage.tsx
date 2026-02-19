@@ -42,11 +42,11 @@ export default function OptimizedImage({
                     {...props}
                 />
             ) : (
-                <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center p-4 text-center">
-                    <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-2">
-                        <span className="text-slate-500 text-xs">AI</span>
+                <div className="absolute inset-0 bg-muted flex flex-col items-center justify-center p-4 text-center">
+                    <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center mb-2">
+                        <span className="text-muted-foreground text-xs font-bold">AI</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Image Unavailable</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Image Unavailable</p>
                 </div>
             )}
         </div>

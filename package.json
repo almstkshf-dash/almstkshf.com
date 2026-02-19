@@ -16,7 +16,7 @@
     "e2e:headless": "start-server-and-test dev http://localhost:3001 \"cypress run --e2e\""
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.37.3",
+    "@clerk/nextjs": "^6.38.0",
     "@google/generative-ai": "^0.24.1",
     "@opentelemetry/api": "^1.9.0",
     "@react-three/drei": "^10.7.7",

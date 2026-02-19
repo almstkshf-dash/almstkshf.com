@@ -1,12 +1,10 @@
 'use client';
 
-import Link, { LinkProps } from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useState } from 'react';
 import { ComponentPropsWithoutRef } from 'react';
 
-type HoverPrefetchLinkProps = LinkProps & ComponentPropsWithoutRef<'a'> & {
-    children: React.ReactNode;
-};
+type HoverPrefetchLinkProps = ComponentPropsWithoutRef<typeof Link>;
 
 export function HoverPrefetchLink({
     children,
@@ -20,7 +18,7 @@ export function HoverPrefetchLink({
         <Link
             {...props}
             prefetch={shouldPrefetch ? (prefetchProp === undefined ? true : prefetchProp) : false}
-            onMouseEnter={(e) => {
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                 setShouldPrefetch(true);
                 onMouseEnter?.(e);
             }}
