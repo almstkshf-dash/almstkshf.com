@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe } from 'lucide-react';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
