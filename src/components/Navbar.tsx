@@ -76,9 +76,10 @@ export default function Navbar() {
                                             onMouseEnter={() => setActiveDropdown(item.label)}
                                             onFocus={() => setActiveDropdown(item.label)}
                                         >
-                                            <button
+                                            <Button
+                                                variant="ghost"
                                                 className={clsx(
-                                                    "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary group",
+                                                    "flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary group shadow-none h-auto py-0",
                                                     isActive || activeDropdown === item.label ? "text-primary" : "text-muted-foreground"
                                                 )}
                                                 aria-expanded={activeDropdown === item.label}
@@ -95,7 +96,7 @@ export default function Navbar() {
                                                     "w-3.5 h-3.5 transition-transform duration-300 opacity-50",
                                                     activeDropdown === item.label && "rotate-180 opacity-100"
                                                 )} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     );
                                 }
@@ -285,12 +286,14 @@ export default function Navbar() {
                                             {tCommon('app_name')}
                                         </span>
                                     </HoverPrefetchLink>
-                                    <button
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors"
+                                        className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors h-auto w-auto"
                                     >
                                         <X className="w-8 h-8" />
-                                    </button>
+                                    </Button>
                                 </div>
 
                                 <div className="flex-1 space-y-6">

@@ -1,10 +1,11 @@
 'use client';
-
+import clsx from 'clsx';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Search, Loader2, Globe, Languages, Calendar, CheckCircle2, ChevronDown, X, AlertTriangle, Filter } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { Search, Loader2, Sparkles, AlertCircle, AlertTriangle, CheckCircle2, Languages, FileText, Share2, Download, Trash2, Edit3, Plus, Filter, ChevronDown, Check, X, Newspaper, Globe, MessageSquare, Megaphone, TrendingUp, ShieldAlert, BarChart, Settings, Users, ArrowRight, Zap, Target, BookOpen, Clock, Heart, MessageCircle, MoreHorizontal } from "lucide-react";
+import Button from "../ui/Button";
+import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
@@ -330,13 +331,15 @@ function MultiSelectDropdown({
                             {selected.length} {selectedText || 'selected'}
                         </span>
                         {selected.length > 0 && (
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => onChange([])}
-                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black transition-colors px-2 py-1 rounded-lg hover:bg-primary/5"
+                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black transition-colors px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
                             >
                                 {clearAllText || 'Clear All'}
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>
