@@ -1,4 +1,5 @@
-import { action, query } from "./_generated/server";
+"use node";
+import { action, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
@@ -119,7 +120,7 @@ export const fetchDeepSources = action({
     }
 });
 
-import { mutation } from "./_generated/server";
+
 
 export const saveIngestionRun = mutation({
     args: {

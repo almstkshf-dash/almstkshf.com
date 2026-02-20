@@ -122,17 +122,17 @@ export default function SettingsPage() {
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-                    <p className="text-sm font-medium text-slate-500 animate-pulse">Loading settings...</p>
+                    <p className="text-sm font-medium text-slate-500 animate-pulse">{t('loading')}</p>
                 </div>
             </div>
         );
     }
 
     const tabs = [
-        { id: 'general', label: t('general' as any) || 'General', icon: Settings },
-        { id: 'ai', label: t('ai_data' as any) || 'AI & Data', icon: Key },
-        { id: 'social', label: t('social' as any) || 'Social', icon: Share2 },
-        { id: 'integrations', label: t('integrations' as any) || 'Integrations', icon: Shield },
+        { id: 'general', label: t('general'), icon: Settings },
+        { id: 'ai', label: t('ai_data'), icon: Key },
+        { id: 'social', label: t('social'), icon: Share2 },
+        { id: 'integrations', label: t('integrations'), icon: Shield },
     ];
 
     return (
@@ -144,7 +144,7 @@ export default function SettingsPage() {
                         {t('title')}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
-                        {t('subtitle' as any) || 'Manage your application configurations and third-party integrations.'}
+                        {t('subtitle')}
                     </p>
                 </div>
                 <Button
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         <p className="font-medium text-slate-900 dark:text-white">{t('logo_desc')}</p>
-                                        <p className="text-sm text-slate-500">Recommended size: 512x512px. Transparent PNG or SVG preferred.</p>
+                                        <p className="text-sm text-slate-500">{t('logo_size_hint')}</p>
                                     </div>
                                 </div>
                             </section>
@@ -259,7 +259,7 @@ export default function SettingsPage() {
                             <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Zap className="h-5 w-5 text-amber-500" />
-                                    Artificial Intelligence
+                                    {t('section_ai')}
                                 </h2>
                                 <div className="space-y-6">
                                     <div className="space-y-2">
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                                             value={geminiKey}
                                             onChange={(e) => setGeminiKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                                            placeholder="AIzaSy..."
+                                            placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                 </div>
@@ -278,7 +278,7 @@ export default function SettingsPage() {
                             <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Globe className="h-5 w-5 text-blue-500" />
-                                    News & Data Services
+                                    {t('section_news')}
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {[
@@ -294,6 +294,7 @@ export default function SettingsPage() {
                                                 value={field.value}
                                                 onChange={(e) => field.set(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                                                placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                     ))}
@@ -308,7 +309,7 @@ export default function SettingsPage() {
                                 <div className="flex items-center justify-between mb-8">
                                     <h2 className="text-xl font-bold flex items-center gap-2">
                                         <Share2 className="h-5 w-5 text-pink-500" />
-                                        Social Media APIs
+                                        {t('section_social')}
                                     </h2>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -319,6 +320,7 @@ export default function SettingsPage() {
                                             value={instagramKey}
                                             onChange={(e) => setInstagramKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -328,6 +330,7 @@ export default function SettingsPage() {
                                             value={twitterBearer}
                                             onChange={(e) => setTwitterBearer(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            placeholder={t('placeholder_token')}
                                         />
                                     </div>
                                 </div>
@@ -337,9 +340,9 @@ export default function SettingsPage() {
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-10 -mt-10" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <Link2 className="h-5 w-5 text-indigo-500" />
-                                    Phyllo Integration
+                                    {t('section_phyllo')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8 max-w-lg">Advanced creator economy connection. Manage your client credentials and authorize users accounts.</p>
+                                <p className="text-sm text-slate-500 mb-8 max-w-lg">{t('phyllo_desc')}</p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                                     <div className="space-y-2">
@@ -348,6 +351,7 @@ export default function SettingsPage() {
                                             value={phylloClientId}
                                             onChange={(e) => setPhylloClientId(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder={t('placeholder_id')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -357,14 +361,15 @@ export default function SettingsPage() {
                                             value={phylloClientSecret}
                                             onChange={(e) => setPhylloClientSecret(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            placeholder={t('placeholder_secret')}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="space-y-1">
-                                        <h3 className="font-bold text-lg">Test Connection</h3>
-                                        <p className="text-indigo-100 text-sm">Initiate the Phyllo Connect flow with your current credentials.</p>
+                                        <h3 className="font-bold text-lg">{t('phyllo_test')}</h3>
+                                        <p className="text-indigo-100 text-sm">{t('phyllo_test_desc')}</p>
                                     </div>
                                     <PhylloConnectButton className="px-8 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
                                 </div>
@@ -379,27 +384,27 @@ export default function SettingsPage() {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl -mr-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <MessageSquare className="h-5 w-5 text-emerald-500" />
-                                    Chatbase AI Support
+                                    {t('section_chatbase')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8">Manage your Chatbase widget which provides 24/7 AI-powered support in the bottom-right corner.</p>
+                                <p className="text-sm text-slate-500 mb-8">{t('chatbase_desc')}</p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">Chatbot ID</label>
+                                        <label className="text-sm font-bold">{t('chatbase_id')}</label>
                                         <input
                                             value={chatbaseId}
                                             onChange={(e) => setChatbaseId(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
-                                            placeholder="WGKAf1CTH..."
+                                            placeholder={t('placeholder_id')}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">Host URL</label>
+                                        <label className="text-sm font-bold">{t('chatbase_host')}</label>
                                         <input
                                             value={chatbaseHost}
                                             onChange={(e) => setChatbaseHost(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none"
-                                            placeholder="https://www.chatbase.co/"
+                                            placeholder={t('placeholder_url')}
                                         />
                                     </div>
                                 </div>
@@ -410,40 +415,40 @@ export default function SettingsPage() {
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 blur-2xl -mr-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <CreditCard className="h-5 w-5 text-violet-500" />
-                                    Stripe Payments
+                                    {t('section_stripe')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8">Configure your payment gateway for subscriptions and one-time purchases.</p>
+                                <p className="text-sm text-slate-500 mb-8">{t('stripe_desc')}</p>
 
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">Publishable Key</label>
+                                        <label className="text-sm font-bold">{t('stripe_publishable')}</label>
                                         <input
                                             type="password"
                                             value={stripePublishableKey}
                                             onChange={(e) => setStripePublishableKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
-                                            placeholder="pk_live_..."
+                                            placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold">Secret Key</label>
+                                            <label className="text-sm font-bold">{t('stripe_secret')}</label>
                                             <input
                                                 type="password"
                                                 value={stripeSecretKey}
                                                 onChange={(e) => setStripeSecretKey(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
-                                                placeholder="sk_live_..."
+                                                placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold">Webhook Secret</label>
+                                            <label className="text-sm font-bold">{t('stripe_webhook')}</label>
                                             <input
                                                 type="password"
                                                 value={stripeWebhookSecret}
                                                 onChange={(e) => setStripeWebhookSecret(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
-                                                placeholder="whsec_..."
+                                                placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                     </div>
