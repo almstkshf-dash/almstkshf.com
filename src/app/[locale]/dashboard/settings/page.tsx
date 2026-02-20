@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import PhylloConnectButton from '@/components/PhylloConnect';
 import clsx from 'clsx';
+import Button from '@/components/ui/Button';
 
 export default function SettingsPage() {
     const t = useTranslations('Settings');
@@ -146,14 +147,15 @@ export default function SettingsPage() {
                         {t('subtitle' as any) || 'Manage your application configurations and third-party integrations.'}
                     </p>
                 </div>
-                <button
+                <Button
                     onClick={handleSave}
-                    disabled={isLoading}
-                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-200 dark:hover:shadow-none disabled:opacity-50 active:scale-95"
+                    isLoading={isLoading}
+                    variant="primary"
+                    className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-200 dark:hover:shadow-none h-auto"
+                    leftIcon={!isLoading && <Save className="h-5 w-5" />}
                 >
-                    {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
                     {t('save')}
-                </button>
+                </Button>
             </div>
 
             {message && (
@@ -170,19 +172,20 @@ export default function SettingsPage() {
                 {/* Sidebar Navigation */}
                 <nav className="lg:w-64 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-none">
                     {tabs.map((tab) => (
-                        <button
+                        <Button
                             key={tab.id}
+                            variant={activeTab === tab.id ? "primary" : "ghost"}
                             onClick={() => setActiveTab(tab.id as any)}
                             className={clsx(
-                                "flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap",
+                                "flex items-center justify-start gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap shadow-none",
                                 activeTab === tab.id
                                     ? "bg-blue-600 text-white shadow-md shadow-blue-100 dark:shadow-none"
                                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                             )}
+                            leftIcon={<tab.icon className="h-5 w-5" />}
                         >
-                            <tab.icon className="h-5 w-5" />
                             {tab.label}
-                        </button>
+                        </Button>
                     ))}
                 </nav>
 

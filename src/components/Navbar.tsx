@@ -133,7 +133,7 @@ export default function Navbar() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border bg-muted/30 lg:px-2 xl:px-3"
+                                className="gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-full hover:bg-muted border border-border bg-muted/30 lg:px-2 xl:px-3"
                                 title={t('search')}
                             >
                                 <Search className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ export default function Navbar() {
                                 variant="secondary"
                                 size="icon"
                                 onClick={toggleLocale}
-                                className="w-10 h-10 text-muted-foreground hover:text-foreground transition-all rounded-full hover:bg-muted border border-border bg-background group shadow-sm"
+                                className="w-10 h-10 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted border border-border bg-background group shadow-sm"
                                 aria-label="Switch Language"
                             >
                                 <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -163,7 +163,7 @@ export default function Navbar() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full"
+                                                    className="text-sm font-medium text-muted-foreground hover:text-foreground px-4 py-2 hover:bg-muted rounded-full"
                                                 >
                                                     {loginLabel}
                                                 </Button>
@@ -207,7 +207,7 @@ export default function Navbar() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
                                 onClick={() => setMobileMenuOpen(true)}
                             >
                                 <Menu className="w-8 h-8" />
@@ -348,7 +348,7 @@ export default function Navbar() {
                                                     <Button
                                                         variant="primary"
                                                         size="lg"
-                                                        className="w-full p-4 text-center font-bold text-lg"
+                                                        className="w-full p-4 font-bold text-lg"
                                                     >
                                                         {t('get_started')}
                                                     </Button>
@@ -377,7 +377,7 @@ export default function Navbar() {
                                         variant="secondary"
                                         size="lg"
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
-                                        className="flex items-center justify-center gap-3 p-4 text-muted-foreground hover:text-foreground bg-muted rounded-xl transition-all border border-border"
+                                        className="gap-3 p-4 text-muted-foreground hover:text-foreground bg-muted rounded-xl border border-border"
                                     >
                                         <Globe className="w-5 h-5" />
                                         <span className="font-medium">{isRTL ? "English" : "العربية"}</span>

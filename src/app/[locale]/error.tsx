@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
+import Button from '@/components/ui/Button';
 
 export default function Error({
     error,
@@ -45,12 +46,14 @@ export default function Error({
                 </p>
 
                 <div className="flex justify-center gap-4">
-                    <button
+                    <Button
                         onClick={() => reset()}
-                        className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-sm transition-all hover:bg-blue-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                        variant="primary"
+                        size="lg"
+                        className="shadow-sm transition-all hover:shadow-md h-auto"
                     >
                         {t('retry')}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

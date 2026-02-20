@@ -158,7 +158,7 @@ export default function Footer() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="hover:text-foreground transition-colors h-auto p-0 font-medium uppercase tracking-widest text-[11px] shadow-none hover:bg-transparent"
+                            className="hover:text-foreground h-auto p-0 font-medium uppercase tracking-widest text-[11px] shadow-none hover:bg-transparent"
                         >
                             {t('status')}
                         </Button>

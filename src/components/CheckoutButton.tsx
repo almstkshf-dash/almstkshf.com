@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import clsx from 'clsx';
 import { getStripe } from '@/lib/stripe-client';
 import { useAuth } from '@clerk/nextjs';
 import Button from '@/components/ui/Button';
@@ -59,7 +60,7 @@ export default function CheckoutButton({
         <Button
             onClick={handleCheckout}
             isLoading={loading}
-            className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white rounded-xl font-semibold transition-all disabled:cursor-not-allowed h-auto ${className}`}
+            className={clsx("h-auto", className)}
         >
             {loading ? 'Processing...' : children}
         </Button>

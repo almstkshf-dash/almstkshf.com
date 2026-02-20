@@ -194,7 +194,7 @@ export default function DashboardPage() {
                         <Button
                             variant="secondary"
                             onClick={() => setManualModalOpen(true)}
-                            className="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-border text-amber-600 dark:text-amber-300 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs shadow-none"
+                            className="bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-300 px-4 text-xs shadow-none h-auto"
                             leftIcon={<Plus className="w-3.5 h-3.5" />}
                         >
                             {t('manual_entry')}
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                                 variant="danger"
                                 onClick={handleClearAll}
                                 isLoading={isClearing}
-                                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive px-4 py-2.5 rounded-xl transition-colors font-bold text-xs disabled:opacity-40 shadow-none"
+                                className="bg-destructive/10 hover:bg-destructive/20 border-destructive/20 text-destructive px-4 text-xs shadow-none h-auto"
                                 leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
                             >
                                 {t('clear_all')}
@@ -223,7 +223,7 @@ export default function DashboardPage() {
                                 onClick={() => handleExport('pdf')}
                                 isLoading={isExporting}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed shadow-none h-auto"
+                                className="px-3 hover:bg-background text-xs text-muted-foreground hover:text-foreground shadow-none h-auto"
                                 leftIcon={!isExporting && <FileDown className="w-3.5 h-3.5" />}
                             >
                                 {t('filters.export_pdf')}
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                                 variant="ghost"
                                 onClick={() => handleExport('excel')}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed shadow-none h-auto"
+                                className="px-3 hover:bg-background text-xs text-muted-foreground hover:text-foreground shadow-none h-auto"
                                 leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
                             >
                                 {t('filters.export_excel')}

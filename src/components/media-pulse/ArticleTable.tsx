@@ -101,7 +101,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                         size="sm"
                         onClick={handleBatchDelete}
                         isLoading={isBatchDeleting}
-                        className="flex items-center gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold transition-all shadow-lg shadow-destructive/25 disabled:opacity-50 h-auto"
+                        className="gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold shadow-lg shadow-destructive/25 h-auto"
                         leftIcon={!isBatchDeleting && <Trash2 className="w-3.5 h-3.5" />}
                     >
                         {t('delete_selected', { count: selectedIds.size })}
@@ -218,7 +218,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                         size="icon"
                                         onClick={() => handleDelete(article._id)}
                                         isLoading={deletingId === article._id}
-                                        className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-50 h-8 w-8 shadow-none"
+                                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-8 w-8 shadow-none"
                                         title={t('delete')}
                                     >
                                         {!deletingId === article._id && <Trash2 className="w-3.5 h-3.5" />}

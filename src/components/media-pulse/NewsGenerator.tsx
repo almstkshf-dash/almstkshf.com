@@ -302,7 +302,7 @@ function MultiSelectDropdown({
                                         variant="ghost"
                                         onClick={() => toggle(item.id)}
                                         className={clsx(
-                                            "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-lg transition-all h-auto shadow-none",
+                                            "w-full flex justify-start gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto",
                                             selected.includes(item.id)
                                                 ? 'bg-primary/10 text-primary font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
@@ -336,7 +336,7 @@ function MultiSelectDropdown({
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onChange([])}
-                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black transition-colors px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
+                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
                             >
                                 {clearAllText || 'Clear All'}
                             </Button>
@@ -488,7 +488,7 @@ export default function NewsGenerator() {
                         variant="ghost"
                         size="sm"
                         onClick={clearForm}
-                        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50 h-auto shadow-none"
+                        className="text-xs text-muted-foreground hover:text-foreground gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50 h-auto shadow-none"
                     >
                         <X className="w-3 h-3" />
                         {t('clear')}
@@ -618,7 +618,7 @@ export default function NewsGenerator() {
                     <Button
                         onClick={handleGenerate}
                         isLoading={loading}
-                        className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground font-bold px-10 py-3.5 rounded-xl transition-all shadow-xl shadow-primary/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
+                        className="w-full md:w-auto font-bold px-10 py-3.5 shadow-xl shadow-primary/20 text-sm whitespace-nowrap"
                     >
                         {loading ? (
                             t('analyzing')
