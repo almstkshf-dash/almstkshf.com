@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { MessageSquare, X, Bot, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Button from "./ui/Button";
 import { useLocale } from "next-intl";
 
 export default function ChatbotTrigger() {
@@ -71,11 +72,10 @@ export default function ChatbotTrigger() {
                 )}
             </AnimatePresence>
 
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            <Button
+                variant="primary"
                 onClick={toggleChat}
-                className="relative group flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950 transition-all"
+                className="relative group flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950 transition-all p-0 h-auto"
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 aria-haspopup="true"
                 aria-expanded={isOpen}
@@ -106,7 +106,7 @@ export default function ChatbotTrigger() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </motion.button>
+            </Button>
         </div>
     );
 }

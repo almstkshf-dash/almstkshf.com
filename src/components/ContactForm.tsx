@@ -62,12 +62,14 @@ export default function ContactForm() {
                     <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                 </div>
                 <h3 className="text-xl font-bold text-white">{t("success")}</h3>
-                <button
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setStatus("idle")}
-                    className="text-emerald-400 font-medium hover:underline text-sm"
+                    className="text-emerald-400 font-medium hover:underline text-sm h-auto p-0 hover:bg-transparent shadow-none"
                 >
                     {t("send_another")}
-                </button>
+                </Button>
             </motion.div>
         );
     }

@@ -103,14 +103,22 @@ export default function KYCVerification() {
                     <h5 className="text-white font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-widest text-[10px] text-slate-600">
                         Help Center
                     </h5>
-                    <button className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm transition-colors">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                        rightIcon={<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                    >
                         Read verification requirements
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                    <button className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm mt-3 transition-colors">
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-400 hover:text-white flex items-center gap-2 group text-sm mt-3 transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                        rightIcon={<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                    >
                         Enterprise onboarding guide
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

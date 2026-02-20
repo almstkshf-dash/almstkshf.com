@@ -6,6 +6,7 @@ import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import Button from "./ui/Button";
 
 export default function Footer() {
     const t = useTranslations("Footer");
@@ -154,7 +155,13 @@ export default function Footer() {
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>
                         <a href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</a>
-                        <button className="hover:text-foreground transition-colors">{t('status')}</button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:text-foreground transition-colors h-auto p-0 font-medium uppercase tracking-widest text-[11px] shadow-none hover:bg-transparent"
+                        >
+                            {t('status')}
+                        </Button>
                     </div>
                 </div>
             </Container>

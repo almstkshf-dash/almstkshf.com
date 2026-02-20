@@ -18,6 +18,7 @@ import {
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/routing";
 import clsx from "clsx";
+import Button from "@/components/ui/Button";
 
 export default function LexcoraClient() {
     const t = useTranslations("CaseStudies.lexcora");
@@ -160,12 +161,20 @@ export default function LexcoraClient() {
                                                     <CheckCircle2 className="w-6 h-6 text-primary" />
                                                 </div>
                                                 <div className="flex flex-col items-end gap-1">
-                                                    <button className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                                    >
                                                         {t("cta_pricing")}
-                                                    </button>
-                                                    <button className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors">
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                                    >
                                                         {t("cta_case_studies")}
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </div>
                                             <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">

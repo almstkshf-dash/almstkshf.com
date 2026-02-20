@@ -89,34 +89,37 @@ export default function IntegrationHub() {
                                         <span className="text-slate-400 truncate max-w-[200px] md:max-w-none">
                                             {showKey[item.id] ? item.apiKey : "••••••••••••••••••••••••••••"}
                                         </span>
-                                        <button
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={() => toggleKey(item.id)}
-                                            className="text-slate-500 hover:text-white transition-colors"
+                                            className="text-slate-500 hover:text-white transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                                         >
                                             {showKey[item.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
                                         onClick={() => copyToClipboard(item.apiKey!, item.id)}
-                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors"
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors h-auto shadow-none"
+                                        leftIcon={copied === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-500" />}
                                     >
                                         {copied === item.id ? (
-                                            <>
-                                                <Check className="w-3 h-3 text-emerald-400" />
-                                                <span className="text-emerald-400">Copied</span>
-                                            </>
+                                            <span className="text-emerald-400">Copied</span>
                                         ) : (
-                                            <>
-                                                <Copy className="w-3 h-3 text-slate-500" />
-                                                <span>Copy</span>
-                                            </>
+                                            <span>Copy</span>
                                         )}
-                                    </button>
-                                    <button className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white transition-colors">
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white transition-colors h-8 w-8 shadow-none"
+                                    >
                                         <RefreshCw className="w-4 h-4" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}

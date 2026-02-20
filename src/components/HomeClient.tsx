@@ -6,6 +6,7 @@ import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
 import Image from 'next/image';
+import Button from '@/components/ui/Button';
 import FreeInsightTool from '@/components/FreeInsightTool';
 
 export default function HomeClient() {
@@ -89,12 +90,14 @@ export default function HomeClient() {
                             {t('Common.try_ai')}
                         </Link>
 
-                        <button
+                        <Button
+                            variant="secondary"
+                            size="lg"
                             onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                             className="px-10 py-5 bg-card border border-border backdrop-blur-xl hover:border-primary text-muted-foreground rounded-2xl font-semibold transition-all hover:text-foreground"
                         >
                             {t('Common.view_details')}
-                        </button>
+                        </Button>
                     </motion.div>
                 </div>
 

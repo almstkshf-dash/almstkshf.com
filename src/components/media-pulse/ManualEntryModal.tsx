@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { X, Loader2, Plus, Wand2 } from 'lucide-react';
+import Button from '@/components/ui/Button';
 
 interface ManualEntryModalProps {
     isOpen: boolean;
@@ -143,9 +144,14 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         <Plus className="w-5 h-5 text-primary" />
                         {t('title')}
                     </h2>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={onClose}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
                         <X className="h-6 w-6" />
-                    </button>
+                    </Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -206,22 +212,20 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                     autoComplete="off"
                                     className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                                 />
-                                <button
+                                <Button
                                     type="button"
+                                    variant="secondary"
                                     onClick={handleExtract}
-                                    disabled={!formData.url || isExtracting}
-                                    className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0"
+                                    isLoading={isExtracting}
+                                    disabled={!formData.url}
+                                    className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0 h-auto shadow-none"
                                     title={t('fetch_article')}
                                 >
-                                    {isExtracting ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <Wand2 className="w-4 h-4" />
-                                    )}
+                                    {!isExtracting && <Wand2 className="w-4 h-4" />}
                                     <span className="hidden sm:inline">
                                         {isExtracting ? t('extracting') : t('fetch_article')}
                                     </span>
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -333,21 +337,20 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-border transition-colors">
-                        <button
-                            type="button"
+                        <Button
+                            variant="ghost"
                             onClick={onClose}
-                            className="px-6 py-3 rounded-xl text-muted-foreground hover:text-foreground font-medium transition-colors"
+                            className="px-6 py-3 rounded-xl text-muted-foreground hover:text-foreground font-medium transition-colors h-auto shadow-none"
                         >
                             {t('cancel')}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
-                            disabled={isLoading}
-                            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
+                            isLoading={isLoading}
+                            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] h-auto"
                         >
-                            {isLoading && <Loader2 className="animate-spin h-4 w-4" />}
                             {t('save')}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div >

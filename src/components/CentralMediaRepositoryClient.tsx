@@ -16,6 +16,7 @@ import {
     FolderTree,
     ArrowRight
 } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 export default function CentralMediaRepositoryClient() {
     const t = useTranslations("MediaMonitoring.central_media_repository");
@@ -206,9 +207,13 @@ export default function CentralMediaRepositoryClient() {
                         <div className="p-8 rounded-3xl bg-blue-600/5 border border-blue-500/10 flex flex-col justify-center items-center text-center space-y-4">
                             <div className="text-blue-400 font-bold uppercase tracking-widest text-xs">{t("advanced_capabilities.transparency")}</div>
                             <h3 className="text-foreground font-bold text-xl leading-snug">{t("advanced_capabilities.backup_title")}</h3>
-                            <button className="flex items-center gap-2 text-blue-400 font-semibold text-sm group">
-                                {t("advanced_capabilities.learn_more")} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </button>
+                            <Button
+                                variant="ghost"
+                                className="flex items-center gap-2 text-blue-400 font-semibold text-sm group h-auto p-0 hover:bg-transparent shadow-none"
+                                rightIcon={<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+                            >
+                                {t("advanced_capabilities.learn_more")}
+                            </Button>
                         </div>
                     </div>
                 </Container>
@@ -225,9 +230,13 @@ export default function CentralMediaRepositoryClient() {
                         <p className="text-blue-100 text-lg md:text-xl max-w-2xl">
                             {t("cta.subtitle")}
                         </p>
-                        <button className="px-10 py-5 bg-white text-blue-900 rounded-2xl font-bold text-lg hover:bg-blue-50 transition-colors shadow-2xl">
+                        <Button
+                            variant="secondary"
+                            size="lg"
+                            className="px-10 py-5 bg-white text-blue-900 rounded-2xl font-bold text-lg hover:bg-blue-50 transition-colors shadow-2xl h-auto"
+                        >
                             {t("cta.button")}
-                        </button>
+                        </Button>
                     </div>
                 </Container>
             </section>

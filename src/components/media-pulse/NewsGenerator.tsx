@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Search, Loader2, Globe, Languages, Calendar, CheckCircle2, ChevronDown, X, AlertTriangle, Filter } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
@@ -295,25 +296,29 @@ function MultiSelectDropdown({
                         ) : (
                             <div className="p-1.5 grid grid-cols-1 gap-0.5">
                                 {filtered.map((item) => (
-                                    <button
+                                    <Button
                                         key={item.id}
-                                        type="button"
+                                        variant="ghost"
                                         onClick={() => toggle(item.id)}
-                                        className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-lg transition-all ${selected.includes(item.id)
-                                            ? 'bg-primary/10 text-primary font-semibold'
-                                            : 'text-foreground hover:bg-muted font-medium'
-                                            }`}
+                                        className={clsx(
+                                            "w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm rounded-lg transition-all h-auto shadow-none",
+                                            selected.includes(item.id)
+                                                ? 'bg-primary/10 text-primary font-semibold'
+                                                : 'text-foreground hover:bg-muted font-medium'
+                                        )}
                                     >
-                                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${selected.includes(item.id)
-                                            ? 'bg-primary border-primary shadow-lg shadow-primary/20'
-                                            : 'border-border bg-background'
-                                            }`}>
+                                        <div className={clsx(
+                                            "w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all",
+                                            selected.includes(item.id)
+                                                ? 'bg-primary border-primary shadow-lg shadow-primary/20'
+                                                : 'border-border bg-background'
+                                        )}>
                                             {selected.includes(item.id) && (
                                                 <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" />
                                             )}
                                         </div>
                                         <div className="flex-1 truncate">{finalRenderItem(item)}</div>
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         )}
@@ -476,10 +481,15 @@ export default function NewsGenerator() {
                     </div>
                 </div>
                 {(keyword || result || errorMsg) && (
-                    <button onClick={clearForm} className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={clearForm}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50 h-auto shadow-none"
+                    >
                         <X className="w-3 h-3" />
                         {t('clear')}
-                    </button>
+                    </Button>
                 )}
             </div>
 
@@ -602,17 +612,17 @@ export default function NewsGenerator() {
                         )}
                     </div>
 
-                    <button
+                    <Button
                         onClick={handleGenerate}
-                        disabled={loading}
+                        isLoading={loading}
                         className="w-full md:w-auto bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground font-bold px-10 py-3.5 rounded-xl transition-all shadow-xl shadow-primary/20 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2.5 text-sm whitespace-nowrap"
                     >
                         {loading ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('analyzing')}</>
+                            t('analyzing')
                         ) : (
                             <>🚀 {t('generate_report')}</>
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </section>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
 import ManualEntryModal from '@/components/media-pulse/ManualEntryModal';
@@ -132,9 +133,14 @@ export default function DashboardPage() {
                     )}>
                         {toast.type === 'error' && <AlertTriangle className="w-4 h-4 flex-shrink-0" />}
                         <span className="text-sm font-medium">{toast.message}</span>
-                        <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setToast(null)}
+                            className="ml-2 hover:opacity-80 h-7 w-7"
+                        >
                             <X className="w-3.5 h-3.5" />
-                        </button>
+                        </Button>
                     </div>
                 )}
 
@@ -146,48 +152,65 @@ export default function DashboardPage() {
                                 {t('title')}
                             </h1>
                             <div className="flex bg-muted/60 rounded-full border border-border p-1">
-                                <button
-                                    className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'standard' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
+                                <Button
+                                    variant={activeView === 'standard' ? 'primary' : 'ghost'}
+                                    size="sm"
+                                    className={clsx(
+                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
+                                        activeView !== 'standard' && "text-muted-foreground"
+                                    )}
                                     onClick={() => setActiveView('standard')}
                                 >
                                     {t('filters.view_standard')}
-                                </button>
-                                <button
-                                    className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'deep' ? 'bg-indigo-500 text-white' : 'text-muted-foreground'}`}
+                                </Button>
+                                <Button
+                                    variant={activeView === 'deep' ? 'primary' : 'ghost'}
+                                    size="sm"
+                                    className={clsx(
+                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
+                                        activeView === 'deep' ? 'bg-indigo-500 hover:bg-indigo-600' : "text-muted-foreground"
+                                    )}
                                     onClick={() => setActiveView('deep')}
                                 >
                                     {t('filters.view_deep')}
-                                </button>
-                                <button
-                                    className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'osint' ? 'bg-emerald-500 text-white' : 'text-muted-foreground'}`}
+                                </Button>
+                                <Button
+                                    variant={activeView === 'osint' ? 'primary' : 'ghost'}
+                                    size="sm"
+                                    className={clsx(
+                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
+                                        activeView === 'osint' ? 'bg-emerald-500 hover:bg-emerald-600' : "text-muted-foreground"
+                                    )}
                                     onClick={() => setActiveView('osint')}
                                 >
                                     {t('filters.view_osint')}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                         <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         {/* Add Manual Entry */}
-                        <button
+                        <Button
+                            variant="secondary"
                             onClick={() => setManualModalOpen(true)}
-                            className="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-border text-amber-600 dark:text-amber-300 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs"
+                            className="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-border text-amber-600 dark:text-amber-300 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs shadow-none"
+                            leftIcon={<Plus className="w-3.5 h-3.5" />}
                         >
-                            <Plus className="w-3.5 h-3.5" />
                             {t('manual_entry')}
-                        </button>
+                        </Button>
 
                         {/* Clear All */}
                         {articles.length > 0 && (
-                            <button
+                            <Button
+                                variant="danger"
                                 onClick={handleClearAll}
-                                disabled={isClearing}
-                                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive px-4 py-2.5 rounded-xl transition-colors font-bold text-xs disabled:opacity-40"
+                                isLoading={isClearing}
+                                className="flex items-center gap-2 bg-destructive/10 hover:bg-destructive/20 border border-destructive/20 text-destructive px-4 py-2.5 rounded-xl transition-colors font-bold text-xs disabled:opacity-40 shadow-none"
+                                leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
                             >
-                                {isClearing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                                 {t('clear_all')}
-                            </button>
+                            </Button>
                         )}
 
                         {/* Vertical Divider */}
@@ -195,23 +218,26 @@ export default function DashboardPage() {
 
                         {/* Export Buttons */}
                         <div className="flex bg-muted/50 rounded-xl border border-border p-0.5">
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => handleExport('pdf')}
-                                disabled={isExporting || filteredArticles.length === 0}
-                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                                isLoading={isExporting}
+                                disabled={filteredArticles.length === 0}
+                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed shadow-none h-auto"
+                                leftIcon={!isExporting && <FileDown className="w-3.5 h-3.5" />}
                             >
-                                {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
                                 {t('filters.export_pdf')}
-                            </button>
+                            </Button>
                             <div className="w-px bg-border my-1" />
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => handleExport('excel')}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed shadow-none h-auto"
+                                leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
                             >
-                                <FileSpreadsheet className="w-3.5 h-3.5" />
                                 {t('filters.export_excel')}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </header>
@@ -270,18 +296,20 @@ export default function DashboardPage() {
 
                                 <div className="flex flex-wrap gap-1.5">
                                     {sourceTypes.map((type) => (
-                                        <button
+                                        <Button
                                             key={type.id}
+                                            variant={selectedType === type.id ? 'primary' : 'secondary'}
+                                            size="sm"
                                             onClick={() => setSelectedType(type.id)}
                                             className={clsx(
-                                                "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border",
+                                                "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border h-auto",
                                                 selectedType === type.id
-                                                    ? 'bg-primary/10 border-primary/30 text-primary'
-                                                    : 'bg-muted border-border text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                                                    ? 'bg-primary/10 border-primary/30 text-primary shadow-none'
+                                                    : 'bg-muted border-border text-muted-foreground hover:bg-muted/80 hover:text-foreground shadow-none'
                                             )}
                                         >
                                             {type.label}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
@@ -291,12 +319,13 @@ export default function DashboardPage() {
                                     <ArticleTable articles={filteredArticles} limit={50} />
                                     {result?.nextSkip !== null && (
                                         <div className="flex justify-center py-4">
-                                            <button
+                                            <Button
+                                                variant="secondary"
                                                 onClick={() => setSkip(result.nextSkip || 0)}
-                                                className="px-4 py-2 bg-muted border border-border rounded-lg text-sm font-bold hover:bg-background"
+                                                className="px-4 py-2 bg-muted border border-border rounded-lg text-sm font-bold hover:bg-background h-auto"
                                             >
                                                 {t('filters.load_more')}
-                                            </button>
+                                            </Button>
                                         </div>
                                     )}
                                 </>

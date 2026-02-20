@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Loader2, Link2 } from 'lucide-react';
+import Button from './ui/Button';
 
 declare global {
     interface Window {
@@ -79,19 +80,16 @@ export default function PhylloConnectButton({ className, label = "Connect Social
                 strategy="lazyOnload"
                 onLoad={() => console.log("📚 Phyllo SDK Loaded")}
             />
-            <button
+            <Button
                 type="button"
+                variant="primary"
                 onClick={openPhyllo}
-                disabled={isConnecting}
-                className={className || "flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"}
+                isLoading={isConnecting}
+                className={className || "flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 h-auto"}
+                leftIcon={!isConnecting && <Link2 className="w-5 h-5" />}
             >
-                {isConnecting ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                    <Link2 className="w-5 h-5" />
-                )}
                 {label}
-            </button>
+            </Button>
         </>
     );
 }

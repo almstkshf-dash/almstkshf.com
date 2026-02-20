@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Loader2, ExternalLink, Image as ImageIcon, Trash2 } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { useState } from 'react';
 import clsx from 'clsx';
 
@@ -95,14 +96,16 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                             {t('items_selected', { count: selectedIds.size })}
                         </span>
                     </div>
-                    <button
+                    <Button
+                        variant="danger"
+                        size="sm"
                         onClick={handleBatchDelete}
-                        disabled={isBatchDeleting}
-                        className="flex items-center gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold transition-all shadow-lg shadow-destructive/25 disabled:opacity-50"
+                        isLoading={isBatchDeleting}
+                        className="flex items-center gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold transition-all shadow-lg shadow-destructive/25 disabled:opacity-50 h-auto"
+                        leftIcon={!isBatchDeleting && <Trash2 className="w-3.5 h-3.5" />}
                     >
-                        {isBatchDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                         {t('delete_selected', { count: selectedIds.size })}
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -210,18 +213,16 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mx-auto shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                                 </td>
                                 <td className="p-4 text-center">
-                                    <button
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
                                         onClick={() => handleDelete(article._id)}
-                                        disabled={deletingId === article._id}
-                                        className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-50"
+                                        isLoading={deletingId === article._id}
+                                        className="opacity-0 group-hover:opacity-100 transition-all p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive disabled:opacity-50 h-8 w-8 shadow-none"
                                         title={t('delete')}
                                     >
-                                        {deletingId === article._id ? (
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                        ) : (
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        )}
-                                    </button>
+                                        {!deletingId === article._id && <Trash2 className="w-3.5 h-3.5" />}
+                                    </Button>
                                 </td>
                             </tr>
                         ))}

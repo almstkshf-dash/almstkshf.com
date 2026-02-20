@@ -3,6 +3,7 @@
 import { useQuery, useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -40,14 +41,16 @@ export default function DeepStatusPanel() {
                     <ShieldCheck className="w-5 h-5 text-indigo-500" />
                     <h3 className="text-lg font-bold">{t('title')}</h3>
                 </div>
-                <button
+                <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={handleFetch}
-                    disabled={loading}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted text-sm font-bold"
+                    isLoading={loading}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted text-sm font-bold h-auto shadow-none"
+                    leftIcon={!loading && <RefreshCw className="w-4 h-4" />}
                 >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                     {t('fetch_now') || 'Fetch Now'}
-                </button>
+                </Button>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             {success && <p className="text-sm text-emerald-600">{success}</p>}

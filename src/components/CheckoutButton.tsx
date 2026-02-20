@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { getStripe } from '@/lib/stripe-client';
 import { useAuth } from '@clerk/nextjs';
+import Button from '@/components/ui/Button';
 
 interface CheckoutButtonProps {
     productId: string;
@@ -55,13 +56,12 @@ export default function CheckoutButton({
     };
 
     return (
-        <button
+        <Button
             onClick={handleCheckout}
-            disabled={loading}
-            className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white rounded-xl font-semibold transition-all disabled:cursor-not-allowed ${className}`}
+            isLoading={loading}
+            className={`inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white rounded-xl font-semibold transition-all disabled:cursor-not-allowed h-auto ${className}`}
         >
-            {loading && <Loader2 className="w-5 h-5 animate-spin" />}
             {loading ? 'Processing...' : children}
-        </button>
+        </Button>
     );
 }

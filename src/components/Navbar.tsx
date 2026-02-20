@@ -12,6 +12,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
+import Button from "@/components/ui/Button";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
@@ -127,7 +128,9 @@ export default function Navbar() {
                             className="hidden lg:flex items-center lg:gap-2 xl:gap-4"
                             onMouseEnter={() => setActiveDropdown(null)}
                         >
-                            <button
+                            <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
                                 className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border bg-muted/30 lg:px-2 xl:px-3"
                                 title={t('search')}
@@ -138,25 +141,31 @@ export default function Navbar() {
                                     <span className="text-[10px] border border-border px-1 rounded bg-muted/50">K</span>
                                 </span>
                                 <span className="hidden xl:inline-block">{t('search')}</span>
-                            </button>
+                            </Button>
 
                             <ThemeToggle />
-                            <button
+                            <Button
+                                variant="secondary"
+                                size="icon"
                                 onClick={toggleLocale}
-                                className="flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-foreground transition-all rounded-full hover:bg-muted border border-border bg-background group active:scale-95 shadow-sm"
+                                className="w-10 h-10 text-muted-foreground hover:text-foreground transition-all rounded-full hover:bg-muted border border-border bg-background group shadow-sm"
                                 aria-label="Switch Language"
                             >
                                 <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                            </button>
+                            </Button>
 
                             {mounted && (
                                 <>
                                     <SignedOut>
                                         <div className="flex items-center gap-2">
                                             <SignInButton mode="modal">
-                                                <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full"
+                                                >
                                                     {loginLabel}
-                                                </button>
+                                                </Button>
                                             </SignInButton>
                                             <HoverPrefetchLink
                                                 href="/contact"
@@ -194,12 +203,14 @@ export default function Navbar() {
                         {/* Mobile Menu Toggle - Visible on Tablet and below */}
                         <div className="lg:hidden flex items-center gap-2">
                             <ThemeToggle />
-                            <button
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                                 onClick={() => setMobileMenuOpen(true)}
                             >
                                 <Menu className="w-8 h-8" />
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
@@ -331,9 +342,13 @@ export default function Navbar() {
                                         <>
                                             <SignedOut>
                                                 <SignInButton mode="modal">
-                                                    <button className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 transition-all">
+                                                    <Button
+                                                        variant="primary"
+                                                        size="lg"
+                                                        className="w-full p-4 text-center font-bold text-lg"
+                                                    >
                                                         {t('get_started')}
-                                                    </button>
+                                                    </Button>
                                                 </SignInButton>
                                             </SignedOut>
 
@@ -355,13 +370,15 @@ export default function Navbar() {
                                         </>
                                     )}
 
-                                    <button
+                                    <Button
+                                        variant="secondary"
+                                        size="lg"
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-3 p-4 text-muted-foreground hover:text-foreground bg-muted rounded-xl transition-all border border-border"
                                     >
                                         <Globe className="w-5 h-5" />
                                         <span className="font-medium">{isRTL ? "English" : "العربية"}</span>
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         </Container>

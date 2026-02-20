@@ -7,6 +7,7 @@ import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout } fr
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { useAction } from "convex/react";
+import Button from "./ui/Button";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 
@@ -117,13 +118,14 @@ export default function SmartMediaAssistantClient() {
                                 autoComplete="off"
                                 className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground/50"
                             />
-                            <button
+                            <Button
                                 onClick={handleGenerate}
-                                disabled={isGenerating || !prompt}
-                                className="px-8 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg shadow-primary/20 text-white whitespace-nowrap"
+                                isLoading={isGenerating}
+                                disabled={!prompt}
+                                className="px-8 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg shadow-primary/20 text-white whitespace-nowrap h-auto"
                             >
-                                {isGenerating ? "..." : tAi("deploy")}
-                            </button>
+                                {tAi("deploy")}
+                            </Button>
                         </motion.div>
                     </div>
 

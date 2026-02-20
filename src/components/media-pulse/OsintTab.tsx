@@ -4,6 +4,7 @@ import resources from '../../../data/osintResources.json';
 import { useState, useMemo } from 'react';
 import { ExternalLink, Filter, Shield } from 'lucide-react';
 import clsx from 'clsx';
+import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
 
 const CATEGORIES = [
@@ -164,9 +165,25 @@ export default function OsintTab() {
       <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>{t('pagination.showing', { count: paged.length, total: filtered.length })}</span>
         <div className="flex items-center gap-2">
-          <button disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))} className={clsx("px-3 py-1 rounded border", page === 0 && "opacity-40 cursor-not-allowed")}>{t('pagination.prev')}</button>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={page === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            className={clsx("px-3 py-1 rounded border h-auto", page === 0 && "opacity-40 cursor-not-allowed")}
+          >
+            {t('pagination.prev')}
+          </Button>
           <span>{t('pagination.page', { page: page + 1, total: pageCount })}</span>
-          <button disabled={page + 1 >= pageCount} onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))} className={clsx("px-3 py-1 rounded border", page + 1 >= pageCount && "opacity-40 cursor-not-allowed")}>{t('pagination.next')}</button>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={page + 1 >= pageCount}
+            onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
+            className={clsx("px-3 py-1 rounded border h-auto", page + 1 >= pageCount && "opacity-40 cursor-not-allowed")}
+          >
+            {t('pagination.next')}
+          </Button>
         </div>
       </div>
     </section>

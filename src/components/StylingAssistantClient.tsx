@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import Button from "./ui/Button";
 
 export default function StylingAssistantClient() {
     const t = useTranslations("CaseStudies.styling");
@@ -224,23 +225,14 @@ export default function StylingAssistantClient() {
                                             <p className="text-rose-400 text-sm text-center bg-rose-500/10 py-2 rounded-lg">{errorMsg}</p>
                                         )}
 
-                                        <button
+                                        <Button
                                             type="submit"
-                                            disabled={status === "submitting"}
-                                            className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                            isLoading={status === "submitting"}
+                                            className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-2xl font-bold shadow-lg shadow-purple-500/25 transition-all transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-auto"
+                                            rightIcon={status !== "submitting" && <ArrowRight className="w-5 h-5" />}
                                         >
-                                            {status === "submitting" ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                                    <span>{t("form.submitting")}</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>{t("form.submit")}</span>
-                                                    <ArrowRight className="w-5 h-5" />
-                                                </>
-                                            )}
-                                        </button>
+                                            {status === "submitting" ? t("form.submitting") : t("form.submit")}
+                                        </Button>
                                     </form>
                                 )}
                             </div>

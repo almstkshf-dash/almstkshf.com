@@ -5,6 +5,7 @@ import Container from "@/components/ui/Container";
 import { motion } from "framer-motion";
 import { Linkedin, Mail, ShieldCheck, Cpu, Award, GraduationCap } from "lucide-react";
 import Image from "next/image";
+import Button from "@/components/ui/Button";
 
 export default function BehindTheSceneClient() {
     const t = useTranslations("Team");
@@ -81,12 +82,20 @@ export default function BehindTheSceneClient() {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60"></div>
                                 <div className="absolute bottom-8 left-8 right-8 flex justify-center gap-4 relative z-10">
-                                    <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
+                                    >
                                         <Linkedin className="w-5 h-5 text-white" />
-                                    </button>
-                                    <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all">
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
+                                    >
                                         <Mail className="w-5 h-5 text-white" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 

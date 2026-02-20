@@ -78,8 +78,10 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
             {/* Filters */}
             <div className="flex flex-wrap gap-2">
                 {filters.map((f) => (
-                    <button
+                    <Button
                         key={f.label}
+                        variant={filter === f.value ? "primary" : "secondary"}
+                        size="sm"
                         onClick={() => {
                             if (filter === f.value && f.value !== "All") {
                                 router.push(f.href);
@@ -88,15 +90,14 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                             }
                         }}
                         className={clsx(
-                            "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
+                            "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 h-auto shadow-none",
                             filter === f.value
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                                : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+                            && "shadow-lg shadow-primary/25"
                         )}
+                        leftIcon={<f.icon className="w-4 h-4" />}
                     >
-                        <f.icon className="w-4 h-4" />
                         <span className="capitalize">{f.label}</span>
-                    </button>
+                    </Button>
                 ))}
             </div>
 
