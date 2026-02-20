@@ -45,6 +45,8 @@ export const analyzeMedia = action({
         const prompt = `You are an expert Media & Reputation Risk analyst.
 Analyze the following text for sentiment, risk, emotions, and strategic impact.
 
+IMPORTANT: Your response (especially "tone", "topics", "entities", and "recommendation") MUST be in the same language as the provided TEXT. If the TEXT is in Arabic, all descriptive fields in the JSON MUST be in Arabic.
+
 TEXT:
 """
 ${text}
@@ -56,11 +58,11 @@ Return valid JSON ONLY:
   "score": number (0-100, 100=most positive),
   "risk": "Low" | "Medium" | "High",
   "riskScore": number (0-100, 100=extreme risk),
-  "tone": "short phrase describing tone",
+  "tone": "short phrase describing tone in input language",
   "emotions": { "joy": 0.x, "anger": 0.x, "sadness": 0.x, "fear": 0.x, "disgust": 0.x, "surprise": 0.x, "trust": 0.x, "anticipation": 0.x },
   "topics": ["topic1", "topic2"],
   "entities": ["entity1", "entity2"],
-  "recommendation": "strategic advice (2 sentences)"
+  "recommendation": "strategic advice (2 sentences) in input language"
 }`;
 
 

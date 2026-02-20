@@ -140,10 +140,10 @@ export default function SettingsPage() {
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-8">
                 <div className="space-y-1">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
                         {t('title')}
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400">
+                    <p className="text-muted-foreground">
                         {t('subtitle')}
                     </p>
                 </div>
@@ -179,8 +179,8 @@ export default function SettingsPage() {
                             className={clsx(
                                 "flex items-center justify-start gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap shadow-none",
                                 activeTab === tab.id
-                                    ? "bg-blue-600 text-white shadow-md shadow-blue-100 dark:shadow-none"
-                                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/10 dark:shadow-none"
+                                    : "text-muted-foreground hover:bg-muted"
                             )}
                             leftIcon={<tab.icon className="h-5 w-5" />}
                         >
@@ -193,17 +193,17 @@ export default function SettingsPage() {
                 <div className="flex-1 space-y-8 animate-in fade-in duration-500">
                     {activeTab === 'general' && (
                         <div className="space-y-8">
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Upload className="h-5 w-5 text-blue-500" />
                                     {t('logo_upload')}
                                 </h2>
                                 <div className="flex flex-col sm:flex-row items-center gap-8">
-                                    <div className="relative w-40 h-40 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl flex items-center justify-center bg-slate-50 dark:bg-slate-950 overflow-hidden group">
+                                    <div className="relative w-40 h-40 border-2 border-dashed border-border rounded-3xl flex items-center justify-center bg-muted/30 overflow-hidden group">
                                         {logoUrl ? (
                                             <Image src={logoUrl} alt="Company Logo" fill className="object-contain p-4 transition-transform group-hover:scale-105" />
                                         ) : (
-                                            <Upload className="h-10 w-10 text-slate-300 dark:text-slate-700" />
+                                            <Upload className="h-10 w-10 text-muted-foreground/30" />
                                         )}
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Upload className="text-white w-6 h-6" />
@@ -216,42 +216,42 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="flex-1 space-y-2">
-                                        <p className="font-medium text-slate-900 dark:text-white">{t('logo_desc')}</p>
-                                        <p className="text-sm text-slate-500">{t('logo_size_hint')}</p>
+                                        <p className="font-medium text-foreground">{t('logo_desc')}</p>
+                                        <p className="text-sm text-muted-foreground">{t('logo_size_hint')}</p>
                                     </div>
                                 </div>
                             </section>
 
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2 font-poppins">
                                     <Settings className="h-5 w-5 text-blue-500" />
                                     {t('defaults')}
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('target_countries')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('target_countries')}</label>
                                         <input
                                             value={targetCountries}
                                             onChange={(e) => setTargetCountries(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_countries')}
                                         />
-                                        <p className="text-xs text-slate-500">{t('iso_hint')}</p>
+                                        <p className="text-xs text-muted-foreground">{t('iso_hint')}</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">{t('ave_multiplier')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('ave_multiplier')}</label>
                                         <input
                                             type="number"
                                             step="0.001"
                                             value={aveMultiplier}
                                             onChange={(e) => setAveMultiplier(parseFloat(e.target.value))}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                         />
-                                        <p className="text-xs text-slate-500">{t('default_value')}: 0.005</p>
+                                        <p className="text-xs text-muted-foreground">{t('default_value')}: 0.005</p>
                                     </div>
                                 </div>
 
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -268,26 +268,26 @@ export default function SettingsPage() {
 
                     {activeTab === 'ai' && (
                         <div className="space-y-8">
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Zap className="h-5 w-5 text-amber-500" />
                                     {t('section_ai')}
                                 </h2>
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('gemini_key')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('gemini_key')}</label>
                                         <input
                                             type="password"
                                             value={geminiKey}
                                             onChange={(e) => setGeminiKey(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                 </div>
                             </section>
 
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Globe className="h-5 w-5 text-blue-500" />
                                     {t('section_news')}
@@ -300,18 +300,18 @@ export default function SettingsPage() {
                                         { id: 'worldnews', label: t('worldnews_key'), value: worldnewsKey, set: setWorldnewsKey },
                                     ].map((field) => (
                                         <div key={field.id} className="space-y-2">
-                                            <label className="text-sm font-bold">{field.label}</label>
+                                            <label className="text-sm font-bold text-foreground/80">{field.label}</label>
                                             <input
                                                 type="password"
                                                 value={field.value}
                                                 onChange={(e) => field.set(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                                                className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                     ))}
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -328,7 +328,7 @@ export default function SettingsPage() {
 
                     {activeTab === 'social' && (
                         <div className="space-y-8">
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
                                 <div className="flex items-center justify-between mb-8">
                                     <h2 className="text-xl font-bold flex items-center gap-2">
                                         <Share2 className="h-5 w-5 text-pink-500" />
@@ -337,27 +337,27 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('instagram_key')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('instagram_key')}</label>
                                         <input
                                             type="password"
                                             value={instagramKey}
                                             onChange={(e) => setInstagramKey(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('twitter_bearer')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('twitter_bearer')}</label>
                                         <input
                                             type="password"
                                             value={twitterBearer}
                                             onChange={(e) => setTwitterBearer(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_token')}
                                         />
                                     </div>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -370,44 +370,44 @@ export default function SettingsPage() {
                                 </div>
                             </section>
 
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-10 -mt-10" />
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-10 -mt-10" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-                                    <Link2 className="h-5 w-5 text-indigo-500" />
+                                    <Link2 className="h-5 w-5 text-primary" />
                                     {t('section_phyllo')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8 max-w-lg">{t('phyllo_desc')}</p>
+                                <p className="text-sm text-muted-foreground mb-8 max-w-lg">{t('phyllo_desc')}</p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-indigo-900 dark:text-indigo-400">{t('phyllo_client_id')}</label>
+                                        <label className="text-sm font-bold text-primary/80">{t('phyllo_client_id')}</label>
                                         <input
                                             value={phylloClientId}
                                             onChange={(e) => setPhylloClientId(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_id')}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-indigo-900 dark:text-indigo-400">{t('phyllo_client_secret')}</label>
+                                        <label className="text-sm font-bold text-primary/80">{t('phyllo_client_secret')}</label>
                                         <input
                                             type="password"
                                             value={phylloClientSecret}
                                             onChange={(e) => setPhylloClientSecret(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/30 dark:bg-indigo-950/20 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_secret')}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div className="p-6 bg-gradient-to-r from-primary to-accent rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="space-y-1">
                                         <h3 className="font-bold text-lg">{t('phyllo_test')}</h3>
-                                        <p className="text-indigo-100 text-sm">{t('phyllo_test_desc')}</p>
+                                        <p className="text-white/80 text-sm">{t('phyllo_test_desc')}</p>
                                     </div>
-                                    <PhylloConnectButton className="px-8 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
+                                    <PhylloConnectButton className="px-8 py-3 bg-white text-primary rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -425,35 +425,35 @@ export default function SettingsPage() {
                     {activeTab === 'integrations' && (
                         <div className="space-y-8">
                             {/* Chatbase Integration */}
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl -mr-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <MessageSquare className="h-5 w-5 text-emerald-500" />
                                     {t('section_chatbase')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8">{t('chatbase_desc')}</p>
+                                <p className="text-sm text-muted-foreground mb-8">{t('chatbase_desc')}</p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('chatbase_id')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('chatbase_id')}</label>
                                         <input
                                             value={chatbaseId}
                                             onChange={(e) => setChatbaseId(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none font-mono"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_id')}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('chatbase_host')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('chatbase_host')}</label>
                                         <input
                                             value={chatbaseHost}
                                             onChange={(e) => setChatbaseHost(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-emerald-500 outline-none"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-emerald-500 outline-none text-foreground"
                                             placeholder={t('placeholder_url')}
                                         />
                                     </div>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -467,49 +467,49 @@ export default function SettingsPage() {
                             </section>
 
                             {/* Stripe Integration */}
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 blur-2xl -mr-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <CreditCard className="h-5 w-5 text-violet-500" />
                                     {t('section_stripe')}
                                 </h2>
-                                <p className="text-sm text-slate-500 mb-8">{t('stripe_desc')}</p>
+                                <p className="text-sm text-muted-foreground mb-8">{t('stripe_desc')}</p>
 
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold">{t('stripe_publishable')}</label>
+                                        <label className="text-sm font-bold text-foreground/80">{t('stripe_publishable')}</label>
                                         <input
                                             type="password"
                                             value={stripePublishableKey}
                                             onChange={(e) => setStripePublishableKey(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold">{t('stripe_secret')}</label>
+                                            <label className="text-sm font-bold text-foreground/80">{t('stripe_secret')}</label>
                                             <input
                                                 type="password"
                                                 value={stripeSecretKey}
                                                 onChange={(e) => setStripeSecretKey(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                                className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold">{t('stripe_webhook')}</label>
+                                            <label className="text-sm font-bold text-foreground/80">{t('stripe_webhook')}</label>
                                             <input
                                                 type="password"
                                                 value={stripeWebhookSecret}
                                                 onChange={(e) => setStripeWebhookSecret(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none font-mono"
+                                                className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
                                             />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button
                                         onClick={handleSave}
                                         isLoading={isLoading}
@@ -523,44 +523,44 @@ export default function SettingsPage() {
                             </section>
 
                             {/* Billing History Section */}
-                            <section className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm" >
-                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                                    <BarChart3 className="h-5 w-5 text-blue-500" />
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm" >
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground">
+                                    <BarChart3 className="h-5 w-5 text-primary" />
                                     {t('billing')}
                                 </h2>
                                 <div className="overflow-x-auto -mx-8">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-slate-50 dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800">
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_date')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_product')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_amount')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-slate-500">{t('col_status')}</th>
+                                            <tr className="bg-muted/50 border-y border-border">
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_date')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_product')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_amount')}</th>
+                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_status')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {!payments || payments.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={4} className="py-12 text-center text-slate-400 dark:text-slate-600 italic">
+                                                    <td colSpan={4} className="py-12 text-center text-muted-foreground italic">
                                                         {t('no_payments')}
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 payments.map((payment) => (
-                                                    <tr key={payment._id} className="border-b border-slate-50 dark:border-slate-800 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                                                        <td className="py-4 px-8 text-sm text-slate-600 dark:text-slate-400">
+                                                    <tr key={payment._id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                                                        <td className="py-4 px-8 text-sm text-muted-foreground">
                                                             {new Date(payment.createdAt).toLocaleDateString()}
                                                         </td>
-                                                        <td className="py-4 px-8 text-sm font-bold text-slate-900 dark:text-white">
+                                                        <td className="py-4 px-8 text-sm font-bold text-foreground">
                                                             {payment.productName}
                                                         </td>
-                                                        <td className="py-4 px-8 text-sm text-slate-600 dark:text-slate-400">
+                                                        <td className="py-4 px-8 text-sm text-muted-foreground">
                                                             {payment.amount} {payment.currency.toUpperCase()}
                                                         </td>
                                                         <td className="py-4 px-8 text-sm">
                                                             <span className={clsx(
                                                                 "inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                                                                payment.status === 'paid' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                                                payment.status === 'paid' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
                                                             )}>
                                                                 {payment.status}
                                                             </span>

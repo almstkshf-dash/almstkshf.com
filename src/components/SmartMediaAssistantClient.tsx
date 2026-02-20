@@ -81,7 +81,7 @@ export default function SmartMediaAssistantClient() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-semibold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase tracking-widest"
                         >
                             <Sparkles className="w-4 h-4" />
                             <span>{tAi("badge")}</span>
@@ -179,13 +179,13 @@ export default function SmartMediaAssistantClient() {
                                                                     <div className="flex flex-wrap gap-2 mb-2">
                                                                         <span className={clsx(
                                                                             "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                                                                            analysis.risk === "High" ? "bg-red-500/20 text-red-400" :
-                                                                                analysis.risk === "Medium" ? "bg-amber-500/20 text-amber-400" :
-                                                                                    "bg-emerald-500/20 text-emerald-400"
+                                                                            analysis.risk === "High" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                                                                analysis.risk === "Medium" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
+                                                                                    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                                                         )}>
                                                                             {tAi("risk_label")}: {analysis.risk}
                                                                         </span>
-                                                                        <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                                                                        <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase">
                                                                             {tAi("sentiment_label")}: {analysis.sentiment}
                                                                         </span>
                                                                     </div>
