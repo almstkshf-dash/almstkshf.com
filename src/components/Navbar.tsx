@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
@@ -22,6 +22,12 @@ export default function Navbar() {
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const loginLabel = (t as any).has?.('login') ? t('login' as any) : "Sign In";
 
     const toggleLocale = () => {
@@ -147,34 +153,38 @@ export default function Navbar() {
                                 <span className="xl:hidden uppercase">{locale === "en" ? "AR" : "EN"}</span>
                             </button>
 
-                            <SignedOut>
-                                <div className="flex items-center gap-2">
-                                    <SignInButton mode="modal">
-                                        <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full">
-                                            {loginLabel}
-                                        </button>
-                                    </SignInButton>
-                                    <HoverPrefetchLink
-                                        href="/contact"
-                                        className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-3.5 lg:py-2 xl:px-6 xl:py-2.5 whitespace-nowrap"
-                                    >
-                                        {t('get_started')}
-                                    </HoverPrefetchLink>
-                                </div>
-                            </SignedOut>
+                            {mounted && (
+                                <>
+                                    <SignedOut>
+                                        <div className="flex items-center gap-2">
+                                            <SignInButton mode="modal">
+                                                <button className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 hover:bg-muted rounded-full">
+                                                    {loginLabel}
+                                                </button>
+                                            </SignInButton>
+                                            <HoverPrefetchLink
+                                                href="/contact"
+                                                className="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 lg:px-3.5 lg:py-2 xl:px-6 xl:py-2.5 whitespace-nowrap"
+                                            >
+                                                {t('get_started')}
+                                            </HoverPrefetchLink>
+                                        </div>
+                                    </SignedOut>
 
-                            <SignedIn>
-                                <div className="flex items-center gap-3">
-                                    <HoverPrefetchLink
-                                        href="/dashboard"
-                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-2.5 lg:gap-1.5 xl:px-4 xl:gap-2"
-                                    >
-                                        <LayoutDashboard className="w-4 h-4" />
-                                        <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
-                                    </HoverPrefetchLink>
-                                    <UserButton afterSignOutUrl="/" />
-                                </div>
-                            </SignedIn>
+                                    <SignedIn>
+                                        <div className="flex items-center gap-3">
+                                            <HoverPrefetchLink
+                                                href="/dashboard"
+                                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors border border-border/50 hover:border-border lg:px-2.5 lg:gap-1.5 xl:px-4 xl:gap-2"
+                                            >
+                                                <LayoutDashboard className="w-4 h-4" />
+                                                <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
+                                            </HoverPrefetchLink>
+                                            <UserButton afterSignOutUrl="/" />
+                                        </div>
+                                    </SignedIn>
+                                </>
+                            )}
                         </div>
 
                         {/* Mobile Menu Toggle - Visible on Tablet and below */}
@@ -313,29 +323,33 @@ export default function Navbar() {
                                 </div>
 
                                 <div className="mt-8 pt-8 border-t border-border flex flex-col gap-4 sticky bottom-0 bg-background pb-6">
-                                    <SignedOut>
-                                        <SignInButton mode="modal">
-                                            <button className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 transition-all">
-                                                {t('get_started')}
-                                            </button>
-                                        </SignInButton>
-                                    </SignedOut>
+                                    {mounted && (
+                                        <>
+                                            <SignedOut>
+                                                <SignInButton mode="modal">
+                                                    <button className="w-full p-4 text-center font-bold text-lg bg-primary text-primary-foreground rounded-xl shadow-lg shadow-primary/20 transition-all">
+                                                        {t('get_started')}
+                                                    </button>
+                                                </SignInButton>
+                                            </SignedOut>
 
-                                    <SignedIn>
-                                        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border">
-                                            <div className="flex items-center gap-3">
-                                                <UserButton afterSignOutUrl="/" />
-                                                <span className="font-bold text-foreground">Account</span>
-                                            </div>
-                                            <HoverPrefetchLink
-                                                href="/dashboard"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                                            >
-                                                <LayoutDashboard className="w-6 h-6" />
-                                            </HoverPrefetchLink>
-                                        </div>
-                                    </SignedIn>
+                                            <SignedIn>
+                                                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl border border-border">
+                                                    <div className="flex items-center gap-3">
+                                                        <UserButton afterSignOutUrl="/" />
+                                                        <span className="font-bold text-foreground">Account</span>
+                                                    </div>
+                                                    <HoverPrefetchLink
+                                                        href="/dashboard"
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                                    >
+                                                        <LayoutDashboard className="w-6 h-6" />
+                                                    </HoverPrefetchLink>
+                                                </div>
+                                            </SignedIn>
+                                        </>
+                                    )}
 
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}

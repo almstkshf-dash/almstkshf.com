@@ -121,8 +121,8 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                             </th>
                             <th className="p-4 font-bold">{t('col_date')}</th>
                             <th className="p-4 font-bold">{t('col_title')}</th>
-                            <th className="p-4 font-bold">{t('col_source' as any) || 'Source'}</th>
-                            <th className="p-4 font-bold">{t('col_depth' as any) || 'Depth'}</th>
+                            <th className="p-4 font-bold">{t('col_source')}</th>
+                            <th className="p-4 font-bold">{t('col_depth')}</th>
                             <th className="p-4 font-bold">{t('col_sentiment')}</th>
                             <th className="p-4 font-bold text-right">{t('col_reach')}</th>
                             <th className="p-4 font-bold text-right">{t('col_ave')}</th>
@@ -150,8 +150,8 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                 <td className="p-4 whitespace-nowrap text-xs font-mono text-muted-foreground transition-colors">
                                     {article.publishedDate}
                                 </td>
-                            <td className="p-4 max-w-sm">
-                                <div className="flex flex-col gap-1 items-start rtl:items-end">
+                                <td className="p-4 max-w-sm">
+                                    <div className="flex flex-col gap-1 items-start rtl:items-end">
                                         <a
                                             href={article.resolvedUrl || article.url}
                                             target="_blank"
@@ -180,16 +180,16 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                         </div>
                                     </div>
                                 </td>
-                            <td className="p-4 text-sm text-muted-foreground">
-                                {article.source || article.sourceCountry || '—'}
-                            </td>
-                            <td className="p-4 text-center">
-                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${article.depth === 'deep'
-                                    ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/30'
-                                    : 'bg-muted text-muted-foreground border border-border'}`}>
-                                    {article.depth || 'standard'}
-                                </span>
-                            </td>
+                                <td className="p-4 text-sm text-muted-foreground">
+                                    {article.source || article.sourceCountry || '—'}
+                                </td>
+                                <td className="p-4 text-center">
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${article.depth === 'deep'
+                                        ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/30'
+                                        : 'bg-muted text-muted-foreground border border-border'}`}>
+                                        {article.depth || 'standard'}
+                                    </span>
+                                </td>
                                 <td className="p-4">
                                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors
                                         ${article.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :

@@ -176,10 +176,12 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     let jsPDF: any;
     try {
         const mod = await import('jspdf');
-        jsPDF = (mod as any).jsPDF || (mod as any).default;
+        jsPDF = mod.jsPDF || (mod as any).default;
+        if (!jsPDF) throw new Error();
     } catch (err) {
+        // Fallback for different bundling environments
         const mod = await import('jspdf/dist/jspdf.umd.min.js');
-        jsPDF = (mod as any).jsPDF || (mod as any).default;
+        jsPDF = mod.jsPDF || (mod as any).default;
     }
     const autoTable = (await import('jspdf-autotable')).default;
 

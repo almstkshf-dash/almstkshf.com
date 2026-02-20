@@ -37,7 +37,7 @@ export default function DashboardPage() {
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
         depth: activeView === 'deep' ? 'deep' : undefined,
-    }) as any;
+    }) as { items: any[], total: number, nextSkip: number | null };
     const articles = result?.items || [];
     const totalArticles = result?.total || 0;
 
@@ -150,19 +150,19 @@ export default function DashboardPage() {
                                     className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'standard' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}
                                     onClick={() => setActiveView('standard')}
                                 >
-                                    Standard
+                                    {t('filters.view_standard')}
                                 </button>
                                 <button
                                     className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'deep' ? 'bg-indigo-500 text-white' : 'text-muted-foreground'}`}
                                     onClick={() => setActiveView('deep')}
                                 >
-                                    Deep Sources
+                                    {t('filters.view_deep')}
                                 </button>
                                 <button
                                     className={`px-3 py-1 text-xs font-bold rounded-full ${activeView === 'osint' ? 'bg-emerald-500 text-white' : 'text-muted-foreground'}`}
                                     onClick={() => setActiveView('osint')}
                                 >
-                                    OSINT
+                                    {t('filters.view_osint')}
                                 </button>
                             </div>
                         </div>
@@ -201,7 +201,7 @@ export default function DashboardPage() {
                                 className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
-                                PDF
+                                {t('filters.export_pdf')}
                             </button>
                             <div className="w-px bg-border my-1" />
                             <button
@@ -210,7 +210,7 @@ export default function DashboardPage() {
                                 className="px-3 py-2 hover:bg-background rounded-lg text-xs font-bold text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 <FileSpreadsheet className="w-3.5 h-3.5" />
-                                Excel
+                                {t('filters.export_excel')}
                             </button>
                         </div>
                     </div>
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                                                 onClick={() => setSkip(result.nextSkip || 0)}
                                                 className="px-4 py-2 bg-muted border border-border rounded-lg text-sm font-bold hover:bg-background"
                                             >
-                                                {t('load_more' as any) || 'Load more'}
+                                                {t('filters.load_more')}
                                             </button>
                                         </div>
                                     )}

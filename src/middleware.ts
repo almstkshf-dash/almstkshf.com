@@ -10,9 +10,10 @@ const intlMiddleware = createMiddleware(routing);
 const isPublicRoute = createRouteMatcher([
     "/",
     "/(en|ar)",
-    "/(en|ar)/case-studies",
-    "/(en|ar)/lexcora",
-    "/(en|ar)/styling-assistant",
+    "/(en|ar)/case-studies(.*)",
+    "/(en|ar)/lexcora(.*)",
+    "/(en|ar)/styling-assistant(.*)",
+    "/(en|ar)/behind-the-scene(.*)",
     "/(en|ar)/contact",
     "/(en|ar)/pricing",
     "/api/stripe/webhook",
@@ -55,8 +56,12 @@ export default clerkMiddleware(async (auth, req) => {
     const response = intlMiddleware(req) || NextResponse.next();
 
     // 5. Apply Content Security Policy (CSP)
-    if (response.status === 200 && !pathname.includes('.')) {
-        response.headers.set('Content-Security-Policy', CSP_HEADER);
+    if (response && response.status === 200 && !pathname.includes('.')) {
+        try {
+            response.headers.set('Content-Security-Policy', CSP_HEADER);
+        } catch (e) {
+            console.error("Failed to set CSP header:", e);
+        }
     }
 
     return response;

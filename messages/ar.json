@@ -56,20 +56,22 @@
         "priority": "الأولوية",
         "download": "تحميل PDF",
         "view_details": "عرض التفاصيل",
-    "generate_report": "إنشاء تقرير",
-    "analyze_tone": "تحليل النبرة",
+        "generate_report": "إنشاء تقرير",
+        "analyze_tone": "تحليل النبرة",
         "toggle_theme": "تبديل المظهر",
         "ai_badge": "ذكاء اصطناعي",
-        "image_unavailable": "الصورة غير متوفرة",
         "copied": "تم النسخ",
-        "copy": "نسخ"
+        "copy": "نسخ",
+        "image_unavailable": "الصورة غير متوفرة"
     },
     "ArticleTable": {
         "export_excel": "تصدير Excel",
         "export_pdf": "تصدير PDF",
         "col_date": "التاريخ",
-        "col_title": "العنوان / المصدر",
-        "col_sentiment": "المشاعر",
+        "col_title": "العنوان",
+        "col_source": "المصدر",
+        "col_depth": "العمق",
+        "col_sentiment": "التوجه",
         "col_reach": "الوصول",
         "col_ave": "القيمة الإعلانية ($)",
         "col_status": "الحالة",
@@ -114,7 +116,13 @@
             "social": "وسائل التواصل",
             "press": "بيان صحفي",
             "blog": "مدونة",
-            "print": "صحافة مطبوعة"
+            "print": "صحافة مطبوعة",
+            "load_more": "تحميل المزيد",
+            "view_standard": "قياسي",
+            "view_deep": "مصادر عميقة",
+            "view_osint": "أوسينت",
+            "export_pdf": "PDF",
+            "export_excel": "Excel"
         }
     },
     "SentimentTracker": {

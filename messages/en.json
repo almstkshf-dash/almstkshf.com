@@ -1020,7 +1020,9 @@
     "export_excel": "Export Excel",
     "export_pdf": "Export PDF",
     "col_date": "Date",
-    "col_title": "Title / Source",
+    "col_title": "Title",
+    "col_source": "Source",
+    "col_depth": "Depth",
     "col_sentiment": "Sentiment",
     "col_reach": "Reach",
     "col_ave": "AVE ($)",
@@ -1066,7 +1068,13 @@
       "social": "Social Media",
       "press": "Press Release",
       "blog": "Blog",
-      "print": "Print"
+      "print": "Print",
+      "load_more": "Load more",
+      "view_standard": "Standard",
+      "view_deep": "Deep Sources",
+      "view_osint": "OSINT",
+      "export_pdf": "PDF",
+      "export_excel": "Excel"
     }
   },
   "NewsGenerator": {
