@@ -130,14 +130,14 @@ export default function OsintTab() {
         />
       </div>
 
-      <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-sm text-amber-800 dark:text-amber-200 flex gap-2">
-        <Filter className="w-4 h-4" />
-        <div>
+      <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-200 flex gap-3">
+        <Filter className="w-5 h-5 shrink-0 mt-0.5" />
+        <div className="min-w-0">
           <div className="font-semibold">{t('legend.title')}</div>
-          <div className="text-xs flex flex-wrap gap-2 mt-1">
-            {LABELS.map(l => <span key={l.code} className="px-2 py-1 rounded bg-muted text-foreground border border-border">{l.code} — {t(`legend.${l.code}` as any)}</span>)}
+          <div className="text-xs flex flex-wrap gap-2 mt-2">
+            {LABELS.map(l => <span key={l.code} className="px-2 py-1 rounded bg-muted text-foreground border border-border whitespace-nowrap">{l.code} — {t(`legend.${l.code}` as any)}</span>)}
           </div>
-          <div className="text-xs mt-1">{t('legend.notice')}</div>
+          <div className="text-xs mt-2 leading-relaxed opacity-80">{t('legend.notice')}</div>
         </div>
       </div>
 

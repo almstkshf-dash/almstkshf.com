@@ -49,7 +49,7 @@ export default function Navbar() {
                         {/* Logo */}
                         <div onMouseEnter={() => setActiveDropdown(null)}>
                             <HoverPrefetchLink href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
-                                <div className="relative w-14 h-14 overflow-hidden rounded-xl bg-white border border-border flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
+                                <div className="relative w-14 h-14 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
                                     <Image
                                         src="/logo.png"
                                         alt={tCommon('app_name')}
@@ -87,8 +87,8 @@ export default function Navbar() {
                                             >
                                                 {item.icon && (
                                                     <item.icon className={clsx(
-                                                        "w-4 h-4 transition-all duration-200",
-                                                        isActive || activeDropdown === item.label ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100 group-hover:scale-110"
+                                                        "w-5 h-5 transition-all duration-200",
+                                                        isActive || activeDropdown === item.label ? "opacity-100 scale-110" : "opacity-85 group-hover:opacity-100 group-hover:scale-110"
                                                     )} />
                                                 )}
                                                 <span>{t(item.label)}</span>
@@ -114,8 +114,8 @@ export default function Navbar() {
                                     >
                                         {item.icon && (
                                             <item.icon className={clsx(
-                                                "w-4 h-4 transition-all duration-200",
-                                                isActive ? "opacity-100 scale-110" : "opacity-70 group-hover:opacity-100 group-hover:scale-110"
+                                                "w-5 h-5 transition-all duration-200",
+                                                isActive ? "opacity-100 scale-110" : "opacity-85 group-hover:opacity-100 group-hover:scale-110"
                                             )} />
                                         )}
                                         {t(item.label)}
