@@ -48,23 +48,21 @@ export default function Navbar() {
                         {/* Logo */}
                         <div onMouseEnter={() => setActiveDropdown(null)}>
                             <HoverPrefetchLink href="/" className="flex items-center gap-3 font-bold text-2xl tracking-tighter text-foreground group z-50 relative">
-                                <div className="relative w-12 h-12 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105">
+                                <div className="relative w-14 h-14 overflow-hidden rounded-xl bg-background border border-border flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
                                     <Image
                                         src="/logo.png"
                                         alt={tCommon('app_name')}
-                                        width={48}
-                                        height={48}
+                                        width={50}
+                                        height={50}
                                         className="object-contain p-1 invert dark:invert-0 transition-all duration-300"
+                                        priority
                                     />
                                 </div>
-                                <span className="hidden xl:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                    {tCommon('app_name')}
-                                </span>
                             </HoverPrefetchLink>
                         </div>
 
-                        {/* Desktop Navigation - Hidden on tablet, visible on large screens */}
-                        <nav className="hidden lg:flex items-center lg:gap-2 xl:gap-8 ms-auto lg:me-2 xl:me-8">
+                        {/* Desktop Navigation */}
+                        <nav className="hidden lg:flex items-center lg:gap-5 xl:gap-8 ms-auto lg:me-4 xl:me-10">
                             {NAVIGATION_ITEMS.map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;
@@ -145,12 +143,10 @@ export default function Navbar() {
                             <ThemeToggle />
                             <button
                                 onClick={toggleLocale}
-                                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted border border-border lg:px-2 xl:px-3"
+                                className="flex items-center justify-center w-10 h-10 text-muted-foreground hover:text-foreground transition-all rounded-full hover:bg-muted border border-border bg-background group active:scale-95 shadow-sm"
                                 aria-label="Switch Language"
                             >
-                                <Globe className="w-3.5 h-3.5" />
-                                <span className="hidden xl:inline-block">{isRTL ? "English" : "العربية"}</span>
-                                <span className="xl:hidden uppercase">{locale === "en" ? "AR" : "EN"}</span>
+                                <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                             </button>
 
                             {mounted && (
@@ -180,7 +176,15 @@ export default function Navbar() {
                                                 <LayoutDashboard className="w-4 h-4" />
                                                 <span className="whitespace-nowrap hidden xl:inline-block">{t('dashboard')}</span>
                                             </HoverPrefetchLink>
-                                            <UserButton afterSignOutUrl="/" />
+                                            <UserButton
+                                                afterSignOutUrl="/"
+                                                appearance={{
+                                                    elements: {
+                                                        userButtonAvatarBox: "w-10 h-10 border-2 border-accent/30 hover:border-accent transition-colors shadow-sm",
+                                                        userButtonTrigger: "focus:shadow-none focus:outline-none"
+                                                    }
+                                                }}
+                                            />
                                         </div>
                                     </SignedIn>
                                 </>

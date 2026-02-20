@@ -7,7 +7,6 @@ import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from
 import clsx from 'clsx';
 import Image from 'next/image';
 import FreeInsightTool from '@/components/FreeInsightTool';
-import MediaWave from '@/components/hero/MediaWave';
 
 export default function HomeClient() {
     const t = useTranslations();
@@ -37,10 +36,9 @@ export default function HomeClient() {
     ];
 
     return (
-        <main className="min-h-screen bg-background">
+        <main className="min-h-screen bg-background overflow-x-hidden">
             {/* Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center text-foreground overflow-hidden">
-                <MediaWave />
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 brightness-100 contrast-150 pointer-events-none mix-blend-overlay"></div>
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
 
@@ -54,14 +52,14 @@ export default function HomeClient() {
                         {t('Common.app_name')}
                     </motion.h1>
 
-                    <motion.p
+                    <motion.h2
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 1 }}
                         className="text-lg md:text-2xl font-medium text-primary mb-8 uppercase tracking-[0.3em]"
                     >
                         {t('Common.slogan')}
-                    </motion.p>
+                    </motion.h2>
 
                     <motion.p
                         initial={{ opacity: 0 }}

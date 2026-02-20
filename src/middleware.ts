@@ -35,22 +35,29 @@ const CSP_HEADER = [
 ].join(' ').replace(/\s{2,}/g, ' ').trim();
 
 export default clerkMiddleware(async (auth, req) => {
-    try {
-        const { pathname } = req.nextUrl;
+    const { pathname } = req.nextUrl;
 
-        // 1. Authentication Protection (Priority)
+    // Log request for debugging in Vercel
+    if (process.env.NODE_ENV === 'production') {
+        console.log(`Middleware processing: ${pathname}`);
+    }
+
+    try {
+        // 1. Authentication Protection
         try {
             if (!isPublicRoute(req)) {
                 await auth.protect();
             }
-        } catch (authError) {
-            console.error("Clerk auth.protect() failed:", authError);
-            // If it's a redirect error from Clerk, we should let it bubble or handle it
-            // For now, let's rethrow to allow Clerk to handle its own redirects
-            throw authError;
+        } catch (authError: any) {
+            // Let Clerk handled redirects pass through, but log errors
+            if (authError?.status === 302 || authError?.message?.includes('redirect')) {
+                throw authError;
+            }
+            console.error(`Auth Error at ${pathname}:`, authError);
+            // Don't crash for non-critical auth inspection failures
         }
 
-        // 2. Root Dashboard Redirect
+        // 2. Dashboard Redirect
         if (pathname === '/dashboard') {
             return NextResponse.redirect(new URL('/en/dashboard', req.url));
         }
@@ -65,25 +72,32 @@ export default clerkMiddleware(async (auth, req) => {
         try {
             response = intlMiddleware(req) || NextResponse.next();
         } catch (intlError) {
-            console.error("next-intl middleware failed:", intlError);
+            console.error(`i18n Error at ${pathname}:`, intlError);
             response = NextResponse.next();
         }
 
         // 5. Apply Content Security Policy (CSP)
-        // Only apply to HTML pages (not images, fonts, etc.)
-        const isHtmlPage = response.headers.get('content-type')?.includes('text/html');
-        if (response && response.status === 200 && !pathname.includes('.') && (isHtmlPage || !response.headers.get('content-type'))) {
-            try {
+        try {
+            const contentType = response.headers.get('content-type');
+            const isHtmlPage = contentType?.includes('text/html');
+
+            if (response.status === 200 && !pathname.includes('.') && (isHtmlPage || !contentType)) {
                 response.headers.set('Content-Security-Policy', CSP_HEADER);
-            } catch (e) {
-                console.error("Failed to set CSP header:", e);
             }
+        } catch (cspError) {
+            console.warn("Non-critical CSP error:", cspError);
         }
 
         return response;
-    } catch (globalError) {
-        console.error("CRITICAL: Middleware failed:", globalError);
-        // Fallback to avoid 500: MIDDLEWARE_INVOCATION_FAILED
+    } catch (error: any) {
+        // Final fallback to prevent MIDDLEWARE_INVOCATION_FAILED (500)
+        console.error(`CRITICAL MIDDLEWARE FAILURE at ${pathname}:`, error);
+
+        // If it's a redirect from auth.protect(), we must allow it
+        if (error?.status === 302 || error?.name === 'ClerkProtectRedirect') {
+            throw error;
+        }
+
         return NextResponse.next();
     }
 });

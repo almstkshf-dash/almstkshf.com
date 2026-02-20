@@ -102,8 +102,7 @@ export default function ChatbotTrigger() {
                             transition={{ duration: 0.2 }}
                             className="flex items-center justify-center"
                         >
-                            <Bot className="w-6 h-6 md:w-8 md:h-8" />
-                            <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-accent-foreground animate-pulse" />
+                            <MessageSquare className="w-6 h-6 md:w-8 md:h-8" />
                         </motion.div>
                     )}
                 </AnimatePresence>

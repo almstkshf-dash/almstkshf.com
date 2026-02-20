@@ -75,11 +75,13 @@ export default function ChatbaseWidget() {
                         style.innerHTML = '#chatbase-bubble-button { display: none !important; }';
                         document.head.appendChild(style);
 
-                        const onLoad = function() {
+        const onLoad = function() {
+                            if (document.getElementById("chatbase-script")) return;
                             const script = document.createElement("script");
                             script.src = "https://www.chatbase.co/embed.min.js";
-                            script.id = "${chatbotId}";
-                            script.domain = "www.chatbase.co";
+                            script.id = "chatbase-script";
+                            script.setAttribute("data-chatbot-id", "${chatbotId}");
+                            script.setAttribute("data-domain", "www.chatbase.co");
                             script.defer = true;
                             document.body.appendChild(script)
                         };
