@@ -320,6 +320,8 @@
         "processing": "جاري المعالجة..."
     },
     "DeepSources": {
+        "title": "المصادر العميقة",
+        "DeepSources": "المصادر العميقة",
         "fetch_success": "تم جلب البيانات بنجاح",
         "fetch_failed": "فشل جلب البيانات",
         "fetch_now": "جلب الآن",

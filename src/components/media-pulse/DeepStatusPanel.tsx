@@ -38,7 +38,7 @@ export default function DeepStatusPanel() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-indigo-500" />
-                    <h3 className="text-lg font-bold">Deep Sources</h3>
+                    <h3 className="text-lg font-bold">{t('title')}</h3>
                 </div>
                 <button
                     onClick={handleFetch}

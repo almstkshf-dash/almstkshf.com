@@ -273,6 +273,8 @@
     "processing": "Processing..."
   },
   "DeepSources": {
+    "title": "Deep Sources",
+    "DeepSources": "Deep Sources",
     "fetch_success": "Fetch completed successfully",
     "fetch_failed": "Fetch failed",
     "fetch_now": "Fetch Now",
