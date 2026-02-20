@@ -62,7 +62,7 @@ export default function Navbar() {
                                         alt={tCommon('app_name')}
                                         width={32}
                                         height={32}
-                                        className="object-contain"
+                                        className="object-contain dark:brightness-0 dark:invert"
                                         priority
                                     />
                                 </div>
@@ -305,7 +305,7 @@ export default function Navbar() {
                                                 alt={tCommon('app_name')}
                                                 width={28}
                                                 height={28}
-                                                className="object-contain"
+                                                className="object-contain dark:brightness-0 dark:invert"
                                             />
                                         </div>
                                         <span className="font-bold text-lg text-foreground">

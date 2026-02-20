@@ -61,7 +61,7 @@ export default function ContactForm() {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                 </div>
-                <h3 className="text-xl font-bold text-white">{t("success")}</h3>
+                <h3 className="text-xl font-bold text-foreground">{t("success")}</h3>
                 <Button
                     variant="ghost"
                     size="sm"
@@ -78,7 +78,7 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                    <label htmlFor="name" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
                         {t("name")}
                     </label>
                     <input
@@ -90,11 +90,11 @@ export default function ContactForm() {
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder={t("placeholders.name")}
                         autoComplete="name"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                    <label htmlFor="email" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
                         {t("email")}
                     </label>
                     <input
@@ -106,13 +106,13 @@ export default function ContactForm() {
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder={t("placeholders.email")}
                         autoComplete="email"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <label htmlFor="subject" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                <label htmlFor="subject" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
                     {t("subject")}
                 </label>
                 <input
@@ -123,12 +123,12 @@ export default function ContactForm() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder={t("placeholders.subject")}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                 />
             </div>
 
             <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">
+                <label htmlFor="message" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
                     {t("message")}
                 </label>
                 <textarea
@@ -139,7 +139,7 @@ export default function ContactForm() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder={t("placeholders.message")}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 px-6 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors resize-none"
                 />
             </div>
 

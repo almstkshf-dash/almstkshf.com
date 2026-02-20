@@ -379,7 +379,14 @@
     "integration": {
       "title": "Integrated directly into your leadership workflow",
       "desc": "The Almstkshf AI Agent doesn't just talk — it acts. It connects with your monitoring data to provide insights that are contextually accurate and tactically sound."
-    }
+    },
+    "analysis_complete": "Analysis complete!",
+    "analysis_empty": "Received an empty response from our analysis engine.",
+    "analysis_error": "An unexpected error occurred during analysis.",
+    "risk_label": "Risk",
+    "sentiment_label": "Sentiment",
+    "awaiting_instruction": "Awaiting instruction...",
+    "processing_input": "Processing input..."
   },
   "Clients": {
     "title": "Trusted by Leaders",

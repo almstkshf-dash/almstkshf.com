@@ -16,7 +16,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
     const t = await getTranslations({ locale, namespace: 'Legal.Privacy' });
 
     return (
-        <main className="bg-slate-950 min-h-screen py-20 text-slate-300">
+        <main className="bg-background min-h-screen py-20 text-foreground">
             <Container>
                 <div className="max-w-3xl mx-auto space-y-12">
                     {/* Header */}
@@ -24,7 +24,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
                         <h1 className="text-4xl md:text-5xl font-bold text-white bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
                             {t('title')}
                         </h1>
-                        <p className="text-lg leading-relaxed text-slate-400">
+                        <p className="text-lg leading-relaxed text-muted-foreground">
                             {t('intro')}
                         </p>
                     </div>
@@ -45,9 +45,9 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
 
 function Section({ title, content }: { title: string; content: string }) {
     return (
-        <section className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-blue-500/30 transition-colors">
-            <h2 className="text-xl font-semibold text-white mb-4">{title}</h2>
-            <p className="leading-relaxed text-slate-400">{content}</p>
+        <section className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors">
+            <h2 className="text-xl font-semibold text-foreground mb-4">{title}</h2>
+            <p className="leading-relaxed text-muted-foreground">{content}</p>
         </section>
     );
 }

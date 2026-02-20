@@ -60,13 +60,13 @@ export default function SmartMediaAssistantClient() {
                     riskScore: Math.round(analysisData.riskScore || 15)
                 };
                 setAnalysis(mappedResult);
-                toast.success("Analysis complete!");
+                toast.success(tAi("analysis_complete"));
             } else {
-                toast.error(result?.error || "Received an empty response from our analysis engine.");
+                toast.error(result?.error || tAi("analysis_empty"));
             }
         } catch (error) {
             console.error("AI Assistant Error:", error);
-            toast.error("An unexpected error occurred during analysis.");
+            toast.error(tAi("analysis_error"));
         } finally {
             setIsGenerating(false);
         }
@@ -144,7 +144,7 @@ export default function SmartMediaAssistantClient() {
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold uppercase tracking-widest text-primary">{tAi("status")}</p>
-                                        <p className="text-foreground font-bold italic">{isGenerating ? "processing_input..." : tAi("instruction")}</p>
+                                        <p className="text-foreground font-bold italic">{isGenerating ? tAi("processing_input") : tAi("instruction")}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-4">
@@ -183,10 +183,10 @@ export default function SmartMediaAssistantClient() {
                                                                                 analysis.risk === "Medium" ? "bg-amber-500/20 text-amber-400" :
                                                                                     "bg-emerald-500/20 text-emerald-400"
                                                                         )}>
-                                                                            Risk: {analysis.risk}
+                                                                            {tAi("risk_label")}: {analysis.risk}
                                                                         </span>
                                                                         <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
-                                                                            Sentiment: {analysis.sentiment}
+                                                                            {tAi("sentiment_label")}: {analysis.sentiment}
                                                                         </span>
                                                                     </div>
                                                                     <p className="leading-relaxed border-l-2 border-primary/30 pl-3 italic text-foreground">
@@ -194,7 +194,7 @@ export default function SmartMediaAssistantClient() {
                                                                     </p>
                                                                 </>
                                                             ) : (
-                                                                <p className="text-muted-foreground italic">Awaiting instruction...</p>
+                                                                <p className="text-muted-foreground italic">{tAi("awaiting_instruction")}</p>
                                                             )}
                                                         </motion.div>
                                                     )}

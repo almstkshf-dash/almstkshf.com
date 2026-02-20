@@ -24,16 +24,16 @@ export default function ReportLibrary() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-muted/50 p-4 rounded-2xl border border-border">
                 <div className="relative w-full md:max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <label htmlFor="report-search" className="sr-only">{t('search_label')}</label>
                     <input
                         id="report-search"
                         name="q"
                         type="text"
                         placeholder={t('search_placeholder')}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -55,24 +55,24 @@ export default function ReportLibrary() {
                     ))
                 ) : filteredArticles?.length === 0 ? (
                     <div className="py-20 text-center space-y-4">
-                        <FileText className="w-12 h-12 text-slate-800 mx-auto" />
-                        <p className="text-slate-500 font-medium">{t('no_results')}</p>
+                        <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto" />
+                        <p className="text-muted-foreground font-medium">{t('no_results')}</p>
                     </div>
                 ) : (
                     filteredArticles?.map((article: any) => (
                         <div
                             key={article._id}
-                            className="bg-slate-900/40 border border-slate-800 hover:border-slate-700 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:bg-slate-900/60 group"
+                            className="bg-card/40 border border-border hover:border-border/80 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:bg-card/60 group"
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                                     <FileText className="w-6 h-6" />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h4 className="text-white font-semibold group-hover:text-blue-400 transition-colors line-clamp-1">
+                                    <h4 className="text-foreground font-semibold group-hover:text-primary transition-colors line-clamp-1">
                                         {article.title}
                                     </h4>
-                                    <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                                    <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
                                             {article.publishedDate}
@@ -87,7 +87,7 @@ export default function ReportLibrary() {
                                             {article.sentiment}
                                         </span>
                                         <span>•</span>
-                                        <span className="text-slate-400">{article.sourceType}</span>
+                                        <span className="text-muted-foreground">{article.sourceType}</span>
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@ export default function ReportLibrary() {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="border-slate-800 hover:bg-slate-800"
+                                    className="border-border hover:bg-muted"
                                     onClick={() => window.open(article.url, '_blank')}
                                 >
                                     {t('preview')}
