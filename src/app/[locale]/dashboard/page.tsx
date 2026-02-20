@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe } from 'lucide-react';
+import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings } from 'lucide-react';
+import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import Button from '@/components/ui/Button';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
@@ -151,13 +152,13 @@ export default function DashboardPage() {
                             <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                                 {t('title')}
                             </h1>
-                            <div className="flex bg-muted/60 rounded-full border border-border p-1">
+                            <div className="flex bg-secondary/80 rounded-full border border-border p-1 backdrop-blur-sm">
                                 <Button
                                     variant={activeView === 'standard' ? 'primary' : 'ghost'}
                                     size="sm"
                                     className={clsx(
-                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
-                                        activeView !== 'standard' && "text-muted-foreground"
+                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
+                                        activeView !== 'standard' && "text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => setActiveView('standard')}
                                 >
@@ -167,8 +168,8 @@ export default function DashboardPage() {
                                     variant={activeView === 'deep' ? 'primary' : 'ghost'}
                                     size="sm"
                                     className={clsx(
-                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
-                                        activeView === 'deep' ? 'bg-indigo-500 hover:bg-indigo-600' : "text-muted-foreground"
+                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
+                                        activeView === 'deep' ? 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600' : "text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => setActiveView('deep')}
                                 >
@@ -178,8 +179,8 @@ export default function DashboardPage() {
                                     variant={activeView === 'osint' ? 'primary' : 'ghost'}
                                     size="sm"
                                     className={clsx(
-                                        "px-3 py-1 text-xs font-bold rounded-full h-auto",
-                                        activeView === 'osint' ? 'bg-emerald-500 hover:bg-emerald-600' : "text-muted-foreground"
+                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
+                                        activeView === 'osint' ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600' : "text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => setActiveView('osint')}
                                 >
@@ -190,6 +191,17 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
+                        {/* Settings Button */}
+                        <HoverPrefetchLink href="/dashboard/settings">
+                            <Button
+                                variant="secondary"
+                                className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-600 dark:text-slate-300 px-3 text-xs shadow-none h-auto w-9 flex justify-center items-center"
+                                iconOnly
+                            >
+                                <Settings className="w-3.5 h-3.5" />
+                            </Button>
+                        </HoverPrefetchLink>
+
                         {/* Add Manual Entry */}
                         <Button
                             variant="secondary"

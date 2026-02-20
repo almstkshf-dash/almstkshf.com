@@ -44,7 +44,8 @@
     "media_pulse_desc": "Live media sentiment analysis",
     "crisis_management_desc": "Strategic crisis response planning",
     "login": "Sign In",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "settings": "Settings"
   },
   "Osint": {
     "title": "OSINT Resources",
@@ -1029,7 +1030,8 @@
     "placeholder_token": "Enter your token",
     "placeholder_secret": "Enter your secret",
     "placeholder_id": "Enter your ID",
-    "placeholder_url": "Enter the URL"
+    "placeholder_url": "Enter the URL",
+    "placeholder_countries": "AE, SA, EG"
   },
   "ManualEntry": {
     "title": "Add Manual Coverage",
@@ -1102,6 +1104,7 @@
     "title": "Media Intelligence Center",
     "subtitle": "Real-time monitoring, AI analysis, and strategic insights.",
     "manual_entry": "Manual Entry",
+    "settings": "Settings",
     "clear_all": "Clear All",
     "confirm_clear_all": "Are you sure you want to PERMANENTLY delete ALL log entries? This cannot be undone.",
     "cleared_success": "Successfully cleared {count} articles",

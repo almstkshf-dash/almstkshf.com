@@ -194,10 +194,14 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     </span>
                                 </td>
                                 <td className="p-4">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors
-                                        ${article.sentiment === 'Positive' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' :
-                                            article.sentiment === 'Negative' ? 'bg-destructive/10 text-destructive border border-destructive/20' :
-                                                'bg-primary/10 text-primary border border-primary/20'}`}>
+                                    <span className={clsx(
+                                        "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all",
+                                        article.sentiment === 'Positive'
+                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                            : article.sentiment === 'Negative'
+                                                ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
+                                                : 'bg-primary/10 text-primary border border-primary/20'
+                                    )}>
                                         {article.sentiment === 'Positive' ? t('sentiments.positive') :
                                             article.sentiment === 'Negative' ? t('sentiments.negative') :
                                                 t('sentiments.neutral')}

@@ -88,29 +88,29 @@
 }
 
 :root {
-  --background: #F8FAFC;
-  --foreground: #0F172A;
+  --background: #FFFFFF;
+  --foreground: #020617;
 
   --card: #FFFFFF;
-  --card-foreground: #0F172A;
+  --card-foreground: #020617;
 
   --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
+  --popover-foreground: #020617;
 
   --primary: #2563EB;
   --primary-foreground: #FFFFFF;
 
   --secondary: #F1F5F9;
-  --secondary-foreground: #475569;
+  --secondary-foreground: #020617;
 
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
+  --muted: #F8FAFC;
+  --muted-foreground: #475569;
 
-  --accent: #3B82F6;
-  --accent-foreground: #FFFFFF;
+  --accent: #F1F5F9;
+  --accent-foreground: #020617;
 
   --destructive: #EF4444;
-  --destructive-foreground: #F8FAFC;
+  --destructive-foreground: #FFFFFF;
 
   --border: #E2E8F0;
   --input: #E2E8F0;
@@ -142,11 +142,11 @@
   --muted: #1E293B;
   --muted-foreground: #94A3B8;
 
-  --accent: #2563EB;
-  --accent-foreground: #FFFFFF;
+  --accent: #1E293B;
+  --accent-foreground: #F8FAFC;
 
-  --destructive: #EF4444;
-  --destructive-foreground: #F8FAFC;
+  --destructive: #991B1B;
+  --destructive-foreground: #FFFFFF;
 
   --border: #1E293B;
   --input: #1E293B;
@@ -158,12 +158,13 @@
 
 @layer base {
   * {
-    border-color: var(--color-border);
+    border-color: var(--border);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--background);
+    color: var(--foreground);
     @apply antialiased;
   }
 }

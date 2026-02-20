@@ -127,9 +127,9 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                     </div>
                                     <div className={clsx(
                                         "p-2 rounded-lg",
-                                        data.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-400" :
-                                            data.sentiment === "negative" ? "bg-rose-500/10 text-rose-400" :
-                                                "bg-amber-500/10 text-amber-400"
+                                        data.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
+                                            data.sentiment === "negative" ? "bg-rose-500/10 text-rose-600 dark:text-rose-400" :
+                                                "bg-amber-500/10 text-amber-600 dark:text-amber-400"
                                     )}>
                                         {data.sentiment === "positive" ? <TrendingUp className="w-4 h-4" /> :
                                             data.sentiment === "negative" ? <TrendingDown className="w-4 h-4" /> :
@@ -144,8 +144,8 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                         </span>
                                         <span className={clsx(
                                             "text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1",
-                                            data.trend > 0 ? "bg-emerald-500/10 text-emerald-400" :
-                                                data.trend < 0 ? "bg-rose-500/10 text-rose-400" :
+                                            data.trend > 0 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
+                                                data.trend < 0 ? "bg-rose-500/10 text-rose-600 dark:text-rose-400" :
                                                     "bg-muted text-muted-foreground"
                                         )}>
                                             {data.trend > 0 ? "+" : ""}{data.trend}% {t('shift')}

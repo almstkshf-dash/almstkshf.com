@@ -234,7 +234,7 @@ export default function SettingsPage() {
                                             value={targetCountries}
                                             onChange={(e) => setTargetCountries(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-blue-500 outline-none"
-                                            placeholder="AE, SA, EG"
+                                            placeholder={t('placeholder_countries')}
                                         />
                                         <p className="text-xs text-slate-500">{t('iso_hint')}</p>
                                     </div>
@@ -249,6 +249,18 @@ export default function SettingsPage() {
                                         />
                                         <p className="text-xs text-slate-500">{t('default_value')}: 0.005</p>
                                     </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
                                 </div>
                             </section>
                         </div>
@@ -299,6 +311,17 @@ export default function SettingsPage() {
                                         </div>
                                     ))}
                                 </div>
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
+                                </div>
                             </section>
                         </div>
                     )}
@@ -333,6 +356,17 @@ export default function SettingsPage() {
                                             placeholder={t('placeholder_token')}
                                         />
                                     </div>
+                                </div>
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
                                 </div>
                             </section>
 
@@ -373,6 +407,17 @@ export default function SettingsPage() {
                                     </div>
                                     <PhylloConnectButton className="px-8 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
                                 </div>
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
+                                </div>
                             </section>
                         </div>
                     )}
@@ -407,6 +452,17 @@ export default function SettingsPage() {
                                             placeholder={t('placeholder_url')}
                                         />
                                     </div>
+                                </div>
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
                                 </div>
                             </section>
 
@@ -452,6 +508,17 @@ export default function SettingsPage() {
                                             />
                                         </div>
                                     </div>
+                                </div>
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
                                 </div>
                             </section>
 

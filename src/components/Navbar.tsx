@@ -186,6 +186,13 @@ export default function Navbar() {
                                             <LayoutDashboard className={ICON_SM} />
                                             <span className="whitespace-nowrap">{t('dashboard')}</span>
                                         </HoverPrefetchLink>
+                                        <HoverPrefetchLink
+                                            href="/dashboard/settings"
+                                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent hover:border-border"
+                                        >
+                                            <Settings className={ICON_SM} />
+                                            <span className="whitespace-nowrap">{t('settings')}</span>
+                                        </HoverPrefetchLink>
                                         <UserButton
                                             afterSignOutUrl="/"
                                             appearance={{
@@ -373,19 +380,31 @@ export default function Navbar() {
                                             </SignedOut>
 
                                             <SignedIn>
-                                                <div className="flex items-center justify-between p-3 bg-muted rounded-xl border border-border">
-                                                    <div className="flex items-center gap-3">
-                                                        <UserButton afterSignOutUrl="/" />
-                                                        <span className="font-medium text-foreground text-sm">Account</span>
+                                                <div className="flex flex-col gap-3 p-3 bg-muted/30 rounded-xl border border-border">
+                                                    <div className="flex items-center justify-between p-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <UserButton afterSignOutUrl="/" />
+                                                            <span className="font-medium text-foreground text-sm">Account</span>
+                                                        </div>
                                                     </div>
-                                                    <HoverPrefetchLink
-                                                        href="/dashboard"
-                                                        onClick={() => setMobileMenuOpen(false)}
-                                                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
-                                                    >
-                                                        <LayoutDashboard className={ICON_SM} />
-                                                        <span>{t('dashboard')}</span>
-                                                    </HoverPrefetchLink>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <HoverPrefetchLink
+                                                            href="/dashboard"
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors border border-primary/20"
+                                                        >
+                                                            <LayoutDashboard className={ICON_SM} />
+                                                            <span>{t('dashboard')}</span>
+                                                        </HoverPrefetchLink>
+                                                        <HoverPrefetchLink
+                                                            href="/dashboard/settings"
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors border border-border"
+                                                        >
+                                                            <Settings className={ICON_SM} />
+                                                            <span>{t('settings')}</span>
+                                                        </HoverPrefetchLink>
+                                                    </div>
                                                 </div>
                                             </SignedIn>
                                         </>
@@ -403,7 +422,7 @@ export default function Navbar() {
                         </Container>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence >
         </>
     );
 }
