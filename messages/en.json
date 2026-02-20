@@ -259,10 +259,25 @@
         "placeholder_email": "Enter your email",
         "submit": "Join Waitlist",
         "submitting": "Joining...",
-        "success": "You're on the list!",
         "error": "Something went wrong. Please try again."
       }
     }
+  },
+  "MediaWave": {
+    "title": "Digital Intelligence. Strategic Precision.",
+    "subtitle": "UAE-based intelligence architecture for elite institutions. We analyze sentiment, monitor global broadcasts, and secure reputation through advanced AI integration.",
+    "get_started": "Initialize Strategy",
+    "view_infrastructure": "View Infrastructure",
+    "live_intelligence": "Live Intelligence",
+    "active_agents": "Active Agents",
+    "processing": "Processing..."
+  },
+  "DeepSources": {
+    "fetch_success": "Fetch completed successfully",
+    "fetch_failed": "Fetch failed",
+    "fetch_now": "Fetch Now",
+    "recent_runs": "Recent Runs",
+    "no_runs": "No runs yet"
   },
   "Contact": {
     "title": "Get in Touch",

@@ -22,6 +22,10 @@ async function isAllowed(url: string): Promise<boolean> {
 export const getDeepRuns = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new Error("Not authenticated");
+        }
         await requireAdmin(ctx.auth);
         const runs = await ctx.db.query("ingestion_runs_deep").order("desc").take(args.limit ?? 20);
         return runs;
@@ -95,7 +99,7 @@ export const fetchDeepSources = action({
                 }
             }
 
-            await ctx.db.insert("ingestion_runs_deep", {
+            await ctx.runMutation(api.deepSources.saveIngestionRun, {
                 startedAt: start,
                 status: "success",
                 source: "newsapi",
@@ -103,7 +107,7 @@ export const fetchDeepSources = action({
             });
             return { success: true, count: itemCount };
         } catch (e: any) {
-            await ctx.db.insert("ingestion_runs_deep", {
+            await ctx.runMutation(api.deepSources.saveIngestionRun, {
                 startedAt: start,
                 status: "error",
                 source: "newsapi",
@@ -112,6 +116,21 @@ export const fetchDeepSources = action({
             });
             return { success: false, error: e?.message || "Deep fetch failed" };
         }
+    }
+});
+
+import { mutation } from "./_generated/server";
+
+export const saveIngestionRun = mutation({
+    args: {
+        startedAt: v.number(),
+        status: v.union(v.literal("success"), v.literal("error")),
+        source: v.string(),
+        itemCount: v.number(),
+        error: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.insert("ingestion_runs_deep", args);
     }
 });
 

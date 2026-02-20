@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useAction } from 'convex/react';
+import { useQuery, useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -8,7 +8,8 @@ import { useState } from 'react';
 
 export default function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
-    const runs = useQuery(api.deepSources.getDeepRuns, { limit: 10 }) as any;
+    const { isAuthenticated } = useConvexAuth();
+    const runs = useQuery(api.deepSources.getDeepRuns, isAuthenticated ? { limit: 10 } : 'skip') as any;
     const fetchDeep = useAction(api.deepSources.fetchDeepSources);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');

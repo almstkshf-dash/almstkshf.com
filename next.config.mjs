@@ -10,7 +10,7 @@ const nextConfig = {
             'framer-motion'
         ],
     },
-    transpilePackages: ['three', 'troika-three-text', 'troika-worker-utils', 'jspdf', 'jspdf-autotable', '@clerk/nextjs'],
+    transpilePackages: ['three', 'troika-three-text', 'troika-worker-utils', 'jspdf', 'jspdf-autotable'],
     poweredByHeader: false,
     eslint: {
         ignoreDuringBuilds: true,
