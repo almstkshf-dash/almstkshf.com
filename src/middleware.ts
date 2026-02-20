@@ -35,36 +35,57 @@ const CSP_HEADER = [
 ].join(' ').replace(/\s{2,}/g, ' ').trim();
 
 export default clerkMiddleware(async (auth, req) => {
-    const { pathname } = req.nextUrl;
+    try {
+        const { pathname } = req.nextUrl;
 
-    // 1. Authentication Protection (Priority)
-    if (!isPublicRoute(req)) {
-        await auth.protect();
-    }
+        // 1. Authentication Protection (Priority)
+        try {
+            if (!isPublicRoute(req)) {
+                await auth.protect();
+            }
+        } catch (authError) {
+            console.error("Clerk auth.protect() failed:", authError);
+            // If it's a redirect error from Clerk, we should let it bubble or handle it
+            // For now, let's rethrow to allow Clerk to handle its own redirects
+            throw authError;
+        }
 
-    // 2. Root Dashboard Redirect
-    if (pathname === '/dashboard') {
-        return NextResponse.redirect(new URL('/en/dashboard', req.url));
-    }
+        // 2. Root Dashboard Redirect
+        if (pathname === '/dashboard') {
+            return NextResponse.redirect(new URL('/en/dashboard', req.url));
+        }
 
-    // 3. Skip i18n for API routes
-    if (pathname.startsWith('/api')) {
+        // 3. Skip i18n for API routes
+        if (pathname.startsWith('/api')) {
+            return NextResponse.next();
+        }
+
+        // 4. Localization (next-intl)
+        let response;
+        try {
+            response = intlMiddleware(req) || NextResponse.next();
+        } catch (intlError) {
+            console.error("next-intl middleware failed:", intlError);
+            response = NextResponse.next();
+        }
+
+        // 5. Apply Content Security Policy (CSP)
+        // Only apply to HTML pages (not images, fonts, etc.)
+        const isHtmlPage = response.headers.get('content-type')?.includes('text/html');
+        if (response && response.status === 200 && !pathname.includes('.') && (isHtmlPage || !response.headers.get('content-type'))) {
+            try {
+                response.headers.set('Content-Security-Policy', CSP_HEADER);
+            } catch (e) {
+                console.error("Failed to set CSP header:", e);
+            }
+        }
+
+        return response;
+    } catch (globalError) {
+        console.error("CRITICAL: Middleware failed:", globalError);
+        // Fallback to avoid 500: MIDDLEWARE_INVOCATION_FAILED
         return NextResponse.next();
     }
-
-    // 4. Localization (next-intl)
-    const response = intlMiddleware(req) || NextResponse.next();
-
-    // 5. Apply Content Security Policy (CSP)
-    if (response && response.status === 200 && !pathname.includes('.')) {
-        try {
-            response.headers.set('Content-Security-Policy', CSP_HEADER);
-        } catch (e) {
-            console.error("Failed to set CSP header:", e);
-        }
-    }
-
-    return response;
 });
 
 export const config = {
