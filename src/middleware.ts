@@ -16,18 +16,15 @@ const isPublicRoute = createRouteMatcher([
     "/(en|ar)/pricing",
     "/api/stripe/webhook",
     "/api/stripe/checkout",
-    "/api/chatbase/token"
+    "/api/chatbase/token",
+    "/api/webhooks(.*)"
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
     const { pathname } = req.nextUrl;
 
-    // 1. Skip middleware for static files and specific internal paths
-    if (
-        pathname.startsWith('/_next') ||
-        pathname.includes('.') ||
-        pathname.startsWith('/api/stripe/webhook')
-    ) {
+    // 1. Skip middleware for static assets (Next.js config matcher handles this, but extra safety)
+    if (pathname.includes('.')) {
         return NextResponse.next();
     }
 
@@ -36,10 +33,10 @@ export default clerkMiddleware(async (auth, req) => {
         await auth.protect();
     }
 
-    // 3. Dashboard Redirect for root path
+    // 3. Dashboard Redirect for bare /dashboard path
     if (pathname === '/dashboard') {
         const url = req.nextUrl.clone();
-        url.pathname = '/en/dashboard';
+        url.pathname = '/en/dashboard'; // Default to English dashboard
         return NextResponse.redirect(url);
     }
 

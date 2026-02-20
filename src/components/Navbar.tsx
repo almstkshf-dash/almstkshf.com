@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, ChevronDown, LayoutDashboard, Search } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, LayoutDashboard, Search, Settings } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
