@@ -92,7 +92,7 @@ export const config = {
     matcher: [
         // Match all paths except Static Assets and Next.js internals
         // Explicitly exclude .json files to avoid unnecessary middleware execution on translations
-        '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+        '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml|txt)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',
     ],
