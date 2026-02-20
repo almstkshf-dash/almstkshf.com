@@ -70,7 +70,8 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
     matcher: [
         // Match all paths except Static Assets and Next.js internals
-        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+        // Explicitly exclude .json files to avoid unnecessary middleware execution on translations
+        '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',
     ],
