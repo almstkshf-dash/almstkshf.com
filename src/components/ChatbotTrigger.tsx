@@ -63,7 +63,7 @@ export default function ChatbotTrigger() {
                         initial={{ opacity: 0, y: 20, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                        className={`bg-white dark:bg-slate-900 border border-border rounded-2xl p-4 shadow-2xl max-w-[200px] ${isRTL ? "mr-12 text-right" : "ml-12 text-left"}`}
+                        className={`bg-background border border-border rounded-2xl p-4 shadow-2xl max-w-[200px] ${isRTL ? "mr-12 text-right" : "ml-12 text-left"}`}
                     >
                         <p className="text-xs font-medium text-foreground">
                             {isRTL ? "كيف يمكنني مساعدتك اليوم؟" : "How can I help you today?"}
@@ -75,7 +75,7 @@ export default function ChatbotTrigger() {
             <Button
                 variant="primary"
                 onClick={toggleChat}
-                className="relative group flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-950 transition-all p-0 h-auto"
+                className="relative group flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all p-0 h-auto"
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 aria-haspopup="true"
                 aria-expanded={isOpen}

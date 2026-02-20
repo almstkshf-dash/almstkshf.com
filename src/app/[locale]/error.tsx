@@ -20,9 +20,9 @@ export default function Error({
     return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
             <div className="max-w-md space-y-6">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10">
                     <svg
-                        className="h-10 w-10 text-red-600"
+                        className="h-10 w-10 text-destructive"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -37,11 +37,11 @@ export default function Error({
                     </svg>
                 </div>
 
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground">
                     {t('title')}
                 </h2>
 
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-foreground/60">
                     {t('description')}
                 </p>
 

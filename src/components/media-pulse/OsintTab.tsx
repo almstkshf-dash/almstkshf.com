@@ -130,7 +130,7 @@ export default function OsintTab() {
         />
       </div>
 
-      <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-200 flex gap-3">
+      <div className="bg-muted/50 border border-border rounded-xl p-4 text-sm text-foreground/80 flex gap-3">
         <Filter className="w-5 h-5 shrink-0 mt-0.5" />
         <div className="min-w-0">
           <div className="font-semibold">{t('legend.title')}</div>

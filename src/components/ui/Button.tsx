@@ -21,13 +21,13 @@ export default function Button({
     disabled,
     ...props
 }: ButtonProps) {
-    const baseStyles = "inline-flex items-center justify-center rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95";
+    const baseStyles = "inline-flex items-center justify-center rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed active:scale-95";
 
     const variants = {
-        primary: "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 border border-blue-400/20",
-        secondary: "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border bg-white dark:bg-slate-900",
-        ghost: "bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground",
-        outline: "bg-transparent border border-border hover:border-primary text-muted-foreground hover:text-primary",
+        primary: "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 border border-primary/20",
+        secondary: "bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border",
+        ghost: "bg-transparent hover:bg-muted text-foreground/70 hover:text-foreground",
+        outline: "bg-transparent border border-border hover:border-primary text-foreground/70 hover:text-primary",
         danger: "bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/30",
     };
 
