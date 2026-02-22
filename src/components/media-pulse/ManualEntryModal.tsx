@@ -168,7 +168,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder={t('title_placeholder')}
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                autoComplete="off"
+                                autoComplete="on"
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
@@ -182,7 +182,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 placeholder={t('source_placeholder')}
                                 value={formData.source}
                                 onChange={e => setFormData({ ...formData, source: e.target.value })}
-                                autoComplete="off"
+                                autoComplete="organization"
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
@@ -211,7 +211,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                     placeholder="https://..."
                                     value={formData.url}
                                     onChange={e => setFormData({ ...formData, url: e.target.value })}
-                                    autoComplete="off"
+                                    autoComplete="url"
                                     className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                                 />
                                 <Button
@@ -279,7 +279,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                         setFormData({ ...formData, reach: Number(raw) });
                                     }
                                 }}
-                                autoComplete="off"
+                                autoComplete="on"
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>
@@ -309,7 +309,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             placeholder={t('content_placeholder')}
                             value={formData.content}
                             onChange={e => setFormData({ ...formData, content: e.target.value })}
-                            autoComplete="off"
+                            autoComplete="on"
                             className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                         />
                     </div>

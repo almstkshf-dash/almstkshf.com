@@ -118,7 +118,7 @@ export default function SmartMediaAssistantClient() {
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder={tAi("instruction")}
-                                autoComplete="off"
+                                autoComplete="on"
                                 className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground/50"
                             />
                             <Button

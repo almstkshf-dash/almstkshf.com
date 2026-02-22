@@ -51,6 +51,7 @@ export function CommandMenu() {
                         <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                         <Command.Input
                             placeholder={t('search_placeholder') || "Search..."}
+                            autoComplete="off"
                             className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                         />
                     </div>

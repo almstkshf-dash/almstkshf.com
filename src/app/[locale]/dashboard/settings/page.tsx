@@ -300,7 +300,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setGeminiKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
-                                            autoComplete="new-password"
+                                            autoComplete="off"
                                         />
                                     </div>
                                 </div>
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                                                 onChange={(e) => field.set(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
-                                                autoComplete="new-password"
+                                                autoComplete="off"
                                             />
                                         </div>
                                     ))}
@@ -368,7 +368,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setInstagramKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_api_key')}
-                                            autoComplete="new-password"
+                                            autoComplete="off"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -381,7 +381,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setTwitterBearer(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_token')}
-                                            autoComplete="new-password"
+                                            autoComplete="off"
                                         />
                                     </div>
                                 </div>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setPhylloClientSecret(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_secret')}
-                                            autoComplete="new-password"
+                                            autoComplete="off"
                                         />
                                     </div>
                                 </div>
@@ -523,7 +523,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setStripePublishableKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
-                                            autoComplete="new-password"
+                                            autoComplete="off"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -537,7 +537,7 @@ export default function SettingsPage() {
                                                 onChange={(e) => setStripeSecretKey(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
-                                                autoComplete="new-password"
+                                                autoComplete="off"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -550,7 +550,7 @@ export default function SettingsPage() {
                                                 onChange={(e) => setStripeWebhookSecret(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
-                                                autoComplete="new-password"
+                                                autoComplete="off"
                                             />
                                         </div>
                                     </div>

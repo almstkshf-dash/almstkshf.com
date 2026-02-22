@@ -98,6 +98,7 @@ export default function FreeInsightTool() {
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={t("placeholder")}
+                                    autoComplete="on"
                                     className="w-full bg-background border border-border rounded-3xl p-6 md:p-8 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors min-h-[160px] resize-none text-lg"
                                 />
                                 <div className="absolute bottom-6 right-6 flex gap-2">

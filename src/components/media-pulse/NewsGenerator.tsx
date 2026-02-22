@@ -281,6 +281,7 @@ function MultiSelectDropdown({
                                 placeholder={searchPlaceholder}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
+                                autoComplete="off"
                                 className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
                                 autoFocus
                             />
@@ -516,6 +517,7 @@ export default function NewsGenerator() {
                             placeholder={t('placeholder')}
                             value={keyword}
                             onChange={(e) => { setKeyword(e.target.value); setErrors(prev => ({ ...prev, keyword: undefined })); }}
+                            autoComplete="on"
                             className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground border ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
                                 }`}
                         />
@@ -597,6 +599,7 @@ export default function NewsGenerator() {
                                 type="date"
                                 value={dateFrom}
                                 onChange={(e) => setDateFrom(e.target.value)}
+                                autoComplete="off"
                                 className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                             />
                             <label htmlFor="date-to" className="sr-only">Date To</label>
@@ -606,6 +609,7 @@ export default function NewsGenerator() {
                                 type="date"
                                 value={dateTo}
                                 onChange={(e) => setDateTo(e.target.value)}
+                                autoComplete="off"
                                 className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                             />
                         </div>

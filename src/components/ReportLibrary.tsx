@@ -36,6 +36,7 @@ export default function ReportLibrary() {
                         className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        autoComplete="off"
                     />
                 </div>
                 <div className="flex gap-2">

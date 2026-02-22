@@ -277,6 +277,7 @@ export default function DashboardPage() {
                                                 onChange={(e) => setSelectedCountry(e.target.value)}
                                                 id="country-select"
                                                 name="country"
+                                                autoComplete="country"
                                                 className="w-full appearance-none bg-muted/50 border border-border rounded-xl pl-10 pr-8 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-muted font-medium"
                                             >
                                                 <option value="All">{t('filters.all_countries')}</option>
@@ -298,6 +299,7 @@ export default function DashboardPage() {
                                                 type="text"
                                                 name="search"
                                                 id="search-input"
+                                                autoComplete="off"
                                                 placeholder={t('search_placeholder')}
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}

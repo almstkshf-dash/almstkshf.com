@@ -123,6 +123,7 @@ export default function ContactForm() {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder={t("placeholders.subject")}
+                    autoComplete="on"
                     className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors"
                 />
             </div>
@@ -139,6 +140,7 @@ export default function ContactForm() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder={t("placeholders.message")}
+                    autoComplete="on"
                     className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary transition-colors resize-none"
                 />
             </div>

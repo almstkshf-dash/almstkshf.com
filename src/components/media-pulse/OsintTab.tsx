@@ -136,6 +136,7 @@ export default function OsintTab() {
           placeholder={t('filters.search_placeholder')}
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          autoComplete="off"
         />
       </div>
 

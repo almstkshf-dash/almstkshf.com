@@ -14,6 +14,8 @@ const isPublicRoute = createRouteMatcher([
     "/(en|ar)/behind-the-scene(.*)",
     "/(en|ar)/contact",
     "/(en|ar)/pricing",
+    "/(en|ar)/technical-solutions(.*)",
+    "/(en|ar)/media-monitoring(.*)",
     "/api/stripe/webhook",
     "/api/stripe/checkout",
     "/api/chatbase/token",
@@ -21,38 +23,20 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    try {
-        const { pathname } = req.nextUrl;
+    const { pathname } = req.nextUrl;
 
-        // 1. Fast path for static assets
-        if (pathname.match(/\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml|txt)$/)) {
-            return NextResponse.next();
-        }
-
-        // 2. Authentication Protection
-        if (!isPublicRoute(req)) {
-            await auth.protect();
-        }
-
-        // 3. Dashboard Redirect for bare /dashboard path
-        if (pathname === '/dashboard') {
-            const url = req.nextUrl.clone();
-            url.pathname = '/en/dashboard'; // Default to English dashboard
-            return NextResponse.redirect(url);
-        }
-
-        // 4. API Routes - No i18n
-        if (pathname.startsWith('/api')) {
-            return NextResponse.next();
-        }
-
-        // 5. Localization (next-intl)
-        return intlMiddleware(req);
-    } catch (error) {
-        console.error("Middleware Invocation Error:", error);
-        // Important: return intlMiddleware as fallback to prevent 500 failure
-        return intlMiddleware(req);
+    // 1. Skip middleware for API routes that aren't protected
+    if (pathname.startsWith('/api')) {
+        return NextResponse.next();
     }
+
+    // 2. Auth Protection - Do not wrap in try/catch as it needs to throw redirects
+    if (!isPublicRoute(req)) {
+        await auth.protect();
+    }
+
+    // 3. Localization and Redirects
+    return intlMiddleware(req);
 });
 
 export const config = {
