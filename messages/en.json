@@ -1101,7 +1101,9 @@
       "positive": "Positive",
       "neutral": "Neutral",
       "negative": "Negative"
-    }
+    },
+    "select_all": "Select all articles",
+    "select_article": "Select article: {title}"
   },
   "Dashboard": {
     "title": "Media Intelligence Center",

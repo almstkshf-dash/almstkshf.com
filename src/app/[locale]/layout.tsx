@@ -39,7 +39,6 @@ export const viewport = {
     ],
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {

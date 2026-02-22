@@ -164,14 +164,14 @@ export default function LexcoraClient() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                                        className="text-[10px] uppercase tracking-widest font-black text-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                                                     >
                                                         {t("cta_pricing")}
                                                     </Button>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                                        className="text-[10px] uppercase tracking-widest font-black text-foreground hover:text-primary transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                                                     >
                                                         {t("cta_case_studies")}
                                                     </Button>

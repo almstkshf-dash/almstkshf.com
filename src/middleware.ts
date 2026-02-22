@@ -8,34 +8,41 @@ const intlMiddleware = createMiddleware(routing);
 const isPublicRoute = createRouteMatcher([
     "/",
     "/(en|ar)",
-    "/(en|ar)/case-studies(.*)",
-    "/(en|ar)/lexcora(.*)",
-    "/(en|ar)/styling-assistant(.*)",
-    "/(en|ar)/behind-the-scene(.*)",
+    "/contact",
     "/(en|ar)/contact",
+    "/pricing",
     "/(en|ar)/pricing",
+    "/case-studies(.*)",
+    "/(en|ar)/case-studies(.*)",
+    "/lexcora(.*)",
+    "/(en|ar)/lexcora(.*)",
+    "/styling-assistant(.*)",
+    "/(en|ar)/styling-assistant(.*)",
+    "/behind-the-scene(.*)",
+    "/(en|ar)/behind-the-scene(.*)",
+    "/technical-solutions(.*)",
     "/(en|ar)/technical-solutions(.*)",
+    "/media-monitoring(.*)",
     "/(en|ar)/media-monitoring(.*)",
     "/api/stripe/webhook",
     "/api/stripe/checkout",
     "/api/chatbase/token",
-    "/api/webhooks(.*)"
+    "/api/webhooks(.*)",
+    "/sign-in(.*)",
+    "/sign-up(.*)",
+    "/monitoring(.*)"
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    const { pathname } = req.nextUrl;
-
-    // 1. Skip middleware for API routes that aren't protected
-    if (pathname.startsWith('/api')) {
-        return NextResponse.next();
+    // 1. If it's a public route, just let intlMiddleware handle it
+    if (isPublicRoute(req)) {
+        return intlMiddleware(req);
     }
 
-    // 2. Auth Protection - Do not wrap in try/catch as it needs to throw redirects
-    if (!isPublicRoute(req)) {
-        await auth.protect();
-    }
+    // 2. Protect non-public routes
+    await auth.protect();
 
-    // 3. Localization and Redirects
+    // 3. Handle localization for protected routes
     return intlMiddleware(req);
 });
 

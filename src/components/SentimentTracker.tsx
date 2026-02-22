@@ -176,11 +176,11 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
                     {/* AI Recommendation */}
                     {recKey && (
-                        <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-2xl flex gap-4 items-start shadow-sm">
-                            <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex gap-4 items-start shadow-sm">
+                            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                             <div>
-                                <h5 className="text-amber-600 dark:text-amber-200 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
-                                <p className="text-amber-700 dark:text-amber-300/80 text-xs leading-relaxed">{t(recKey)}</p>
+                                <h5 className="text-amber-800 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
+                                <p className="text-amber-950 dark:text-amber-300/80 text-xs leading-relaxed font-medium">{t(recKey)}</p>
                             </div>
                         </div>
                     )}

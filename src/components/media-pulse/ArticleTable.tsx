@@ -119,6 +119,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     type="checkbox"
                                     checked={selectedIds.size === displayedArticles.length && displayedArticles.length > 0}
                                     onChange={toggleSelectAll}
+                                    aria-label={t('select_all')}
                                     className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                                 />
                             </th>
@@ -147,6 +148,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                         type="checkbox"
                                         checked={selectedIds.has(article._id)}
                                         onChange={() => toggleSelect(article._id)}
+                                        aria-label={t('select_article', { title: article.title })}
                                         className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                                     />
                                 </td>
@@ -179,7 +181,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                                 {article.sourceCountry || article.country}
                                             </span>
                                             {article.imageUrl && <ImageIcon className="w-3 h-3 text-primary/50" />}
-                                            {article.isManual && <span className="bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
+                                            {article.isManual && <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
                                         </div>
                                     </div>
                                 </td>
@@ -188,8 +190,8 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                 </td>
                                 <td className="p-4 text-center">
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${article.depth === 'deep'
-                                        ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/30'
-                                        : 'bg-muted text-muted-foreground border border-border'}`}>
+                                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 border border-indigo-500/20'
+                                        : 'bg-muted text-foreground border border-border'}`}>
                                         {article.depth || 'standard'}
                                     </span>
                                 </td>
@@ -197,10 +199,10 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                     <span className={clsx(
                                         "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all",
                                         article.sentiment === 'Positive'
-                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20'
                                             : article.sentiment === 'Negative'
-                                                ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
-                                                : 'bg-primary/10 text-primary border border-primary/20'
+                                                ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border border-red-500/20'
+                                                : 'bg-slate-100 dark:bg-slate-900/30 text-slate-800 dark:text-slate-400 border border-slate-500/20'
                                     )}>
                                         {article.sentiment === 'Positive' ? t('sentiments.positive') :
                                             article.sentiment === 'Negative' ? t('sentiments.negative') :

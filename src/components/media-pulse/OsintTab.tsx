@@ -77,6 +77,7 @@ export default function OsintTab() {
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={category}
             onChange={(e) => { setCategory(e.target.value); setPage(0); }}
+            aria-label={t('filters.category')}
           >
             <option value="all">All</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -91,6 +92,7 @@ export default function OsintTab() {
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={labelFilter}
             onChange={(e) => { setLabelFilter(e.target.value); setPage(0); }}
+            aria-label={t('filters.label')}
           >
             <option value="all">All</option>
             {LABELS.map(l => <option key={l.code} value={l.code}>{l.code} - {l.text}</option>)}
@@ -105,6 +107,7 @@ export default function OsintTab() {
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={language}
             onChange={(e) => { setLanguage(e.target.value); setPage(0); }}
+            aria-label={t('filters.language')}
           >
             <option value="all">All</option>
             <option value="en">English</option>
@@ -163,9 +166,9 @@ export default function OsintTab() {
             </div>
             <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-bold uppercase tracking-widest">
               {r.categories.map(c => <span key={c} className="px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20">{c}</span>)}
-              {r.labels.map(l => <span key={l} className="px-2 py-1 rounded bg-muted text-muted-foreground border border-border">{l}</span>)}
-              {r.freeTier && <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/30">{t('badges.free')}</span>}
-              {r.region && <span className="px-2 py-1 rounded bg-indigo-500/10 text-indigo-500 border border-indigo-500/30">{r.region}</span>}
+              {r.labels.map(l => <span key={l} className="px-2 py-1 rounded bg-muted text-foreground border border-border">{l}</span>)}
+              {r.freeTier && <span className="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 border border-emerald-500/30">{t('badges.free')}</span>}
+              {r.region && <span className="px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-400 border border-indigo-500/30">{r.region}</span>}
             </div>
             {r.notes && <p className="text-xs text-muted-foreground mt-2">{r.notes}</p>}
           </a>

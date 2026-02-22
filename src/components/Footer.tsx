@@ -30,29 +30,29 @@ export default function Footer() {
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
+                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
                                 <Linkedin className="w-5 h-5" />
                             </Link>
                         </div>
                         <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                             <div className="relative w-20 h-8">
-                                <Image src="/tdra.png" alt="TDRA" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/tdra.png" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
                             </div>
                             <div className="relative w-8 h-8">
-                                <Image src="/soc2.png" alt="SOC2" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain dark:brightness-110" />
+                                <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain dark:brightness-110" />
                             </div>
                             <div className="relative w-20 h-8">
-                                <Image src="/secure.png" alt="Secure App" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/secure.png" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
                             </div>
                         </div>
                     </div>
 
                     {/* Column 2: Quick Links */}
                     <div>
-                        <h4 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
                             <span className="w-8 h-px bg-primary"></span>
                             {t('links')}
-                        </h4>
+                        </h3>
                         <ul className="space-y-4">
                             {/* Filter out items that are already top-level or have children, 
                                 and ensure we don't duplicate items that are explicitly listed below */}
@@ -99,21 +99,21 @@ export default function Footer() {
 
                     {/* Column 3: Contact Info */}
                     <div>
-                        <h4 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
                             <span className="w-8 h-px bg-primary"></span>
                             {tCommon('try_ai')}
-                        </h4>
+                        </h3>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group cursor-pointer">
-                                <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
+                                <MapPin className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>{t('address_dubai')}<br />{t('address_abu_dhabi')}</span>
                             </li>
                             <li className="flex items-center gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group">
-                                <Phone className="w-5 h-5 text-primary flex-shrink-0" />
+                                <Phone className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>+971 58 59 52 035</span>
                             </li>
                             <li className="flex items-center gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group">
-                                <Mail className="w-5 h-5 text-primary flex-shrink-0" />
+                                <Mail className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>k.account@almstkshf.com</span>
                             </li>
                         </ul>
@@ -121,10 +121,10 @@ export default function Footer() {
 
                     {/* Column 4: Newsletter/Legal */}
                     <div>
-                        <h4 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
                             <span className="w-8 h-px bg-primary"></span>
                             {t('legal')}
-                        </h4>
+                        </h3>
                         <ul className="space-y-4">
                             <li>
                                 <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">

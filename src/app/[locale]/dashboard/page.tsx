@@ -278,6 +278,7 @@ export default function DashboardPage() {
                                                 id="country-select"
                                                 name="country"
                                                 autoComplete="country"
+                                                aria-label={t('filters.all_countries')}
                                                 className="w-full appearance-none bg-muted/50 border border-border rounded-xl pl-10 pr-8 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-muted font-medium"
                                             >
                                                 <option value="All">{t('filters.all_countries')}</option>

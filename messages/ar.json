@@ -93,7 +93,9 @@
             "positive": "إيجابي",
             "neutral": "محايد",
             "negative": "سلبي"
-        }
+        },
+        "select_all": "تحديد الكل",
+        "select_article": "تحديد المقال: {title}"
     },
     "Dashboard": {
         "title": "مركز الاستخبارات الإعلامية",
