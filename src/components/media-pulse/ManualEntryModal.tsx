@@ -143,7 +143,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
             <div className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border flex flex-col transition-all">
                 <div className="p-6 border-b border-border flex justify-between items-center bg-muted/50 transition-colors">
                     <h2 className="text-xl font-bold text-foreground flex items-center gap-2 transition-colors">
-                        <Plus className="w-5 h-5 text-primary" />
+                        <Plus className="w-5 h-5 text-primary" aria-hidden="true" />
                         {t('title')}
                     </h2>
                     <Button
@@ -151,8 +151,9 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         size="icon"
                         onClick={onClose}
                         className="text-muted-foreground hover:text-foreground transition-colors"
+                        aria-label={t('cancel')}
                     >
-                        <X className="h-6 w-6" />
+                        <X className="h-6 w-6" aria-hidden="true" />
                     </Button>
                 </div>
 
@@ -223,7 +224,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                     className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0 h-auto shadow-none"
                                     title={t('fetch_article')}
                                 >
-                                    {!isExtracting && <Wand2 className="w-4 h-4" />}
+                                    {!isExtracting && <Wand2 className="w-4 h-4" aria-hidden="true" />}
                                     <span className="hidden sm:inline">
                                         {isExtracting ? t('extracting') : t('fetch_article')}
                                     </span>
@@ -332,7 +333,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                             {formData.imageUrl && (
                                 <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
-                                    <img src={formData.imageUrl} alt="Preview" className="h-full w-full object-cover" />
+                                    <img src={formData.imageUrl} alt="" className="h-full w-full object-cover" aria-hidden="true" />
                                 </div>
                             )}
                         </div>

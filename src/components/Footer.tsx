@@ -31,7 +31,7 @@ export default function Footer() {
                         </p>
                         <div className="flex gap-4">
                             <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
-                                <Linkedin className="w-5 h-5" />
+                                <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
                         <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
@@ -50,7 +50,7 @@ export default function Footer() {
                     {/* Column 2: Quick Links */}
                     <div>
                         <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
-                            <span className="w-8 h-px bg-primary"></span>
+                            <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {t('links')}
                         </h3>
                         <ul className="space-y-4">
@@ -100,7 +100,7 @@ export default function Footer() {
                     {/* Column 3: Contact Info */}
                     <div>
                         <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
-                            <span className="w-8 h-px bg-primary"></span>
+                            <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {tCommon('try_ai')}
                         </h3>
                         <ul className="space-y-4">
@@ -122,7 +122,7 @@ export default function Footer() {
                     {/* Column 4: Newsletter/Legal */}
                     <div>
                         <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
-                            <span className="w-8 h-px bg-primary"></span>
+                            <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {t('legal')}
                         </h3>
                         <ul className="space-y-4">
@@ -143,7 +143,7 @@ export default function Footer() {
                             <p className="text-xs text-muted-foreground mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-2 py-1 bg-muted text-[10px] text-foreground rounded font-medium border border-border">{t('regions.uae')}</span>
-                                <span className="px-2 py-1 bg-muted text-[10px] text-muted-foreground/50 rounded font-medium border border-border opacity-50">{t('regions.ksa')} ({t('coming_soon')})</span>
+                                <span className="px-2 py-1 bg-muted text-[10px] text-muted-foreground/80 rounded font-medium border border-border">{t('regions.ksa')} ({t('coming_soon')})</span>
                             </div>
                         </div>
                     </div>

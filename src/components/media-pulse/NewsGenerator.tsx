@@ -245,12 +245,13 @@ function MultiSelectDropdown({
                                 {finalRenderTag(id)}
                                 <span
                                     role="button"
+                                    aria-label={`Remove ${items.find(i => i.id === id)?.label || id}`}
                                     tabIndex={0}
                                     onClick={(e) => { e.stopPropagation(); toggle(id); }}
                                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(id); } }}
                                     className="hover:text-primary/70 ml-0.5 cursor-pointer transition-colors"
                                 >
-                                    <X className="w-3 h-3" />
+                                    <X className="w-3 h-3" aria-hidden="true" />
                                 </span>
                             </span>
                         ))

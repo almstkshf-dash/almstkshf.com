@@ -67,7 +67,7 @@ export default function StylingAssistantClient() {
                             animate={{ opacity: 1, scale: 1 }}
                             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-purple-500/30 text-purple-600 dark:text-purple-300 text-sm font-semibold uppercase tracking-widest backdrop-blur-md shadow-xl"
                         >
-                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
                             <span>{t("title")}</span>
                         </motion.div>
 
@@ -121,7 +121,7 @@ export default function StylingAssistantClient() {
                                 className="space-y-6"
                             >
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                                    <Sparkles className="w-6 h-6 text-white" />
+                                    <Sparkles className="w-6 h-6 text-white" aria-hidden="true" />
                                 </div>
                                 <p className="text-lg text-muted-foreground leading-relaxed">
                                     {t("desc1")}
@@ -136,7 +136,7 @@ export default function StylingAssistantClient() {
                                 className="space-y-6"
                             >
                                 <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center">
-                                    <ArrowRight className="w-6 h-6 text-purple-400" />
+                                    <ArrowRight className="w-6 h-6 text-purple-400" aria-hidden="true" />
                                 </div>
                                 <p className="text-lg text-muted-foreground leading-relaxed">
                                     {t("desc2")}
@@ -188,7 +188,7 @@ export default function StylingAssistantClient() {
                                         <div className="space-y-2">
                                             <label htmlFor="styling-name" className="text-sm font-medium text-muted-foreground ml-1">{t("form.name")}</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
                                                 <input
                                                     id="styling-name"
                                                     name="name"
@@ -198,7 +198,7 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setName(e.target.value)}
                                                     placeholder={t("form.placeholder_name")}
                                                     autoComplete="name"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>
@@ -206,7 +206,7 @@ export default function StylingAssistantClient() {
                                         <div className="space-y-2">
                                             <label htmlFor="styling-email" className="text-sm font-medium text-muted-foreground ml-1">{t("form.email")}</label>
                                             <div className="relative group">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" />
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
                                                 <input
                                                     id="styling-email"
                                                     name="email"
@@ -216,7 +216,7 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder={t("form.placeholder_email")}
                                                     autoComplete="email"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>

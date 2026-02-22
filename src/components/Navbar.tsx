@@ -12,6 +12,7 @@ import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import Button from "@/components/ui/Button";
 
 export default function Navbar() {
     const t = useTranslations("Navigation");
@@ -56,13 +57,12 @@ export default function Navbar() {
                         {/* ─── Logo ─── */}
                         <div onMouseEnter={() => setActiveDropdown(null)} className="shrink-0">
                             <HoverPrefetchLink href="/" aria-label={`${tCommon('app_name')} - Go to homepage`} className="flex items-center gap-2.5 group z-50 relative">
-                                <div className="relative w-10 h-10 overflow-hidden rounded-lg border border-border bg-background flex items-center justify-center transition-transform group-hover:scale-105">
+                                <div className="relative w-8 h-8 rounded-lg bg-primary flex items-center justify-center overflow-hidden shrink-0">
                                     <Image
                                         src="/logo.png"
-                                        alt={tCommon('app_name')}
-                                        width={32}
-                                        height={32}
-                                        className="object-contain dark:brightness-0 dark:invert"
+                                        alt=""
+                                        fill
+                                        className="object-contain"
                                         priority
                                     />
                                 </div>
@@ -137,29 +137,34 @@ export default function Navbar() {
                             onMouseEnter={() => setActiveDropdown(null)}
                         >
                             {/* Search */}
-                            <button
+                            <Button
+                                variant="outline"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-                                className={clsx(ACTION_BTN, "gap-1.5 w-auto px-3")}
-                                aria-label={t('search')}
+                                className="px-3 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
+                                aria-label={`${t('search')} - Press ⌘K to search`}
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
                                 <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/70">
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">⌘</kbd>
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">K</kbd>
                                 </span>
-                            </button>
+                            </Button>
 
                             {/* Theme Toggle */}
                             <ThemeToggle />
 
                             {/* Language Toggle */}
-                            <button
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={toggleLocale}
-                                className={ACTION_BTN}
-                                aria-label={isRTL ? "Switch to English" : "Switch to Arabic"}
+                                className="bg-muted hover:bg-muted/80 rounded-full h-10 w-10 relative flex items-center justify-center overflow-hidden border border-border group shadow-none"
+                                aria-label={isRTL ? "EN - Switch to English" : "AR - Switch to Arabic"}
                             >
-                                <Globe className={ICON_LG} aria-hidden="true" />
-                            </button>
+                                <span className="font-bold text-xs group-hover:scale-110 transition-transform">
+                                    {isRTL ? "EN" : "AR"}
+                                </span>
+                            </Button>
 
                             {/* Auth section - ALWAYS visible */}
                             {mounted && (
@@ -310,7 +315,7 @@ export default function Navbar() {
                                         <div className="relative w-9 h-9 overflow-hidden rounded-lg border border-border bg-background flex items-center justify-center">
                                             <Image
                                                 src="/logo.png"
-                                                alt={tCommon('app_name')}
+                                                alt=""
                                                 width={28}
                                                 height={28}
                                                 className="object-contain dark:brightness-0 dark:invert"
@@ -347,7 +352,7 @@ export default function Navbar() {
                                                                 onClick={() => setMobileMenuOpen(false)}
                                                             >
                                                                 <div className="p-1.5 bg-muted rounded-md border border-border text-foreground/50" aria-hidden="true">
-                                                                    {child.icon && <child.icon className={ICON_SM} />}
+                                                                    {child.icon && <child.icon className={ICON_SM} aria-hidden="true" />}
                                                                 </div>
                                                                 <span className="text-sm font-medium">{t(child.label)}</span>
                                                             </HoverPrefetchLink>
@@ -414,7 +419,7 @@ export default function Navbar() {
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/70 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
-                                        aria-label={isRTL ? "Switch to English" : "Switch to Arabic"}
+                                        aria-label={isRTL ? "English - Switch to English" : "العربية - Switch to Arabic"}
                                     >
                                         <Globe className={ICON_LG} aria-hidden="true" />
                                         <span>{isRTL ? "English" : "العربية"}</span>

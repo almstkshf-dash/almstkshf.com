@@ -18,12 +18,18 @@ export function ThemeToggle() {
 
     return (
         <button
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            onClick={() => {
+                const nextTheme = theme === "light" ? "dark" : "light";
+                // Fix #3: Direct DOM call to bypass React reconciliation for the class change
+                document.documentElement.classList.toggle("dark", nextTheme === "dark");
+                React.startTransition(() => {
+                    setTheme(nextTheme);
+                });
+            }}
             className="w-9 h-9 rounded-full border border-border bg-background hover:bg-muted transition-colors flex items-center justify-center relative"
-            aria-label="Toggle theme"
         >
-            <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all duration-200 dark:-rotate-90 dark:scale-0 text-foreground/70" />
-            <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all duration-200 dark:rotate-0 dark:scale-100 text-foreground/70" />
+            <Sun className="h-[18px] w-[18px] rotate-0 scale-100 transition-all duration-200 dark:-rotate-90 dark:scale-0 text-foreground/70" aria-hidden="true" />
+            <Moon className="absolute h-[18px] w-[18px] rotate-90 scale-0 transition-all duration-200 dark:rotate-0 dark:scale-100 text-foreground/70" aria-hidden="true" />
             <span className="sr-only">Toggle theme</span>
         </button>
     );

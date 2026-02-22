@@ -85,6 +85,7 @@ export default function BehindTheSceneClient() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label="LinkedIn"
                                         className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
                                     >
                                         <Linkedin className="w-5 h-5 text-white" />
@@ -92,6 +93,7 @@ export default function BehindTheSceneClient() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label="Email"
                                         className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
                                     >
                                         <Mail className="w-5 h-5 text-white" />

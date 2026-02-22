@@ -83,7 +83,7 @@ export default function SmartMediaAssistantClient() {
                             animate={{ opacity: 1, scale: 1 }}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase tracking-widest"
                         >
-                            <Sparkles className="w-4 h-4" />
+                            <Sparkles className="w-4 h-4" aria-hidden="true" />
                             <span>{tAi("badge")}</span>
                         </motion.div>
 
@@ -119,7 +119,7 @@ export default function SmartMediaAssistantClient() {
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder={tAi("instruction")}
                                 autoComplete="on"
-                                className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground/50"
+                                className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground/75"
                             />
                             <Button
                                 onClick={handleGenerate}
@@ -143,7 +143,7 @@ export default function SmartMediaAssistantClient() {
                             <div className="space-y-6">
                                 <div className="flex items-center gap-4 border-b border-border/50 pb-6">
                                     <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
-                                        <Brain className="w-6 h-6 text-primary-foreground" />
+                                        <Brain className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
                                     </div>
                                     <div>
                                         <p className="text-xs font-bold uppercase tracking-widest text-primary">{tAi("status")}</p>
@@ -229,7 +229,7 @@ export default function SmartMediaAssistantClient() {
                                 className="p-10 bg-card border border-border rounded-[2.5rem] hover:border-primary/30 transition-all group shadow-sm hover:shadow-xl"
                             >
                                 <div className={clsx("w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-inner")}>
-                                    <cap.icon className={clsx("w-7 h-7", cap.color)} />
+                                    <cap.icon className={clsx("w-7 h-7", cap.color)} aria-hidden="true" />
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4">{cap.title}</h3>
                                 <p className="text-muted-foreground font-light leading-relaxed">{cap.desc}</p>
@@ -240,7 +240,7 @@ export default function SmartMediaAssistantClient() {
 
                 {/* Integration Section */}
                 <section className="mt-40 bg-gradient-to-br from-primary/10 to-transparent p-12 md:p-24 rounded-[4rem] border border-primary/10 text-center space-y-8">
-                    <Layout className="w-16 h-16 text-primary mx-auto" />
+                    <Layout className="w-16 h-16 text-primary mx-auto" aria-hidden="true" />
                     <h2 className="text-4xl md:text-6xl font-bold max-w-3xl mx-auto tracking-tight">{tAi("integration.title")}</h2>
                     <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-light">
                         {tAi("integration.desc")}

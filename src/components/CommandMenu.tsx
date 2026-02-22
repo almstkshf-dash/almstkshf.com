@@ -96,21 +96,30 @@ export function CommandMenu() {
 
                         <Command.Group heading="Theme" className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-2">
                             <Command.Item
-                                onSelect={() => runCommand(() => setTheme("light"))}
+                                onSelect={() => runCommand(() => {
+                                    document.documentElement.classList.remove("dark");
+                                    React.startTransition(() => setTheme("light"));
+                                })}
                                 className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                             >
                                 <Sun className="mr-2 h-4 w-4" />
                                 <span>Light</span>
                             </Command.Item>
                             <Command.Item
-                                onSelect={() => runCommand(() => setTheme("dark"))}
+                                onSelect={() => runCommand(() => {
+                                    document.documentElement.classList.add("dark");
+                                    React.startTransition(() => setTheme("dark"));
+                                })}
                                 className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                             >
                                 <Moon className="mr-2 h-4 w-4" />
                                 <span>Dark</span>
                             </Command.Item>
                             <Command.Item
-                                onSelect={() => runCommand(() => setTheme("system"))}
+                                onSelect={() => runCommand(() => {
+                                    // For system, we'll let next-themes handle it but still wrap in transition
+                                    React.startTransition(() => setTheme("system"));
+                                })}
                                 className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                             >
                                 <Laptop className="mr-2 h-4 w-4" />
