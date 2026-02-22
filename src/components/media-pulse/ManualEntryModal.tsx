@@ -40,7 +40,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAuthenticated) { alert('يجب تسجيل الدخول أولاً / You must be signed in.'); return; }
+        if (!isAuthenticated) { alert(t('not_authenticated')); return; }
         setIsLoading(true);
 
         try {

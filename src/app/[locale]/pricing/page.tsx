@@ -111,15 +111,15 @@ export default function PricingPage() {
     return (
         <div className="min-h-screen bg-background py-20 relative overflow-hidden">
             {/* Background Gradients */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl -z-10" />
-            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl -z-10" />
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
 
             <Container>
                 <div className="text-center mb-16 space-y-4">
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
+                        className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent"
                     >
                         {t("title")}
                     </motion.h1>
@@ -179,7 +179,7 @@ export default function PricingPage() {
 
                             <ul className="space-y-4 mb-8 flex-grow">
                                 {plan.features.map((feature) => (
-                                    <li key={feature} className="flex items-start gap-3 text-sm text-slate-300">
+                                    <li key={feature} className="flex items-start gap-3 text-sm text-foreground/70">
                                         <Check className="w-5 h-5 text-primary shrink-0" />
                                         <span>{feature}</span>
                                     </li>
@@ -190,14 +190,14 @@ export default function PricingPage() {
                                 {plan.contactOnly || !plan.price ? (
                                     <Link
                                         href="/contact"
-                                        className="inline-flex items-center justify-center w-full px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-all"
+                                        className="inline-flex items-center justify-center w-full px-6 py-3 bg-muted hover:bg-muted/80 text-foreground rounded-xl font-semibold border border-border transition-all"
                                     >
                                         Contact Sales
                                     </Link>
                                 ) : (
                                     <CheckoutButton
                                         productId={plan.productId as string}
-                                        className={`w-full ${plan.highlight ? 'bg-primary hover:bg-primary/90' : 'bg-slate-800 hover:bg-slate-700'}`}
+                                        className={`w-full ${plan.highlight ? 'bg-primary hover:bg-primary/90' : 'bg-muted hover:bg-muted/80 text-foreground border border-border'}`}
                                     >
                                         Subscribe Now
                                     </CheckoutButton>
@@ -212,9 +212,9 @@ export default function PricingPage() {
                     <h2 className="text-3xl font-bold mb-8">Specialized Solutions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {customSolutions.map((sol) => (
-                            <div key={sol.name} className="p-6 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
-                                <h3 className="text-lg font-semibold text-white mb-2">{sol.name}</h3>
-                                <p className="text-sm text-slate-400">{sol.description}</p>
+                            <div key={sol.name} className="p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors">
+                                <h3 className="text-lg font-semibold text-foreground mb-2">{sol.name}</h3>
+                                <p className="text-sm text-muted-foreground">{sol.description}</p>
                             </div>
                         ))}
                     </div>

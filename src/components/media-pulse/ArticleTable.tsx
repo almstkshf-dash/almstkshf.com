@@ -179,7 +179,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                                 {article.sourceCountry || article.country}
                                             </span>
                                             {article.imageUrl && <ImageIcon className="w-3 h-3 text-primary/50" />}
-                                            {article.isManual && <span className="bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
+                                            {article.isManual && <span className="bg-amber-500/10 text-amber-700 dark:text-amber-500 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
                                         </div>
                                     </div>
                                 </td>
@@ -224,8 +224,9 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
                                         isLoading={deletingId === article._id}
                                         className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-8 w-8 shadow-none"
                                         title={t('delete')}
+                                        aria-label={t('delete')}
                                     >
-                                        {!deletingId === article._id && <Trash2 className="w-3.5 h-3.5" />}
+                                        {deletingId !== article._id && <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
                                     </Button>
                                 </td>
                             </tr>

@@ -590,13 +590,19 @@ export default function NewsGenerator() {
                     <div className="space-y-2">
                         <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</span>
                         <div className="grid grid-cols-2 gap-2">
+                            <label htmlFor="date-from" className="sr-only">Date From</label>
                             <input
+                                id="date-from"
+                                name="date-from"
                                 type="date"
                                 value={dateFrom}
                                 onChange={(e) => setDateFrom(e.target.value)}
                                 className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                             />
+                            <label htmlFor="date-to" className="sr-only">Date To</label>
                             <input
+                                id="date-to"
+                                name="date-to"
                                 type="date"
                                 value={dateTo}
                                 onChange={(e) => setDateTo(e.target.value)}

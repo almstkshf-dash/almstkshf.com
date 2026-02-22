@@ -55,7 +55,7 @@ export default function Navbar() {
 
                         {/* ─── Logo ─── */}
                         <div onMouseEnter={() => setActiveDropdown(null)} className="shrink-0">
-                            <HoverPrefetchLink href="/" className="flex items-center gap-2.5 group z-50 relative">
+                            <HoverPrefetchLink href="/" aria-label={`${tCommon('app_name')} - Go to homepage`} className="flex items-center gap-2.5 group z-50 relative">
                                 <div className="relative w-10 h-10 overflow-hidden rounded-lg border border-border bg-background flex items-center justify-center transition-transform group-hover:scale-105">
                                     <Image
                                         src="/logo.png"
@@ -97,13 +97,13 @@ export default function Navbar() {
                                                 aria-haspopup="true"
                                             >
                                                 {item.icon && (
-                                                    <item.icon className={clsx(ICON_MD, "shrink-0")} />
+                                                    <item.icon className={clsx(ICON_MD, "shrink-0")} aria-hidden="true" />
                                                 )}
                                                 <span>{t(item.label)}</span>
                                                 <ChevronDown className={clsx(
                                                     ICON_SM, "shrink-0 transition-transform duration-200",
                                                     activeDropdown === item.label && "rotate-180"
-                                                )} />
+                                                )} aria-hidden="true" />
                                             </button>
                                         </div>
                                     );
@@ -123,7 +123,7 @@ export default function Navbar() {
                                         onFocus={() => setActiveDropdown(null)}
                                     >
                                         {item.icon && (
-                                            <item.icon className={clsx(ICON_MD, "shrink-0")} />
+                                            <item.icon className={clsx(ICON_MD, "shrink-0")} aria-hidden="true" />
                                         )}
                                         {t(item.label)}
                                     </HoverPrefetchLink>
@@ -140,10 +140,10 @@ export default function Navbar() {
                             <button
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
                                 className={clsx(ACTION_BTN, "gap-1.5 w-auto px-3")}
-                                title={t('search')}
+                                aria-label={t('search')}
                             >
-                                <Search className={ICON_SM} />
-                                <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/50">
+                                <Search className={ICON_SM} aria-hidden="true" />
+                                <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/70">
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">⌘</kbd>
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">K</kbd>
                                 </span>
@@ -156,9 +156,9 @@ export default function Navbar() {
                             <button
                                 onClick={toggleLocale}
                                 className={ACTION_BTN}
-                                aria-label="Switch Language"
+                                aria-label={isRTL ? "Switch to English" : "Switch to Arabic"}
                             >
-                                <Globe className={ICON_LG} />
+                                <Globe className={ICON_LG} aria-hidden="true" />
                             </button>
 
                             {/* Auth section - ALWAYS visible */}
@@ -183,14 +183,14 @@ export default function Navbar() {
                                             href="/dashboard"
                                             className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
                                         >
-                                            <LayoutDashboard className={ICON_SM} />
+                                            <LayoutDashboard className={ICON_SM} aria-hidden="true" />
                                             <span className="whitespace-nowrap">{t('dashboard')}</span>
                                         </HoverPrefetchLink>
                                         <HoverPrefetchLink
                                             href="/dashboard/settings"
                                             className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent hover:border-border"
                                         >
-                                            <Settings className={ICON_SM} />
+                                            <Settings className={ICON_SM} aria-hidden="true" />
                                             <span className="whitespace-nowrap">{t('settings')}</span>
                                         </HoverPrefetchLink>
                                         <UserButton
@@ -208,7 +208,7 @@ export default function Navbar() {
 
                             {/* Fallback while Clerk loads or if not signed in  */}
                             {!mounted && (
-                                <div className={clsx(ACTION_BTN, "animate-pulse bg-muted")} />
+                                <div className={clsx(ACTION_BTN, "animate-pulse bg-muted")} aria-hidden="true" />
                             )}
                         </div>
 
@@ -220,8 +220,9 @@ export default function Navbar() {
                                     <HoverPrefetchLink
                                         href="/dashboard"
                                         className={clsx(ACTION_BTN, "text-primary")}
+                                        aria-label={t('dashboard')}
                                     >
-                                        <LayoutDashboard className={ICON_SM} />
+                                        <LayoutDashboard className={ICON_SM} aria-hidden="true" />
                                     </HoverPrefetchLink>
                                     <UserButton
                                         afterSignOutUrl="/"
@@ -242,7 +243,7 @@ export default function Navbar() {
                                 onClick={() => setMobileMenuOpen(true)}
                                 aria-label="Open menu"
                             >
-                                <Menu className={ICON_LG} />
+                                <Menu className={ICON_LG} aria-hidden="true" />
                             </button>
                         </div>
                     </div>
@@ -271,13 +272,13 @@ export default function Navbar() {
                                             >
                                                 <div className="flex items-start gap-3">
                                                     <div className="mt-0.5 p-2 bg-muted rounded-lg group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors text-foreground/60 border border-border group-hover/item:border-primary/20">
-                                                        {child.icon && <child.icon className={ICON_LG} />}
+                                                        {child.icon && <child.icon className={ICON_LG} aria-hidden="true" />}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="text-sm font-semibold text-foreground group-hover/item:text-primary transition-colors">
                                                             {t(child.label)}
                                                         </div>
-                                                        <div className="text-xs text-foreground/50 mt-1 line-clamp-2 leading-relaxed">
+                                                        <div className="text-xs text-foreground/70 mt-1 line-clamp-2 leading-relaxed">
                                                             {t(`${child.label}_desc` as any)}
                                                         </div>
                                                     </div>
@@ -324,7 +325,7 @@ export default function Navbar() {
                                         className={clsx(ACTION_BTN, "text-foreground")}
                                         aria-label="Close menu"
                                     >
-                                        <X className={ICON_LG} />
+                                        <X className={ICON_LG} aria-hidden="true" />
                                     </button>
                                 </div>
 
@@ -334,7 +335,7 @@ export default function Navbar() {
                                         <div key={item.label}>
                                             {item.children ? (
                                                 <div className="space-y-1">
-                                                    <div className="text-xs font-semibold text-foreground/40 uppercase tracking-wider px-3 py-2">
+                                                    <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider px-3 py-2">
                                                         {t(item.label)}
                                                     </div>
                                                     <div className="space-y-0.5 ps-3 border-s-2 border-border ms-3">
@@ -345,7 +346,7 @@ export default function Navbar() {
                                                                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
                                                                 onClick={() => setMobileMenuOpen(false)}
                                                             >
-                                                                <div className="p-1.5 bg-muted rounded-md border border-border text-foreground/50">
+                                                                <div className="p-1.5 bg-muted rounded-md border border-border text-foreground/50" aria-hidden="true">
                                                                     {child.icon && <child.icon className={ICON_SM} />}
                                                                 </div>
                                                                 <span className="text-sm font-medium">{t(child.label)}</span>
@@ -359,7 +360,7 @@ export default function Navbar() {
                                                     className="flex items-center gap-3 px-3 py-3 text-base font-medium text-foreground/70 hover:text-foreground hover:bg-muted rounded-lg transition-all"
                                                     onClick={() => setMobileMenuOpen(false)}
                                                 >
-                                                    {item.icon && <item.icon className={ICON_LG} />}
+                                                    {item.icon && <item.icon className={ICON_LG} aria-hidden="true" />}
                                                     {t(item.label)}
                                                 </HoverPrefetchLink>
                                             )}
@@ -393,7 +394,7 @@ export default function Navbar() {
                                                             onClick={() => setMobileMenuOpen(false)}
                                                             className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors border border-primary/20"
                                                         >
-                                                            <LayoutDashboard className={ICON_SM} />
+                                                            <LayoutDashboard className={ICON_SM} aria-hidden="true" />
                                                             <span>{t('dashboard')}</span>
                                                         </HoverPrefetchLink>
                                                         <HoverPrefetchLink
@@ -401,7 +402,7 @@ export default function Navbar() {
                                                             onClick={() => setMobileMenuOpen(false)}
                                                             className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors border border-border"
                                                         >
-                                                            <Settings className={ICON_SM} />
+                                                            <Settings className={ICON_SM} aria-hidden="true" />
                                                             <span>{t('settings')}</span>
                                                         </HoverPrefetchLink>
                                                     </div>
@@ -413,8 +414,9 @@ export default function Navbar() {
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/70 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
+                                        aria-label={isRTL ? "Switch to English" : "Switch to Arabic"}
                                     >
-                                        <Globe className={ICON_LG} />
+                                        <Globe className={ICON_LG} aria-hidden="true" />
                                         <span>{isRTL ? "English" : "العربية"}</span>
                                     </button>
                                 </div>

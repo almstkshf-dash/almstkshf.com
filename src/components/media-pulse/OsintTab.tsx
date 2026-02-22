@@ -70,8 +70,10 @@ export default function OsintTab() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="space-y-1">
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.category')}</label>
+          <label htmlFor="filter-category" className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.category')}</label>
           <select
+            id="filter-category"
+            name="filter-category"
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={category}
             onChange={(e) => { setCategory(e.target.value); setPage(0); }}
@@ -82,8 +84,10 @@ export default function OsintTab() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.label')}</label>
+          <label htmlFor="filter-label" className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.label')}</label>
           <select
+            id="filter-label"
+            name="filter-label"
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={labelFilter}
             onChange={(e) => { setLabelFilter(e.target.value); setPage(0); }}
@@ -94,8 +98,10 @@ export default function OsintTab() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.language')}</label>
+          <label htmlFor="filter-language" className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.language')}</label>
           <select
+            id="filter-language"
+            name="filter-language"
             className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
             value={language}
             onChange={(e) => { setLanguage(e.target.value); setPage(0); }}
@@ -111,6 +117,7 @@ export default function OsintTab() {
           <div className="flex items-center gap-2">
             <input
               id="free-only"
+              name="free-only"
               type="checkbox"
               checked={freeOnly}
               onChange={(e) => { setFreeOnly(e.target.checked); setPage(0); }}
@@ -121,8 +128,10 @@ export default function OsintTab() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.search')}</label>
+        <label htmlFor="filter-search" className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('filters.search')}</label>
         <input
+          id="filter-search"
+          name="filter-search"
           className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm"
           placeholder={t('filters.search_placeholder')}
           value={search}

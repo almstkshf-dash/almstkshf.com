@@ -21,7 +21,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
                 <div className="max-w-3xl mx-auto space-y-12">
                     {/* Header */}
                     <div className="space-y-4">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
                             {t('title')}
                         </h1>
                         <p className="text-lg leading-relaxed text-muted-foreground">

@@ -149,7 +149,7 @@ export default function DashboardPage() {
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
                                 {t('title')}
                             </h1>
                             <div className="flex bg-secondary/80 rounded-full border border-border p-1 backdrop-blur-sm">
@@ -192,13 +192,14 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         {/* Settings Button */}
-                        <HoverPrefetchLink href="/dashboard/settings">
+                        <HoverPrefetchLink href="/dashboard/settings" aria-label={t('settings')}>
                             <Button
                                 variant="secondary"
                                 className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-600 dark:text-slate-300 px-3 text-xs shadow-none h-auto w-9 flex justify-center items-center"
                                 iconOnly
+                                aria-label={t('settings')}
                             >
-                                <Settings className="w-3.5 h-3.5" />
+                                <Settings className="w-3.5 h-3.5" aria-hidden="true" />
                             </Button>
                         </HoverPrefetchLink>
 
@@ -206,8 +207,8 @@ export default function DashboardPage() {
                         <Button
                             variant="secondary"
                             onClick={() => setManualModalOpen(true)}
-                            className="bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-amber-300 px-4 text-xs shadow-none h-auto"
-                            leftIcon={<Plus className="w-3.5 h-3.5" />}
+                            className="bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 px-4 text-xs shadow-none h-auto"
+                            leftIcon={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
                         >
                             {t('manual_entry')}
                         </Button>

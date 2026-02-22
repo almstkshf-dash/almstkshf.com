@@ -16,25 +16,25 @@ export default function KYCPage() {
         {
             key: "goaml",
             icon: RefreshCw,
-            color: "text-blue-400",
+            color: "text-blue-600 dark:text-blue-400",
             bg: "bg-blue-500/10",
         },
         {
             key: "control",
             icon: ShieldCheck,
-            color: "text-emerald-400",
+            color: "text-emerald-600 dark:text-emerald-400",
             bg: "bg-emerald-500/10",
         },
         {
             key: "audit",
             icon: FileText,
-            color: "text-amber-400",
+            color: "text-amber-700 dark:text-amber-400",
             bg: "bg-amber-500/10",
         },
         {
             key: "risk",
             icon: Database,
-            color: "text-purple-400",
+            color: "text-purple-600 dark:text-purple-400",
             bg: "bg-purple-500/10",
         }
     ];
@@ -57,7 +57,7 @@ export default function KYCPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8 leading-tight bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent"
+                        className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8 leading-tight bg-gradient-to-r from-foreground via-primary to-primary/70 bg-clip-text text-transparent"
                     >
                         {t("title")}
                     </motion.h1>

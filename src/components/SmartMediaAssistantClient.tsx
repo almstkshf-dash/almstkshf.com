@@ -110,7 +110,10 @@ export default function SmartMediaAssistantClient() {
                             transition={{ delay: 0.2 }}
                             className="flex flex-col sm:flex-row gap-4"
                         >
+                            <label htmlFor="ai-prompt" className="sr-only">{tAi("prompt")}</label>
                             <input
+                                id="ai-prompt"
+                                name="ai-prompt"
                                 type="text"
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}

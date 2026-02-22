@@ -276,11 +276,13 @@
   "DeepSources": {
     "title": "Deep Sources",
     "DeepSources": "Deep Sources",
-    "fetch_success": "Fetch completed successfully",
-    "fetch_failed": "Failed to retrieve deep source data. Please check your connection and try again.",
+    "fetch_success": "Data fetched successfully",
+    "fetch_failed": "Failed to fetch deep source data. Please check your connection and try again.",
     "fetch_now": "Fetch Now",
     "recent_runs": "Recent Runs",
-    "no_runs": "No runs yet"
+    "no_runs": "No runs yet",
+    "not_authenticated": "Not authenticated. Please sign in first.",
+    "items": "items"
   },
   "Contact": {
     "title": "Get in Touch",
@@ -1066,7 +1068,8 @@
     "save_failed": "Failed to save article. Please try again.",
     "fetch_article": "Fetch & Auto-Analyze",
     "extracting": "Extracting...",
-    "extract_failed": "Failed to extract content. Please check the URL or fulfill manually."
+    "extract_failed": "Failed to extract content. Please check the URL or fulfill manually.",
+    "not_authenticated": "Not authenticated. Please sign in first."
   },
   "ArticleTable": {
     "no_articles": "No articles found. Start monitoring or add manually.",
@@ -1130,7 +1133,8 @@
       "view_osint": "OSINT",
       "export_pdf": "PDF",
       "export_excel": "Excel"
-    }
+    },
+    "not_authenticated": "Not authenticated. Please sign in first."
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1162,7 +1166,8 @@
     "source_types": "Source Types",
     "select_sources": "Select sources...",
     "search_sources": "Search sources...",
-    "clear_all": "Clear All"
+    "clear_all": "Clear All",
+    "not_authenticated": "Not authenticated. Please sign in first."
   },
   "SentimentTracker": {
     "title": "Live Pulse: Public Sentiment",

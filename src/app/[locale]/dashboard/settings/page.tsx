@@ -11,6 +11,15 @@ import PhylloConnectButton from '@/components/PhylloConnect';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 
+interface Payment {
+    _id: string;
+    createdAt: number;
+    productName: string;
+    amount: number;
+    currency: string;
+    status: string;
+}
+
 export default function SettingsPage() {
     const t = useTranslations('Settings');
     const { userId } = useAuth();
@@ -138,7 +147,7 @@ export default function SettingsPage() {
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-10">
             {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border pb-8">
                 <div className="space-y-1">
                     <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
                         {t('title')}
@@ -208,7 +217,10 @@ export default function SettingsPage() {
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <Upload className="text-white w-6 h-6" />
                                         </div>
+                                        <label htmlFor="logo-upload" className="sr-only">{t('logo_upload')}</label>
                                         <input
+                                            id="logo-upload"
+                                            name="logo-upload"
                                             type="file"
                                             accept="image/*"
                                             onChange={handleLogoUpload}
@@ -229,8 +241,10 @@ export default function SettingsPage() {
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('target_countries')}</label>
+                                        <label htmlFor="target-countries" className="text-sm font-bold text-foreground/80">{t('target_countries')}</label>
                                         <input
+                                            id="target-countries"
+                                            name="target-countries"
                                             value={targetCountries}
                                             onChange={(e) => setTargetCountries(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
@@ -239,8 +253,10 @@ export default function SettingsPage() {
                                         <p className="text-xs text-muted-foreground">{t('iso_hint')}</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('ave_multiplier')}</label>
+                                        <label htmlFor="ave-multiplier" className="text-sm font-bold text-foreground/80">{t('ave_multiplier')}</label>
                                         <input
+                                            id="ave-multiplier"
+                                            name="ave-multiplier"
                                             type="number"
                                             step="0.001"
                                             value={aveMultiplier}
@@ -275,13 +291,16 @@ export default function SettingsPage() {
                                 </h2>
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('gemini_key')}</label>
+                                        <label htmlFor="gemini-key" className="text-sm font-bold text-foreground/80">{t('gemini_key')}</label>
                                         <input
+                                            id="gemini-key"
+                                            name="gemini-key"
                                             type="password"
                                             value={geminiKey}
                                             onChange={(e) => setGeminiKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                 </div>
@@ -300,13 +319,16 @@ export default function SettingsPage() {
                                         { id: 'worldnews', label: t('worldnews_key'), value: worldnewsKey, set: setWorldnewsKey },
                                     ].map((field) => (
                                         <div key={field.id} className="space-y-2">
-                                            <label className="text-sm font-bold text-foreground/80">{field.label}</label>
+                                            <label htmlFor={field.id} className="text-sm font-bold text-foreground/80">{field.label}</label>
                                             <input
+                                                id={field.id}
+                                                name={field.id}
                                                 type="password"
                                                 value={field.value}
                                                 onChange={(e) => field.set(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
+                                                autoComplete="new-password"
                                             />
                                         </div>
                                     ))}
@@ -337,23 +359,29 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('instagram_key')}</label>
+                                        <label htmlFor="instagram-key" className="text-sm font-bold text-foreground/80">{t('instagram_key')}</label>
                                         <input
+                                            id="instagram-key"
+                                            name="instagram-key"
                                             type="password"
                                             value={instagramKey}
                                             onChange={(e) => setInstagramKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_api_key')}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('twitter_bearer')}</label>
+                                        <label htmlFor="twitter-bearer" className="text-sm font-bold text-foreground/80">{t('twitter_bearer')}</label>
                                         <input
+                                            id="twitter-bearer"
+                                            name="twitter-bearer"
                                             type="password"
                                             value={twitterBearer}
                                             onChange={(e) => setTwitterBearer(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_token')}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                 </div>
@@ -380,8 +408,10 @@ export default function SettingsPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-primary/80">{t('phyllo_client_id')}</label>
+                                        <label htmlFor="phyllo-client-id" className="text-sm font-bold text-primary/80">{t('phyllo_client_id')}</label>
                                         <input
+                                            id="phyllo-client-id"
+                                            name="phyllo-client-id"
                                             value={phylloClientId}
                                             onChange={(e) => setPhylloClientId(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
@@ -389,18 +419,21 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-primary/80">{t('phyllo_client_secret')}</label>
+                                        <label htmlFor="phyllo-client-secret" className="text-sm font-bold text-primary/80">{t('phyllo_client_secret')}</label>
                                         <input
+                                            id="phyllo-client-secret"
+                                            name="phyllo-client-secret"
                                             type="password"
                                             value={phylloClientSecret}
                                             onChange={(e) => setPhylloClientSecret(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                             placeholder={t('placeholder_secret')}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="p-6 bg-gradient-to-r from-primary to-accent rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                                <div className="p-6 bg-gradient-to-r from-primary to-primary/70 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
                                     <div className="space-y-1">
                                         <h3 className="font-bold text-lg">{t('phyllo_test')}</h3>
                                         <p className="text-white/80 text-sm">{t('phyllo_test_desc')}</p>
@@ -435,8 +468,10 @@ export default function SettingsPage() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('chatbase_id')}</label>
+                                        <label htmlFor="chatbase-id" className="text-sm font-bold text-foreground/80">{t('chatbase_id')}</label>
                                         <input
+                                            id="chatbase-id"
+                                            name="chatbase-id"
                                             value={chatbaseId}
                                             onChange={(e) => setChatbaseId(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-emerald-500 outline-none font-mono text-foreground"
@@ -444,8 +479,10 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('chatbase_host')}</label>
+                                        <label htmlFor="chatbase-host" className="text-sm font-bold text-foreground/80">{t('chatbase_host')}</label>
                                         <input
+                                            id="chatbase-host"
+                                            name="chatbase-host"
                                             value={chatbaseHost}
                                             onChange={(e) => setChatbaseHost(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-emerald-500 outline-none text-foreground"
@@ -477,34 +514,43 @@ export default function SettingsPage() {
 
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-foreground/80">{t('stripe_publishable')}</label>
+                                        <label htmlFor="stripe-publishable" className="text-sm font-bold text-foreground/80">{t('stripe_publishable')}</label>
                                         <input
+                                            id="stripe-publishable"
+                                            name="stripe-publishable"
                                             type="password"
                                             value={stripePublishableKey}
                                             onChange={(e) => setStripePublishableKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                             placeholder={t('placeholder_api_key')}
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-foreground/80">{t('stripe_secret')}</label>
+                                            <label htmlFor="stripe-secret" className="text-sm font-bold text-foreground/80">{t('stripe_secret')}</label>
                                             <input
+                                                id="stripe-secret"
+                                                name="stripe-secret"
                                                 type="password"
                                                 value={stripeSecretKey}
                                                 onChange={(e) => setStripeSecretKey(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
+                                                autoComplete="new-password"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-foreground/80">{t('stripe_webhook')}</label>
+                                            <label htmlFor="stripe-webhook" className="text-sm font-bold text-foreground/80">{t('stripe_webhook')}</label>
                                             <input
+                                                id="stripe-webhook"
+                                                name="stripe-webhook"
                                                 type="password"
                                                 value={stripeWebhookSecret}
                                                 onChange={(e) => setStripeWebhookSecret(e.target.value)}
                                                 className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
                                                 placeholder={t('placeholder_api_key')}
+                                                autoComplete="new-password"
                                             />
                                         </div>
                                     </div>
@@ -546,7 +592,7 @@ export default function SettingsPage() {
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                payments.map((payment) => (
+                                                payments.map((payment: Payment) => (
                                                     <tr key={payment._id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
                                                         <td className="py-4 px-8 text-sm text-muted-foreground">
                                                             {new Date(payment.createdAt).toLocaleDateString()}
