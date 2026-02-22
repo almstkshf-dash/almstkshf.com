@@ -79,7 +79,7 @@ const BRAND_AMBER = [218, 165, 32] as const;   // #DAA520 (golden)
 const ACCENT_BG = [245, 247, 250] as const;    // #F5F7FA
 
 // Helper: add header with logo
-function addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number) {
+function addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number, fontLoaded: boolean = false) {
     // Top bar
     doc.setFillColor(...BRAND_DARK);
     doc.rect(0, 0, pageWidth, 18, 'F');
@@ -90,6 +90,9 @@ function addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number)
             doc.addImage(logoBase64, 'PNG', 6, 2, 14, 14);
         } catch { /* ignore */ }
     }
+
+    // Set correct font before writing text
+    doc.setFont(fontLoaded ? 'Amiri' : 'helvetica');
 
     // Company name
     doc.setFontSize(10);
@@ -138,35 +141,47 @@ async function loadLogo(): Promise<string | null> {
 // ════════════════════════════════════════════════════════════════════════
 
 /**
- * A simple Arabic reshaper and Bidi logic to handle Arabic in jsPDF.
- * This is necessary because jsPDF does not natively handle Arabic script joining or RTL.
+ * Arabic letter forms map for reshaping (isolated, final, initial, medial)
+ * Amiri font supports full Unicode Arabic, so we only need proper Bidi reordering.
+ * We do NOT reverse individual characters — that destroys Arabic letter shapes.
+ * Instead, we reverse the word order for RTL paragraph display in jsPDF.
  */
 function fixArabicForPDF(text: string): string {
     if (!text || !/[\u0600-\u06FF]/.test(text)) return text;
 
-    // 1. Basic Arabic Reshaping (Simple version for joining characters)
-    // In a production environment, you'd use 'arabic-reshaper' and 'bidi-js'.
-    // Here we use a heuristic or at least handle the RTL reordering.
+    // Split into RTL (Arabic) and LTR (Latin/numbers) segments
+    // Preserve whitespace as-is between segments
+    const segments = text.split(/(\s+)/);
 
-    // For jsPDF, if we have a proper UTF-8 font, we primarily need to reorder for RTL.
-    // However, without a reshaper, letters will be isolated.
-    // Given the user's issue (Mojibake), the priority is FONT and UTF-8 handling.
+    // Separate Arabic word-groups from Latin word-groups
+    const result: string[] = [];
+    let arabicBuffer: string[] = [];
 
-    // Let's at least handle the RTL reordering for mixed text.
-    const isArabic = (char: string) => /[\u0600-\u06FF]/.test(char);
-
-    // Split into segments of Arabic and non-Arabic
-    const words = text.split(/(\s+)/);
-    const processedWords = words.map(word => {
-        if (isArabic(word)) {
-            // Reverse Arabic words for RTL
-            return word.split('').reverse().join('');
+    for (const seg of segments) {
+        if (/[\u0600-\u06FF]/.test(seg)) {
+            // Arabic segment — collect for RTL reversal
+            arabicBuffer.push(seg);
+        } else {
+            if (arabicBuffer.length > 0) {
+                // Flush: reverse word order for RTL (NOT characters, only words)
+                result.push(...arabicBuffer.reverse());
+                arabicBuffer = [];
+            }
+            result.push(seg);
         }
-        return word;
-    });
+    }
+    // Flush remaining Arabic
+    if (arabicBuffer.length > 0) {
+        result.push(...arabicBuffer.reverse());
+    }
 
-    // If the whole string is primarily Arabic, reverse the order of segments too
-    return processedWords.reverse().join('');
+    // If entire string is Arabic, reverse segment order for RTL paragraph
+    const isFullyArabic = /^[\u0600-\u06FF\s\u060C\u061B\u061F\u0640]+$/.test(text);
+    if (isFullyArabic) {
+        return result.reverse().join('');
+    }
+
+    return result.join('');
 }
 
 export async function exportToPDF(articles: Article[], _logoUrl?: string, reportTitle: string = 'Media Coverage Report') {
@@ -189,27 +204,41 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
-    // Load Arabic font with higher reliability
+    // Load Arabic font with multiple fallback CDN URLs
     let fontLoaded = false;
-    try {
-        // Use a more reliable CDN for the font (Google Fonts Gstatic)
-        const fontUrl = 'https://fonts.gstatic.com/s/amiri/v26/J7afF9i7VnKU6OTvXqE.ttf';
-        const res = await fetch(fontUrl);
-        if (res.ok) {
+    const fontUrls = [
+        'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw74NL.ttf',
+        'https://fonts.gstatic.com/s/amiri/v26/J7afF9i7VnKU6OTvXqE.ttf',
+        'https://cdn.jsdelivr.net/npm/amiri-font@1.0.0/fonts/Amiri-Regular.ttf',
+    ];
+
+    for (const fontUrl of fontUrls) {
+        try {
+            const res = await fetch(fontUrl);
+            if (!res.ok) continue;
+
             const arrayBuffer = await res.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
+
+            // Use chunk-based btoa to avoid call stack overflow on large fonts
             let binary = '';
-            for (let i = 0; i < uint8Array.byteLength; i++) {
-                binary += String.fromCharCode(uint8Array[i]);
+            const chunkSize = 8192;
+            for (let i = 0; i < uint8Array.byteLength; i += chunkSize) {
+                binary += String.fromCharCode(...uint8Array.subarray(i, i + chunkSize));
             }
             const base64 = btoa(binary);
 
             doc.addFileToVFS('Amiri-Regular.ttf', base64);
             doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
             fontLoaded = true;
+            break; // Success — stop trying fallbacks
+        } catch (e) {
+            console.warn(`Could not load font from ${fontUrl}`, e);
         }
-    } catch (e) {
-        console.warn("Could not load Arabic font, falling back to standard fonts.", e);
+    }
+
+    if (!fontLoaded) {
+        console.warn('All Arabic font sources failed. Arabic text may not render correctly.');
     }
 
     // Load logo
@@ -288,7 +317,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // PAGE 2 — EXECUTIVE SUMMARY
     // ═══════════════════════════════════════════════════════
     doc.addPage();
-    addPageHeader(doc, logoBase64, pageWidth);
+    addPageHeader(doc, logoBase64, pageWidth, fontLoaded);
 
     let y = 28;
     doc.setFontSize(18);
@@ -375,7 +404,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // PAGE 3+ — ARTICLES TABLE
     // ═══════════════════════════════════════════════════════
     doc.addPage();
-    addPageHeader(doc, logoBase64, pageWidth);
+    addPageHeader(doc, logoBase64, pageWidth, fontLoaded);
 
     doc.setFontSize(14);
     doc.setTextColor(...BRAND_DARK);
@@ -383,7 +412,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
 
     const tableData = articles.map(a => [
         a.publishedDate,
-        a.title,
+        isArabic(a.title) ? fixArabicForPDF(a.title) : a.title,
         a.sourceType,
         a.sourceCountry,
         a.sentiment,
@@ -407,6 +436,7 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
             halign: 'center',
             fontSize: 7,
             fontStyle: 'bold',
+            font: fontLoaded ? 'Amiri' : 'helvetica',
         },
         alternateRowStyles: { fillColor: [245, 247, 250] },
         columnStyles: {
@@ -419,14 +449,19 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
             6: { cellWidth: 20, halign: 'right' },
         },
         didParseCell: (data) => {
-            // If the cell contains Arabic, we can try to fix it,
-            // though autoTable might handle it differently.
-            if (data.section === 'body' && typeof data.cell.raw === 'string' && isArabic(data.cell.raw)) {
-                data.cell.text = [fixArabicForPDF(data.cell.raw)];
+            // Apply Arabic fix only to body cells containing Arabic text
+            // We apply it here so autoTable uses the corrected text for rendering
+            if (data.section === 'body' && typeof data.cell.raw === 'string') {
+                const raw = data.cell.raw as string;
+                if (/[\u0600-\u06FF]/.test(raw)) {
+                    data.cell.text = [fixArabicForPDF(raw)];
+                    // Force right-align Arabic cells
+                    data.cell.styles.halign = 'right';
+                }
             }
         },
         didDrawPage: () => {
-            addPageHeader(doc, logoBase64, pageWidth);
+            addPageHeader(doc, logoBase64, pageWidth, fontLoaded);
         },
     });
 
@@ -442,4 +477,3 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     // Save
     doc.save(`${reportTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
 }
-

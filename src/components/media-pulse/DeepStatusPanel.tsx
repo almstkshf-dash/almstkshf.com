@@ -17,6 +17,10 @@ export default function DeepStatusPanel() {
     const [success, setSuccess] = useState('');
 
     const handleFetch = async () => {
+        if (!isAuthenticated) {
+            setError(t('not_authenticated') || 'Not authenticated. Please sign in first.');
+            return;
+        }
         setLoading(true);
         setError('');
         setSuccess('');
@@ -46,6 +50,7 @@ export default function DeepStatusPanel() {
                     size="sm"
                     onClick={handleFetch}
                     isLoading={loading}
+                    disabled={!isAuthenticated || loading}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted text-sm font-bold h-auto shadow-none"
                     leftIcon={!loading && <RefreshCw className="w-4 h-4" />}
                 >
