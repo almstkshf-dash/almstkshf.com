@@ -10,36 +10,30 @@ export default function ChatbaseWidget() {
         // Identify user with Chatbase after widget loads
         const identifyUser = async () => {
             try {
-                // Wait for chatbase to be initialized
                 const checkChatbase = setInterval(() => {
                     if (window.chatbase && typeof window.chatbase === 'function') {
                         clearInterval(checkChatbase);
 
-                        // Get JWT token from API
                         fetch('/api/chatbase/token')
                             .then(res => res.json())
                             .then(data => {
                                 if (data.token) {
                                     window.chatbase('identify', { token: data.token });
-                                    console.log('Chatbase: User identified successfully');
                                 }
                             })
                             .catch(err => {
                                 console.warn('Chatbase: Failed to identify user', err);
                             });
                     }
-                }, 100);
+                }, 500);
 
-                // Clear interval after 10 seconds if chatbase doesn't load
-                setTimeout(() => clearInterval(checkChatbase), 10000);
+                setTimeout(() => clearInterval(checkChatbase), 15000);
             } catch (error) {
                 console.warn('Chatbase: Error during user identification', error);
             }
         };
 
-        // Run identification after a short delay to ensure script is loaded
-        const timer = setTimeout(identifyUser, 2000);
-
+        const timer = setTimeout(identifyUser, 3000);
         return () => clearTimeout(timer);
     }, []);
 
@@ -71,24 +65,21 @@ export default function ChatbaseWidget() {
                                 }
                             })
                         }
-                        const style = document.createElement("style");
-                        style.innerHTML = '#chatbase-bubble-button { display: none !important; }';
-                        document.head.appendChild(style);
 
-        const onLoad = function() {
-                            if (document.getElementById("chatbase-script")) return;
+                        const onLoad = function() {
+                            if (document.getElementById("${chatbotId}")) return;
                             const script = document.createElement("script");
                             script.src = "https://www.chatbase.co/embed.min.js";
-                            script.id = "chatbase-script";
-                            script.setAttribute("data-chatbot-id", "${chatbotId}");
-                            script.setAttribute("data-domain", "www.chatbase.co");
+                            script.id = "${chatbotId}";
+                            script.setAttribute("chatbotId", "${chatbotId}");
+                            script.setAttribute("domain", "www.chatbase.co");
                             script.defer = true;
-                            document.body.appendChild(script)
+                            document.body.appendChild(script);
                         };
                         if(document.readyState === "complete") {
-                            onLoad()
+                            onLoad();
                         } else {
-                            window.addEventListener("load", onLoad)
+                            window.addEventListener("load", onLoad);
                         }
                     })();
                 `,

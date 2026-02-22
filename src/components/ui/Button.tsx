@@ -8,6 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     isLoading?: boolean;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    iconOnly?: boolean;
 }
 
 export default function Button({
@@ -18,6 +19,7 @@ export default function Button({
     isLoading,
     leftIcon,
     rightIcon,
+    iconOnly,
     disabled,
     ...props
 }: ButtonProps) {

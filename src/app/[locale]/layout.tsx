@@ -11,7 +11,6 @@ import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import ChatbaseWidget from '@/components/ChatbaseWidget';
-import ChatbotTrigger from '@/components/ChatbotTrigger';
 import { Analytics } from "@vercel/analytics/next"
 import { CommandMenu } from "@/components/CommandMenu";
 import { Toaster } from "sonner";
@@ -125,7 +124,6 @@ export default async function RootLayout({
                                 <Analytics />
                                 <Footer />
                                 <ChatbaseWidget />
-                                <ChatbotTrigger />
                             </ThemeProvider>
                         </ConvexClientProvider>
                     </NextIntlClientProvider>
