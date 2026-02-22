@@ -1,7 +1,7 @@
 'use client';
 import clsx from 'clsx';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useAction } from 'convex/react';
+import { useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Search, Loader2, Sparkles, AlertCircle, AlertTriangle, CheckCircle2, Languages, FileText, Share2, Download, Trash2, Edit3, Plus, Filter, ChevronDown, Check, X, Newspaper, Globe, MessageSquare, Megaphone, TrendingUp, ShieldAlert, BarChart, Settings, Users, ArrowRight, Zap, Target, BookOpen, Clock, Heart, MessageCircle, MoreHorizontal } from "lucide-react";
 import Button from "../ui/Button";
@@ -356,6 +356,8 @@ export default function NewsGenerator() {
     const t = useTranslations('NewsGenerator');
     const isAr = locale === 'ar';
 
+    // Guard: ensure Clerk token is propagated to Convex before firing the action
+    const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
     const fetchNews = useAction(api.monitoringAction.fetchNews);
 
     const [keyword, setKeyword] = useState('');
@@ -433,6 +435,11 @@ export default function NewsGenerator() {
 
     const handleGenerate = async () => {
         if (!validate()) return;
+        // Safety: never invoke an authenticated action when Convex hasn't received the token yet
+        if (!isAuthenticated) {
+            setErrorMsg(isAr ? 'يجب تسجيل الدخول أولاً' : 'You must be signed in to run this action.');
+            return;
+        }
         setLoading(true);
         setResult(null);
         setErrorMsg('');
@@ -617,7 +624,8 @@ export default function NewsGenerator() {
 
                     <Button
                         onClick={handleGenerate}
-                        isLoading={loading}
+                        isLoading={loading || authLoading}
+                        disabled={!isAuthenticated || authLoading}
                         className="w-full md:w-auto font-bold px-10 py-3.5 shadow-xl shadow-primary/20 text-sm whitespace-nowrap"
                     >
                         {loading ? (

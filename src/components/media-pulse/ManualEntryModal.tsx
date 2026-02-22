@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useMutation, useAction, useQuery } from 'convex/react';
+import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { X, Loader2, Plus, Wand2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -18,6 +18,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     const saveArticle = useMutation(api.monitoring.saveArticle);
     const extractArticle = useAction(api.monitoringAction.extractArticle);
     const settings = useQuery(api.settings.getSettings);
+    const { isAuthenticated } = useConvexAuth();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
@@ -39,6 +40,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isAuthenticated) { alert('يجب تسجيل الدخول أولاً / You must be signed in.'); return; }
         setIsLoading(true);
 
         try {
@@ -97,7 +99,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     };
 
     const handleExtract = async () => {
-        if (!formData.url) return;
+        if (!formData.url || !isAuthenticated) return;
         setIsExtracting(true);
 
         try {

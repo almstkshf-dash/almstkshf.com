@@ -13,6 +13,12 @@ if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
 
 const convex = new ConvexReactClient(convexUrl);
 
+/**
+ * Provides the Convex client with Clerk auth integration.
+ * NOTE: This component must always be rendered inside <ClerkProvider>,
+ * which lives in [locale]/layout.tsx (a Server Component) to guarantee
+ * a single, top-level Clerk initialisation before any useAuth() calls.
+ */
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
     return (
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>

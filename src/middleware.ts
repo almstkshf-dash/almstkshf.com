@@ -21,32 +21,38 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    const { pathname } = req.nextUrl;
+    try {
+        const { pathname } = req.nextUrl;
 
-    // 1. Skip middleware for static assets (Next.js config matcher handles this, but extra safety)
-    if (pathname.includes('.')) {
-        return NextResponse.next();
+        // 1. Fast path for static assets
+        if (pathname.match(/\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml|txt)$/)) {
+            return NextResponse.next();
+        }
+
+        // 2. Authentication Protection
+        if (!isPublicRoute(req)) {
+            await auth.protect();
+        }
+
+        // 3. Dashboard Redirect for bare /dashboard path
+        if (pathname === '/dashboard') {
+            const url = req.nextUrl.clone();
+            url.pathname = '/en/dashboard'; // Default to English dashboard
+            return NextResponse.redirect(url);
+        }
+
+        // 4. API Routes - No i18n
+        if (pathname.startsWith('/api')) {
+            return NextResponse.next();
+        }
+
+        // 5. Localization (next-intl)
+        return intlMiddleware(req);
+    } catch (error) {
+        console.error("Middleware Invocation Error:", error);
+        // Important: return intlMiddleware as fallback to prevent 500 failure
+        return intlMiddleware(req);
     }
-
-    // 2. Authentication Protection
-    if (!isPublicRoute(req)) {
-        await auth.protect();
-    }
-
-    // 3. Dashboard Redirect for bare /dashboard path
-    if (pathname === '/dashboard') {
-        const url = req.nextUrl.clone();
-        url.pathname = '/en/dashboard'; // Default to English dashboard
-        return NextResponse.redirect(url);
-    }
-
-    // 4. API Routes - No i18n
-    if (pathname.startsWith('/api')) {
-        return NextResponse.next();
-    }
-
-    // 5. Localization (next-intl)
-    return intlMiddleware(req);
 });
 
 export const config = {

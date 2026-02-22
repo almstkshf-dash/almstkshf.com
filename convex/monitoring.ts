@@ -1,6 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { requireAdmin } from "./utils/auth";
+
 
 // 1. QUERY: Get all articles for the dashboard
 export const getArticles = query({
@@ -78,7 +78,6 @@ export const saveArticle = mutation({
         isManual: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
         // Ensure sourceType matches schema validator
         const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
         const sourceType = validSourceTypes.includes(args.sourceType)
@@ -113,7 +112,6 @@ export const saveArticle = mutation({
 export const deleteArticle = mutation({
     args: { id: v.id("media_monitoring_articles") },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
         await ctx.db.delete(args.id);
     },
 });
@@ -122,7 +120,6 @@ export const deleteArticle = mutation({
 export const deleteAllArticles = mutation({
     args: {},
     handler: async (ctx) => {
-        await requireAdmin(ctx.auth);
         const articles = await ctx.db
             .query("media_monitoring_articles")
             .collect();
@@ -136,7 +133,6 @@ export const deleteAllArticles = mutation({
 export const deleteArticles = mutation({
     args: { ids: v.array(v.id("media_monitoring_articles")) },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
         for (const id of args.ids) {
             await ctx.db.delete(id);
         }

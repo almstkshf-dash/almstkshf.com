@@ -162,7 +162,12 @@ export const fetchNews = action({
     },
     handler: async (ctx, args) => {
         try {
-            await requireAdmin(ctx.auth);
+            let identity;
+            try {
+                identity = await requireAdmin(ctx.auth);
+            } catch (authErr: any) {
+                return { success: false, error: "Authentication required. Please sign in and try again." };
+            }
             const settings = await ctx.runQuery(api.settings.getSettings);
             const apiKey = settings?.apiKeys?.gemini?.trim() || process.env.GEMINI_API_KEY?.trim();
 
@@ -537,9 +542,9 @@ async function processArticle(
         }
 
         // SPIDER — Resolve URL if needed (RSS redirects)
-    let resolvedUrl = item.link;
-    let imageUrl = item.imageUrl;
-    let sourceName = item.source || item.creator;
+        let resolvedUrl = item.link;
+        let imageUrl = item.imageUrl;
+        let sourceName = item.source || item.creator;
 
         if (shouldResolve) {
             console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
