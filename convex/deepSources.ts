@@ -22,22 +22,16 @@ async function isAllowed(url: string): Promise<boolean> {
 export const getDeepRuns = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
-        try {
-            // requireAdmin will throw "Not authenticated" or "Not authorized" correctly
-            await requireAdmin(ctx.auth);
+        // requireAdmin will throw "Not authenticated" or "Not authorized" correctly
+        await requireAdmin(ctx.auth);
 
-            // Using the defined index for better performance and explicit sorting
-            const runs = await ctx.db.query("ingestion_runs_deep")
-                .withIndex("by_started_at")
-                .order("desc")
-                .take(args.limit ?? 20);
+        // Using the defined index for better performance and explicit sorting
+        const runs = await ctx.db.query("ingestion_runs_deep")
+            .withIndex("by_started_at")
+            .order("desc")
+            .take(args.limit ?? 20);
 
-            return runs;
-        } catch (error: any) {
-            console.error("Error in getDeepRuns:", error);
-            if (error instanceof ConvexError) throw error;
-            throw new ConvexError(`Server error in getDeepRuns: ${error.message || "Unknown error"}`);
-        }
+        return runs;
     }
 });
 
