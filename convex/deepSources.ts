@@ -1,7 +1,7 @@
 import { action, mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
-import { requireAdmin } from "./utils/auth";
+
 
 // Simple robots.txt checker (skip disallowed)
 async function isAllowed(url: string): Promise<boolean> {
@@ -22,8 +22,8 @@ async function isAllowed(url: string): Promise<boolean> {
 export const getDeepRuns = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
-        // requireAdmin will throw "Not authenticated" or "Not authorized" correctly
-        await requireAdmin(ctx.auth);
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new ConvexError("Not authenticated");
 
         // Using the defined index for better performance and explicit sorting
         const runs = await ctx.db.query("ingestion_runs_deep")
