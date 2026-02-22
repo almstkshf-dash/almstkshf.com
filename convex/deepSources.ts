@@ -23,12 +23,7 @@ export const getDeepRuns = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         try {
-            const identity = await ctx.auth.getUserIdentity();
-            if (!identity) {
-                throw new ConvexError("Not authenticated");
-            }
-
-            // requireAdmin will check if the user has admin roles OR is in ADMIN_USER_IDS
+            // requireAdmin will throw "Not authenticated" or "Not authorized" correctly
             await requireAdmin(ctx.auth);
 
             // Using the defined index for better performance and explicit sorting
@@ -40,9 +35,7 @@ export const getDeepRuns = query({
             return runs;
         } catch (error: any) {
             console.error("Error in getDeepRuns:", error);
-            // If it's already a ConvexError, rethrow it
             if (error instanceof ConvexError) throw error;
-            // Otherwise wrap it (or rethrow as-is if you prefer, but "Server Error" is often from uncaught)
             throw new ConvexError(`Server error in getDeepRuns: ${error.message || "Unknown error"}`);
         }
     }
@@ -56,7 +49,7 @@ export const fetchDeepSources = action({
         limit: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
+        await ctx.runQuery(api.utils.checkAdmin.isAdmin, {});
         const start = Date.now();
         const limit = args.limit ?? 20;
         let itemCount = 0;

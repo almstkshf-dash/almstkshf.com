@@ -162,9 +162,8 @@ export const fetchNews = action({
     },
     handler: async (ctx, args) => {
         try {
-            let identity;
             try {
-                identity = await requireAdmin(ctx.auth);
+                await ctx.runQuery(api.utils.checkAdmin.isAdmin, {});
             } catch (authErr: any) {
                 return { success: false, error: "Authentication required. Please sign in and try again." };
             }
