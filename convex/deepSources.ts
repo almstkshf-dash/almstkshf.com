@@ -1,5 +1,5 @@
 import { action, mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
 
@@ -22,13 +22,29 @@ async function isAllowed(url: string): Promise<boolean> {
 export const getDeepRuns = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
-            throw new Error("Not authenticated");
+        try {
+            const identity = await ctx.auth.getUserIdentity();
+            if (!identity) {
+                throw new ConvexError("Not authenticated");
+            }
+
+            // requireAdmin will check if the user has admin roles OR is in ADMIN_USER_IDS
+            await requireAdmin(ctx.auth);
+
+            // Using the defined index for better performance and explicit sorting
+            const runs = await ctx.db.query("ingestion_runs_deep")
+                .withIndex("by_started_at")
+                .order("desc")
+                .take(args.limit ?? 20);
+
+            return runs;
+        } catch (error: any) {
+            console.error("Error in getDeepRuns:", error);
+            // If it's already a ConvexError, rethrow it
+            if (error instanceof ConvexError) throw error;
+            // Otherwise wrap it (or rethrow as-is if you prefer, but "Server Error" is often from uncaught)
+            throw new ConvexError(`Server error in getDeepRuns: ${error.message || "Unknown error"}`);
         }
-        await requireAdmin(ctx.auth);
-        const runs = await ctx.db.query("ingestion_runs_deep").order("desc").take(args.limit ?? 20);
-        return runs;
     }
 });
 
