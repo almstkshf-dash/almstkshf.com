@@ -25,7 +25,7 @@ function hasAdminRole(identity: any): boolean {
 export async function requireUser(auth: Auth) {
     const identity = await auth.getUserIdentity();
     if (!identity) {
-        throw new ConvexError("Not authenticated");
+        throw new ConvexError("Not authenticated: Identity is null. If testing in the Dashboard/CLI, please use 'Impersonate' or provide a user token.");
     }
     return identity;
 }

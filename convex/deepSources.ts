@@ -43,7 +43,7 @@ export const fetchDeepSources = action({
         limit: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
-        await ctx.runQuery(api.utils.checkAdmin.isAdmin, {});
+        await requireAdmin(ctx.auth);
         const start = Date.now();
         const limit = args.limit ?? 20;
         let itemCount = 0;

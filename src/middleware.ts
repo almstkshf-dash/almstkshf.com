@@ -29,7 +29,9 @@ const isPublicRoute = createRouteMatcher([
     "/api/chatbase/token",
     "/api/webhooks(.*)",
     "/sign-in(.*)",
+    "/(en|ar)/sign-in(.*)",
     "/sign-up(.*)",
+    "/(en|ar)/sign-up(.*)",
     "/monitoring(.*)"
 ]);
 
