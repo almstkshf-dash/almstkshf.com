@@ -10,18 +10,24 @@ import {
     Settings,
     User,
     CreditCard,
-    LogOut,
     Moon,
     Sun,
-    Laptop
+    Laptop,
+    Home,
+    Activity,
+    ShieldAlert,
+    Users,
+    ChevronRight,
+    SearchSlash
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { clsx } from "clsx";
+import { NAVIGATION_ITEMS } from "@/lib/navigation";
 
 export function CommandMenu() {
     const [open, setOpen] = React.useState(false);
     const router = useRouter();
     const t = useTranslations("Common");
+    const tNav = useTranslations("Navigation");
     const { setTheme } = useTheme();
 
     React.useEffect(() => {
@@ -30,11 +36,14 @@ export function CommandMenu() {
                 e.preventDefault();
                 setOpen((open) => !open);
             }
+            if (e.key === "Escape" && open) {
+                setOpen(false);
+            }
         };
 
         document.addEventListener("keydown", down);
         return () => document.removeEventListener("keydown", down);
-    }, []);
+    }, [open]);
 
     const runCommand = React.useCallback((command: () => unknown) => {
         setOpen(false);
@@ -44,86 +53,133 @@ export function CommandMenu() {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[999] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-lg shadow-2xl rounded-xl overflow-hidden border border-border animate-in slide-in-from-top-2 duration-300">
-                <Command className="bg-popover text-popover-foreground w-full">
-                    <div className="flex items-center border-b border-border px-3" cmdk-input-wrapper="">
-                        <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        <div
+            className="fixed inset-0 z-[999] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 sm:p-6 md:p-20 animate-in fade-in duration-200"
+            onClick={() => setOpen(false)}
+        >
+            <div
+                className="w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden border border-border bg-popover animate-in slide-in-from-top-4 duration-300"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <Command
+                    className="flex h-full w-full flex-col overflow-hidden rounded-2xl"
+                    label="Command Menu"
+                >
+                    <div className="flex items-center border-b border-border px-4 py-3" cmdk-input-wrapper="">
+                        <Search className="me-3 h-5 w-5 shrink-0 opacity-50" />
                         <Command.Input
-                            placeholder={t('search_placeholder') || "Search..."}
+                            placeholder={t('search_placeholder') || "Search for pages, tools, or settings..."}
                             autoComplete="off"
-                            className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-10 w-full rounded-md bg-transparent py-3 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                         />
+                        <div className="hidden sm:flex items-center gap-1 ms-auto">
+                            <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted text-[10px] font-medium text-muted-foreground">ESC</kbd>
+                        </div>
                     </div>
-                    <Command.List className="max-h-[300px] overflow-y-auto overflow-x-hidden p-2">
-                        <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
-                            {t('no_results') || "No results found."}
+
+                    <Command.List className="max-h-[70vh] overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
+                        <Command.Empty className="py-12 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                            <SearchSlash className="h-10 w-10 opacity-20" />
+                            <p className="text-sm">{t('no_results') || "No matches found for your search."}</p>
                         </Command.Empty>
 
-                        <Command.Group heading="Navigation" className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 px-2">
+                        <Command.Group
+                            heading={tNav('dashboard') || "Personal"}
+                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 px-3 pt-2"
+                        >
                             <Command.Item
+                                value="dashboard"
                                 onSelect={() => runCommand(() => router.push("/dashboard"))}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
                             >
-                                <LayoutDashboard className="mr-2 h-4 w-4" />
-                                <span>Dashboard</span>
-                            </Command.Item>
-                            <Command.Item
-                                onSelect={() => runCommand(() => router.push("/media-monitoring/central-media-repository"))}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                            >
-                                <Search className="mr-2 h-4 w-4" />
-                                <span>Media Repository</span>
+                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                    <LayoutDashboard className="h-4 w-4" />
+                                </div>
+                                <span className="font-medium">{tNav('dashboard')}</span>
+                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
                             </Command.Item>
                         </Command.Group>
 
-                        <Command.Group heading="Settings" className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-2">
-                            <Command.Item
-                                onSelect={() => runCommand(() => router.push("/settings"))}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                            >
-                                <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
-                            </Command.Item>
-                            <Command.Item
-                                onSelect={() => runCommand(() => router.push("/settings"))}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-                            >
-                                <CreditCard className="mr-2 h-4 w-4" />
-                                <span>Billing</span>
-                            </Command.Item>
+                        <Command.Group
+                            heading={tNav('media_monitoring') || "Media & Intelligence"}
+                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
+                        >
+                            {NAVIGATION_ITEMS.map((item) => {
+                                if (item.children) {
+                                    return item.children.map((child) => (
+                                        <Command.Item
+                                            key={child.href}
+                                            value={tNav(child.label)}
+                                            onSelect={() => runCommand(() => router.push(child.href as any))}
+                                            className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
+                                        >
+                                            <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                                {child.icon ? <child.icon className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">{tNav(child.label)}</span>
+                                                <span className="text-[10px] text-muted-foreground line-clamp-1">{tNav(item.label)}</span>
+                                            </div>
+                                            <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                        </Command.Item>
+                                    ));
+                                }
+
+                                if (!item.href || item.href === "/" || item.label === "landing_page") return null;
+
+                                return (
+                                    <Command.Item
+                                        key={item.href}
+                                        value={tNav(item.label)}
+                                        onSelect={() => runCommand(() => router.push(item.href as any))}
+                                        className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
+                                    >
+                                        <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                            {item.icon ? <item.icon className="h-4 w-4" /> : <Home className="h-4 w-4" />}
+                                        </div>
+                                        <span className="font-medium">{tNav(item.label)}</span>
+                                        <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                    </Command.Item>
+                                );
+                            })}
                         </Command.Group>
 
-                        <Command.Group heading="Theme" className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-2">
+                        <Command.Group
+                            heading={tNav('settings') || "System & Settings"}
+                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
+                        >
                             <Command.Item
-                                onSelect={() => runCommand(() => {
-                                    document.documentElement.classList.remove("dark");
-                                    React.startTransition(() => setTheme("light"));
-                                })}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                value="settings"
+                                onSelect={() => runCommand(() => router.push("/dashboard/settings"))}
+                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
                             >
-                                <Sun className="mr-2 h-4 w-4" />
-                                <span>Light</span>
+                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                    <Settings className="h-4 w-4" />
+                                </div>
+                                <span className="font-medium">{tNav('settings')}</span>
+                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
                             </Command.Item>
+
                             <Command.Item
-                                onSelect={() => runCommand(() => {
-                                    document.documentElement.classList.add("dark");
-                                    React.startTransition(() => setTheme("dark"));
-                                })}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                value="light theme"
+                                onSelect={() => runCommand(() => setTheme("light"))}
+                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
                             >
-                                <Moon className="mr-2 h-4 w-4" />
-                                <span>Dark</span>
+                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                    <Sun className="h-4 w-4" />
+                                </div>
+                                <span className="font-medium">Light Theme</span>
                             </Command.Item>
+
                             <Command.Item
-                                onSelect={() => runCommand(() => {
-                                    // For system, we'll let next-themes handle it but still wrap in transition
-                                    React.startTransition(() => setTheme("system"));
-                                })}
-                                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                value="dark theme"
+                                onSelect={() => runCommand(() => setTheme("dark"))}
+                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
                             >
-                                <Laptop className="mr-2 h-4 w-4" />
-                                <span>System</span>
+                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                                    <Moon className="h-4 w-4" />
+                                </div>
+                                <span className="font-medium">Dark Theme</span>
                             </Command.Item>
                         </Command.Group>
                     </Command.List>
@@ -132,3 +188,4 @@ export function CommandMenu() {
         </div>
     );
 }
+

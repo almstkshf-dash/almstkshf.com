@@ -93,7 +93,9 @@
     "ai_badge": "AI",
     "image_unavailable": "Image Unavailable",
     "copied": "Copied",
-    "copy": "Copy"
+    "copy": "Copy",
+    "search_placeholder": "Search...",
+    "no_results": "No results found"
   },
   "Footer": {
     "about": "About ALMSTKSHF",

@@ -139,7 +139,7 @@ export default function Navbar() {
                             {/* Search */}
                             <Button
                                 variant="outline"
-                                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+                                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }))}
                                 className="px-3 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
                                 aria-label={`${t('search')} - Press ⌘K to search`}
                             >

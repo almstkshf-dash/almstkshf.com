@@ -34,15 +34,36 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // 1. If it's a public route, just let intlMiddleware handle it
-    if (isPublicRoute(req)) {
+    const url = req.nextUrl;
+    const isApiRoute = url.pathname.startsWith('/api');
+    const isPublic = isPublicRoute(req);
+
+    // 0. Perform Auth check
+    const authObj = await auth();
+    const { userId } = authObj;
+
+    // 1. Handle API routes
+    if (isApiRoute) {
+        if (!isPublic && !userId) {
+            return NextResponse.json(
+                { error: 'Unauthorized', message: 'Authentication required' },
+                { status: 401 }
+            );
+        }
+        return NextResponse.next();
+    }
+
+    // 2. Handle Public routes
+    if (isPublic) {
         return intlMiddleware(req);
     }
 
-    // 2. Protect non-public routes
-    await auth.protect();
+    // 3. Protect all other non-public routes
+    if (!authObj.userId) {
+        return (authObj as any).protect();
+    }
 
-    // 3. Handle localization for protected routes
+    // 4. Handle localized routing for protected routes
     return intlMiddleware(req);
 });
 

@@ -63,7 +63,9 @@
         "ai_badge": "ذكاء اصطناعي",
         "copied": "تم النسخ",
         "copy": "نسخ",
-        "image_unavailable": "الصورة غير متوفرة"
+        "image_unavailable": "الصورة غير متوفرة",
+        "search_placeholder": "ابحث...",
+        "no_results": "لا توجد نتائج"
     },
     "ArticleTable": {
         "export_excel": "تصدير Excel",

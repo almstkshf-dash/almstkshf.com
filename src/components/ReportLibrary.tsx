@@ -5,7 +5,7 @@ import { api } from "../../convex/_generated/api";
 import { FileText, Download, Calendar, Search, Filter } from "lucide-react";
 import Button from "./ui/Button";
 import { SkeletonReportRow } from "./ui/Skeleton";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 
 import { useTranslations } from "next-intl";
@@ -18,7 +18,7 @@ export default function ReportLibrary() {
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
-    React.useEffect(() => {
+    useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(inputValue);
         }, 150);

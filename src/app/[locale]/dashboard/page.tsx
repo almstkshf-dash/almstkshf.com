@@ -40,7 +40,7 @@ export default function DashboardPage() {
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
         depth: activeView === 'deep' ? 'deep' : undefined,
     }) as { items: any[], total: number, nextSkip: number | null };
-    const articles = result?.items || [];
+    const articles = result?.items;
     const totalArticles = result?.total || 0;
 
     const deleteAll = useMutation(api.monitoring.deleteAllArticles);
@@ -54,13 +54,12 @@ export default function DashboardPage() {
         { id: 'Print', label: t('filters.print') },
     ];
 
-    // Additional Client-Side Search Filtering
     // accumulate pages
     useEffect(() => {
-        if (articles) {
-            setLoadedArticles(prev => skip === 0 ? articles : [...prev, ...articles]);
+        if (result?.items) {
+            setLoadedArticles(prev => skip === 0 ? result.items : [...prev, ...result.items]);
         }
-    }, [articles, skip]);
+    }, [result?.items, skip]);
 
     // reset when filters change
     useEffect(() => {
@@ -214,7 +213,7 @@ export default function DashboardPage() {
                         </Button>
 
                         {/* Clear All */}
-                        {articles.length > 0 && (
+                        {totalArticles > 0 && (
                             <Button
                                 variant="danger"
                                 onClick={handleClearAll}
