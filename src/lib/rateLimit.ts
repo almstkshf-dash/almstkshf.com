@@ -9,6 +9,10 @@ export interface RateLimitResult {
 export async function rateLimit(key: string, limit: number, windowSeconds: number): Promise<RateLimitResult> {
     try {
         const redis = getRedis();
+        if (!redis) {
+            return { allowed: true, remaining: limit, resetSeconds: windowSeconds };
+        }
+
         const count = await redis.incr(key);
         if (count === 1) {
             await redis.expire(key, windowSeconds);

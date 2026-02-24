@@ -1,71 +1,51 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
-import { NextResponse } from "next/server";
 
 const intlMiddleware = createMiddleware(routing);
 
 const isPublicRoute = createRouteMatcher([
     "/",
     "/(en|ar)",
-    "/contact",
     "/(en|ar)/contact",
-    "/pricing",
+    "/contact",
     "/(en|ar)/pricing",
-    "/case-studies(.*)",
+    "/pricing",
     "/(en|ar)/case-studies(.*)",
-    "/lexcora(.*)",
+    "/case-studies(.*)",
     "/(en|ar)/lexcora(.*)",
-    "/styling-assistant(.*)",
+    "/lexcora(.*)",
     "/(en|ar)/styling-assistant(.*)",
-    "/behind-the-scene(.*)",
+    "/styling-assistant(.*)",
     "/(en|ar)/behind-the-scene(.*)",
-    "/technical-solutions(.*)",
+    "/behind-the-scene(.*)",
     "/(en|ar)/technical-solutions(.*)",
-    "/media-monitoring(.*)",
+    "/technical-solutions(.*)",
     "/(en|ar)/media-monitoring(.*)",
+    "/media-monitoring(.*)",
     "/api/stripe/webhook",
     "/api/stripe/checkout",
     "/api/chatbase/token",
     "/api/webhooks(.*)",
-    "/sign-in(.*)",
     "/(en|ar)/sign-in(.*)",
-    "/sign-up(.*)",
+    "/sign-in(.*)",
     "/(en|ar)/sign-up(.*)",
+    "/sign-up(.*)",
     "/monitoring(.*)"
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    const url = req.nextUrl;
-    const isApiRoute = url.pathname.startsWith('/api');
-    const isPublic = isPublicRoute(req);
-
-    // 0. Perform Auth check
-    const authObj = await auth();
-    const { userId } = authObj;
-
-    // 1. Handle API routes
-    if (isApiRoute) {
-        if (!isPublic && !userId) {
-            return NextResponse.json(
-                { error: 'Unauthorized', message: 'Authentication required' },
-                { status: 401 }
-            );
-        }
-        return NextResponse.next();
+    // 1. Skip i18n for API routes
+    if (req.nextUrl.pathname.startsWith('/api')) {
+        return;
     }
 
-    // 2. Handle Public routes
-    if (isPublic) {
-        return intlMiddleware(req);
+    // 2. Protect non-public routes
+    if (!isPublicRoute(req)) {
+        await auth.protect();
     }
 
-    // 3. Protect all other non-public routes
-    if (!authObj.userId) {
-        return (authObj as any).protect();
-    }
-
-    // 4. Handle localized routing for protected routes
+    // 3. For all other requests, apply next-intl middleware
     return intlMiddleware(req);
 });
 
