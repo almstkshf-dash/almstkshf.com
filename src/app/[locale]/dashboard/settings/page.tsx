@@ -10,6 +10,8 @@ import { useAuth } from '@clerk/nextjs';
 import PhylloConnectButton from '@/components/PhylloConnect';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
+import { Link } from '@/i18n/routing';
+import { useParams } from 'next/navigation';
 
 interface Payment {
     _id: string;
@@ -289,6 +291,24 @@ export default function SettingsPage() {
                                     <Zap className="h-5 w-5 text-amber-500" />
                                     {t('section_ai')}
                                 </h2>
+
+                                <div className="mb-8 p-6 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="flex items-center gap-4 text-center md:text-left">
+                                        <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/5">
+                                            <Key className="h-6 w-6 text-primary" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="font-extrabold text-foreground">{t('api_keys_title')}</p>
+                                            <p className="text-sm text-muted-foreground">{t('api_keys_subtitle')}</p>
+                                        </div>
+                                    </div>
+                                    <Link href="/dashboard/settings/api-keys">
+                                        <Button variant="outline" className="font-bold border-primary text-primary hover:bg-primary hover:text-white transition-all px-8 rounded-xl h-auto">
+                                            {t('manage')}
+                                        </Button>
+                                    </Link>
+                                </div>
+
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <label htmlFor="gemini-key" className="text-sm font-bold text-foreground/80">{t('gemini_key')}</label>

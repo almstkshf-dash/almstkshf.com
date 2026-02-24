@@ -1,5 +1,6 @@
 import 'server-only';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { resolveGeminiKey } from "./gemini-key-resolver";
 
 interface MediaAnalysis {
     sentiment: "Positive" | "Neutral" | "Negative";
@@ -8,10 +9,10 @@ interface MediaAnalysis {
 }
 
 export async function analyzeContent(text: string, title?: string): Promise<MediaAnalysis> {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { key: apiKey, error: resolutionError } = await resolveGeminiKey();
 
     if (!apiKey) {
-        console.error("CRITICAL: GEMINI_API_KEY is missing from environment variables.");
+        console.error("Gemini Key Resolution Failed:", resolutionError);
         return { sentiment: "Neutral", brandName: "Unknown", sourceCountry: "AE" }; // Fallback
     }
 

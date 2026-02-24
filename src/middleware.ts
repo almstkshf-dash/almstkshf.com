@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
 
@@ -37,7 +38,7 @@ const isPublicRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
     // 1. Skip i18n for API routes
     if (req.nextUrl.pathname.startsWith('/api')) {
-        return;
+        return NextResponse.next();
     }
 
     // 2. Protect non-public routes

@@ -1083,7 +1083,21 @@
         "placeholder_secret": "أدخل السر الخاص بك",
         "placeholder_id": "أدخل المعرف الخاص بك",
         "placeholder_url": "أدخل الرابط",
-        "placeholder_countries": "AE, SA, EG"
+        "placeholder_countries": "AE, SA, EG",
+        "api_keys_title": "مفاتيح API والوصول",
+        "api_keys_subtitle": "إدارة مفتاح Gemini API الخاص بك والتحقق من حالة اشتراكك.",
+        "trial_status": "تجربة مجانية",
+        "subscription_status": "اشتراك",
+        "trial_ends_at": "ينتهي في {date}",
+        "no_key_warning": "لم يتم العثور على مفتاح API. يرجى إضافة واحد لمواصلة استخدام ميزات الذكاء الاصطناعي بعد انتهاء الفترة التجريبية.",
+        "how_it_works": "كيف يعمل؟",
+        "tier_desc": "يحدد مستوى وصولك مفتاح API الذي يتم استخدامه لتحليل الذكاء الاصطناعي.",
+        "byok_desc": "أحضر مفتاحك الخاص (BYOK) - استخدم مفتاح Gemini API الخاص بك لجميع الطلبات.",
+        "system_key_desc": "استخدام مفتاح النظام - تتم تغطية جميع الطلبات من خلال تجربتك أو اشتراكك.",
+        "active": "نشط",
+        "expired": "منتهي",
+        "upgrade_now": "ترقية الآن",
+        "add_key_now": "إضافة مفتاح الآن"
     },
     "ManualEntry": {
         "title": "إضافة تغطية يدوية",

@@ -1035,7 +1035,21 @@
     "placeholder_secret": "Enter your secret",
     "placeholder_id": "Enter your ID",
     "placeholder_url": "Enter the URL",
-    "placeholder_countries": "AE, SA, EG"
+    "placeholder_countries": "AE, SA, EG",
+    "api_keys_title": "API Keys & Access",
+    "api_keys_subtitle": "Manage your Gemini API key and check your subscription status.",
+    "trial_status": "Free Trial",
+    "subscription_status": "Subscription",
+    "trial_ends_at": "Ends on {date}",
+    "no_key_warning": "No API key found. Please add one to continue using AI features after your trial expires.",
+    "how_it_works": "How it works?",
+    "tier_desc": "Your access level determines which API key is used for AI analysis.",
+    "byok_desc": "Bring Your Own Key (BYOK) - Use your own Gemini API key for all requests.",
+    "system_key_desc": "Using System Key - All requests are covered by your trial or subscription.",
+    "active": "Active",
+    "expired": "Expired",
+    "upgrade_now": "Upgrade Now",
+    "add_key_now": "Add Key Now"
   },
   "ManualEntry": {
     "title": "Add Manual Coverage",

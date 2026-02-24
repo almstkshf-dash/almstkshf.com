@@ -180,8 +180,15 @@ export const fetchNews = action({
             const worldnewsKey = settings?.apiKeys?.worldnews?.trim() || process.env.WORLDNEWS_API_KEY?.trim();
             const twitterBearer = settings?.apiKeys?.twitterBearer?.trim() || process.env.TWITTER_BEARER?.trim();
 
-            if (!newsdataKey || !newsapiKey || !gnewsKey || !worldnewsKey) {
-                return { success: false, error: "Missing news provider API keys. Configure in Settings." };
+            const providers = [
+                { name: 'NewsData.io', key: newsdataKey },
+                { name: 'NewsAPI.org', key: newsapiKey },
+                { name: 'GNews.io', key: gnewsKey },
+                { name: 'WorldNews API', key: worldnewsKey }
+            ];
+
+            if (providers.filter(p => p.key).length === 0) {
+                return { success: false, error: "Missing news provider API keys. Please configure at least one in Settings." };
             }
 
             const parser = new Parser();
@@ -250,188 +257,196 @@ export const fetchNews = action({
             }
 
             // 2. FETCH FROM NEWSDATA.IO (Full API)
-            console.log(`📡 Fetching NewsData.io for: ${args.keyword}`);
-            try {
-                const ndUrl = `https://newsdata.io/api/1/latest?apikey=${newsdataKey}&q=${encodeURIComponent(args.keyword)}&language=${languageList.join(',')}&country=${countryList.join(',')}`;
-                const ndRes = await fetch(ndUrl);
-                if (ndRes.ok) {
-                    const ndData = await ndRes.json();
-                    if (ndData.status === "success" && ndData.results) {
-                        console.log(`📰 Found ${ndData.results.length} items from NewsData.io`);
-                        for (const item of ndData.results) {
-                            const success = await processArticle(ctx, {
-                                title: item.title,
-                                link: item.link,
-                                pubDate: item.pubDate,
-                                contentSnippet: `Source: ${item.source_id || 'Unknown'}. ${item.description || item.content || item.title}`,
-                                imageUrl: item.image_url
-                            }, (item.country?.[0] || countryList[0]).toUpperCase(), item.language || languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
-                            if (success) totalSuccess++; else totalSkipped++;
-                        }
-                    }
-                } else {
-                    console.warn(`⚠️ NewsData.io API returned error: ${ndRes.status}`);
-                }
-            } catch (e) { console.error(`❌ NewsData.io fail`, e); }
-
-            // 3. FETCH FROM NEWSAPI.ORG (v2/everything)
-            console.log(`📡 Fetching NewsAPI for: ${args.keyword} (using newsapi library)`);
-            try {
-                const naClient = new NewsAPI(newsapiKey);
-                const naDateFrom = dateFromObj ? dateFromObj.toISOString().split('T')[0] : undefined;
-                const naDateTo = dateToObj ? dateToObj.toISOString().split('T')[0] : undefined;
-
-                for (const lang of languageList) {
-                    const response = await naClient.v2.everything({
-                        q: args.keyword,
-                        language: lang as any,
-                        from: naDateFrom,
-                        to: naDateTo,
-                        sortBy: 'publishedAt',
-                        pageSize: 20
-                    });
-
-                    if (response.status === "ok" && response.articles) {
-                        console.log(`📰 Found ${response.articles.length} items from NewsAPI library [${lang}]`);
-                        for (const item of response.articles) {
-                            const success = await processArticle(ctx, {
-                                title: item.title,
-                                link: item.url,
-                                pubDate: item.publishedAt,
-                                contentSnippet: `Source: ${item.source?.name || 'Unknown'}. ${item.description || item.content || item.title}`,
-                                imageUrl: item.urlToImage
-                            }, (countryList[0] || "AE").toUpperCase(), lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
-                            if (success) totalSuccess++; else totalSkipped++;
+            if (newsdataKey) {
+                console.log(`📡 Fetching NewsData.io for: ${args.keyword}`);
+                try {
+                    const ndUrl = `https://newsdata.io/api/1/latest?apikey=${newsdataKey}&q=${encodeURIComponent(args.keyword)}&language=${languageList.join(',')}&country=${countryList.join(',')}`;
+                    const ndRes = await fetch(ndUrl);
+                    if (ndRes.ok) {
+                        const ndData = await ndRes.json();
+                        if (ndData.status === "success" && ndData.results) {
+                            console.log(`📰 Found ${ndData.results.length} items from NewsData.io`);
+                            for (const item of ndData.results) {
+                                const success = await processArticle(ctx, {
+                                    title: item.title,
+                                    link: item.link,
+                                    pubDate: item.pubDate,
+                                    contentSnippet: `Source: ${item.source_id || 'Unknown'}. ${item.description || item.content || item.title}`,
+                                    imageUrl: item.image_url
+                                }, (item.country?.[0] || countryList[0]).toUpperCase(), item.language || languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                if (success) totalSuccess++; else totalSkipped++;
+                            }
                         }
                     } else {
-                        console.warn(`⚠️ NewsAPI library error for [${lang}]:`, response.message || "Unknown error");
+                        console.warn(`⚠️ NewsData.io API returned error: ${ndRes.status}`);
                     }
-                }
-            } catch (e) { console.error(`❌ NewsAPI library fail`, e); }
+                } catch (e) { console.error(`❌ NewsData.io fail`, e); }
+            }
 
-            // 4. FETCH FROM GNEWS.IO
-            console.log(`📡 Fetching GNews for: ${args.keyword}`);
-            try {
-                const gDateFrom = dateFromObj ? dateFromObj.toISOString().split('.')[0] + 'Z' : "";
-                const gDateTo = dateToObj ? dateToObj.toISOString().split('.')[0] + 'Z' : "";
+            // 3. FETCH FROM NEWSAPI.ORG (v2/everything)
+            if (newsapiKey) {
+                console.log(`📡 Fetching NewsAPI for: ${args.keyword} (using newsapi library)`);
+                try {
+                    const naClient = new NewsAPI(newsapiKey);
+                    const naDateFrom = dateFromObj ? dateFromObj.toISOString().split('T')[0] : undefined;
+                    const naDateTo = dateToObj ? dateToObj.toISOString().split('T')[0] : undefined;
 
-                let gnewsHalt = false;
-                for (const lang of languageList) {
-                    if (gnewsHalt) break;
-                    for (const country of countryList) {
-                        if (gnewsHalt) break;
+                    for (const lang of languageList) {
+                        const response = await naClient.v2.everything({
+                            q: args.keyword,
+                            language: lang as any,
+                            from: naDateFrom,
+                            to: naDateTo,
+                            sortBy: 'publishedAt',
+                            pageSize: 20
+                        });
 
-                        // GNews specific: wrap phrase in quotes for exact sequence search if it contains spaces
-                        let gQuery = args.keyword.trim();
-                        if (gQuery.includes(' ') && !gQuery.startsWith('"')) {
-                            gQuery = `"${gQuery}"`;
-                        }
-                        // Limit to 200 chars per GNews docs
-                        gQuery = gQuery.substring(0, 200);
-
-                        let gUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(gQuery)}&lang=${lang}&country=${country}&max=20&apikey=${gnewsKey}&sortby=publishedAt&nullable=description,image`;
-                        if (gDateFrom) gUrl += `&from=${gDateFrom}`;
-                        if (gDateTo) gUrl += `&to=${gDateTo}`;
-
-                        const gRes = await fetch(gUrl);
-                        if (gRes.ok) {
-                            const gData = await gRes.json();
-                            if (gData.articles) {
-                                console.log(`📰 Found ${gData.articles.length} items from GNews [${lang}/${country}]`);
-                                for (const item of gData.articles) {
-                                    const success = await processArticle(ctx, {
-                                        title: item.title,
-                                        link: item.url,
-                                        pubDate: item.publishedAt,
-                                        contentSnippet: `Source: ${item.source?.name || 'Unknown'}. ${item.description || item.content || item.title}`,
-                                        imageUrl: item.image
-                                    }, country.toUpperCase(), lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
-                                    if (success) totalSuccess++; else totalSkipped++;
-                                }
+                        if (response.status === "ok" && response.articles) {
+                            console.log(`📰 Found ${response.articles.length} items from NewsAPI library [${lang}]`);
+                            for (const item of response.articles) {
+                                const success = await processArticle(ctx, {
+                                    title: item.title,
+                                    link: item.url,
+                                    pubDate: item.publishedAt,
+                                    contentSnippet: `Source: ${item.source?.name || 'Unknown'}. ${item.description || item.content || item.title}`,
+                                    imageUrl: item.urlToImage
+                                }, (countryList[0] || "AE").toUpperCase(), lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                if (success) totalSuccess++; else totalSkipped++;
                             }
                         } else {
-                            const status = gRes.status;
-                            let errorMsg = `Status ${status}`;
-                            try {
-                                const errData = await gRes.json();
-                                if (errData.errors) {
-                                    errorMsg = Array.isArray(errData.errors) ? errData.errors[0] : (typeof errData.errors === 'object' ? JSON.stringify(errData.errors) : errData.errors);
+                            console.warn(`⚠️ NewsAPI library error for [${lang}]:`, response.message || "Unknown error");
+                        }
+                    }
+                } catch (e) { console.error(`❌ NewsAPI library fail`, e); }
+            }
+
+            // 4. FETCH FROM GNEWS.IO
+            if (gnewsKey) {
+                console.log(`📡 Fetching GNews for: ${args.keyword}`);
+                try {
+                    const gDateFrom = dateFromObj ? dateFromObj.toISOString().split('.')[0] + 'Z' : "";
+                    const gDateTo = dateToObj ? dateToObj.toISOString().split('.')[0] + 'Z' : "";
+
+                    let gnewsHalt = false;
+                    for (const lang of languageList) {
+                        if (gnewsHalt) break;
+                        for (const country of countryList) {
+                            if (gnewsHalt) break;
+
+                            // GNews specific: wrap phrase in quotes for exact sequence search if it contains spaces
+                            let gQuery = args.keyword.trim();
+                            if (gQuery.includes(' ') && !gQuery.startsWith('"')) {
+                                gQuery = `"${gQuery}"`;
+                            }
+                            // Limit to 200 chars per GNews docs
+                            gQuery = gQuery.substring(0, 200);
+
+                            let gUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(gQuery)}&lang=${lang}&country=${country}&max=20&apikey=${gnewsKey}&sortby=publishedAt&nullable=description,image`;
+                            if (gDateFrom) gUrl += `&from=${gDateFrom}`;
+                            if (gDateTo) gUrl += `&to=${gDateTo}`;
+
+                            const gRes = await fetch(gUrl);
+                            if (gRes.ok) {
+                                const gData = await gRes.json();
+                                if (gData.articles) {
+                                    console.log(`📰 Found ${gData.articles.length} items from GNews [${lang}/${country}]`);
+                                    for (const item of gData.articles) {
+                                        const success = await processArticle(ctx, {
+                                            title: item.title,
+                                            link: item.url,
+                                            pubDate: item.publishedAt,
+                                            contentSnippet: `Source: ${item.source?.name || 'Unknown'}. ${item.description || item.content || item.title}`,
+                                            imageUrl: item.image
+                                        }, country.toUpperCase(), lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                        if (success) totalSuccess++; else totalSkipped++;
+                                    }
                                 }
-                            } catch (e) { /* ignore parse fail */ }
+                            } else {
+                                const status = gRes.status;
+                                let errorMsg = `Status ${status}`;
+                                try {
+                                    const errData = await gRes.json();
+                                    if (errData.errors) {
+                                        errorMsg = Array.isArray(errData.errors) ? errData.errors[0] : (typeof errData.errors === 'object' ? JSON.stringify(errData.errors) : errData.errors);
+                                    }
+                                } catch (e) { /* ignore parse fail */ }
 
-                            console.warn(`⚠️ GNews API Error [${status}]: ${errorMsg}`);
+                                console.warn(`⚠️ GNews API Error [${status}]: ${errorMsg}`);
 
-                            if (status === 401 || status === 403) {
-                                console.error("🚨 GNews Fatal: Unauthorized or Quota Exceeded. Halting GNews requests.");
-                                gnewsHalt = true;
-                            } else if (status === 429) {
-                                console.warn("⏳ GNews Rate Limit: Throttling...");
-                                await new Promise(r => setTimeout(r, 1000));
+                                if (status === 401 || status === 403) {
+                                    console.error("🚨 GNews Fatal: Unauthorized or Quota Exceeded. Halting GNews requests.");
+                                    gnewsHalt = true;
+                                } else if (status === 429) {
+                                    console.warn("⏳ GNews Rate Limit: Throttling...");
+                                    await new Promise(r => setTimeout(r, 1000));
+                                }
                             }
                         }
                     }
-                }
-            } catch (e) { console.error(`❌ GNews fail`, e); }
+                } catch (e) { console.error(`❌ GNews fail`, e); }
+            }
 
             // 5. FETCH FROM WORLDNEWSAPI.COM
-            console.log(`📡 Fetching WorldNews for: ${args.keyword}`);
-            try {
-                // World News API parameters: text (max 100), language, source-country, earliest-publish-date
-                const wnDateFrom = dateFromObj ? dateFromObj.toISOString().replace('T', ' ').split('.')[0] : "";
+            if (worldnewsKey) {
+                console.log(`📡 Fetching WorldNews for: ${args.keyword}`);
+                try {
+                    // World News API parameters: text (max 100), language, source-country, earliest-publish-date
+                    const wnDateFrom = dateFromObj ? dateFromObj.toISOString().replace('T', ' ').split('.')[0] : "";
 
-                let wnKeyword = args.keyword.trim();
-                if (wnKeyword.includes(' ') && !wnKeyword.startsWith('"')) {
-                    wnKeyword = `"${wnKeyword}"`;
-                }
-                // Truncate to 100 chars per docs
-                wnKeyword = wnKeyword.substring(0, 100);
-
-                // API supports multiple languages as comma-separated
-                const langs = languageList.join(',');
-
-                // Note: Documentation shows source-country (singular). If multiple, we take the first or loop. 
-                // We'll use the first one for the primary query to stay within quota/speed.
-                const country = (countryList[0] || 'ae').toLowerCase();
-
-                let wnUrl = `https://api.worldnewsapi.com/search-news?text=${encodeURIComponent(wnKeyword)}&language=${langs}&source-country=${country}&number=20&sort=publish-time&sort-direction=DESC`;
-                if (wnDateFrom) wnUrl += `&earliest-publish-date=${wnDateFrom}`;
-
-                const wnRes = await fetch(wnUrl, {
-                    headers: { 'x-api-key': worldnewsKey }
-                });
-
-                // Log quota if headers present
-                const quotaUsed = wnRes.headers.get('x-api-quota-used');
-                const quotaLeft = wnRes.headers.get('x-api-quota-left');
-                if (quotaUsed || quotaLeft) {
-                    console.log(`📊 WorldNews Quota: Used ${quotaUsed}, Left ${quotaLeft}`);
-                }
-
-                if (wnRes.ok) {
-                    const wnData = await wnRes.json();
-                    if (wnData.news) {
-                        console.log(`📰 Found ${wnData.news.length} items from WorldNewsAPI (Available: ${wnData.available})`);
-                        if (wnData.available >= 100000) {
-                            console.warn("⚠️ WorldNewsAPI: 100,000+ results found. Consider making the query more specific.");
-                        }
-                        for (const item of wnData.news) {
-                            // Format authors array to string
-                            const authorStr = Array.isArray(item.authors) ? item.authors.join(', ') : (item.author || 'Unknown');
-
-                            const success = await processArticle(ctx, {
-                                title: item.title,
-                                link: item.url,
-                                pubDate: item.publish_date, // Format is YYYY-MM-DD HH:MM:SS
-                                contentSnippet: `Source: ${authorStr}. ${item.text || item.title}`,
-                                imageUrl: item.image
-                            }, (item.source_country || country).toUpperCase(), item.language || languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
-                            if (success) totalSuccess++; else totalSkipped++;
-                        }
+                    let wnKeyword = args.keyword.trim();
+                    if (wnKeyword.includes(' ') && !wnKeyword.startsWith('"')) {
+                        wnKeyword = `"${wnKeyword}"`;
                     }
-                } else {
-                    console.warn(`⚠️ WorldNews API returned error: ${wnRes.status}`);
-                }
-            } catch (e) { console.error(`❌ WorldNews fail`, e); }
+                    // Truncate to 100 chars per docs
+                    wnKeyword = wnKeyword.substring(0, 100);
+
+                    // API supports multiple languages as comma-separated
+                    const langs = languageList.join(',');
+
+                    // Note: Documentation shows source-country (singular). If multiple, we take the first or loop. 
+                    // We'll use the first one for the primary query to stay within quota/speed.
+                    const country = (countryList[0] || 'ae').toLowerCase();
+
+                    let wnUrl = `https://api.worldnewsapi.com/search-news?text=${encodeURIComponent(wnKeyword)}&language=${langs}&source-country=${country}&number=20&sort=publish-time&sort-direction=DESC`;
+                    if (wnDateFrom) wnUrl += `&earliest-publish-date=${wnDateFrom}`;
+
+                    const wnRes = await fetch(wnUrl, {
+                        headers: { 'x-api-key': worldnewsKey }
+                    });
+
+                    // Log quota if headers present
+                    const quotaUsed = wnRes.headers.get('x-api-quota-used');
+                    const quotaLeft = wnRes.headers.get('x-api-quota-left');
+                    if (quotaUsed || quotaLeft) {
+                        console.log(`📊 WorldNews Quota: Used ${quotaUsed}, Left ${quotaLeft}`);
+                    }
+
+                    if (wnRes.ok) {
+                        const wnData = await wnRes.json();
+                        if (wnData.news) {
+                            console.log(`📰 Found ${wnData.news.length} items from WorldNewsAPI (Available: ${wnData.available})`);
+                            if (wnData.available >= 100000) {
+                                console.warn("⚠️ WorldNewsAPI: 100,000+ results found. Consider making the query more specific.");
+                            }
+                            for (const item of wnData.news) {
+                                // Format authors array to string
+                                const authorStr = Array.isArray(item.authors) ? item.authors.join(', ') : (item.author || 'Unknown');
+
+                                const success = await processArticle(ctx, {
+                                    title: item.title,
+                                    link: item.url,
+                                    pubDate: item.publish_date, // Format is YYYY-MM-DD HH:MM:SS
+                                    contentSnippet: `Source: ${authorStr}. ${item.text || item.title}`,
+                                    imageUrl: item.image
+                                }, (item.source_country || country).toUpperCase(), item.language || languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                if (success) totalSuccess++; else totalSkipped++;
+                            }
+                        }
+                    } else {
+                        console.warn(`⚠️ WorldNews API returned error: ${wnRes.status}`);
+                    }
+                } catch (e) { console.error(`❌ WorldNews fail`, e); }
+            }
 
             // 6. FETCH FROM TWITTER (X) if configured
             if (twitterBearer) {

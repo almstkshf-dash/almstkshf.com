@@ -10,8 +10,6 @@ export default defineSchema({
         content: v.optional(v.string()),
     }),
 
-
-    // PART 1: THE DATA SCHEMA (NON-NEGOTIABLE)
     media_monitoring_articles: defineTable({
         keyword: v.string(),
         url: v.string(),
@@ -87,6 +85,7 @@ export default defineSchema({
         integrationApiKeys: v.optional(v.object({
             serviceA: v.string(),
             serviceB: v.string(),
+            gemini: v.optional(v.string()),
         })),
         preferences: v.optional(v.any()),
     }).index("by_user_id", ["userId"]),
@@ -144,4 +143,14 @@ export default defineSchema({
         updatedAt: v.number(),
     }).index("by_user_id", ["userId"])
         .index("by_subscription_id", ["stripeSubscriptionId"]),
+
+    userSettings: defineTable({
+        userId: v.string(),
+        geminiApiKey: v.optional(v.string()),
+        isSubscribed: v.optional(v.boolean()),
+        isTrialActive: v.optional(v.boolean()),
+        trialEndsAt: v.optional(v.number()),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_userId", ["userId"]),
 });

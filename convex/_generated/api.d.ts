@@ -20,6 +20,7 @@ import type * as payments from "../payments.js";
 import type * as phyllo from "../phyllo.js";
 import type * as queries from "../queries.js";
 import type * as settings from "../settings.js";
+import type * as userSettings from "../userSettings.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_checkAdmin from "../utils/checkAdmin.js";
 import type * as waitlist from "../waitlist.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   phyllo: typeof phyllo;
   queries: typeof queries;
   settings: typeof settings;
+  userSettings: typeof userSettings;
   "utils/auth": typeof utils_auth;
   "utils/checkAdmin": typeof utils_checkAdmin;
   waitlist: typeof waitlist;
