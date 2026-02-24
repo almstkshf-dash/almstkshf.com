@@ -5,10 +5,10 @@ import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Loader2, ExternalLink, Image as ImageIcon, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import clsx from 'clsx';
 
-export default function ArticleTable({ articles, limit = 50 }: { articles: any[], limit?: number }) {
+const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { articles: any[], limit?: number }) {
     const t = useTranslations('ArticleTable');
     const deleteArticle = useMutation(api.monitoring.deleteArticle);
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
@@ -25,7 +25,7 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
         return null; // parent handles empty state
     }
 
-    const displayedArticles = articles.slice(0, limit);
+    const displayedArticles = useMemo(() => articles.slice(0, limit), [articles, limit]);
 
     const toggleSelectAll = () => {
         if (selectedIds.size === displayedArticles.length) {
@@ -238,4 +238,6 @@ export default function ArticleTable({ articles, limit = 50 }: { articles: any[]
             </div>
         </div>
     );
-}
+});
+
+export default ArticleTable;

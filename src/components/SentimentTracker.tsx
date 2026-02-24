@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, Activity, AlertCircle, Zap } from "lucide-react";
 import clsx from "clsx";
@@ -73,8 +74,12 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
     const t = useTranslations('SentimentTracker');
 
     const hasData = articles.length > 0;
-    const sourceAnalysis = analyzeBySource(articles);
-    const recKey = buildRecommendation(articles);
+
+    // 1. Memoize source analysis to prevent expensive re-calculation
+    const sourceAnalysis = useMemo(() => analyzeBySource(articles), [articles]);
+
+    // 2. Memoize recommendations
+    const recKey = useMemo(() => buildRecommendation(articles), [articles]);
 
     return (
         <div className="space-y-6">

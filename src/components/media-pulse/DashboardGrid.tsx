@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
+import { useMemo, memo } from "react";
 
 interface DashboardGridProps {
     articles?: any[];
@@ -20,12 +21,16 @@ interface DashboardGridProps {
     };
 }
 
-export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) {
+export const DashboardGrid = memo(function DashboardGrid({ articles = [], analytics }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
 
-    // Use aggregate analytics if available, fallback to manual logic
-    const totalReach = analytics?.totalReach ?? articles.reduce((sum, a) => sum + (a.reach || 0), 0);
-    const totalAVE = articles.reduce((sum, a) => sum + (a.ave || 0), 0);
+    // Memoize stats to avoid heavy reduction on every re-render
+    const { totalReach, totalAVE } = useMemo(() => {
+        return {
+            totalReach: analytics?.totalReach ?? articles.reduce((sum, a) => sum + (a.reach || 0), 0),
+            totalAVE: articles.reduce((sum, a) => sum + (a.ave || 0), 0)
+        };
+    }, [articles, analytics]);
 
     const sentimentPcts = analytics?.sentimentDistribution ?? {
         Positive: 0,
@@ -205,4 +210,4 @@ export function DashboardGrid({ articles = [], analytics }: DashboardGridProps) 
             </div>
         </div>
     );
-}
+});

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
@@ -40,7 +40,7 @@ export default function DashboardPage() {
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
         depth: activeView === 'deep' ? 'deep' : undefined,
     }) as { items: any[], total: number, nextSkip: number | null };
-    const articles = result?.items;
+
     const totalArticles = result?.total || 0;
 
     const deleteAll = useMutation(api.monitoring.deleteAllArticles);
@@ -67,14 +67,19 @@ export default function DashboardPage() {
         setLoadedArticles([]);
     }, [selectedType, selectedCountry, activeView]);
 
-    const filteredArticles = loadedArticles.filter((a: any) => {
-        const matchesSearch = !searchQuery ||
-            a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            a.keyword?.toLowerCase().includes(searchQuery.toLowerCase()) || // keyword might be missing in old data
-            (a.sourceType && a.sourceType.toLowerCase().includes(searchQuery.toLowerCase()));
+    // 1. Memoize filteredArticles to prevent expensive re-calculation on every render
+    const filteredArticles = useMemo(() => {
+        const query = searchQuery.toLowerCase().trim();
+        if (!query) return loadedArticles;
 
-        return matchesSearch;
-    });
+        return loadedArticles.filter((a: any) => {
+            return (
+                a.title.toLowerCase().includes(query) ||
+                (a.keyword && a.keyword.toLowerCase().includes(query)) ||
+                (a.sourceType && a.sourceType.toLowerCase().includes(query))
+            );
+        });
+    }, [loadedArticles, searchQuery]);
 
     const showToast = (type: 'success' | 'error', message: string) => {
         setToast({ type, message });
@@ -82,10 +87,14 @@ export default function DashboardPage() {
     };
 
     const handleClearAll = async () => {
-        if (!confirm(t('confirm_clear_all'))) return;
+        // confirm() is synchronous and blocks the main thread during interaction.
+        if (!window.confirm(t('confirm_clear_all'))) return;
+
         setIsClearing(true);
         try {
             const res = await deleteAll({});
+            setLoadedArticles([]);
+            setSkip(0);
             showToast('success', t('cleared_success', { count: (res as any)?.deleted || 0 }));
         } catch (error) {
             console.error("Clear failed:", error);
