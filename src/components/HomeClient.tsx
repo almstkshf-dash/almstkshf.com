@@ -40,8 +40,11 @@ export default function HomeClient() {
         <main className="min-h-screen bg-background overflow-x-hidden">
             {/* Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center text-foreground overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 brightness-100 contrast-150 pointer-events-none mix-blend-overlay"></div>
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+                {/* Noise texture – self-hosted, single layer, GPU-promoted */}
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.15] brightness-100 contrast-150 pointer-events-none mix-blend-overlay will-change-transform"
+                />
 
                 <div className="z-10 text-center max-w-4xl px-4">
                     <motion.h1

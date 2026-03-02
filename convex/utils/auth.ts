@@ -32,6 +32,15 @@ export async function requireUser(auth: Auth) {
 
 export async function requireAdmin(auth: Auth) {
     const identity = await requireUser(auth);
+
+    // Allow Convex dashboard test identity in development only
+    if (
+        process.env.NODE_ENV !== "production" &&
+        identity.subject === "fake_id"
+    ) {
+        return identity;
+    }
+
     if (!hasAdminRole(identity)) {
         // Build a diagnostic payload so we can see exactly what Clerk sent
         const detectedRole = (
