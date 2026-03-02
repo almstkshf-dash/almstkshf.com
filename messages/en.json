@@ -77,6 +77,162 @@
       "next": "Next"
     }
   },
+  "OsintTab": {
+    "title": "Investigation Engine",
+    "subtitle": "Access global data points across dimensions. Our automated agents aggregate data from verified OSINT repositories in real-time.",
+    "suggested_tools": "Suggested External Tools",
+    "panels": {
+      "email": {
+        "title": "Email Intelligence",
+        "desc": "Trace breach history, social accounts, and domain associations.",
+        "placeholder": "Enter email address..."
+      },
+      "domain": {
+        "title": "Domain Analyzer",
+        "desc": "Identify technological stacks, WHOIS history, and DNS maps.",
+        "placeholder": "Enter domain (e.g. example.com)..."
+      },
+      "ip": {
+        "title": "IP Geospatial",
+        "desc": "Map network infrastructure, hosting nodes, and security flags.",
+        "placeholder": "Enter IP address..."
+      },
+      "username": {
+        "title": "Identity Scout",
+        "desc": "Look up handle availability across 500+ social platforms.",
+        "placeholder": "Enter username..."
+      },
+      "phone": {
+        "title": "Phone Validator",
+        "desc": "Check carrier data, reputation flags, and regional routing.",
+        "placeholder": "Enter phone (e.g. +1...)"
+      }
+    },
+    "tools": {
+      "dehashed": {
+        "name": "DeHashed",
+        "desc": "Enterprise deep-web asset and breach search engine."
+      },
+      "epieos": {
+        "name": "Epieos",
+        "desc": "Universal email and phone OSINT investigator."
+      },
+      "hunter": {
+        "name": "Hunter.io",
+        "desc": "Professional email discovery and verification tool."
+      },
+      "intelx": {
+        "name": "IntelX",
+        "desc": "Intelligence X: Search billions of data points."
+      },
+      "builtwith": {
+        "name": "BuiltWith",
+        "desc": "Technology profiler and market share analysis tool."
+      },
+      "shodan": {
+        "name": "Shodan",
+        "desc": "Search engine for Internet-connected devices."
+      },
+      "censys": {
+        "name": "Censys",
+        "desc": "Map the visible digital attack surface."
+      },
+      "securitytrails": {
+        "name": "SecurityTrails",
+        "desc": "Total domain and IP history intelligence."
+      },
+      "whois": {
+        "name": "WHOIS Lookup",
+        "desc": "Verify domain ownership and registration data."
+      },
+      "whatsmyname": {
+        "name": "WhatsMyName",
+        "desc": "Cross-platform social media handle scout."
+      },
+      "knowem": {
+        "name": "KnowEm",
+        "desc": "Check handle availability on 500+ social sites."
+      },
+      "sherlock": {
+        "name": "Sherlock",
+        "desc": "Search for handles across the social landscape."
+      },
+      "opencorp": {
+        "name": "OpenCorporates",
+        "desc": "The largest open database of companies in the world."
+      }
+    }
+  },
+  "ArticleTable": {
+    "no_articles": "No articles found. Start monitoring or add manually.",
+    "showing": "Showing {count} of {total} articles",
+    "export_excel": "Export Excel",
+    "export_pdf": "Export PDF",
+    "col_date": "Date",
+    "col_title": "Title",
+    "col_source": "Source",
+    "col_depth": "Depth",
+    "col_sentiment": "Sentiment",
+    "col_reach": "Reach",
+    "col_ave": "AVE ($)",
+    "col_status": "Status",
+    "manual": "Manual",
+    "confirm_delete": "Are you sure you want to delete this article?",
+    "confirm_delete_selected": "Are you sure you want to delete {count} selected articles?",
+    "delete_selected": "Delete Selected ({count})",
+    "items_selected": "{count} items selected",
+    "delete": "Delete",
+    "types": {
+      "print": "Print",
+      "online_news": "Online News",
+      "social_media": "Social Media",
+      "blog": "Blog",
+      "press_release": "Press Release"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "select_all": "Select all articles",
+    "select_article": "Select article: {title}"
+  },
+  "ManualEntry": {
+    "title": "Add Manual Coverage",
+    "article_title": "Title",
+    "title_placeholder": "Article Headline",
+    "source_name": "Source Name",
+    "source_placeholder": "e.g. Gulf News",
+    "date": "Date",
+    "url_optional": "URL (Optional)",
+    "type": "Type",
+    "sentiment": "Sentiment",
+    "reach": "Reach",
+    "reach_placeholder": "0 = Auto",
+    "country": "Country",
+    "content": "Content / Snippet",
+    "content_placeholder": "Paste the article text or summary here...",
+    "evidence_image": "Evidence Image (Optional)",
+    "cancel": "Cancel",
+    "save": "Save Entry",
+    "types": {
+      "print": "Print",
+      "online_news": "Online News",
+      "social_media": "Social Media",
+      "blog": "Blog",
+      "press_release": "Press Release"
+    },
+    "sentiments": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "save_failed": "Failed to save article. Please try again.",
+    "fetch_article": "Fetch & Auto-Analyze",
+    "extracting": "Extracting...",
+    "extract_failed": "Failed to extract content. Please check the URL or fill manually.",
+    "not_authenticated": "Not authenticated. Please sign in first."
+  },
   "Common": {
     "app_name": "ALMSTKSHF",
     "slogan": "We Develop To Lead",
@@ -275,7 +431,6 @@
     "active_agents": "Active Agents",
     "processing": "Processing..."
   },
-  
   "Contact": {
     "title": "Get in Touch",
     "subtitle": "Have questions about our AI-driven solutions? Our team of experts is ready to assist you.",
@@ -760,11 +915,11 @@
       "specialized_services": "Specialized Services",
       "advanced_solutions": "Advanced Solutions",
       "total_ave": "Total AVE",
-      "articles_count": "Articles",
-      "positive_sent": "Positive Sent.",
-      "emotional_pulse": "Emotional Pulse",
-      "top_topics": "Top Topics",
-      "intensity": "Intensity"
+      "intensity": "Intensity",
+      "nss_index": "NSS Index",
+      "risk": "Risk",
+      "top_regions": "Top Regions",
+      "articles": "articles"
     }
   },
   "CrisisManagementDetail": {
@@ -995,6 +1150,24 @@
     "saved_success": "Settings saved successfully",
     "save_failed": "Failed to save settings. Please try again.",
     "iso_hint": "Comma separated ISO codes (e.g. AE, SA)",
+    "api_keys_title": "API Keys & Access",
+    "api_keys_subtitle": "Manage your secure connectivity and AI credentials.",
+    "api_keys_disclaimer": "* Your key is stored securely and never shared.",
+    "trial_status": "Trial Status",
+    "trial_ends_at": "Expires on {date}",
+    "expired": "Expired",
+    "active": "Active",
+    "subscription_status": "Subscription Status",
+    "upgrade_now": "Upgrade Now",
+    "how_it_works": "Multi-Tier Strategy",
+    "tier_desc": "Our platform dynamically switches between system keys and your local BYOK (Bring Your Own Key) based on your subscription depth.",
+    "byok_desc": "When a local key is provided, it takes precedence over system defaults, granting you dedicated rate limits.",
+    "system_key_desc": "As a premium subscriber, you are utilizing our high-throughput enterprise API keys.",
+    "no_key_warning": "No dedicated key detected. Using shared system resources with limited bandwidth.",
+    "status_premium": "Premium",
+    "status_free": "Free",
+    "trial_label": "7-Day Trial",
+    "add_key_now": "Add Key Now",
     "billing": "Billing History",
     "billing_desc": "View and manage your recent transactions.",
     "no_payments": "No payments found.",
@@ -1019,97 +1192,16 @@
     "stripe_desc": "Configure your payment gateway for subscriptions and one-time purchases.",
     "stripe_publishable": "Publishable Key",
     "stripe_secret": "Secret Key",
-    "stripe_webhook": "Webhook Secret",
+    "placeholder_gemini": "AIzaSy...",
+    "logo_alt": "Company Logo",
+    "key_privacy_notice": "Your key is stored securely and never shared.",
+    "stripe_webhook": "Stripe Webhook Secret",
     "placeholder_api_key": "Enter your API key",
     "placeholder_token": "Enter your token",
     "placeholder_secret": "Enter your secret",
     "placeholder_id": "Enter your ID",
     "placeholder_url": "Enter the URL",
-    "placeholder_countries": "AE, SA, EG",
-    "api_keys_title": "API Keys & Access",
-    "api_keys_subtitle": "Manage your Gemini API key and check your subscription status.",
-    "trial_status": "Free Trial",
-    "subscription_status": "Subscription",
-    "trial_ends_at": "Ends on {date}",
-    "no_key_warning": "No API key found. Please add one to continue using AI features after your trial expires.",
-    "how_it_works": "How it works?",
-    "tier_desc": "Your access level determines which API key is used for AI analysis.",
-    "byok_desc": "Bring Your Own Key (BYOK) - Use your own Gemini API key for all requests.",
-    "system_key_desc": "Using System Key - All requests are covered by your trial or subscription.",
-    "active": "Active",
-    "expired": "Expired",
-    "upgrade_now": "Upgrade Now",
-    "add_key_now": "Add Key Now"
-  },
-  "ManualEntry": {
-    "title": "Add Manual Coverage",
-    "article_title": "Title",
-    "title_placeholder": "Article Headline",
-    "source_name": "Source Name",
-    "source_placeholder": "e.g. Gulf News",
-    "date": "Date",
-    "url_optional": "URL (Optional)",
-    "type": "Type",
-    "sentiment": "Sentiment",
-    "reach": "Reach",
-    "reach_placeholder": "0 = Auto",
-    "country": "Country",
-    "content": "Content / Snippet",
-    "content_placeholder": "Paste the article text or summary here...",
-    "evidence_image": "Evidence Image (Optional)",
-    "cancel": "Cancel",
-    "save": "Save Entry",
-    "types": {
-      "print": "Print",
-      "online_news": "Online News",
-      "social_media": "Social Media",
-      "blog": "Blog",
-      "press_release": "Press Release"
-    },
-    "sentiments": {
-      "positive": "Positive",
-      "neutral": "Neutral",
-      "negative": "Negative"
-    },
-    "save_failed": "Failed to save article. Please try again.",
-    "fetch_article": "Fetch & Auto-Analyze",
-    "extracting": "Extracting...",
-    "extract_failed": "Failed to extract content. Please check the URL or fulfill manually.",
-    "not_authenticated": "Not authenticated. Please sign in first."
-  },
-  "ArticleTable": {
-    "no_articles": "No articles found. Start monitoring or add manually.",
-    "showing": "Showing {count} of {total} articles",
-    "export_excel": "Export Excel",
-    "export_pdf": "Export PDF",
-    "col_date": "Date",
-    "col_title": "Title",
-    "col_source": "Source",
-    "col_depth": "Depth",
-    "col_sentiment": "Sentiment",
-    "col_reach": "Reach",
-    "col_ave": "AVE ($)",
-    "col_status": "Status",
-    "manual": "Manual",
-    "confirm_delete": "Are you sure you want to delete this article?",
-    "confirm_delete_selected": "Are you sure you want to delete {count} selected articles?",
-    "delete_selected": "Delete Selected ({count})",
-    "items_selected": "{count} items selected",
-    "delete": "Delete",
-    "types": {
-      "print": "Print",
-      "online_news": "Online News",
-      "social_media": "Social Media",
-      "blog": "Blog",
-      "press_release": "Press Release"
-    },
-    "sentiments": {
-      "positive": "Positive",
-      "neutral": "Neutral",
-      "negative": "Negative"
-    },
-    "select_all": "Select all articles",
-    "select_article": "Select article: {title}"
+    "placeholder_countries": "AE, SA, EG"
   },
   "Dashboard": {
     "title": "Media Intelligence Center",
@@ -1135,14 +1227,25 @@
       "press": "Press Release",
       "blog": "Blog",
       "print": "Print",
-      "load_more": "Load more",
-      "view_standard": "Press Release Monitoring",
-      "view_deep": "Deep Web Monitoring",
-      "view_osint": "OSINT Intelligence",
-      "export_pdf": "PDF",
-      "export_excel": "Excel"
+      "load_more": "Load More",
+      "country": "Country",
+      "language": "Language",
+      "view_standard": "Standard View",
+      "view_deep": "Deep View",
+      "view_osint": "OSINT View",
+      "export_pdf": "Export PDF",
+      "export_excel": "Export Excel"
     },
-    "not_authenticated": "Not authenticated. Please sign in first."
+    "geography": "Geographic Reach",
+    "articles_count": "Articles",
+    "not_authenticated": "Not authenticated. Please sign in first.",
+    "config_title": "Monitoring Configuration",
+    "press_monitoring": "Press Release Monitoring",
+    "press_monitoring_desc": "Real-time sync with global news wires and press distribution networks.",
+    "monitor_standard_title": "Standard Monitor",
+    "monitor_deep_title": "Deep Monitor",
+    "monitor_osint_title": "OSINT Monitor",
+    "limit_results": "Limit: {count} results"
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1172,6 +1275,13 @@
     "selected": "selected",
     "sources_selected": "items selected",
     "source_types": "Source Types",
+    "source_types_list": {
+      "online_news": "Online News",
+      "press_release": "Press Release",
+      "blog": "Blog",
+      "social_media": "Social Media",
+      "print": "Print"
+    },
     "select_sources": "Select sources...",
     "search_sources": "Search sources...",
     "clear_all": "Clear All",
@@ -1196,6 +1306,7 @@
     "language_hint": "Comma-separated codes (e.g. en, ar, fr)",
     "result_limit": "Max Results",
     "scanning": "Scanning deep web sources...",
+    "status_scanning": "Loading recent scans...",
     "config_panel": "Scan Configuration",
     "result_count": "fetched {count} items"
   },
@@ -1213,6 +1324,22 @@
     "ai_rec_moderate_negative": "Moderate negative coverage detected in local news. Consider proactive outreach and monitoring the trend closely before it intensifies.",
     "ai_rec_positive_trend": "Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.",
     "ai_rec_default": "Coverage sentiment is balanced. Continue current media strategy and monitor for shifts."
+  },
+  "PressReleasePanel": {
+    "title": "PR Wire Monitoring",
+    "subtitle": "Real-time sync with {count} global news wires and outlets.",
+    "db_count": "{count} PR Records",
+    "keyword_placeholder": "Search keyword in PR archives...",
+    "max_per_feed": "Max per feed:",
+    "date_from": "From",
+    "date_to": "To",
+    "clear": "Clear",
+    "sync_now": "Sync Now",
+    "syncing": "Syncing...",
+    "fetch_failed": "Failed to sync PR wires.",
+    "not_authenticated": "Not authenticated. Please sign in first.",
+    "failed": "Failed",
+    "cron_hint": "Auto-sync runs every 6 hours."
   },
   "Error": {
     "title": "Something went wrong!",

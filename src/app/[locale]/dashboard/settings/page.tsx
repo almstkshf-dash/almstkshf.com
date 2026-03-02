@@ -212,7 +212,7 @@ export default function SettingsPage() {
                                 <div className="flex flex-col sm:flex-row items-center gap-8">
                                     <div className="relative w-40 h-40 border-2 border-dashed border-border rounded-3xl flex items-center justify-center bg-muted/30 overflow-hidden group">
                                         {logoUrl ? (
-                                            <Image src={logoUrl} alt="Company Logo" fill className="object-contain p-4 transition-transform group-hover:scale-105" />
+                                            <Image src={logoUrl} alt={t('logo_alt')} fill className="object-contain p-4 transition-transform group-hover:scale-105" />
                                         ) : (
                                             <Upload className="h-10 w-10 text-muted-foreground/30" />
                                         )}
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                                             onChange={(e) => setAveMultiplier(parseFloat(e.target.value))}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
                                         />
-                                        <p className="text-xs text-muted-foreground">{t('default_value')}: 0.005</p>
+                                        <p className="text-sm text-muted-foreground">{t('default_value')}: 0.005</p>
                                     </div>
                                 </div>
 

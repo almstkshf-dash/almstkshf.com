@@ -47,6 +47,12 @@
         "signup": "تسجيل جديد",
         "settings": "الإعدادات"
     },
+    "dashboard_grid": {
+        "nss_index": "مؤشر نبض الاستقرار",
+        "risk": "المخاطر",
+        "top_regions": "أهم المناطق",
+        "articles": "مقالات"
+    },
     "Common": {
         "app_name": "المستكشف",
         "slogan": "نطور لنقود",
@@ -68,6 +74,8 @@
         "no_results": "لا توجد نتائج"
     },
     "ArticleTable": {
+        "no_articles": "لم يتم العثور على مقالات. ابدأ المراقبة أو أضف يدوياً.",
+        "showing": "عرض {count} من أصل {total} مقالات",
         "export_excel": "تصدير Excel",
         "export_pdf": "تصدير PDF",
         "col_date": "التاريخ",
@@ -99,6 +107,42 @@
         "select_all": "تحديد الكل",
         "select_article": "تحديد المقال: {title}"
     },
+    "ManualEntry": {
+        "title": "إضافة تغطية يدوية",
+        "article_title": "العنوان",
+        "title_placeholder": "عنوان المقال",
+        "source_name": "اسم المصدر",
+        "source_placeholder": "مثال: جلف نيوز",
+        "date": "التاريخ",
+        "url_optional": "الرابط (اختياري)",
+        "type": "النوع",
+        "sentiment": "المشاعر",
+        "reach": "الوصول",
+        "reach_placeholder": "0 = تلقائي",
+        "country": "البلد",
+        "content": "المحتوى / مقتطف",
+        "content_placeholder": "صق نص المقال أو الملخص هنا...",
+        "evidence_image": "صورة الإثبات (اختياري)",
+        "cancel": "إلغاء",
+        "save": "حفظ الإدخال",
+        "types": {
+            "print": "صحافة مطبوعة",
+            "online_news": "أخبار إلكترونية",
+            "social_media": "وسائل التواصل",
+            "blog": "مدونة",
+            "press_release": "بيان صحفي"
+        },
+        "sentiments": {
+            "positive": "إيجابي",
+            "neutral": "محايد",
+            "negative": "سلبي"
+        },
+        "save_failed": "فشل في حفظ المقال. يرجى المحاولة مرة أخرى.",
+        "fetch_article": "جلب وتحليل تلقائي",
+        "extracting": "جاري الاستخراج...",
+        "extract_failed": "فشل استخراج المحتوى. يرجى التحقق من الرابط أو التعبئة يدوياً.",
+        "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً."
+    },
     "Dashboard": {
         "title": "مركز الاستخبارات الإعلامية",
         "subtitle": "رصد فوري، تحليل ذكي، ورؤى استراتيجية.",
@@ -123,14 +167,25 @@
             "press": "بيان صحفي",
             "blog": "مدونة",
             "print": "صحافة مطبوعة",
+            "country": "الدولة",
+            "language": "اللغة",
             "load_more": "تحميل المزيد",
-            "view_standard": "رصد البيانات الصحفية",
-            "view_deep": "رصد الويب العميق",
-            "view_osint": "استخبارات المصادر المفتوحة",
-            "export_pdf": "PDF",
-            "export_excel": "Excel"
+            "view_standard": "العرض القياسي",
+            "view_deep": "العرض العميق",
+            "view_osint": "عرض الاستخبارات",
+            "export_pdf": "تصدير PDF",
+            "export_excel": "تصدير Excel"
         },
-        "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً."
+        "geography": "الانتشار الجغرافي",
+        "articles_count": "مقال",
+        "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً.",
+        "config_title": "إعدادات الرصد",
+        "press_monitoring": "رصد البيانات الصحفية",
+        "press_monitoring_desc": "مزامنة فورية مع وكالات الأنباء العالمية وشبكات توزيع البيانات الصحفية.",
+        "monitor_standard_title": "رصد قياسي",
+        "monitor_deep_title": "رصد عميق",
+        "monitor_osint_title": "رصد استخباراتي",
+        "limit_results": "الحد الأقصى: {count} نتائج"
     },
     "SentimentTracker": {
         "title": "النبض المباشر: الرأي العام",
@@ -345,6 +400,7 @@
         "language_hint": "رموز اللغة مفصولة بفواصل (مث: en, ar, fr)",
         "result_limit": "أقصى عدد نتائج",
         "scanning": "جاري مسح مصادر الويب العميق...",
+        "status_scanning": "جاري تحميل عمليات المسح الأخيرة...",
         "config_panel": "إعدادات المسح",
         "result_count": "تم جلب {count} عنصر"
     },
@@ -1088,63 +1144,13 @@
         "stripe_desc": "تكوين بوابة الدفع الخاصة بك للاشتركات وعمليات الشراء لمرة واحدة.",
         "stripe_publishable": "المفتاح القابل للنشر (Publishable Key)",
         "stripe_secret": "المفتاح السري (Secret Key)",
-        "stripe_webhook": "سر الويب هوك (Webhook Secret)",
-        "placeholder_api_key": "أدخل مفتاح API الخاص بك",
-        "placeholder_token": "أدخل التوكن الخاص بك",
-        "placeholder_secret": "أدخل السر الخاص بك",
-        "placeholder_id": "أدخل المعرف الخاص بك",
-        "placeholder_url": "أدخل الرابط",
-        "placeholder_countries": "AE, SA, EG",
-        "api_keys_title": "مفاتيح API والوصول",
-        "api_keys_subtitle": "إدارة مفتاح Gemini API الخاص بك والتحقق من حالة اشتراكك.",
-        "trial_status": "تجربة مجانية",
-        "subscription_status": "اشتراك",
-        "trial_ends_at": "ينتهي في {date}",
-        "no_key_warning": "لم يتم العثور على مفتاح API. يرجى إضافة واحد لمواصلة استخدام ميزات الذكاء الاصطناعي بعد انتهاء الفترة التجريبية.",
-        "how_it_works": "كيف يعمل؟",
-        "tier_desc": "يحدد مستوى وصولك مفتاح API الذي يتم استخدامه لتحليل الذكاء الاصطناعي.",
-        "byok_desc": "أحضر مفتاحك الخاص (BYOK) - استخدم مفتاح Gemini API الخاص بك لجميع الطلبات.",
-        "system_key_desc": "استخدام مفتاح النظام - تتم تغطية جميع الطلبات من خلال تجربتك أو اشتراكك.",
-        "active": "نشط",
-        "expired": "منتهي",
-        "upgrade_now": "ترقية الآن",
-        "add_key_now": "إضافة مفتاح الآن"
-    },
-    "ManualEntry": {
-        "title": "إضافة تغطية يدوية",
-        "article_title": "العنوان",
-        "title_placeholder": "عنوان المقال",
-        "source_name": "اسم المصدر",
-        "source_placeholder": "مثال: جلف نيوز",
-        "date": "التاريخ",
-        "url_optional": "الرابط (اختياري)",
-        "type": "النوع",
-        "sentiment": "المشاعر",
-        "reach": "الوصول",
-        "reach_placeholder": "0 = تلقائي",
-        "country": "البلد",
-        "content": "المحتوى / مقتطف",
-        "content_placeholder": "صق نص المقال أو الملخص هنا...",
-        "evidence_image": "صورة الإثبات (اختياري)",
-        "cancel": "إلغاء",
-        "save": "حفظ الإدخال",
-        "types": {
-            "print": "صحافة مطبوعة",
-            "online_news": "أخبار إلكترونية",
-            "social_media": "وسائل التواصل",
-            "blog": "مدونة",
-            "press_release": "بيان صحفي"
-        },
-        "sentiments": {
-            "positive": "إيجابي",
-            "neutral": "محايد",
-            "negative": "سلبي"
-        },
-        "save_failed": "فشل في حفظ المقال. يرجى المحاولة مرة أخرى.",
-        "fetch_article": "جلب وتحليل تلقائي",
-        "extracting": "جاري الاستخراج...",
-        "extract_failed": "فشل استخراج المحتوى. يرجى التحقق من الرابط أو التعبئة يدوياً.",
-        "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً."
+        "placeholder_gemini": "AIzaSy...",
+        "logo_alt": "شعار الشركة",
+        "key_privacy_notice": "يتم تخزين مفتاحك بشكل آمن ولا يتم مشاركته أبداً.",
+        "status_premium": "مميز",
+        "status_free": "مجاني",
+        "trial_name": "تجربة لمدة 7 أيام",
+        "stripe_webhook": "سر الويب هوك (Webhook Secret)"
     },
     "NewsGenerator": {
         "monitor_keyword": "مراقبة الكلمات المفتاحية",
@@ -1174,10 +1180,33 @@
         "selected": "مختارة",
         "sources_selected": "عناصر مختارة",
         "source_types": "أنواع المصادر",
+        "source_types_list": {
+            "online_news": "أخبار إلكترونية",
+            "press_release": "بيان صحفي",
+            "blog": "مدونات",
+            "social_media": "وسائل التواصل",
+            "print": "صحافة مطبوعة"
+        },
         "select_sources": "اختر المصادر...",
         "search_sources": "البحث في المصادر...",
         "clear_all": "مسح الكل",
         "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً."
+    },
+    "PressReleasePanel": {
+        "title": "رصد وكالات الأنباء",
+        "subtitle": "مزامنة فورية مع {count} من وكالات الأنباء العالمية.",
+        "db_count": "{count} سجلات صحفية",
+        "keyword_placeholder": "ابحث بالكلمة المفتاحية في الأرشيف...",
+        "max_per_feed": "الحد الأقصى لكل مصدر:",
+        "date_from": "من",
+        "date_to": "إلى",
+        "clear": "مسح",
+        "sync_now": "مزامنة الآن",
+        "syncing": "جاري المزامنة...",
+        "fetch_failed": "فشل مزامنة الوكالات.",
+        "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً.",
+        "failed": "فشل",
+        "cron_hint": "تتم المزامنة التلقائية كل 6 ساعات."
     },
     "Error": {
         "title": "حدث خطأ ما!",
@@ -1202,7 +1231,8 @@
             "free": "المستوى المجاني",
             "free_label": "مجاني/يحتوي على مستوى مجاني",
             "search": "بحث",
-            "search_placeholder": "البحث في الموارد"
+            "search_placeholder": "البحث في الموارد",
+            "free_only": "المجاني فقط"
         },
         "legend": {
             "title": "دليل الرموز",
@@ -1220,6 +1250,92 @@
             "page": "صفحة {page} / {total}",
             "prev": "السابق",
             "next": "التالي"
+        }
+    },
+    "OsintTab": {
+        "title": "محرك التحقيق",
+        "subtitle": "الوصول إلى نقاط البيانات العالمية عبر أبعاد متعددة. تقوم وكلاؤنا الآليون بتجميع البيانات من مستودعات OSINT المعتمدة في الوقت الفعلي.",
+        "suggested_tools": "الأدوات الخارجية المقترحة",
+        "panels": {
+            "email": {
+                "title": "استخبارات البريد الإلكتروني",
+                "desc": "تتبع تاريخ الاختراقات، الحسابات الاجتماعية، والارتباطات بالنطاقات.",
+                "placeholder": "أدخل البريد الإلكتروني..."
+            },
+            "domain": {
+                "title": "محلل النطاقات",
+                "desc": "تحديد التقنيات المستخدمة، تاريخ WHOIS، وخرائط DNS.",
+                "placeholder": "أدخل النطاق (مثال: example.com)..."
+            },
+            "ip": {
+                "title": "الاستعلام الجغرافي لـ IP",
+                "desc": "رسم خرائط البنية التحتية للشبكة، عقد الاستضافة، وأعلام الأمان.",
+                "placeholder": "أدخل عنوان IP..."
+            },
+            "username": {
+                "title": "كشاف الهوية",
+                "desc": "ابحث عن توفر اسم المستخدم عبر أكثر من 500 منصة اجتماعية.",
+                "placeholder": "أدخل اسم المستخدم..."
+            },
+            "phone": {
+                "title": "مدقق الهاتف",
+                "desc": "تحقق من بيانات المشغل، أعلام السمعة، والتوجيه الإقليمي.",
+                "placeholder": "أدخل الهاتف (مثال: +971...)"
+            }
+        },
+        "tools": {
+            "dehashed": {
+                "name": "DeHashed",
+                "desc": "محرك بحث عن الأصول والاختراقات في الويب العميق."
+            },
+            "epieos": {
+                "name": "Epieos",
+                "desc": "محقق عالمي للبريد الإلكتروني والهاتف."
+            },
+            "hunter": {
+                "name": "Hunter.io",
+                "desc": "أداة احترافية لاكتشاف والتحقق من البريد الإلكتروني."
+            },
+            "intelx": {
+                "name": "IntelX",
+                "desc": "Intelligence X: ابحث في مليارات نقاط البيانات."
+            },
+            "builtwith": {
+                "name": "BuiltWith",
+                "desc": "أداة لتحليل التقنيات المستخدمة وحصة السوق."
+            },
+            "shodan": {
+                "name": "Shodan",
+                "desc": "محرك بحث للأجهزة المتصلة بالإنترنت."
+            },
+            "censys": {
+                "name": "Censys",
+                "desc": "رسم خرائط سطح الهجوم الرقمي المرئي."
+            },
+            "securitytrails": {
+                "name": "SecurityTrails",
+                "desc": "استخبارات شاملة لتاريخ النطاق وعناوين IP."
+            },
+            "whois": {
+                "name": "WHOIS Lookup",
+                "desc": "التحقق من ملكية النطاق وبيانات التسجيل."
+            },
+            "whatsmyname": {
+                "name": "WhatsMyName",
+                "desc": "كشاف أسماء المستخدمين عبر المنصات الاجتماعية."
+            },
+            "knowem": {
+                "name": "KnowEm",
+                "desc": "تحقق من توفر الاسم في 500+ موقع."
+            },
+            "sherlock": {
+                "name": "Sherlock",
+                "desc": "ابحث عن الأسماء عبر المشهد الاجتماعي."
+            },
+            "opencorp": {
+                "name": "OpenCorporates",
+                "desc": "أكبر قاعدة بيانات مفتوحة للشركات في العالم."
+            }
         }
     }
 }

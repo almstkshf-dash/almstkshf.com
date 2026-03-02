@@ -44,6 +44,8 @@ export default function DashboardPage() {
     const [isExporting, setIsExporting] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     // Fetch Data with Filters
     const result = useQuery(api.monitoring.getArticles, {
@@ -295,7 +297,7 @@ export default function DashboardPage() {
 
                 {activeView === 'standard' && (
                     <>
-                        <NewsGenerator />
+                        <NewsGenerator defaultSourceType="Online News" />
                         <PressReleasePanel />
                         <DashboardGrid articles={filteredArticles} analytics={analytics} />
                         <section className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
@@ -305,7 +307,7 @@ export default function DashboardPage() {
                                         <Filter className="w-4 h-4 text-primary" />
                                         {t('coverage_log')}
                                         <span className="bg-primary/10 text-primary text-[10px] px-2.5 py-0.5 rounded-full ml-1 border border-primary/20 font-bold">
-                                            {filteredArticles.length}/{totalArticles}
+                                            {mounted ? `${filteredArticles.length}/${totalArticles}` : '0/0'}
                                         </span>
                                     </h2>
 
@@ -399,7 +401,7 @@ export default function DashboardPage() {
 
                 {activeView === 'deep' && (
                     <>
-                        <NewsGenerator />
+                        <NewsGenerator defaultSourceType="Online News" />
                         <DashboardGrid articles={filteredArticles} analytics={analytics} />
                         <DeepStatusPanel />
                     </>

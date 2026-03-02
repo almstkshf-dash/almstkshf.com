@@ -673,8 +673,10 @@ export const fetchPressReleaseSources = action({
         // Fetch all feeds in parallel (each feed error is isolated)
         await Promise.all(
             PR_WIRE_FEEDS.map(async (feed) => {
+                let savedCount = 0;
                 try {
                     const feedData = await parser.parseURL(feed.url);
+
                     // Each feed pulls up to itemLimit candidates, then we filter by keyword
                     const candidates = feedData.items.slice(0, itemLimit);
 

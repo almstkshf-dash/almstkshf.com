@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 
 // ─── PR wire sources metadata (mirrored from backend for display) ────
 const PR_WIRES = [
@@ -31,6 +32,7 @@ type FeedResult = {
 };
 
 export default function PressReleasePanel() {
+    const t = useTranslations('PressReleasePanel');
     const { isAuthenticated } = useConvexAuth();
     const [loading, setLoading] = useState(false);
     const [syncResult, setSyncResult] = useState<{
@@ -55,7 +57,7 @@ export default function PressReleasePanel() {
     const prCount = prStats?.total ?? 0;
 
     const handleSync = async () => {
-        if (!isAuthenticated) { setError('Please sign in first.'); return; }
+        if (!isAuthenticated) { setError(t('not_authenticated')); return; }
         setLoading(true);
         setError('');
         setSyncResult(null);
@@ -68,7 +70,7 @@ export default function PressReleasePanel() {
             }) as { totalSaved: number; totalErrors: number; feedResults: FeedResult[]; message: string };
             setSyncResult(res);
         } catch (e: unknown) {
-            const msg = e instanceof Error ? e.message : 'Sync failed. Check that your Convex deployment is running.';
+            const msg = e instanceof Error ? e.message : t('fetch_failed');
             setError(msg);
         } finally {
             setLoading(false);
@@ -84,9 +86,9 @@ export default function PressReleasePanel() {
                         <Rss className="w-4 h-4 text-blue-500" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-foreground">PR Wire Sync</h3>
+                        <h3 className="text-sm font-bold text-foreground">{t('title')}</h3>
                         <p className="text-[11px] text-muted-foreground">
-                            Direct ingestion from {PR_WIRES.length} global & MENA press release wires
+                            {t('subtitle', { count: PR_WIRES.length })}
                         </p>
                     </div>
                 </div>
@@ -95,7 +97,7 @@ export default function PressReleasePanel() {
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
                         <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
                         <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-                            {prCount.toLocaleString()} PRs in DB
+                            {t('db_count', { count: prCount })}
                         </span>
                     </div>
                 </div>
@@ -110,13 +112,13 @@ export default function PressReleasePanel() {
                             type="text"
                             value={keyword}
                             onChange={e => setKeyword(e.target.value)}
-                            placeholder="Keyword (exact match, leave empty = fetch all)"
+                            placeholder={t('keyword_placeholder')}
                             className="w-full pl-9 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50"
                             disabled={loading}
                         />
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">Max per feed</label>
+                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('max_per_feed')}</label>
                         <input
                             type="number"
                             min={5}
@@ -132,7 +134,7 @@ export default function PressReleasePanel() {
                 {/* Row 2: date range + sync button */}
                 <div className="flex gap-3 items-center">
                     <div className="flex items-center gap-2 flex-1">
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">From</label>
+                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('date_from')}</label>
                         <input
                             type="date"
                             value={dateFrom}
@@ -140,7 +142,7 @@ export default function PressReleasePanel() {
                             className="flex-1 px-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                             disabled={loading}
                         />
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">To</label>
+                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('date_to')}</label>
                         <input
                             type="date"
                             value={dateTo}
@@ -153,7 +155,7 @@ export default function PressReleasePanel() {
                             <button
                                 onClick={() => { setDateFrom(''); setDateTo(''); }}
                                 className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
-                                title="Clear date range"
+                                title={t('clear')}
                             >
                                 ✕
                             </button>
@@ -166,7 +168,7 @@ export default function PressReleasePanel() {
                         isLoading={loading}
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
                     >
-                        {loading ? 'Syncing...' : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />Sync Now</>}
+                        {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />{t('sync_now')}</>}
                     </Button>
                 </div>
 
@@ -226,7 +228,7 @@ export default function PressReleasePanel() {
                                 >
                                     <span className="truncate">{f.feed}</span>
                                     {f.error ? (
-                                        <span className="ml-2 text-[10px] opacity-70 flex-shrink-0">failed</span>
+                                        <span className="ml-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
                                     ) : (
                                         <span className="ml-2 flex-shrink-0 text-emerald-600 dark:text-emerald-400 font-bold">
                                             +{f.saved ?? 0}
@@ -241,7 +243,7 @@ export default function PressReleasePanel() {
                 {/* Cron hint */}
                 <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5 border-t border-border/50 pt-4">
                     <Clock className="w-3 h-3 flex-shrink-0" />
-                    Auto-sync runs every 6 hours via Convex scheduled jobs. Manual sync above fetches the latest immediately.
+                    {t('cron_hint')}
                 </p>
             </div>
         </div>

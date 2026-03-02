@@ -1,95 +1,119 @@
-# ⚡ Development Speed Guide
+# Development Speed Reference
 
-> **Objective:** Reduce friction and build features 10x faster.
-
-## 🚀 The "Unified Command"
-Stop running separate terminals. Use this single command to start Next.js + Convex + Type Generation:
-```bash
-npm run dev
-```
-*(This now runs `concurrently` under the hood)*
+> Quick lookup for recurring tasks
 
 ---
 
-## 🛠️ Feature Development Pattern (The 3-Step Flow)
+## Adding a Feature (End-to-End Checklist)
 
-Instead of jumping between files randomly, follow this exact sequence to add a feature:
+- [ ] Create Convex function in `convex/myFeature.ts`
+- [ ] Add to `convex/_generated/api.ts` (auto via `convex dev`)
+- [ ] Create page at `src/app/[locale]/my-route/page.tsx`
+- [ ] Create client component if interactive in `src/components/MyComponent.tsx`
+- [ ] Add route to `isPublicRoute` in `src/middleware.ts` if public
+- [ ] Add nav link in `src/components/Navbar.tsx`
+- [ ] Add translation keys to **both** `messages/ar.json` and `messages/en.json`
+- [ ] Test in Arabic locale (`/ar/...`)
+- [ ] Test in English locale (`/en/...`)
 
-### Step 1: Define Data (Backend)
-Go to `convex/schema.ts` and add your table. 
-*Constraint:* Keep schemas simple. Use `v.string()`, `v.number()`, `v.boolean()` mostly.
+---
 
-### Step 2: Write Logic (API)
-Create a file in `convex/myFeature.ts`.
-*   **Query (Read):** For fetching data to display.
-*   **Mutation (Write):** For changing data (create, update, delete).
-*   **Action (External):** ONLY for calling 3rd party APIs (Stripe, OpenAI).
+## Common Code Patterns
 
-**Example Snippet:**
-```typescript
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+### Convex Query in Client Component
+```tsx
+'use client';
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
 
-export const createItem = mutation({
-  args: { title: v.string() },
-  handler: async (ctx, args) => {
-    // 1. Auth Check (Always first)
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    // 2. Logic
-    await ctx.db.insert("items", { title: args.title, userId: identity.subject });
-  },
-});
+export default function MyComponent() {
+  const data = useQuery(api.myFeature.getItems, { userId: 'xxx' });
+  if (!data) return <div>Loading...</div>;
+  return <div>{data.length} items</div>;
+}
 ```
 
-### Step 3: Build UI (Frontend)
-Use `Client Components` for interactivity. Fetch data directly with hooks.
-
-**The "Fast UI" Template (`src/components/MyFeature.tsx`):**
+### Convex Mutation
 ```tsx
-"use client";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+const createItem = useMutation(api.myFeature.createItem);
+await createItem({ title: 'Hello' });
+```
 
-export default function MyFeature() {
-  // 1. Fetch Data (Real-time!)
-  const items = useQuery(api.myFeature.list);
-  const create = useMutation(api.myFeature.createItem);
+### Convex Action (outside components, in API route)
+```typescript
+// src/app/api/my-route/route.ts
+import { ConvexHttpClient } from 'convex/browser';
+const client = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const result = await client.action(api.myFeature.doSomething, { param: value });
+```
 
-  if (!items) return <div>Loading...</div>; // Skeleton here
+### Translation (Component)
+```tsx
+import { useTranslations } from 'next-intl';
+const t = useTranslations('MyNamespace');
+// → t('my_key')
+// → t('nested.key')
+// → t('with_variable', { count: 5 })
+```
 
-  return (
-    <div>
-      {items.map(item => (
-        <div key={item._id}>{item.title}</div>
-      ))}
-      <button onClick={() => create({ title: "New One" })}>Add</button>
-    </div>
-  );
+### Server-side Translation (Server Component)
+```tsx
+import { getTranslations } from 'next-intl/server';
+const t = await getTranslations('MyNamespace');
+```
+
+### Protected API Route
+```typescript
+import { auth } from '@clerk/nextjs/server';
+export async function POST(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return new Response('Unauthorized', { status: 401 });
+  // ...
 }
 ```
 
 ---
 
-## ⚠️ Anti-Patterns (What Slows You Down)
+## Debugging Translation Errors
 
-1.  **Over-using API Routes (`/api/...`):** 
-    *   **Slow:** Creating a Next.js API route just to fetch data from Convex.
-    *   **Fast:** Use `useQuery` directly in the component. Middleware handles the auth token automatically!
+```
+MISSING_MESSAGE: Could not resolve `Namespace.key` in messages for locale `ar`
+```
 
-2.  **Middleware Logic Bloat:**
-    *   **Slow:** Checking permissions in `middleware.ts`.
-    *   **Fast:** Check permissions in the **Convex Mutation** (`ctx.auth.getUserIdentity()`). It's safer and faster.
-
-3.  **Manual Type Definitions:**
-    *   **Slow:** Creating TypeScript interfaces manually.
-    *   **Fast:** Let Convex generate them. Run `npx convex dev` (which is now part of `npm run dev`).
+1. Open `messages/ar.json` and `messages/en.json`
+2. Search for the namespace (`Namespace`)
+3. Find the missing key inside that namespace
+4. Add it to BOTH files
 
 ---
 
-## 🐛 Debugging Shortcuts
+## Stripe Quick Reference
 
-*   **Console Logs:** Check the browser console, NOT the terminal, for `Client Component` errors.
-*   **Convex Dashboard:** Use `npx convex dashboard` to see your data instantly.
-*   **Clerk Issues:** Check `Application` tab in Chrome DevTools -> Cookies. If `__session` is missing, you are signed out.
+| Action | Where |
+|---|---|
+| Create checkout session | `POST /api/stripe/checkout` |
+| Handle payment webhook | `POST /api/stripe/webhook` |
+| Product/price IDs | `src/lib/stripe-products.ts` |
+| Test webhook locally | `stripe listen --forward-to localhost:3001/api/stripe/webhook` |
+
+---
+
+## Convex Quick Reference
+
+| Concept | Notes |
+|---|---|
+| `query` | Read-only. Cached, reactive. Cannot call external APIs. |
+| `mutation` | Write operations. Cannot call external APIs. |
+| `action` | Can call external APIs and other functions. Node.js runtime. |
+| `internalQuery/Mutation/Action` | Same as above but only callable by other Convex functions |
+| Scheduling | Use `ctx.scheduler.runAfter()` inside actions |
+
+---
+
+## Deployment Checklist
+
+1. `git push origin main` → Vercel auto-deploys
+2. If schema changed: `npx convex deploy`
+3. Check Vercel deployment logs at vercel.com
+4. Verify Stripe webhook endpoint in Stripe dashboard
+5. Test a critical authenticated flow in production

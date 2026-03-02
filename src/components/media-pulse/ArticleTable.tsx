@@ -17,6 +17,8 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
+    const displayedArticles = useMemo(() => (articles ?? []).slice(0, limit), [articles, limit]);
+
     if (articles === undefined) {
         return <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div>;
     }
@@ -24,8 +26,6 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
     if (articles.length === 0) {
         return null; // parent handles empty state
     }
-
-    const displayedArticles = useMemo(() => articles.slice(0, limit), [articles, limit]);
 
     const toggleSelectAll = () => {
         if (selectedIds.size === displayedArticles.length) {
@@ -210,10 +210,10 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     </span>
                                 </td>
                                 <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
-                                    {article.reach.toLocaleString()}
+                                    {article.reach?.toLocaleString()}
                                 </td>
                                 <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors">
-                                    ${article.ave.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                                    ${article.ave?.toLocaleString()}
                                 </td>
                                 <td className="p-4 text-center">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mx-auto shadow-[0_0_8px_rgba(16,185,129,0.5)]" />

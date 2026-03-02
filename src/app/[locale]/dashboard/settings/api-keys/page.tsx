@@ -101,7 +101,7 @@ export default function ApiKeysPage() {
                                 <Shield className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="font-bold text-lg">{isSubscribed ? "Premium" : "Free"}</p>
+                                <p className="font-bold text-lg">{isSubscribed ? t('status_premium') : t('status_free')}</p>
                                 {!isSubscribed && (
                                     <button className="text-xs text-primary font-bold hover:underline flex items-center gap-1 mt-1">
                                         {t('upgrade_now')} <ArrowUpCircle className="h-3 w-3" />
@@ -134,7 +134,7 @@ export default function ApiKeysPage() {
                                 <Zap className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="font-bold text-lg">7-Day Trial</p>
+                                <p className="font-bold text-lg">{t('trial_name')}</p>
                                 {userSettings?.trialEndsAt && (
                                     <p className="text-xs text-muted-foreground mt-1">
                                         {t('trial_ends_at', { date: new Date(userSettings.trialEndsAt).toLocaleDateString() })}
@@ -172,7 +172,7 @@ export default function ApiKeysPage() {
                                         value={geminiKey}
                                         onChange={(e) => setGeminiKey(e.target.value)}
                                         className="flex-1 px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none font-mono text-foreground"
-                                        placeholder="AIzaSy..."
+                                        placeholder={t('placeholder_gemini')}
                                         autoComplete="off"
                                     />
                                     <Button
@@ -185,7 +185,7 @@ export default function ApiKeysPage() {
                                     </Button>
                                 </div>
                                 <p className="text-[10px] text-muted-foreground">
-                                    * Your key is stored securely and never shared.
+                                    * {t('key_privacy_notice')}
                                 </p>
                             </div>
                         </div>

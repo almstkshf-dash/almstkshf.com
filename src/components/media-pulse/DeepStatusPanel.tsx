@@ -36,7 +36,7 @@ export default function DeepStatusPanel() {
             return;
         }
         if (!keyword.trim() && !countries.trim()) {
-            setError('Please enter a keyword or topic to monitor.');
+            setError(t('keyword_placeholder'));
             return;
         }
         setLoading(true);
@@ -177,7 +177,7 @@ export default function DeepStatusPanel() {
                 {runs === undefined && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Loading...
+                        {t('status_scanning')}
                     </div>
                 )}
                 {runs && runs.length === 0 && (
@@ -194,8 +194,8 @@ export default function DeepStatusPanel() {
                             </span>
                             <span
                                 className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-widest ${run.status === 'success'
-                                        ? 'bg-emerald-500/10 text-emerald-600'
-                                        : 'bg-rose-500/10 text-rose-500'
+                                    ? 'bg-emerald-500/10 text-emerald-600'
+                                    : 'bg-rose-500/10 text-rose-500'
                                     }`}
                             >
                                 {run.status}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { X, Loader2, Plus, Wand2 } from 'lucide-react';
+import { X, Plus, Wand2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface ManualEntryModalProps {

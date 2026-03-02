@@ -1,48 +1,89 @@
-# 📡 ALMSTKSHF (المستكشف)
+# ALMSTKSHF.COM
 
-**ALMSTKSHF** is a cutting-edge Media Monitoring and Analysis platform designed to provide real-time insights, sentiment analysis, and crisis management solutions. Built with a focus on speed, security, and scalability.
+**A UAE-based intelligent media intelligence platform** — providing media monitoring, sentiment analysis, OSINT investigation, crisis management, and AI-powered reporting for executive-level institutions.
 
-## 🚀 Tech Stack
+---
 
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org) - React 19
-- **Backend**: [Convex](https://convex.dev) - Real-time serverless database and functions
-- **Authentication**: [Clerk](https://clerk.com) - Secure identity management
-- **Internationalization**: [next-intl](https://next-intl-docs.vercel.app/) - RTL/LTR support (English & Arabic)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com) - Modern, utility-first CSS
-- **AI Integration**: Google Gemini & Chatbase
-- **Payments**: Stripe (Embedded Checkout)
-- **Monitoring**: Vercel Analytics & OpenTelemetry
+## 🚀 Quick Start
 
-## 📂 Key Features
+```bash
+npm install
+cp .env.local.example .env.local  # fill in your keys
+npm run dev                        # starts Next.js on :3001 + Convex dev
+```
 
-- **Media Pulse Dashboard**: Real-time tracking of media mentions and sentiment.
-- **Lexcura Lawyer**: AI-powered legal document analysis and assistance.
-- **Smart Media Assistant**: Automated crisis management and strategic communication plans.
-- **Multi-locale Support**: Seamless Arabic and English user experience.
+Visit: [http://localhost:3001](http://localhost:3001)
 
-## 🛠️ Getting Started
+---
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+## 📚 Documentation
 
-2. **Run Development Mode**:
-   ```bash
-   npm run dev
-   ```
-   *This starts both the Next.js frontend and the Convex backend concurrently.*
+All documentation lives in the [`docs/`](./docs/) folder:
 
-3. **Environment Setup**:
-   Copy `.env.local.example` (if available) or ensure Clerk and Convex keys are set correctly.
+| Document | Description |
+|---|---|
+| [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Full system architecture — stack, routes, DB schema, components, middleware |
+| [DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Developer guide — setup, env vars, adding features, deployment, common errors |
+| [MIDDLEWARE_AUDIT.md](./docs/MIDDLEWARE_AUDIT.md) | Middleware logic and Edge Runtime constraints |
 
-## 📄 Documentation
+---
 
-- [Setup Guide](./SETUP_GUIDE.md)
-- [Architecture Overview](./docs/ARCHITECTURE.md)
-- [Development Speed](./docs/DEVELOPMENT_SPEED.md)
-- [Stripe Integration](./STRIPE_INTEGRATION_GUIDE.md)
+## 🏗️ Stack
 
-## ⚖️ License
+| | Technology |
+|---|---|
+| **Frontend** | Next.js 15 (App Router), React 19, Tailwind CSS v4 |
+| **Backend** | Convex (serverless DB + functions) |
+| **Auth** | Clerk |
+| **Payments** | Stripe (subscriptions + one-time) |
+| **AI** | Google Gemini Pro |
+| **Email** | Resend |
+| **Chat** | Chatbase |
+| **Cache / Rate Limit** | Upstash Redis |
+| **i18n** | next-intl (Arabic + English) |
+| **Deployment** | Vercel |
 
-Private - All rights reserved.
+---
+
+## 🌍 Locales
+
+- `ar` — Arabic (RTL, default)
+- `en` — English
+
+---
+
+## 🧪 Testing
+
+```bash
+npm run cypress:open      # interactive E2E tests
+npm run e2e:headless      # headless CI mode
+```
+
+---
+
+## 📁 Key Directories
+
+```
+convex/       Backend functions and schema
+src/app/      Next.js routes
+src/components/  UI components  
+src/lib/      Utility libraries (Gemini, Stripe, metrics)
+messages/     i18n translation files (ar.json + en.json)
+docs/         Project documentation
+public/       Static assets
+data/         Static JSON data (OSINT resources directory)
+```
+
+---
+
+## ⚠️ Environment Variables
+
+See [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md#2-environment-variables) for the full list of required environment variables.
+
+**Critical:** All variables must be set in both `.env.local` (local) and **Vercel project settings** (production).
+
+---
+
+## 📄 License
+
+See [LICENSE](./LICENSE) for details.

@@ -3,9 +3,8 @@ import clsx from 'clsx';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Search, Loader2, Sparkles, AlertCircle, AlertTriangle, CheckCircle2, Languages, FileText, Share2, Download, Trash2, Edit3, Plus, Filter, ChevronDown, Check, X, Newspaper, Globe, MessageSquare, Megaphone, TrendingUp, ShieldAlert, BarChart, Settings, Users, ArrowRight, Zap, Target, BookOpen, Clock, Heart, MessageCircle, MoreHorizontal } from "lucide-react";
+import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X, Globe } from "lucide-react";
 import Button from "../ui/Button";
-import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from 'next-intl';
 
 // ═══════════════════════════════════════════════════════════════
@@ -353,7 +352,7 @@ function MultiSelectDropdown({
 // ═══════════════════════════════════════════════════════════════
 // MAIN NEWS GENERATOR
 // ═══════════════════════════════════════════════════════════════
-export default function NewsGenerator() {
+export default function NewsGenerator({ defaultSourceType }: { defaultSourceType?: string }) {
     const locale = useLocale();
     const t = useTranslations('NewsGenerator');
     const isAr = locale === 'ar';
@@ -367,15 +366,18 @@ export default function NewsGenerator() {
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>(isAr ? ['ar', 'en'] : ['en', 'ar']);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
-    const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>(['Online News', 'Press Release']);
+    const [selectedSourceTypes, setSelectedSourceTypes] = useState<string[]>(
+        defaultSourceType ? [defaultSourceType] : ['Online News', 'Press Release']
+    );
+
     const [loading, setLoading] = useState(false);
 
     const sourceTypes = [
-        { id: 'Online News', label: isAr ? 'أخبار عبر الإنترنت' : 'Online News', searchStr: 'Online News أخبار عبر الإنترنت' },
-        { id: 'Press Release', label: isAr ? 'بيان صحفي' : 'Press Release', searchStr: 'Press Release بيان صحفي' },
-        { id: 'Blog', label: isAr ? 'مدونة' : 'Blog', searchStr: 'Blog مدونة' },
-        { id: 'Social Media', label: isAr ? 'وسائل التواصل الاجتماعي' : 'Social Media', searchStr: 'Social Media وسائل التواصل الاجتماعي' },
-        { id: 'Print', label: isAr ? 'صحافة مطبوعة' : 'Print', searchStr: 'Print صحافة مطبوعة' },
+        { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
+        { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release بيان صحفي' },
+        { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog مدونة' },
+        { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
+        { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
     ];
     const [result, setResult] = useState<{ count: number; skipped: number; feeds: number } | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
@@ -383,8 +385,6 @@ export default function NewsGenerator() {
     // Validation errors
     const [errors, setErrors] = useState<{ keyword?: string; countries?: string; languages?: string }>({});
 
-    // Date picker dropdown
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const dateRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -439,7 +439,7 @@ export default function NewsGenerator() {
         if (!validate()) return;
         // Safety: never invoke an authenticated action when Convex hasn't received the token yet
         if (!isAuthenticated) {
-            setErrorMsg(isAr ? 'يجب تسجيل الدخول أولاً' : 'You must be signed in to run this action.');
+            setErrorMsg(t('not_authenticated') || (isAr ? 'يجب تسجيل الدخول أولاً' : 'You must be signed in to run this action.'));
             return;
         }
         setLoading(true);
@@ -642,7 +642,7 @@ export default function NewsGenerator() {
                         {loading ? (
                             t('analyzing')
                         ) : (
-                            <>🚀 {t('generate_report')}</>
+                            <>{t('generate_report')}</>
                         )}
                     </Button>
                 </div>

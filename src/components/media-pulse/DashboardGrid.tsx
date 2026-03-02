@@ -23,6 +23,7 @@ interface DashboardGridProps {
 
 export const DashboardGrid = memo(function DashboardGrid({ articles = [], analytics }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
+    const tDashboard = useTranslations("Dashboard");
 
     // Memoize stats to avoid heavy reduction on every re-render
     const { totalReach, totalAVE } = useMemo(() => {
@@ -183,7 +184,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         <div className="pt-4 border-t border-border mt-4">
                             <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
                                 <Globe className="w-3 h-3" />
-                                Top Regions
+                                {tDashboard('geography')}
                             </h5>
                             <div className="space-y-2">
                                 {Object.entries(analytics.geography).slice(0, 3).map(([code, count]) => (
@@ -192,7 +193,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                             <span className="w-4 h-3 bg-muted rounded-sm text-[8px] flex items-center justify-center">{code}</span>
                                             {code}
                                         </span>
-                                        <span className="text-muted-foreground">{count as number} articles</span>
+                                        <span className="text-muted-foreground">{count as number} {tDashboard('articles_count')}</span>
                                     </div>
                                 ))}
                             </div>
