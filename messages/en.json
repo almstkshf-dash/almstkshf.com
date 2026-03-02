@@ -919,7 +919,9 @@
       "nss_index": "NSS Index",
       "risk": "Risk",
       "top_regions": "Top Regions",
-      "articles": "articles"
+      "articles": "articles",
+      "articles_count": "articles",
+      "emotional_pulse": "Emotional Pulse"
     }
   },
   "CrisisManagementDetail": {
