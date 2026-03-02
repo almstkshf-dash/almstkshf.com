@@ -234,20 +234,18 @@ export default function DashboardPage() {
                         {/* Settings Button */}
                         <HoverPrefetchLink href="/dashboard/settings" aria-label={t('settings')}>
                             <Button
-                                variant="secondary"
-                                className="bg-slate-500/10 hover:bg-slate-500/20 text-slate-600 dark:text-slate-300 px-3 text-xs shadow-none h-auto w-9 flex justify-center items-center"
-                                iconOnly
+                                variant="ghost"
+                                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-500/10 dark:hover:bg-slate-500/20 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-transparent px-3 text-xs shadow-none h-auto w-9 flex justify-center items-center"
+                                leftIcon={<Settings className="w-3.5 h-3.5" aria-hidden="true" />}
                                 aria-label={t('settings')}
-                            >
-                                <Settings className="w-3.5 h-3.5" aria-hidden="true" />
-                            </Button>
+                            />
                         </HoverPrefetchLink>
 
                         {/* Add Manual Entry */}
                         <Button
-                            variant="secondary"
+                            variant="ghost"
                             onClick={() => setManualModalOpen(true)}
-                            className="bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 px-4 text-xs shadow-none h-auto"
+                            className="bg-amber-100 hover:bg-amber-200 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-transparent px-4 text-xs shadow-none h-auto"
                             leftIcon={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
                         >
                             {t('manual_entry')}
@@ -259,7 +257,7 @@ export default function DashboardPage() {
                                 variant="danger"
                                 onClick={handleClearAll}
                                 isLoading={isClearing}
-                                className="bg-destructive/10 hover:bg-destructive/20 border-destructive/20 text-destructive px-4 text-xs shadow-none h-auto"
+                                className="bg-red-100 hover:bg-red-200 dark:bg-destructive/10 dark:hover:bg-destructive/20 border border-red-300 dark:border-destructive/20 text-red-700 dark:text-destructive px-4 text-xs shadow-none h-auto"
                                 leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
                             >
                                 {t('clear_all')}
@@ -270,13 +268,13 @@ export default function DashboardPage() {
                         <div className="w-px h-8 bg-border mx-1" />
 
                         {/* Export Buttons */}
-                        <div className="flex bg-muted/50 rounded-xl border border-border p-0.5">
+                        <div className="flex bg-background rounded-xl border border-border p-0.5 shadow-sm">
                             <Button
                                 variant="ghost"
                                 onClick={() => handleExport('pdf')}
                                 isLoading={isExporting}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 hover:bg-background text-xs text-muted-foreground hover:text-foreground shadow-none h-auto"
+                                className="px-3 hover:bg-muted text-xs text-foreground/70 hover:text-foreground shadow-none h-auto"
                                 leftIcon={!isExporting && <FileDown className="w-3.5 h-3.5" />}
                             >
                                 {t('filters.export_pdf')}
@@ -286,7 +284,7 @@ export default function DashboardPage() {
                                 variant="ghost"
                                 onClick={() => handleExport('excel')}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 hover:bg-background text-xs text-muted-foreground hover:text-foreground shadow-none h-auto"
+                                className="px-3 hover:bg-muted text-xs text-foreground/70 hover:text-foreground shadow-none h-auto"
                                 leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
                             >
                                 {t('filters.export_excel')}
