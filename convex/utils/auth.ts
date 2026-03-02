@@ -33,7 +33,21 @@ export async function requireUser(auth: Auth) {
 export async function requireAdmin(auth: Auth) {
     const identity = await requireUser(auth);
     if (!hasAdminRole(identity)) {
-        throw new ConvexError("Not authorized");
+        // Build a diagnostic payload so we can see exactly what Clerk sent
+        const detectedRole = (
+            identity?.role ||
+            (identity as any)?.orgRole ||
+            (identity as any)?.publicMetadata?.role ||
+            (identity as any)?.claims?.role ||
+            null
+        );
+        throw new ConvexError(
+            `Not authorized. ` +
+            `subject="${identity.subject}" ` +
+            `detectedRole="${detectedRole ?? "NONE"}" ` +
+            `(role must be "admin", "owner", or "superadmin" — ` +
+            `set this in your Clerk JWT template under publicMetadata.role)`
+        );
     }
     return identity;
 }

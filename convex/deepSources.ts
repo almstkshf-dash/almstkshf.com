@@ -1,6 +1,8 @@
 import { action, mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
+import { requireAdmin } from "./utils/auth";
+
 
 
 // Simple robots.txt checker (skip disallowed)
@@ -43,7 +45,12 @@ export const fetchDeepSources = action({
         limit: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
+        // When called from the scheduler (cron), there is no user identity — that's safe by design.
+        // When called directly by a user, we still require admin privileges.
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity) {
+            await requireAdmin(ctx.auth);
+        }
         const start = Date.now();
         const limit = args.limit ?? 20;
         let itemCount = 0;

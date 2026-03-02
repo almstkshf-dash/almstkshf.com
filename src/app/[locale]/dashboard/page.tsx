@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Filter, Loader2, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings } from 'lucide-react';
+import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import Button from '@/components/ui/Button';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
@@ -16,6 +16,19 @@ import clsx from 'clsx';
 import { useLocale } from 'next-intl';
 import DeepStatusPanel from '@/components/media-pulse/DeepStatusPanel';
 import OsintTab from '@/components/media-pulse/OsintTab';
+import PressReleasePanel from '@/components/media-pulse/PressReleasePanel';
+
+type ArticleItem = {
+    _id: string;
+    title: string;
+    keyword?: string;
+    sourceType?: string;
+    sourceCountry?: string;
+    publishedDate?: string;
+    sentiment?: string;
+    url?: string;
+    [key: string]: unknown;
+};
 
 export default function DashboardPage() {
     const t = useTranslations('Dashboard');
@@ -27,7 +40,7 @@ export default function DashboardPage() {
     const [selectedCountry, setSelectedCountry] = useState('All');
     const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint'>('standard');
     const [skip, setSkip] = useState(0);
-    const [loadedArticles, setLoadedArticles] = useState<any[]>([]);
+    const [loadedArticles, setLoadedArticles] = useState<ArticleItem[]>([]);
     const [isExporting, setIsExporting] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -39,7 +52,24 @@ export default function DashboardPage() {
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
         depth: activeView === 'deep' ? 'deep' : undefined,
-    }) as { items: any[], total: number, nextSkip: number | null };
+    }) as { items: ArticleItem[], total: number, nextSkip: number | null };
+
+    // ── Analytics queries (these power the dashboard indicators) ──────────────────────────
+    const analyticsOverview = useQuery(api.monitoring.getAnalyticsOverview, {});
+    const emotionAggregates = useQuery(api.monitoring.getEmotionAggregates, {});
+    const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {});
+
+    // Combine into a single analytics object for DashboardGrid
+    const analytics = analyticsOverview ? {
+        nss: analyticsOverview.nss ?? 0,
+        riskScore: analyticsOverview.riskScore ?? 0,
+        velocity: analyticsOverview.velocity ?? 0,
+        totalReach: analyticsOverview.totalReach ?? 0,
+        sentimentDistribution: analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 },
+        crisisProbability: analyticsOverview.crisisProbability ?? 0,
+        emotions: (emotionAggregates as Record<string, number>) ?? {},
+        geography: (geographyAggregates as Record<string, number>) ?? {},
+    } : undefined;
 
     const totalArticles = result?.total || 0;
 
@@ -72,7 +102,7 @@ export default function DashboardPage() {
         const query = searchQuery.toLowerCase().trim();
         if (!query) return loadedArticles;
 
-        return loadedArticles.filter((a: any) => {
+        return loadedArticles.filter((a: ArticleItem) => {
             return (
                 a.title.toLowerCase().includes(query) ||
                 (a.keyword && a.keyword.toLowerCase().includes(query)) ||
@@ -95,7 +125,7 @@ export default function DashboardPage() {
             const res = await deleteAll({});
             setLoadedArticles([]);
             setSkip(0);
-            showToast('success', t('cleared_success', { count: (res as any)?.deleted || 0 }));
+            showToast('success', t('cleared_success', { count: (res as { deleted?: number })?.deleted ?? 0 }));
         } catch (error) {
             console.error("Clear failed:", error);
             showToast('error', t('clear_failed'));
@@ -113,7 +143,7 @@ export default function DashboardPage() {
             try {
                 exportToExcel(filteredArticles);
                 showToast('success', t('export_success'));
-            } catch (e) { showToast('error', t('export_failed')); }
+            } catch { showToast('error', t('export_failed')); }
         } else {
             setIsExporting(true);
             try {
@@ -266,7 +296,8 @@ export default function DashboardPage() {
                 {activeView === 'standard' && (
                     <>
                         <NewsGenerator />
-                        <DashboardGrid articles={filteredArticles} />
+                        <PressReleasePanel />
+                        <DashboardGrid articles={filteredArticles} analytics={analytics} />
                         <section className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
                             <div className="p-5 border-b border-border space-y-4">
                                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -369,7 +400,7 @@ export default function DashboardPage() {
                 {activeView === 'deep' && (
                     <>
                         <NewsGenerator />
-                        <DashboardGrid articles={filteredArticles} />
+                        <DashboardGrid articles={filteredArticles} analytics={analytics} />
                         <DeepStatusPanel />
                     </>
                 )}

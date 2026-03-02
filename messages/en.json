@@ -275,17 +275,7 @@
     "active_agents": "Active Agents",
     "processing": "Processing..."
   },
-  "DeepSources": {
-    "title": "Deep Sources",
-    "DeepSources": "Deep Sources",
-    "fetch_success": "Data fetched successfully",
-    "fetch_failed": "Failed to fetch deep source data. Please check your connection and try again.",
-    "fetch_now": "Fetch Now",
-    "recent_runs": "Recent Runs",
-    "no_runs": "No runs yet",
-    "not_authenticated": "Not authenticated. Please sign in first.",
-    "items": "items"
-  },
+  
   "Contact": {
     "title": "Get in Touch",
     "subtitle": "Have questions about our AI-driven solutions? Our team of experts is ready to assist you.",
@@ -1146,9 +1136,9 @@
       "blog": "Blog",
       "print": "Print",
       "load_more": "Load more",
-      "view_standard": "Standard",
-      "view_deep": "Deep Sources",
-      "view_osint": "OSINT",
+      "view_standard": "Press Release Monitoring",
+      "view_deep": "Deep Web Monitoring",
+      "view_osint": "OSINT Intelligence",
       "export_pdf": "PDF",
       "export_excel": "Excel"
     },
@@ -1186,6 +1176,28 @@
     "search_sources": "Search sources...",
     "clear_all": "Clear All",
     "not_authenticated": "Not authenticated. Please sign in first."
+  },
+  "DeepSources": {
+    "title": "Deep Web Monitoring",
+    "fetch_now": "Start Deep Scan",
+    "fetch_success": "Deep scan completed successfully",
+    "fetch_failed": "Failed to fetch deep web data. Please check your connection and try again.",
+    "recent_runs": "Recent Scans",
+    "no_runs": "No scans yet. Start your first deep web scan above.",
+    "not_authenticated": "Not authenticated. Please sign in first.",
+    "items": "items",
+    "search_keyword": "Search Keyword",
+    "keyword_placeholder": "Enter brand, topic, or entity to monitor...",
+    "target_countries": "Target Countries",
+    "countries_placeholder": "e.g. ae,sa,eg",
+    "countries_hint": "Comma-separated ISO codes (e.g. ae, sa, eg, us)",
+    "content_language": "Content Language",
+    "language_placeholder": "e.g. en,ar",
+    "language_hint": "Comma-separated codes (e.g. en, ar, fr)",
+    "result_limit": "Max Results",
+    "scanning": "Scanning deep web sources...",
+    "config_panel": "Scan Configuration",
+    "result_count": "fetched {count} items"
   },
   "SentimentTracker": {
     "title": "Live Pulse: Public Sentiment",

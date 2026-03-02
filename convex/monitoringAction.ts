@@ -612,3 +612,168 @@ async function processArticle(
         return false;
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRESS RELEASE WIRE INGESTION
+// Directly pulls from major global and Arab PR wire RSS feeds.
+// Bypasses news aggregator APIs — content is first-party from wire services.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// PR wire RSS sources — mix of global and MENA-focused feeds
+const PR_WIRE_FEEDS: Array<{
+    name: string;
+    url: string;
+    country: string;
+    lang: "en" | "ar";
+}> = [
+        // Global wires (English)
+        { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-list.rss", country: "US", lang: "en" },
+        { name: "Business Wire", url: "https://feeds.businesswire.com/rss/home?rss=G1&rssid=rss_bw_all", country: "US", lang: "en" },
+        { name: "GlobeNewswire MENA", url: "https://www.globenewswire.com/RssFeed/subjectcode/15/Middle+East+and+Africa", country: "AE", lang: "en" },
+        // MENA / Arab wires
+        { name: "Zawya PR", url: "https://www.zawya.com/en/rss/press-releases", country: "AE", lang: "en" },
+        { name: "WAM (UAE EN)", url: "https://www.wam.ae/en/rss", country: "AE", lang: "en" },
+        { name: "WAM (UAE AR)", url: "https://www.wam.ae/ar/rss", country: "AE", lang: "ar" },
+        { name: "SPA (Saudi)", url: "https://www.spa.gov.sa/rss/feedAll.rss", country: "SA", lang: "ar" },
+        { name: "MENA FN", url: "https://menafn.com/rss/1", country: "AE", lang: "en" },
+        { name: "Gulf News PR", url: "https://gulfnews.com/rss/press-releases", country: "AE", lang: "en" },
+    ];
+
+export const fetchPressReleaseSources = action({
+    args: {
+        keyword: v.optional(v.string()),
+        limit: v.optional(v.number()),      // max candidates per feed (user-controlled)
+        dateFrom: v.optional(v.string()),   // ISO date string e.g. "2025-01-01"
+        dateTo: v.optional(v.string()),     // ISO date string e.g. "2025-12-31"
+    },
+    handler: async (ctx, args) => {
+        await requireAdmin(ctx.auth);
+
+        // Get Gemini API key from settings
+        const settings: any = await ctx.runQuery(api.settings.getSettings);
+        const geminiKey = settings?.apiKeys?.gemini || process.env.GEMINI_API_KEY;
+
+        const fetchedKeyword = args.keyword?.trim() || "";
+        // Build a lowercase exact-phrase matcher for filtering
+        // If a keyword is provided we require it appears verbatim in the title or snippet.
+        // Multi-word phrases are matched as a contained substring.
+        const keywordFilter = fetchedKeyword.toLowerCase();
+        const keyword = fetchedKeyword || "Press Release";
+        const itemLimit = args.limit ?? 30;   // per-feed cap — user controlled
+
+        // Date range (optional) — ISO strings from the UI date picker
+        const dateFromObj = args.dateFrom ? new Date(args.dateFrom) : null;
+        const dateToObj = args.dateTo ? new Date(args.dateTo + "T23:59:59Z") : null;
+        const parser = new Parser({ timeout: 10000 });
+
+        let totalSaved = 0;
+        let totalErrors = 0;
+        const feedResults: Record<string, unknown>[] = [];
+
+        // Fetch all feeds in parallel (each feed error is isolated)
+        await Promise.all(
+            PR_WIRE_FEEDS.map(async (feed) => {
+                try {
+                    const feedData = await parser.parseURL(feed.url);
+                    // Each feed pulls up to itemLimit candidates, then we filter by keyword
+                    const candidates = feedData.items.slice(0, itemLimit);
+
+                    // ── Keyword filter ──────────────────────────────────────────────
+                    // When a keyword is provided, only keep items that contain it
+                    // verbatim in the title or description (case-insensitive).
+                    const afterKeyword = keywordFilter
+                        ? candidates.filter((item) => {
+                            const haystack = [
+                                item.title ?? "",
+                                item.contentSnippet ?? "",
+                                item.content ?? "",
+                            ]
+                                .join(" ")
+                                .toLowerCase();
+                            return haystack.includes(keywordFilter);
+                        })
+                        : candidates;
+
+                    // ── Date range filter ────────────────────────────────────────────
+                    const items = (dateFromObj || dateToObj)
+                        ? afterKeyword.filter((item) => {
+                            if (!item.pubDate) return true;
+                            const pub = new Date(item.pubDate);
+                            if (isNaN(pub.getTime())) return true;
+                            if (dateFromObj && pub < dateFromObj) return false;
+                            if (dateToObj && pub > dateToObj) return false;
+                            return true;
+                        })
+                        : afterKeyword;
+
+                    for (const item of items) {
+                        if (!item.link || !item.title) continue;
+
+                        try {
+                            const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
+                            const dd = pubDate.getDate().toString().padStart(2, "0");
+                            const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
+                            const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
+
+                            const snippet = item.contentSnippet || item.content || item.title;
+                            const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+
+                            let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
+                            let summary = snippet.slice(0, 300);
+                            let reach = 75000;
+
+                            if (geminiKey) {
+                                try {
+                                    const aiData = await callGeminiForAnalysis(
+                                        geminiKey, item.title, snippet, keyword, ["Press Release"]
+                                    );
+                                    sentiment = aiData.sentiment;
+                                    summary = aiData.summary || summary;
+                                    reach = aiData.reach_estimate || reach;
+                                } catch (_) { /* use defaults if AI fails */ }
+                            }
+
+                            const ave = Math.round(reach * 0.02 * 5);
+
+                            await ctx.runMutation(api.monitoring.saveArticle, {
+                                keyword,
+                                url: item.link,
+                                publishedDate: formattedDate,
+                                title: item.title,
+                                content: summary,
+                                language: (isArabic || feed.lang === "ar") ? "AR" : "EN",
+                                sentiment,
+                                sourceType: "Press Release",
+                                source: feed.name,
+                                sourceCountry: feed.country,
+                                reach,
+                                ave,
+                                depth: "standard",
+                                ingestMethod: "rss",
+                            });
+
+                            savedCount++;
+                            totalSaved++;
+                        } catch (_) {
+                            totalErrors++;
+                        }
+                    }
+
+                    feedResults.push({ feed: feed.name, saved: savedCount, total: items.length });
+                } catch (feedErr: any) {
+                    feedResults.push({ feed: feed.name, error: feedErr?.message || "fetch failed" });
+                    totalErrors++;
+                }
+            })
+        );
+
+        return {
+            success: true,
+            totalSaved,
+            totalErrors,
+            feedResults,
+            message: `Ingested ${totalSaved} press releases from ${PR_WIRE_FEEDS.length} wire sources`,
+        };
+    },
+});
+

@@ -120,6 +120,23 @@ export default defineSchema({
         timestamp_ms: v.optional(v.number()),
     }).index("by_email", ["email"]),
 
+    // OSINT Investigation Results
+    osint_results: defineTable({
+        type: v.union(
+            v.literal("email"),
+            v.literal("domain"),
+            v.literal("ip"),
+            v.literal("username"),
+            v.literal("phone")
+        ),
+        query: v.string(),
+        result: v.any(),
+        userId: v.string(),
+        createdAt: v.number(),
+    })
+        .index("by_created_at", ["createdAt"])
+        .index("by_user_id", ["userId"]),
+
     payments: defineTable({
         stripeSessionId: v.string(),
         userId: v.optional(v.string()),
