@@ -209,16 +209,22 @@ export const getAnalyticsOverview = query({
 export const getEmotionAggregates = query({
     args: {},
     handler: async (ctx) => {
-        const analyses = await ctx.db.query("free_analyses").collect();
+        const articles = await ctx.db.query("media_monitoring_articles").collect();
         const emotions: Record<string, number> = { joy: 0, anger: 0, sadness: 0, fear: 0, disgust: 0, surprise: 0, trust: 0, anticipation: 0 };
         let count = 0;
 
-        analyses.forEach(a => {
-            if (a.emotions) {
-                count++;
-                Object.entries(a.emotions).forEach(([k, v]) => {
-                    if (emotions[k] !== undefined) emotions[k] += (v as number);
-                });
+        articles.forEach(a => {
+            // We expect 'tone' field (JSON string) to contain emotion scores
+            if (a.tone) {
+                try {
+                    const parsedTone = JSON.parse(a.tone);
+                    if (parsedTone.emotions) {
+                        count++;
+                        Object.entries(parsedTone.emotions).forEach(([k, v]) => {
+                            if (emotions[k] !== undefined) emotions[k] += (v as number);
+                        });
+                    }
+                } catch (e) { /* skip unparseable tone */ }
             }
         });
 

@@ -223,7 +223,7 @@ export const lookupDomain = action({
             }
         } catch (_) { /* Wayback unavailable */ }
 
-        const recordId = await ctx.runMutation(api.osint.saveOsintResult, {
+        const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
             type: "domain",
             query: domain,
             result: results,
@@ -304,7 +304,7 @@ export const lookupIp = action({
             }
         } catch (_) { /* Reverse DNS failed */ }
 
-        const recordId = await ctx.runMutation(api.osint.saveOsintResult, {
+        const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
             type: "ip",
             query: ip,
             result: results,
@@ -404,7 +404,7 @@ export const lookupUsername = action({
             unknownOn: platformResults.filter((p) => p.found === null).map((p) => p.platform),
         };
 
-        const recordId = await ctx.runMutation(api.osint.saveOsintResult, {
+        const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
             type: "username",
             query: username,
             result: results,
@@ -461,7 +461,7 @@ export const lookupPhone = action({
             results.validationNote = `Phone lookup failed: ${e?.message}`;
         }
 
-        const recordId = await ctx.runMutation(api.osint.saveOsintResult, {
+        const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
             type: "phone",
             query: phone,
             result: results,
