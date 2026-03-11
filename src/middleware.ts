@@ -36,17 +36,23 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // 1. Skip i18n for API routes
-    if (req.nextUrl.pathname.startsWith('/api')) {
-        return NextResponse.next();
-    }
+    // 1. Identify public routes
+    const isPublic = isPublicRoute(req);
 
-    // 2. Protect non-public routes
-    if (!isPublicRoute(req)) {
+    // 2. Skip i18n for API routes and identify them
+    const isApiRoute = req.nextUrl.pathname.startsWith('/api');
+
+    // 3. Protect non-public routes
+    if (!isPublic && !isApiRoute) {
         await auth.protect();
     }
 
-    // 3. For all other requests, apply next-intl middleware
+    // 4. Return early for API routes
+    if (isApiRoute) {
+        return NextResponse.next();
+    }
+
+    // 5. For all other requests, apply next-intl middleware
     return intlMiddleware(req);
 });
 
