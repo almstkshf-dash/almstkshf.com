@@ -49,22 +49,15 @@ const nextConfig = {
         return [
             {
                 /*
-                 * RENDER-BLOCKING CSS FIX — HTTP Early Hints:
-                 * Vercel sends a 103 Early Hints response with the CSS preload link
-                 * BEFORE the server finishes rendering the HTML. The browser starts
-                 * downloading CSS immediately, eliminating the waterfall delay that
-                 * was adding ~400ms to the CSS load time.
-                 *
-                 * Note: Vercel automatically injects 103 Early Hints for script/style
-                 * preloads found in the page HTML. This header ensures the hint is
-                 * sent at the HTTP level, before server components resolve.
+                 * Security and Cache headers are handled here.
+                 * (Note: Vercel automatically injects Early Hints for discovered assets).
                  */
-                source: '/:locale(en|ar)',
+                source: '/(.*)',
                 headers: [
                     {
-                        key: 'Link',
-                        value: '</_next/static/css/>; rel=preload; as=style',
-                    },
+                        key: 'X-DNS-Prefetch-Control',
+                        value: 'on'
+                    }
                 ],
             },
         ];

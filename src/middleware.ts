@@ -36,29 +36,26 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    // 1. Identify public routes
+    const isApiRoute = req.nextUrl.pathname.startsWith('/api');
     const isPublic = isPublicRoute(req);
 
-    // 2. Skip i18n for API routes and identify them
-    const isApiRoute = req.nextUrl.pathname.startsWith('/api');
-
-    // 3. Protect non-public routes
-    if (!isPublic && !isApiRoute) {
-        await auth.protect();
-    }
-
-    // 4. Return early for API routes
+    // 1. Return early for API routes to avoid intl overhead if not needed
     if (isApiRoute) {
         return NextResponse.next();
     }
 
-    // 5. For all other requests, apply next-intl middleware
+    // 2. Protect non-public routes
+    if (!isPublic) {
+        await auth.protect();
+    }
+
+    // 3. Apply next-intl middleware for all other requests
     return intlMiddleware(req);
 });
 
 export const config = {
     matcher: [
-        // Match all paths except Static Assets and Next.js internals
+        // Skip Next.js internals and all static files, but run for everything else
         '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml|txt)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',

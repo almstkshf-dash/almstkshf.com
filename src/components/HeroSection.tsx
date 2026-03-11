@@ -48,7 +48,11 @@ export default async function HeroSection() {
                     {t("Common.slogan")}
                 </h2>
 
-                <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+                <p
+                    id="hero-description"
+                    className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light"
+                    style={{ opacity: 1 }} // LCP FIX: Explicitly set to 1 in SSR to override any global hydration-based opacity:0 rules
+                >
                     {t("Common.description")}
                 </p>
 
