@@ -1,6 +1,8 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import BundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin();
+const withBundleAnalyzer = BundleAnalyzer({ enabled: process.env.ANALYZE === 'true' });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,7 +10,12 @@ const nextConfig = {
         optimizeCss: true,
         optimizePackageImports: [
             'lucide-react',
-            'framer-motion'
+            'framer-motion',
+            '@clerk/nextjs',
+            'recharts',
+            'sonner',
+            'next-themes',
+            '@vercel/analytics',
         ],
     },
     transpilePackages: ['three', 'troika-three-text', 'troika-worker-utils', 'jspdf', 'jspdf-autotable'],
@@ -29,4 +36,4 @@ const nextConfig = {
     },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundleAnalyzer(withNextIntl(nextConfig));

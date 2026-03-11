@@ -68,6 +68,7 @@
   ],
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@next/bundle-analyzer": "^16.1.6",
     "@swc/wasm": "^1.15.11",
     "@types/cheerio": "^0.22.35",
     "@types/jsonwebtoken": "^9.0.10",

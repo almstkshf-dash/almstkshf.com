@@ -133,7 +133,7 @@
   --popover: #0F172A;
   --popover-foreground: #F8FAFC;
 
-  --primary: #3B82F6;
+  --primary: #1D4ED8;        /* darkened from #3B82F6 → contrast ~6.0:1 with white (WCAG AA ✓) */
   --primary-foreground: #FFFFFF;
 
   --secondary: #1E293B;
@@ -150,7 +150,7 @@
 
   --border: #1E293B;
   --input: #1E293B;
-  --ring: #3B82F6;
+  --ring: #1D4ED8;
 
   --glass-bg: rgba(15, 23, 42, 0.7);
   --glass-border: rgba(30, 41, 59, 0.5);

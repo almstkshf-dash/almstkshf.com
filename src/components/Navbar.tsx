@@ -4,15 +4,25 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Globe, ChevronDown, LayoutDashboard, Search, Settings } from "lucide-react";
+import { Menu, X, Globe, ChevronDown, Search } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
 import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Button from "@/components/ui/Button";
+import dynamic from "next/dynamic";
+
+// Lazy-load all Clerk UI — keeps the ~186 KiB Clerk bundle out of the initial page load
+const NavbarAuthSection = dynamic(
+    () => import("@/components/NavbarAuthSection"),
+    { ssr: false, loading: () => <div className="w-9 h-9 rounded-full bg-muted animate-pulse" aria-hidden="true" /> }
+);
+const MobileAuthFooter = dynamic(
+    () => import("@/components/NavbarAuthSection").then(m => ({ default: m.MobileAuthFooter })),
+    { ssr: false }
+);
 
 export default function Navbar() {
     const t = useTranslations("Navigation");
@@ -166,52 +176,18 @@ export default function Navbar() {
                                 </span>
                             </Button>
 
-                            {/* Auth section - ALWAYS visible */}
+                            {/* Auth section — only after hydration, Clerk bundle loaded lazily */}
                             {mounted && (
-                                <>
-                                    <SignedOut>
-                                        <SignInButton mode="modal">
-                                            <button className="px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">
-                                                {loginLabel}
-                                            </button>
-                                        </SignInButton>
-                                        <HoverPrefetchLink
-                                            href="/contact"
-                                            className="px-5 py-2 text-sm font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all whitespace-nowrap"
-                                        >
-                                            {t('get_started')}
-                                        </HoverPrefetchLink>
-                                    </SignedOut>
-
-                                    <SignedIn>
-                                        <HoverPrefetchLink
-                                            href="/dashboard"
-                                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
-                                        >
-                                            <LayoutDashboard className={ICON_SM} aria-hidden="true" />
-                                            <span className="whitespace-nowrap">{t('dashboard')}</span>
-                                        </HoverPrefetchLink>
-                                        <HoverPrefetchLink
-                                            href="/dashboard/settings"
-                                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent hover:border-border"
-                                        >
-                                            <Settings className={ICON_SM} aria-hidden="true" />
-                                            <span className="whitespace-nowrap">{t('settings')}</span>
-                                        </HoverPrefetchLink>
-                                        <UserButton
-                                            afterSignOutUrl="/"
-                                            appearance={{
-                                                elements: {
-                                                    userButtonAvatarBox: "w-9 h-9 border-2 border-border hover:border-primary transition-colors",
-                                                    userButtonTrigger: "focus:shadow-none focus:outline-none"
-                                                }
-                                            }}
-                                        />
-                                    </SignedIn>
-                                </>
+                                <NavbarAuthSection
+                                    loginLabel={loginLabel}
+                                    dashboardLabel={t('dashboard')}
+                                    settingsLabel={t('settings')}
+                                    getStartedLabel={t('get_started')}
+                                    iconSm={ICON_SM}
+                                />
                             )}
 
-                            {/* Fallback while Clerk loads or if not signed in  */}
+                            {/* Fallback skeleton while Clerk loads */}
                             {!mounted && (
                                 <div className={clsx(ACTION_BTN, "animate-pulse bg-muted")} aria-hidden="true" />
                             )}
@@ -219,26 +195,15 @@ export default function Navbar() {
 
                         {/* ─── Mobile Controls ─── */}
                         <div className="lg:hidden flex items-center gap-2 shrink-0">
-                            {/* Dashboard link - ALWAYS visible on mobile when signed in */}
+                            {/* Mobile dashboard/avatar — shown after hydration via lazy Clerk chunk */}
                             {mounted && (
-                                <SignedIn>
-                                    <HoverPrefetchLink
-                                        href="/dashboard"
-                                        className={clsx(ACTION_BTN, "text-primary")}
-                                        aria-label={t('dashboard')}
-                                    >
-                                        <LayoutDashboard className={ICON_SM} aria-hidden="true" />
-                                    </HoverPrefetchLink>
-                                    <UserButton
-                                        afterSignOutUrl="/"
-                                        appearance={{
-                                            elements: {
-                                                userButtonAvatarBox: "w-9 h-9 border border-border",
-                                                userButtonTrigger: "focus:shadow-none focus:outline-none"
-                                            }
-                                        }}
-                                    />
-                                </SignedIn>
+                                <NavbarAuthSection
+                                    loginLabel={loginLabel}
+                                    dashboardLabel={t('dashboard')}
+                                    settingsLabel={t('settings')}
+                                    getStartedLabel={t('get_started')}
+                                    iconSm={ICON_SM}
+                                />
                             )}
 
                             <ThemeToggle />
@@ -376,44 +341,13 @@ export default function Navbar() {
                                 {/* Mobile Footer Actions */}
                                 <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
                                     {mounted && (
-                                        <>
-                                            <SignedOut>
-                                                <SignInButton mode="modal">
-                                                    <button className="w-full py-3 text-base font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-                                                        {t('get_started')}
-                                                    </button>
-                                                </SignInButton>
-                                            </SignedOut>
-
-                                            <SignedIn>
-                                                <div className="flex flex-col gap-3 p-3 bg-muted/30 rounded-xl border border-border">
-                                                    <div className="flex items-center justify-between p-2">
-                                                        <div className="flex items-center gap-3">
-                                                            <UserButton afterSignOutUrl="/" />
-                                                            <span className="font-medium text-foreground text-sm">Account</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <HoverPrefetchLink
-                                                            href="/dashboard"
-                                                            onClick={() => setMobileMenuOpen(false)}
-                                                            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors border border-primary/20"
-                                                        >
-                                                            <LayoutDashboard className={ICON_SM} aria-hidden="true" />
-                                                            <span>{t('dashboard')}</span>
-                                                        </HoverPrefetchLink>
-                                                        <HoverPrefetchLink
-                                                            href="/dashboard/settings"
-                                                            onClick={() => setMobileMenuOpen(false)}
-                                                            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors border border-border"
-                                                        >
-                                                            <Settings className={ICON_SM} aria-hidden="true" />
-                                                            <span>{t('settings')}</span>
-                                                        </HoverPrefetchLink>
-                                                    </div>
-                                                </div>
-                                            </SignedIn>
-                                        </>
+                                        <MobileAuthFooter
+                                            getStartedLabel={t('get_started')}
+                                            dashboardLabel={t('dashboard')}
+                                            settingsLabel={t('settings')}
+                                            iconSm={ICON_SM}
+                                            onClose={() => setMobileMenuOpen(false)}
+                                        />
                                     )}
 
                                     <button

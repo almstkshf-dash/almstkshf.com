@@ -110,7 +110,7 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <ClerkProvider dynamic={false}>
+        <ClerkProvider dynamic={true}>
             <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
                 <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
                     <NextIntlClientProvider locale={locale} messages={messages}>
