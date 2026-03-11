@@ -50,8 +50,11 @@ export default function HomeClient() {
 
     return (
         <>
-            {/* Clients Carousel Section */}
-            <section className="py-20 bg-background border-y border-border overflow-hidden">
+            {/* Clients Carousel Section — below fold, skipped during initial paint */}
+            <section
+                className="py-20 bg-background border-y border-border overflow-hidden"
+                style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
+            >
                 <div className="mb-10 text-center">
                     <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">{t('Clients.title')}</p>
                 </div>
@@ -89,7 +92,10 @@ export default function HomeClient() {
             </section>
 
             {/* Trust & Compliance Row — images are below the fold, no priority needed */}
-            <section className="py-12 bg-muted/30 border-b border-border transition-colors duration-300">
+            <section
+                className="py-12 bg-muted/30 border-b border-border"
+                style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}
+            >
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
                         {/* Use <img> for decorative trust badges — they are below fold, lazy by default */}
@@ -144,7 +150,11 @@ export default function HomeClient() {
             <FreeInsightTool />
 
             {/* Why Choose Us Section */}
-            <section id="features" className="py-32 relative overflow-hidden bg-background">
+            <section
+                id="features"
+                className="py-32 relative overflow-hidden bg-background"
+                style={{ contentVisibility: 'auto', containIntrinsicSize: '0 900px' }}
+            >
                 <Container>
                     <div className="text-center mb-24 space-y-4">
                         <motion.h2
