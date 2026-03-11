@@ -11,6 +11,22 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import { Analytics } from "@vercel/analytics/next";
 import LazyLayoutParts from '@/components/LazyLayoutParts';
+import ReactDOM from 'react-dom';
+
+/*
+ * RENDER-BLOCKING CSS FIX — Resource Hints via ReactDOM.preload()
+ *
+ * ReactDOM.preload() is the React 18 / Next.js App Router API for injecting
+ * <link rel="preload" fetchpriority="high"> tags into the server-rendered HTML.
+ * These hints tell the browser to start fetching assets as early as possible —
+ * before the page's JS executes or CSS is even parsed.
+ *
+ * noise.svg is used in the HeroSection above the fold. Without a preload hint,
+ * the browser discovers it only when the CSS background rule is evaluated,
+ * which introduces a waterfall delay that adds to Speed Index and LCP.
+ */
+ReactDOM.preload('/noise.svg', { as: 'image', fetchPriority: 'low' });
+ReactDOM.preload('/logo.png', { as: 'image', fetchPriority: 'high' });
 
 
 const inter = Inter({
@@ -141,7 +157,8 @@ export default async function RootLayout({
                       the hero section: background (page bg), primary (h1 gradient +
                       button), and foreground (body text).
                     */}
-                    <style dangerouslySetInnerHTML={{ __html: `
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
                       :root{--background:#FFFFFF;--foreground:#020617;--primary:#2563EB;--primary-foreground:#FFFFFF;--border:#E2E8F0;--muted:#F8FAFC;--muted-foreground:#374151;--accent:#F1F5F9;--card:#FFFFFF;--ring:#2563EB}
                       .dark{--background:#020617;--foreground:#F8FAFC;--primary:#1D4ED8;--primary-foreground:#FFFFFF;--border:#1E293B;--muted:#1E293B;--muted-foreground:#A8B8CC;--accent:#1E293B;--card:#0F172A;--ring:#1D4ED8}
                       html{background:var(--background);color:var(--foreground)}
@@ -158,7 +175,8 @@ export default async function RootLayout({
                       This is intentionally a blocking script — it MUST run before
                       paint to be effective. It is ~200 bytes (trivial).
                     */}
-                    <script dangerouslySetInnerHTML={{ __html: `
+                    <script dangerouslySetInnerHTML={{
+                        __html: `
                       (function(){
                         try{
                           var t=localStorage.getItem('theme');
@@ -183,7 +201,8 @@ export default async function RootLayout({
                       This script disables all transitions for 100ms then removes
                       itself. By then the page has fully painted its initial state.
                     */}
-                    <script dangerouslySetInnerHTML={{ __html: `
+                    <script dangerouslySetInnerHTML={{
+                        __html: `
                       (function(){
                         var s=document.createElement('style');
                         s.id='no-transition';

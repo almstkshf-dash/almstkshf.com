@@ -1,27 +1,25 @@
 @import "tailwindcss";
 
+/**
+ * DESIGN TOKENS — also inlined in layout.tsx <head> as a blocking <style>
+ * so these values are available before this file downloads.
+ */
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-arabic: var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -30,6 +28,7 @@
   --color-status-alert: #F59E0B;
   --color-status-crisis: #F43F5E;
 
+  /* ─── Animation tokens ─────────────────────────────────── */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-fade-in-up: fade-in-up 0.5s ease-out forwards;
@@ -37,157 +36,85 @@
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes accordion-down {
-    from {
-      height: 0
-    }
-
-    to {
-      height: var(--radix-accordion-content-height)
-    }
+    from { height: 0 }
+    to   { height: var(--radix-accordion-content-height) }
   }
-
   @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height)
-    }
-
-    to {
-      height: 0
-    }
+    from { height: var(--radix-accordion-content-height) }
+    to   { height: 0 }
   }
-
   @keyframes fade-in-up {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    0%   { opacity: 0; transform: translateY(20px) }
+    100% { opacity: 1; transform: translateY(0) }
   }
-
   @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
+    0%   { transform: translate(0,0) scale(1) }
+    33%  { transform: translate(30px,-50px) scale(1.1) }
+    66%  { transform: translate(-20px,20px) scale(0.9) }
+    100% { transform: translate(0,0) scale(1) }
   }
 }
 
+/* ─── Light mode (default) ──────────────────────────────────── */
 :root {
   --background: #FFFFFF;
   --foreground: #020617;
-
   --card: #FFFFFF;
   --card-foreground: #020617;
-
   --popover: #FFFFFF;
   --popover-foreground: #020617;
-
   --primary: #2563EB;
   --primary-foreground: #FFFFFF;
-
   --secondary: #F1F5F9;
   --secondary-foreground: #020617;
-
   --muted: #F8FAFC;
   --muted-foreground: #374151;
-
   --accent: #F1F5F9;
   --accent-foreground: #020617;
-
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-
   --border: #E2E8F0;
   --input: #E2E8F0;
   --ring: #2563EB;
-
   --radius: 0.75rem;
-
-  /* Custom adaptive variables */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(226, 232, 240, 0.5);
+  --glass-bg: rgba(255,255,255,0.7);
+  --glass-border: rgba(226,232,240,0.5);
 }
 
+/* ─── Dark mode ─────────────────────────────────────────────── */
 .dark {
   --background: #020617;
   --foreground: #F8FAFC;
-
   --card: #0F172A;
   --card-foreground: #F8FAFC;
-
   --popover: #0F172A;
   --popover-foreground: #F8FAFC;
-
-  --primary: #1D4ED8;        /* darkened from #3B82F6 → contrast ~6.0:1 with white (WCAG AA ✓) */
+  --primary: #1D4ED8;
   --primary-foreground: #FFFFFF;
-
   --secondary: #1E293B;
   --secondary-foreground: #F8FAFC;
-
   --muted: #1E293B;
   --muted-foreground: #A8B8CC;
-
   --accent: #1E293B;
   --accent-foreground: #F8FAFC;
-
   --destructive: #991B1B;
   --destructive-foreground: #FFFFFF;
-
   --border: #1E293B;
   --input: #1E293B;
   --ring: #1D4ED8;
-
-  --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(30, 41, 59, 0.5);
+  --glass-bg: rgba(15,23,42,0.7);
+  --glass-border: rgba(30,41,59,0.5);
 }
 
+/* ─── Base layer ────────────────────────────────────────────── */
 @layer base {
   /*
-   * LCP FIX: Global `color` transition on `*` forces the browser to apply a
-   * style-transition to the h1 LCP element, delaying paint until the transition
-   * completes. We scope transitions to specific interactive elements only.
-   * Non-text / non-LCP elements keep the theme-switch transitions via their
-   * own class-level utility or component styles.
+   * LCP FIX: Do NOT put color/background-color transitions on the universal
+   * selector — it forces the browser to defer painting the LCP <h1> until
+   * all transitions resolve. Transitions are scoped to non-text elements only.
    */
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     border-color: var(--border);
-  }
-
-  /* Allow smooth theme-toggle transitions ONLY on elements that benefit */
-  body,
-  header,
-  nav,
-  footer,
-  aside,
-  section,
-  article,
-  div:not(.lcp-exempt) {
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-
-  /* Buttons, links and icon fills can still animate */
-  a,
-  button,
-  svg,
-  [role="button"] {
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, fill 0.2s ease, stroke 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
   }
 
   body {
@@ -195,95 +122,80 @@
     color: var(--foreground);
     @apply antialiased;
   }
+
+  /*
+   * Theme-switch transitions — ONLY elements that visibly change on theme toggle.
+   * Excludes headings and paragraphs so LCP text never has a transition applied.
+   */
+  body, header, nav, footer, aside, section, article {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  a, button, svg, [role="button"] {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      fill 0.2s ease,
+      stroke 0.2s ease,
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
 }
 
-/* Optimization for theme toggle icon */
+/* ─── Component-level helpers ───────────────────────────────── */
+
+/* RTL font override */
+[dir="rtl"] {
+  font-family: var(--font-ibm-plex-arabic), var(--font-sans);
+}
+
+/* Theme-toggle icon — GPU layer so it doesn't repaint surrounding text */
 svg.lucide-moon {
   will-change: transform;
   contain: strict;
 }
 
-[dir="rtl"] {
-  font-family: var(--font-ibm-plex-arabic), var(--font-sans);
-}
-
-/* ═══════════════════════════════════════════════════════════ */
-/* DROPDOWN ANIMATIONS                                        */
-/* ═══════════════════════════════════════════════════════════ */
+/* ─── Navbar dropdown animations ───────────────────────────── */
+/*
+ * These keyframes are BELOW-FOLD and NOT needed before the user interacts
+ * with the navbar. However, @keyframes must be in the global stylesheet for
+ * Tailwind to reference them. They are small (< 300 bytes) so the cost is
+ * acceptable. The custom class names (.animate-in etc.) are only applied
+ * via JS interaction, so they never block the initial render.
+ */
 .animate-in {
   animation-duration: 200ms;
   animation-fill-mode: forwards;
 }
-
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.slide-in-from-top-2 {
-  --tw-translate-y: -0.5rem;
-  animation-name: slideInFromTop;
-}
-
-.slide-in-from-right {
-  --tw-translate-x: 1rem;
-  animation-name: slideInFromRight;
-}
+.fade-in          { animation-name: fadeIn }
+.slide-in-from-top-2  { --tw-translate-y: -0.5rem; animation-name: slideInFromTop }
+.slide-in-from-right  { --tw-translate-x: 1rem;    animation-name: slideInFromRight }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0 }
+  to   { opacity: 1 }
 }
-
 @keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-0.5rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-0.5rem) }
+  to   { opacity: 1; transform: translateY(0) }
 }
-
 @keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(1rem);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(1rem) }
+  to   { opacity: 1; transform: translateX(0) }
 }
 
-/* ═══════════════════════════════════════════════════════════ */
-/* SLIM SCROLLBAR FOR DROPDOWNS                               */
-/* ═══════════════════════════════════════════════════════════ */
+/* ─── Scrollbar utilities (CommandMenu, dropdowns only) ─────── */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
+  scrollbar-color: rgba(100,116,139,0.3) transparent;
 }
-
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+.scrollbar-thin::-webkit-scrollbar       { width: 4px }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.3);
+  background: rgba(100,116,139,0.3);
   border-radius: 9999px;
 }
-
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.5);
+  background: rgba(100,116,139,0.5);
 }
