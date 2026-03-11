@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "الصفحة الرئيسية للمستكشف - رائد الحلول الاستراتيجية والتحليل الإعلامي والقانوني في الخليج."
             : "ALMSTKSHF Home - Leader in strategic solutions, media analysis, and legal tech in the Gulf.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}`,
+        },
     };
 }
 

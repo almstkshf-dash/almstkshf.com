@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         openGraph: {
             type: "website",
             locale: locale === "ar" ? "ar_AE" : "en_US",
-            url: `https://almstkshf.com/${locale}`,
+            url: `https://www.almstkshf.com/${locale}`,
             siteName: "ALMSTKSHF",
             images: [
                 {
@@ -75,10 +75,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             images: ["/logo.png"],
         },
         alternates: {
-            canonical: `https://almstkshf.com/${locale}`,
             languages: {
-                en: "https://almstkshf.com/en",
-                ar: "https://almstkshf.com/ar",
+                'x-default': 'https://www.almstkshf.com',
+                en: 'https://www.almstkshf.com/en',
+                ar: 'https://www.almstkshf.com/ar',
             },
         },
         icons: {
@@ -86,7 +86,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             shortcut: "/favicon.ico",
             apple: "/logo.png",
         },
-        metadataBase: new URL("https://almstkshf.com"),
+        metadataBase: new URL('https://www.almstkshf.com'),
     };
 }
 

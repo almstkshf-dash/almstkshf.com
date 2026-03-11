@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "تعرف على الفريق القيادي وراء منظومة ذكاء المستكشف."
             : "Meet the leadership team behind the Almstkshf intelligence ecosystem.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/behind-the-scene`,
+        },
     };
 }
 

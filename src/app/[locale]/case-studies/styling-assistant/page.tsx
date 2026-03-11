@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "اكتشف كيف يغير مساعد التنسيق الذكي تجربة التسوق الرقمي باستخدام الذكاء الاصطناعي."
             : "Discover how Smart Styling Assistant revolutionizes digital shopping with AI.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/case-studies/styling-assistant`,
+        },
     };
 }
 

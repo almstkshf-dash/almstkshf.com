@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "اكتشف كيف يغير ليكسكورا العمل القانوني لشركات المحاماة الكبرى باستخدام الذكاء الاصطناعي والأتمتة."
             : "Discover how LEXCORA transforms legal workflows for high-net-worth law firms with AI and automation.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/case-studies/lexcora`,
+        },
     };
 }
 

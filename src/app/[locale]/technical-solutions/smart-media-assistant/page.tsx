@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "قدرات الذكاء الاصطناعي من المستكشف لإنشاء المحتوى عند الطلب ودعم استراتيجية الاتصال."
             : "Almstkshf AI capabilities for on-demand content generation and communication strategy support.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/technical-solutions/smart-media-assistant`,
+        },
     };
 }
 

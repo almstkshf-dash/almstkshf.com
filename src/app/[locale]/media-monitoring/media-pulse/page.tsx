@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: isAr
             ? "رصد وتحليل فوري للرأي العام وتغطية العلامة التجارية عبر آلاف المصادر العالمية."
             : "Real-time tracking and analysis of public opinion and brand coverage across thousands of global sources.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/media-monitoring/media-pulse`,
+        },
     };
 }
 
