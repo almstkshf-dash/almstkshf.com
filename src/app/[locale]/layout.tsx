@@ -7,13 +7,11 @@ import { notFound } from 'next/navigation';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { ClerkProvider } from '@clerk/nextjs';
 import { routing } from '@/i18n/config';
-import Footer from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
-import ChatbaseWidget from '@/components/ChatbaseWidget';
-import { Analytics } from "@vercel/analytics/next"
-import { CommandMenu } from "@/components/CommandMenu";
-import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
+import LazyLayoutParts from '@/components/LazyLayoutParts';
+
 
 const inter = Inter({
     subsets: ["latin"],
@@ -137,11 +135,8 @@ export default async function RootLayout({
                             <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
                                 <Navbar />
                                 {children}
-                                <CommandMenu />
-                                <Toaster richColors position="top-center" />
+                                <LazyLayoutParts />
                                 <Analytics />
-                                <Footer />
-                                <ChatbaseWidget />
                             </ThemeProvider>
                         </ConvexClientProvider>
                     </NextIntlClientProvider>

@@ -4,7 +4,14 @@ import { motion } from 'framer-motion';
 import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
-import FreeInsightTool from '@/components/FreeInsightTool';
+import dynamic from 'next/dynamic';
+
+/*
+ * TBT FIX — FreeInsightTool imports convex/react + the generated Convex API.
+ * Lazy-loading it defers that parse cost until after the hero + clients sections
+ * have already rendered and the main thread is no longer in the critical path.
+ */
+const FreeInsightTool = dynamic(() => import('@/components/FreeInsightTool'), { ssr: false });
 
 /**
  * HomeClient — Client Component containing ONLY below-the-fold, animated sections.
