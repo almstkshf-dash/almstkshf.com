@@ -1,14 +1,19 @@
 "use client";
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Link } from '@/i18n/routing';
 import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
-import Image from 'next/image';
-import Button from '@/components/ui/Button';
 import FreeInsightTool from '@/components/FreeInsightTool';
 
+/**
+ * HomeClient — Client Component containing ONLY below-the-fold, animated sections.
+ *
+ * LCP fix: The hero section (h1 LCP element) was extracted into `HeroSection.tsx`
+ * (a Server Component) so the browser renders it instantly in static HTML without
+ * waiting for this JS bundle. All framer-motion animations here only affect
+ * content that is scrolled into view *after* the LCP event has already fired.
+ */
 export default function HomeClient() {
     const t = useTranslations();
 
@@ -37,82 +42,7 @@ export default function HomeClient() {
     ];
 
     return (
-        <main className="min-h-screen bg-background overflow-x-hidden">
-            {/* Hero Section */}
-            <section className="relative h-[90vh] flex items-center justify-center text-foreground overflow-hidden">
-                {/* Noise texture – self-hosted, single layer, GPU-promoted */}
-                <div
-                    aria-hidden="true"
-                    className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.15] brightness-100 contrast-150 pointer-events-none mix-blend-overlay will-change-transform"
-                />
-
-                <div className="z-10 text-center max-w-4xl px-4">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-6xl md:text-9xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-foreground to-accent inline-block"
-                    >
-                        {t('Common.app_name')}
-                    </motion.h1>
-
-                    <motion.h2
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 1 }}
-                        className="text-lg md:text-2xl font-medium text-primary mb-8 uppercase tracking-[0.3em]"
-                    >
-                        {t('Common.slogan')}
-                    </motion.h2>
-
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6, duration: 1 }}
-                        className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light"
-                    >
-                        {t('Common.description')}
-                    </motion.p>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8, duration: 0.6 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-                    >
-                        <Link
-                            href="https://chatgpt.com/g/g-68297975a3548191a8530cb64b22aaa3-almstkshf"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-10 py-5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-primary/30 flex items-center gap-3 group"
-                        >
-                            <span className="relative flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-foreground"></span>
-                            </span>
-                            {t('Common.try_ai')}
-                        </Link>
-
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="px-10 py-5 bg-card border border-border backdrop-blur-xl hover:border-primary text-muted-foreground rounded-2xl font-semibold transition-all hover:text-foreground"
-                        >
-                            {t('Common.view_details')}
-                        </Button>
-                    </motion.div>
-                </div>
-
-                {/* Animated Background Element */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.1 }}
-                    transition={{ delay: 1, duration: 2 }}
-                    className="absolute bottom-0 left-0 right-0 h-[300px] border-t border-primary/20 bg-gradient-to-t from-primary/5 to-transparent"
-                ></motion.div>
-            </section>
-
+        <>
             {/* Clients Carousel Section */}
             <section className="py-20 bg-background border-y border-border overflow-hidden">
                 <div className="mb-10 text-center">
@@ -151,21 +81,54 @@ export default function HomeClient() {
                 </div>
             </section>
 
-            {/* Trust & Compliance Row */}
+            {/* Trust & Compliance Row — images are below the fold, no priority needed */}
             <section className="py-12 bg-muted/30 border-b border-border transition-colors duration-300">
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
+                        {/* Use <img> for decorative trust badges — they are below fold, lazy by default */}
                         <div className="relative w-32 h-12">
-                            <Image src="/tdra.webp" alt="TDRA Approved" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <img
+                                src="/tdra.webp"
+                                alt="TDRA Approved"
+                                width={128}
+                                height={48}
+                                loading="lazy"
+                                decoding="async"
+                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                            />
                         </div>
                         <div className="relative w-16 h-16">
-                            <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 64px, 64px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <img
+                                src="/soc2.png"
+                                alt="SOC2 Compliance"
+                                width={64}
+                                height={64}
+                                loading="lazy"
+                                decoding="async"
+                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                            />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/secure.webp" alt="Secure App" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <img
+                                src="/secure.webp"
+                                alt="Secure App"
+                                width={128}
+                                height={48}
+                                loading="lazy"
+                                decoding="async"
+                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                            />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/saas-awards.webp" alt="SaaS Awards" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <img
+                                src="/saas-awards.webp"
+                                alt="SaaS Awards"
+                                width={128}
+                                height={48}
+                                loading="lazy"
+                                decoding="async"
+                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                            />
                         </div>
                     </div>
                 </Container>
@@ -262,7 +225,6 @@ export default function HomeClient() {
                     </div>
                 </Container>
             </section>
-
-        </main>
+        </>
     );
 }

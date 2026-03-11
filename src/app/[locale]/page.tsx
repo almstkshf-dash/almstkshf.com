@@ -1,3 +1,4 @@
+import HeroSection from "@/components/HeroSection";
 import HomeClient from "@/components/HomeClient";
 import { Metadata } from "next";
 
@@ -16,6 +17,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
+/**
+ * Home page — Server Component.
+ *
+ * Architecture for fast LCP:
+ * 1. `HeroSection` is a **Server Component** — renders the h1 (LCP element)
+ *    as static HTML with no JS dependency. Browser paints it immediately.
+ * 2. `HomeClient` is a **Client Component** — loaded as a separate JS chunk
+ *    and handles all below-the-fold animated sections.
+ *
+ * This ensures the LCP element is never blocked behind a JS bundle download.
+ */
 export default function Home() {
-    return <HomeClient />;
+    return (
+        <main className="min-h-screen bg-background overflow-x-hidden">
+            {/* Server-rendered hero — LCP element paints here */}
+            <HeroSection />
+
+            {/* Client-side animated sections — below the fold */}
+            <HomeClient />
+        </main>
+    );
 }
