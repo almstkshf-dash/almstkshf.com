@@ -156,13 +156,13 @@ export default function HomeClient() {
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
                         <div className="relative w-32 h-12">
-                            <Image src="/tdra.png" alt="TDRA Approved" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <Image src="/tdra.webp" alt="TDRA Approved" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative w-16 h-16">
                             <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 64px, 64px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative w-32 h-12">
-                            <Image src="/secure.png" alt="Secure App" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
+                            <Image src="/secure.webp" alt="Secure App" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />
                         </div>
                         <div className="relative w-32 h-12">
                             <Image src="/saas-awards.webp" alt="SaaS Awards" fill sizes="(max-width: 768px) 128px, 128px" className="object-contain dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity" />

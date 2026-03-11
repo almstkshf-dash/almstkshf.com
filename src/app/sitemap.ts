@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next'
 
-const locales = ['en', 'ar']
+const BASE_URL = 'https://almstkshf.com'
+
+// Public routes only — private/authenticated routes must never appear in the sitemap
 const routes = [
     '',
     '/case-studies/lexcora',
@@ -18,20 +20,38 @@ const routes = [
     '/pricing',
     '/privacy',
     '/terms',
-    '/dashboard'
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const sitemapData: MetadataRoute.Sitemap = []
 
-    locales.forEach((locale) => {
-        routes.forEach((route) => {
-            sitemapData.push({
-                url: `https://almstkshf.com/${locale}${route}`,
-                lastModified: new Date(),
-                changeFrequency: 'weekly',
-                priority: route === '' ? 1 : 0.8,
-            })
+    routes.forEach((route) => {
+        // For every route, add one entry per locale that cross-references all alternates
+        // Next.js serialises `alternates.languages` as xhtml:link rel="alternate" in the XML
+        sitemapData.push({
+            url: `${BASE_URL}/en${route}`,
+            changeFrequency: 'weekly',
+            priority: route === '' ? 1 : 0.8,
+            alternates: {
+                languages: {
+                    en: `${BASE_URL}/en${route}`,
+                    ar: `${BASE_URL}/ar${route}`,
+                    'x-default': `${BASE_URL}/en${route}`,
+                },
+            },
+        })
+
+        sitemapData.push({
+            url: `${BASE_URL}/ar${route}`,
+            changeFrequency: 'weekly',
+            priority: route === '' ? 1 : 0.8,
+            alternates: {
+                languages: {
+                    en: `${BASE_URL}/en${route}`,
+                    ar: `${BASE_URL}/ar${route}`,
+                    'x-default': `${BASE_URL}/en${route}`,
+                },
+            },
         })
     })
 

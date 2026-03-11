@@ -36,13 +36,13 @@ export default function Footer() {
                         </div>
                         <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                             <div className="relative w-20 h-8">
-                                <Image src="/tdra.png" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/tdra.webp" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
                             </div>
                             <div className="relative w-8 h-8">
                                 <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain dark:brightness-110" />
                             </div>
                             <div className="relative w-20 h-8">
-                                <Image src="/secure.png" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/secure.webp" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
                             </div>
                         </div>
                     </div>
