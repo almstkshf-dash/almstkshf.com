@@ -24,6 +24,8 @@ const isPublicRoute = createRouteMatcher([
     "/technical-solutions(.*)",
     "/(en|ar)/media-monitoring(.*)",
     "/media-monitoring(.*)",
+    "/(en|ar)/monitoring(.*)", // Added locale prefix for monitoring
+    "/monitoring(.*)",
     "/api/stripe/webhook",
     "/api/stripe/checkout",
     "/api/chatbase/token",
@@ -31,20 +33,23 @@ const isPublicRoute = createRouteMatcher([
     "/(en|ar)/sign-in(.*)",
     "/sign-in(.*)",
     "/(en|ar)/sign-up(.*)",
-    "/sign-up(.*)",
-    "/monitoring(.*)"
+    "/sign-up(.*)"
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    if (!isPublicRoute(req)) {
-        await auth.protect();
+    // 1. If it's a public route, handle with intlMiddleware directly
+    if (isPublicRoute(req)) {
+        return intlMiddleware(req);
     }
+
+    // 2. Otherwise, protect and then process i18n
+    await auth.protect();
     return intlMiddleware(req);
 });
 
 export const config = {
     matcher: [
-        // Skip Next.js internals and all static files, but run for everything else
+        // Skip Next.js internals and all static files
         '/((?!_next|[^?]*\\.(?:html?|css|js|json|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|xml|txt)).*)',
         // Always run for API routes
         '/(api|trpc)(.*)',
