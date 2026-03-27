@@ -2,6 +2,7 @@ import { action, mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
+import { resolveApiKey } from "./utils/keys";
 
 
 
@@ -55,8 +56,7 @@ export const fetchDeepSources = action({
         const limit = args.limit ?? 20;
         let itemCount = 0;
         try {
-            const settings = await ctx.runQuery(api.settings.getSettings);
-            const newsapiKey = settings?.apiKeys?.newsapi?.trim() || process.env.NEWSAPI_API_KEY?.trim();
+            const newsapiKey = await resolveApiKey(ctx, "NEWSAPI_API_KEY", "newsapi");
 
             if (!newsapiKey) {
                 throw new Error("Missing NewsAPI key. Configure in Settings.");

@@ -168,17 +168,17 @@ export const fetchNews = action({
             } catch (authErr: any) {
                 return { success: false, error: "Authentication required. Please sign in and try again." };
             }
-            const apiKey = await resolveApiKey(ctx, "gemini", "GEMINI_API_KEY");
+            const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             if (!apiKey) {
                 return { success: false, error: "Missing Gemini API key. Configure in Settings." };
             }
 
-            const newsdataKey = await resolveApiKey(ctx, "newsdata", "NEWSDATA_API_KEY");
-            const newsapiKey = await resolveApiKey(ctx, "newsapi", "NEWSAPI_API_KEY");
-            const gnewsKey = await resolveApiKey(ctx, "gnews", "GNEWS_API_KEY");
-            const worldnewsKey = await resolveApiKey(ctx, "worldnews", "WORLDNEWS_API_KEY");
-            const twitterBearer = await resolveApiKey(ctx, "twitterBearer", "TWITTER_BEARER");
+            const newsdataKey = await resolveApiKey(ctx, "NEWSDATA_API_KEY", "newsdata");
+            const newsapiKey = await resolveApiKey(ctx, "NEWSAPI_API_KEY", "newsapi");
+            const gnewsKey = await resolveApiKey(ctx, "GNEWS_API_KEY", "gnews");
+            const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
+            const twitterBearer = await resolveApiKey(ctx, "TWITTER_BEARER", "twitterBearer");
 
             const providers = [
                 { name: 'NewsData.io', key: newsdataKey },
@@ -502,7 +502,7 @@ export const extractArticle = action({
     },
     handler: async (ctx, args) => {
         try {
-            const worldnewsKey = await resolveApiKey(ctx, "worldnews", "WORLDNEWS_API_KEY");
+            const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
             if (!worldnewsKey) {
                 return { success: false, error: "Missing WorldNews API key. Configure in Settings." };
             }
@@ -649,7 +649,7 @@ export const fetchPressReleaseSources = action({
         await requireAdmin(ctx.auth);
 
         // Get Gemini API key from hierarchical settings
-        const geminiKey = await resolveApiKey(ctx, "gemini", "GEMINI_API_KEY");
+        const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         const fetchedKeyword = args.keyword?.trim() || "";
         // Build a lowercase exact-phrase matcher for filtering
