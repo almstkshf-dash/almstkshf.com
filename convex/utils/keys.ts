@@ -18,7 +18,7 @@ export async function resolveApiKey(
     if (identity) {
       // In Actions, we must use runQuery. In Queries, we could use db (but runQuery is safer for a shared utility).
       const userSettings = await (ctx as ActionCtx).runQuery(
-        api.userSettings.getByUserId,
+        api.userSettings.get,
         { userId: identity.subject }
       );
       if (settingsField && userSettings?.apiKeys && typeof userSettings.apiKeys === 'object') {
@@ -34,7 +34,7 @@ export async function resolveApiKey(
   // 2. Global app_settings
   try {
     const appSettings = await (ctx as ActionCtx).runQuery(
-      api.settings.getGlobalSettings,
+      api.settings.getSettings,
       {}
     );
     if (settingsField && appSettings?.apiKeys && typeof appSettings.apiKeys === 'object') {

@@ -478,8 +478,8 @@ export const lookupPhone = action({
 
 // ─── Internal helper: email → MD5 (for Gravatar) ─────────────────────
 async function emailToMd5(email: string): Promise<string> {
-    const msgBuffer = new TextEncoder().encode(email);
-    const hashBuffer = await crypto.subtle.digest("MD5", msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    // crypto.subtle does NOT support MD5. Use Node's native crypto module instead.
+    // This file already uses "use node" so this is safe.
+    const { createHash } = await import("crypto");
+    return createHash("md5").update(email).digest("hex");
 }
