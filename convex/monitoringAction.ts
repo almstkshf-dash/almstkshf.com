@@ -163,11 +163,8 @@ export const fetchNews = action({
     },
     handler: async (ctx, args) => {
         try {
-            try {
-                await requireAdmin(ctx.auth);
-            } catch (authErr: any) {
-                return { success: false, error: "Authentication required. Please sign in and try again." };
-            }
+            // Check if user is admin
+            await requireAdmin(ctx.auth);
             const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             if (!apiKey) {
