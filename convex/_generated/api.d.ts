@@ -26,6 +26,7 @@ import type * as settings from "../settings.js";
 import type * as userSettings from "../userSettings.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_checkAdmin from "../utils/checkAdmin.js";
+import type * as utils_keys from "../utils/keys.js";
 import type * as waitlist from "../waitlist.js";
 
 import type {
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   userSettings: typeof userSettings;
   "utils/auth": typeof utils_auth;
   "utils/checkAdmin": typeof utils_checkAdmin;
+  "utils/keys": typeof utils_keys;
   waitlist: typeof waitlist;
 }>;
 
