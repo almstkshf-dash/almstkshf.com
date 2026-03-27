@@ -68,8 +68,8 @@ export const saveArticle = mutation({
         sourceType: v.string(),
         sourceCountry: v.string(),
         source: v.optional(v.string()),
-        depth: v.optional(v.string()),
-        ingestMethod: v.optional(v.string()),
+        depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
+        ingestMethod: v.optional(v.union(v.literal("api"), v.literal("rss"), v.literal("headless"))),
         tone: v.optional(v.string()),
         risk: v.optional(v.string()),
         reach: v.number(),
@@ -101,7 +101,7 @@ export const saveArticle = mutation({
                 ...args,
                 createdAt: Date.now(),
                 sourceType: finalSourceType,
-                depth: args.depth ?? "standard",
+                depth: (args.depth ?? "standard") as "standard" | "deep",
                 ingestMethod: args.ingestMethod,
             });
         }

@@ -1,6 +1,4 @@
 {
     "css.lint.unknownAtRules": "ignore",
-    "git.ignoreLimitWarning": true,
-    "chatgpt.openOnStartup": true,
-    "chatgpt.runCodexInWindowsSubsystemForLinux": true
+    "git.ignoreLimitWarning": true
 }

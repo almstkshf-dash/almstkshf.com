@@ -1,19 +1,21 @@
 import ExcelJS from 'exceljs';
+import type { jsPDF } from 'jspdf';
 
 interface Article {
     title: string;
-    publishedDate: string;
-    url: string;
+    publishedDate?: string;
+    url?: string;
     resolvedUrl?: string;
-    sourceType: string;
-    sourceCountry: string;
+    sourceType?: string;
+    sourceCountry?: string;
     source?: string;
-    sentiment: string;
-    reach: number;
-    ave: number;
-    content: string;
+    sentiment?: string;
+    reach?: number;
+    ave?: number;
+    content?: string;
     imageUrl?: string;
     keyword?: string;
+    [key: string]: unknown;
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -411,13 +413,13 @@ export async function exportToPDF(articles: Article[], _logoUrl?: string, report
     addText('Coverage Log / سجل التغطية', pageWidth - 14, 28, { align: 'right' });
 
     const tableData = articles.map(a => [
-        a.publishedDate,
+        a.publishedDate ?? '',
         isArabic(a.title) ? fixArabicForPDF(a.title) : a.title,
-        a.sourceType,
-        a.sourceCountry,
-        a.sentiment,
-        a.reach.toLocaleString(),
-        `$${a.ave.toLocaleString()}`
+        a.sourceType ?? '',
+        a.sourceCountry ?? '',
+        a.sentiment ?? '',
+        (a.reach ?? 0).toLocaleString(),
+        `$${(a.ave ?? 0).toLocaleString()}`
     ]);
 
     autoTable(doc, {

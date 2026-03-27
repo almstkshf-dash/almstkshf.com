@@ -161,7 +161,7 @@ export const fetchNews = action({
         dateFrom: v.optional(v.string()),  // DD/MM/YYYY
         dateTo: v.optional(v.string()),    // DD/MM/YYYY
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; count?: number; skipped?: number; feeds?: number; error?: string }> => {
         try {
             // Check if user is admin
             await requireAdmin(ctx.auth);
@@ -497,7 +497,7 @@ export const extractArticle = action({
         url: v.string(),
         analyze: v.optional(v.boolean()),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data?: any; error?: string }> => {
         try {
             const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
             if (!worldnewsKey) {
@@ -642,7 +642,7 @@ export const fetchPressReleaseSources = action({
         dateFrom: v.optional(v.string()),   // ISO date string e.g. "2025-01-01"
         dateTo: v.optional(v.string()),     // ISO date string e.g. "2025-12-31"
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: Record<string, unknown>[]; message: string }> => {
         await requireAdmin(ctx.auth);
 
         // Get Gemini API key from hierarchical settings

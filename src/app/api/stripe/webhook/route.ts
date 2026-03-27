@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
                     stripePriceId: subscription.items.data[0].price.id,
                     stripeCustomerId: subscription.customer as string,
                     status: subscription.status,
-                    currentPeriodEnd: subscription.current_period_end * 1000, // Stripe uses seconds
+                    currentPeriodEnd: (subscription.items.data[0]?.current_period_end ?? 0) * 1000, // Stripe uses seconds
                     cancelAtPeriodEnd: subscription.cancel_at_period_end,
                 });
 
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
                         stripePriceId: subscription.items.data[0].price.id,
                         stripeCustomerId: subscription.customer as string,
                         status: 'canceled',
-                        currentPeriodEnd: subscription.current_period_end * 1000,
+                        currentPeriodEnd: (subscription.items.data[0]?.current_period_end ?? 0) * 1000,
                         cancelAtPeriodEnd: true,
                     });
                 }

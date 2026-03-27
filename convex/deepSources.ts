@@ -45,7 +45,7 @@ export const fetchDeepSources = action({
         sources: v.optional(v.string()), // enum list, unused for now
         limit: v.optional(v.number()),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; count?: number; error?: string }> => {
         // When called from the scheduler (cron), there is no user identity — that's safe by design.
         // When called directly by a user, we still require admin privileges.
         const identity = await ctx.auth.getUserIdentity();

@@ -4,7 +4,7 @@ import { api } from "./_generated/api";
 
 export const getOrCreatePhylloUser = action({
     args: {},
-    handler: async (ctx) => {
+    handler: async (ctx): Promise<string> => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Not authenticated");
 
@@ -59,7 +59,7 @@ export const getOrCreatePhylloUser = action({
 
 export const getPhylloToken = action({
     args: { phylloUserId: v.string() },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<string> => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Not authenticated");
 

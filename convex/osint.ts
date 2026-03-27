@@ -15,7 +15,7 @@ export const lookupEmail = action({
     args: {
         email: v.string(),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data: Record<string, any>; recordId: string }> => {
         await requireAdmin(ctx.auth);
         const email = args.email.trim().toLowerCase();
         if (!email || !email.includes("@")) {
@@ -108,7 +108,7 @@ export const lookupDomain = action({
     args: {
         domain: v.string(),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data: Record<string, any>; recordId: string }> => {
         await requireAdmin(ctx.auth);
         const domain = args.domain.trim().toLowerCase()
             .replace(/^https?:\/\//, "")
@@ -240,7 +240,7 @@ export const lookupIp = action({
     args: {
         ip: v.string(),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data: Record<string, any>; recordId: string }> => {
         await requireAdmin(ctx.auth);
         const ip = args.ip.trim();
 
@@ -321,7 +321,7 @@ export const lookupUsername = action({
     args: {
         username: v.string(),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data: Record<string, any>; recordId: string }> => {
         await requireAdmin(ctx.auth);
         const username = args.username.trim().replace(/^@/, "");
 
@@ -421,7 +421,7 @@ export const lookupPhone = action({
     args: {
         phone: v.string(),
     },
-    handler: async (ctx, args) => {
+    handler: async (ctx, args): Promise<{ success: boolean; data: Record<string, any>; recordId: string }> => {
         await requireAdmin(ctx.auth);
         const phone = args.phone.trim().replace(/\s+/g, "");
 
