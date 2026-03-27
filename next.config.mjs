@@ -27,7 +27,6 @@ const nextConfig = {
         optimizePackageImports: [
             'lucide-react',
             'framer-motion',
-            '@clerk/nextjs',
             'recharts',
             'sonner',
             'next-themes',

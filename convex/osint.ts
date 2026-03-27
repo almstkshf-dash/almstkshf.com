@@ -3,6 +3,7 @@ import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
+import { resolveApiKey } from "./utils/keys";
 
 // ═══════════════════════════════════════════════════════════════════
 // OSINT ENGINE — Active Open-Source Intelligence Lookups
@@ -30,7 +31,7 @@ export const lookupEmail = action({
                 {
                     headers: {
                         "User-Agent": "ALMSTKSHF-OSINT/1.0",
-                        "hibp-api-key": process.env.HIBP_API_KEY || "",
+                        "hibp-api-key": await resolveApiKey(ctx, "hibp", "HIBP_API_KEY") || "",
                     },
                 }
             );
@@ -121,9 +122,10 @@ export const lookupDomain = action({
 
         // 1. WHOIS via whoisjson.com (free public API)
         try {
+            const whoisKey = await resolveApiKey(ctx, "whoisjson", "WHOISJSON_API_KEY");
             const whoisRes = await fetch(
                 `https://whoisjson.com/api/v1/whois?domain=${domain}`,
-                { headers: { "Authorization": `TOKEN=${process.env.WHOISJSON_API_KEY || ""}` } }
+                { headers: { "Authorization": `TOKEN=${whoisKey || ""}` } }
             );
             if (whoisRes.ok) {
                 const w = await whoisRes.json();
@@ -268,7 +270,7 @@ export const lookupIp = action({
 
         // 2. Abuse IPDB — check if IP is known malicious (free tier)
         try {
-            const abuseKey = process.env.ABUSEIPDB_API_KEY;
+            const abuseKey = await resolveApiKey(ctx, "abuseipdb", "ABUSEIPDB_API_KEY");
             if (abuseKey) {
                 const abuseRes = await fetch(
                     `https://api.abuseipdb.com/api/v2/check?ipAddress=${ip}&maxAgeInDays=90&verbose`,
@@ -431,7 +433,7 @@ export const lookupPhone = action({
 
         // numverify — free tier (100 requests/month)
         try {
-            const numKey = process.env.NUMVERIFY_API_KEY;
+            const numKey = await resolveApiKey(ctx, "numverify", "NUMVERIFY_API_KEY");
             if (numKey) {
                 const numRes = await fetch(
                     `http://apilayer.net/api/validate?access_key=${numKey}&number=${encodeURIComponent(phone)}&format=1`

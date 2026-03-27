@@ -7,6 +7,7 @@ import * as cheerio from 'cheerio';
 // @ts-ignore
 import NewsAPI from 'newsapi';
 import { requireAdmin } from "./utils/auth";
+import { resolveApiKey } from "./utils/keys";
 
 // ═══════════════════════════════════════════════════════════════════
 // THE SPIDER — Inlined link resolver for Convex Node Runtime
@@ -167,18 +168,17 @@ export const fetchNews = action({
             } catch (authErr: any) {
                 return { success: false, error: "Authentication required. Please sign in and try again." };
             }
-            const settings = await ctx.runQuery(api.settings.getSettings);
-            const apiKey = settings?.apiKeys?.gemini?.trim() || process.env.GEMINI_API_KEY?.trim();
+            const apiKey = await resolveApiKey(ctx, "gemini", "GEMINI_API_KEY");
 
             if (!apiKey) {
                 return { success: false, error: "Missing Gemini API key. Configure in Settings." };
             }
 
-            const newsdataKey = settings?.apiKeys?.newsdata?.trim() || process.env.NEWSDATA_API_KEY?.trim();
-            const newsapiKey = settings?.apiKeys?.newsapi?.trim() || process.env.NEWSAPI_API_KEY?.trim();
-            const gnewsKey = settings?.apiKeys?.gnews?.trim() || process.env.GNEWS_API_KEY?.trim();
-            const worldnewsKey = settings?.apiKeys?.worldnews?.trim() || process.env.WORLDNEWS_API_KEY?.trim();
-            const twitterBearer = settings?.apiKeys?.twitterBearer?.trim() || process.env.TWITTER_BEARER?.trim();
+            const newsdataKey = await resolveApiKey(ctx, "newsdata", "NEWSDATA_API_KEY");
+            const newsapiKey = await resolveApiKey(ctx, "newsapi", "NEWSAPI_API_KEY");
+            const gnewsKey = await resolveApiKey(ctx, "gnews", "GNEWS_API_KEY");
+            const worldnewsKey = await resolveApiKey(ctx, "worldnews", "WORLDNEWS_API_KEY");
+            const twitterBearer = await resolveApiKey(ctx, "twitterBearer", "TWITTER_BEARER");
 
             const providers = [
                 { name: 'NewsData.io', key: newsdataKey },
@@ -502,8 +502,7 @@ export const extractArticle = action({
     },
     handler: async (ctx, args) => {
         try {
-            const settings = await ctx.runQuery(api.settings.getSettings);
-            const worldnewsKey = settings?.apiKeys?.worldnews?.trim() || process.env.WORLDNEWS_API_KEY?.trim();
+            const worldnewsKey = await resolveApiKey(ctx, "worldnews", "WORLDNEWS_API_KEY");
             if (!worldnewsKey) {
                 return { success: false, error: "Missing WorldNews API key. Configure in Settings." };
             }
@@ -649,9 +648,8 @@ export const fetchPressReleaseSources = action({
     handler: async (ctx, args) => {
         await requireAdmin(ctx.auth);
 
-        // Get Gemini API key from settings
-        const settings: any = await ctx.runQuery(api.settings.getSettings);
-        const geminiKey = settings?.apiKeys?.gemini || process.env.GEMINI_API_KEY;
+        // Get Gemini API key from hierarchical settings
+        const geminiKey = await resolveApiKey(ctx, "gemini", "GEMINI_API_KEY");
 
         const fetchedKeyword = args.keyword?.trim() || "";
         // Build a lowercase exact-phrase matcher for filtering

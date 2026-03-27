@@ -63,6 +63,11 @@ export default defineSchema({
             stripePublishableKey: v.optional(v.string()),
             stripeSecretKey: v.optional(v.string()),
             stripeWebhookSecret: v.optional(v.string()),
+            // OSINT keys
+            hibp: v.optional(v.string()),
+            whoisjson: v.optional(v.string()),
+            abuseipdb: v.optional(v.string()),
+            numverify: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -164,6 +169,18 @@ export default defineSchema({
     userSettings: defineTable({
         userId: v.string(),
         geminiApiKey: v.optional(v.string()),
+        apiKeys: v.optional(v.object({
+            gemini: v.optional(v.string()),
+            newsdata: v.optional(v.string()),
+            newsapi: v.optional(v.string()),
+            gnews: v.optional(v.string()),
+            worldnews: v.optional(v.string()),
+            twitterBearer: v.optional(v.string()),
+            hibp: v.optional(v.string()),
+            whoisjson: v.optional(v.string()),
+            abuseipdb: v.optional(v.string()),
+            numverify: v.optional(v.string()),
+        })),
         isSubscribed: v.optional(v.boolean()),
         isTrialActive: v.optional(v.boolean()),
         trialEndsAt: v.optional(v.number()),

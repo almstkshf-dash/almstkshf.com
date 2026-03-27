@@ -35,6 +35,11 @@ export const updateSettings = mutation({
             stripePublishableKey: v.optional(v.string()),
             stripeSecretKey: v.optional(v.string()),
             stripeWebhookSecret: v.optional(v.string()),
+            // OSINT keys
+            hibp: v.optional(v.string()),
+            whoisjson: v.optional(v.string()),
+            abuseipdb: v.optional(v.string()),
+            numverify: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
