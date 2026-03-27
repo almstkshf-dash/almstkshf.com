@@ -22,7 +22,7 @@ const nextConfig = {
          *
          * Estimated saving: 650 ms (per Lighthouse audit).
          */
-        optimizeCss: true,
+        optimizeCss: false,
 
         optimizePackageImports: [
             'lucide-react',

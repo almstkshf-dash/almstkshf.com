@@ -36,35 +36,10 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  try {
-    const isApiRoute = req.nextUrl.pathname.startsWith('/api');
-    const isPublic = isPublicRoute(req);
-
-    // 1. Return early for API routes
-    if (isApiRoute) {
-      return NextResponse.next();
+    if (!isPublicRoute(req)) {
+        await auth.protect();
     }
-
-    // 2. Protect non-public routes
-    if (!isPublic) {
-      await auth.protect();
-    }
-
-    // 3. Apply next-intl middleware
     return intlMiddleware(req);
-  } catch (error) {
-    // Edge Runtime: log the real error, never crash silently
-    console.error("[middleware] invocation failed:", error);
-    
-    // Fail safe: If it's a public route, let it through. 
-    // If it's protected, redirect to sign-in.
-    if (isPublicRoute(req)) {
-      return intlMiddleware(req);
-    }
-    
-    const signInUrl = new URL("/sign-in", req.url);
-    return NextResponse.redirect(signInUrl);
-  }
 });
 
 export const config = {
