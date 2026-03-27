@@ -453,7 +453,7 @@ export const fetchNews = action({
                 console.log(`📡 Fetching Twitter for: ${args.keyword}`);
                 try {
                     const txQuery = encodeURIComponent(args.keyword);
-                    let txUrl = `https://api.twitter.com/2/tweets/search/recent?query=${txQuery}&max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
+                    const txUrl = `https://api.twitter.com/2/tweets/search/recent?query=${txQuery}&max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
 
                     const txRes = await fetch(txUrl, {
                         headers: { 'Authorization': `Bearer ${twitterBearer}` }
