@@ -1123,6 +1123,7 @@
   },
   "Settings": {
     "title": "System Settings",
+    "manage": "Manage",
     "subtitle": "Manage your application configurations and third-party integrations.",
     "loading": "Loading settings...",
     "general": "General",

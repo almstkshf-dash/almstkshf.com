@@ -37,6 +37,11 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+    // 0. Skip localization for API routes
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+        return NextResponse.next();
+    }
+
     // 1. If it's a public route, handle with intlMiddleware directly
     if (isPublicRoute(req)) {
         return intlMiddleware(req);

@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { requireAdmin } from "./utils/auth";
 
 export const getSettings = query({
@@ -47,18 +47,26 @@ export const updateSettings = mutation({
         }),
     },
     handler: async (ctx, args) => {
-        await requireAdmin(ctx.auth);
-        const existing = await ctx.db
-            .query("app_settings")
-            .filter((q) => q.eq(q.field("type"), "global"))
-            .first();
+        try {
+            await requireAdmin(ctx.auth);
+            const existing = await ctx.db
+                .query("app_settings")
+                .filter((q) => q.eq(q.field("type"), "global"))
+                .first();
 
-        if (existing) {
-            await ctx.db.patch(existing._id, args);
-        } else {
-            await ctx.db.insert("app_settings", {
-                type: "global",
-                ...args,
+            if (existing) {
+                await ctx.db.patch(existing._id, args);
+            } else {
+                await ctx.db.insert("app_settings", {
+                    type: "global",
+                    ...args,
+                });
+            }
+        } catch (error: any) {
+            console.error("Error in updateSettings:", error);
+            throw new ConvexError({
+                message: error.message || "Failed to update settings",
+                code: error.code || "INTERNAL_ERROR",
             });
         }
     },
