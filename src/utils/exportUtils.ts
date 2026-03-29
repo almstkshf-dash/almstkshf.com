@@ -119,11 +119,11 @@ function addPageFooter(doc: jsPDF, pageWidth: number, pageHeight: number, pageNu
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
     doc.text(translations.footer_url || 'www.almstkshf.com', 14, footerY);
-    
+
     const genDate = new Date().toLocaleDateString('en-GB');
     const genText = (translations.generated_at || 'Generated: {date}').replace('{date}', genDate);
     doc.text(genText, pageWidth / 2, footerY, { align: 'center' });
-    
+
     const pageText = (translations.page_count || 'Page {current} / {total}')
         .replace('{current}', pageNum.toString())
         .replace('{total}', totalPages.toString());
@@ -503,4 +503,4 @@ export async function exportToPDF(articles: Article[], translations: any, _logoU
 
     // Save
     doc.save(`${finalReportTitle.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
-}
+}
