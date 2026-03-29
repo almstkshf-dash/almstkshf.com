@@ -371,6 +371,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     );
 
     const [loading, setLoading] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const sourceTypes = [
         { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },

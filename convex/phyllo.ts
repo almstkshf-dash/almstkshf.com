@@ -100,8 +100,8 @@ export const getUserSettings = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
         return await ctx.db
-            .query("user_settings")
-            .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+            .query("userSettings")
+            .withIndex("by_userId", (q) => q.eq("userId", args.userId))
             .first();
     }
 });
@@ -110,17 +110,19 @@ export const updatePhylloUserId = mutation({
     args: { userId: v.string(), phylloUserId: v.string() },
     handler: async (ctx, args) => {
         const existing = await ctx.db
-            .query("user_settings")
-            .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+            .query("userSettings")
+            .withIndex("by_userId", (q) => q.eq("userId", args.userId))
             .first();
 
         if (existing) {
             await ctx.db.patch(existing._id, { phylloUserId: args.phylloUserId });
         } else {
-            await ctx.db.insert("user_settings", {
+            await ctx.db.insert("userSettings", {
                 userId: args.userId,
                 kycStatus: "Pending",
-                phylloUserId: args.phylloUserId
+                phylloUserId: args.phylloUserId,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
             });
         }
     }

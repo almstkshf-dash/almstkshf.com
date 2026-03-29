@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import { MessageSquare, X, Bot, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./ui/Button";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function ChatbotTrigger() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const locale = useLocale();
+    const t = useTranslations("Chatbot");
     const isRTL = locale === "ar";
 
     useEffect(() => {
@@ -66,7 +67,7 @@ export default function ChatbotTrigger() {
                         className={`bg-background border border-border rounded-2xl p-4 shadow-2xl max-w-[200px] ${isRTL ? "mr-12 text-right" : "ml-12 text-left"}`}
                     >
                         <p className="text-xs font-medium text-foreground">
-                            {isRTL ? "كيف يمكنني مساعدتك اليوم؟" : "How can I help you today?"}
+                            {t("greeting")}
                         </p>
                     </motion.div>
                 )}
@@ -76,7 +77,7 @@ export default function ChatbotTrigger() {
                 variant="primary"
                 onClick={toggleChat}
                 className="relative group flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all p-0 h-auto"
-                aria-label={isOpen ? "Close chat" : "Open chat"}
+                aria-label={isOpen ? t("aria_close") : t("aria_open")}
                 aria-haspopup="true"
                 aria-expanded={isOpen}
             >

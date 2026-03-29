@@ -66,7 +66,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 content: formData.content,
                 language: isArabic ? 'AR' : 'EN',
                 sentiment: formData.sentiment as 'Positive' | 'Neutral' | 'Negative',
-                sourceType: formData.sourceType,
+                sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
                 sourceCountry: formData.sourceCountry,
                 source: formData.source || 'Manual Source',
                 reach: reachValue,

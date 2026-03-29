@@ -5,6 +5,13 @@ import { requireAdmin } from "./utils/auth";
 export const getSettings = query({
     args: {},
     handler: async (ctx) => {
+        // Require authentication — this document contains sensitive API secrets.
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            return null; // Return null for unauthenticated callers instead of throwing,
+                         // so UI can safely call this without crashing.
+        }
+
         const settings = await ctx.db
             .query("app_settings")
             .filter((q) => q.eq(q.field("type"), "global"))

@@ -12,6 +12,7 @@ import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
+import { Id } from '../../../convex/_generated/dataModel';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Static directory data ─────────────────────────────────────────────
@@ -311,7 +312,7 @@ export default function OsintTab() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id }); }}
+                        onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id as Id<"osint_results"> }); }}
                         className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

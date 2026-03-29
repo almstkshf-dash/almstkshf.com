@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings } from 'lucide-react';
+import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import Button from '@/components/ui/Button';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
 import ManualEntryModal from '@/components/media-pulse/ManualEntryModal';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
 import NewsGenerator, { ALL_COUNTRIES } from '@/components/media-pulse/NewsGenerator';
@@ -46,6 +46,13 @@ export default function DashboardPage() {
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
+
+    // Admin status — determines which restricted tabs/actions are enabled
+    const { isAuthenticated } = useConvexAuth();
+    const isAdmin = useQuery(
+        (api as any).authQueries?.checkIsAdmin,
+        isAuthenticated ? {} : 'skip'
+    ) ?? false;
 
     // Fetch Data with Filters
     const result = useQuery(api.monitoring.getArticles, {
@@ -136,20 +143,60 @@ export default function DashboardPage() {
         }
     };
 
+    const tExport = useTranslations('Export');
+
     const handleExport = async (type: 'excel' | 'pdf') => {
         if (filteredArticles.length === 0) {
             showToast('error', t('export_empty'));
             return;
         }
+
+        // Get all Export translations as an object
+        const exportTranslations = {
+            sheet_name: tExport('sheet_name'),
+            date: tExport('date'),
+            title: tExport('title'),
+            url: tExport('url'),
+            type: tExport('type'),
+            source: tExport('source'),
+            depth: tExport('depth'),
+            country: tExport('country'),
+            sentiment: tExport('sentiment'),
+            reach: tExport('reach'),
+            ave: tExport('ave'),
+            brand_name: tExport('brand_name'),
+            brand_tagline: tExport('brand_tagline'),
+            footer_url: tExport('footer_url'),
+            generated_at: tExport('generated_at'),
+            page_count: tExport('page_count'),
+            report_title: tExport('report_title'),
+            summary_title: tExport('summary_title'),
+            sentiment_title: tExport('sentiment_title'),
+            ai_recommendation: tExport('ai_recommendation'),
+            total_reach: tExport('total_reach'),
+            ad_value: tExport('ad_value'),
+            total_articles: tExport('total_articles'),
+            keyword_label: tExport('keyword_label'),
+            region_label: tExport('region_label'),
+            langs_label: tExport('langs_label'),
+            coverage_log: tExport('coverage_log'),
+            rec_high_neg: tExport('rec_high_neg'),
+            rec_mod_neg: tExport('rec_mod_neg'),
+            rec_healthy: tExport('rec_healthy'),
+            sentiment_pos: t('sentiment.positive'), // reuse from Dashboard if possible
+            sentiment_neu: t('sentiment.neutral'),
+            sentiment_neg: t('sentiment.negative'),
+        };
+
         if (type === 'excel') {
             try {
-                exportToExcel(filteredArticles);
+                exportToExcel(filteredArticles, exportTranslations);
                 showToast('success', t('export_success'));
             } catch { showToast('error', t('export_failed')); }
         } else {
             setIsExporting(true);
             try {
-                await exportToPDF(filteredArticles);
+                await exportToPDF(filteredArticles, exportTranslations);
                 showToast('success', t('export_success'));
             } catch (e) {
                 console.error("Export failed", e);
@@ -219,11 +266,13 @@ export default function DashboardPage() {
                                     variant={activeView === 'osint' ? 'primary' : 'ghost'}
                                     size="sm"
                                     className={clsx(
-                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
+                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all flex items-center gap-1.5",
                                         activeView === 'osint' ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600' : "text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => setActiveView('osint')}
+                                    title={!isAdmin ? 'OSINT features require admin privileges' : undefined}
                                 >
+                                    {!isAdmin && <Lock className="w-3 h-3 opacity-60" />}
                                     {t('filters.view_osint')}
                                 </Button>
                             </div>

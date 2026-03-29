@@ -528,6 +528,14 @@ async function extractWithWorldNews(url: string, apiKey: string, analyze: boolea
 }
 
 // Helper to avoid code duplication
+const VALID_SOURCE_TYPES = ["Online News", "Social Media", "Blog", "Print", "Press Release"] as const;
+type ValidSourceType = typeof VALID_SOURCE_TYPES[number];
+
+function sanitizeSourceType(val: string | undefined): ValidSourceType {
+    if (val && VALID_SOURCE_TYPES.includes(val as ValidSourceType)) return val as ValidSourceType;
+    return "Online News";
+}
+
 async function processArticle(
     ctx: any,
     item: any,
@@ -592,7 +600,7 @@ async function processArticle(
             content: aiData.summary || item.title,
             language: language as "EN" | "AR",
             sentiment: aiData.sentiment,
-            sourceType: (forceSourceType || aiData.sourceType) as any,
+            sourceType: sanitizeSourceType(forceSourceType || aiData.sourceType),
             sourceCountry: country,
             source: sourceName || new URL(resolvedUrl || item.link).hostname,
             tone: aiData.tone,

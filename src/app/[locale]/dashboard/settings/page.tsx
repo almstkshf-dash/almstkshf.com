@@ -81,6 +81,15 @@ export default function SettingsPage() {
     const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Guard against Convex's 1MB document limit — base64 adds ~33% overhead.
+            // Combined with all API keys in the same document, 700KB is a safe ceiling.
+            if (file.size > 700 * 1024) {
+                setMessage({
+                    type: 'error',
+                    text: `Logo file is too large (${Math.round(file.size / 1024)}KB). Please use an image under 700KB.`
+                });
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 setLogoUrl(reader.result as string);
@@ -120,9 +129,17 @@ export default function SettingsPage() {
                 },
             });
             setMessage({ type: 'success', text: t('saved_success') });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save settings:', error);
-            setMessage({ type: 'error', text: t('save_failed') });
+            // Give specific feedback for auth failures vs generic errors
+            const msg = error?.message || '';
+            const isAuthError = msg.toLowerCase().includes('not authorized') || msg.toLowerCase().includes('admin');
+            setMessage({
+                type: 'error',
+                text: isAuthError
+                    ? 'Admin access required. Only administrators can update global settings.'
+                    : t('save_failed')
+            });
         } finally {
             setIsLoading(false);
         }

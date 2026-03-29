@@ -83,18 +83,6 @@ export default defineSchema({
         monitor_id: v.optional(v.id("media_monitoring_articles")),
     }),
 
-    user_settings: defineTable({
-        userId: v.string(),
-        kycStatus: v.union(v.literal("Pending"), v.literal("Verified"), v.literal("Rejected")),
-        phylloUserId: v.optional(v.string()),
-        integrationApiKeys: v.optional(v.object({
-            serviceA: v.string(),
-            serviceB: v.string(),
-            gemini: v.optional(v.string()),
-        })),
-        preferences: v.optional(v.any()),
-    }).index("by_user_id", ["userId"]),
-
     contact_submissions: defineTable({
         name: v.string(),
         email: v.string(),
@@ -184,6 +172,8 @@ export default defineSchema({
         isSubscribed: v.optional(v.boolean()),
         isTrialActive: v.optional(v.boolean()),
         trialEndsAt: v.optional(v.number()),
+        phylloUserId: v.optional(v.string()),
+        kycStatus: v.optional(v.union(v.literal("Pending"), v.literal("Verified"), v.literal("Rejected"))),
         createdAt: v.number(),
         updatedAt: v.number(),
     }).index("by_userId", ["userId"]),

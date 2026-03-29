@@ -1,0 +1,10 @@
+[
+  "MediaPulseDetail.dashboard_grid.nss_index",
+  "MediaPulseDetail.dashboard_grid.risk",
+  "MediaPulseDetail.dashboard_grid.top_regions",
+  "MediaPulseDetail.dashboard_grid.articles",
+  "TechnicalSolutions.kyc.features.status_tier_1",
+  "TechnicalSolutions.kyc.features.verified_msg",
+  "TechnicalSolutions.kyc.features.ready_scan",
+  "TechnicalSolutions.kyc.features.max_file_size"
+]

@@ -12,19 +12,24 @@ export async function resolveApiKey(
   envVarName: string,
   settingsField?: string
 ): Promise<string | null> {
-  // 1. User Settings (only if authenticated)
+  // 1. User Settings (only if authenticated and context supports runQuery)
   try {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity) {
-      // In Actions, we must use runQuery. In Queries, we could use db (but runQuery is safer for a shared utility).
-      const userSettings = await (ctx as ActionCtx).runQuery(
-        api.userSettings.get,
-        { userId: identity.subject }
-      );
-      if (settingsField && userSettings?.apiKeys && typeof userSettings.apiKeys === 'object') {
-        // @ts-ignore
-        const key = userSettings.apiKeys[settingsField];
-        if (key) return String(key).trim();
+    if ('runQuery' in ctx) {
+      const identity = await ctx.auth.getUserIdentity();
+      if (identity) {
+        const userSettings = await (ctx as ActionCtx).runQuery(
+          api.userSettings.get,
+          { userId: identity.subject }
+        );
+        if (settingsField && userSettings?.apiKeys && typeof userSettings.apiKeys === 'object') {
+          // @ts-ignore
+          const key = userSettings.apiKeys[settingsField];
+          if (key) return String(key).trim();
+        }
+        // Also check top-level geminiApiKey field for BYOK
+        if (settingsField === 'gemini' && (userSettings as any)?.geminiApiKey) {
+          return String((userSettings as any).geminiApiKey).trim();
+        }
       }
     }
   } catch (e) {

@@ -1356,5 +1356,42 @@
   },
   "Pricing": {
     "title": "Plans & Pricing"
+  },
+  "Export": {
+    "sheet_name": "Coverage Report",
+    "date": "Date",
+    "title": "Title",
+    "url": "URL",
+    "type": "Type",
+    "source": "Source",
+    "depth": "Depth",
+    "country": "Country",
+    "sentiment": "Sentiment",
+    "reach": "Reach",
+    "ave": "AVE ($)",
+    "brand_name": "ALMSTKSHF",
+    "brand_tagline": "Media Monitoring & Development",
+    "footer_url": "www.almstkshf.com",
+    "generated_at": "Generated: {date}",
+    "page_count": "Page {current} / {total}",
+    "report_title": "Media Coverage Report",
+    "summary_title": "Executive Summary",
+    "sentiment_title": "Sentiment Distribution",
+    "ai_recommendation": "AI Recommendation",
+    "total_reach": "TOTAL REACH",
+    "ad_value": "AD VALUE (AVE)",
+    "total_articles": "TOTAL ARTICLES",
+    "keyword_label": "Keyword",
+    "region_label": "Region",
+    "langs_label": "Languages",
+    "coverage_log": "Coverage Log",
+    "rec_high_neg": "High negative sentiment detected. Recommend activating crisis management protocols immediately.",
+    "rec_mod_neg": "Moderate negative coverage. Monitor closely and prepare proactive messaging.",
+    "rec_healthy": "Coverage sentiment is healthy. Continue current media strategy."
+  },
+  "Chatbot": {
+    "greeting": "How can I help you today?",
+    "aria_open": "Open chat",
+    "aria_close": "Close chat"
   }
 }

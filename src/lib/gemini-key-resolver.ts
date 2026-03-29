@@ -5,6 +5,23 @@ import { auth } from "@clerk/nextjs/server";
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 /**
+ * Returns an authenticated ConvexHttpClient for the current user session.
+ * Uses Clerk JWT with the "convex" template for Convex auth.
+ */
+async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
+    try {
+        const { getToken } = await auth();
+        const token = await getToken({ template: "convex" });
+        if (token) {
+            convex.setAuth(token);
+        }
+    } catch {
+        // Auth token unavailable — proceed as anonymous (read-only queries may still work)
+    }
+    return convex;
+}
+
+/**
  * Resolves the Gemini API Key to use for the current user session.
  * 
  * Hierarchy:
@@ -30,13 +47,15 @@ export async function resolveGeminiKey(): Promise<{ key: string | null; error?: 
     }
 
     try {
+        const client = await getAuthenticatedConvex();
+
         // 2. Fetch User Settings
-        let userSettings = await convex.query(api.userSettings.get, { userId });
+        let userSettings = await client.query(api.userSettings.get, { userId });
 
         // 3. Auto-initialize user settings/trial if missing
         if (!userSettings) {
-            await convex.mutation(api.userSettings.init, { userId });
-            userSettings = await convex.query(api.userSettings.get, { userId });
+            await client.mutation(api.userSettings.init, { userId });
+            userSettings = await client.query(api.userSettings.get, { userId });
         }
 
         if (!userSettings) {

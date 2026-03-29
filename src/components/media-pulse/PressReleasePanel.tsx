@@ -5,7 +5,7 @@ import { useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
     Newspaper, RefreshCw, CheckCircle2, XCircle, Rss,
-    TrendingUp, Clock,
+    TrendingUp, Clock, Lock,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import clsx from 'clsx';
@@ -34,6 +34,10 @@ type FeedResult = {
 export default function PressReleasePanel() {
     const t = useTranslations('PressReleasePanel');
     const { isAuthenticated } = useConvexAuth();
+    const isAdmin = useQuery(
+        (api as any).authQueries?.checkIsAdmin,
+        isAuthenticated ? {} : 'skip'
+    ) ?? false;
     const [loading, setLoading] = useState(false);
     const [syncResult, setSyncResult] = useState<{
         totalSaved: number;
@@ -58,6 +62,7 @@ export default function PressReleasePanel() {
 
     const handleSync = async () => {
         if (!isAuthenticated) { setError(t('not_authenticated')); return; }
+        if (!isAdmin) { setError('This action requires admin privileges.'); return; }
         setLoading(true);
         setError('');
         setSyncResult(null);
@@ -67,7 +72,7 @@ export default function PressReleasePanel() {
                 limit: limitPerFeed,
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
-            }) as { totalSaved: number; totalErrors: number; feedResults: FeedResult[]; message: string };
+            }) as any;
             setSyncResult(res);
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : t('fetch_failed');
@@ -161,12 +166,19 @@ export default function PressReleasePanel() {
                             </button>
                         )}
                     </div>
+                    {!isAdmin && isAuthenticated && (
+                        <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-2.5 py-1.5 rounded-lg">
+                            <Lock className="w-3 h-3" />
+                            Admin only
+                        </span>
+                    )}
                     <Button
                         variant="primary"
                         onClick={handleSync}
-                        disabled={loading || !isAuthenticated}
+                        disabled={loading || !isAuthenticated || !isAdmin}
                         isLoading={loading}
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
+                        title={!isAdmin ? 'This feature requires admin privileges' : undefined}
                     >
                         {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />{t('sync_now')}</>}
                     </Button>

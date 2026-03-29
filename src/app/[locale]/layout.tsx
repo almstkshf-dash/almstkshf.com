@@ -157,12 +157,13 @@ export default async function RootLayout({
                       the hero section: background (page bg), primary (h1 gradient +
                       button), and foreground (body text).
                     */}
-                    <style dangerouslySetInnerHTML={{
-                        __html: `
-                      :root{--background:#FFFFFF;--foreground:#020617;--primary:#2563EB;--primary-foreground:#FFFFFF;--border:#E2E8F0;--muted:#F8FAFC;--muted-foreground:#374151;--accent:#F1F5F9;--card:#FFFFFF;--ring:#2563EB}
+                    <style
+                        key="critical-css"
+                        suppressHydrationWarning
+                        dangerouslySetInnerHTML={{
+                            __html: `:root{--background:#FFFFFF;--foreground:#020617;--primary:#2563EB;--primary-foreground:#FFFFFF;--border:#E2E8F0;--muted:#F8FAFC;--muted-foreground:#374151;--accent:#F1F5F9;--card:#FFFFFF;--ring:#2563EB}
                       .dark{--background:#020617;--foreground:#F8FAFC;--primary:#1D4ED8;--primary-foreground:#FFFFFF;--border:#1E293B;--muted:#1E293B;--muted-foreground:#A8B8CC;--accent:#1E293B;--card:#0F172A;--ring:#1D4ED8}
-                      html{background:var(--background);color:var(--foreground)}
-                    `}} />
+                      html{background:var(--background);color:var(--foreground)}`}} />
 
                     {/*
                       SPEED INDEX FIX 2 — Blocking theme script.

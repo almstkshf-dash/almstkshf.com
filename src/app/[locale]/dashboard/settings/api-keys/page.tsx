@@ -26,11 +26,10 @@ export default function ApiKeysPage() {
     }, [userSettings]);
 
     const handleSave = async () => {
-        if (!userId) return;
         setIsSaving(true);
         setMessage(null);
         try {
-            await updateGeminiKey({ userId, geminiApiKey: geminiKey });
+            await updateGeminiKey({ geminiApiKey: geminiKey });
             setMessage({ type: 'success', text: t('saved_success') });
         } catch (error) {
             console.error('Failed to save API key:', error);

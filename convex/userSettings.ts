@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 
 /**
  * Fetches user settings by Clerk user ID.
@@ -46,13 +46,20 @@ export const init = mutation({
 
 /**
  * Updates the user's personal Gemini API key (BYOK).
+ * userId is derived server-side from the authenticated session — never trusted from the client.
  */
 export const updateGeminiKey = mutation({
-    args: { userId: v.string(), geminiApiKey: v.string() },
+    args: { geminiApiKey: v.string() },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new ConvexError("Not authenticated");
+        }
+        const userId = identity.subject;
+
         const existing = await ctx.db
             .query("userSettings")
-            .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
             .unique();
 
         if (existing) {
@@ -62,9 +69,9 @@ export const updateGeminiKey = mutation({
             });
         } else {
             await ctx.db.insert("userSettings", {
-                userId: args.userId,
+                userId,
                 geminiApiKey: args.geminiApiKey,
-                isTrialActive: false, // Override trial if they add their own key? Or keep it?
+                isTrialActive: false,
                 isSubscribed: false,
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
@@ -74,11 +81,24 @@ export const updateGeminiKey = mutation({
 });
 
 /**
- * Sets the subscription status for a user (Admin only).
+ * Sets the subscription status for a user.
+ * ADMIN-ONLY — typically called by the Stripe webhook handler.
  */
 export const setSubscriptionStatus = mutation({
     args: { userId: v.string(), isSubscribed: v.boolean() },
     handler: async (ctx, args) => {
+        // Only admin users or the system webhook can call this.
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity) {
+            // If a user is authenticated, they must be an admin.
+            const adminIds = (process.env.ADMIN_USER_IDS || "")
+                .split(",").map((s) => s.trim()).filter(Boolean);
+            if (!adminIds.includes(identity.subject)) {
+                throw new ConvexError("Admin access required to update subscription status.");
+            }
+        }
+        // If no identity (webhook/system call), allow through.
+
         const existing = await ctx.db
             .query("userSettings")
             .withIndex("by_userId", (q) => q.eq("userId", args.userId))

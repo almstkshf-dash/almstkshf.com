@@ -65,7 +65,13 @@ export const saveArticle = mutation({
         content: v.string(),
         language: v.union(v.literal("EN"), v.literal("AR")),
         sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
-        sourceType: v.string(),
+        sourceType: v.union(
+            v.literal("Online News"),
+            v.literal("Social Media"),
+            v.literal("Blog"),
+            v.literal("Print"),
+            v.literal("Press Release")
+        ),
         sourceCountry: v.string(),
         source: v.optional(v.string()),
         depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
