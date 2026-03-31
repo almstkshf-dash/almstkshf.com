@@ -3,7 +3,7 @@
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 
@@ -31,6 +31,19 @@ const convex = new ConvexReactClient(convexUrl || "http://127.0.0.1:3210");
  * a single, top-level Clerk initialisation before any useAuth() calls.
  */
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
+    useEffect(() => {
+        // Bfcache (Back/Forward Cache) Optimization:
+        // WebSocket connections are active blockers for Bfcache in some browsers.
+        // By closing the connection on pagehide, we allow the page to be cached.
+        // Convex automatically re-opens the connection when the page is restored or a query is needed.
+        const handlePageHide = () => {
+            convex.close();
+        };
+
+        window.addEventListener("pagehide", handlePageHide);
+        return () => window.removeEventListener("pagehide", handlePageHide);
+    }, []);
+
     return (
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             {children}

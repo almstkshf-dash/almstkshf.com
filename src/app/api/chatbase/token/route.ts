@@ -24,25 +24,27 @@ export async function GET(request: NextRequest) {
         }
 
         // For now, we'll create a guest/anonymous user token
-        // You can integrate with your authentication system (Clerk, Auth0, etc.) later
         const sessionId = request.cookies.get('session_id')?.value || generateSessionId();
 
         // Get user info from your auth system
-        // For now, using anonymous/guest user
         const userPayload = {
             user_id: sessionId,
             email: 'guest@almstkshf.com',
             is_guest: true,
-            // Add any custom attributes you want to pass to Chatbase
-            // stripe_accounts: user.stripe_accounts,
-            // subscription_tier: user.subscription_tier,
         };
 
         // Generate JWT token
         const token = jwt.sign(userPayload, secret, { expiresIn: '1h' });
 
         // Set session cookie if it doesn't exist
-        const response = NextResponse.json({ token });
+        const response = NextResponse.json(
+            { token },
+            {
+                headers: {
+                    "Cache-Control": "private, max-age=0, must-revalidate",
+                },
+            }
+        );
 
         try {
             if (!request.cookies.get('session_id')) {
@@ -55,7 +57,6 @@ export async function GET(request: NextRequest) {
             }
         } catch (cookieError) {
             console.warn('Error setting session cookie:', cookieError);
-            // Verify we can still return the token even if cookie setting fails
         }
 
         return response;

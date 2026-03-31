@@ -129,7 +129,7 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <ClerkProvider dynamic={true}>
+        <ClerkProvider>
             <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
                 <head>
                     {/*

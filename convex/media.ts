@@ -1,6 +1,7 @@
 import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
+import { resolveApiKey } from "./utils/keys";
 
 // Define the expected structure from Gemini API
 interface GeminiResponse {
@@ -32,13 +33,13 @@ interface AnalysisResult {
 export const analyzeMedia = action({
     args: { text: v.string() },
     handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string }> => {
-        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         if (!apiKey) {
             console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
             return {
                 success: false,
-                error: "Media analysis service is not fully configured. Our team has been notified. (Error: CFG_MISSING)"
+                error: "The AI service is not configured. Please add your Gemini API key in Settings or contact support. (Error: CFG_MISSING)"
             };
         }
 
@@ -69,7 +70,7 @@ Return valid JSON ONLY:
         try {
             // Helper function to call Gemini API
             const callGemini = async (model: string) => {
-                console.log(`Attempting analysis with model: ${model}`);
+                console.log(`🧠 Attempting analysis with model: ${model}`);
                 const response = await fetch(
                     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
                     {
@@ -88,23 +89,37 @@ Return valid JSON ONLY:
             };
 
             // Try models in sequence
-            let response = await callGemini("gemini-2.0-flash");
+            const models = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+            let response: Response | null = null;
+            let lastError = "";
 
-            if (!response.ok && response.status === 404) {
-                console.warn("Primary model (gemini-2.0-flash) not found, attempting fallback to gemini-1.5-flash-latest...");
-                response = await callGemini("gemini-1.5-flash-latest");
+            for (const model of models) {
+                try {
+                    response = await callGemini(model);
+                    if (response.ok) break;
 
-                if (!response.ok && response.status === 404) {
-                    console.warn("Fallback model (gemini-1.5-flash-latest) not found, attempting final fallback to gemini-pro...");
-                    response = await callGemini("gemini-pro");
+                    const errText = await response.text();
+                    lastError = `Model ${model} failed (${response.status}): ${errText}`;
+                    console.warn(`⚠️ ${lastError}`);
+
+                    // Only continue if it's a 404 (model not found) or perhaps a transient error
+                    if (response.status !== 404 && response.status !== 429) {
+                        // If it's a hard error like 400 or 401, don't keep cycling
+                        break;
+                    }
+                } catch (e: any) {
+                    lastError = `Fetch failed for ${model}: ${e.message}`;
+                    console.warn(`⚠️ ${lastError}`);
                 }
             }
 
 
-            if (!response.ok) {
-                const errorBody = await response.text();
-                console.error(`Gemini API Error: ${response.status} ${response.statusText} - ${errorBody}`);
-                return { success: false, error: "The AI service is currently unavailable. Please try again in a few moments." };
+            if (!response || !response.ok) {
+                const status = response?.status || "UNKNOWN";
+                return { 
+                    success: false, 
+                    error: `The AI service is currently unavailable (Status: ${status}). Please ensure your API key and quota are active. ${lastError.substring(0, 50)}` 
+                };
             }
 
             const data = (await response.json()) as GeminiResponse;

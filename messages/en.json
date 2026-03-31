@@ -524,6 +524,10 @@
       "s3": {
         "title": "Tactical Response",
         "desc": "On-demand counter-messaging based on real-time sentiment shifts."
+      },
+      "s4": {
+        "title": "Agent Deployment",
+        "desc": "Deploy autonomous AI agents to monitor specific narratives, interact with stakeholders, or manage communication channels 24/7."
       }
     },
     "integration": {

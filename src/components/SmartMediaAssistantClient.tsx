@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTranslations } from "next-intl";
 import Container from "@/components/ui/Container";
-import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout } from "lucide-react";
+import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { useAction } from "convex/react";
@@ -39,6 +39,12 @@ export default function SmartMediaAssistantClient() {
             desc: tAi("capabilities.s3.desc"),
             icon: Zap,
             color: "text-amber-400"
+        },
+        {
+            title: tAi("capabilities.s4.title"),
+            desc: tAi("capabilities.s4.desc"),
+            icon: Bot,
+            color: "text-red-400"
         }
     ];
 
@@ -218,7 +224,7 @@ export default function SmartMediaAssistantClient() {
                         <p className="text-primary uppercase tracking-widest font-bold text-xs">{tAi("capabilities.subtitle")}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {capabilities.map((cap, idx) => (
                             <motion.div
                                 key={cap.title}
