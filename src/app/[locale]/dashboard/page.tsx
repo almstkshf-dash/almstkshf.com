@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
-import Button from '@/components/ui/Button';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
 import ManualEntryModal from '@/components/media-pulse/ManualEntryModal';
@@ -221,124 +220,128 @@ export default function DashboardPage() {
                     )}>
                         {toast.type === 'error' && <AlertTriangle className="w-4 h-4 flex-shrink-0" />}
                         <span className="text-sm font-medium">{toast.message}</span>
-                        <Button
-                            variant="ghost"
-                            size="icon"
+                        <button
                             onClick={() => setToast(null)}
-                            className="ml-2 hover:opacity-80 h-7 w-7"
+                            className="ml-2 inline-flex items-center justify-center h-7 w-7 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring flex-shrink-0"
+                            aria-label="Dismiss"
                         >
                             <X className="w-3.5 h-3.5" />
-                        </Button>
+                        </button>
                     </div>
                 )}
 
                 {/* Header */}
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
                     <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-                                {t('title')}
-                            </h1>
-                            <div className="flex bg-secondary/80 rounded-full border border-border p-1 backdrop-blur-sm">
-                                <Button
-                                    variant={activeView === 'standard' ? 'primary' : 'ghost'}
-                                    size="sm"
-                                    className={clsx(
-                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
-                                        activeView !== 'standard' && "text-muted-foreground hover:text-foreground"
-                                    )}
-                                    onClick={() => setActiveView('standard')}
-                                >
-                                    {t('filters.view_standard')}
-                                </Button>
-                                <Button
-                                    variant={activeView === 'deep' ? 'primary' : 'ghost'}
-                                    size="sm"
-                                    className={clsx(
-                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all",
-                                        activeView === 'deep' ? 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600' : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                    onClick={() => setActiveView('deep')}
-                                >
-                                    {t('filters.view_deep')}
-                                </Button>
-                                <Button
-                                    variant={activeView === 'osint' ? 'primary' : 'ghost'}
-                                    size="sm"
-                                    className={clsx(
-                                        "px-4 py-1.5 text-xs font-bold rounded-full h-auto transition-all flex items-center gap-1.5",
-                                        activeView === 'osint' ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600' : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                    onClick={() => setActiveView('osint')}
-                                    title={!isAdmin ? 'OSINT features require admin privileges' : undefined}
-                                >
-                                    {!isAdmin && <Lock className="w-3 h-3 opacity-60" />}
-                                    {t('filters.view_osint')}
-                                </Button>
-                            </div>
-                        </div>
+                        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+                            {t('title')}
+                        </h1>
                         <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
                     </div>
+
+                    {/* View Switcher — centered on mobile, inline on desktop */}
+                    <div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
+                        <button
+                            onClick={() => setActiveView('standard')}
+                            className={clsx(
+                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                activeView === 'standard'
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            )}
+                        >
+                            {t('filters.view_standard')}
+                        </button>
+                        <div className="w-px h-5 bg-border flex-shrink-0" />
+                        <button
+                            onClick={() => setActiveView('deep')}
+                            className={clsx(
+                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                activeView === 'deep'
+                                    ? 'bg-status-info-bg text-status-info-fg font-bold shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            )}
+                        >
+                            {t('filters.view_deep')}
+                        </button>
+                        <div className="w-px h-5 bg-border flex-shrink-0" />
+                        <button
+                            onClick={() => setActiveView('osint')}
+                            title={!isAdmin ? 'OSINT features require admin privileges' : undefined}
+                            className={clsx(
+                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                                activeView === 'osint'
+                                    ? 'bg-status-success-bg text-status-success-fg font-bold shadow-sm'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            )}
+                        >
+                            {!isAdmin && <Lock className="w-3 h-3 opacity-60" />}
+                            {t('filters.view_osint')}
+                        </button>
+                    </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        {/* Settings Button */}
+
+                        {/* Settings — icon-only, consistent h-9 w-9 */}
                         <HoverPrefetchLink href="/dashboard/settings" aria-label={t('settings')}>
-                            <Button
-                                variant="ghost"
-                                className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-500/10 dark:hover:bg-slate-500/20 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-transparent px-3 text-xs shadow-none h-auto w-9 flex justify-center items-center"
-                                leftIcon={<Settings className="w-3.5 h-3.5" aria-hidden="true" />}
+                            <button
+                                className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm"
                                 aria-label={t('settings')}
-                            />
+                            >
+                                <Settings className="w-4 h-4" aria-hidden="true" />
+                            </button>
                         </HoverPrefetchLink>
 
-                        {/* Add Manual Entry */}
-                        <Button
-                            variant="ghost"
+                        {/* Manual Entry */}
+                        <button
                             onClick={() => setManualModalOpen(true)}
-                            className="bg-amber-100 hover:bg-amber-200 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-transparent px-4 text-xs shadow-none h-auto"
-                            leftIcon={<Plus className="w-3.5 h-3.5" aria-hidden="true" />}
+                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm"
                         >
+                            <Plus className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
                             {t('manual_entry')}
-                        </Button>
+                        </button>
 
-                        {/* Clear All */}
+                        {/* Clear All — only shown when articles exist */}
                         {totalArticles > 0 && (
-                            <Button
-                                variant="danger"
+                            <button
                                 onClick={handleClearAll}
-                                isLoading={isClearing}
-                                className="bg-red-100 hover:bg-red-200 dark:bg-destructive/10 dark:hover:bg-destructive/20 border border-red-300 dark:border-destructive/20 text-red-700 dark:text-destructive px-4 text-xs shadow-none h-auto"
-                                leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
+                                disabled={isClearing}
+                                className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-status-error-fg/20 bg-status-error-bg text-status-error-fg text-xs font-semibold transition-all hover:bg-status-error-fg/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
+                                {isClearing
+                                    ? <span className="w-3.5 h-3.5 rounded-full border-2 border-status-error-fg/30 border-t-status-error-fg animate-spin" />
+                                    : <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                                }
                                 {t('clear_all')}
-                            </Button>
+                            </button>
                         )}
 
                         {/* Vertical Divider */}
-                        <div className="w-px h-8 bg-border mx-1" />
+                        <div className="w-px h-6 bg-border mx-0.5" />
 
-                        {/* Export Buttons */}
-                        <div className="flex bg-background rounded-xl border border-border p-0.5 shadow-sm">
-                            <Button
-                                variant="ghost"
+                        {/* Export Buttons — segmented group matching view-switcher style */}
+                        <div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
+                            <button
                                 onClick={() => handleExport('pdf')}
-                                isLoading={isExporting}
-                                disabled={filteredArticles.length === 0}
-                                className="px-3 hover:bg-muted text-xs text-foreground/70 hover:text-foreground shadow-none h-auto"
-                                leftIcon={!isExporting && <FileDown className="w-3.5 h-3.5" />}
+                                disabled={isExporting || filteredArticles.length === 0}
+                                className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold text-foreground/70 hover:text-foreground hover:bg-muted transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             >
+                                {isExporting
+                                    ? <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
+                                    : <FileDown className="w-3.5 h-3.5" aria-hidden="true" />
+                                }
                                 {t('filters.export_pdf')}
-                            </Button>
-                            <div className="w-px bg-border my-1" />
-                            <Button
-                                variant="ghost"
+                            </button>
+                            <div className="w-px h-5 bg-border flex-shrink-0" />
+                            <button
                                 onClick={() => handleExport('excel')}
                                 disabled={filteredArticles.length === 0}
-                                className="px-3 hover:bg-muted text-xs text-foreground/70 hover:text-foreground shadow-none h-auto"
-                                leftIcon={<FileSpreadsheet className="w-3.5 h-3.5" />}
+                                className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold text-foreground/70 hover:text-foreground hover:bg-muted transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                             >
+                                <FileSpreadsheet className="w-3.5 h-3.5" aria-hidden="true" />
                                 {t('filters.export_excel')}
-                            </Button>
+                            </button>
                         </div>
+
                     </div>
                 </header>
 
@@ -400,20 +403,18 @@ export default function DashboardPage() {
 
                                 <div className="flex flex-wrap gap-1.5">
                                     {sourceTypes.map((type) => (
-                                        <Button
+                                        <button
                                             key={type.id}
-                                            variant={selectedType === type.id ? 'primary' : 'secondary'}
-                                            size="sm"
                                             onClick={() => setSelectedType(type.id)}
                                             className={clsx(
-                                                "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border h-auto",
+                                                "inline-flex items-center h-8 px-3.5 rounded-lg text-xs font-bold transition-all border",
                                                 selectedType === type.id
-                                                    ? 'bg-primary/10 border-primary/30 text-primary shadow-none'
-                                                    : 'bg-muted border-border text-muted-foreground hover:bg-muted/80 hover:text-foreground shadow-none'
+                                                    ? 'bg-primary/10 border-primary/30 text-primary'
+                                                    : 'bg-muted border-border text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                                             )}
                                         >
                                             {type.label}
-                                        </Button>
+                                        </button>
                                     ))}
                                 </div>
                             </div>
@@ -423,13 +424,12 @@ export default function DashboardPage() {
                                     <ArticleTable articles={filteredArticles} limit={50} />
                                     {result?.nextSkip !== null && (
                                         <div className="flex justify-center py-4">
-                                            <Button
-                                                variant="secondary"
+                                            <button
                                                 onClick={() => setSkip(result.nextSkip || 0)}
-                                                className="px-4 py-2 bg-muted border border-border rounded-lg text-sm font-bold hover:bg-background h-auto"
+                                                className="inline-flex items-center h-9 px-5 bg-muted border border-border rounded-lg text-sm font-semibold text-foreground hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                             >
                                                 {t('filters.load_more')}
-                                            </Button>
+                                            </button>
                                         </div>
                                     )}
                                 </>

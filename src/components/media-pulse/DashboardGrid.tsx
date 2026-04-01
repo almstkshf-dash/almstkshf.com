@@ -239,31 +239,76 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     />
                 </motion.div>
 
-                    {analytics?.geography && Object.keys(analytics.geography).length > 0 && (
+                {/* Geographic Reach — proper card with ranked bars */}
+                {analytics?.geography && Object.keys(analytics.geography).length > 0 && (() => {
+                    const geoEntries = Object.entries(analytics.geography)
+                        .sort(([, a], [, b]) => (b as number) - (a as number))
+                        .slice(0, 5);
+                    const maxCount = (geoEntries[0]?.[1] as number) || 1;
+                    return (
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.4 }}
-                            className="pt-4 border-t border-border mt-4"
+                            className="p-6 bg-card border border-border rounded-2xl space-y-5 shadow-sm transition-colors"
                         >
-                            <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <Globe className="w-3 h-3" />
-                                {tDashboard('geography')}
-                            </h5>
-                            <div className="space-y-2">
-                                {Object.entries(analytics.geography).slice(0, 3).map(([code, count]) => (
-                                    <div key={code} className="flex items-center justify-between text-xs transition-colors">
-                                        <span className="font-bold flex items-center gap-2">
-                                            <span className="w-4 h-3 bg-muted rounded-sm text-[8px] flex items-center justify-center">{code}</span>
-                                            {code}
-                                        </span>
-                                        <span className="text-muted-foreground">{count as number} {tDashboard('articles_count')}</span>
-                                    </div>
-                                ))}
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-foreground font-bold text-xs tracking-wider flex items-center gap-2 transition-colors">
+                                    <Globe className="w-3.5 h-3.5 text-primary" />
+                                    {tDashboard('geography')}
+                                </h4>
+                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md border border-border transition-colors">
+                                    TOP {geoEntries.length}
+                                </span>
+                            </div>
+                            <div className="space-y-3.5">
+                                {geoEntries.map(([code, count], index) => {
+                                    const pct = Math.round(((count as number) / maxCount) * 100);
+                                    return (
+                                        <div key={code} className="space-y-1.5">
+                                            <div className="flex items-center justify-between">
+                                                <span className="flex items-center gap-2">
+                                                    <span className={clsx(
+                                                        "inline-flex items-center justify-center min-w-[2.5rem] h-5 px-1.5 rounded text-[9px] font-black uppercase tracking-tight border transition-colors",
+                                                        index === 0
+                                                            ? "bg-primary text-primary-foreground border-primary/30 shadow-sm shadow-primary/20"
+                                                            : "bg-muted text-muted-foreground border-border"
+                                                    )}>
+                                                        {code}
+                                                    </span>
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground tabular-nums">
+                                                    <span className={clsx("font-black", index === 0 ? "text-primary" : "text-foreground")}>
+                                                        {pct}%
+                                                    </span>
+                                                    {" · "}
+                                                    {count as number} {tDashboard('articles_count')}
+                                                </span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden transition-colors">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    whileInView={{ width: `${pct}%` }}
+                                                    viewport={{ once: true }}
+                                                    transition={{ duration: 0.9, ease: "easeOut", delay: index * 0.07 }}
+                                                    className={clsx(
+                                                        "h-full rounded-full",
+                                                        index === 0
+                                                            ? "bg-primary shadow-sm"
+                                                            : index === 1
+                                                                ? "bg-primary/60"
+                                                                : "bg-primary/30"
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </motion.div>
-                    )}
+                    );
+                })()}
 
                 <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-2 shadow-sm transition-all group hover:bg-primary/10">
                     <Zap className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
