@@ -117,3 +117,77 @@ MISSING_MESSAGE: Could not resolve `Namespace.key` in messages for locale `ar`
 3. Check Vercel deployment logs at vercel.com
 4. Verify Stripe webhook endpoint in Stripe dashboard
 5. Test a critical authenticated flow in production
+
+---
+
+## Chart Component Quick Reference
+
+### getCSSVar — resolving CSS tokens for Recharts / SVG
+
+```typescript
+function getCSSVar(name: string): string {
+    if (typeof window === "undefined") return "";
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+// In useEffect — run once on mount:
+useEffect(() => {
+    setColors({
+        // Tokens stored as hex → use directly
+        primary:  getCSSVar("--primary"),
+        border:   getCSSVar("--border"),
+        popover:  getCSSVar("--popover"),
+        mutedFg:  getCSSVar("--muted-foreground"),
+        // Status tokens stored as bare HSL components → wrap with hsl()
+        success:  `hsl(${getCSSVar("--status-success")})`,
+        warning:  `hsl(${getCSSVar("--status-warning")})`,
+        error:    `hsl(${getCSSVar("--status-error")})`,
+    });
+}, []);
+```
+
+> ⚠️ Provide **fallback hex values** in the `useState({})` initialiser for SSR safety.
+
+### New chart component checklist
+
+- [ ] `"use client"` directive at the top
+- [ ] `useState(false)` for `mounted` — return early skeleton if not mounted
+- [ ] `useState({...fallbackHex})` for `colors`
+- [ ] `useEffect` calling `getCSSVar()` to populate colors
+- [ ] Pass resolved color strings (not CSS variable strings) to Recharts props
+
+---
+
+## Dashboard Button Quick Reference (`dashboard/page.tsx`)
+
+This file uses **native `<button>` elements only** — the `Button` component is not imported here.
+
+```tsx
+{/* Icon-only — settings */}
+<button className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm">
+    <IconName className="w-4 h-4" />
+</button>
+
+{/* Text + icon — manual entry style */}
+<button className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm">
+    <Plus className="w-3.5 h-3.5 text-primary" />
+    Label
+</button>
+
+{/* Segmented group — view switcher / export */}
+<div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
+    <button className="inline-flex items-center h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-muted-foreground hover:text-foreground hover:bg-muted">
+        Inactive
+    </button>
+    <div className="w-px h-5 bg-border flex-shrink-0" />
+    <button className="inline-flex items-center h-9 px-4 text-xs font-semibold bg-primary text-primary-foreground shadow-sm">
+        Active
+    </button>
+</div>
+
+{/* Destructive — clear all style */}
+<button className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-status-error-fg/20 bg-status-error-bg text-status-error-fg text-xs font-semibold transition-all hover:bg-status-error-fg/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+    <Trash2 className="w-3.5 h-3.5" />
+    Label
+</button>
+```

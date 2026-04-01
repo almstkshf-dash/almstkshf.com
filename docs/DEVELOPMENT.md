@@ -118,14 +118,17 @@ almstkshf.com/
 │   │
 │   ├── components/
 │   │   ├── media-pulse/    # Dashboard-specific components
-│   │   │   ├── ArticleTable.tsx
-│   │   │   ├── DashboardGrid.tsx
-│   │   │   ├── DeepStatusPanel.tsx
-│   │   │   ├── ManualEntryModal.tsx
-│   │   │   ├── NewsGenerator.tsx
-│   │   │   ├── OsintTab.tsx
-│   │   │   └── PressReleasePanel.tsx
-│   │   ├── ui/             # Reusable primitives (Button, etc.)
+│   │   │   ├── DashboardGrid.tsx       # KPI card orchestrator + geographic reach
+│   │   │   ├── ArticleTable.tsx        # Coverage log table
+│   │   │   ├── ManualEntryModal.tsx    # Manual article form
+│   │   │   ├── ArticlesTrendChart.tsx  # Area chart (runtime CSS var resolution)
+│   │   │   ├── SentimentDonutChart.tsx # Half-donut NSS gauge
+│   │   │   ├── EmotionRadarChart.tsx   # Emotion radar chart
+│   │   │   ├── DeepStatusPanel.tsx     # Deep web scan UI
+│   │   │   ├── NewsGenerator.tsx       # Monitoring form
+│   │   │   ├── OsintTab.tsx            # OSINT engine
+│   │   │   └── PressReleasePanel.tsx   # PR wire sync
+│   │   ├── ui/             # Reusable primitives (Button, HoverPrefetchLink, etc.)
 │   │   └── *.tsx           # Page-level client components
 │   │
 │   ├── lib/
@@ -247,7 +250,60 @@ This is handled in `src/lib/gemini-key-resolver.ts`.
 
 ---
 
-## 10. Deployment (Vercel)
+## 10. Chart Color Resolution
+
+CSS variables in `globals.css` store **raw hex values** (e.g. `--primary: #2563EB`). When you use these inside Recharts or SVG attributes, `hsl(var(--primary))` produces invalid CSS (`hsl(#2563EB)`) and renders as black or transparent.
+
+**The pattern for all chart components:**
+
+```typescript
+// Resolve at mount time, not at render time
+function getCSSVar(name: string): string {
+    if (typeof window === "undefined") return "";
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+useEffect(() => {
+    setColors({
+        primary: getCSSVar("--primary"),       // hex → use directly
+        border:  getCSSVar("--border"),         // hex → use directly
+        popover: getCSSVar("--popover"),        // hex → use directly
+        // Status tokens are bare HSL components (e.g. "158 64% 52%") → wrap with hsl()
+        success: `hsl(${getCSSVar("--status-success")})`,
+        warning: `hsl(${getCSSVar("--status-warning")})`,
+        error:   `hsl(${getCSSVar("--status-error")})`,
+    });
+}, []);
+```
+
+> **Rule:** Always provide fallback hex values in the initial `useState({})` call so the component renders correctly on the server (no `window`) and before hydration.
+
+---
+
+## 11. Dashboard Button System
+
+`src/app/[locale]/dashboard/page.tsx` does **not** import the `Button` component. All interactive controls are native `<button>` elements with explicit Tailwind classes. This was deliberately chosen to eliminate height/shape inconsistency from the `Button` component's internal sizing system.
+
+**The unified spec for all buttons in this file:**
+
+| Property | Value |
+|---|---|
+| Height | `h-9` (strict, no `h-auto`) |
+| Text | `text-xs font-semibold` |
+| Shape | `rounded-lg` |
+| Focus | `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring` |
+| Icon size | `w-3.5 h-3.5` |
+
+**Three visual tiers:**
+1. **Segmented groups** (view switcher, export buttons) — `overflow-hidden` container, `border border-border`, `bg-muted/50`, separator `<div className="w-px h-5 bg-border" />`
+2. **Standalone actions** (Settings icon, Manual Entry) — `rounded-lg border border-border bg-muted/50 shadow-sm`
+3. **Destructive action** (Clear All) — `border-status-error-fg/20 bg-status-error-bg text-status-error-fg`
+
+> **Do not re-add the `Button` component import** to this file. If you need a new button, follow the native `<button>` pattern above.
+
+---
+
+## 12. Deployment (Vercel)
 
 1. Push to `main` branch on GitHub
 2. Vercel auto-deploys via GitHub integration
@@ -266,7 +322,7 @@ This is handled in `src/lib/gemini-key-resolver.ts`.
 
 ---
 
-## 11. Common Errors & Fixes
+## 12. Common Errors & Fixes
 
 | Error | Cause | Fix |
 |---|---|---|
@@ -275,3 +331,7 @@ This is handled in `src/lib/gemini-key-resolver.ts`.
 | `MIDDLEWARE_INVOCATION_FAILED` | Convex or Node.js API used in middleware | Remove any Convex calls from `src/middleware.ts` |
 | `Not authenticated` in Convex action | Missing auth context | Ensure `ctx.auth.getUserIdentity()` is checked, not skipped |
 | Duplicate locale in URL `/en/en/` | Middleware applying locale twice | Check `isPublicRoute` matcher isn't double-wrapping intl |
+| Chart renders black/transparent | `hsl(var(--token))` in SVG — tokens are hex, not HSL components | Use `getCSSVar()` pattern — see §10 above |
+| `ReferenceError: Button is not defined` | `Button` import removed from `dashboard/page.tsx` but usages remain | Convert remaining `<Button>` to native `<button>` — see §11 above |
+| Recharts tooltip `payload` type error | `payload` is `readonly any[]` — cannot be spread into typed interface | Inline the render callback or cast with `as { value?: number }` |
+| `Session History Item Has Been Marked Skippable` | Programmatic navigation pushing sign-in redirect to history stack | Use `router.replace()` instead of `router.push()` for auth redirects |

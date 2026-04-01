@@ -22,9 +22,16 @@ All documentation lives in the [`docs/`](./docs/) folder:
 
 | Document | Description |
 |---|---|
-| [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Full system architecture — stack, routes, DB schema, components, middleware |
-| [DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Developer guide — setup, env vars, adding features, deployment, common errors |
+| [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Full system architecture — stack, routes, DB schema, components, middleware, critical patterns |
+| [DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Developer guide — setup, env vars, adding features, chart patterns, button system, deployment, common errors |
+| [DEVELOPMENT_SPEED.md](./docs/DEVELOPMENT_SPEED.md) | Quick-reference patterns: Convex hooks, translations, getCSSVar for charts, dashboard button snippets |
 | [MIDDLEWARE_AUDIT.md](./docs/MIDDLEWARE_AUDIT.md) | Middleware logic and Edge Runtime constraints |
+
+Root-level audit files:
+
+| Document | Description |
+|---|---|
+| [DASHBOARD_PRODUCTION_AUDIT.md](./DASHBOARD_PRODUCTION_AUDIT.md) | Known production issues, security gaps, and fix priority order |
 
 ---
 

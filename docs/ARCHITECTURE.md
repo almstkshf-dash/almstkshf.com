@@ -1,6 +1,6 @@
 # System Architecture — almstkshf.com
 
-> **Last updated:** March 2026  
+> **Last updated:** April 2026  
 > **Stack:** Next.js 15 · Convex · Clerk · Stripe · next-intl · Tailwind CSS v4 · Google Gemini · Chatbase · Resend · Upstash Redis
 
 ---
@@ -149,15 +149,11 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `Footer.tsx` | Every page | Footer links, legal, address |
 | `HomeClient.tsx` | `/` | Landing page (hero, AI demo, clients, FAQ) |
 | `FreeInsightTool.tsx` | Landing | Free AI sentiment demo widget |
-| `DashboardGrid.tsx → via dashboard page` | Dashboard | Live KPI dashboard grid |
-| `ArticleTable.tsx` | Dashboard | Article listing, filtering, delete, export |
-| `ManualEntryModal.tsx` | Dashboard | Manual article CRUD form |
 | `SentimentTracker.tsx` | Dashboard | Live sentiment chart |
 | `NewsGenerator.tsx` | Dashboard | Monitoring form UI |
 | `OsintTab.tsx` | Dashboard | OSINT engine + external resource directory |
 | `DeepStatusPanel.tsx` | Dashboard | Deep web scan config + run history |
 | `PressReleasePanel.tsx` | Dashboard | PR wire sync |
-| `DashboardGrid.tsx` | Dashboard | KPI widget grid |
 | `LexcoraClient.tsx` | `/case-studies/lexcora` | Lexcora ERP showcase |
 | `StylingAssistantClient.tsx` | `/case-studies/styling-assistant` | VA showcase + waitlist |
 | `SmartMediaAssistantClient.tsx` | Media monitoring pages | Smart assistant embed |
@@ -173,6 +169,21 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `ThemeToggle.tsx` | Navbar | Theme switch button |
 | `ReportLibrary.tsx` | Media Monitoring | Report card grid view |
 | `ReportsChart.tsx` | Media Monitoring | Analytics charts |
+
+### Media Pulse components (`src/components/media-pulse/`)
+
+All dashboard-specific data visualisation and table components live here.
+
+| Component | Purpose |
+|---|---|
+| `DashboardGrid.tsx` | Main KPI orchestrator — layouts all analytics cards and the geographic reach sidebar |
+| `ArticleTable.tsx` | Coverage log table with sentiment badges, source filters, and delete actions |
+| `ManualEntryModal.tsx` | Manual article CRUD form (modal) |
+| `ArticlesTrendChart.tsx` | Area chart — article volume over time. Resolves CSS vars at runtime via `getCSSVar()` |
+| `SentimentDonutChart.tsx` | Half-donut gauge showing positive/neutral/negative split with NSS index overlay |
+| `EmotionRadarChart.tsx` | Radar chart for emotion distribution across articles |
+
+> ⚠️ **Color Resolution Rule:** All chart components that use Recharts or SVG must resolve CSS variables at runtime using `getComputedStyle(document.documentElement).getPropertyValue('--var-name')`. Direct `var(--token)` or `hsl(var(--token))` strings are **not valid** in SVG fill/stroke attributes and will render as black or transparent.
 
 ### Utility library (`src/lib/`)
 | File | Purpose |
@@ -277,6 +288,8 @@ User sets keyword + countries + languages
 4. **useMemo / useState** — always declare all state variables referenced in dependency arrays.
 5. **Translation keys** — always add new keys to BOTH `ar.json` AND `en.json` simultaneously to prevent `MISSING_MESSAGE` errors.
 6. **Deep web & OSINT** — these run as Convex `action` (Node.js runtime), not queries/mutations.
+7. **Chart color resolution** — do NOT use `hsl(var(--token))` in Recharts or SVG attributes. CSS variables in this project store hex values (e.g. `#2563EB`), so `hsl(#hex)` is invalid. Always call `getComputedStyle(document.documentElement).getPropertyValue('--token').trim()` at component mount time and pass the resolved string to chart props. Status tokens (`--status-success`, etc.) store bare HSL components (e.g. `158 64% 52%`) and must be wrapped: `` `hsl(${resolvedValue})` ``.
+8. **Button system in `dashboard/page.tsx`** — this file uses native `<button>` elements exclusively (the `Button` component import was removed). All buttons share `h-9` height, `text-xs font-semibold`, `rounded-lg`, and `border border-border`. Do not re-introduce the `Button` component import; maintain the native system for consistency.
 
 ---
 
