@@ -15,29 +15,29 @@ export default function PressClient() {
             icon: Globe,
             titleKey: "features.digital_print.title",
             descKey: "features.digital_print.desc",
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Send,
             titleKey: "features.publisher.title",
             descKey: "features.publisher.desc",
-            color: "text-emerald-400",
-            bg: "bg-emerald-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: BarChart,
             titleKey: "features.analytics.title",
             descKey: "features.analytics.desc",
-            color: "text-indigo-400",
-            bg: "bg-indigo-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Bell,
             titleKey: "features.alerts.title",
             descKey: "features.alerts.desc",
-            color: "text-amber-400",
-            bg: "bg-amber-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         }
     ];
 

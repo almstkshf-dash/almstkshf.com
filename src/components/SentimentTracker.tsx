@@ -85,21 +85,21 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-foreground font-bold text-lg flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-amber-500" />
+                    <Activity className="w-5 h-5 text-status-warning-fg" />
                     {t('title')}
                 </h3>
-                <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
+                <div className="px-3 py-1 bg-status-success-bg border border-status-success/20 rounded-full flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
                         <span className={clsx(
                             "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-                            hasData ? "bg-emerald-400" : "bg-slate-500"
+                            hasData ? "bg-status-success" : "bg-muted-foreground/50"
                         )}></span>
                         <span className={clsx(
                             "relative inline-flex rounded-full h-2 w-2",
-                            hasData ? "bg-emerald-500" : "bg-muted-foreground/30"
+                            hasData ? "bg-status-success" : "bg-muted-foreground/30"
                         )}></span>
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                    <span className="text-[10px] font-bold text-status-success-fg uppercase tracking-widest">
                         {hasData ? t('live') : t('awaiting_data')}
                     </span>
                 </div>
@@ -107,7 +107,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
             {!hasData && (
                 <div className="p-6 bg-muted/20 border border-border rounded-2xl text-center">
-                    <Zap className="w-5 h-5 text-amber-500/30 mx-auto mb-2" />
+                    <Zap className="w-5 h-5 text-status-warning-fg/50 mx-auto mb-2" />
                     <p className="text-muted-foreground text-xs">{t('no_data_message')}</p>
                 </div>
             )}

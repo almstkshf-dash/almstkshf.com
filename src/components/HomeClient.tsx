@@ -36,15 +36,15 @@ export default function HomeClient() {
             id: 'ai_agent',
             icon: Zap,
             color: 'from-purple-500 to-pink-600',
-            bg: 'bg-purple-500/10',
-            border: 'border-purple-500/20'
+            bg: 'bg-primary/10',
+            border: 'border-primary/20'
         },
         {
             id: 'sentiment',
             icon: ShieldCheck,
             color: 'from-emerald-500 to-teal-600',
-            bg: 'bg-emerald-500/10',
-            border: 'border-emerald-500/20'
+            bg: 'bg-primary/10',
+            border: 'border-primary/20'
         }
     ];
 
@@ -86,8 +86,8 @@ export default function HomeClient() {
                     </motion.div>
 
                     {/* Gradient Fades for the edges */}
-                    <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10"></div>
-                    <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10"></div>
+                    <div className="absolute inset-y-0 left-0 w-32 bg-primary/10 z-10"></div>
+                    <div className="absolute inset-y-0 right-0 w-32 bg-primary/10 z-10"></div>
                 </div>
             </section>
 
@@ -179,7 +179,7 @@ export default function HomeClient() {
                                 className={clsx(
                                     "relative p-10 rounded-[2.5rem] border transition-all h-full group overflow-hidden shadow-sm hover:shadow-xl",
                                     feature.border,
-                                    "bg-card hover:bg-card/80 backdrop-blur-2xl"
+                                    "bg-card hover:bg-card/80"
                                 )}
                             >
                                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -206,12 +206,12 @@ export default function HomeClient() {
                                             <div className="h-1.5 w-1/2 bg-muted rounded-full"></div>
                                         </div>
                                         <div className="flex gap-2">
-                                            <div className="h-1.5 w-2/3 bg-indigo-500 rounded-full"></div>
+                                            <div className="h-1.5 w-2/3 bg-primary rounded-full"></div>
                                             <div className="h-1.5 w-1/4 bg-muted rounded-full"></div>
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
                                             <BarChart3 className="w-4 h-4 text-primary" />
-                                            <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                            <TrendingUp className="w-4 h-4 text-primary" />
                                         </div>
                                     </div>
                                 )}
@@ -233,7 +233,7 @@ export default function HomeClient() {
                                             ))}
                                         </div>
                                         <div className="h-2 flex-1 bg-muted rounded-full overflow-hidden">
-                                            <div className="h-full bg-emerald-500 w-[85%]"></div>
+                                            <div className="h-full bg-primary w-[85%]"></div>
                                         </div>
                                     </div>
                                 )}

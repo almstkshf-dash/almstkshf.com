@@ -28,26 +28,26 @@ export default function CrisisManagementClient() {
         {
             icon: ShieldAlert,
             key: "intelligence_sentiment",
-            color: "text-rose-400",
-            bg: "bg-rose-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Activity,
             key: "trend_anomaly",
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Network,
             key: "audience_mapping",
-            color: "text-indigo-400",
-            bg: "bg-indigo-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: BarChart3,
             key: "benchmarking",
-            color: "text-emerald-400",
-            bg: "bg-emerald-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         }
     ];
 
@@ -61,13 +61,12 @@ export default function CrisisManagementClient() {
         <div className="space-y-32 pb-24 bg-background text-foreground">
             {/* Hero Section */}
             <section className="relative pt-16 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-rose-600/10 blur-[120px] rounded-full -z-10"></div>
                 <Container>
                     <div className="max-w-4xl mx-auto text-center space-y-8">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-[0.2em]"
+                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-[0.2em]"
                         >
                             <ShieldCheck className="w-4 h-4" />
                             <span>{t("cover_label")}</span>
@@ -103,12 +102,12 @@ export default function CrisisManagementClient() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1 }}
-                                className="group p-10 rounded-[2.5rem] bg-card border border-border hover:border-rose-500/30 transition-all duration-500 backdrop-blur-3xl shadow-sm hover:shadow-xl"
+                                className="group p-10 rounded-[2.5rem] bg-card border border-border hover:border-primary/30 transition-all duration-500 shadow-sm hover:shadow-xl"
                             >
                                 <div className={`w-16 h-16 rounded-2xl ${feature.bg} ${feature.color} flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
                                     <feature.icon className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-rose-400 transition-colors">
+                                <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-primary transition-colors">
                                     {t(`features.${feature.key}.title`)}
                                 </h3>
                                 <p className="text-muted-foreground leading-relaxed font-light">
@@ -121,12 +120,11 @@ export default function CrisisManagementClient() {
             </section>
 
             {/* Multimedia OSINT Section */}
-            <section className="relative py-24 bg-slate-900/20 border-y border-slate-900 overflow-hidden">
-                <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
-                <Container className="relative z-10">
+            <section className="py-24 bg-muted border-y border-border">
+                <Container>
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                         <div className="lg:col-span-12 max-w-3xl space-y-8 mb-16">
-                            <div className="inline-flex p-3 rounded-2xl bg-indigo-500/10 text-indigo-400">
+                            <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary">
                                 <Globe className="w-8 h-8" />
                             </div>
                             <h2 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
@@ -148,7 +146,7 @@ export default function CrisisManagementClient() {
                                         viewport={{ once: true }}
                                         className="p-8 rounded-3xl bg-card border border-border space-y-6 shadow-sm"
                                     >
-                                        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-indigo-400 border border-border">
+                                        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-primary border border-border">
                                             <Icon className="w-6 h-6" />
                                         </div>
                                         <div>
@@ -164,7 +162,7 @@ export default function CrisisManagementClient() {
             </section>
 
             {/* Advanced Infrastructure Section */}
-            <section className="py-24 bg-slate-950">
+            <section className="py-24 bg-background">
                 <Container>
                     <div className="text-center mb-20 space-y-4">
                         <motion.h2
@@ -184,13 +182,13 @@ export default function CrisisManagementClient() {
                         {/* Column 1: Monitoring & Coverage */}
                         <div className="space-y-8">
                             {[
-                                { key: "global_entity", icon: Activity, color: "text-blue-400" },
-                                { key: "transnational", icon: Globe, color: "text-indigo-400" }
+                                { key: "global_entity", icon: Activity, color: "text-primary" },
+                                { key: "transnational", icon: Globe, color: "text-primary" }
                             ].map((item, idx) => (
                                 <motion.div
                                     key={item.key}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: idx * 0.2 }}
                                     className="p-8 rounded-3xl bg-card border border-border hover:bg-muted/50 transition-colors group shadow-sm"
@@ -201,7 +199,7 @@ export default function CrisisManagementClient() {
                                     <h3 className="text-xl font-bold text-foreground mb-4">{t(`advanced_infrastructure.items.${item.key}.title`)}</h3>
                                     <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
                                     <div className="pt-4 border-t border-border flex items-center gap-3">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
                                     </div>
                                 </motion.div>
@@ -213,28 +211,9 @@ export default function CrisisManagementClient() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="lg:row-span-2 p-8 rounded-[3rem] bg-gradient-to-b from-blue-600/10 to-indigo-600/5 border border-blue-500/20 flex flex-col items-center justify-center text-center overflow-hidden relative"
+                            className="lg:row-span-2 p-8 rounded-[3rem] bg-card border border-border flex flex-col items-center justify-center text-center overflow-hidden"
                         >
-                            {/* Animated Background Rings */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                    className="absolute w-[400px] h-[400px] border border-blue-500/30 rounded-full"
-                                ></motion.div>
-                                <motion.div
-                                    animate={{ rotate: -360 }}
-                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                    className="absolute w-[300px] h-[300px] border border-dashed border-indigo-500/40 rounded-full"
-                                ></motion.div>
-                                <motion.div
-                                    animate={{ scale: [1, 1.1, 1] }}
-                                    transition={{ duration: 4, repeat: Infinity }}
-                                    className="absolute w-[200px] h-[200px] bg-blue-500/10 blur-3xl rounded-full"
-                                ></motion.div>
-                            </div>
-
-                            <div className="relative z-10 space-y-8 w-full">
+                            <div className="space-y-8 w-full">
                                 <div className="space-y-2">
                                     <span className="text-xs font-bold text-primary uppercase tracking-widest">{t('visual_data.global_status')}</span>
                                     <h3 className="text-3xl font-bold text-foreground tracking-tight">{t('visual_data.extraction')}</h3>
@@ -242,9 +221,9 @@ export default function CrisisManagementClient() {
 
                                 {/* Mock Data Chart / Visual */}
                                 <div className="w-full bg-background/50 rounded-2xl p-6 border border-border space-y-4 shadow-inner">
-                                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase">
+                                    <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase">
                                         <span>{t('visual_data.flow')}</span>
-                                        <span className="text-emerald-400">98.4% {t('visual_data.efficiency')}</span>
+                                        <span className="text-primary">98.4% {t('visual_data.efficiency')}</span>
                                     </div>
                                     <div className="flex items-end justify-between h-20 gap-1">
                                         {[40, 70, 45, 90, 65, 80, 55, 95, 75, 60].map((h, i) => (
@@ -253,16 +232,16 @@ export default function CrisisManagementClient() {
                                                 initial={{ height: 0 }}
                                                 whileInView={{ height: `${h}%` }}
                                                 transition={{ delay: i * 0.05, duration: 1 }}
-                                                className="flex-1 bg-gradient-to-t from-blue-600 to-indigo-500 rounded-t-sm"
+                                                className="flex-1 bg-primary rounded-t-sm"
                                             ></motion.div>
                                         ))}
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 pt-2">
-                                        <div className="text-left">
+                                        <div className="text-start">
                                             <div className="text-lg font-bold text-foreground">12.4M</div>
                                             <div className="text-[8px] text-muted-foreground uppercase tracking-wider">{t('visual_data.entries')}</div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <div className="text-lg font-bold text-foreground">~45ms</div>
                                             <div className="text-[8px] text-muted-foreground uppercase tracking-wider">{t('visual_data.latency')}</div>
                                         </div>
@@ -282,14 +261,14 @@ export default function CrisisManagementClient() {
                         {/* Column 3: Tech & Security */}
                         <div className="space-y-8">
                             {[
-                                { key: "query_eng", icon: Zap, color: "text-amber-400" },
-                                { key: "data_extraction", icon: Zap, color: "text-emerald-400" },
-                                { key: "stealth_collection", icon: ShieldAlert, color: "text-rose-400" }
+                                { key: "query_eng", icon: Zap, color: "text-primary" },
+                                { key: "data_extraction", icon: Zap, color: "text-primary" },
+                                { key: "stealth_collection", icon: ShieldAlert, color: "text-primary" }
                             ].map((item, idx) => (
                                 <motion.div
                                     key={item.key}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: idx * 0.2 }}
                                     className="p-8 rounded-3xl bg-card border border-border hover:bg-muted/50 transition-colors group shadow-sm"

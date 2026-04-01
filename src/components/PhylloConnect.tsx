@@ -85,7 +85,7 @@ export default function PhylloConnectButton({ className, label = "Connect Social
                 variant="primary"
                 onClick={openPhyllo}
                 isLoading={isConnecting}
-                className={className || "flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 h-auto"}
+                className={className || "flex items-center gap-2 px-6 py-3 bg-primary hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 h-auto"}
                 leftIcon={!isConnecting && <Link2 className="w-5 h-5" />}
             >
                 {label}

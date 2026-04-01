@@ -56,7 +56,7 @@ export default function LexcoraClient() {
         <main className="min-h-screen pb-20 bg-background text-foreground">
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/10 to-transparent blur-3xl rounded-full opacity-30 pointer-events-none transition-opacity duration-300"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-primary/10 blur-3xl rounded-full opacity-30 pointer-events-none transition-opacity duration-300"></div>
 
                 <Container className="relative z-10">
                     <div className="flex flex-col lg:flex-row items-center gap-16">
@@ -73,7 +73,7 @@ export default function LexcoraClient() {
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-6xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground transition-colors duration-300"
+                                className="text-6xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-primary/10 transition-colors duration-300"
                             >
                                 {t("title")}
                             </motion.h1>
@@ -114,7 +114,7 @@ export default function LexcoraClient() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="flex-1 w-full max-w-xl relative rounded-3xl border border-border bg-card/50 backdrop-blur-xl group shadow-2xl shadow-primary/20 transition-all duration-300"
+                            className="flex-1 w-full max-w-xl relative rounded-3xl border border-border bg-card/50  group shadow-2xl shadow-primary/20 transition-all duration-300"
                         >
                             <Image
                                 src="/lexcora_dashboard.png"
@@ -248,14 +248,14 @@ export default function LexcoraClient() {
                                         )}
                                         {key === "customization" && (
                                             <div className="flex gap-2">
-                                                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                                                <div className="w-4 h-4 rounded-full bg-indigo-500"></div>
-                                                <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
                                             </div>
                                         )}
                                         {key === "financials" && (
                                             <div className="h-4 w-full bg-muted rounded overflow-hidden">
-                                                <div className="h-full bg-emerald-500/50 w-2/3"></div>
+                                                <div className="h-full bg-primary/50 w-2/3"></div>
                                             </div>
                                         )}
                                         {(key === "what_is" || key === "database") && (
@@ -292,7 +292,7 @@ export default function LexcoraClient() {
             <section className="py-24">
                 <Container>
                     <div className="relative rounded-[3rem] overflow-hidden bg-primary p-12 md:p-24 text-center space-y-8 shadow-2xl shadow-primary/30">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        <div className="absolute inset-0 bg-primary/10"></div>
                         <h2 className="text-4xl md:text-6xl font-bold relative z-10 text-primary-foreground">{t("cta_ready")}</h2>
                         <p className="text-primary-foreground/90 text-lg max-w-2xl mx-auto relative z-10">
                             {t("cta_join")}
@@ -306,7 +306,7 @@ export default function LexcoraClient() {
                             </Link>
                             <Link
                                 href={`/${locale}/contact`}
-                                className="px-10 py-5 bg-primary-foreground/10 text-primary-foreground border border-primary-foreground/20 rounded-2xl font-bold hover:scale-105 transition-all backdrop-blur-sm hover:bg-primary-foreground/20"
+                                className="px-10 py-5 bg-primary-foreground/10 text-primary-foreground border border-primary-foreground/20 rounded-2xl font-bold hover:scale-105 transition-all  hover:bg-primary-foreground/20"
                             >
                                 {t("cta_demo")}
                             </Link>

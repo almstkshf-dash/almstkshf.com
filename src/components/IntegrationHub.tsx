@@ -44,37 +44,36 @@ export default function IntegrationHub() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden group hover:border-blue-500/30 transition-all"
+                        className="bg-card border border-border rounded-2xl overflow-hidden group hover:border-primary/30 transition-all"
                     >
                         <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex gap-4">
                                 <div className={clsx(
                                     "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
-                                    item.status === "connected" ? "bg-blue-500/10 text-blue-400" : "bg-slate-800 text-slate-500"
+                                    item.status === "connected" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                                 )}>
                                     <Key className="w-6 h-6" />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-3">
-                                        <h4 className="text-white font-bold">{item.name}</h4>
+                                        <h4 className="text-foreground font-bold">{item.name}</h4>
                                         <span className={clsx(
                                             "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
-                                            item.status === "connected" ? "border-emerald-500/20 text-emerald-500 bg-emerald-500/5" : "border-slate-800 text-slate-500 bg-slate-900"
+                                            item.status === "connected" ? "border-emerald-500/20 text-emerald-500 bg-emerald-500/5" : "border-border text-muted-foreground bg-muted"
                                         )}>
                                             {item.status}
                                         </span>
                                     </div>
-                                    <p className="text-slate-500 text-sm mt-1">{item.description}</p>
+                                    <p className="text-muted-foreground text-sm mt-1">{item.description}</p>
                                 </div>
                             </div>
-
                             <div className="flex items-center gap-3">
                                 {item.status === "connected" ? (
-                                    <Button variant="outline" size="sm" className="text-rose-400 border-rose-500/20 hover:bg-rose-500/5">
+                                    <Button variant="outline" size="sm" className="text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive">
                                         Revoke
                                     </Button>
                                 ) : (
-                                    <Button variant="primary" size="sm" className="bg-blue-600 hover:bg-blue-500">
+                                    <Button variant="primary" size="sm" className="bg-primary hover:bg-primary/90">
                                         Connect
                                     </Button>
                                 )}
@@ -82,18 +81,18 @@ export default function IntegrationHub() {
                         </div>
 
                         {item.apiKey && (
-                            <div className="px-6 py-4 bg-slate-950/50 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="px-6 py-4 bg-muted/50 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2">API Key</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">API Key</p>
                                     <div className="flex items-center gap-3 font-mono text-sm">
-                                        <span className="text-slate-400 truncate max-w-[200px] md:max-w-none">
+                                        <span className="text-muted-foreground truncate max-w-[200px] md:max-w-none">
                                             {showKey[item.id] ? item.apiKey : "••••••••••••••••••••••••••••"}
                                         </span>
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => toggleKey(item.id)}
-                                            className="text-slate-500 hover:text-white transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                            className="text-muted-foreground hover:text-foreground transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                                         >
                                             {showKey[item.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </Button>
@@ -104,8 +103,8 @@ export default function IntegrationHub() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => copyToClipboard(item.apiKey!, item.id)}
-                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors h-auto shadow-none"
-                                        leftIcon={copied === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-500" />}
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border text-muted-foreground text-xs font-semibold hover:bg-muted transition-colors h-auto shadow-none"
+                                        leftIcon={copied === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
                                     >
                                         {copied === item.id ? (
                                             <span className="text-emerald-400">Copied</span>
@@ -116,7 +115,7 @@ export default function IntegrationHub() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-500 hover:text-white transition-colors h-8 w-8 shadow-none"
+                                        className="p-1.5 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 w-8 shadow-none"
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                     </Button>
@@ -127,20 +126,21 @@ export default function IntegrationHub() {
                 ))}
             </div>
 
-            <div className="p-8 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 flex flex-col md:flex-row items-center gap-8">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-8 h-8 text-blue-500" />
+            <div className="p-8 rounded-3xl border border-border bg-card flex flex-col md:flex-row items-center gap-8">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-8 h-8 text-primary" />
                 </div>
                 <div className="space-y-2">
-                    <h4 className="text-white font-bold text-lg">Secure Integration Layer</h4>
-                    <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
+                    <h4 className="text-foreground font-bold text-lg">Secure Integration Layer</h4>
+                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xl">
                         All API keys are encrypted at rest using AES-256 and stored in your dedicated secure vault. No personnel can access these keys directly.
                     </p>
                 </div>
-                <Button variant="outline" className="whitespace-nowrap ml-auto">
+                <Button variant="outline" className="whitespace-nowrap ml-auto bg-card text-foreground border-border hover:bg-muted">
                     Security Whitepaper
                 </Button>
             </div>
         </div>
     );
 }
+

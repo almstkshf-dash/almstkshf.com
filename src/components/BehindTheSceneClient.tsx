@@ -14,17 +14,17 @@ export default function BehindTheSceneClient() {
         {
             key: "tamer",
             icon: Award,
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
-            border: "border-blue-500/20",
+            color: "text-primary",
+            bg: "bg-primary/10",
+            border: "border-primary/20",
             image: "/tamer.png"
         },
         {
             key: "rami",
             icon: ShieldCheck,
-            color: "text-indigo-400",
-            bg: "bg-indigo-500/10",
-            border: "border-indigo-500/20",
+            color: "text-primary",
+            bg: "bg-primary/10",
+            border: "border-primary/20",
             image: "/rami.jpg"
         }
     ];
@@ -37,7 +37,7 @@ export default function BehindTheSceneClient() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-semibold uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase tracking-widest"
                     >
                         <Award className="w-4 h-4" />
                         <span>{t("badge")}</span>
@@ -70,7 +70,7 @@ export default function BehindTheSceneClient() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: idx * 0.2 }}
-                            className="relative group lg:flex items-center gap-16 p-8 lg:p-12 rounded-[3.5rem] bg-card border border-border backdrop-blur-xl hover:bg-muted/30 transition-all duration-700 shadow-sm hover:shadow-xl"
+                            className="relative group lg:flex items-center gap-16 p-8 lg:p-12 rounded-[3.5rem] bg-card border border-border  hover:bg-muted/30 transition-all duration-700 shadow-sm hover:shadow-xl"
                         >
                             {/* Photo Container */}
                             <div className="flex-shrink-0 w-full lg:w-[400px] h-[500px] rounded-[2.5rem] overflow-hidden bg-muted border border-border relative group-hover:border-primary/30 transition-all duration-700">
@@ -86,7 +86,7 @@ export default function BehindTheSceneClient() {
                                         variant="ghost"
                                         size="icon"
                                         aria-label="LinkedIn"
-                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
+                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-primary transition-all h-auto w-auto shadow-none"
                                     >
                                         <Linkedin className="w-5 h-5 text-white" />
                                     </Button>
@@ -94,7 +94,7 @@ export default function BehindTheSceneClient() {
                                         variant="ghost"
                                         size="icon"
                                         aria-label="Email"
-                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-blue-600 transition-all h-auto w-auto shadow-none"
+                                        className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-primary transition-all h-auto w-auto shadow-none"
                                     >
                                         <Mail className="w-5 h-5 text-white" />
                                     </Button>
@@ -116,8 +116,8 @@ export default function BehindTheSceneClient() {
                                 </div>
 
                                 <div className="relative">
-                                    <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-transparent opacity-30 rounded-full hidden lg:block rtl:hidden"></div>
-                                    <div className="absolute -right-6 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-transparent opacity-30 rounded-full hidden lg:block ltr:hidden"></div>
+                                    <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary/10 opacity-30 rounded-full hidden lg:block rtl:hidden"></div>
+                                    <div className="absolute -right-6 top-0 bottom-0 w-1 bg-primary/10 opacity-30 rounded-full hidden lg:block ltr:hidden"></div>
                                     <p className="text-lg text-muted-foreground leading-relaxed font-light">
                                         {t(`members.${member.key}.desc`)}
                                     </p>
@@ -145,14 +145,14 @@ export default function BehindTheSceneClient() {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    className="mt-40 p-12 md:p-24 rounded-[4rem] bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/10 text-center space-y-12"
+                    className="mt-40 p-12 md:p-24 rounded-[4rem] bg-primary/10 border border-blue-500/10 text-center space-y-12"
                 >
                     <div className="relative inline-block">
-                        <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-blue-500">"</span>
+                        <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-primary">"</span>
                         <h2 className="text-3xl md:text-5xl font-light italic text-foreground max-w-4xl mx-auto leading-tight">
                             {t("quote")}
                         </h2>
-                        <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-blue-500">"</span>
+                        <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-primary">"</span>
                     </div>
                 </motion.section>
 
@@ -172,7 +172,7 @@ function WhoWeAreSection() {
         <section className="space-y-24">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                 <div className="space-y-8">
-                    <div className="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest">
+                    <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
                         {t("badge")}
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
@@ -193,8 +193,8 @@ function WhoWeAreSection() {
                         <Cpu className="w-64 h-64" />
                     </div>
                     <div className="relative z-10 space-y-8">
-                        <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                            <Cpu className="w-8 h-8 text-blue-400" />
+                        <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                            <Cpu className="w-8 h-8 text-primary" />
                         </div>
                         <h3 className="text-3xl font-bold text-foreground tracking-tight">
                             {t("tech_driven.title")}

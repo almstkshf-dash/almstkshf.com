@@ -14,26 +14,26 @@ export default function TvRadioClient() {
         {
             icon: Globe,
             titleKey: "analytics", // This text is long, I'll use it as a title or split it
-            color: "text-blue-400",
-            bg: "bg-blue-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Bell,
             titleKey: "alerts",
-            color: "text-amber-400",
-            bg: "bg-amber-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Scissors,
             titleKey: "clips",
-            color: "text-emerald-400",
-            bg: "bg-emerald-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         },
         {
             icon: Target,
             titleKey: "custom_profiles",
-            color: "text-indigo-400",
-            bg: "bg-indigo-500/10",
+            color: "text-primary",
+            bg: "bg-primary/10",
         }
     ];
 
@@ -101,10 +101,10 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-amber-500/30 transition-all group hover:shadow-xl"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-primary/10 text-primary dark:text-primary group-hover:scale-110 transition-transform">
                                     <Bell className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
@@ -121,10 +121,10 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-emerald-500/30 transition-all group hover:shadow-xl"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-primary/10 text-primary dark:text-primary group-hover:scale-110 transition-transform">
                                     <Scissors className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
@@ -141,10 +141,10 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, x: 20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-indigo-500/30 transition-all group hover:shadow-xl"
+                            className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group hover:shadow-xl"
                         >
                             <div className="flex items-start gap-6">
-                                <div className="p-4 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                                <div className="p-4 rounded-2xl bg-primary/10 text-primary dark:text-primary group-hover:scale-110 transition-transform">
                                     <Zap className="w-8 h-8" />
                                 </div>
                                 <div className="space-y-4">
@@ -182,7 +182,7 @@ export default function TvRadioClient() {
                                             <span>{t('real_time_clips')}</span>
                                         </div>
                                         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
-                                            <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                            <Zap className="w-4 h-4 text-primary dark:text-primary" />
                                             <span>{t('immediate_alerts')}</span>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@ export default function TvRadioClient() {
                                         </div>
                                     </div>
                                     {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+                                    <div className="absolute inset-0 bg-primary/10"></div>
                                 </div>
                             </div>
                         </motion.div>
