@@ -194,6 +194,8 @@
       "neutral": "Neutral",
       "negative": "Negative"
     },
+    "status_live": "Live",
+    "status_in_progress": "In Progress",
     "select_all": "Select all articles",
     "select_article": "Select article: {title}"
   },
@@ -925,7 +927,10 @@
       "top_regions": "Top Regions",
       "articles": "articles",
       "articles_count": "articles",
-      "emotional_pulse": "Emotional Pulse"
+      "emotional_pulse": "Emotional Pulse",
+      "articles_trend": "Articles Trend",
+      "sentiment_distribution": "Sentiment Distribution",
+      "top_emotions": "Top Emotions"
     }
   },
   "CrisisManagementDetail": {
@@ -1252,7 +1257,26 @@
     "monitor_standard_title": "Standard Monitor",
     "monitor_deep_title": "Deep Monitor",
     "monitor_osint_title": "OSINT Monitor",
-    "limit_results": "Limit: {count} results"
+    "limit_results": "Limit: {count} results",
+    "live_stream": "Pulse: Real-Time Stream",
+    "reputation_safeguard": "Reputation Safeguard",
+    "reputation_desc": "Active defense system analyzing sentiment shifts and influence velocity across global networks.",
+    "total_ave": "Total AVE",
+    "risk": "Risk Level",
+    "scope": "Global Reach",
+    "scope_desc": "Total potential audience impact across all monitored sources.",
+    "emotional_pulse": "Emotional Pulse",
+    "articles_trend": "Coverage Trend",
+    "emotions": {
+      "anger": "Anger",
+      "joy": "Joy",
+      "sadness": "Sadness",
+      "disgust": "Disgust",
+      "surprise": "Surprise",
+      "fear": "Fear",
+      "anticipation": "Anticipation",
+      "trust": "Trust"
+    }
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",

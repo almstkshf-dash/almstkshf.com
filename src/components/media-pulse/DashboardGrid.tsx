@@ -6,6 +6,10 @@ import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
 import { useMemo, memo } from "react";
+import SentimentDonutChart from "./SentimentDonutChart";
+import EmotionRadarChart from "./EmotionRadarChart";
+import ArticlesTrendChart from "./ArticlesTrendChart";
+import { TrendingUp } from "lucide-react";
 
 interface DashboardGridProps {
     articles?: any[];
@@ -46,13 +50,13 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Pulse View */}
             <div className="lg:col-span-2 space-y-8">
-                <section className="p-8 bg-card border border-border rounded-[2.5rem] backdrop-blur-3xl relative overflow-hidden group shadow-lg transition-colors">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-                        <Activity className="w-64 h-64" />
+                <section className="p-6 bg-card border border-border rounded-2xl backdrop-blur-3xl relative overflow-hidden group shadow-sm transition-colors">
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                        <Activity className="w-48 h-48" />
                     </div>
                     <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-bold text-foreground transition-colors">{t('live_stream')}</h2>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-foreground transition-colors">{t('live_stream')}</h2>
                             <div className="flex gap-2">
                                 <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-widest">{t('real_time')}</div>
                                 <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center transition-colors">{t('global')}</div>
@@ -63,31 +67,34 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                 </section>
 
                 {/* Reputation Defense Chart */}
-                <section className="p-10 rounded-[2.5rem] bg-card border border-border transition-colors flex flex-col md:flex-row gap-12 items-center shadow-lg">
-                    <div className="flex-1 space-y-6">
-                        <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center transition-colors">
-                            <ShieldAlert className="w-8 h-8 text-destructive" />
+                <section className="p-6 rounded-2xl bg-card border border-border transition-colors flex flex-col md:flex-row gap-8 items-center shadow-sm">
+                    <div className="flex-1 space-y-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center transition-colors">
+                                <ShieldAlert className="w-6 h-6 text-destructive" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-foreground transition-colors">{t('reputation_safeguard')}</h3>
                         </div>
-                        <h3 className="text-3xl font-bold text-foreground transition-colors">{t('reputation_safeguard')}</h3>
-                        <p className="text-muted-foreground leading-relaxed font-light transition-colors">
+                        <p className="text-sm text-muted-foreground leading-relaxed transition-colors">
                             {t('reputation_desc')}
                         </p>
-                        <div className="flex gap-4">
-                            <div className="px-4 py-2 bg-destructive/10 text-destructive text-[10px] font-bold uppercase tracking-widest rounded-lg border border-destructive/20 transition-colors">{t('total_ave')}: ${(totalAVE / 1000).toFixed(1)}k</div>
-                            <div className="px-4 py-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-emerald-500/20 transition-colors">{articles.length} {t('articles_count')}</div>
+                        <div className="flex gap-3">
+                            <div className="px-3 py-1.5 bg-status-error-bg text-status-error-fg text-[10px] font-bold uppercase tracking-widest rounded-lg border border-status-error/20 transition-colors">{t('total_ave')}: ${(totalAVE / 1000).toFixed(1)}k</div>
+                            <div className="px-3 py-1.5 bg-status-success-bg text-status-success-fg text-[10px] font-bold uppercase tracking-widest rounded-lg border border-status-success/20 transition-colors">{articles.length} {t('articles_count')}</div>
                         </div>
                     </div>
-                    <div className="w-full md:w-64 h-64 relative flex items-center justify-center">
-                        <div className="absolute inset-0 border-[16px] border-muted rounded-full transition-colors"></div>
-                        {/* Dynamic safety score based on Positive %? */}
-                        <div className="absolute inset-0 border-[16px] border-emerald-500 rounded-full border-t-transparent border-l-transparent rotate-[45deg]" style={{ clipPath: `polygon(0 0, 100% 0, 100% ${sentimentPcts.Positive}%, 0 ${sentimentPcts.Positive}%)` }}></div>
-                        <div className="text-center">
-                            <p className="text-4xl font-bold text-foreground transition-colors">{nss >= 0 ? '+' : ''}{nss}</p>
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest transition-colors">NSS Index</p>
-                            <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
-                                <ShieldAlert className="w-3 h-3" />
-                                Risk: {riskScore}%
-                            </div>
+                    <div className="w-full md:w-64 h-64 flex flex-col items-center justify-center pt-4">
+                        <SentimentDonutChart 
+                            data={{
+                                positive: sentimentPcts.Positive,
+                                neutral: sentimentPcts.Neutral,
+                                negative: sentimentPcts.Negative
+                            }}
+                            nssIndex={nss}
+                        />
+                        <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
+                            <ShieldAlert className="w-3 h-3" />
+                            {t('risk')}: {riskScore}%
                         </div>
                     </div>
                 </section>
@@ -99,16 +106,16 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2rem] text-primary-foreground shadow-2xl shadow-primary/40 relative overflow-hidden group transition-colors"
+                    className="p-6 bg-gradient-to-br from-primary to-primary/80 rounded-2xl text-primary-foreground shadow-lg shadow-primary/20 relative overflow-hidden group transition-colors"
                 >
-                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
-                        <Globe className="w-32 h-32" />
+                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform pointer-events-none">
+                        <Globe className="w-24 h-24" />
                     </div>
-                    <h4 className="font-bold text-sm uppercase tracking-[0.2em] mb-6 opacity-80 italic transition-colors">{t('scope')}</h4>
-                    <div className="text-5xl font-bold mb-4 tracking-tighter">
+                    <h4 className="font-bold text-xs uppercase tracking-[0.2em] mb-4 opacity-80 italic transition-colors">{t('scope')}</h4>
+                    <div className="text-4xl font-bold mb-2 tracking-tighter">
                         {(totalReach / 1000000).toFixed(1)}M+
                     </div>
-                    <p className="text-primary-foreground/90 text-sm font-light leading-relaxed transition-colors">{t('scope_desc')}</p>
+                    <p className="text-primary-foreground/90 text-xs font-light leading-relaxed transition-colors">{t('scope_desc')}</p>
                 </motion.div>
 
                 <motion.div
@@ -124,9 +131,9 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     </div>
                     <div className="space-y-6">
                         {[
-                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-emerald-500", icon: ShieldCheck },
-                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-primary", icon: Activity },
-                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-destructive", icon: AlertCircle },
+                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-status-success", icon: ShieldCheck },
+                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-status-warning", icon: Activity },
+                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-status-error", icon: AlertCircle },
                         ].map((item) => (
                             <div key={item.label} className="space-y-3">
                                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
@@ -156,32 +163,90 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="p-8 bg-card border border-border rounded-[2rem] space-y-6 shadow-md transition-colors relative overflow-hidden"
+                    className="p-6 bg-card border border-border rounded-2xl space-y-6 shadow-sm transition-colors relative overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 p-4 opacity-10">
-                        <Zap className="w-12 h-12 text-primary" />
+                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <Zap className="w-10 h-10 text-primary" />
                     </div>
-                    <h4 className="text-foreground font-bold text-sm tracking-wider transition-colors">{t('emotional_pulse')}</h4>
+                    <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('emotional_pulse')}</h4>
 
-                    <div className="flex flex-wrap gap-2">
-                        {Object.entries(analytics?.emotions || {}).slice(0, 6).map(([emotion, count]) => (
-                            <div key={emotion} className="flex flex-col gap-1 w-[45%]">
-                                <div className="flex justify-between text-[8px] font-bold uppercase tracking-tighter opacity-70">
-                                    <span>{emotion}</span>
-                                    <span>{count as number}</span>
-                                </div>
-                                <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-primary/40 transition-all duration-1000"
-                                        style={{ width: `${Math.min(100, (count as number) * 5)}%` }}
-                                    />
-                                </div>
+                    <EmotionRadarChart 
+                        data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
+                            subject,
+                            value: value as number,
+                            fullMark: 100
+                        }))}
+                    />
+
+                    {/* Emotions breakdown table/list */}
+                    {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
+                        <div className="pt-6 border-t border-border mt-2 space-y-4">
+                            <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                <TrendingUp className="w-3 h-3 text-primary" />
+                                {t('top_emotions')}
+                            </h5>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {Object.entries(analytics.emotions)
+                                    .sort(([, a], [, b]) => (b as number) - (a as number))
+                                    .slice(0, 4)
+                                    .map(([emotion, value]) => (
+                                        <div key={emotion} className="group p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all shadow-sm">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-[10px] font-bold text-foreground/80 uppercase tracking-tight">
+                                                    {tDashboard(`emotions.${emotion.toLowerCase()}`)}
+                                                </span>
+                                                <span className="text-xs font-black text-primary">{value as number}%</span>
+                                            </div>
+                                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                                                <motion.div 
+                                                    initial={{ width: 0 }}
+                                                    whileInView={{ width: `${value}%` }}
+                                                    className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)] transition-all duration-1000"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    )}
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 }}
+                    className="p-6 bg-card border border-border rounded-2xl space-y-4 shadow-sm transition-colors"
+                >
+                    <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('articles_trend')}</h4>
+                    <ArticlesTrendChart 
+                        data={articles.length > 0 ? (
+                            // Simple transformation for trend if not provided by analytics
+                            Object.entries(
+                                articles.reduce((acc: any, a) => {
+                                    const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                    acc[date] = (acc[date] || 0) + 1;
+                                    return acc;
+                                }, {})
+                            ).map(([date, count]) => ({ date, count: count as number }))
+                        ) : [
+                            { date: 'Mon', count: 4 },
+                            { date: 'Tue', count: 3 },
+                            { date: 'Wed', count: 7 },
+                            { date: 'Thu', count: 5 },
+                            { date: 'Fri', count: 8 },
+                        ]}
+                    />
+                </motion.div>
 
                     {analytics?.geography && Object.keys(analytics.geography).length > 0 && (
-                        <div className="pt-4 border-t border-border mt-4">
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                            className="pt-4 border-t border-border mt-4"
+                        >
                             <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2">
                                 <Globe className="w-3 h-3" />
                                 {tDashboard('geography')}
@@ -197,14 +262,13 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
                     )}
-                </motion.div>
 
-                <div className="p-8 rounded-[2rem] border border-primary/20 bg-primary/5 space-y-4 shadow-sm transition-all">
-                    <Zap className="w-6 h-6 text-primary" />
-                    <h4 className="text-foreground font-bold text-sm transition-colors">{t('automated_alerts')}</h4>
-                    <p className="text-muted-foreground text-xs leading-relaxed transition-colors">
+                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-2 shadow-sm transition-all group hover:bg-primary/10">
+                    <Zap className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                    <h4 className="text-foreground font-bold text-xs transition-colors">{t('automated_alerts')}</h4>
+                    <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors">
                         {t('alerts_desc')}
                     </p>
                 </div>

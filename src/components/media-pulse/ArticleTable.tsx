@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Loader2, ExternalLink, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useState, useMemo, memo } from 'react';
 import clsx from 'clsx';
@@ -75,14 +75,25 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
         }
     };
 
+    const getSourceIcon = (type: string) => {
+        switch (type) {
+            case 'Press Release': return <BookOpen className="w-3 h-3" />;
+            case 'Online News': return <Newspaper className="w-3 h-3" />;
+            case 'Social Media': return <MessageSquare className="w-3 h-3" />;
+            case 'Blog': return <Globe2 className="w-3 h-3" />;
+            case 'Print': return <Printer className="w-3 h-3" />;
+            default: return <Newspaper className="w-3 h-3" />;
+        }
+    };
+
     const getSourceBadgeColor = (type: string) => {
         switch (type) {
-            case 'Press Release': return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200/50';
-            case 'Online News': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200/50';
-            case 'Social Media': return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border-indigo-200/50';
-            case 'Blog': return 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300 border-cyan-200/50';
-            case 'Print': return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300 border-slate-200/50';
-            default: return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300 border-slate-200/50';
+            case 'Press Release': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
+            case 'Online News': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
+            case 'Social Media': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
+            case 'Blog': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
+            case 'Print': return 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20';
+            default: return 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20';
         }
     };
 
@@ -167,8 +178,9 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                             <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
                                             <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
                                         </a>
-                                        <div className="flex items-center gap-2 flex-wrap" dir="auto">
-                                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${getSourceBadgeColor(article.sourceType)}`}>
+                                         <div className="flex items-center gap-2 flex-wrap" dir="auto">
+                                            <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${getSourceBadgeColor(article.sourceType)}`}>
+                                                {getSourceIcon(article.sourceType)}
                                                 {article.sourceType === 'Press Release' ? t('types.press_release') :
                                                     article.sourceType === 'Online News' ? t('types.online_news') :
                                                         article.sourceType === 'Social Media' ? t('types.social_media') :
@@ -180,8 +192,12 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                                 <span className="w-1 h-1 rounded-full bg-border" />
                                                 {article.sourceCountry || article.country}
                                             </span>
-                                            {article.imageUrl && <ImageIcon className="w-3 h-3 text-primary/50" />}
-                                            {article.isManual && <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 border border-amber-500/20 px-1.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors">{t('manual')}</span>}
+                                            {article.imageUrl && <ImageIcon className="w-3 h-3 text-status-info-fg/70" />}
+                                            {article.isManual && (
+                                                <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
+                                                    {t('manual')}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </td>
@@ -189,21 +205,24 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     {article.source || article.sourceCountry || '—'}
                                 </td>
                                 <td className="p-4 text-center">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${article.depth === 'deep'
-                                        ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 border border-indigo-500/20'
-                                        : 'bg-muted text-foreground border border-border'}`}>
+                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${article.depth === 'deep'
+                                        ? 'bg-status-info-bg text-status-info-fg border-status-info-fg/10'
+                                        : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/10'}`}>
                                         {article.depth || 'standard'}
                                     </span>
                                 </td>
                                 <td className="p-4">
                                     <span className={clsx(
-                                        "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all",
+                                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border",
                                         article.sentiment === 'Positive'
-                                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-500/20'
+                                            ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
                                             : article.sentiment === 'Negative'
-                                                ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border border-red-500/20'
-                                                : 'bg-slate-100 dark:bg-slate-900/30 text-slate-800 dark:text-slate-400 border border-slate-500/20'
+                                                ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
+                                                : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
                                     )}>
+                                        {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" />}
+                                        {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" />}
+                                        {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" />}
                                         {article.sentiment === 'Positive' ? t('sentiments.positive') :
                                             article.sentiment === 'Negative' ? t('sentiments.negative') :
                                                 t('sentiments.neutral')}
@@ -216,7 +235,18 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     ${article.ave?.toLocaleString()}
                                 </td>
                                 <td className="p-4 text-center">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mx-auto shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                    <span className={clsx(
+                                        "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.1em] border transition-all",
+                                        article.status === 'in_progress'
+                                            ? 'bg-status-warning-bg text-status-warning-fg border-status-warning-fg/20'
+                                            : 'bg-status-success-bg text-status-success-fg border-status-success-fg/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]'
+                                    )}>
+                                        <span className={clsx(
+                                            "w-1 h-1 rounded-full mr-1.5 transition-all animate-pulse",
+                                            article.status === 'in_progress' ? "bg-status-warning-fg" : "bg-status-success-fg"
+                                        )} />
+                                        {article.status === 'in_progress' ? t('status_in_progress') : t('status_live')}
+                                    </span>
                                 </td>
                                 <td className="p-4 text-center">
                                     <Button

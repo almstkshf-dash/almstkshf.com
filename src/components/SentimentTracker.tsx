@@ -106,9 +106,9 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
             </div>
 
             {!hasData && (
-                <div className="p-6 bg-muted/30 border border-border rounded-2xl text-center">
-                    <Zap className="w-6 h-6 text-amber-500/50 mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">{t('no_data_message')}</p>
+                <div className="p-6 bg-muted/20 border border-border rounded-2xl text-center">
+                    <Zap className="w-5 h-5 text-amber-500/30 mx-auto mb-2" />
+                    <p className="text-muted-foreground text-xs">{t('no_data_message')}</p>
                 </div>
             )}
 
@@ -125,16 +125,16 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <h4 className="text-foreground font-semibold text-sm">{data.source}</h4>
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                                        <h4 className="text-foreground font-bold text-sm tracking-tight">{data.source}</h4>
+                                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-medium opacity-70">
                                             {t('source_analysis')} · {data.count} {t('articles')}
                                         </p>
                                     </div>
                                     <div className={clsx(
-                                        "p-2 rounded-lg",
-                                        data.sentiment === "positive" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
-                                            data.sentiment === "negative" ? "bg-rose-500/10 text-rose-600 dark:text-rose-400" :
-                                                "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                        "p-2 rounded-lg transition-colors",
+                                        data.sentiment === "positive" ? "bg-status-success-bg text-status-success-fg" :
+                                            data.sentiment === "negative" ? "bg-status-error-bg text-status-error-fg" :
+                                                "bg-status-warning-bg text-status-warning-fg"
                                     )}>
                                         {data.sentiment === "positive" ? <TrendingUp className="w-4 h-4" /> :
                                             data.sentiment === "negative" ? <TrendingDown className="w-4 h-4" /> :
@@ -144,13 +144,13 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-end">
-                                        <span className="text-3xl font-bold text-foreground tracking-tighter">
+                                        <span className="text-2xl font-bold text-foreground tracking-tighter">
                                             {data.score}%
                                         </span>
                                         <span className={clsx(
-                                            "text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1",
-                                            data.trend > 0 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
-                                                data.trend < 0 ? "bg-rose-500/10 text-rose-600 dark:text-rose-400" :
+                                            "text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 transition-colors",
+                                            data.trend > 0 ? "bg-status-success-bg text-status-success-fg" :
+                                                data.trend < 0 ? "bg-status-error-bg text-status-error-fg" :
                                                     "bg-muted text-muted-foreground"
                                         )}>
                                             {data.trend > 0 ? "+" : ""}{data.trend}% {t('shift')}
@@ -164,9 +164,9 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                             transition={{ duration: 1, delay: 0.5 + idx * 0.1 }}
                                             className={clsx(
                                                 "h-full rounded-full transition-all duration-1000",
-                                                data.sentiment === "positive" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" :
-                                                    data.sentiment === "negative" ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" :
-                                                        "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                                                data.sentiment === "positive" ? "bg-status-success shadow-[0_0_8px_rgba(16,185,129,0.3)]" :
+                                                    data.sentiment === "negative" ? "bg-status-error shadow-[0_0_8px_rgba(244,63,94,0.3)]" :
+                                                        "bg-status-warning shadow-[0_0_8px_rgba(245,158,11,0.3)]"
                                             )}
                                         />
                                     </div>
@@ -181,11 +181,11 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
 
                     {/* AI Recommendation */}
                     {recKey && (
-                        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex gap-4 items-start shadow-sm">
-                            <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                        <div className="p-4 bg-status-warning-bg border border-status-warning/20 rounded-2xl flex gap-4 items-start shadow-sm transition-all hover:bg-status-warning-bg/80">
+                            <AlertCircle className="w-5 h-5 text-status-warning-fg mt-0.5 flex-shrink-0" />
                             <div>
-                                <h5 className="text-amber-800 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
-                                <p className="text-amber-950 dark:text-amber-300/80 text-xs leading-relaxed font-medium">{t(recKey)}</p>
+                                <h5 className="text-status-warning-fg text-xs font-bold uppercase tracking-wider mb-1">{t('ai_recommendation')}</h5>
+                                <p className="text-foreground/90 text-xs leading-relaxed font-medium">{t(recKey)}</p>
                             </div>
                         </div>
                     )}
