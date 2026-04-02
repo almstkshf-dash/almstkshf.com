@@ -58,7 +58,7 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
     return (
         <div className="relative w-full h-[180px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={180}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={180} debounce={1}>
                 <PieChart>
                     <Pie
                         data={chartData}

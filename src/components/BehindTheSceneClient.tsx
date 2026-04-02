@@ -78,6 +78,7 @@ export default function BehindTheSceneClient() {
                                     src={member.image}
                                     alt={t(`members.${member.key}.name`)}
                                     fill
+                                    sizes="(max-width: 1024px) 100vw, 400px"
                                     className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60"></div>

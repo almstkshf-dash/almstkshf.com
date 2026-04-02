@@ -72,6 +72,7 @@ export default function Navbar() {
                                         src="/logo.png"
                                         alt=""
                                         fill
+                                        sizes="32px"
                                         className="object-contain"
                                         priority
                                     />

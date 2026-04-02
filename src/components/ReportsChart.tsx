@@ -75,7 +75,7 @@ export default function ReportsChart({ data }: ReportsChartProps) {
         return (
             <div className="w-full h-[300px] p-4 bg-card border border-border rounded-2xl mb-8 transition-opacity duration-300">
                 <h3 className="text-lg font-bold mb-4 px-2">{t('reports_overview')} (Demo)</h3>
-                <ResponsiveContainer width="100%" height="100%" minHeight={100} minWidth={100}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={100} minWidth={100} debounce={1}>
                     <AreaChart data={mockData}>
                         <defs>
                             <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
