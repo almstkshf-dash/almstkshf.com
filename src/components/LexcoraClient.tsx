@@ -102,7 +102,7 @@ export default function LexcoraClient() {
                                     <ExternalLink className="w-4 h-4" />
                                 </Link>
                                 <Link
-                                    href={`/${locale}/contact`}
+                                    href="/contact"
                                     className="px-8 py-4 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-accent hover:border-accent transition-all outline-none focus:ring-2 focus:ring-border focus:ring-offset-2 focus:ring-offset-background flex items-center justify-center"
                                 >
                                     {t("cta_demo")}
@@ -305,8 +305,7 @@ export default function LexcoraClient() {
                                 {t("cta_start")}
                             </Link>
                             <Link
-                                href={`/${locale}/contact`}
-                                className="px-10 py-5 bg-primary-foreground/10 text-primary-foreground border border-primary-foreground/20 rounded-2xl font-bold hover:scale-105 transition-all  hover:bg-primary-foreground/20"
+                                href="/contact"                                className="px-10 py-5 bg-primary-foreground/10 text-primary-foreground border border-primary-foreground/20 rounded-2xl font-bold hover:scale-105 transition-all  hover:bg-primary-foreground/20"
                             >
                                 {t("cta_demo")}
                             </Link>

@@ -7,7 +7,6 @@ import { api } from '../../../../../convex/_generated/api';
 import { Save, Upload, Loader2, CreditCard, Link2, Settings, Key, Share2, MessageSquare, Shield, Zap, BarChart3, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
-import PhylloConnectButton from '@/components/PhylloConnect';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 import { Link } from '@/i18n/routing';
@@ -41,8 +40,6 @@ export default function SettingsPage() {
     const [newsapiKey, setNewsapiKey] = useState('');
     const [gnewsKey, setGnewsKey] = useState('');
     const [worldnewsKey, setWorldnewsKey] = useState('');
-    const [phylloClientId, setPhylloClientId] = useState('');
-    const [phylloClientSecret, setPhylloClientSecret] = useState('');
     const [chatbaseId, setChatbaseId] = useState('');
     const [chatbaseHost, setChatbaseHost] = useState('');
     const [stripePublishableKey, setStripePublishableKey] = useState('');
@@ -66,8 +63,6 @@ export default function SettingsPage() {
             setNewsapiKey(settings.apiKeys?.newsapi || '');
             setGnewsKey(settings.apiKeys?.gnews || '');
             setWorldnewsKey(settings.apiKeys?.worldnews || '');
-            setPhylloClientId(settings.apiKeys?.phylloClientId || '');
-            setPhylloClientSecret(settings.apiKeys?.phylloClientSecret || '');
             setChatbaseId(settings.apiKeys?.chatbaseId || '');
             setChatbaseHost(settings.apiKeys?.chatbaseHost || '');
             setStripePublishableKey(settings.apiKeys?.stripePublishableKey || '');
@@ -115,8 +110,6 @@ export default function SettingsPage() {
                     newsapi: newsapiKey,
                     gnews: gnewsKey,
                     worldnews: worldnewsKey,
-                    phylloClientId: phylloClientId,
-                    phylloClientSecret: phylloClientSecret,
                     chatbaseId: chatbaseId,
                     chatbaseHost: chatbaseHost,
                     stripePublishableKey: stripePublishableKey,
@@ -421,61 +414,6 @@ export default function SettingsPage() {
                                             autoComplete="off"
                                         />
                                     </div>
-                                </div>
-                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
-                                    <Button
-                                        onClick={handleSave}
-                                        isLoading={isLoading}
-                                        variant="primary"
-                                        className="gap-2"
-                                        leftIcon={<Save className="h-4 w-4" />}
-                                    >
-                                        {t('save')}
-                                    </Button>
-                                </div>
-                            </section>
-
-                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -mr-10 -mt-10" />
-                                <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-                                    <Link2 className="h-5 w-5 text-primary" />
-                                    {t('section_phyllo')}
-                                </h2>
-                                <p className="text-sm text-muted-foreground mb-8 max-w-lg">{t('phyllo_desc')}</p>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                                    <div className="space-y-2">
-                                        <label htmlFor="phyllo-client-id" className="text-sm font-bold text-primary/80">{t('phyllo_client_id')}</label>
-                                        <input
-                                            id="phyllo-client-id"
-                                            name="phyllo-client-id"
-                                            value={phylloClientId}
-                                            onChange={(e) => setPhylloClientId(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
-                                            placeholder={t('placeholder_id')}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="phyllo-client-secret" className="text-sm font-bold text-primary/80">{t('phyllo_client_secret')}</label>
-                                        <input
-                                            id="phyllo-client-secret"
-                                            name="phyllo-client-secret"
-                                            type="password"
-                                            value={phylloClientSecret}
-                                            onChange={(e) => setPhylloClientSecret(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-primary/20 bg-primary/5 focus:ring-2 focus:ring-primary outline-none text-foreground"
-                                            placeholder={t('placeholder_secret')}
-                                            autoComplete="off"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="p-6 bg-gradient-to-r from-primary to-primary/70 rounded-2xl text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-                                    <div className="space-y-1">
-                                        <h3 className="font-bold text-lg">{t('phyllo_test')}</h3>
-                                        <p className="text-white/80 text-sm">{t('phyllo_test_desc')}</p>
-                                    </div>
-                                    <PhylloConnectButton className="px-8 py-3 bg-white text-primary rounded-xl font-bold hover:bg-slate-100 transition-colors shadow-lg active:scale-95" />
                                 </div>
                                 <div className="mt-8 pt-6 border-t border-border flex justify-end">
                                     <Button

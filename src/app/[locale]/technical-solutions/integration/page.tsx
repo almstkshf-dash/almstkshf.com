@@ -68,8 +68,7 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                             className="flex flex-wrap gap-4"
                         >
                             <Link
-                                href={`/${locale}/contact`}
-                                className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/25 transition-all hover:-translate-y-1 flex items-center gap-2"
+                                href="/contact"                                className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/25 transition-all hover:-translate-y-1 flex items-center gap-2"
                             >
                                 {tNav("contact")}
                                 <ArrowRight className="w-5 h-5" />

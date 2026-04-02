@@ -105,9 +105,7 @@ export const seed = mutation({
         if (existingSettings) {
             await ctx.db.patch(existingSettings._id, {
                 apiKeys: {
-                    ...existingSettings.apiKeys,
-                    phylloClientId: "8100b456-be56-4ef9-b0c3-054ad8bdc664",
-                    phylloClientSecret: "f975fba7-e7b7-4110-ae4e-ce004e00d3e1"
+                    ...existingSettings.apiKeys
                 }
             });
         } else {
@@ -124,9 +122,7 @@ export const seed = mutation({
                     newsdata: "",
                     newsapi: "",
                     gnews: "",
-                    worldnews: "",
-                    phylloClientId: "8100b456-be56-4ef9-b0c3-054ad8bdc664",
-                    phylloClientSecret: "f975fba7-e7b7-4110-ae4e-ce004e00d3e1"
+                    worldnews: ""
                 },
                 defaults: {
                     targetCountries: ["AE", "SA"],

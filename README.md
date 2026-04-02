@@ -91,6 +91,19 @@ See [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md#2-environment-variables) for the
 
 ---
 
+## 🔐 API Key Resolution (The Golden Rule)
+
+To maintain consistent behavior across the frontend and backend, all API key resolution must follow this strict hierarchy:
+
+1. **Hierarchy (General)**: User BYOK → System App Settings (`app_settings` table) → Environment Variables.
+2. **Admin/Dev/Corporate Override**: 
+   - **Admins** and **Dev Mode** activities (plus Subscribed/Trial users for Gemini) always prioritize the **Platform Key** (App Settings > Env).
+   - This ensures platform services (like news monitoring) always have a valid, shared high-quota key even if the individual admin hasn't set up a personal one.
+3. **Validation**: Any key value defined as `"None"`, `"undefined"`, `"null"`, or an empty string is treated as **invalid** and skipped in favor of the next fallback.
+4. **Consistency**: Use the `resolveApiKey` utility in `convex/utils/keys.ts` for all backend services and `resolveGeminiKey` in `src/lib/gemini-key-resolver.ts` for the frontend.
+
+---
+
 ## 📄 License
 
 See [LICENSE](./LICENSE) for details.

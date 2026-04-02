@@ -33,6 +33,7 @@ interface AnalysisResult {
 export const analyzeMedia = action({
     args: { text: v.string() },
     handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string }> => {
+        const identity = await ctx.auth.getUserIdentity();
         const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         if (!apiKey) {
@@ -88,8 +89,12 @@ Return valid JSON ONLY:
                 return response;
             };
 
-            // Try models in sequence
-            const models = ["gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-1.5-flash", "gemini-pro"];
+            // Diagnostics: Identify Key Source (Masked)
+            const keyMasked = apiKey.length > 8 ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : "****";
+            console.log(`🧠 AI Analysis Request: [Key: ${keyMasked}] [UserID: ${(identity?.subject || "ANONYMOUS").substring(0, 8)}]`);
+
+            // Try models in sequence (Sync with monitoringAction.ts)
+            const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-pro"];
             let response: Response | null = null;
             let lastError = "";
 
@@ -102,11 +107,8 @@ Return valid JSON ONLY:
                     lastError = `Model ${model} failed (${response.status}): ${errText}`;
                     console.warn(`⚠️ ${lastError}`);
 
-                    // Only continue if it's a 404 (model not found) or perhaps a transient error
-                    if (response.status !== 404 && response.status !== 429) {
-                        // If it's a hard error like 400 or 401, don't keep cycling
-                        break;
-                    }
+                    // Only skip to next model if it's 404 (not found), 429 (rate limit), or 400 (bad request/invalid per model)
+                    // We no longer break on 400 as different models might have different key restrictions
                 } catch (e: any) {
                     lastError = `Fetch failed for ${model}: ${e.message}`;
                     console.warn(`⚠️ ${lastError}`);

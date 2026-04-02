@@ -86,7 +86,7 @@ Return valid JSON ONLY with these exact fields:
   "risk": "Low" | "Medium" | "High"
 }`;
 
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
 
     for (const model of models) {
         try {
@@ -168,7 +168,9 @@ export const fetchNews = action({
             const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             if (!apiKey) {
-                return { success: false, error: "Missing Gemini API key. Configure in Settings." };
+                const ident = await ctx.auth.getUserIdentity();
+                const sourceInfo = ident ? (ident.subject ? "Source: User Settings or System Config" : "Source: System Config") : "Source: Env Context (No Identity)";
+                throw new Error(`Gemini API key is missing or invalid. [${sourceInfo}]. Please ensure you have configured your GEMINI_API_KEY in App Settings or Environment Variables.`);
             }
 
             const newsdataKey = await resolveApiKey(ctx, "NEWSDATA_API_KEY", "newsdata");

@@ -114,8 +114,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                         <p className="text-muted-foreground font-medium">{tMedia('no_reports')}</p>
                         <Link
-                            href={`/${locale}/media-monitoring/central-media-repository`}
-                            className="text-primary text-sm hover:underline mt-2 inline-block transition-colors"
+                            href="/media-monitoring/central-media-repository"                            className="text-primary text-sm hover:underline mt-2 inline-block transition-colors"
                         >
                             {tMedia('visit_repository')}
                         </Link>

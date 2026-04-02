@@ -32,55 +32,44 @@ async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
  */
 export async function resolveGeminiKey(): Promise<{ key: string | null; error?: string }> {
     const { userId } = await auth();
-    const systemKey = process.env.GEMINI_API_KEY || null;
-
-    // 1. Dev Mode or Admin Bypass
-    const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-    const isAdmin = userId && adminIds.includes(userId);
-
-    if (process.env.NODE_ENV !== "production" || isAdmin) {
-        return { key: systemKey };
-    }
+    // envKey is the final fallback
+    const envKey = process.env.GEMINI_API_KEY || null;
 
     if (!userId) {
-        return { error: "User not authenticated" + (systemKey ? " (System Key available but user ID missing)" : ""), key: null };
+        return { error: envKey ? undefined : "User not authenticated", key: envKey };
     }
 
     try {
         const client = await getAuthenticatedConvex();
+        const userSettings = await client.query(api.userSettings.get, { userId });
+        const appSettings = await client.query(api.settings.getSettings, {});
+        
+        // System Key priority: App Settings (DB) > Environment Variables
+        const dbSystemKey = appSettings?.apiKeys?.gemini;
+        const systemKey = (dbSystemKey && dbSystemKey !== "None") ? dbSystemKey : envKey;
 
-        // 2. Fetch User Settings
-        let userSettings = await client.query(api.userSettings.get, { userId });
-
-        // 3. Auto-initialize user settings/trial if missing
-        if (!userSettings) {
-            await client.mutation(api.userSettings.init, { userId });
-            userSettings = await client.query(api.userSettings.get, { userId });
-        }
-
-        if (!userSettings) {
-            return { error: "Failed to initialize user settings", key: null };
-        }
-
-        // 4. Subscribed users use System Key
-        if (userSettings.isSubscribed) {
-            if (!systemKey) return { error: "System Key missing for subscribed user", key: null };
-            return { key: systemKey };
-        }
-
-        // 5. Active Trial uses System Key
-        if (userSettings.isTrialActive && userSettings.trialEndsAt && userSettings.trialEndsAt > Date.now()) {
-            if (!systemKey) return { error: "System Key missing for trial user", key: null };
-            return { key: systemKey };
-        }
-
-        // 6. BYOK (Bring Your Own Key)
-        if (userSettings.geminiApiKey) {
+        // 1. BYOK (User's own key) FIRST (The Golden Rule)
+        if (userSettings?.geminiApiKey && userSettings.geminiApiKey !== "None") {
             return { key: userSettings.geminiApiKey };
         }
 
-        // 7. Expired Trial / No Key
-        const trialExpired = userSettings.trialEndsAt && userSettings.trialEndsAt <= Date.now();
+        // 2. Admin / Dev Mode Bypass (System Key)
+        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
+        const isAdmin = adminIds.includes(userId);
+        if (process.env.NODE_ENV !== "production" || isAdmin) {
+            return { key: systemKey };
+        }
+
+        // 3. Subscribed / Trial users (System Key)
+        if (userSettings?.isSubscribed) {
+            return { key: systemKey };
+        }
+        if (userSettings?.isTrialActive && userSettings.trialEndsAt && userSettings.trialEndsAt > Date.now()) {
+            return { key: systemKey };
+        }
+
+        // 4. Fallback/Error
+        const trialExpired = userSettings?.trialEndsAt && userSettings.trialEndsAt <= Date.now();
         if (trialExpired) {
             return { error: "Your free trial has expired. Please upgrade or add your own API key in Settings.", key: null };
         }

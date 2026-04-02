@@ -113,8 +113,7 @@ export default function KYCPage() {
 
                         <div className="flex justify-center">
                             <Link
-                                href={`/${locale}/contact`}
-                                className="px-10 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20 transform hover:-translate-y-1 inline-block"
+                                href="/contact"                                className="px-10 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/20 transform hover:-translate-y-1 inline-block"
                             >
                                 {tNav("contact")}
                             </Link>

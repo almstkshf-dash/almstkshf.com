@@ -35,8 +35,6 @@ export const updateSettings = mutation({
             newsapi: v.optional(v.string()),
             gnews: v.optional(v.string()),
             worldnews: v.optional(v.string()),
-            phylloClientId: v.optional(v.string()),
-            phylloClientSecret: v.optional(v.string()),
             chatbaseId: v.optional(v.string()),
             chatbaseHost: v.optional(v.string()),
             stripePublishableKey: v.optional(v.string()),
