@@ -68,21 +68,26 @@ async function callGeminiForAnalysis(
     tone?: string;
     risk?: "Low" | "Medium" | "High";
 }> {
-    const prompt = `Analyze this news article for media monitoring.
-IMPORTANT: Return the "summary" in the same language as the article (if Arabic, summary must be in Arabic).
+    const prompt = `Analyze this content for media monitoring (can be News or Social Media).
+IMPORTANT: Return the "summary" in the same language as the content (if Arabic, summary must be in Arabic).
 Intended Categories (User Filter): ${intendedCategories.join(', ')}
 
-Title: "${title}"
-Snippet: "${snippet}"
+Title/Author: "${title}"
+Snippet/Text: "${snippet}"
 Monitoring Keyword: "${keyword}"
+
+Rules for Analysis:
+1. For Social Media (Twitter/X): Consider emojis, common Arabic dialects (Gulf, Levantine, etc.), and informal language.
+2. Sentiment: Detect the polarity towards the Monitoring Keyword.
+3. Summary: Provide a one-sentence summary that highlights the main point.
 
 Return valid JSON ONLY with these exact fields:
 {
   "sentiment": "Positive" | "Neutral" | "Negative",
-  "summary": "One concise sentence summary in the article's primary language.",
+  "summary": "One concise sentence summary in the content's primary language.",
   "sourceType": "Online News" | "Blog" | "Press Release" | "Social Media" | "Print",
   "reach_estimate": number,
-  "tone": "short phrase describing tone",
+  "tone": "short phrase describing tone (e.g., Sarcastic, Informative, Alarming)",
   "risk": "Low" | "Medium" | "High"
 }`;
 
@@ -177,7 +182,11 @@ export const fetchNews = action({
             const newsapiKey = await resolveApiKey(ctx, "NEWSAPI_API_KEY", "newsapi");
             const gnewsKey = await resolveApiKey(ctx, "GNEWS_API_KEY", "gnews");
             const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
-            const twitterBearer = await resolveApiKey(ctx, "TWITTER_BEARER", "twitterBearer");
+            const twitterBearer = await resolveApiKey(ctx, "X_BEARER_TOKEN", "twitterBearer");
+            const twitterApiKey = await resolveApiKey(ctx, "X_API_KEY", "twitterConsumerKey");
+            const twitterApiSecret = await resolveApiKey(ctx, "X_API_SECRET", "twitterConsumerSecret");
+            const twitterAccessToken = await resolveApiKey(ctx, "X_ACCESS_TOKEN", "twitterAccessToken");
+            const twitterTokenSecret = await resolveApiKey(ctx, "X_ACCESS_TOKEN_SECRET", "twitterAccessTokenSecret");
 
             const providers = [
                 { name: 'NewsData.io', key: newsdataKey },
@@ -470,7 +479,10 @@ export const fetchNews = action({
                                     link: `https://twitter.com/${author}/status/${tweet.id}`,
                                     pubDate: tweet.created_at,
                                     contentSnippet: `Source: Twitter (@${author}). ${tweet.text}`,
-                                    imageUrl: null
+                                    imageUrl: null,
+                                    likes: tweet.public_metrics?.like_count,
+                                    retweets: tweet.public_metrics?.retweet_count,
+                                    replies: tweet.public_metrics?.reply_count
                                 }, (countryList[0] || 'ae').toUpperCase(), languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false, "Social Media");
                                 if (success) totalSuccess++; else totalSkipped++;
                             }
@@ -610,6 +622,9 @@ async function processArticle(
             reach: reach,
             ave: ave,
             imageUrl: imageUrl,
+            likes: item.likes,
+            retweets: item.retweets,
+            replies: item.replies,
         });
 
         return true;

@@ -515,6 +515,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                         <input
                             id="monitor_keyword"
                             name="monitor_keyword"
+                            aria-label={t('monitor_keyword')}
                             type="text"
                             placeholder={t('placeholder')}
                             value={keyword}
@@ -529,8 +530,10 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Countries */}
                     <div className="space-y-2">
-                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</span>
+                        <label id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</label>
                         <MultiSelectDropdown
+                            id="region-select"
+                            aria-labelledby="region-label"
                             items={countryItems}
                             selected={selectedCountries}
                             onChange={(v) => setSelectedCountries(v)}
@@ -555,8 +558,10 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Languages */}
                     <div className="space-y-2">
-                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</span>
+                        <label id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</label>
                         <MultiSelectDropdown
+                            id="language-select"
+                            aria-labelledby="language-label"
                             items={languageItems}
                             selected={selectedLanguages}
                             onChange={(v) => setSelectedLanguages(v)}
@@ -578,8 +583,10 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Source Types */}
                     <div className="space-y-2">
-                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</span>
+                        <label id="sources-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</label>
                         <MultiSelectDropdown
+                            id="sources-select"
+                            aria-labelledby="sources-label"
                             items={sourceTypes}
                             selected={selectedSourceTypes}
                             onChange={(v) => setSelectedSourceTypes(v)}
@@ -592,28 +599,34 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Dates */}
                     <div className="space-y-2">
-                        <span className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</span>
-                        <div className="grid grid-cols-2 gap-2">
-                            <label htmlFor="date-from" className="sr-only">Date From</label>
-                            <input
-                                id="date-from"
-                                name="date-from"
-                                type="date"
-                                value={dateFrom}
-                                onChange={(e) => setDateFrom(e.target.value)}
-                                autoComplete="off"
-                                className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                            />
-                            <label htmlFor="date-to" className="sr-only">Date To</label>
-                            <input
-                                id="date-to"
-                                name="date-to"
-                                type="date"
-                                value={dateTo}
-                                onChange={(e) => setDateTo(e.target.value)}
-                                autoComplete="off"
-                                className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                            />
+                        <label id="date-range-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</label>
+                        <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="date-range-label">
+                            <div className="space-y-1">
+                                <label htmlFor="date-from" className="sr-only">Date From</label>
+                                <input
+                                    id="date-from"
+                                    name="date-from"
+                                    aria-label={t('date_from')}
+                                    type="date"
+                                    value={dateFrom}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                    autoComplete="off"
+                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label htmlFor="date-to" className="sr-only">Date To</label>
+                                <input
+                                    id="date-to"
+                                    name="date-to"
+                                    aria-label={t('date_to')}
+                                    type="date"
+                                    value={dateTo}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                    autoComplete="off"
+                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

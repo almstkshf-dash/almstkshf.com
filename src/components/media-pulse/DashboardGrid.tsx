@@ -170,13 +170,15 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     </div>
                     <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('emotional_pulse')}</h4>
 
-                    <EmotionRadarChart 
-                        data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
-                            subject,
-                            value: value as number,
-                            fullMark: 100
-                        }))}
-                    />
+                    <div className="h-[200px] w-full">
+                        <EmotionRadarChart 
+                            data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
+                                subject,
+                                value: value as number,
+                                fullMark: 100
+                            }))}
+                        />
+                    </div>
 
                     {/* Emotions breakdown table/list */}
                     {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
@@ -219,24 +221,26 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     className="p-6 bg-card border border-border rounded-2xl space-y-4 shadow-sm transition-colors"
                 >
                     <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('articles_trend')}</h4>
-                    <ArticlesTrendChart 
-                        data={articles.length > 0 ? (
-                            // Simple transformation for trend if not provided by analytics
-                            Object.entries(
-                                articles.reduce((acc: any, a) => {
-                                    const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                                    acc[date] = (acc[date] || 0) + 1;
-                                    return acc;
-                                }, {})
-                            ).map(([date, count]) => ({ date, count: count as number }))
-                        ) : [
-                            { date: 'Mon', count: 4 },
-                            { date: 'Tue', count: 3 },
-                            { date: 'Wed', count: 7 },
-                            { date: 'Thu', count: 5 },
-                            { date: 'Fri', count: 8 },
-                        ]}
-                    />
+                    <div className="h-[160px] w-full">
+                        <ArticlesTrendChart 
+                            data={articles.length > 0 ? (
+                                // Simple transformation for trend if not provided by analytics
+                                Object.entries(
+                                    articles.reduce((acc: any, a) => {
+                                        const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                        acc[date] = (acc[date] || 0) + 1;
+                                        return acc;
+                                    }, {})
+                                ).map(([date, count]) => ({ date, count: count as number }))
+                            ) : [
+                                { date: 'Mon', count: 4 },
+                                { date: 'Tue', count: 3 },
+                                { date: 'Wed', count: 7 },
+                                { date: 'Thu', count: 5 },
+                                { date: 'Fri', count: 8 },
+                            ]}
+                        />
+                    </div>
                 </motion.div>
 
                 {/* Geographic Reach — proper card with ranked bars */}

@@ -215,7 +215,10 @@ export default function OsintTab() {
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <label htmlFor="lookup-input" className="sr-only">{currentType.placeholder}</label>
                 <input
+                  id="lookup-input"
+                  name="lookup"
                   type="text"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
@@ -410,32 +413,32 @@ export default function OsintTab() {
               {/* Reuse of standard filters */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.category')}</label>
-                  <select className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={category} onChange={e => { setCategory(e.target.value); setPage(0); }}>
+                  <label htmlFor="dir-category" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.category')}</label>
+                  <select id="dir-category" name="category" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={category} onChange={e => { setCategory(e.target.value); setPage(0); }}>
                     <option value="all">Global (All)</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.label')}</label>
-                  <select className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={labelFilter} onChange={e => { setLabelFilter(e.target.value); setPage(0); }}>
+                  <label htmlFor="dir-label" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.label')}</label>
+                  <select id="dir-label" name="label" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={labelFilter} onChange={e => { setLabelFilter(e.target.value); setPage(0); }}>
                     <option value="all">Any Access</option>
                     {LABELS.map(l => <option key={l.code} value={l.code}>{l.text}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.language')}</label>
-                  <select className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={language} onChange={e => { setLanguage(e.target.value); setPage(0); }}>
+                  <label htmlFor="dir-lang" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.language')}</label>
+                  <select id="dir-lang" name="language" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={language} onChange={e => { setLanguage(e.target.value); setPage(0); }}>
                     <option value="all">Multi-language</option>
                     <option value="en">English Only</option>
                     <option value="ar">Arabic Oriented</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.search')}</label>
+                  <label htmlFor="dir-search" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.search')}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                    <input className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
+                    <input id="dir-search" name="search" className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
                   </div>
                 </div>
               </div>

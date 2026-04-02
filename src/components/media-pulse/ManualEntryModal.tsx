@@ -34,6 +34,9 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         content: '',
         imageUrl: '',
         sourceCountry: 'AE',
+        likes: 0,
+        retweets: 0,
+        replies: 0,
     });
 
     if (!isOpen) return null;
@@ -72,6 +75,9 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 reach: reachValue,
                 ave: ave,
                 imageUrl: formData.imageUrl || undefined,
+                likes: formData.likes || 0,
+                retweets: formData.retweets || 0,
+                replies: formData.replies || 0,
                 isManual: true,
             });
 
@@ -87,6 +93,9 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 content: '',
                 imageUrl: '',
                 sourceCountry: 'AE',
+                likes: 0,
+                retweets: 0,
+                replies: 0,
             });
 
             onClose();
@@ -295,6 +304,45 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 value={formData.sourceCountry}
                                 onChange={e => setFormData({ ...formData, sourceCountry: e.target.value.toUpperCase() })}
                                 autoComplete="country"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                            <label htmlFor="likes" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('likes')}</label>
+                            <input
+                                id="likes"
+                                name="likes"
+                                type="number"
+                                placeholder="0"
+                                value={formData.likes}
+                                onChange={e => setFormData({ ...formData, likes: Number(e.target.value) })}
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="retweets" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('retweets')}</label>
+                            <input
+                                id="retweets"
+                                name="retweets"
+                                type="number"
+                                placeholder="0"
+                                value={formData.retweets}
+                                onChange={e => setFormData({ ...formData, retweets: Number(e.target.value) })}
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="replies" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('replies')}</label>
+                            <input
+                                id="replies"
+                                name="replies"
+                                type="number"
+                                placeholder="0"
+                                value={formData.replies}
+                                onChange={e => setFormData({ ...formData, replies: Number(e.target.value) })}
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                             />
                         </div>

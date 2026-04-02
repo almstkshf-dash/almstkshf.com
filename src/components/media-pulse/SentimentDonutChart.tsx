@@ -57,7 +57,8 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
 
     return (
         <div className="relative w-full h-[180px] flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
+            {mounted && (
+                <ResponsiveContainer width="100%" height="100%" minHeight={180}>
                 <PieChart>
                     <Pie
                         data={chartData}
@@ -86,6 +87,7 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
                     />
                 </PieChart>
             </ResponsiveContainer>
+            )}
 
             {/* NSS Index Overlay */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center pb-2">

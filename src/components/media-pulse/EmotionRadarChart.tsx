@@ -39,7 +39,8 @@ export default function EmotionRadarChart({ data }: EmotionRadarChartProps) {
 
     return (
         <div className="w-full h-[200px] flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
+            {mounted && (
+                <ResponsiveContainer width="100%" height="100%" minHeight={200}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={translatedData}>
                     <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
                     <PolarAngleAxis 
@@ -56,6 +57,7 @@ export default function EmotionRadarChart({ data }: EmotionRadarChartProps) {
                     />
                 </RadarChart>
             </ResponsiveContainer>
+            )}
         </div>
     );
 }

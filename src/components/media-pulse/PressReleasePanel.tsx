@@ -113,7 +113,10 @@ export default function PressReleasePanel() {
                 <div className="flex gap-3">
                     <div className="flex-1 relative">
                         <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <label htmlFor="pr-keyword-input" className="sr-only">{t('keyword_placeholder')}</label>
                         <input
+                            id="pr-keyword-input"
+                            name="keyword"
                             type="text"
                             value={keyword}
                             onChange={e => setKeyword(e.target.value)}
@@ -123,8 +126,10 @@ export default function PressReleasePanel() {
                         />
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('max_per_feed')}</label>
+                        <label htmlFor="pr-limit-per-feed" className="text-xs text-muted-foreground whitespace-nowrap">{t('max_per_feed')}</label>
                         <input
+                            id="pr-limit-per-feed"
+                            name="limitPerFeed"
                             type="number"
                             min={5}
                             max={200}
@@ -139,16 +144,20 @@ export default function PressReleasePanel() {
                 {/* Row 2: date range + sync button */}
                 <div className="flex gap-3 items-center">
                     <div className="flex items-center gap-2 flex-1">
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('date_from')}</label>
+                        <label htmlFor="pr-date-from" className="text-xs text-muted-foreground whitespace-nowrap">{t('date_from')}</label>
                         <input
+                            id="pr-date-from"
+                            name="dateFrom"
                             type="date"
                             value={dateFrom}
                             onChange={e => setDateFrom(e.target.value)}
                             className="flex-1 px-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                             disabled={loading}
                         />
-                        <label className="text-xs text-muted-foreground whitespace-nowrap">{t('date_to')}</label>
+                        <label htmlFor="pr-date-to" className="text-xs text-muted-foreground whitespace-nowrap">{t('date_to')}</label>
                         <input
+                            id="pr-date-to"
+                            name="dateTo"
                             type="date"
                             value={dateTo}
                             min={dateFrom || undefined}

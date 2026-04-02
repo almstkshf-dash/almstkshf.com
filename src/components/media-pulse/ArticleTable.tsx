@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer } from 'lucide-react';
+import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useState, useMemo, memo } from 'react';
 import clsx from 'clsx';
@@ -140,6 +140,9 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                             <th className="p-4 font-bold">{t('col_depth')}</th>
                             <th className="p-4 font-bold">{t('col_sentiment')}</th>
                             <th className="p-4 font-bold text-right">{t('col_reach')}</th>
+                            <th className="p-4 font-bold text-right">{t('col_likes')}</th>
+                            <th className="p-4 font-bold text-right">{t('col_retweets')}</th>
+                            <th className="p-4 font-bold text-right">{t('col_replies')}</th>
                             <th className="p-4 font-bold text-right">{t('col_ave')}</th>
                             <th className="p-4 font-bold text-center">{t('col_status')}</th>
                             <th className="p-4 font-bold text-center w-12"></th>
@@ -229,10 +232,34 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     </span>
                                 </td>
                                 <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
-                                    {article.reach?.toLocaleString()}
+                                    {article.reach?.toLocaleString() || '—'}
+                                </td>
+                                <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+                                    {article.likes !== undefined ? (
+                                        <div className="flex items-center justify-end gap-1.5">
+                                            <span className="tabular-nums">{article.likes.toLocaleString()}</span>
+                                            <Heart className="w-3 h-3 text-status-error-fg/70" />
+                                        </div>
+                                    ) : '—'}
+                                </td>
+                                <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+                                    {article.retweets !== undefined ? (
+                                        <div className="flex items-center justify-end gap-1.5">
+                                            <span className="tabular-nums">{article.retweets.toLocaleString()}</span>
+                                            <Share2 className="w-3 h-3 text-status-success-fg/70" />
+                                        </div>
+                                    ) : '—'}
+                                </td>
+                                <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+                                    {article.replies !== undefined ? (
+                                        <div className="flex items-center justify-end gap-1.5">
+                                            <span className="tabular-nums">{article.replies.toLocaleString()}</span>
+                                            <MessageCircle className="w-3 h-3 text-status-info-fg/70" />
+                                        </div>
+                                    ) : '—'}
                                 </td>
                                 <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors">
-                                    ${article.ave?.toLocaleString()}
+                                    ${article.ave?.toLocaleString() || '0'}
                                 </td>
                                 <td className="p-4 text-center">
                                     <span className={clsx(

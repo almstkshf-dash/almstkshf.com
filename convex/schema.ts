@@ -30,6 +30,9 @@ export default defineSchema({
         ave: v.number(),
         imageUrl: v.optional(v.string()), // For PDF thumbnails
         isManual: v.optional(v.boolean()), // To distinguish manual entries
+        likes: v.optional(v.number()),
+        retweets: v.optional(v.number()),
+        replies: v.optional(v.number()),
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
 
@@ -52,6 +55,8 @@ export default defineSchema({
             twitterBearer: v.optional(v.string()),
             twitterConsumerKey: v.optional(v.string()),
             twitterConsumerSecret: v.optional(v.string()),
+            twitterAccessToken: v.optional(v.string()),
+            twitterAccessTokenSecret: v.optional(v.string()),
             newsdata: v.optional(v.string()),
             newsapi: v.optional(v.string()),
             gnews: v.optional(v.string()),
@@ -164,6 +169,10 @@ export default defineSchema({
             gnews: v.optional(v.string()),
             worldnews: v.optional(v.string()),
             twitterBearer: v.optional(v.string()),
+            twitterConsumerKey: v.optional(v.string()),
+            twitterConsumerSecret: v.optional(v.string()),
+            twitterAccessToken: v.optional(v.string()),
+            twitterAccessTokenSecret: v.optional(v.string()),
             hibp: v.optional(v.string()),
             whoisjson: v.optional(v.string()),
             abuseipdb: v.optional(v.string()),

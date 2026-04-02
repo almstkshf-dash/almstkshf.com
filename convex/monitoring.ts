@@ -82,6 +82,9 @@ export const saveArticle = mutation({
         ave: v.number(),
         imageUrl: v.optional(v.string()),
         isManual: v.optional(v.boolean()),
+        likes: v.optional(v.number()),
+        retweets: v.optional(v.number()),
+        replies: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
         // Ensure sourceType matches schema validator

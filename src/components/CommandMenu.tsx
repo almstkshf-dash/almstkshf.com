@@ -67,7 +67,13 @@ export function CommandMenu() {
                 >
                     <div className="flex items-center border-b border-border px-4 py-3" cmdk-input-wrapper="">
                         <Search className="me-3 h-5 w-5 shrink-0 opacity-50" />
+                        <label htmlFor="command-search-input" className="sr-only">
+                            {t('search_placeholder') || "Search for pages, tools, or settings..."}
+                        </label>
                         <Command.Input
+                            id="command-search-input"
+                            aria-label={t('search_placeholder') || "Search for pages, tools, or settings..."}
+                            name="search"
                             placeholder={t('search_placeholder') || "Search for pages, tools, or settings..."}
                             autoComplete="off"
                             className="flex h-10 w-full rounded-md bg-transparent py-3 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
