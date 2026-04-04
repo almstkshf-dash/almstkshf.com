@@ -76,7 +76,21 @@ export async function POST(request: NextRequest) {
                 const session = event.data.object as Stripe.Checkout.Session;
                 console.log('✅ Async payment successful:', session.id);
 
-                // TODO: Fulfill the purchase
+                // Initialize Convex Client
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                // Update the payment status to 'paid'
+                await convex.mutation(api.payments.recordPayment, {
+                    stripeSessionId: session.id,
+                    userId: session.client_reference_id || session.metadata?.userId,
+                    amount: (session.amount_total || 0) / 100,
+                    currency: session.currency || 'usd',
+                    status: 'paid',
+                    productName: session.metadata?.productName || 'Default Product',
+                    customerEmail: session.customer_details?.email || undefined,
+                });
 
                 break;
             }
@@ -85,9 +99,21 @@ export async function POST(request: NextRequest) {
                 const session = event.data.object as Stripe.Checkout.Session;
                 console.log('❌ Async payment failed:', session.id);
 
-                // TODO: Handle failed payment
-                // - Send notification email
-                // - Log the failure
+                // Initialize Convex Client
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                // Update the payment status to 'failed'
+                await convex.mutation(api.payments.recordPayment, {
+                    stripeSessionId: session.id,
+                    userId: session.client_reference_id || session.metadata?.userId,
+                    amount: (session.amount_total || 0) / 100,
+                    currency: session.currency || 'usd',
+                    status: 'failed',
+                    productName: session.metadata?.productName || 'Default Product',
+                    customerEmail: session.customer_details?.email || undefined,
+                });
 
                 break;
             }

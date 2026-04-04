@@ -4,11 +4,12 @@ import { useQuery, useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
     Loader2, RefreshCw, ScanSearch, Globe, Languages,
-    Hash, CheckCircle2, XCircle, Clock
+    Hash, CheckCircle2, XCircle, Clock, FileText, FileSpreadsheet
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 import { useState } from 'react';
+import { ReportGenerator } from '@/lib/report-generator';
 
 export default function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
@@ -24,11 +25,25 @@ export default function DeepStatusPanel() {
     const [countries, setCountries] = useState('ae,sa,eg');
     const [languages, setLanguages] = useState('en,ar');
     const [limit, setLimit] = useState(20);
+    const messages = useMessages();
 
     // UI state
     const [loading, setLoading] = useState(false);
+    const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    const handleExport = async (format: 'pdf' | 'excel') => {
+        if (!runs || runs.length === 0) return;
+        setIsExporting(format);
+        try {
+            await ReportGenerator.exportDeepWebReport(runs, messages, format);
+        } catch (err) {
+            console.error('Deep Web export failed:', err);
+        } finally {
+            setIsExporting(null);
+        }
+    };
 
     const handleFetch = async () => {
         if (!isAuthenticated) {
@@ -167,11 +182,38 @@ export default function DeepStatusPanel() {
                 )}
             </div>
 
-            {/* ── Recent Scans Card ── */}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-3">
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    {t('recent_runs')}
+                <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        {t('recent_runs')}
+                    </div>
+                    {runs && runs.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleExport('pdf')}
+                                disabled={!!isExporting}
+                                isLoading={isExporting === 'pdf'}
+                                className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                            >
+                                <FileText className="w-3 h-3" />
+                                PDF
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleExport('excel')}
+                                disabled={!!isExporting}
+                                isLoading={isExporting === 'excel'}
+                                className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                            >
+                                <FileSpreadsheet className="w-3 h-3" />
+                                EXCEL
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {runs === undefined && (

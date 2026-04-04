@@ -1,15 +1,18 @@
 "use client";
 
-import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe } from "lucide-react";
+import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
-import { useMemo, memo } from "react";
+import { useMemo, memo, useState } from "react";
 import SentimentDonutChart from "./SentimentDonutChart";
 import EmotionRadarChart from "./EmotionRadarChart";
 import ArticlesTrendChart from "./ArticlesTrendChart";
 import { TrendingUp } from "lucide-react";
+import { ReportGenerator } from "@/lib/report-generator";
+import Button from "@/components/ui/Button";
+import { useMessages } from "next-intl";
 
 interface DashboardGridProps {
     articles?: any[];
@@ -29,6 +32,9 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const tDashboard = useTranslations("Dashboard");
 
+    const sentimentDonutT = useTranslations("MediaPulseDetail.sentiment_donut");
+    const messages = useMessages();
+    
     // Memoize stats to avoid heavy reduction on every re-render
     const { totalReach, totalAVE } = useMemo(() => {
         return {
@@ -46,6 +52,21 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
     const riskScore = analytics?.riskScore ?? 0;
     const nss = analytics?.nss ?? 0;
 
+    const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
+
+    const handleExport = async (format: 'pdf' | 'excel') => {
+        setIsExporting(format);
+        try {
+            await ReportGenerator.exportPressReleaseReport(articles, messages, format);
+        } catch (error) {
+            console.error('Export failed:', error);
+        } finally {
+            setIsExporting(null);
+        }
+    };
+
+    const isPressRelease = articles.some(a => a.sourceType === 'Press Release');
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Pulse View */}
@@ -57,7 +78,33 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-foreground transition-colors">{t('live_stream')}</h2>
-                            <div className="flex gap-2">
+                            <div className="flex items-center gap-2">
+                                {isPressRelease && (
+                                    <div className="flex items-center gap-2 mr-4 pr-4 border-r border-border">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleExport('pdf')}
+                                            disabled={!!isExporting}
+                                            isLoading={isExporting === 'pdf'}
+                                            className="h-8 text-[10px] uppercase tracking-widest font-bold gap-2 rounded-xl"
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            PDF
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleExport('excel')}
+                                            disabled={!!isExporting}
+                                            isLoading={isExporting === 'excel'}
+                                            className="h-8 text-[10px] uppercase tracking-widest font-bold gap-2 rounded-xl"
+                                        >
+                                            <FileSpreadsheet className="w-3.5 h-3.5" />
+                                            EXCEL
+                                        </Button>
+                                    </div>
+                                )}
                                 <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-widest">{t('real_time')}</div>
                                 <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center transition-colors">{t('global')}</div>
                             </div>

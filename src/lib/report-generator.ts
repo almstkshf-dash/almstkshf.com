@@ -1,0 +1,575 @@
+import ExcelJS from 'exceljs';
+import type { jsPDF } from 'jspdf';
+
+// ════════════════════════════════════════════════════════════════════════
+// TYPES & INTERFACES
+// ════════════════════════════════════════════════════════════════════════
+
+export interface ReportArticle {
+    title: string;
+    publishedDate?: string;
+    url?: string;
+    source?: string;
+    sourceType?: string;
+    sentiment?: string;
+    reach?: number;
+    ave?: number;
+    content?: string;
+    [key: string]: any;
+}
+
+export interface DeepWebRun {
+    _id: string;
+    _creationTime: number;
+    status: string;
+    source?: string;
+    articlesCount?: number;
+    errorMessage?: string;
+}
+
+export interface OsintResult {
+    _id?: string;
+    query: string;
+    type: string;
+    result: any;
+    createdAt?: number;
+    timestamp?: number;
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// CONSTANTS & THEME
+// ════════════════════════════════════════════════════════════════════════
+
+const BRAND_DARK = [31, 78, 120] as const;
+const BRAND_AMBER = [218, 165, 32] as const;
+const ACCENT_BG = [245, 247, 250] as const;
+
+// ════════════════════════════════════════════════════════════════════════
+// UTILITY: REPORT GENERATOR
+// ════════════════════════════════════════════════════════════════════════
+
+export class ReportGenerator {
+    // ════════════════════════════════════════════════════════════════════════
+    // PUBLIC METHODS
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Specialized Press Release Report (Reach & AVE Focus)
+     */
+    static async exportPressReleaseReport(articles: ReportArticle[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+        const title = translations.reports?.pr_title || 'Press Release Coverage Report';
+        if (format === 'excel') {
+            return this.generateExcel(articles, translations, title);
+        }
+        return this.generatePressReleasePDF(articles, translations, title);
+    }
+
+    /**
+     * Deep Web Risk Assessment Report
+     */
+    static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[], translations: any) {
+        const title = translations.reports?.deep_title || 'Deep Web Risk Assessment';
+        return this.generateDeepWebPDF(runs, threats, translations, title);
+    }
+
+    /**
+     * OSINT Technical Dossier (Single or History)
+     */
+    static async exportOsintReport(data: OsintResult | OsintResult[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+        const title = translations.reports?.osint_title || 'OSINT Technical Dossier';
+        if (Array.isArray(data)) {
+            if (format === 'excel') {
+                return this.generateOsintHistoryExcel(data, translations, title);
+            }
+            return this.generateOsintHistoryPDF(data, translations, title);
+        }
+
+        if (format === 'excel') {
+            // Excel for single result is just a key-value list
+            return this.generateOsintHistoryExcel([data], translations, `${title}: ${data.query}`);
+        }
+        return this.generateOsintPDF(data, translations, `${title}: ${data.query}`);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // FEATURE-SPECIFIC PDF GENERATORS
+    // ════════════════════════════════════════════════════════════════════════
+
+    private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+
+        // Cover Page
+        this.addCoverPage(doc, title, articles.length, translations, logoBase64);
+
+        // Summary Page with Reach/AVE charts
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.reports?.summary || 'Metrics Summary', 14, y, fontLoaded);
+        y += 12;
+
+        const totalReach = articles.reduce((sum, a) => sum + (a.reach || 0), 0);
+        const totalAVE = articles.reduce((sum, a) => sum + (a.ave || 0), 0);
+
+        this.drawMetricBoxes(doc, [
+            { label: translations.reports?.total_reach || 'TOTAL REACH', value: totalReach.toLocaleString(), color: BRAND_DARK },
+            { label: translations.reports?.total_ave || 'AD VALUE (AVE)', value: `$${totalAVE.toLocaleString()}`, color: BRAND_AMBER },
+            { label: translations.reports?.article_count || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] }
+        ], y, pageWidth);
+        y += 40;
+
+        // Article Table
+        this.drawHeading(doc, translations.reports?.coverage_details || 'Coverage Details', 14, y, fontLoaded);
+
+        const tableData = articles.map(a => [
+            a.publishedDate || '',
+            this.fixArabic(a.title),
+            a.source || '',
+            (a.reach || 0).toLocaleString(),
+            `$${(a.ave || 0).toLocaleString()}`
+        ]);
+
+        await this.addAutoTable(doc, {
+            head: [[
+                translations.reports?.col_date || 'Date',
+                translations.reports?.col_title || 'Title',
+                translations.reports?.col_source || 'Source',
+                translations.reports?.col_reach || 'Reach',
+                translations.reports?.col_ave || 'AVE'
+            ]],
+            body: tableData,
+            startY: y + 8,
+            fontLoaded,
+            logoBase64,
+            translations
+        });
+
+        this.finalizePDF(doc, title, translations);
+    }
+
+    private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+
+        this.addCoverPage(doc, title, threats.length, translations, logoBase64);
+
+        // Ingestion Logs Section
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.reports?.ingestion_logs || 'Ingestion Activity (Last 10 Runs)', 14, y, fontLoaded);
+
+        const logsTable = runs.slice(0, 10).map(r => [
+            new Date(r._creationTime).toLocaleString(),
+            r.source || 'Generic',
+            r.status.toUpperCase(),
+            r.articlesCount?.toString() || '0'
+        ]);
+
+        await this.addAutoTable(doc, {
+            head: [[
+                translations.reports?.col_time || 'Timestamp',
+                translations.reports?.col_source || 'Source',
+                translations.reports?.col_status || 'Status',
+                translations.reports?.col_count || 'Articles'
+            ]],
+            body: logsTable,
+            startY: y + 8,
+            fontLoaded,
+            logoBase64,
+            translations
+        });
+
+        // Identified Threats Section
+        y = (doc as any).lastAutoTable.finalY + 15;
+        this.drawHeading(doc, translations.reports?.identified_threats || 'High-Risk identified Threats', 14, y, fontLoaded);
+
+        const threatsTable = threats.map(t => [
+            t.publishedDate || '',
+            this.fixArabic(t.title),
+            t.sentiment || 'Neutral',
+            this.fixArabic(t.source || '')
+        ]);
+
+        await this.addAutoTable(doc, {
+            head: [[
+                translations.reports?.col_date || 'Date',
+                translations.reports?.col_title || 'Headline / Snippet',
+                translations.reports?.col_sentiment || 'Sentiment',
+                translations.reports?.col_source || 'Platform'
+            ]],
+            body: threatsTable,
+            startY: y + 8,
+            fontLoaded,
+            logoBase64,
+            translations
+        });
+
+        this.finalizePDF(doc, title, translations);
+    }
+
+    private static async generateOsintHistoryPDF(items: OsintResult[], translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+
+        this.addCoverPage(doc, title, items.length, translations, logoBase64);
+
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.OsintTab?.export_history || 'Investigation History', 14, y, fontLoaded);
+
+        const tableData = items.map(item => [
+            new Date(item.createdAt || item.timestamp || Date.now()).toLocaleString(),
+            item.query,
+            item.type.toUpperCase(),
+            typeof item.result === 'object' ? Object.keys(item.result).length.toString() : '1'
+        ]);
+
+        await this.addAutoTable(doc, {
+            head: [[
+                translations.reports?.col_time || 'Timestamp',
+                translations.reports?.investigation_target || 'Target',
+                translations.reports?.investigation_type || 'Type',
+                translations.reports?.data_points || 'Attributes'
+            ]],
+            body: tableData,
+            startY: y + 8,
+            fontLoaded,
+            logoBase64,
+            translations
+        });
+
+        this.finalizePDF(doc, title, translations);
+    }
+
+    private static async generateOsintPDF(data: OsintResult, translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+
+        // Custom Dossier Cover
+        this.addCoverPage(doc, title, 1, translations, logoBase64);
+
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.reports?.investigation_target || 'Investigation Target', 14, y, fontLoaded);
+        y += 10;
+
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(...BRAND_AMBER);
+        doc.text(data.query, 20, y);
+        y += 8;
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(`${translations.reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`, 20, y);
+        y += 15;
+
+        // Parse Results JSON into structured tables
+        const result = data.result;
+        if (result && typeof result === 'object') {
+            // General Info Table
+            const details = Object.entries(result)
+                .filter(([_, v]) => typeof v !== 'object')
+                .slice(0, 25);
+
+            if (details.length > 0) {
+                this.drawHeading(doc, translations.reports?.technical_details || 'Technical Attributes', 14, y, fontLoaded);
+                await this.addAutoTable(doc, {
+                    head: [[translations.reports?.attribute || 'Attribute', translations.reports?.value || 'Value']],
+                    body: details.map(([k, v]) => [k, String(v)]),
+                    startY: y + 8,
+                    fontLoaded,
+                    logoBase64,
+                    translations
+                });
+                y = (doc as any).lastAutoTable.finalY + 15;
+            }
+
+            // Entity Map
+            const entities = (result as any).entities || (result as any).associations || [];
+            if (Array.isArray(entities) && entities.length > 0) {
+                if (y > 220) { doc.addPage(); y = 30; this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded); }
+                this.drawHeading(doc, translations.reports?.entity_map || 'Identified Entities & Associations', 14, y, fontLoaded);
+                await this.addAutoTable(doc, {
+                    head: [[translations.reports?.entity_name || 'Entity Name', translations.reports?.entity_type || 'Type', translations.reports?.relevance || 'Relevance']],
+                    body: entities.map((e: any) => [
+                        this.fixArabic(e.name || e.value || String(e)),
+                        e.type || 'Unknown',
+                        e.score || e.relevance || 'High'
+                    ]),
+                    startY: y + 8,
+                    fontLoaded,
+                    logoBase64,
+                    translations
+                });
+            }
+        }
+
+        this.finalizePDF(doc, title, translations);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS: PDF CORE
+    // ════════════════════════════════════════════════════════════════════════
+
+    private static async initPDF(translations: any) {
+        const { jsPDF } = await import('jspdf');
+        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_line_height"] });
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+
+        let fontLoaded = false;
+        try {
+            const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw74NL.ttf';
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout for font load
+
+            const res = await fetch(fontUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+                const arrayBuffer = await res.arrayBuffer();
+                const base64 = this.arrayBufferToBase64(arrayBuffer);
+                doc.addFileToVFS('Amiri-Regular.ttf', base64);
+                doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+                fontLoaded = true;
+            }
+        } catch (e) {
+            console.warn('Amiri font load failed or timed out. Falling back to system fonts.', e);
+        }
+
+        const logoBase64 = await this.loadLogo();
+
+        return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
+    }
+
+    private static addCoverPage(doc: jsPDF, title: string, count: number, translations: any, logoBase64: string | null) {
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+
+        doc.setFillColor(...BRAND_DARK);
+        doc.rect(0, 0, pageWidth, 70, 'F');
+
+        if (logoBase64) {
+            try { doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 15, 15, 30, 30); } catch { /* */ }
+        }
+
+        doc.setFontSize(12);
+        doc.setTextColor(255, 255, 255);
+        doc.text(translations.brand_name || 'ALMSTKSHF', pageWidth / 2, 55, { align: 'center' });
+
+        doc.setFontSize(24);
+        doc.setTextColor(...BRAND_DARK);
+        doc.text(title.toUpperCase(), pageWidth / 2, pageHeight / 2 - 10, { align: 'center' });
+
+        doc.setDrawColor(...BRAND_AMBER);
+        doc.setLineWidth(1);
+        doc.line(pageWidth / 4, pageHeight / 2, (pageWidth * 3) / 4, pageHeight / 2);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`${translations.reports?.generated_at || 'Generated'}: ${new Date().toLocaleDateString()}`, pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
+        doc.text(`${translations.reports?.data_points || 'Total Data Points'}: ${count}`, pageWidth / 2, pageHeight / 2 + 22, { align: 'center' });
+
+        doc.setFillColor(...BRAND_DARK);
+        doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+    }
+
+    private static async addAutoTable(doc: jsPDF, options: any) {
+        const autoTable = (await import('jspdf-autotable')).default;
+        return autoTable(doc, {
+            ...options,
+            styles: {
+                fontSize: 8,
+                font: options.fontLoaded ? 'Amiri' : 'helvetica',
+                cellPadding: 3,
+            },
+            headStyles: {
+                fillColor: BRAND_DARK,
+                textColor: [255, 255, 255],
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: { fillColor: ACCENT_BG },
+            didParseCell: (data) => {
+                if (data.section === 'body' && typeof data.cell.raw === 'string' && /[\u0600-\u06FF]/.test(data.cell.raw)) {
+                    data.cell.styles.halign = 'right';
+                }
+            }
+        });
+    }
+
+    private static finalizePDF(doc: jsPDF, title: string, translations: any) {
+        const pages = doc.getNumberOfPages();
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+
+        for (let i = 1; i <= pages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7);
+            doc.setTextColor(150);
+            doc.text(`${translations.brand_name || 'ALMSTKSHF'} | ${title}`, 14, pageHeight - 10);
+            doc.text(`Page ${i} / ${pages}`, pageWidth - 14, pageHeight - 10, { align: 'right' });
+        }
+
+        doc.save(`${title.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // PRIVATE HELPERS: COMMON UI
+    // ════════════════════════════════════════════════════════════════════════
+
+    private static drawHeading(doc: jsPDF, text: string, x: number, y: number, fontLoaded: boolean) {
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(...BRAND_DARK);
+        const processed = this.fixArabic(text);
+        doc.text(processed, x, y);
+    }
+
+    private static drawMetricBoxes(doc: jsPDF, boxes: { label: string, value: string, color: readonly [number, number, number] | [number, number, number] }[], y: number, pageWidth: number) {
+        const boxW = (pageWidth - 40) / boxes.length;
+        boxes.forEach((box, i) => {
+            const x = 14 + i * (boxW + 6);
+            doc.setFillColor(...ACCENT_BG);
+            doc.roundedRect(x, y, boxW, 25, 2, 2, 'F');
+            doc.setFontSize(7);
+            doc.setTextColor(100);
+            doc.text(box.label, x + boxW / 2, y + 8, { align: 'center' });
+            doc.setFontSize(14);
+            doc.setTextColor(...(box.color as [number, number, number]));
+            doc.text(box.value, x + boxW / 2, y + 18, { align: 'center' });
+        });
+    }
+
+    private static addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number, translations: any, fontLoaded: boolean) {
+        doc.setFillColor(...BRAND_DARK);
+        doc.rect(0, 0, pageWidth, 15, 'F');
+        if (logoBase64) {
+            try { doc.addImage(logoBase64, 'PNG', 5, 2, 11, 11); } catch { /* */ }
+        }
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica');
+        doc.setTextColor(255);
+        doc.setFontSize(10);
+        doc.text(translations.brand_name || 'ALMSTKSHF', 18, 9);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // EXCEL EXPORT (Unified)
+    // ════════════════════════════════════════════════════════════════════════
+
+    private static async generateExcel(articles: ReportArticle[], translations: any, title: string) {
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Report');
+
+        sheet.columns = [
+            { header: translations.reports?.col_date || 'Date', key: 'date', width: 15 },
+            { header: translations.reports?.col_title || 'Title', key: 'title', width: 50 },
+            { header: translations.reports?.col_source || 'Source', key: 'source', width: 20 },
+            { header: translations.reports?.col_reach || 'Reach', key: 'reach', width: 15 },
+            { header: translations.reports?.col_ave || 'AVE ($)', key: 'ave', width: 15 },
+        ];
+
+        const headerRow = sheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
+
+        articles.forEach(a => {
+            sheet.addRow({
+                date: a.publishedDate,
+                title: a.title,
+                source: a.source,
+                reach: a.reach,
+                ave: a.ave
+            });
+        });
+
+        this.downloadWorkbook(workbook, title);
+    }
+
+    private static async generateOsintHistoryExcel(items: OsintResult[], translations: any, title: string) {
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('OSINT History');
+
+        sheet.columns = [
+            { header: translations.reports?.col_time || 'Timestamp', key: 'time', width: 25 },
+            { header: translations.reports?.investigation_target || 'Target', key: 'target', width: 30 },
+            { header: translations.reports?.investigation_type || 'Type', key: 'type', width: 15 },
+            { header: translations.reports?.data_points || 'Attributes', key: 'attrs', width: 15 },
+        ];
+
+        const headerRow = sheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
+
+        items.forEach(item => {
+            sheet.addRow({
+                time: new Date(item.createdAt || item.timestamp || Date.now()).toLocaleString(),
+                target: item.query,
+                type: item.type.toUpperCase(),
+                attrs: typeof item.result === 'object' ? Object.keys(item.result).length : 1
+            });
+        });
+
+        this.downloadWorkbook(workbook, title);
+    }
+
+    private static async downloadWorkbook(workbook: ExcelJS.Workbook, title: string) {
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${title.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
+        link.click();
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // SHARED UTILS (Arabic & Logo)
+    // ════════════════════════════════════════════════════════════════════════
+
+    private static fixArabic(text: string): string {
+        if (!text || !/[\u0600-\u06FF]/.test(text)) return text;
+        const segments = text.split(/(\s+)/);
+        const result: string[] = [];
+        let arabicBuffer: string[] = [];
+
+        for (const seg of segments) {
+            if (/[\u0600-\u06FF]/.test(seg)) {
+                arabicBuffer.push(seg);
+            } else {
+                if (arabicBuffer.length > 0) {
+                    result.push(...arabicBuffer.reverse());
+                    arabicBuffer = [];
+                }
+                result.push(seg);
+            }
+        }
+        if (arabicBuffer.length > 0) result.push(...arabicBuffer.reverse());
+        return /^[\u0600-\u06FF\s\u060C\u061B\u061F\u0640]+$/.test(text) ? result.reverse().join('') : result.join('');
+    }
+
+    private static async loadLogo(): Promise<string | null> {
+        try {
+            const res = await fetch('/logo.png');
+            if (!res.ok) return null;
+            const blob = await res.blob();
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+                reader.readAsDataURL(blob);
+            });
+        } catch { return null; }
+    }
+
+    private static arrayBufferToBase64(buffer: ArrayBuffer): string {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    }
+}

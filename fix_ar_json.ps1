@@ -1,0 +1,42 @@
+$filePath = 'c:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\messages\ar.json'
+$goodContent = Get-Content $filePath | Select-Object -First 1436
+$tail = @(
+    '  },',
+    '  "Reports": {',
+    '    "pr_title": "تقرير تغطية البيان الصحفي",',
+    '    "deep_title": "تقييم مخاطر الشبكة العميقة",',
+    '    "osint_title": "الملف الفني للاستخبارات مفتوحة المصدر",',
+    '    "summary": "ملخص المقاييس",',
+    '    "total_reach": "إجمالي الوصول",',
+    '    "total_ave": "القيمة الإعلانية (AVE)",',
+    '    "article_count": "إجمالي المقالات",',
+    '    "coverage_details": "تفاصيل التغطية",',
+    '    "ingestion_logs": "نشاط الاستيعاب (آخر 10 عمليات)",',
+    '    "identified_threats": "التهديدات المحددة عالية المخاطر",',
+    '    "investigation_target": "هدف التحقيق",',
+    '    "technical_details": "السمات الفنية",',
+    '    "entity_map": "الكيانات والارتباطات المحددة",',
+    '    "investigation_type": "نوع التحقيق",',
+    '    "attribute": "السمة",',
+    '    "value": "القيمة",',
+    '    "entity_name": "اسم الكيان",',
+    '    "entity_type": "النوع",',
+    '    "relevance": "الأهمية",',
+    '    "generated_at": "تاريخ الإنشاء",',
+    '    "data_points": "إجمالي نقاط البيانات",',
+    '    "col_date": "التاريخ",',
+    '    "col_title": "العنوان",',
+    '    "col_source": "المصدر",',
+    '    "col_reach": "الوصول",',
+    '    "col_ave": "AVE ($)",',
+    '    "col_status": "الحالة",',
+    '    "col_time": "الطابع الزمني",',
+    '    "col_count": "المقالات",',
+    '    "col_sentiment": "الانطباع",',
+    '    "export_pdf": "تصدير PDF",',
+    '    "export_excel": "تصدير Excel",',
+    '    "export_dossier": "تصدير الملف"'
+    '  }',
+    '}'
+)
+$goodContent + $tail | Set-Content $filePath -Force

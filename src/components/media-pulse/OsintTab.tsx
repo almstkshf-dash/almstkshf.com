@@ -6,14 +6,16 @@ import {
   ExternalLink, Filter, Shield, Search, Mail, Globe,
   Wifi, User, Phone, CheckCircle2, XCircle,
   ChevronDown, ChevronUp, Clock, Trash2,
+  FileText, FileSpreadsheet
 } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useMessages } from 'next-intl';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ReportGenerator } from '@/lib/report-generator';
 
 // ─── Static directory data ─────────────────────────────────────────────
 const CATEGORIES = [
@@ -60,6 +62,7 @@ export default function OsintTab() {
   const tCommon = useTranslations('Common');
   const tOsint = useTranslations('Osint');
   const tDashboard = useTranslations('Dashboard');
+  const isAdmin = useQuery(api.authQueries.checkIsAdmin);
 
   const LOOKUP_TYPES: Array<{
     type: LookupType;
@@ -83,9 +86,23 @@ export default function OsintTab() {
   const [activeType, setActiveType] = useState<LookupType>('email');
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
+  const messages = useMessages();
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState('');
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    if (!history || history.length === 0) return;
+    setIsExporting(format);
+    try {
+      await ReportGenerator.exportOsintReport(history, messages, format);
+    } catch (err) {
+      console.error('OSINT export failed:', err);
+    } finally {
+      setIsExporting(null);
+    }
+  };
 
   // ── Convex actions (Node.js runtime — osint.ts) ──
   const lookupEmail = useAction(api.osint.lookupEmail);
@@ -131,6 +148,7 @@ export default function OsintTab() {
   // ── Run lookup ──
   const handleLookup = async () => {
     if (!isAuthenticated) { setError(tDashboard('not_authenticated')); return; }
+    if (!isAdmin) { setError(t('admin_only')); return; }
     if (!query.trim()) { setError(tCommon('search_placeholder')); return; }
 
     setLoading(true);
@@ -138,7 +156,7 @@ export default function OsintTab() {
     setResult(null);
 
     try {
-      let res: { data?: Record<string, unknown> } | undefined;
+      let res: { success: boolean; data?: Record<string, unknown>; error?: string } | undefined;
       switch (activeType) {
         case 'email': res = await lookupEmail({ email: query }); break;
         case 'domain': res = await lookupDomain({ domain: query }); break;
@@ -146,9 +164,17 @@ export default function OsintTab() {
         case 'username': res = await lookupUsername({ username: query }); break;
         case 'phone': res = await lookupPhone({ phone: query }); break;
       }
-      setResult(res?.data ?? null);
+      
+      if (res?.success) {
+        setResult(res.data ?? null);
+        setError('');
+      } else {
+        setError(res?.error || tCommon('no_results'));
+        setResult(null);
+      }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : tCommon('no_results'));
+      setResult(null);
     } finally {
       setLoading(false);
     }
@@ -229,18 +255,24 @@ export default function OsintTab() {
                 />
               </div>
               <Button
-                variant="primary"
+                variant={isAdmin ? "primary" : "secondary"}
                 onClick={handleLookup}
                 isLoading={loading}
-                disabled={loading || !isAuthenticated}
-                className="px-8 py-3 font-bold text-sm h-auto shadow-lg shadow-primary/20"
+                disabled={loading || !isAuthenticated || (!isAdmin && !!query)}
+                className={clsx(
+                  "px-8 py-3 font-bold text-sm h-auto shadow-lg",
+                  isAdmin ? "shadow-primary/20" : "opacity-80 grayscale"
+                )}
               >
+                {!isAdmin ? <Shield className="w-4 h-4 mr-2 inline" /> : null}
                 {loading ? tCommon('analyze_tone') : tCommon('generate_report')}
               </Button>
             </div>
             <div className="flex items-center gap-2 px-1">
-              <div className="w-1 h-1 rounded-full bg-primary/40" />
-              <p className="text-[11px] text-muted-foreground font-medium">{currentType.hint}</p>
+              <div className={clsx("w-1.5 h-1.5 rounded-full", isAdmin ? "bg-primary/40" : "bg-amber-500")} />
+              <p className={clsx("text-[11px] font-medium", isAdmin ? "text-muted-foreground" : "text-amber-600 font-bold")}>
+                {!isAdmin ? t('admin_only') : currentType.hint}
+              </p>
             </div>
           </div>
 
@@ -284,9 +316,35 @@ export default function OsintTab() {
         {/* Investigation History */}
         {mounted && isAuthenticated && history && history.length > 0 && (
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">{tDashboard('coverage_log')}</h3>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">{tDashboard('coverage_log')}</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleExport('pdf')}
+                  disabled={!!isExporting}
+                  isLoading={isExporting === 'pdf'}
+                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                >
+                  <FileText className="w-3 h-3" />
+                  PDF
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleExport('excel')}
+                  disabled={!!isExporting}
+                  isLoading={isExporting === 'excel'}
+                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                >
+                  <FileSpreadsheet className="w-3 h-3" />
+                  EXCEL
+                </Button>
+              </div>
             </div>
             <div className="space-y-3">
               {history.map((item) => (

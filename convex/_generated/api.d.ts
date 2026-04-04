@@ -26,7 +26,9 @@ import type * as queries from "../queries.js";
 import type * as settings from "../settings.js";
 import type * as userSettings from "../userSettings.js";
 import type * as utils_auth from "../utils/auth.js";
+import type * as utils_booleanFilter from "../utils/booleanFilter.js";
 import type * as utils_checkAdmin from "../utils/checkAdmin.js";
+import type * as utils_dedup from "../utils/dedup.js";
 import type * as utils_keys from "../utils/keys.js";
 import type * as waitlist from "../waitlist.js";
 
@@ -55,7 +57,9 @@ declare const fullApi: ApiFromModules<{
   settings: typeof settings;
   userSettings: typeof userSettings;
   "utils/auth": typeof utils_auth;
+  "utils/booleanFilter": typeof utils_booleanFilter;
   "utils/checkAdmin": typeof utils_checkAdmin;
+  "utils/dedup": typeof utils_dedup;
   "utils/keys": typeof utils_keys;
   waitlist: typeof waitlist;
 }>;

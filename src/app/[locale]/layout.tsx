@@ -38,10 +38,10 @@ const inter = Inter({
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
     subsets: ["arabic"],
-    weight: ["400", "700"],  // Reduced from 4 weights → 2 weights (saves ~30 KB)
+    weight: ["400", "700"],
     variable: "--font-ibm-plex-arabic",
     display: "swap",
-    preload: true,
+    preload: false, // Fix: Prevent "preloaded but not used" warning on English locale
 });
 
 export function generateStaticParams() {

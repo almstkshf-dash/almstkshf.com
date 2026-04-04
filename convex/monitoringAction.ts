@@ -8,6 +8,8 @@ import * as cheerio from 'cheerio';
 import NewsAPI from 'newsapi';
 import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
+import { parseBooleanKeyword, matchesBooleanFilter, buildApiQuery } from "./utils/booleanFilter";
+import { checkAndSetSeen } from "./utils/dedup";
 
 // ═══════════════════════════════════════════════════════════════════
 // THE SPIDER — Inlined link resolver for Convex Node Runtime
@@ -91,7 +93,7 @@ Return valid JSON ONLY with these exact fields:
   "risk": "Low" | "Medium" | "High"
 }`;
 
-    const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-flash-latest"];
+    const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
 
     for (const model of models) {
         try {
@@ -151,6 +153,75 @@ Return valid JSON ONLY with these exact fields:
         sourceType: "Online News",
         reach_estimate: 50000,
     };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GEMINI RELEVANCY GATE — Returns 0-100 relevancy score
+// Articles scoring below RELEVANCY_THRESHOLD are discarded before DB write.
+// ═══════════════════════════════════════════════════════════════════
+const RELEVANCY_THRESHOLD = 70;
+
+async function callGeminiRelevancyScore(
+    apiKey: string,
+    title: string,
+    snippet: string,
+    keyword: string
+): Promise<number> {
+    const prompt = `You are a media monitoring relevancy judge.
+Keyword being monitored: "${keyword}"
+Article Title: "${title}"
+Article Snippet: "${snippet.substring(0, 500)}"
+
+Score how relevant this article is to the monitoring keyword on a scale of 0 to 100.
+- 100 = the article is directly and substantially about the keyword
+- 70+ = clearly relevant, keyword is a main topic
+- 50-69 = tangentially related, keyword mentioned briefly
+- 0-49 = not relevant, keyword appears incidentally or not at all
+
+Return valid JSON ONLY:
+{"relevancy_score": <number 0-100>, "reason": "<one sentence>"}` ;
+
+    // Use the fastest available model for this quick gate
+    const models = ["gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+
+    for (const model of models) {
+        try {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.1,
+                            responseMimeType: "application/json",
+                        },
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                if (response.status === 404) continue;
+                console.warn(`Relevancy check ${model} returned ${response.status}`);
+                return 100; // Fail-open: allow article if API errors
+            }
+
+            const data = await response.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) return 100;
+
+            const parsed = JSON.parse(text.trim());
+            const score = typeof parsed.relevancy_score === "number" ? parsed.relevancy_score : 100;
+            console.log(`🎯 Relevancy [${score}/100] — ${parsed.reason || ""} — "${title.substring(0, 50)}"`);
+            return score;
+        } catch (e) {
+            console.warn(`Relevancy model ${model} failed:`, e);
+            continue;
+        }
+    }
+
+    return 100; // Fail-open if all models fail
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -219,7 +290,10 @@ export const fetchNews = action({
             }
 
             // Full-phrase search — wrap in quotes for exact match on Google News
-            let enrichedQuery = args.keyword.includes(' ') ? `"${args.keyword}"` : args.keyword;
+            // We use buildApiQuery to get a "clean" version for the API, 
+            // but for RSS we might want to keep the enriched logic.
+            const cleanQuery = buildApiQuery(args.keyword);
+            let enrichedQuery = cleanQuery.includes(' ') ? `"${cleanQuery}"` : cleanQuery;
 
             // Source Type targeting
             const stList = args.sourceTypes ? args.sourceTypes.split(',').map(s => s.trim()) : [];
@@ -266,9 +340,9 @@ export const fetchNews = action({
 
             // 2. FETCH FROM NEWSDATA.IO (Full API)
             if (newsdataKey) {
-                console.log(`📡 Fetching NewsData.io for: ${args.keyword}`);
+                console.log(`📡 Fetching NewsData.io for: ${cleanQuery}`);
                 try {
-                    const ndUrl = `https://newsdata.io/api/1/latest?apikey=${newsdataKey}&q=${encodeURIComponent(args.keyword)}&language=${languageList.join(',')}&country=${countryList.join(',')}`;
+                    const ndUrl = `https://newsdata.io/api/1/latest?apikey=${newsdataKey}&q=${encodeURIComponent(cleanQuery)}&language=${languageList.join(',')}&country=${countryList.join(',')}`;
                     const ndRes = await fetch(ndUrl);
                     if (ndRes.ok) {
                         const ndData = await ndRes.json();
@@ -301,7 +375,7 @@ export const fetchNews = action({
 
                     for (const lang of languageList) {
                         const response = await naClient.v2.everything({
-                            q: args.keyword,
+                            q: cleanQuery,
                             language: lang as any,
                             from: naDateFrom,
                             to: naDateTo,
@@ -342,7 +416,7 @@ export const fetchNews = action({
                             if (gnewsHalt) break;
 
                             // GNews specific: wrap phrase in quotes for exact sequence search if it contains spaces
-                            let gQuery = args.keyword.trim();
+                            let gQuery = cleanQuery.trim();
                             if (gQuery.includes(' ') && !gQuery.startsWith('"')) {
                                 gQuery = `"${gQuery}"`;
                             }
@@ -401,7 +475,7 @@ export const fetchNews = action({
                     // World News API parameters: text (max 100), language, source-country, earliest-publish-date
                     const wnDateFrom = dateFromObj ? dateFromObj.toISOString().replace('T', ' ').split('.')[0] : "";
 
-                    let wnKeyword = args.keyword.trim();
+                    let wnKeyword = cleanQuery.trim();
                     if (wnKeyword.includes(' ') && !wnKeyword.startsWith('"')) {
                         wnKeyword = `"${wnKeyword}"`;
                     }
@@ -458,9 +532,9 @@ export const fetchNews = action({
 
             // 6. FETCH FROM TWITTER (X) if configured
             if (twitterBearer) {
-                console.log(`📡 Fetching Twitter for: ${args.keyword}`);
+                console.log(`📡 Fetching Twitter for: ${cleanQuery}`);
                 try {
-                    const txQuery = encodeURIComponent(args.keyword);
+                    const txQuery = encodeURIComponent(cleanQuery);
                     const txUrl = `https://api.twitter.com/2/tweets/search/recent?query=${txQuery}&max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
 
                     const txRes = await fetch(txUrl, {
@@ -566,14 +640,47 @@ async function processArticle(
     if (!item.link || !item.title) return false;
 
     try {
-        // Date filter
+        // ── GATE 1: Boolean Pre-Filter ─────────────────────────────────────
+        // Evaluates mandatory (+), excluded (-), and phrase terms BEFORE any
+        // API call. Zero cost — pure string matching.
+        const boolExpr = parseBooleanKeyword(keyword);
+        const snippet = item.contentSnippet || item.content || item.title;
+        if (!matchesBooleanFilter(boolExpr, item.title, snippet)) {
+            console.log(`⚡ Boolean reject: "${item.title.substring(0, 60)}..."`);
+            return false;
+        }
+
+        // ── GATE 2: Date Filter ────────────────────────────────────────────
         const pubDate = item.pubDate ? new Date(item.pubDate) : null;
         if (pubDate) {
             if (dateFrom && pubDate < dateFrom) return false;
             if (dateTo && pubDate > dateTo) return false;
         }
 
-        // SPIDER — Resolve URL if needed (RSS redirects)
+        // ── GATE 3: Redis Deduplication (24-hour hash cache) ──────────────
+        // Prevents the same article from multiple providers (NewsData, GNews,
+        // RSS) being stored twice. Uses SHA-256(url+title) with 24h TTL.
+        const isDuplicate = await checkAndSetSeen(item.link, item.title);
+        if (isDuplicate) {
+            return false; // Log already printed inside checkAndSetSeen
+        }
+
+        // ── GATE 4: Gemini Relevancy Score (≥70 required) ─────────────────
+        // Lightweight Gemini call to score how relevant the article is to the
+        // keyword. Articles scoring below 70/100 are discarded before the
+        // full analysis + DB write.
+        const relevancyScore = await callGeminiRelevancyScore(
+            geminiKey,
+            item.title,
+            snippet,
+            keyword
+        );
+        if (relevancyScore < RELEVANCY_THRESHOLD) {
+            console.log(`⚠️ Low relevancy (${relevancyScore}/100) — discarded: "${item.title.substring(0, 60)}"`);
+            return false;
+        }
+
+        // ── RESOLVE: Spider — Resolve URL if needed (RSS redirects) ───────
         let resolvedUrl = item.link;
         let imageUrl = item.imageUrl;
         let sourceName = item.source || item.creator;
@@ -588,11 +695,11 @@ async function processArticle(
             }
         }
 
-        // AI Analysis
+        // ── ANALYSE: Full Gemini Sentiment Analysis ────────────────────────
         const aiData = await callGeminiForAnalysis(
             geminiKey,
             item.title,
-            item.contentSnippet || item.title,
+            snippet,
             keyword,
             stList
         );
@@ -602,7 +709,7 @@ async function processArticle(
         const d = pubDate || new Date();
         const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
-        const isArabic = /[\u0600-\u06FF]/.test(item.title + (item.contentSnippet || ""));
+        const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
         const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
 
         await ctx.runMutation(api.monitoring.saveArticle, {
@@ -674,10 +781,8 @@ export const fetchPressReleaseSources = action({
         const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         const fetchedKeyword = args.keyword?.trim() || "";
-        // Build a lowercase exact-phrase matcher for filtering
-        // If a keyword is provided we require it appears verbatim in the title or snippet.
-        // Multi-word phrases are matched as a contained substring.
-        const keywordFilter = fetchedKeyword.toLowerCase();
+        // Support Boolean logic in Press Release filtering
+        const booleanExpr = parseBooleanKeyword(fetchedKeyword);
         const keyword = fetchedKeyword || "Press Release";
         const itemLimit = args.limit ?? 30;   // per-feed cap — user controlled
 
@@ -700,19 +805,12 @@ export const fetchPressReleaseSources = action({
                     // Each feed pulls up to itemLimit candidates, then we filter by keyword
                     const candidates = feedData.items.slice(0, itemLimit);
 
-                    // ── Keyword filter ──────────────────────────────────────────────
-                    // When a keyword is provided, only keep items that contain it
-                    // verbatim in the title or description (case-insensitive).
-                    const afterKeyword = keywordFilter
+                    // ── Keyword filter (Boolean logic) ────────────────────────────────
+                    const afterKeyword = fetchedKeyword
                         ? candidates.filter((item) => {
-                            const haystack = [
-                                item.title ?? "",
-                                item.contentSnippet ?? "",
-                                item.content ?? "",
-                            ]
-                                .join(" ")
-                                .toLowerCase();
-                            return haystack.includes(keywordFilter);
+                            const title = item.title ?? "";
+                            const snippet = item.contentSnippet || item.content || "";
+                            return matchesBooleanFilter(booleanExpr, title, snippet);
                         })
                         : candidates;
 
@@ -732,6 +830,14 @@ export const fetchPressReleaseSources = action({
                         if (!item.link || !item.title) continue;
 
                         try {
+                            // ── GATE 1: Redis Deduplication ──────────────────────────────────
+                            // Prevent identical PRs from overlapping feeds or multiple runs
+                            const isSeen = await checkAndSetSeen(item.link, item.title);
+                            if (isSeen) {
+                                console.log(`🗑️ PR Dedup skip: ${item.title.substring(0, 50)}...`);
+                                continue;
+                            }
+
                             const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
                             const dd = pubDate.getDate().toString().padStart(2, "0");
                             const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
@@ -739,6 +845,18 @@ export const fetchPressReleaseSources = action({
 
                             const snippet = item.contentSnippet || item.content || item.title;
                             const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+
+                            // ── GATE 2: Relevancy Scoring ────────────────────────────────────
+                            // Even for PR wires, ensure it's high quality if keyword logic is complex
+                            if (geminiKey && fetchedKeyword) {
+                                try {
+                                    const relScore = await callGeminiRelevancyScore(geminiKey, item.title, snippet, fetchedKeyword);
+                                    if (relScore < 70) {
+                                        console.log(`⚠️ PR Low relevancy (${relScore}): ${item.title.substring(0, 50)}...`);
+                                        continue;
+                                    }
+                                } catch (e) { console.error("Relevancy gate error (PR):", e); }
+                            }
 
                             let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
                             let summary = snippet.slice(0, 300);

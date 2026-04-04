@@ -94,7 +94,7 @@ Return valid JSON ONLY:
             console.log(`🧠 AI Analysis Request: [Key: ${keyMasked}] [UserID: ${(identity?.subject || "ANONYMOUS").substring(0, 8)}]`);
 
             // Try models in sequence (Sync with monitoringAction.ts)
-            const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash-latest", "gemini-pro"];
+            const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
             let response: Response | null = null;
             let lastError = "";
 
