@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle } from 'lucide-react';
+import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle, Edit, History, RotateCcw } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useState, useMemo, memo } from 'react';
 import clsx from 'clsx';
@@ -12,8 +12,10 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
     const t = useTranslations('ArticleTable');
     const deleteArticle = useMutation(api.monitoring.deleteArticle);
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
+    const updateSentiment = useMutation(api.monitoring.updateSentiment);
 
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
@@ -208,28 +210,86 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     {article.source || article.sourceCountry || '—'}
                                 </td>
                                 <td className="p-4 text-center">
-                                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${article.depth === 'deep'
-                                        ? 'bg-status-info-bg text-status-info-fg border-status-info-fg/10'
-                                        : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/10'}`}>
-                                        {article.depth || 'standard'}
-                                    </span>
+                                    <div className="flex flex-col gap-1.5 items-center">
+                                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${article.depth === 'deep'
+                                            ? 'bg-status-info-bg text-status-info-fg border-status-info-fg/10'
+                                            : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/10'}`}>
+                                            {article.depth || 'standard'}
+                                        </span>
+                                        {article.relevancy_score !== undefined && (
+                                            <div className="flex items-center gap-1 text-[9px] font-bold text-muted-foreground/60 uppercase tracking-tighter" title={t('relevancy')}>
+                                                <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
+                                                    <div
+                                                        className={clsx(
+                                                            "h-full transition-all",
+                                                            article.relevancy_score >= 90 ? "bg-status-success-fg" :
+                                                                article.relevancy_score >= 70 ? "bg-status-info-fg" : "bg-status-warning-fg"
+                                                        )}
+                                                        style={{ width: `${article.relevancy_score}%` }}
+                                                    />
+                                                </div>
+                                                <span>{article.relevancy_score}%</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </td>
                                 <td className="p-4">
-                                    <span className={clsx(
-                                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border",
-                                        article.sentiment === 'Positive'
-                                            ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
-                                            : article.sentiment === 'Negative'
-                                                ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
-                                                : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
-                                    )}>
-                                        {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" />}
-                                        {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" />}
-                                        {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" />}
-                                        {article.sentiment === 'Positive' ? t('sentiments.positive') :
-                                            article.sentiment === 'Negative' ? t('sentiments.negative') :
-                                                t('sentiments.neutral')}
-                                    </span>
+                                    <div className="relative group/sentiment">
+                                        <div className={clsx(
+                                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border cursor-pointer hover:ring-2 hover:ring-primary/20",
+                                            article.sentiment === 'Positive'
+                                                ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
+                                                : article.sentiment === 'Negative'
+                                                    ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
+                                                    : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
+                                        )}>
+                                            {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" />}
+                                            {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" />}
+                                            {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" />}
+                                            {article.sentiment === 'Positive' ? t('sentiments.positive') :
+                                                article.sentiment === 'Negative' ? t('sentiments.negative') :
+                                                    t('sentiments.neutral')}
+
+                                            {article.manualSentimentOverride && (
+                                                <span title={`Original: ${article.originalSentiment}`}>
+                                                    <History className="w-2.5 h-2.5 opacity-60 ml-0.5" />
+                                                </span>
+                                            )}
+                                            <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 transition-opacity ml-1" />
+                                        </div>
+
+                                        {/* Simple Sentiment Dropdown */}
+                                        <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-in fade-in zoom-in-95 duration-200">
+                                            {(['Positive', 'Neutral', 'Negative'] as const).map((s) => (
+                                                <button
+                                                    key={s}
+                                                    disabled={updatingId === article._id}
+                                                    onClick={async () => {
+                                                        if (article.sentiment === s) return;
+                                                        setUpdatingId(article._id);
+                                                        try {
+                                                            await updateSentiment({ id: article._id, sentiment: s });
+                                                        } finally {
+                                                            setUpdatingId(null);
+                                                        }
+                                                    }}
+                                                    className={clsx(
+                                                        "w-full text-left rtl:text-right px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-between",
+                                                        s === 'Positive' ? "hover:bg-status-success-bg/30 text-status-success-fg" :
+                                                            s === 'Negative' ? "hover:bg-status-error-bg/30 text-status-error-fg" :
+                                                                "hover:bg-status-neutral-bg/30 text-status-neutral-fg",
+                                                        article.sentiment === s && "bg-primary/10 ring-1 ring-inset ring-primary/20",
+                                                        updatingId === article._id && "opacity-50 cursor-not-allowed"
+                                                    )}
+                                                >
+                                                    {s === 'Positive' ? t('sentiments.positive') :
+                                                        s === 'Negative' ? t('sentiments.negative') :
+                                                            t('sentiments.neutral')}
+                                                    {updatingId === article._id && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </td>
                                 <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
                                     {article.reach?.toLocaleString() || '—'}

@@ -30,6 +30,8 @@ export default defineSchema({
         ave: v.number(),
         imageUrl: v.optional(v.string()), // For PDF thumbnails
         isManual: v.optional(v.boolean()), // To distinguish manual entries
+        manualSentimentOverride: v.optional(v.boolean()),
+        originalSentiment: v.optional(v.string()),
         likes: v.optional(v.number()),
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),

@@ -83,6 +83,8 @@
     "col_replies": "الردود",
     "col_ave": "القيمة الإعلانية ($)",
     "col_status": "الحالة",
+    "sentiment_override": "تعديل التوجه",
+    "relevancy": "الملاءمة البحثية",
     "manual": "يدوي",
     "confirm_delete": "هل أنت متأكد من حذف هذا المقال؟",
     "confirm_delete_selected": "هل أنت متأكد من حذف {count} مقالات مختارة؟",

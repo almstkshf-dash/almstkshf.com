@@ -85,6 +85,9 @@ export const saveArticle = mutation({
         likes: v.optional(v.number()),
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),
+        relevancy_score: v.optional(v.number()),
+        manualSentimentOverride: v.optional(v.boolean()),
+        originalSentiment: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         // Ensure sourceType matches schema validator
@@ -112,6 +115,9 @@ export const saveArticle = mutation({
                 sourceType: finalSourceType,
                 depth: (args.depth ?? "standard") as "standard" | "deep",
                 ingestMethod: args.ingestMethod,
+                manualSentimentOverride: args.manualSentimentOverride ?? false,
+                originalSentiment: args.originalSentiment ?? args.sentiment,
+                relevancy_score: args.relevancy_score,
             });
         }
     },
@@ -146,6 +152,24 @@ export const deleteArticles = mutation({
             await ctx.db.delete(id);
         }
         return { deleted: args.ids.length };
+    },
+});
+
+// 5.5 MUTATION: Update article sentiment (manual override)
+export const updateSentiment = mutation({
+    args: {
+        id: v.id("media_monitoring_articles"),
+        sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
+    },
+    handler: async (ctx, args) => {
+        const existing = await ctx.db.get(args.id);
+        if (!existing) throw new Error("Article not found");
+
+        await ctx.db.patch(args.id, {
+            sentiment: args.sentiment,
+            manualSentimentOverride: true,
+            originalSentiment: existing.manualSentimentOverride ? (existing.originalSentiment ?? existing.sentiment) : existing.sentiment,
+        });
     },
 });
 // 6. QUERY: Get Analytics Overview (NSS, Risk Score, etc.)

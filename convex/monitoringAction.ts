@@ -732,6 +732,7 @@ async function processArticle(
             likes: item.likes,
             retweets: item.retweets,
             replies: item.replies,
+            relevancy_score: relevancyScore,
         });
 
         return true;
