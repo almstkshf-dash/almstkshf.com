@@ -15,6 +15,7 @@ interface Article {
     content?: string;
     imageUrl?: string;
     keyword?: string;
+    hashtags?: string[];
     [key: string]: unknown;
 }
 
@@ -36,6 +37,7 @@ export async function exportToExcel(articles: Article[], translations: any, repo
         { header: translations.sentiment || 'Sentiment', key: 'sentiment', width: 12 },
         { header: translations.reach || 'Reach', key: 'reach', width: 15 },
         { header: translations.ave || 'AVE ($)', key: 'ave', width: 15 },
+        { header: translations.hashtags || 'Hashtags', key: 'hashtags', width: 30 },
     ];
 
     const headerRow = sheet.getRow(1);
@@ -56,6 +58,7 @@ export async function exportToExcel(articles: Article[], translations: any, repo
             sentiment: article.sentiment,
             reach: article.reach,
             ave: article.ave,
+            hashtags: Array.isArray(article.hashtags) ? article.hashtags.join(', ') : '',
         });
     });
 
@@ -429,15 +432,19 @@ export async function exportToPDF(articles: Article[], translations: any, _logoU
     doc.setTextColor(...BRAND_DARK);
     addText(translations.coverage_log || 'Coverage Log', pageWidth - 14, 28, { align: 'right' });
 
-    const tableData = articles.map(a => [
-        a.publishedDate ?? '',
-        isArabic(a.title) ? fixArabicForPDF(a.title) : a.title,
-        a.sourceType ?? '',
-        a.sourceCountry ?? '',
-        a.sentiment ?? '',
-        (a.reach ?? 0).toLocaleString(),
-        `$${(a.ave ?? 0).toLocaleString()}`
-    ]);
+    const tableData = articles.map(a => {
+        const parsedTitle = isArabic(a.title) ? fixArabicForPDF(a.title) : a.title;
+        const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
+        return [
+            a.publishedDate ?? '',
+            parsedTitle + hashStr,
+            a.sourceType ?? '',
+            a.sourceCountry ?? '',
+            a.sentiment ?? '',
+            (a.reach ?? 0).toLocaleString(),
+            `$${(a.ave ?? 0).toLocaleString()}`
+        ];
+    });
 
     autoTable(doc, {
         head: [[

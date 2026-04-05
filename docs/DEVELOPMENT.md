@@ -305,7 +305,23 @@ useEffect(() => {
 
 ---
 
-## 12. Deployment (Vercel)
+## 12. Data Quality & AI
+
+This application implements strict boundaries on automated data ingestion using Gemini to validate relevancy before saving records to the database.
+
+### Relevancy Logic
+- **`RELEVANCY_THRESHOLD` is set to 85%.**
+- Only articles scoring 85 or higher out of 100 on the relevancy scale are saved.
+- This threshold is enforced in `monitoringAction.ts` to dramatically reduce noise, tangential mentions, and false positives in the system. 
+
+### Sentiment Rules (UAE/KSA Precision)
+To prevent the application from hallucinating negative sentiment on standard business/regional operations, specific context rules are applied to the Gemini prompt:
+- **Standard Legal/Corporate Updates** (e.g., memorandums, standard executive restructuring, compliance milestones) MUST be classified as **Neutral**, not negative or positive.
+- Do NOT revert the Gemini prompt to generic emotional scales. The prompt natively understands UAE/KSA business semantics and should only flag material risks or exceptional successes.
+
+---
+
+## 13. Deployment (Vercel)
 
 1. Push to `main` branch on GitHub
 2. Vercel auto-deploys via GitHub integration
@@ -324,7 +340,7 @@ useEffect(() => {
 
 ---
 
-## 12. Common Errors & Fixes
+## 14. Common Errors & Fixes
 
 | Error | Cause | Fix |
 |---|---|---|

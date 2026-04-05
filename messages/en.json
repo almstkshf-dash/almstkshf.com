@@ -940,7 +940,8 @@
       "emotional_pulse": "Emotional Pulse",
       "articles_trend": "Articles Trend",
       "sentiment_distribution": "Sentiment Distribution",
-      "top_emotions": "Top Emotions"
+      "top_emotions": "Top Emotions",
+      "keywords": "Active Keywords"
     }
   },
   "CrisisManagementDetail": {

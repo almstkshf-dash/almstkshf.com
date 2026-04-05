@@ -32,6 +32,7 @@ export default defineSchema({
         isManual: v.optional(v.boolean()), // To distinguish manual entries
         manualSentimentOverride: v.optional(v.boolean()),
         originalSentiment: v.optional(v.string()),
+        hashtags: v.optional(v.array(v.string())), // Add hashtags
         likes: v.optional(v.number()),
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),

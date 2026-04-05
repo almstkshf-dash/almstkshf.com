@@ -70,6 +70,7 @@ async function callGeminiForAnalysis(
     reach_estimate: number;
     tone?: string;
     risk?: "Low" | "Medium" | "High";
+    hashtags?: string[];
 }> {
     const prompt = `Analyze this content for media monitoring (can be News or Social Media) within the context of UAE and Saudi Arabian media and legal sectors.
 IMPORTANT: Return the "summary" in the same language as the content (if Arabic, summary must be in Arabic).
@@ -91,7 +92,8 @@ Return valid JSON ONLY with these exact fields:
   "sourceType": "Online News" | "Blog" | "Press Release" | "Social Media" | "Print",
   "reach_estimate": number,
   "tone": "short phrase describing tone (e.g., Sarcastic, Informative, Alarming)",
-  "risk": "Low" | "Medium" | "High"
+  "risk": "Low" | "Medium" | "High",
+  "hashtags": ["list", "of", "relevant", "hashtags"]
 }`;
 
     const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
@@ -140,6 +142,7 @@ Return valid JSON ONLY with these exact fields:
                 reach_estimate: typeof parsed.reach_estimate === "number" ? parsed.reach_estimate : 50000,
                 tone: typeof parsed.tone === "string" ? parsed.tone : "Analytical",
                 risk: ["Low", "Medium", "High"].includes(parsed.risk) ? parsed.risk : "Medium",
+                hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
             };
         } catch (error) {
             console.warn(`Gemini ${model} failed:`, error);
@@ -734,6 +737,7 @@ async function processArticle(
             retweets: item.retweets,
             replies: item.replies,
             relevancy_score: relevancyScore,
+            hashtags: aiData.hashtags,
         });
 
         const ident = await ctx.auth.getUserIdentity();

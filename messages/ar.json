@@ -864,7 +864,8 @@
       "articles": "مقال",
       "articles_trend": "اتجاه المقالات",
       "sentiment_distribution": "توزيع المشاعر",
-      "top_emotions": "أبرز الانفعالات"
+      "top_emotions": "أبرز الانفعالات",
+      "keywords": "الكلمات المفتاحية النشطة"
     }
   },
   "CrisisManagementDetail": {

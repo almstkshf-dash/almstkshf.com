@@ -23,12 +23,40 @@ import {
 import { useTheme } from "next-themes";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 
+function ThemeCommandItems({ runCommand }: { runCommand: (cmd: () => void) => void }) {
+    const { setTheme } = useTheme();
+    return (
+        <>
+            <Command.Item
+                value="light theme"
+                onSelect={() => runCommand(() => setTheme("light"))}
+                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
+            >
+                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                    <Sun className="h-4 w-4" />
+                </div>
+                <span className="font-medium">Light Theme</span>
+            </Command.Item>
+
+            <Command.Item
+                value="dark theme"
+                onSelect={() => runCommand(() => setTheme("dark"))}
+                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
+            >
+                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
+                    <Moon className="h-4 w-4" />
+                </div>
+                <span className="font-medium">Dark Theme</span>
+            </Command.Item>
+        </>
+    );
+}
+
 export function CommandMenu() {
     const [open, setOpen] = React.useState(false);
     const router = useRouter();
     const t = useTranslations("Common");
     const tNav = useTranslations("Navigation");
-    const { setTheme } = useTheme();
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -166,27 +194,7 @@ export function CommandMenu() {
                                 <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
                             </Command.Item>
 
-                            <Command.Item
-                                value="light theme"
-                                onSelect={() => runCommand(() => setTheme("light"))}
-                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
-                            >
-                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
-                                    <Sun className="h-4 w-4" />
-                                </div>
-                                <span className="font-medium">Light Theme</span>
-                            </Command.Item>
-
-                            <Command.Item
-                                value="dark theme"
-                                onSelect={() => runCommand(() => setTheme("dark"))}
-                                className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group"
-                            >
-                                <div className="me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors">
-                                    <Moon className="h-4 w-4" />
-                                </div>
-                                <span className="font-medium">Dark Theme</span>
-                            </Command.Item>
+                            <ThemeCommandItems runCommand={runCommand} />
                         </Command.Group>
                     </Command.List>
                 </Command>

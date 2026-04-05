@@ -13,7 +13,7 @@ import { TrendingUp } from "lucide-react";
 import { ReportGenerator } from "@/lib/report-generator";
 import Button from "@/components/ui/Button";
 import { useMessages } from "next-intl";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
 interface DashboardGridProps {
@@ -70,6 +70,35 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
 
     const isPressRelease = articles.some(a => a.sourceType === 'Press Release');
 
+    const uniqueKeywords = useMemo(() => {
+        return [...new Set(articles.map(a => a.keyword).filter(Boolean))];
+    }, [articles]);
+
+    const updateKeyword = useMutation(api.monitoring.updateKeyword);
+    const [editingKeyword, setEditingKeyword] = useState<string | null>(null);
+    const [editValue, setEditValue] = useState("");
+
+    const handleEditKeyword = (oldKw: string) => {
+        setEditingKeyword(oldKw);
+        setEditValue(oldKw);
+    };
+
+    const saveKeyword = async (oldKw: string) => {
+        if (editValue && editValue.trim() !== oldKw) {
+            try {
+                await updateKeyword({ oldKeyword: oldKw, newKeyword: editValue.trim() });
+            } catch (err) {
+                console.error("Failed to update keyword", err);
+            }
+        }
+        setEditingKeyword(null);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, kw: string) => {
+        if (e.key === 'Enter') saveKeyword(kw);
+        if (e.key === 'Escape') setEditingKeyword(null);
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Pulse View */}
@@ -112,6 +141,38 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center transition-colors">{t('global')}</div>
                             </div>
                         </div>
+
+                        {uniqueKeywords.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 mb-6">
+                                <span className={clsx("text-[10px] font-bold text-muted-foreground uppercase tracking-widest")}>
+                                    {t('keywords') || 'Keywords'}:
+                                </span>
+                                {uniqueKeywords.map((kw: string) => (
+                                    <div key={kw} className="inline-flex items-center bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
+                                        {editingKeyword === kw ? (
+                                            <input
+                                                type="text"
+                                                value={editValue}
+                                                onChange={e => setEditValue(e.target.value)}
+                                                onBlur={() => saveKeyword(kw)}
+                                                onKeyDown={e => handleKeyDown(e, kw)}
+                                                autoFocus
+                                                className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
+                                            />
+                                        ) : (
+                                            <span 
+                                                onDoubleClick={() => handleEditKeyword(kw)} 
+                                                className="cursor-pointer hover:underline" 
+                                                title="Double click to edit keyword across all matching articles"
+                                            >
+                                                {kw}
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <SentimentTracker articles={articles} />
                     </div>
                 </section>

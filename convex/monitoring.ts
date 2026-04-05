@@ -88,6 +88,7 @@ export const saveArticle = mutation({
         relevancy_score: v.optional(v.number()),
         manualSentimentOverride: v.optional(v.boolean()),
         originalSentiment: v.optional(v.string()),
+        hashtags: v.optional(v.array(v.string())),
     },
     handler: async (ctx, args) => {
         // Ensure sourceType matches schema validator
@@ -118,6 +119,7 @@ export const saveArticle = mutation({
                 manualSentimentOverride: args.manualSentimentOverride ?? false,
                 originalSentiment: args.originalSentiment ?? args.sentiment,
                 relevancy_score: args.relevancy_score,
+                hashtags: args.hashtags,
             });
         }
     },
@@ -216,6 +218,19 @@ export const updateSentiment = mutation({
             originalSentiment: existing.manualSentimentOverride ? (existing.originalSentiment ?? existing.sentiment) : existing.sentiment,
         });
     },
+});
+
+// 5.6 MUTATION: Update keyword (used on dashboard)
+export const updateKeyword = mutation({
+    args: { oldKeyword: v.string(), newKeyword: v.string() },
+    handler: async (ctx, args) => {
+        const articles = await ctx.db.query("media_monitoring_articles")
+            .filter(q => q.eq(q.field("keyword"), args.oldKeyword))
+            .collect();
+        for (const article of articles) {
+            await ctx.db.patch(article._id, { keyword: args.newKeyword });
+        }
+    }
 });
 // 6. QUERY: Get Analytics Overview (NSS, Risk Score, etc.)
 export const getAnalyticsOverview = query({

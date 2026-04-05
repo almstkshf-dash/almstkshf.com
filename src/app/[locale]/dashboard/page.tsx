@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
@@ -33,6 +33,7 @@ export default function DashboardPage() {
     const t = useTranslations('Dashboard');
     const locale = useLocale();
     const isAr = locale === 'ar';
+    const [isPending, startTransition] = useTransition();
     const [isManualModalOpen, setManualModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedType, setSelectedType] = useState('All');
@@ -242,37 +243,45 @@ export default function DashboardPage() {
                     {/* View Switcher — centered on mobile, inline on desktop */}
                     <div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
                         <button
-                            onClick={() => setActiveView('standard')}
+                            onClick={() => startTransition(() => setActiveView('standard'))}
                             className={clsx(
                                 "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                                 activeView === 'standard'
                                     ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                                isPending && "opacity-70 cursor-wait"
                             )}
                         >
                             {t('filters.view_standard')}
                         </button>
                         <div className="w-px h-5 bg-border flex-shrink-0" />
                         <button
-                            onClick={() => setActiveView('deep')}
+                            onClick={() => startTransition(() => setActiveView('deep'))}
                             className={clsx(
                                 "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                                 activeView === 'deep'
                                     ? 'bg-status-info-bg text-status-info-fg font-bold shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                                isPending && "opacity-70 cursor-wait"
                             )}
                         >
                             {t('filters.view_deep')}
                         </button>
                         <div className="w-px h-5 bg-border flex-shrink-0" />
                         <button
-                            onClick={() => setActiveView('osint')}
+                            onClick={() => {
+                                if (isAdmin) {
+                                    startTransition(() => setActiveView('osint'));
+                                }
+                            }}
                             title={!isAdmin ? 'OSINT features require admin privileges' : undefined}
                             className={clsx(
                                 "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                                 activeView === 'osint'
                                     ? 'bg-status-success-bg text-status-success-fg font-bold shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                                (!isAdmin || isPending) && "opacity-70 cursor-wait",
+                                !isAdmin && "cursor-not-allowed"
                             )}
                         >
                             {!isAdmin && <Lock className="w-3 h-3 opacity-60" />}
