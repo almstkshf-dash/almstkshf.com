@@ -231,6 +231,8 @@ export const fetchExternal = action({...});
 2. Add product/price IDs to `src/lib/stripe-products.ts`
 3. The checkout flow uses `/api/stripe/checkout` POST endpoint
 4. Webhook events are handled in `/api/stripe/webhook`
+   - Includes full subscription lifecycle (`completed`, `updated`, `deleted`)
+   - Dispatch notifications on `invoice.payment_failed` and `checkout.session.async_payment_failed`
 
 ### Testing webhooks locally
 ```bash

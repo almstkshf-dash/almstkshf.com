@@ -104,16 +104,27 @@ export async function POST(request: NextRequest) {
                 const { api } = await import('../../../../../convex/_generated/api');
                 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+                const userId = session.client_reference_id || session.metadata?.userId;
+
                 // Update the payment status to 'failed'
                 await convex.mutation(api.payments.recordPayment, {
                     stripeSessionId: session.id,
-                    userId: session.client_reference_id || session.metadata?.userId,
+                    userId: userId,
                     amount: (session.amount_total || 0) / 100,
                     currency: session.currency || 'usd',
                     status: 'failed',
                     productName: session.metadata?.productName || 'Default Product',
                     customerEmail: session.customer_details?.email || undefined,
                 });
+
+                if (userId) {
+                    await convex.mutation(api.monitoring.createNotification, {
+                        userId: userId as string,
+                        title: "Payment Failed",
+                        message: `Your payment for ${session.metadata?.productName || 'your subscription'} could not be processed.`,
+                        type: "billing"
+                    });
+                }
 
                 break;
             }
@@ -192,8 +203,30 @@ export async function POST(request: NextRequest) {
                 const invoice = event.data.object as Stripe.Invoice;
                 console.log('❌ Invoice payment failed:', invoice.id);
 
-                // For subscriptions, this will eventually trigger customer.subscription.updated with status 'unpaid' or 'past_due'
-                // But we can proactively log or notify here if needed.
+                try {
+                    const { ConvexHttpClient } = await import('convex/browser');
+                    const { api } = await import('../../../../../convex/_generated/api');
+                    const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+                    // Customer ID can sometimes be mapped back to user or we can pull userId from subscription metadata
+                    // Not guaranteed to have the userId, but we can try from customer_email or metadata
+                    const customerEmail = invoice.customer_email;
+
+                    // Note: Ideally we look up the user by customerEmail or subscription ID in Convex.
+                    // For now, we will just use the invoice metadata:
+                    const userId = invoice.metadata?.userId;
+
+                    if (userId) {
+                        await convex.mutation(api.monitoring.createNotification, {
+                            userId: userId as string,
+                            title: "Invoice Payment Failed",
+                            message: `Payment failed for invoice ${invoice.number || invoice.id}. Please update your billing methods.`,
+                            type: "billing"
+                        });
+                    }
+                } catch (e) {
+                    console.error("Failed to push notification for invoice fail", e);
+                }
 
                 break;
             }

@@ -13,6 +13,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 import Button from "@/components/ui/Button";
 import dynamic from "next/dynamic";
+import { NotificationBell } from "@/components/NotificationBell";
 
 // Lazy-load all Clerk UI — keeps the ~186 KiB Clerk bundle out of the initial page load
 const NavbarAuthSection = dynamic(
@@ -164,6 +165,9 @@ export default function Navbar() {
                             {/* Theme Toggle */}
                             <ThemeToggle />
 
+                            {/* Notifications */}
+                            <NotificationBell />
+
                             {/* Language Toggle */}
                             <Button
                                 variant="ghost"
@@ -208,6 +212,9 @@ export default function Navbar() {
                             )}
 
                             <ThemeToggle />
+
+                            {/* Notifications (Mobile) */}
+                            <NotificationBell />
 
                             <button
                                 className={clsx(ACTION_BTN, "text-foreground")}

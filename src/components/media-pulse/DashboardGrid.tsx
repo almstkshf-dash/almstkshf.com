@@ -13,6 +13,8 @@ import { TrendingUp } from "lucide-react";
 import { ReportGenerator } from "@/lib/report-generator";
 import Button from "@/components/ui/Button";
 import { useMessages } from "next-intl";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 interface DashboardGridProps {
     articles?: any[];
@@ -34,7 +36,8 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
 
     const sentimentDonutT = useTranslations("MediaPulseDetail.sentiment_donut");
     const messages = useMessages();
-    
+    const unreadNotifs = useQuery(api.monitoring.getUnreadNotifications);
+
     // Memoize stats to avoid heavy reduction on every re-render
     const { totalReach, totalAVE } = useMemo(() => {
         return {
@@ -131,7 +134,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         </div>
                     </div>
                     <div className="w-full md:w-64 h-64 flex flex-col items-center justify-center pt-4">
-                        <SentimentDonutChart 
+                        <SentimentDonutChart
                             data={{
                                 positive: sentimentPcts.Positive,
                                 neutral: sentimentPcts.Neutral,
@@ -218,7 +221,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('emotional_pulse')}</h4>
 
                     <div className="h-[200px] w-full">
-                        <EmotionRadarChart 
+                        <EmotionRadarChart
                             data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
                                 subject,
                                 value: value as number,
@@ -247,7 +250,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                                 <span className="text-xs font-black text-primary">{value as number}%</span>
                                             </div>
                                             <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                                                <motion.div 
+                                                <motion.div
                                                     initial={{ width: 0 }}
                                                     whileInView={{ width: `${value}%` }}
                                                     className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)] transition-all duration-1000"
@@ -269,7 +272,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                 >
                     <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('articles_trend')}</h4>
                     <div className="h-[160px] w-full">
-                        <ArticlesTrendChart 
+                        <ArticlesTrendChart
                             data={articles.length > 0 ? (
                                 // Simple transformation for trend if not provided by analytics
                                 Object.entries(
@@ -361,12 +364,29 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     );
                 })()}
 
-                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-2 shadow-sm transition-all group hover:bg-primary/10">
-                    <Zap className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-3 shadow-sm transition-all group hover:bg-primary/10">
+                    <div className="flex items-center justify-between">
+                        <Zap className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                        {unreadNotifs && unreadNotifs.length > 0 && (
+                            <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold">{unreadNotifs.length} New</span>
+                        )}
+                    </div>
                     <h4 className="text-foreground font-bold text-xs transition-colors">{t('automated_alerts')}</h4>
-                    <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors">
-                        {t('alerts_desc')}
-                    </p>
+
+                    {unreadNotifs && unreadNotifs.length > 0 ? (
+                        <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-1">
+                            {unreadNotifs.slice(0, 3).map((notif) => (
+                                <div key={notif._id} className="p-2.5 bg-background/60 backdrop-blur-sm rounded-xl border border-border/50 text-[10px] shadow-sm">
+                                    <div className="font-bold text-foreground mb-0.5 line-clamp-1">{notif.title}</div>
+                                    <div className="text-muted-foreground line-clamp-2 leading-relaxed">{notif.message}</div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors mt-2">
+                            {t('alerts_desc')}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

@@ -112,6 +112,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `osint_results` | OSINT investigation history | `by_created_at`, `by_user_id` |
 | `payments` | Stripe one-time payment records | `by_session_id`, `by_user_id` |
 | `subscriptions` | Stripe subscription records | `by_user_id`, `by_subscription_id` |
+| `notifications` | In-app alerts, deep scans, high-risk detection, billing | `by_userId` |
 
 > ⚠️ **Note:** `user_settings` and `userSettings` are **two separate tables** with overlapping but different fields. `userSettings` is the subscription-aware table. `user_settings` holds KYC status and Phyllo integration.
 
@@ -169,6 +170,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `ThemeToggle.tsx` | Navbar | Theme switch button |
 | `ReportLibrary.tsx` | Media Monitoring | Report card grid view |
 | `ReportsChart.tsx` | Media Monitoring | Analytics charts |
+| `NotificationBell.tsx` | Navbar | UI panel for reading/dismissing in-app alerts |
 
 ### Media Pulse components (`src/components/media-pulse/`)
 
@@ -263,6 +265,8 @@ User clicks "Subscribe"
 - `checkout.session.completed` → record payment
 - `customer.subscription.updated` → update status
 - `customer.subscription.deleted` → cancel subscription
+- `checkout.session.async_payment_failed` → dispatch billing notification
+- `invoice.payment_failed` → dispatch billing notification
 
 ---
 

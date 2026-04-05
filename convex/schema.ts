@@ -35,6 +35,7 @@ export default defineSchema({
         likes: v.optional(v.number()),
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),
+        relevancy_score: v.optional(v.number()),
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
 
@@ -186,5 +187,14 @@ export default defineSchema({
         kycStatus: v.optional(v.union(v.literal("Pending"), v.literal("Verified"), v.literal("Rejected"))),
         createdAt: v.number(),
         updatedAt: v.number(),
+    }).index("by_userId", ["userId"]),
+
+    notifications: defineTable({
+        userId: v.string(),
+        title: v.string(),
+        message: v.string(),
+        type: v.union(v.literal("alert"), v.literal("system"), v.literal("billing")),
+        isRead: v.boolean(),
+        createdAt: v.number(),
     }).index("by_userId", ["userId"]),
 });

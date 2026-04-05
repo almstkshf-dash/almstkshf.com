@@ -115,6 +115,15 @@ export const fetchDeepSources = action({
                 source: "newsapi",
                 itemCount,
             });
+
+            const subjectId = identity?.subject || "system";
+            await ctx.runMutation(api.monitoring.createNotification, {
+                userId: subjectId,
+                title: "Deep Scan Completed",
+                message: `Background sweep finished. Discovered ${itemCount} new items.`,
+                type: "system"
+            });
+
             return { success: true, count: itemCount };
         } catch (e: any) {
             await ctx.runMutation(api.deepSources.saveIngestionRun, {

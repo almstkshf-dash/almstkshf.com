@@ -10,6 +10,7 @@ import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
 import { parseBooleanKeyword, matchesBooleanFilter, buildApiQuery } from "./utils/booleanFilter";
 import { checkAndSetSeen } from "./utils/dedup";
+import { sendResendEmail } from "./utils/email";
 
 // ═══════════════════════════════════════════════════════════════════
 // THE SPIDER — Inlined link resolver for Convex Node Runtime
@@ -70,7 +71,7 @@ async function callGeminiForAnalysis(
     tone?: string;
     risk?: "Low" | "Medium" | "High";
 }> {
-    const prompt = `Analyze this content for media monitoring (can be News or Social Media).
+    const prompt = `Analyze this content for media monitoring (can be News or Social Media) within the context of UAE and Saudi Arabian media and legal sectors.
 IMPORTANT: Return the "summary" in the same language as the content (if Arabic, summary must be in Arabic).
 Intended Categories (User Filter): ${intendedCategories.join(', ')}
 
@@ -80,7 +81,7 @@ Monitoring Keyword: "${keyword}"
 
 Rules for Analysis:
 1. For Social Media (Twitter/X): Consider emojis, common Arabic dialects (Gulf, Levantine, etc.), and informal language.
-2. Sentiment: Detect the polarity towards the Monitoring Keyword.
+2. Sentiment: Detect the polarity towards the Monitoring Keyword. *IMPORTANT*: In the UAE/Saudi context, "Negative" sentiment must explicitly involve regulatory breaches, legal action, financial fraud, public boycotts, or direct reputational damage. Constructive criticism or routine operational updates should be classified as "Neutral".
 3. Summary: Provide a one-sentence summary that highlights the main point.
 
 Return valid JSON ONLY with these exact fields:
@@ -159,7 +160,7 @@ Return valid JSON ONLY with these exact fields:
 // GEMINI RELEVANCY GATE — Returns 0-100 relevancy score
 // Articles scoring below RELEVANCY_THRESHOLD are discarded before DB write.
 // ═══════════════════════════════════════════════════════════════════
-const RELEVANCY_THRESHOLD = 70;
+const RELEVANCY_THRESHOLD = 85;
 
 async function callGeminiRelevancyScore(
     apiKey: string,
@@ -174,9 +175,9 @@ Article Snippet: "${snippet.substring(0, 500)}"
 
 Score how relevant this article is to the monitoring keyword on a scale of 0 to 100.
 - 100 = the article is directly and substantially about the keyword
-- 70+ = clearly relevant, keyword is a main topic
-- 50-69 = tangentially related, keyword mentioned briefly
-- 0-49 = not relevant, keyword appears incidentally or not at all
+- 95+ = clearly relevant, keyword is a main topic
+- 85-94 = tangentially related, keyword mentioned briefly
+- 0-84 = not relevant, keyword appears incidentally or not at all
 
 Return valid JSON ONLY:
 {"relevancy_score": <number 0-100>, "reason": "<one sentence>"}` ;
@@ -734,6 +735,51 @@ async function processArticle(
             replies: item.replies,
             relevancy_score: relevancyScore,
         });
+
+        const ident = await ctx.auth.getUserIdentity();
+        const userId = ident?.subject;
+
+        if (userId && (aiData.risk === "High" || aiData.sentiment === "Negative")) {
+            try {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId,
+                    title: "Alert: High Risk / Negative Mention",
+                    message: `Found mention for "${keyword}": ${item.title.substring(0, 60)}...`,
+                    type: "alert"
+                });
+
+                const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
+                await sendResendEmail({
+                    to: CONTACT_EMAIL,
+                    subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+                            <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
+                                <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
+                            </div>
+                            <div style="padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+                                <p style="margin-top: 0;"><strong>Keyword:</strong> ${keyword}</p>
+                                <p><strong>Risk Level:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.risk}</span></p>
+                                <p><strong>Sentiment:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.sentiment}</span></p>
+                                
+                                <h3 style="margin-top: 20px;">Article Title</h3>
+                                <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${item.title}</p>
+                                
+                                <h3>AI Summary</h3>
+                                <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
+                                
+                                <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                                    <a href="${item.link}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                });
+
+            } catch (err) {
+                console.error("Failed to create notification or send email:", err);
+            }
+        }
 
         return true;
     } catch (e) {

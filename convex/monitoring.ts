@@ -131,6 +131,51 @@ export const deleteArticle = mutation({
     },
 });
 
+export const createNotification = mutation({
+    args: {
+        userId: v.string(),
+        title: v.string(),
+        message: v.string(),
+        type: v.union(v.literal("alert"), v.literal("system"), v.literal("billing")),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.insert("notifications", {
+            ...args,
+            isRead: false,
+            createdAt: Date.now(),
+        });
+    }
+});
+
+export const getUnreadNotifications = query({
+    args: {},
+    handler: async (ctx) => {
+        const ident = await ctx.auth.getUserIdentity();
+        if (!ident) return [];
+
+        const userId = ident.subject;
+        return await ctx.db
+            .query("notifications")
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
+            .filter((q) => q.eq(q.field("isRead"), false))
+            .order("desc")
+            .collect();
+    }
+});
+
+export const markNotificationAsRead = mutation({
+    args: { id: v.id("notifications") },
+    handler: async (ctx, args) => {
+        const ident = await ctx.auth.getUserIdentity();
+        if (!ident) return;
+
+        const notif = await ctx.db.get(args.id);
+        if (notif && notif.userId === ident.subject) {
+            await ctx.db.patch(args.id, { isRead: true });
+        }
+    }
+});
+
 // 4. MUTATION: Delete ALL articles (clear report)
 export const deleteAllArticles = mutation({
     args: {},

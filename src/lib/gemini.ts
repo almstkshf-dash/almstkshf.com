@@ -23,12 +23,13 @@ export async function analyzeContent(text: string, title?: string): Promise<Medi
     });
 
     const prompt = `
-    Analyze the following text (Title + Content).
+    Analyze the following text (Title + Content) within the context of UAE and Saudi Arabian media and legal sectors.
     
     TITLE: ${title || "N/A"}
     CONTENT: ${text.substring(0, 2000)}
 
-    1. Sentiment (Positive/Neutral/Negative)?
+    1. Sentiment (Positive/Neutral/Negative)? 
+       *IMPORTANT*: In the UAE/Saudi context, "Negative" sentiment must explicitly involve regulatory breaches, legal action, financial fraud, public boycotts, or direct reputational damage. Constructive criticism or routine operational updates should be classified as "Neutral".
     2. Extract Brand Name (e.g. "AlMstkshf", "Toyota", etc.).
     3. Estimate 'Source Country' based on publication name or content context (Return 2-letter ISO Code, e.g. AE, SA, US). Default to AE if unsure.
 

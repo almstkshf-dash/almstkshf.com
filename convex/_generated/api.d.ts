@@ -29,6 +29,7 @@ import type * as utils_auth from "../utils/auth.js";
 import type * as utils_booleanFilter from "../utils/booleanFilter.js";
 import type * as utils_checkAdmin from "../utils/checkAdmin.js";
 import type * as utils_dedup from "../utils/dedup.js";
+import type * as utils_email from "../utils/email.js";
 import type * as utils_keys from "../utils/keys.js";
 import type * as waitlist from "../waitlist.js";
 
@@ -60,6 +61,7 @@ declare const fullApi: ApiFromModules<{
   "utils/booleanFilter": typeof utils_booleanFilter;
   "utils/checkAdmin": typeof utils_checkAdmin;
   "utils/dedup": typeof utils_dedup;
+  "utils/email": typeof utils_email;
   "utils/keys": typeof utils_keys;
   waitlist: typeof waitlist;
 }>;
