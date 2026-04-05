@@ -1,5 +1,5 @@
 "use client";
-
+import { memo } from "react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { LayoutDashboard, Settings } from "lucide-react";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
@@ -19,7 +19,7 @@ interface NavbarAuthSectionProps {
  * Dynamically imported in Navbar with { ssr: false } so the Clerk chunk
  * is excluded from the initial page bundle and only loaded after hydration.
  */
-export default function NavbarAuthSection({
+const NavbarAuthSection = memo(function NavbarAuthSection({
     loginLabel,
     dashboardLabel,
     settingsLabel,
@@ -55,6 +55,7 @@ export default function NavbarAuthSection({
                     <HoverPrefetchLink
                         href="/dashboard/settings"
                         className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-lg transition-colors border border-transparent hover:border-border"
+                        dir="ltr"
                     >
                         <Settings className={`${iconSm} shrink-0`} aria-hidden="true" />
                         <span className="whitespace-nowrap">{settingsLabel}</span>
@@ -94,7 +95,9 @@ export default function NavbarAuthSection({
             </div>
         </>
     );
-}
+});
+
+export default NavbarAuthSection;
 
 /* ─────────────────────────────────────────────────────────────
    Mobile menu footer auth — used by the mobile drawer
@@ -107,7 +110,7 @@ interface MobileAuthFooterProps {
     onClose: () => void;
 }
 
-export function MobileAuthFooter({
+export const MobileAuthFooter = memo(function MobileAuthFooter({
     getStartedLabel,
     dashboardLabel,
     settingsLabel,
@@ -154,4 +157,4 @@ export function MobileAuthFooter({
             </SignedIn>
         </>
     );
-}
+});

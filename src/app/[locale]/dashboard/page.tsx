@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock } from 'lucide-react';
+import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
@@ -16,6 +16,8 @@ import { useLocale } from 'next-intl';
 import DeepStatusPanel from '@/components/media-pulse/DeepStatusPanel';
 import OsintTab from '@/components/media-pulse/OsintTab';
 import PressReleasePanel from '@/components/media-pulse/PressReleasePanel';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import Button from '@/components/ui/Button';
 
 type ArticleItem = {
     _id: string;
@@ -43,6 +45,7 @@ export default function DashboardPage() {
     const [loadedArticles, setLoadedArticles] = useState<ArticleItem[]>([]);
     const [isExporting, setIsExporting] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
+    const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
@@ -126,9 +129,7 @@ export default function DashboardPage() {
     };
 
     const handleClearAll = async () => {
-        // confirm() is synchronous and blocks the main thread during interaction.
-        if (!window.confirm(t('confirm_clear_all'))) return;
-
+        setIsClearDialogOpen(false);
         setIsClearing(true);
         try {
             const res = await deleteAll({});
@@ -212,24 +213,7 @@ export default function DashboardPage() {
             <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8">
 
                 {/* Toast Notification */}
-                {toast && (
-                    <div className={clsx(
-                        "fixed top-24 right-6 z-[100] px-5 py-3.5 rounded-xl border shadow-2xl flex items-center gap-3 animate-in slide-in-from-right duration-300",
-                        toast.type === 'success'
-                            ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-300 shadow-emerald-900/20'
-                            : 'bg-destructive/15 border-destructive/30 text-destructive dark:text-rose-300 shadow-destructive/20'
-                    )}>
-                        {toast.type === 'error' && <AlertTriangle className="w-4 h-4 flex-shrink-0" />}
-                        <span className="text-sm font-medium">{toast.message}</span>
-                        <button
-                            onClick={() => setToast(null)}
-                            className="ml-2 inline-flex items-center justify-center h-7 w-7 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring flex-shrink-0"
-                            aria-label="Dismiss"
-                        >
-                            <X className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
-                )}
+
 
                 {/* Header */}
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
@@ -311,17 +295,16 @@ export default function DashboardPage() {
 
                         {/* Clear All — only shown when articles exist */}
                         {totalArticles > 0 && (
-                            <button
-                                onClick={handleClearAll}
-                                disabled={isClearing}
-                                className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-status-error-fg/20 bg-status-error-bg text-status-error-fg text-xs font-semibold transition-all hover:bg-status-error-fg/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            <Button
+                                variant="danger"
+                                onClick={() => setIsClearDialogOpen(true)}
+                                disabled={isClearing || totalArticles === 0}
+                                isLoading={isClearing}
+                                className="h-9 px-3.5 rounded-lg border border-status-error-fg/20 bg-status-error-bg text-status-error-fg text-xs font-semibold shadow-sm"
+                                leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
                             >
-                                {isClearing
-                                    ? <span className="w-3.5 h-3.5 rounded-full border-2 border-status-error-fg/30 border-t-status-error-fg animate-spin" />
-                                    : <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
-                                }
                                 {t('clear_all')}
-                            </button>
+                            </Button>
                         )}
 
                         {/* Vertical Divider */}
@@ -463,16 +446,55 @@ export default function DashboardPage() {
                     </>
                 )}
 
-                {activeView === 'osint' && (
-                    <OsintTab />
-                )}
-
-                {/* Modals */}
-                <ManualEntryModal
-                    isOpen={isManualModalOpen}
-                    onClose={() => setManualModalOpen(false)}
-                />
+                {activeView === 'osint' && <OsintTab />}
             </div>
+
+            {/* Global Overlays */}
+            <ConfirmationDialog
+                isOpen={isClearDialogOpen}
+                onClose={() => setIsClearDialogOpen(false)}
+                onConfirm={handleClearAll}
+                title={t('clear_all')}
+                description={t('confirm_clear_all')}
+                variant="danger"
+                isLoading={isClearing}
+            />
+
+            {toast && (
+                <div role="status" className={clsx(
+                    "fixed bottom-8 right-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5 duration-500 border flex items-center gap-4 transition-all",
+                    toast.type === 'success'
+                        ? "bg-status-success-bg/90 text-status-success-fg border-status-success-fg/20"
+                        : "bg-status-error-bg/90 text-status-error-fg border-status-error-fg/20"
+                )}>
+                    <div className={clsx(
+                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg",
+                        toast.type === 'success' ? "bg-status-success-fg/20" : "bg-status-error-fg/20"
+                    )}>
+                        {toast.type === 'success' ? <ShieldCheck className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                    </div>
+                    <div>
+                        <div className="font-bold text-sm tracking-tight leading-none mb-1">
+                            {toast.type === 'success' ? t('success') : t('error')}
+                        </div>
+                        <div className="text-xs font-semibold opacity-90 leading-tight pr-4">
+                            {toast.message}
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setToast(null)}
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors opacity-60 hover:opacity-100"
+                    >
+                        <Plus className="w-4 h-4 rotate-45" />
+                    </button>
+                    <div className="absolute inset-x-2 bottom-2 h-0.5 bg-current opacity-20 rounded-full" />
+                </div>
+            )}
+
+            <ManualEntryModal
+                isOpen={isManualModalOpen}
+                onClose={() => setManualModalOpen(false)}
+            />
         </main>
     );
 }
