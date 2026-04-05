@@ -100,6 +100,17 @@ export const lookupEmail = action({
                 result: results,
             });
 
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Email lookup for ${email} finished. ${results.breachCount || 0} breaches found.`,
+                    type: "system"
+                });
+            }
+
             return { success: true, data: results, recordId };
         } catch (e: any) {
             console.error("lookupEmail failed:", e);
@@ -237,6 +248,17 @@ export const lookupDomain = action({
                 result: results,
             });
 
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Domain lookup for ${domain} finished.`,
+                    type: "system"
+                });
+            }
+
             return { success: true, data: results, recordId };
         } catch (e: any) {
             console.error("lookupDomain failed:", e);
@@ -323,6 +345,17 @@ export const lookupIp = action({
                 query: ip,
                 result: results,
             });
+
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `IP lookup for ${ip} finished.`,
+                    type: "system"
+                });
+            }
 
             return { success: true, data: results, recordId };
         } catch (e: any) {
@@ -429,6 +462,17 @@ export const lookupUsername = action({
                 result: results,
             });
 
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Username lookup for ${username} finished.`,
+                    type: "system"
+                });
+            }
+
             return { success: true, data: results, recordId };
         } catch (e: any) {
             console.error("lookupUsername failed:", e);
@@ -490,6 +534,17 @@ export const lookupPhone = action({
                 query: phone,
                 result: results,
             });
+
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Phone lookup for ${phone} finished.`,
+                    type: "system"
+                });
+            }
 
             return { success: true, data: results, recordId };
         } catch (e: any) {

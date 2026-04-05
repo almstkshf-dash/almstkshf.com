@@ -6,12 +6,19 @@ import { Bell } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export function NotificationBell() {
+    const [mounted, setMounted] = useState(false);
+    const t = useTranslations("Notifications");
     const unreadNotifications = useQuery(api.monitoring.getUnreadNotifications) || [];
     const markAsRead = useMutation(api.monitoring.markNotificationAsRead);
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -26,6 +33,10 @@ export function NotificationBell() {
     const handleDismiss = async (id: any) => {
         await markAsRead({ id });
     };
+
+    if (!mounted) {
+        return <div className="w-9 h-9 rounded-full border border-border bg-background" />;
+    }
 
     return (
         <div className="relative" ref={ref}>
@@ -49,26 +60,26 @@ export function NotificationBell() {
                         className="absolute right-0 mt-2 w-80 bg-background border border-border rounded-xl shadow-2xl z-[100] overflow-hidden"
                     >
                         <div className="p-3 border-b border-border bg-muted/30">
-                            <h3 className="font-semibold text-sm">Notifications</h3>
+                            <h3 className="font-semibold text-sm">{t("title")}</h3>
                         </div>
                         <div className="max-h-80 overflow-y-auto">
                             {unreadNotifications.length === 0 ? (
                                 <div className="p-4 text-center text-sm text-foreground/50">
-                                    No new notifications
+                                    {t("no_new")}
                                 </div>
                             ) : (
                                 unreadNotifications.map(notif => (
                                     <div key={notif._id} className="p-3 border-b border-border/50 hover:bg-muted/50 transition-colors">
                                         <div className="flex justify-between items-start gap-2">
                                             <div>
-                                                <h4 className="text-sm font-medium">{notif.title}</h4>
+                                                <h4 className="text-sm font-medium">{t(notif.title as any)}</h4>
                                                 <p className="text-xs text-foreground/70 mt-1">{notif.message}</p>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={() => handleDismiss(notif._id)}
                                                 className="text-xs text-primary hover:underline shrink-0"
                                             >
-                                                Dismiss
+                                                {t("dismiss")}
                                             </button>
                                         </div>
                                     </div>

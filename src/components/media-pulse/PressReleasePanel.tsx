@@ -209,7 +209,8 @@ export default function PressReleasePanel() {
                 {/* Status messages */}
                 {error && (
                     <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
-                        <XCircle className="w-4 h-4 flex-shrink-0" /> {error}
+                        <XCircle className="w-4 h-4 flex-shrink-0" />
+                        <span>{error}</span>
                     </div>
                 )}
 
@@ -223,7 +224,7 @@ export default function PressReleasePanel() {
                                 : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
                         )}>
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                            {syncResult.message}
+                            <span>{syncResult.message}</span>
                             {syncResult.totalErrors > 0 && (
                                 <span className="ml-auto text-xs opacity-70">{syncResult.totalErrors} feed(s) failed</span>
                             )}

@@ -6,7 +6,7 @@ import { api } from '../../../convex/_generated/api';
 import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle, Edit, History } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
-import { useState, useMemo, memo, useCallback } from 'react';
+import { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 
 /**
@@ -192,13 +192,13 @@ const ArticleRow = memo(({
                     </div>
                 </div>
             </td>
-            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors" suppressHydrationWarning>
                 {article.reach?.toLocaleString() || '—'}
             </td>
             <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
                 {article.likes !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums">{article.likes.toLocaleString()}</span>
+                        <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
                         <Heart className="w-3 h-3 text-status-error-fg/70" />
                     </div>
                 ) : '—'}
@@ -206,7 +206,7 @@ const ArticleRow = memo(({
             <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
                 {article.retweets !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums">{article.retweets.toLocaleString()}</span>
+                        <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
                         <Share2 className="w-3 h-3 text-status-success-fg/70" />
                     </div>
                 ) : '—'}
@@ -214,12 +214,12 @@ const ArticleRow = memo(({
             <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
                 {article.replies !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums">{article.replies.toLocaleString()}</span>
+                        <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
                         <MessageCircle className="w-3 h-3 text-status-info-fg/70" />
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors">
+            <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors" suppressHydrationWarning>
                 ${article.ave?.toLocaleString() || '0'}
             </td>
             <td className="p-4 text-center">
@@ -261,7 +261,12 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
     const updateSentiment = useMutation(api.monitoring.updateSentiment);
 
+    const [mounted, setMounted] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
@@ -330,8 +335,13 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
         }
     }, [updateSentiment]);
 
-    if (articles === undefined) {
-        return <div className="p-8 flex justify-center"><Loader2 className="animate-spin h-8 w-8 text-primary" /></div>;
+    if (!mounted || articles === undefined) {
+        return (
+            <div className="p-8 space-y-4 animate-pulse">
+                <div className="h-10 bg-muted/20 rounded-xl w-full" />
+                <div className="h-64 bg-muted/10 rounded-xl w-full" />
+            </div>
+        );
     }
 
     if (articles.length === 0) {

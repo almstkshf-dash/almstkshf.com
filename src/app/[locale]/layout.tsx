@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "../globals.css";
-import { NextIntlClientProvider } from 'next-intl';
+import { routing } from '@/i18n/config';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { ConvexClientProvider } from '@/app/ConvexClientProvider';
-import { ClerkProvider } from '@clerk/nextjs';
-import { routing } from '@/i18n/config';
-import { ThemeProvider } from '@/components/ThemeProvider';
+
 import Navbar from '@/components/Navbar';
 import { Analytics } from "@vercel/analytics/next";
 import LazyLayoutParts from '@/components/LazyLayoutParts';
+import { RootProviders } from '@/components/providers/RootProviders';
+
 import ReactDOM from 'react-dom';
 
 /*
@@ -129,43 +128,26 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <ClerkProvider>
-            <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
-                <head>
-                    {/*
+        <html lang={locale} dir={dir} className="scroll-smooth" suppressHydrationWarning>
+
+
+            <head>
+                {/*
                       Preconnect to critical third-party origins.
                       This eliminates DNS + TCP + TLS setup time for these domains
                       which was adding ~200-400ms to LCP on the first request.
                     */}
-                    <link rel="preconnect" href="https://clerk.com" />
-                    <link rel="preconnect" href="https://img.clerk.com" />
-                    <link rel="preconnect" href="https://fonts.googleapis.com" />
-                    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                    {process.env.NEXT_PUBLIC_CONVEX_URL && (
-                        <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />
-                    )}
+                <link rel="preconnect" href="https://clerk.com" />
+                <link rel="preconnect" href="https://img.clerk.com" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                {process.env.NEXT_PUBLIC_CONVEX_URL && (
+                    <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />
+                )}
 
-                    {/*
-                      SPEED INDEX FIX 1 — Inline critical CSS variables.
 
-                      The browser paints the page BEFORE the external stylesheet is
-                      fully parsed. Without these variables inlined, the body background
-                      is transparent/white and the gradient text on the h1 has no color,
-                      both of which register as "unpainted" frames in Speed Index.
 
-                      These 3 variables are the only ones needed to correctly paint
-                      the hero section: background (page bg), primary (h1 gradient +
-                      button), and foreground (body text).
-                    */}
-                    <style
-                        key="critical-css"
-                        suppressHydrationWarning
-                        dangerouslySetInnerHTML={{
-                            __html: `:root{--background:#FFFFFF;--foreground:#020617;--primary:#2563EB;--primary-foreground:#FFFFFF;--border:#E2E8F0;--muted:#F8FAFC;--muted-foreground:#374151;--accent:#F1F5F9;--card:#FFFFFF;--ring:#2563EB}
-                      .dark{--background:#020617;--foreground:#F8FAFC;--primary:#1D4ED8;--primary-foreground:#FFFFFF;--border:#1E293B;--muted:#1E293B;--muted-foreground:#A8B8CC;--accent:#1E293B;--card:#0F172A;--ring:#1D4ED8}
-                      html{background:var(--background);color:var(--foreground)}`}} />
-
-                    {/*
+                {/*
                       SPEED INDEX FIX 2 — Blocking theme script.
 
                       Runs synchronously before ANY CSS is parsed. Sets the correct
@@ -176,8 +158,8 @@ export default async function RootLayout({
                       This is intentionally a blocking script — it MUST run before
                       paint to be effective. It is ~200 bytes (trivial).
                     */}
-                    <script dangerouslySetInnerHTML={{
-                        __html: `
+                <script dangerouslySetInnerHTML={{
+                    __html: `
                       (function(){
                         try{
                           var t=localStorage.getItem('theme');
@@ -191,7 +173,7 @@ export default async function RootLayout({
                       })();
                     `}} />
 
-                    {/*
+                {/*
                       SPEED INDEX FIX 3 — No-transition guard.
 
                       CSS transitions on `body` and `section` (background-color: 0.3s)
@@ -202,8 +184,8 @@ export default async function RootLayout({
                       This script disables all transitions for 100ms then removes
                       itself. By then the page has fully painted its initial state.
                     */}
-                    <script dangerouslySetInnerHTML={{
-                        __html: `
+                <script dangerouslySetInnerHTML={{
+                    __html: `
                       (function(){
                         var s=document.createElement('style');
                         s.id='no-transition';
@@ -219,36 +201,24 @@ export default async function RootLayout({
                         });
                       })();
                     `}} />
-                </head>
-                <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}>
-                    <NextIntlClientProvider locale={locale} messages={messages}>
-                        <ConvexClientProvider>
-                            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-                                <Navbar />
-                                {children}
-                                <LazyLayoutParts />
-                                <Analytics />
-                            </ThemeProvider>
-                        </ConvexClientProvider>
-                    </NextIntlClientProvider>
-                    <script
-                        type="application/ld+json"
-                        dangerouslySetInnerHTML={{
-                            __html: JSON.stringify({
-                                "@context": "https://schema.org",
-                                "@type": "Organization",
-                                "name": "ALMSTKSHF",
-                                "url": "https://almstkshf.com",
-                                "logo": "https://almstkshf.com/logo.png",
-                                "sameAs": [
-                                    "https://twitter.com/almstkshf",
-                                    "https://linkedin.com/company/almstkshf"
-                                ]
-                            })
-                        }}
-                    />
-                </body>
-            </html>
-        </ClerkProvider>
+            </head>
+            <body className={`${inter.variable} ${ibmPlexArabic.variable} antialiased font-sans bg-background text-foreground`}><RootProviders locale={locale} messages={messages}><Navbar />{children}<LazyLayoutParts /><Analytics /></RootProviders><script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        "name": "ALMSTKSHF",
+                        "url": "https://almstkshf.com",
+                        "logo": "https://almstkshf.com/logo.png",
+                        "sameAs": [
+                            "https://twitter.com/almstkshf",
+                            "https://linkedin.com/company/almstkshf"
+                        ]
+                    })
+                }}
+            />
+            </body>
+        </html>
     );
 }

@@ -15,7 +15,7 @@ export default function GlobalError({
     }, [error]);
 
     return (
-        <html>
+        <html lang="en" dir="ltr">
             <body className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center">
                 <div className="rounded-xl bg-white p-8 shadow-xl">
                     <h2 className="mb-4 text-2xl font-bold text-gray-900">Something went wrong!</h2>

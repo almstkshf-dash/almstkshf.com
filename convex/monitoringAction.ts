@@ -743,45 +743,51 @@ async function processArticle(
         const ident = await ctx.auth.getUserIdentity();
         const userId = ident?.subject;
 
-        if (userId && (aiData.risk === "High" || aiData.sentiment === "Negative")) {
-            try {
-                await ctx.runMutation(api.monitoring.createNotification, {
-                    userId,
-                    title: "Alert: High Risk / Negative Mention",
-                    message: `Found mention for "${keyword}": ${item.title.substring(0, 60)}...`,
-                    type: "alert"
-                });
+        if (userId) {
+            const isPressRelease = forceSourceType === "Press Release" || aiData.sourceType === "Press Release";
+            const isCritical = aiData.risk === "High" || aiData.sentiment === "Negative";
 
-                const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
-                await sendResendEmail({
-                    to: CONTACT_EMAIL,
-                    subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
-                            <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
-                                <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
-                            </div>
-                            <div style="padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
-                                <p style="margin-top: 0;"><strong>Keyword:</strong> ${keyword}</p>
-                                <p><strong>Risk Level:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.risk}</span></p>
-                                <p><strong>Sentiment:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.sentiment}</span></p>
-                                
-                                <h3 style="margin-top: 20px;">Article Title</h3>
-                                <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${item.title}</p>
-                                
-                                <h3>AI Summary</h3>
-                                <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
-                                
-                                <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                                    <a href="${item.link}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
+            if (isCritical || isPressRelease) {
+                try {
+                    await ctx.runMutation(api.monitoring.createNotification, {
+                        userId,
+                        title: isCritical ? "critical_mention" : "press_release_found",
+                        message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${keyword}": ${item.title.substring(0, 60)}...`,
+                        type: isCritical ? "alert" : "system"
+                    });
+
+                    if (isCritical) {
+                        const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
+                        await sendResendEmail({
+                            to: CONTACT_EMAIL,
+                            subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+                                    <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
+                                        <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
+                                    </div>
+                                    <div style="padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+                                        <p style="margin-top: 0;"><strong>Keyword:</strong> ${keyword}</p>
+                                        <p><strong>Risk Level:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.risk}</span></p>
+                                        <p><strong>Sentiment:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.sentiment}</span></p>
+                                        
+                                        <h3 style="margin-top: 20px;">Article Title</h3>
+                                        <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${item.title}</p>
+                                        
+                                        <h3>AI Summary</h3>
+                                        <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
+                                        
+                                        <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                                            <a href="${item.link}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    `
-                });
-
-            } catch (err) {
-                console.error("Failed to create notification or send email:", err);
+                            `
+                        });
+                    }
+                } catch (err) {
+                    console.error("Failed to create notification or send email:", err);
+                }
             }
         }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -20,8 +20,13 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     const settings = useQuery(api.settings.getSettings);
     const { isAuthenticated } = useConvexAuth();
 
+    const [mounted, setMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -39,7 +44,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         replies: 0,
     });
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

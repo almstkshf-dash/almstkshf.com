@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useTranslations, useMessages } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ReportGenerator } from '@/lib/report-generator';
 
 export default function DeepStatusPanel() {
@@ -25,7 +25,12 @@ export default function DeepStatusPanel() {
     const [countries, setCountries] = useState('ae,sa,eg');
     const [languages, setLanguages] = useState('en,ar');
     const [limit, setLimit] = useState(20);
+    const [mounted, setMounted] = useState(false);
     const messages = useMessages();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // UI state
     const [loading, setLoading] = useState(false);
@@ -76,6 +81,15 @@ export default function DeepStatusPanel() {
             setLoading(false);
         }
     };
+
+    if (!mounted) {
+        return (
+            <div className="space-y-6 animate-pulse">
+                <div className="h-48 bg-muted/20 rounded-2xl border border-border" />
+                <div className="h-24 bg-muted/20 rounded-2xl border border-border" />
+            </div>
+        );
+    }
 
     return (
         <section className="space-y-6">
@@ -231,7 +245,7 @@ export default function DeepStatusPanel() {
                             key={run._id}
                             className="flex flex-wrap items-center justify-between bg-muted/40 border border-border rounded-lg px-3 py-2 text-sm gap-2"
                         >
-                            <span className="font-semibold text-xs text-muted-foreground">
+                            <span className="font-semibold text-xs text-muted-foreground" suppressHydrationWarning>
                                 {new Date(run.startedAt).toLocaleString()}
                             </span>
                             <span

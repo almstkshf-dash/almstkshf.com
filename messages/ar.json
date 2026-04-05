@@ -47,6 +47,14 @@
     "signup": "تسجيل جديد",
     "settings": "الإعدادات"
   },
+  "Notifications": {
+    "title": "التنبيهات",
+    "no_new": "لا توجد تنبيهات جديدة",
+    "dismiss": "تجاهل",
+    "osint_ready": "نتيجة OSINT جاهزة",
+    "press_release_found": "تم العثور على بيان صحفي جديد",
+    "critical_mention": "تنبيه: ذكر حرج"
+  },
   "Common": {
     "confirm": "تأكيد",
     "cancel": "إلغاء",

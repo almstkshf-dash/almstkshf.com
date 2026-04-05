@@ -297,7 +297,8 @@ export default function OsintTab() {
                 className="space-y-3"
               >
                 <div className="flex items-center gap-2 text-sm font-bold text-emerald-600 px-1">
-                  <CheckCircle2 className="w-4 h-4" /> {tCommon('copied')}
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{tCommon('copied')}</span>
                 </div>
                 <div className="bg-muted/30 border border-border rounded-2xl overflow-hidden">
                   <div className="px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between">

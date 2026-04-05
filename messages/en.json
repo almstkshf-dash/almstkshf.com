@@ -247,6 +247,14 @@
     "extract_failed": "Failed to extract content. Please check the URL or fill manually.",
     "not_authenticated": "Not authenticated. Please sign in first."
   },
+  "Notifications": {
+    "title": "Notifications",
+    "no_new": "No new notifications",
+    "dismiss": "Dismiss",
+    "osint_ready": "OSINT Result Ready",
+    "press_release_found": "New Press Release Found",
+    "critical_mention": "Alert: Critical Mention"
+  },
   "Common": {
     "confirm": "Confirm",
     "cancel": "Cancel",

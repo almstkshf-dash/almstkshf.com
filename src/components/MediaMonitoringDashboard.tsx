@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link, useRouter } from "@/i18n/routing";
@@ -50,7 +50,12 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
 
+    const [mounted, setMounted] = useState(false);
     const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const reports = useQuery(api.queries.getMediaReports, { source: filter });
     const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
@@ -64,6 +69,24 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         { label: "Social Media", value: "Social Media", icon: Globe, href: "/media-monitoring/media-pulse" },
         { label: "Press Release", value: "Press Release", icon: FileText, href: "/media-monitoring/press" },
     ], []);
+
+    if (!mounted) {
+        return (
+            <div className="space-y-8 animate-pulse">
+                <div className="h-64 bg-muted/20 rounded-3xl border border-border" />
+                <div className="flex gap-2">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="h-10 w-24 bg-muted/30 rounded-full" />
+                    ))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="h-48 bg-muted/20 rounded-xl" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
