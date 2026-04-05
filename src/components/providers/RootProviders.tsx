@@ -25,7 +25,6 @@ export function RootProviders({ children, locale, messages }: RootProvidersProps
         setMounted(true);
     }, []);
 
-    return (
-        <ClerkProvider><NextIntlClientProvider locale={locale} messages={messages}><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
+    return (<ClerkProvider><NextIntlClientProvider locale={locale} messages={messages}><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
     );
 }
