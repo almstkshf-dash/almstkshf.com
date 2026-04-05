@@ -38,7 +38,7 @@ export default function EmotionRadarChart({ data }: EmotionRadarChartProps) {
     );
 
     return (
-        <div className="w-full h-[300px] flex items-center justify-center">
+        <div className="w-full h-[300px]">
             {mounted && (
                 <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={300} debounce={1}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={translatedData}>

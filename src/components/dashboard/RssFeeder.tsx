@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
+import DOMPurify from 'dompurify';
 import {
   Rss,
   ExternalLink,
@@ -50,7 +51,7 @@ export default function RssFeeder({
     setError(null);
 
     try {
-      const response = await fetch(`/api/feed?url=${encodeURIComponent(activeUrl)}`);
+      const response = await fetch(`/api/proxy-rss?url=${encodeURIComponent(activeUrl)}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch feed data');
@@ -66,7 +67,12 @@ export default function RssFeeder({
       }
     } catch (err: any) {
       console.error('[RssFeeder] Fetch error:', err);
-      setError(t('error_fetching'));
+      // Explicitly check for browser-level network drops/blocks
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Network blocked. Please disable AdBlocker or check your connection.');
+      } else {
+        setError(err.message || t('error_fetching'));
+      }
       if (!silent) toast.error(t('error_fetching'));
     } finally {
       if (!silent) setIsLoading(false);
@@ -135,7 +141,7 @@ export default function RssFeeder({
       {/* Content Area */}
       <div className="relative min-h-[300px] bg-card/40 border border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm shadow-sm transition-all hover:shadow-md hover:border-border">
         <AnimatePresence mode="wait">
-          {isLoading ? (
+          {isLoading && items.length === 0 ? (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}
@@ -146,7 +152,7 @@ export default function RssFeeder({
               <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
               <p className="text-sm font-medium">{t('loading')}</p>
             </motion.div>
-          ) : error ? (
+          ) : error && items.length === 0 ? (
             <motion.div
               key="error"
               initial={{ opacity: 0 }}
@@ -167,7 +173,7 @@ export default function RssFeeder({
                 </button>
               </div>
             </motion.div>
-          ) : items.length === 0 ? (
+          ) : items.length === 0 && !isLoading ? (
             <motion.div
               key="empty"
               initial={{ opacity: 0 }}
@@ -221,12 +227,12 @@ export default function RssFeeder({
                       )}
                     </div>
 
-                    {/* Note: In a production environment with full HTML rendering, 
-                        you should use DOMPurify to sanitize item.description or item.content 
-                        before using dangerouslySetInnerHTML. Currently we use a safe text-only strip. */}
+                    {/* Note: Sanitize and safely strip all HTML tags using DOMPurify */}
                     {item.description && (
                       <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed">
-                        {item.description.replace(/<[^>]*>/g, '').slice(0, 150)}...
+                        {typeof window !== 'undefined'
+                          ? DOMPurify.sanitize(item.description, { ALLOWED_TAGS: [] }).slice(0, 150)
+                          : item.description.replace(/<[^>]*>/g, '').slice(0, 150)}...
                       </p>
                     )}
 
