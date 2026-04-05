@@ -1485,5 +1485,16 @@
     "export_pdf": "Export PDF",
     "export_excel": "Export Excel",
     "export_dossier": "Export Dossier"
+  },
+  "RssFeeder": {
+    "title": "Intelligence Stream",
+    "loading": "Syncing feed...",
+    "no_items": "No recent updates found for this stream.",
+    "last_updated": "Last updated",
+    "read_more": "Read Full Intelligence",
+    "source": "Source",
+    "error_fetching": "Connection to the intelligence stream failed.",
+    "placeholder_url": "Enter RSS link (e.g., https://...)",
+    "analyze": "Analyze Stream"
   }
 }

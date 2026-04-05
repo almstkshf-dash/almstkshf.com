@@ -32,15 +32,15 @@ export default function EmotionRadarChart({ data }: EmotionRadarChartProps) {
     })), [data, t]);
 
     if (!mounted) return (
-        <div className="w-full h-[200px] flex items-center justify-center">
+        <div className="w-full h-[300px] flex items-center justify-center">
             <div className="w-32 h-32 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
         </div>
     );
 
     return (
-        <div className="w-full h-[200px] flex items-center justify-center">
+        <div className="w-full h-[300px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={200} debounce={1}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={300} debounce={1}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={translatedData}>
                     <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
                     <PolarAngleAxis 

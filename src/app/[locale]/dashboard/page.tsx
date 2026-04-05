@@ -18,6 +18,8 @@ import OsintTab from '@/components/media-pulse/OsintTab';
 import PressReleasePanel from '@/components/media-pulse/PressReleasePanel';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
+import RssFeeder from '@/components/dashboard/RssFeeder';
+import { AAWSAT_SOURCES } from '@/config/rss-sources';
 
 type ArticleItem = {
     _id: string;
@@ -341,7 +343,20 @@ export default function DashboardPage() {
                     <>
                         <NewsGenerator defaultSourceType="Online News" />
                         <PressReleasePanel />
-                        <DashboardGrid articles={filteredArticles} analytics={analytics} />
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <div className="lg:col-span-3">
+                                <DashboardGrid articles={filteredArticles} analytics={analytics} />
+                            </div>
+                            <div className="lg:col-span-1">
+                                <RssFeeder 
+                                    initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
+                                    initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
+                                    categories={isAr ? AAWSAT_SOURCES : []}
+                                    maxItems={7}
+                                />
+                            </div>
+                        </div>
                         <section className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
                             <div className="p-5 border-b border-border space-y-4">
                                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">

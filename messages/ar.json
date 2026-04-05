@@ -1491,5 +1491,16 @@
     "export_pdf": "تصدير PDF",
     "export_excel": "تصدير Excel",
     "export_dossier": "تصدير الملف"
+  },
+  "RssFeeder": {
+    "title": "تدفق الاستخبارات",
+    "loading": "جاري مزامنة الموجز...",
+    "no_items": "لم يتم العثور على تحديثات أخيرة لهذا التدفق.",
+    "last_updated": "آخر تحديث",
+    "read_more": "اقرأ الاستخبارات كاملة",
+    "source": "المصدر",
+    "error_fetching": "فشل الاتصال بتدفق الاستخبارات.",
+    "placeholder_url": "أدخل رابط RSS (مثلاً https://...)",
+    "analyze": "تحليل التدفق"
   }
 }

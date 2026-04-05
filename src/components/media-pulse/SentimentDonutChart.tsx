@@ -53,40 +53,40 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
         { name: t("ToneLabels.negative"), value: data.negative, color: colors.error },
     ];
 
-    if (!mounted) return <div className="w-full h-[180px]" />;
+    if (!mounted) return <div className="w-full h-[300px]" />;
 
     return (
-        <div className="relative w-full h-[180px] flex items-center justify-center">
+        <div className="relative w-full h-[300px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={180} debounce={1}>
-                <PieChart>
-                    <Pie
-                        data={chartData}
-                        cx="50%"
-                        cy="100%"
-                        startAngle={180}
-                        endAngle={0}
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                        stroke="none"
-                    >
-                        {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        contentStyle={{
-                            backgroundColor: colors.popover,
-                            border: `1px solid ${colors.border}`,
-                            borderRadius: "8px",
-                            fontSize: "12px",
-                            color: colors.popoverFg,
-                        }}
-                    />
-                </PieChart>
-            </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={300} debounce={1}>
+                    <PieChart>
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="100%"
+                            startAngle={180}
+                            endAngle={0}
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            stroke="none"
+                        >
+                            {chartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                        </Pie>
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: colors.popover,
+                                border: `1px solid ${colors.border}`,
+                                borderRadius: "8px",
+                                fontSize: "12px",
+                                color: colors.popoverFg,
+                            }}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
             )}
 
             {/* NSS Index Overlay */}
