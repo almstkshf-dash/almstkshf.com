@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
@@ -9,6 +9,7 @@ import { useMemo, memo, useState } from "react";
 import SentimentDonutChart from "./SentimentDonutChart";
 import EmotionRadarChart from "./EmotionRadarChart";
 import ArticlesTrendChart from "./ArticlesTrendChart";
+import VolumeHeatmapChart from "./VolumeHeatmapChart";
 import { TrendingUp } from "lucide-react";
 import { ReportGenerator } from "@/lib/report-generator";
 import Button from "@/components/ui/Button";
@@ -99,6 +100,45 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         if (e.key === 'Escape') setEditingKeyword(null);
     };
 
+    const heatmapData = useMemo(() => {
+        if (!articles || articles.length === 0) {
+            // Dummy data to show the chart when there are no articles
+            return [
+                { day: 1, hour: 9, value: 12 },
+                { day: 1, hour: 10, value: 25 },
+                { day: 2, hour: 14, value: 30 },
+                { day: 3, hour: 8, value: 15 },
+                { day: 4, hour: 18, value: 40 },
+                { day: 5, hour: 11, value: 20 },
+            ];
+        }
+
+        const counts: Record<string, number> = {};
+
+        // Initialize all combinations to 0
+        for (let d = 0; d < 7; d++) {
+            for (let h = 0; h < 24; h++) {
+                counts[`${d}-${h}`] = 0;
+            }
+        }
+
+        articles.forEach(a => {
+            const date = new Date(a.publishedAt || (a as any)._creationTime);
+            date.setUTCHours(date.getUTCHours() + 4);
+            const day = date.getUTCDay();
+            const hour = date.getUTCHours();
+            const key = `${day}-${hour}`;
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
+        const data = [];
+        for (const [key, val] of Object.entries(counts)) {
+            const [day, hour] = key.split('-').map(Number);
+            data.push({ day, hour, value: val });
+        }
+        return data;
+    }, [articles]);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Pulse View */}
@@ -160,9 +200,9 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                                 className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
                                             />
                                         ) : (
-                                            <span 
-                                                onDoubleClick={() => handleEditKeyword(kw)} 
-                                                className="cursor-pointer hover:underline" 
+                                            <span
+                                                onDoubleClick={() => handleEditKeyword(kw)}
+                                                className="cursor-pointer hover:underline"
                                                 title="Double click to edit keyword across all matching articles"
                                             >
                                                 {kw}
@@ -450,6 +490,28 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     )}
                 </div>
             </div>
+
+            {/* Volume Heatmap (Full Width) */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="p-6 bg-card border border-border rounded-2xl shadow-sm transition-colors lg:col-span-3"
+            >
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-primary/10 rounded-2xl text-primary border border-primary/20 shadow-inner">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h4 className="text-foreground font-bold text-lg tracking-wider">tDashboard('volume_heatmap_title')</h4>
+                            <p className="text-sm text-muted-foreground mt-1">tDashboard('volume_heatmap_desc')</p>
+                        </div>
+                    </div>
+                </div>
+                <VolumeHeatmapChart data={heatmapData} />
+            </motion.div>
         </div>
     );
 });

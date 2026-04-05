@@ -958,7 +958,21 @@
       "articles_trend": "Articles Trend",
       "sentiment_distribution": "Sentiment Distribution",
       "top_emotions": "Top Emotions",
-      "keywords": "Active Keywords"
+      "keywords": "Active Keywords",
+      "Less": "Less",
+      "More": "More",
+      "volume_heatmap_title": "News Cycle Heatmap",
+      "volume_heatmap_desc": "Days of the week vs. Hour of the day (UAE Time)",
+      "at": "at",
+      "days": {
+        "Sun": "Sun",
+        "Mon": "Mon",
+        "Tue": "Tue",
+        "Wed": "Wed",
+        "Thu": "Thu",
+        "Fri": "Fri",
+        "Sat": "Sat"
+      }
     }
   },
   "CrisisManagementDetail": {
