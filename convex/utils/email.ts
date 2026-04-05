@@ -30,7 +30,7 @@ export async function sendResendEmail(options: {
         const responseData = await response.text();
 
         if (!response.ok) {
-            let errorMsg = responseData;
+            const errorMsg = responseData;
             try {
                 const errorData = JSON.parse(responseData);
                 if (errorData.name === "validation_error" && errorData.message.includes("testing emails")) {

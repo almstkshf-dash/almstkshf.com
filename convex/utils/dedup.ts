@@ -42,7 +42,7 @@ function getRedisClient() {
  * canonical comparison) before hashing.
  */
 function buildDedupHash(url: string, title: string): string {
-  let normalizedUrl = url.toLowerCase().split("?")[0].replace(/\/$/, "");
+  const normalizedUrl = url.toLowerCase().split("?")[0].replace(/\/$/, "");
   const normalizedTitle = title.toLowerCase().trim();
   const raw = `${normalizedUrl}::${normalizedTitle}`;
   return createHash("sha256").update(raw).digest("hex").substring(0, 32);

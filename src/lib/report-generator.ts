@@ -217,7 +217,7 @@ export class ReportGenerator {
         doc.addPage();
         this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
-        let y = 30;
+        const y = 30;
         this.drawHeading(doc, translations.OsintTab?.export_history || 'Investigation History', 14, y, fontLoaded);
 
         const tableData = items.map(item => [
