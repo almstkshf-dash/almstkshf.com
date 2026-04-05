@@ -77,6 +77,7 @@ export default defineSchema({
             whoisjson: v.optional(v.string()),
             abuseipdb: v.optional(v.string()),
             numverify: v.optional(v.string()),
+            qstash: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -181,6 +182,7 @@ export default defineSchema({
             whoisjson: v.optional(v.string()),
             abuseipdb: v.optional(v.string()),
             numverify: v.optional(v.string()),
+            qstash: v.optional(v.string()),
         })),
         isSubscribed: v.optional(v.boolean()),
         isTrialActive: v.optional(v.boolean()),
