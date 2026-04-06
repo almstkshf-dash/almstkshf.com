@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 const file = 'src/components/media-pulse/DashboardGrid.tsx';
 const lines = fs.readFileSync(file, 'utf8').split('\n');
 

@@ -365,7 +365,7 @@ export const fetchNews = action({
 
 
             let totalSuccess = 0;
-            let totalSkipped = 0;
+            const totalSkipped = 0;
 
             // ── Parallel Provider Fetching ───────────────────────────────────
             console.log(`🚀 Starting parallel fetch for keyword: ${args.keyword}`);
