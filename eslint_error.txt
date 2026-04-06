@@ -1,0 +1,296 @@
+﻿
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\contact\page.tsx
+  4:31  warning  'Globe' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\dashboard\page.tsx
+    5:82   warning  'X' is defined but never used                 @typescript-eslint/no-unused-vars
+    5:121  warning  'AlertCircle' is defined but never used       @typescript-eslint/no-unused-vars
+    5:134  warning  'Loader2' is defined but never used           @typescript-eslint/no-unused-vars
+   53:12   warning  'mounted' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   59:17   warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  256:88   warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\dashboard\settings\api-keys\page.tsx
+  49:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\dashboard\settings\page.tsx
+    7:45  warning  'Link2' is defined but never used         @typescript-eslint/no-unused-vars
+   13:10  warning  'useParams' is defined but never used     @typescript-eslint/no-unused-vars
+  125:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  199:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\payment\cancelled\page.tsx
+  27:90  warning  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\payment\success\page.tsx
+  13:12  warning  'session' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  13:44  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\technical-solutions\integration\page.tsx
+  12:11  warning  'locale' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\[locale]\technical-solutions\kyc\page.tsx
+  13:11  warning  'locale' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\chatbase\token\route.ts
+  63:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\monitor\route.ts
+  110:9   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  116:13  warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  120:9   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  125:21  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  151:15  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  153:21  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\search\route.ts
+  31:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\sentiment\overview\route.ts
+  24:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\sentiment\risk\route.ts
+  22:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\app\api\stripe\webhook\route.ts
+  213:27  warning  'customerEmail' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\BehindTheSceneClient.tsx
+  152:113  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  156:117  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\ChatbaseWidget.tsx
+  94:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\ChatbotTrigger.tsx
+  4:28  warning  'Bot' is defined but never used       @typescript-eslint/no-unused-vars
+  4:33  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\CheckoutButton.tsx
+  4:10  warning  'Loader2' is defined but never used    @typescript-eslint/no-unused-vars
+  6:10  warning  'getStripe' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\CommandMenu.tsx
+   11:5    warning  'User' is defined but never used          @typescript-eslint/no-unused-vars
+   12:5    warning  'CreditCard' is defined but never used    @typescript-eslint/no-unused-vars
+   15:5    warning  'Laptop' is defined but never used        @typescript-eslint/no-unused-vars
+   17:5    warning  'Activity' is defined but never used      @typescript-eslint/no-unused-vars
+   18:5    warning  'ShieldAlert' is defined but never used   @typescript-eslint/no-unused-vars
+   19:5    warning  'Users' is defined but never used         @typescript-eslint/no-unused-vars
+  147:104  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:99   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\ContactForm.tsx
+  10:8  warning  'clsx' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\CrisisManagementClient.tsx
+   13:5   warning  'TrendingUp' is defined but never used    @typescript-eslint/no-unused-vars
+   14:5   warning  'Users' is defined but never used         @typescript-eslint/no-unused-vars
+   19:5   warning  'Search' is defined but never used        @typescript-eslint/no-unused-vars
+  139:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\Footer.tsx
+   8:10  warning  'Facebook' is defined but never used        @typescript-eslint/no-unused-vars
+   8:20  warning  'Twitter' is defined but never used         @typescript-eslint/no-unused-vars
+   8:39  warning  'Instagram' is defined but never used       @typescript-eslint/no-unused-vars
+  16:11  warning  'isRTL' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  62:60  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\FreeInsightTool.tsx
+   6:45  warning  'ArrowRight' is defined but never used       @typescript-eslint/no-unused-vars
+   9:10  warning  'Link' is defined but never used             @typescript-eslint/no-unused-vars
+  16:11  warning  'locale' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  59:23  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\HomeClient.tsx
+  103:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  114:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  125:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  136:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\IntegrationHub.tsx
+   4:15  warning  'Globe' is defined but never used                     @typescript-eslint/no-unused-vars
+  24:26  warning  'setIntegrations' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\KYCVerification.tsx
+   3:10  warning  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+  16:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:46  warning  'idx' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\LexcoraClient.tsx
+   25:11  warning  'locale' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  137:47  warning  'catIdx' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\MediaMonitoringDashboard.tsx
+    3:36  warning  'useEffect' is defined but never used         @typescript-eslint/no-unused-vars
+   24:11  warning  'DashboardArticle' is defined but never used  @typescript-eslint/no-unused-vars
+   64:11  warning  'locale' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   94:83  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  146:42  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  193:48  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\MediaPulseClient.tsx
+  13:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\Navbar.tsx
+   42:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:89  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  323:85  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  337:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\NotificationBell.tsx
+   7:8    warning  'clsx' is defined but never used          @typescript-eslint/no-unused-vars
+  33:38   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:103  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\PressClient.tsx
+  8:50  warning  'Layout' is defined but never used  @typescript-eslint/no-unused-vars
+  8:58  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+  8:66  warning  'Mail' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\ReportLibrary.tsx
+  16:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\SentimentTracker.tsx
+  16:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\SmartMediaAssistantClient.tsx
+   6:26  warning  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+   6:41  warning  'PenTool' is defined but never used        @typescript-eslint/no-unused-vars
+  15:11  warning  't' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  20:52  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\StylingAssistantClient.tsx
+  6:46  warning  'Loader2' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\TvRadioClient.tsx
+  13:11  warning  'features' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\dashboard\RssFeeder.tsx
+  68:19  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  87:6   warning  React Hook useEffect has a missing dependency: 'fetchFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\ArticleTable.tsx
+   53:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:8   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  258:87  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  320:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  332:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  332:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  403:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\DashboardGrid.tsx
+    3:82  warning  'Download' is defined but never used                  @typescript-eslint/no-unused-vars
+   21:16  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+   41:11  warning  'sentimentDonutT' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  129:58  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  356:63  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\DeepStatusPanel.tsx
+   20:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  243:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\ManualEntryModal.tsx
+  292:82  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  389:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\NewsGenerator.tsx
+  374:12  warning  'showDatePicker' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  406:11  warning  'formatDateDisplay' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  428:11  warning  'getLangByCode' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  457:19  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  464:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\OsintTab.tsx
+    7:22  warning  'CheckCircle2' is defined but never used          @typescript-eslint/no-unused-vars
+   19:10  warning  'AlertCircle' is defined but never used           @typescript-eslint/no-unused-vars
+   19:23  warning  'ArrowRight' is defined but never used            @typescript-eslint/no-unused-vars
+   77:78  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   89:45  warning  't' is defined but never used                     @typescript-eslint/no-unused-vars
+   89:76  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   89:84  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   93:23  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  268:20  warning  'setFreeOnly' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\media-pulse\PressReleasePanel.tsx
+  38:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\providers\RootProviders.tsx
+  13:15  warning  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+  22:12  warning  'mounted' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\components\ui\Button.tsx
+  22:5  warning  'iconOnly' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\i18n\request.ts
+  8:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\lib\navigation.ts
+   8:3   warning  'Mic2' is defined but never used          @typescript-eslint/no-unused-vars
+  17:3   warning  'Radio' is defined but never used         @typescript-eslint/no-unused-vars
+  25:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\lib\report-exporter.ts
+  39:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\lib\report-generator.ts
+   18:20   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   34:13   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:84   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:98   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:85   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:91   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:105  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:21   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:86   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:76   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:27   warning  '_' is defined but never used             @typescript-eslint/no-unused-vars
+  288:29   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  292:41   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  292:69   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:44   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  318:34   warning  'translations' is defined but never used  @typescript-eslint/no-unused-vars
+  318:48   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  349:89   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  381:60   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  404:73   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  447:106  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  463:81   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  492:88   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\lib\rss-engine.ts
+   25:15  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   79:7   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   90:17  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  102:13  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  105:17  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  113:40  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\lib\stripe.ts
+  11:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\ceo\OneDrive\Desktop\projects\almstkshf.com\almstkshf.com\src\utils\exportUtils.ts
+   25:72   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+   55:33   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+   56:32   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+   87:96   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  116:126  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  201:70   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  207:16   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  210:38   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  212:14   warning  'err' is defined but never used             @typescript-eslint/no-unused-vars
+  215:38   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  264:67   warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+  273:15   warning  'align' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 185 problems (0 errors, 185 warnings)
+
