@@ -14,8 +14,8 @@ import { useTranslations, useMessages } from 'next-intl';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
+import { AlertCircle, ArrowRight, ShieldCheck, Database, Server, Smartphone, Info } from 'lucide-react';
 
 // ─── Static directory data ─────────────────────────────────────────────
 const CATEGORIES = [
@@ -46,13 +46,156 @@ type Resource = {
 // ─── Lookup type definition ─────────────────────────────────────────────
 type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone';
 
-// ─── History record shape from Convex ─────────────────────────────────────────
-type HistoryItem = {
-  _id: string;
-  type: LookupType;
-  query: string;
-  result: Record<string, unknown>;
-  createdAt: number;
+// ─── Result Components ──────────────────────────────────────────────────
+const StatusBadge = ({ label, value, type = 'default' }: { label: string; value: string | boolean; type?: 'default' | 'success' | 'warning' | 'error' | 'info' }) => {
+    const isTrue = value === true || value === 'true' || value === 'yes';
+    const isFalse = value === false || value === 'false' || value === 'no';
+
+    const colors = {
+        success: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+        warning: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+        error: 'bg-destructive/10 text-destructive border-destructive/20',
+        info: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+        default: 'bg-muted/50 text-muted-foreground border-border'
+    };
+
+    let activeColor = colors[type];
+    if (type === 'default') {
+        if (isTrue) activeColor = colors.success;
+        if (isFalse) activeColor = colors.error;
+    }
+
+    return (
+        <div className={clsx("flex items-center justify-between px-3 py-2 rounded-xl border transition-all", activeColor)}>
+            <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{label}</span>
+            <span className="text-xs font-bold">{String(value)}</span>
+        </div>
+    );
+};
+
+const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) => (
+    <div className="space-y-3">
+        <div className="flex items-center gap-2 px-1">
+            <Icon className="w-3.5 h-3.5 text-primary/60" />
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{title}</h4>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {children}
+        </div>
+    </div>
+);
+
+const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: any }) => {
+    if (!data) return null;
+
+    // Helper to get nested values safely
+    const get = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
+
+    return (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {/* Header/Summary Card */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {type === 'email' && (
+                    <>
+                        <StatusBadge label="Deliverable" value={get(data, 'deliverability') || get(data, 'format_valid') || 'Unknown'} />
+                        <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
+                        <StatusBadge label="Risk Score" value={get(data, 'reputation') || 'Low'} type={get(data, 'reputation') === 'High' ? 'error' : 'success'} />
+                    </>
+                )}
+                {type === 'ip' && (
+                    <>
+                        <StatusBadge label="Country" value={get(data, 'country_name') || get(data, 'country') || 'Unknown'} type="info" />
+                        <StatusBadge label="VPN/Proxy" value={get(data, 'security.is_vpn') || get(data, 'is_proxy') || false} type={get(data, 'security.is_vpn') ? 'warning' : 'success'} />
+                        <StatusBadge label="Threat Level" value={get(data, 'security.threat_level') || 'Low'} type={get(data, 'security.threat_level') === 'High' ? 'error' : 'success'} />
+                    </>
+                )}
+                {type === 'domain' && (
+                    <>
+                        <StatusBadge label="Registered" value={get(data, 'registered') || 'Yes'} />
+                        <StatusBadge label="DNSSEC" value={get(data, 'dnssec') || 'Unknown'} type="info" />
+                        <StatusBadge label="Status" value={get(data, 'status') || 'Active'} type="success" />
+                    </>
+                )}
+                {type === 'phone' && (
+                    <>
+                        <StatusBadge label="Valid" value={get(data, 'valid') || false} />
+                        <StatusBadge label="Line Type" value={get(data, 'line_type') || 'Mobile'} type="info" />
+                        <StatusBadge label="Carrier" value={get(data, 'carrier') || 'Unknown'} type="info" />
+                    </>
+                )}
+            </div>
+
+            {/* Detailed Sections */}
+            <div className="bg-muted/10 border border-border rounded-2xl p-5 space-y-6">
+                {type === 'email' && (
+                    <DataSection title="Identity Details" icon={User}>
+                        <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
+                        <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
+                        <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
+                        <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
+                    </DataSection>
+                )}
+
+                {type === 'ip' && (
+                    <>
+                        <DataSection title="Geolocation" icon={Globe}>
+                            <StatusBadge label="City" value={get(data, 'city') || 'Unknown'} />
+                            <StatusBadge label="Region" value={get(data, 'region') || 'Unknown'} />
+                            <StatusBadge label="Postal" value={get(data, 'zip') || 'N/A'} />
+                            <StatusBadge label="Timezone" value={get(data, 'time_zone.name') || 'N/A'} />
+                        </DataSection>
+                        <DataSection title="Network Infrastructure" icon={Server}>
+                            <StatusBadge label="ASN" value={get(data, 'asn') || 'N/A'} />
+                            <StatusBadge label="ISP" value={get(data, 'isp') || 'N/A'} />
+                            <StatusBadge label="Organization" value={get(data, 'org') || 'N/A'} />
+                            <StatusBadge label="Type" value={get(data, 'type') || 'IPv4'} />
+                        </DataSection>
+                    </>
+                )}
+
+                {type === 'domain' && (
+                    <>
+                        <DataSection title="WHOIS Information" icon={Database}>
+                            <StatusBadge label="Registrar" value={get(data, 'registrar') || 'N/A'} />
+                            <StatusBadge label="Created" value={get(data, 'created_date') || 'N/A'} />
+                            <StatusBadge label="Expiry" value={get(data, 'expiration_date') || 'N/A'} />
+                            <StatusBadge label="Updated" value={get(data, 'updated_date') || 'N/A'} />
+                        </DataSection>
+                        <DataSection title="Technical Records" icon={Wifi}>
+                            <StatusBadge label="Nameservers" value={Array.isArray(get(data, 'name_servers')) ? get(data, 'name_servers').length : 0} />
+                            <StatusBadge label="MX Check" value={get(data, 'mx_found') || false} />
+                        </DataSection>
+                    </>
+                )}
+
+                {type === 'phone' && (
+                    <DataSection title="Carrier Details" icon={Smartphone}>
+                        <StatusBadge label="Local Format" value={get(data, 'local_format') || 'N/A'} />
+                        <StatusBadge label="Intl Format" value={get(data, 'international_format') || 'N/A'} />
+                        <StatusBadge label="Country Prefix" value={get(data, 'country_prefix') || 'N/A'} />
+                        <StatusBadge label="Location" value={get(data, 'location') || 'N/A'} />
+                    </DataSection>
+                )}
+
+                {/* Raw View Toggle */}
+                <div className="pt-4 border-t border-border mt-4">
+                    <button 
+                        onClick={() => {
+                            const pre = document.getElementById('raw-json-view');
+                            if (pre) pre.classList.toggle('hidden');
+                        }}
+                        className="text-[9px] font-black text-muted-foreground hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
+                    >
+                        <Info className="w-3 h-3" />
+                        Toggle Developer Raw Data
+                    </button>
+                    <pre id="raw-json-view" className="hidden mt-3 text-[10px] text-foreground/60 whitespace-pre-wrap break-all bg-black/5 p-4 rounded-xl font-mono">
+                        {JSON.stringify(data, null, 2)}
+                    </pre>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 // ─── Main component ─────────────────────────────────────────────────────
@@ -291,25 +434,25 @@ export default function OsintTab() {
             )}
 
             {result && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-3"
-              >
-                <div className="flex items-center gap-2 text-sm font-bold text-emerald-600 px-1">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{tCommon('copied')}</span>
-                </div>
-                <div className="bg-muted/30 border border-border rounded-2xl overflow-hidden">
-                  <div className="px-4 py-2 border-b border-border bg-muted/50 flex items-center justify-between">
-                    <span className="text-[10px] font-black text-muted-foreground uppercase">RAW DATA</span>
-                    <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] uppercase font-bold" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>{tCommon('copy')}</Button>
+              <div className="pt-4 border-t border-border/50">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
+                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Analysis Completed Successfully</p>
+                    </div>
                   </div>
-                  <pre className="text-xs text-foreground/80 whitespace-pre-wrap break-all overflow-auto max-h-[400px] p-4 font-mono scrollbar-thin">
-                    {JSON.stringify(result, null, 2)}
-                  </pre>
+                  <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
+                    <Database className="w-3 h-3" />
+                    {tCommon('copy')}
+                  </Button>
                 </div>
-              </motion.div>
+                
+                <StructuredResultView type={activeType} data={result} t={t} />
+              </div>
             )}
           </AnimatePresence>
         </div>
@@ -385,15 +528,9 @@ export default function OsintTab() {
                     </div>
                   </div>
                   {expandedHistory === item._id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      className="border-t border-border bg-background/50"
-                    >
-                      <pre className="text-[10px] text-foreground/70 whitespace-pre-wrap break-all p-4 overflow-auto max-h-60 font-mono leading-relaxed">
-                        {JSON.stringify(item.result, null, 2)}
-                      </pre>
-                    </motion.div>
+                    <div className="border-t border-border bg-background/30 p-6">
+                      <StructuredResultView type={item.type} data={item.result} t={t} />
+                    </div>
                   )}
                 </div>
               ))}

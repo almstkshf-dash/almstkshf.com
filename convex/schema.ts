@@ -37,6 +37,14 @@ export default defineSchema({
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),
         relevancy_score: v.optional(v.number()),
+        emotions: v.optional(v.object({
+            joy: v.number(),
+            sadness: v.number(),
+            anger: v.number(),
+            fear: v.number(),
+            surprise: v.number(),
+            trust: v.number(),
+        })),
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
 

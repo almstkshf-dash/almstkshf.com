@@ -89,6 +89,14 @@ export const saveArticle = mutation({
         manualSentimentOverride: v.optional(v.boolean()),
         originalSentiment: v.optional(v.string()),
         hashtags: v.optional(v.array(v.string())),
+        emotions: v.optional(v.object({
+            joy: v.number(),
+            sadness: v.number(),
+            anger: v.number(),
+            fear: v.number(),
+            surprise: v.number(),
+            trust: v.number(),
+        })),
     },
     handler: async (ctx, args) => {
         // Ensure sourceType matches schema validator
@@ -120,6 +128,7 @@ export const saveArticle = mutation({
                 originalSentiment: args.originalSentiment ?? args.sentiment,
                 relevancy_score: args.relevancy_score,
                 hashtags: args.hashtags,
+                emotions: args.emotions,
             });
         }
     },
@@ -287,6 +296,12 @@ export const getAnalyticsOverview = query({
             Negative: Math.round((counts.Negative / articles.length) * 100),
         };
 
+        // Identify Risk Factors
+        const riskFactors: string[] = [];
+        if (nss < -10) riskFactors.push("negative_sentiment_tilt");
+        if (sentimentDistribution.Negative > 30) riskFactors.push("high_negative_volume");
+        if (totalReach > 1000000 && nss < 0) riskFactors.push("viral_negative_reach");
+
         return {
             nss,
             riskScore,
@@ -295,6 +310,7 @@ export const getAnalyticsOverview = query({
             sentimentDistribution,
             crisisProbability: Math.min(100, Math.round(riskScore * 1.2)),
             count: articles.length,
+            riskFactors,
         };
     },
 });
@@ -307,8 +323,15 @@ export const getEmotionAggregates = query({
         let count = 0;
 
         articles.forEach(a => {
-            // We expect 'tone' field (JSON string) to contain emotion scores
-            if (a.tone) {
+            // Priority 1: Dedicated emotions field
+            if (a.emotions) {
+                count++;
+                Object.entries(a.emotions).forEach(([k, v]) => {
+                    if (emotions[k] !== undefined) emotions[k] += (v as number);
+                });
+            }
+            // Priority 2: Legacy tone field (if it's a JSON string containing emotions)
+            else if (a.tone) {
                 try {
                     const parsedTone = JSON.parse(a.tone);
                     if (parsedTone.emotions) {

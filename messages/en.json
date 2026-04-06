@@ -47,124 +47,7 @@
     "signup": "Sign Up",
     "settings": "Settings"
   },
-  "Osint": {
-    "title": "OSINT Resources",
-    "subtitle": "Curated, free/registration-friendly links. Respect ToS/robots.",
-    "filters": {
-      "category": "Category",
-      "label": "Label",
-      "language": "Language",
-      "free": "Free tier",
-      "free_label": "Free/has free tier",
-      "search": "Search",
-      "search_placeholder": "Search resources"
-    },
-    "legend": {
-      "title": "Legend",
-      "notice": "Links are third-party. Respect their ToS/robots. No automated scraping.",
-      "T": "Tool (local install)",
-      "R": "Registration required",
-      "M": "Manual URL edit",
-      "D": "Google dork"
-    },
-    "badges": {
-      "free": "Free tier"
-    },
-    "pagination": {
-      "showing": "Showing {count} of {total}",
-      "page": "Page {page} / {total}",
-      "prev": "Prev",
-      "next": "Next"
-    }
-  },
-  "OsintTab": {
-    "title": "Investigation Engine",
-    "subtitle": "Access global data points across dimensions. Our automated agents aggregate data from verified OSINT repositories in real-time.",
-    "suggested_tools": "Suggested External Tools",
-    "panels": {
-      "email": {
-        "title": "Email Intelligence",
-        "desc": "Trace breach history, social accounts, and domain associations.",
-        "placeholder": "Enter email address..."
-      },
-      "domain": {
-        "title": "Domain Analyzer",
-        "desc": "Identify technological stacks, WHOIS history, and DNS maps.",
-        "placeholder": "Enter domain (e.g. example.com)..."
-      },
-      "ip": {
-        "title": "IP Geospatial",
-        "desc": "Map network infrastructure, hosting nodes, and security flags.",
-        "placeholder": "Enter IP address..."
-      },
-      "username": {
-        "title": "Identity Scout",
-        "desc": "Look up handle availability across 500+ social platforms.",
-        "placeholder": "Enter username..."
-      },
-      "phone": {
-        "title": "Phone Validator",
-        "desc": "Check carrier data, reputation flags, and regional routing.",
-        "placeholder": "Enter phone (e.g. +1...)"
-      },
-      "admin_only": "Advanced OSINT lookups are restricted to Admin accounts. Please contact the administrator for access.",
-      "export_history": "Export Investigation History",
-      "tools": {
-        "dehashed": {
-          "name": "DeHashed",
-          "desc": "Enterprise deep-web asset and breach search engine."
-        },
-        "epieos": {
-          "name": "Epieos",
-          "desc": "Universal email and phone OSINT investigator."
-        },
-        "hunter": {
-          "name": "Hunter.io",
-          "desc": "Professional email discovery and verification tool."
-        },
-        "intelx": {
-          "name": "IntelX",
-          "desc": "Intelligence X: Search billions of data points."
-        },
-        "builtwith": {
-          "name": "BuiltWith",
-          "desc": "Technology profiler and market share analysis tool."
-        },
-        "shodan": {
-          "name": "Shodan",
-          "desc": "Search engine for Internet-connected devices."
-        },
-        "censys": {
-          "name": "Censys",
-          "desc": "Map the visible digital attack surface."
-        },
-        "securitytrails": {
-          "name": "SecurityTrails",
-          "desc": "Total domain and IP history intelligence."
-        },
-        "whois": {
-          "name": "WHOIS Lookup",
-          "desc": "Verify domain ownership and registration data."
-        },
-        "whatsmyname": {
-          "name": "WhatsMyName",
-          "desc": "Cross-platform social media handle scout."
-        },
-        "knowem": {
-          "name": "KnowEm",
-          "desc": "Check handle availability on 500+ social sites."
-        },
-        "sherlock": {
-          "name": "Sherlock",
-          "desc": "Search for handles across the social landscape."
-        },
-        "opencorp": {
-          "name": "OpenCorporates",
-          "desc": "The largest open database of companies in the world."
-        }
-      }
-    }
-  },
+
   "ArticleTable": {
     "no_articles": "No articles found. Start monitoring or add manually.",
     "showing": "Showing {count} of {total} articles",
@@ -972,7 +855,14 @@
         "Thu": "Thu",
         "Fri": "Fri",
         "Sat": "Sat"
-      }
+      },
+      "risk_factors": {
+        "NEGATIVE_SENTIMENT_SPIKE": "Negative Sentiment Spike",
+        "VOLUME_SURGE_NEGATIVE": "Volume Surge (Negative Content)",
+        "HIGH_REACH_CRITICAL": "High Reach Critical Mention",
+        "SENTIMENT_SHIFT_DETECTION": "Sudden Sentiment Shift"
+      },
+      "top_risk_indicators": "Top Risk Indicators"
     }
   },
   "CrisisManagementDetail": {
@@ -1319,7 +1209,17 @@
       "fear": "Fear",
       "anticipation": "Anticipation",
       "trust": "Trust"
-    }
+    },
+    "sentiment": {
+      "positive": "Positive",
+      "neutral": "Neutral",
+      "negative": "Negative"
+    },
+    "success": "Success",
+    "error": "Error",
+    "media_pulse_analytics_title": "Media Pulse Analytics",
+    "total_articles_detected": "total articles detected in current scope",
+    "reset_filters": "Reset All Filters"
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1427,6 +1327,174 @@
   },
   "Pricing": {
     "title": "Plans & Pricing"
+  },
+  "Osint": {
+    "title": "Open Source Intelligence (OSINT)",
+    "subtitle": "Curated resources, free or registration-only. Please respect terms of use.",
+    "filters": {
+      "category": "Category",
+      "label": "Label",
+      "language": "Language",
+      "free": "Free Tier",
+      "free_label": "Free / contains free tier",
+      "search": "Search",
+      "search_placeholder": "Search resources",
+      "free_only": "Free Only"
+    },
+    "legend": {
+      "title": "Icon Legend",
+      "notice": "Links belong to third parties. Respect their TOS and robots.txt. Automated scraping is not permitted.",
+      "T": "Tool (local install)",
+      "R": "Registration required",
+      "M": "Manual URL edit",
+      "D": "Google dork"
+    },
+    "badges": {
+      "free": "Free Tier"
+    },
+    "pagination": {
+      "showing": "Showing {count} of {total}",
+      "page": "Page {page} / {total}",
+      "prev": "Prev",
+      "next": "Next"
+    }
+  },
+  "OsintTab": {
+    "title": "Investigation Engine",
+    "subtitle": "Access global data points across multiple dimensions. Our agents aggregate data from certified OSINT repositories in real-time.",
+    "suggested_tools": "Suggested External Tools",
+    "panels": {
+      "email": {
+        "title": "Email Intelligence",
+        "desc": "Trace breach history, social accounts, and domain associations.",
+        "placeholder": "Enter email address..."
+      },
+      "domain": {
+        "title": "Domain Analyzer",
+        "desc": "Identify tech stacks, WHOIS history, and DNS mapping.",
+        "placeholder": "Enter domain (e.g. example.com)..."
+      },
+      "ip": {
+        "title": "IP Geo-Lookup",
+        "desc": "Map network infrastructure, hosting nodes, and security flags.",
+        "placeholder": "Enter IP address..."
+      },
+      "username": {
+        "title": "Identity Scout",
+        "desc": "Search username availability across 500+ social platforms.",
+        "placeholder": "Enter username..."
+      },
+      "phone": {
+        "title": "Phone Validator",
+        "desc": "Verify carrier data, reputation flags, and regional routing.",
+        "placeholder": "Enter phone (e.g. +971...)"
+      }
+    },
+    "result_view": {
+      "headers": {
+        "deliverable": "Deliverable",
+        "disposable": "Disposable",
+        "risk_score": "Risk Score",
+        "country": "Country",
+        "vpn_proxy": "VPN/Proxy",
+        "threat_level": "Threat Level",
+        "registered": "Registered",
+        "dnssec": "DNSSEC",
+        "status": "Status",
+        "valid": "Valid",
+        "line_type": "Line Type",
+        "carrier": "Carrier"
+      },
+      "sections": {
+        "identity_details": "Identity Details",
+        "geolocation": "Geolocation",
+        "infrastructure": "Network Infrastructure",
+        "whois": "WHOIS Information",
+        "technical_records": "Technical Records",
+        "carrier_details": "Carrier Details"
+      },
+      "fields": {
+        "username": "Username",
+        "domain": "Domain",
+        "free_provider": "Free Provider",
+        "catch_all": "Catch All",
+        "city": "City",
+        "region": "Region",
+        "postal": "Postal",
+        "timezone": "Timezone",
+        "asn": "ASN",
+        "isp": "ISP",
+        "organization": "Organization",
+        "type": "Type",
+        "registrar": "Registrar",
+        "created": "Created",
+        "expiry": "Expiry",
+        "updated": "Updated",
+        "nameservers": "Nameservers",
+        "mx_check": "MX Check",
+        "local_format": "Local Format",
+        "international_format": "Intl Format",
+        "country_prefix": "Country Prefix",
+        "location": "Location"
+      },
+      "toggle_raw": "Toggle Developer Raw Data"
+    },
+    "admin_only": "Advanced OSINT searches are restricted to admin accounts. Please contact administrator for access.",
+    "export_history": "Export Investigation History",
+    "tools": {
+      "dehashed": {
+        "name": "DeHashed",
+        "desc": "Deep web asset and breach search engine."
+      },
+      "epieos": {
+        "name": "Epieos",
+        "desc": "Universal email and phone investigator."
+      },
+      "hunter": {
+        "name": "Hunter.io",
+        "desc": "Professional email discovery and verification tool."
+      },
+      "intelx": {
+        "name": "IntelX",
+        "desc": "Intelligence X: Search billions of data points."
+      },
+      "builtwith": {
+        "name": "BuiltWith",
+        "desc": "Technology profiler and market share analyzer."
+      },
+      "shodan": {
+        "name": "Shodan",
+        "desc": "Search engine for Internet-connected devices."
+      },
+      "censys": {
+        "name": "Censys",
+        "desc": "Visual digital attack surface mapping."
+      },
+      "securitytrails": {
+        "name": "SecurityTrails",
+        "desc": "Comprehensive domain and IP history intelligence."
+      },
+      "whois": {
+        "name": "WHOIS Lookup",
+        "desc": "Check domain ownership and registration data."
+      },
+      "whatsmyname": {
+        "name": "WhatsMyName",
+        "desc": "Cross-platform social media username scout."
+      },
+      "knowem": {
+        "name": "KnowEm",
+        "desc": "Check name availability on 500+ sites."
+      },
+      "sherlock": {
+        "name": "Sherlock",
+        "desc": "Hunt down social accounts across the web."
+      },
+      "opencorp": {
+        "name": "OpenCorporates",
+        "desc": "The largest open database of companies in the world."
+      }
+    }
   },
   "Export": {
     "sheet_name": "Coverage Report",

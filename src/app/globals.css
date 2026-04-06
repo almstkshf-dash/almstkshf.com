@@ -52,22 +52,53 @@
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes accordion-down {
-    from { height: 0 }
-    to   { height: var(--radix-accordion-content-height) }
+    from {
+      height: 0
+    }
+
+    to {
+      height: var(--radix-accordion-content-height)
+    }
   }
+
   @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height) }
-    to   { height: 0 }
+    from {
+      height: var(--radix-accordion-content-height)
+    }
+
+    to {
+      height: 0
+    }
   }
+
   @keyframes fade-in-up {
-    0%   { opacity: 0; transform: translateY(20px) }
-    100% { opacity: 1; transform: translateY(0) }
+    0% {
+      opacity: 0;
+      transform: translateY(20px)
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0)
+    }
   }
+
   @keyframes blob {
-    0%   { transform: translate(0,0) scale(1) }
-    33%  { transform: translate(30px,-50px) scale(1.1) }
-    66%  { transform: translate(-20px,20px) scale(0.9) }
-    100% { transform: translate(0,0) scale(1) }
+    0% {
+      transform: translate(0, 0) scale(1)
+    }
+
+    33% {
+      transform: translate(30px, -50px) scale(1.1)
+    }
+
+    66% {
+      transform: translate(-20px, 20px) scale(0.9)
+    }
+
+    100% {
+      transform: translate(0, 0) scale(1)
+    }
   }
 }
 
@@ -93,8 +124,8 @@
   --input: #E2E8F0;
   --ring: #2563EB;
   --radius: 0.75rem;
-  --glass-bg: rgba(255,255,255,0.7);
-  --glass-border: rgba(226,232,240,0.5);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(226, 232, 240, 0.5);
 
   /* Design System Status Tokens */
   --status-success: 158 64% 52%;
@@ -111,6 +142,12 @@
   --status-info-bg: hsl(221 83% 53% / 0.1);
   --status-neutral-fg: hsl(215 16% 40%);
   --status-neutral-bg: hsl(215 16% 47% / 0.1);
+
+  /* Premium Design Tokens */
+  --premium-gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --premium-gradient-2: linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%);
+  --premium-glass-bg: rgba(255, 255, 255, 0.03);
+  --premium-glass-border: rgba(255, 255, 255, 0.08);
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────── */
@@ -134,8 +171,8 @@
   --border: #1E293B;
   --input: #1E293B;
   --ring: #1D4ED8;
-  --glass-bg: rgba(15,23,42,0.7);
-  --glass-border: rgba(30,41,59,0.5);
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(30, 41, 59, 0.5);
 
   /* Dark mode status refinements */
   --status-success: 158 64% 52%;
@@ -156,12 +193,15 @@
 
 /* ─── Base layer ────────────────────────────────────────────── */
 @layer base {
+
   /*
    * LCP FIX: Do NOT put color/background-color transitions on the universal
    * selector — it forces the browser to defer painting the LCP <h1> until
    * all transitions resolve. Transitions are scoped to non-text elements only.
    */
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     border-color: var(--border);
   }
 
@@ -180,11 +220,20 @@
    * Theme-switch transitions — ONLY elements that visibly change on theme toggle.
    * Excludes headings and paragraphs so LCP text never has a transition applied.
    */
-  body, header, nav, footer, aside, section, article {
+  body,
+  header,
+  nav,
+  footer,
+  aside,
+  section,
+  article {
     transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
-  a, button, svg, [role="button"] {
+  a,
+  button,
+  svg,
+  [role="button"] {
     transition:
       background-color 0.2s ease,
       border-color 0.2s ease,
@@ -221,34 +270,138 @@ svg.lucide-moon {
   animation-duration: 200ms;
   animation-fill-mode: forwards;
 }
-.fade-in          { animation-name: fadeIn }
-.slide-in-from-top-2  { --tw-translate-y: -0.5rem; animation-name: slideInFromTop }
-.slide-in-from-right  { --tw-translate-x: 1rem;    animation-name: slideInFromRight }
+
+.fade-in {
+  animation-name: fadeIn
+}
+
+.slide-in-from-top-2 {
+  --tw-translate-y: -0.5rem;
+  animation-name: slideInFromTop
+}
+
+.slide-in-from-right {
+  --tw-translate-x: 1rem;
+  animation-name: slideInFromRight
+}
 
 @keyframes fadeIn {
-  from { opacity: 0 }
-  to   { opacity: 1 }
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
 }
+
 @keyframes slideInFromTop {
-  from { opacity: 0; transform: translateY(-0.5rem) }
-  to   { opacity: 1; transform: translateY(0) }
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
 }
+
 @keyframes slideInFromRight {
-  from { opacity: 0; transform: translateX(1rem) }
-  to   { opacity: 1; transform: translateX(0) }
+  from {
+    opacity: 0;
+    transform: translateX(1rem)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0)
+  }
 }
 
 /* ─── Scrollbar utilities (CommandMenu, dropdowns only) ─────── */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100,116,139,0.3) transparent;
+  scrollbar-color: rgba(100, 116, 139, 0.3) transparent;
 }
-.scrollbar-thin::-webkit-scrollbar       { width: 4px }
-.scrollbar-thin::-webkit-scrollbar-track { background: transparent }
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent
+}
+
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(100,116,139,0.3);
+  background: rgba(100, 116, 139, 0.3);
   border-radius: 9999px;
 }
+
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(100,116,139,0.5);
+  background: rgba(100, 116, 139, 0.5);
+}
+
+/* ─── Premium Dashboard Utilities ────────────────────────────── */
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-card {
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.premium-border {
+  position: relative;
+}
+
+.premium-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(var(--premium-gradient-1));
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0.15;
+}
+
+.neo-blur {
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+}
+
+.vibrant-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.vibrant-shimmer::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 45%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 55%,
+      transparent 100%);
+  transform: rotate(45deg);
+  animation: shimmer 6s infinite;
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%) rotate(45deg);
+  }
+
+  to {
+    transform: translateX(100%) rotate(45deg);
+  }
 }

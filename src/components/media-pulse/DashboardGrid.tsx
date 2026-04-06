@@ -28,10 +28,13 @@ interface DashboardGridProps {
         crisisProbability: number;
         emotions?: Record<string, number>;
         geography?: Record<string, number>;
+        riskFactors?: string[];
     };
+    topLeftSlot?: React.ReactNode;
+    topRightSlot?: React.ReactNode;
 }
 
-export const DashboardGrid = memo(function DashboardGrid({ articles = [], analytics }: DashboardGridProps) {
+export const DashboardGrid = memo(function DashboardGrid({ articles = [], analytics, topLeftSlot, topRightSlot }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const tDashboard = useTranslations("Dashboard");
 
@@ -140,11 +143,12 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
     }, [articles]);
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
             {/* Main Pulse View */}
-            <div className="lg:col-span-2 space-y-8">
-                <section className="p-6 bg-card border border-border rounded-2xl backdrop-blur-3xl relative overflow-hidden group shadow-sm transition-colors">
-                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+            <div className="xl:col-span-8 space-y-8">
+                {topLeftSlot}
+                <section className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden group shadow-2xl transition-all hover:bg-card/80">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity pointer-events-none group-hover:scale-110 duration-700">
                         <Activity className="w-48 h-48" />
                     </div>
                     <div className="relative z-10">
@@ -234,165 +238,138 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                             <div className="px-3 py-1.5 bg-status-success-bg text-status-success-fg text-[10px] font-bold uppercase tracking-widest rounded-lg border border-status-success/20 transition-colors">{articles.length} {t('articles_count')}</div>
                         </div>
                     </div>
-                    <div className="w-full md:w-64 h-64 flex flex-col items-center justify-center pt-4">
-                        <SentimentDonutChart
-                            data={{
-                                positive: sentimentPcts.Positive,
-                                neutral: sentimentPcts.Neutral,
-                                negative: sentimentPcts.Negative
-                            }}
-                            nssIndex={nss}
-                        />
-                        <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
-                            <ShieldAlert className="w-3 h-3" />
-                            {t('risk')}: {riskScore}%
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            {/* Sidebar / Stats */}
-            <div className="space-y-6">
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    className="p-6 bg-gradient-to-br from-primary to-primary/80 rounded-2xl text-primary-foreground shadow-lg shadow-primary/20 relative overflow-hidden group transition-colors"
-                >
-                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform pointer-events-none">
-                        <Globe className="w-24 h-24" />
-                    </div>
-                    <h4 className="font-bold text-xs uppercase tracking-[0.2em] mb-4 opacity-80 italic transition-colors">{t('scope')}</h4>
-                    <div className="text-4xl font-bold mb-2 tracking-tighter">
-                        {(totalReach / 1000000).toFixed(1)}M+
-                    </div>
-                    <p className="text-primary-foreground/90 text-xs font-light leading-relaxed transition-colors">{t('scope_desc')}</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 }}
-                    className="p-8 bg-card border border-border rounded-[2rem] space-y-8 shadow-md transition-colors"
-                >
-                    <div className="flex items-center justify-between">
-                        <h4 className="text-foreground font-bold text-sm tracking-wider transition-colors">{t('tone_distribution')}</h4>
-                        <BarChart3 className="w-4 h-4 text-muted-foreground transition-colors" />
-                    </div>
-                    <div className="space-y-6">
-                        {[
-                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-status-success", icon: ShieldCheck },
-                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-status-warning", icon: Activity },
-                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-status-error", icon: AlertCircle },
-                        ].map((item) => (
-                            <div key={item.label} className="space-y-3">
-                                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-                                    <span className="text-muted-foreground flex items-center gap-2 transition-colors">
-                                        <item.icon className="w-3 h-3" />
-                                        {item.label}
-                                    </span>
-                                    <span className="text-foreground bg-muted px-2 py-0.5 rounded-md transition-colors">{item.value}%</span>
-                                </div>
-                                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden p-[1px] transition-colors">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: `${item.value}%` }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 1, ease: "easeOut" }}
-                                        className={clsx("h-full rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]", item.color)}
-                                    />
-                                </div>
+                    <div className="w-full md:w-64 space-y-4">
+                        <div className="flex flex-col items-center justify-center">
+                            <SentimentDonutChart
+                                data={{
+                                    positive: sentimentPcts.Positive,
+                                    neutral: sentimentPcts.Neutral,
+                                    negative: sentimentPcts.Negative
+                                }}
+                                nssIndex={nss}
+                            />
+                            <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
+                                <ShieldAlert className="w-3 h-3" />
+                                {t('risk')}: {riskScore}%
                             </div>
-                        ))}
-                    </div>
-                </motion.div>
+                        </div>
 
-                {/* Emotional Pulse Section */}
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                    className="p-6 bg-card border border-border rounded-2xl space-y-6 shadow-sm transition-colors relative overflow-hidden"
-                >
-                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                        <Zap className="w-10 h-10 text-primary" />
-                    </div>
-                    <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('emotional_pulse')}</h4>
-
-                    <div className="h-[200px] w-full">
-                        <EmotionRadarChart
-                            data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
-                                subject,
-                                value: value as number,
-                                fullMark: 100
-                            }))}
-                        />
-                    </div>
-
-                    {/* Emotions breakdown table/list */}
-                    {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
-                        <div className="pt-6 border-t border-border mt-2 space-y-4">
-                            <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <TrendingUp className="w-3 h-3 text-primary" />
-                                {t('top_emotions')}
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {Object.entries(analytics.emotions)
-                                    .sort(([, a], [, b]) => (b as number) - (a as number))
-                                    .slice(0, 4)
-                                    .map(([emotion, value]) => (
-                                        <div key={emotion} className="group p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all shadow-sm">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-[10px] font-bold text-foreground/80 uppercase tracking-tight">
-                                                    {tDashboard(`emotions.${emotion.toLowerCase()}`)}
-                                                </span>
-                                                <span className="text-xs font-black text-primary">{value as number}%</span>
-                                            </div>
-                                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    whileInView={{ width: `${value}%` }}
-                                                    className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)] transition-all duration-1000"
-                                                />
-                                            </div>
+                        {/* Identified Risk Factors */}
+                        {analytics?.riskFactors && analytics.riskFactors.length > 0 && (
+                            <div className="space-y-2 pt-4 border-t border-border mt-2">
+                                <h5 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3">{t('top_risk_indicators') || "Active Risk Indicators"}</h5>
+                                <div className="flex flex-col gap-2">
+                                    {analytics.riskFactors.map(factor => (
+                                        <div key={factor} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-destructive/5 border border-destructive/10 group transition-all hover:bg-destructive/10">
+                                            <AlertCircle className="w-3.5 h-3.5 text-destructive animate-pulse" />
+                                            <span className="text-[10px] font-bold text-destructive/90 uppercase tracking-tight">
+                                                {t(`risk_factors.${factor}`) || factor.replace(/_/g, ' ')}
+                                            </span>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Emotional Pulse Section */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="glass-card p-8 rounded-[2.5rem] space-y-8 shadow-xl relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none rotate-12">
+                            <Zap className="w-32 h-32 text-primary" />
+                        </div>
+                        <div className="flex items-center justify-between relative z-10">
+                            <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('emotional_pulse')}</h4>
+                            <div className="p-2 bg-amber-500/10 rounded-lg">
+                                <Zap className="w-4 h-4 text-amber-500" />
                             </div>
                         </div>
-                    )}
-                </motion.div>
 
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 }}
-                    className="p-6 bg-card border border-border rounded-2xl space-y-4 shadow-sm transition-colors"
-                >
-                    <h4 className="text-foreground font-bold text-xs tracking-wider transition-colors">{t('articles_trend')}</h4>
-                    <div className="h-[160px] w-full">
-                        <ArticlesTrendChart
-                            data={articles.length > 0 ? (
-                                // Simple transformation for trend if not provided by analytics
-                                Object.entries(
-                                    articles.reduce((acc: any, a) => {
-                                        const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                                        acc[date] = (acc[date] || 0) + 1;
-                                        return acc;
-                                    }, {})
-                                ).map(([date, count]) => ({ date, count: count as number }))
-                            ) : [
-                                { date: 'Mon', count: 4 },
-                                { date: 'Tue', count: 3 },
-                                { date: 'Wed', count: 7 },
-                                { date: 'Thu', count: 5 },
-                                { date: 'Fri', count: 8 },
-                            ]}
-                        />
-                    </div>
-                </motion.div>
+                        <div className="h-[200px] w-full">
+                            <EmotionRadarChart
+                                data={Object.entries(analytics?.emotions || {}).map(([subject, value]) => ({
+                                    subject,
+                                    value: value as number,
+                                    fullMark: 100
+                                }))}
+                            />
+                        </div>
+
+                        {/* Emotions breakdown table/list */}
+                        {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
+                            <div className="pt-6 border-t border-border mt-2 space-y-4">
+                                <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <TrendingUp className="w-3 h-3 text-primary" />
+                                    {t('top_emotions')}
+                                </h5>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {Object.entries(analytics.emotions)
+                                        .sort(([, a], [, b]) => (b as number) - (a as number))
+                                        .slice(0, 4)
+                                        .map(([emotion, value]) => (
+                                            <div key={emotion} className="group p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all shadow-sm">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-[10px] font-bold text-foreground/80 uppercase tracking-tight">
+                                                        {tDashboard(`emotions.${emotion.toLowerCase()}`)}
+                                                    </span>
+                                                    <span className="text-xs font-black text-primary">{value as number}%</span>
+                                                </div>
+                                                <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        whileInView={{ width: `${value}%` }}
+                                                        className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)] transition-all duration-1000"
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 }}
+                        className="glass-card p-8 rounded-[2.5rem] space-y-6 shadow-xl"
+                    >
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('articles_trend')}</h4>
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                                <TrendingUp className="w-4 h-4 text-blue-500" />
+                            </div>
+                        </div>
+                        <div className="h-[160px] w-full">
+                            <ArticlesTrendChart
+                                data={articles.length > 0 ? (
+                                    // Simple transformation for trend if not provided by analytics
+                                    Object.entries(
+                                        articles.reduce((acc: any, a) => {
+                                            const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                            acc[date] = (acc[date] || 0) + 1;
+                                            return acc;
+                                        }, {})
+                                    ).map(([date, count]) => ({ date, count: count as number }))
+                                ) : [
+                                    { date: 'Mon', count: 4 },
+                                    { date: 'Tue', count: 3 },
+                                    { date: 'Wed', count: 7 },
+                                    { date: 'Thu', count: 5 },
+                                    { date: 'Fri', count: 8 },
+                                ]}
+                            />
+                        </div>
+                    </motion.div>
+                </div>
 
                 {/* Geographic Reach — proper card with ranked bars */}
                 {analytics?.geography && Object.keys(analytics.geography).length > 0 && (() => {
@@ -402,18 +379,18 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     const maxCount = (geoEntries[0]?.[1] as number) || 1;
                     return (
                         <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.4 }}
-                            className="p-6 bg-card border border-border rounded-2xl space-y-5 shadow-sm transition-colors"
+                            className="glass-card p-8 rounded-[2.5rem] space-y-7 shadow-xl"
                         >
                             <div className="flex items-center justify-between">
-                                <h4 className="text-foreground font-bold text-xs tracking-wider flex items-center gap-2 transition-colors">
-                                    <Globe className="w-3.5 h-3.5 text-primary" />
+                                <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase flex items-center gap-3">
+                                    <Globe className="w-4 h-4 text-primary" />
                                     {tDashboard('geography')}
                                 </h4>
-                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md border border-border transition-colors">
+                                <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
                                     TOP {geoEntries.length}
                                 </span>
                             </div>
@@ -465,48 +442,124 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     );
                 })()}
 
-                <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 space-y-3 shadow-sm transition-all group hover:bg-primary/10">
+            </div>
+
+            {/* Sidebar / Stats */}
+            <div className="xl:col-span-4 space-y-6">
+                {topRightSlot}
+            </div>
+
+            <div className="xl:col-span-12 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2.5rem] text-primary-foreground shadow-xl shadow-primary/20 relative overflow-hidden group transition-all flex flex-col justify-center h-full min-h-[250px]"
+                >
+                    <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform pointer-events-none duration-500">
+                        <Globe className="w-32 h-32" />
+                    </div>
+                    <h4 className="font-black text-sm uppercase tracking-[0.2em] mb-6 opacity-80 italic transition-colors relative z-10">{t('scope')}</h4>
+                    <div className="text-5xl font-black mb-4 tracking-tighter relative z-10">
+                        {(totalReach / 1000000).toFixed(1)}M+
+                    </div>
+                    <p className="text-primary-foreground/90 text-sm font-medium leading-relaxed transition-colors relative z-10">{t('scope_desc')}</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.1 }}
+                    className="glass-card p-8 rounded-[2.5rem] space-y-8 shadow-xl h-full flex flex-col min-h-[250px]"
+                >
                     <div className="flex items-center justify-between">
-                        <Zap className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                        <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('tone_distribution')}</h4>
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                            <BarChart3 className="w-4 h-4 text-primary" />
+                        </div>
+                    </div>
+                    <div className="space-y-7 flex-1 flex flex-col justify-center">
+                        {[
+                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-status-success", icon: ShieldCheck, glow: "shadow-[0_0_15px_rgba(var(--status-success-rgb),0.5)]" },
+                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-status-warning", icon: Activity, glow: "shadow-[0_0_15px_rgba(var(--status-warning-rgb),0.5)]" },
+                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-status-error", icon: AlertCircle, glow: "shadow-[0_0_15px_rgba(var(--status-error-rgb),0.5)]" },
+                        ].map((item) => (
+                            <div key={item.label} className="space-y-3 group/item">
+                                <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.15em]">
+                                    <span className="text-muted-foreground flex items-center gap-2 group-hover/item:text-foreground transition-colors">
+                                        <item.icon className="w-3.5 h-3.5" />
+                                        {item.label}
+                                    </span>
+                                    <span className="text-foreground bg-muted/50 px-3 py-1 rounded-lg border border-border/50 transition-all group-hover/item:scale-110">{item.value}%</span>
+                                </div>
+                                <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden p-[2px] border border-border/30">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        whileInView={{ width: `${item.value}%` }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 1.2, ease: "circOut" }}
+                                        className={clsx("h-full rounded-full transition-all duration-500", item.color, item.glow)}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="p-8 rounded-[2.5rem] border border-primary/30 bg-primary/5 space-y-4 shadow-xl transition-all group hover:bg-primary/10 relative overflow-hidden h-full flex flex-col min-h-[250px]"
+                >
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 blur-3xl rounded-full group-hover:scale-150 transition-transform duration-700" />
+                    <div className="flex items-center justify-between relative z-10">
+                        <div className="p-2.5 bg-primary/20 rounded-xl">
+                            <Zap className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
+                        </div>
                         {unreadNotifs && unreadNotifs.length > 0 && (
-                            <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold">{unreadNotifs.length} New</span>
+                            <span className="text-[11px] bg-primary text-primary-foreground px-3 py-1 rounded-full font-black shadow-lg shadow-primary/30 animate-bounce">
+                                {unreadNotifs.length} {t('new') || 'NEW'}
+                            </span>
                         )}
                     </div>
-                    <h4 className="text-foreground font-bold text-xs transition-colors">{t('automated_alerts')}</h4>
+                    <h4 className="text-lg font-black text-foreground transition-colors tracking-tight">{t('automated_alerts')}</h4>
 
-                    {unreadNotifs && unreadNotifs.length > 0 ? (
-                        <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-1">
-                            {unreadNotifs.slice(0, 3).map((notif) => (
-                                <div key={notif._id} className="p-2.5 bg-background/60 backdrop-blur-sm rounded-xl border border-border/50 text-[10px] shadow-sm">
-                                    <div className="font-bold text-foreground mb-0.5 line-clamp-1">{notif.title}</div>
-                                    <div className="text-muted-foreground line-clamp-2 leading-relaxed">{notif.message}</div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors mt-2">
-                            {t('alerts_desc')}
-                        </p>
-                    )}
-                </div>
+                    <div className="flex-1">
+                        {unreadNotifs && unreadNotifs.length > 0 ? (
+                            <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-1">
+                                {unreadNotifs.slice(0, 3).map((notif) => (
+                                    <div key={notif._id} className="p-2.5 bg-background/60 backdrop-blur-sm rounded-xl border border-border/50 text-[10px] shadow-sm">
+                                        <div className="font-bold text-foreground mb-0.5 line-clamp-1">{notif.title}</div>
+                                        <div className="text-muted-foreground line-clamp-2 leading-relaxed">{notif.message}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors mt-2">
+                                {t('alerts_desc')}
+                            </p>
+                        )}
+                    </div>
+                </motion.div>
             </div>
 
             {/* Volume Heatmap (Full Width) */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.5 }}
-                className="p-6 bg-card border border-border rounded-2xl shadow-sm transition-colors lg:col-span-3"
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+                className="glass-card p-10 rounded-[3rem] shadow-2xl xl:col-span-12 relative overflow-hidden group"
             >
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-primary/10 rounded-2xl text-primary border border-primary/20 shadow-inner">
-                            <Clock className="w-6 h-6" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="flex items-center justify-between mb-10 relative z-10">
+                    <div className="flex items-center gap-6">
+                        <div className="p-4 bg-primary/10 rounded-[1.5rem] text-primary border border-primary/20 shadow-xl group-hover:scale-110 transition-transform duration-500">
+                            <Clock className="w-8 h-8" />
                         </div>
-                        <div>
-                            <h4 className="text-foreground font-bold text-lg tracking-wider">tDashboard('volume_heatmap_title')</h4>
-                            <p className="text-sm text-muted-foreground mt-1">tDashboard('volume_heatmap_desc')</p>
+                        <div className="space-y-1">
+                            <h4 className="text-2xl font-black text-foreground tracking-tight">{t('volume_heatmap_title')}</h4>
+                            <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest opacity-70">{t('volume_heatmap_desc')}</p>
                         </div>
                     </div>
                 </div>

@@ -8,6 +8,7 @@
  *   -word       → excluded term (article MUST NOT contain it)
  *   "phrase"    → exact phrase match (mandatory)
  *   word        → soft term (ignored in strict gate — used for scoring)
+ *   A OR B      → either A or B must be present
  *
  * Usage:
  *   parseBooleanKeyword('ADNOC -gas +"press release"')
@@ -16,27 +17,30 @@
  */
 
 export interface BooleanExpression {
-  mandatory: string[];   // +word or "phrase" — ALL must match
-  excluded: string[];    // -word — NONE must match
-  soft: string[];        // plain words — no hard constraint
-  rawKeyword: string;    // the original keyword to use as API query term
+  mandatory: string[];     // +word or "phrase" — ALL must match
+  excluded: string[];      // -word — NONE must match
+  soft: string[];          // plain words — no hard constraint
+  orGroups: string[][];    // [["A", "B"], ["C", "D"]] → (A or B) AND (C or D)
+  rawKeyword: string;      // the original keyword to use as API query term
 }
 
 /**
  * Parses a user-provided keyword string into a BooleanExpression.
- *
- * Rules:
- *  - Tokens starting with + are mandatory (strip the +)
- *  - Tokens starting with - are excluded (strip the -)
- *  - Tokens wrapped in quotes are exact phrases (mandatory)
- *  - All other tokens are soft
  */
 export function parseBooleanKeyword(keyword: string): BooleanExpression {
   const mandatory: string[] = [];
   const excluded: string[] = [];
   const soft: string[] = [];
+  const orGroups: string[][] = [];
 
-  // Tokenise: first extract quoted phrases, then split remainder by spaces
+  // 1. Handle OR logic: Split by " OR " (case insensitive)
+  const orParts = keyword.split(/\s+OR\s+/i);
+  if (orParts.length > 1) {
+    // If we have OR parts, treat them as a group where at least one must match
+    orGroups.push(orParts.map(p => p.trim().replace(/^"|"$/g, "").toLowerCase()).filter(Boolean));
+  }
+
+  // 2. Tokenise (original logic + refinement)
   const tokens: string[] = [];
   const quoteRegex = /[+\-]?"[^"]+"/g;
   let remaining = keyword;
@@ -49,7 +53,7 @@ export function parseBooleanKeyword(keyword: string): BooleanExpression {
 
   // Split remaining on whitespace
   remaining.split(/\s+/).forEach((t) => {
-    if (t) tokens.push(t);
+    if (t && t.toUpperCase() !== 'OR') tokens.push(t);
   });
 
   for (const token of tokens) {
@@ -63,7 +67,6 @@ export function parseBooleanKeyword(keyword: string): BooleanExpression {
       const value = stripped.slice(1).replace(/^"|"$/g, "").toLowerCase();
       if (value) excluded.push(value);
     } else if (stripped.startsWith('"') && stripped.endsWith('"')) {
-      // Bare quoted phrase → mandatory
       const value = stripped.replace(/^"|"$/g, "").toLowerCase();
       if (value) mandatory.push(value);
     } else {
@@ -71,17 +74,12 @@ export function parseBooleanKeyword(keyword: string): BooleanExpression {
     }
   }
 
-  // rawKeyword: the first soft or mandatory term (for API queries)
   const rawKeyword = [...mandatory, ...soft].find((t) => t.length > 0) ?? keyword;
-
-  return { mandatory, excluded, soft, rawKeyword };
+  return { mandatory, excluded, soft, orGroups, rawKeyword };
 }
 
 /**
  * Returns true if the article text passes the boolean filter gate.
- * @param expr      - Parsed BooleanExpression
- * @param title     - Article title
- * @param snippet   - Article snippet / description
  */
 export function matchesBooleanFilter(
   expr: BooleanExpression,
@@ -92,14 +90,17 @@ export function matchesBooleanFilter(
 
   // 1. All mandatory terms must be present
   for (const term of expr.mandatory) {
-    if (!haystack.includes(term)) {
-      return false;
-    }
+    if (!haystack.includes(term)) return false;
   }
 
   // 2. No excluded terms may be present
   for (const term of expr.excluded) {
-    if (haystack.includes(term)) {
+    if (haystack.includes(term)) return false;
+  }
+
+  // 3. At least one member of each OR group must be present
+  for (const group of expr.orGroups) {
+    if (!group.some(term => haystack.includes(term))) {
       return false;
     }
   }
@@ -108,14 +109,21 @@ export function matchesBooleanFilter(
 }
 
 /**
- * Extracts the clean query string to send to news APIs —
- * strips boolean operators, keeps the core terms.
+ * Extracts the clean query string to send to news APIs.
  */
 export function buildApiQuery(keyword: string): string {
   const expr = parseBooleanKeyword(keyword);
-  // Build: mandatory phrases + soft terms, quoted if multi-word
+  
+  // If there are OR groups, construct the query for engines that support OR
+  if (expr.orGroups.length > 0) {
+    return expr.orGroups.map(group => 
+      group.map(t => t.includes(" ") ? `"${t}"` : t).join(" OR ")
+    ).join(" ");
+  }
+
   const terms = [...expr.mandatory, ...expr.soft].map((t) =>
     t.includes(" ") ? `"${t}"` : t
   );
   return terms.join(" ") || keyword;
 }
+

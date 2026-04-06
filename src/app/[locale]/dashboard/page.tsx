@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
-import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2, Activity, BarChart3 } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
@@ -12,6 +12,7 @@ import { api } from '../../../../convex/_generated/api';
 import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
 import NewsGenerator, { ALL_COUNTRIES } from '@/components/media-pulse/NewsGenerator';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import DeepStatusPanel from '@/components/media-pulse/DeepStatusPanel';
 import OsintTab from '@/components/media-pulse/OsintTab';
@@ -211,213 +212,223 @@ export default function DashboardPage() {
     };
 
     return (
-        <main className="min-h-screen bg-background text-foreground">
-            <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8">
+        <main className="min-h-screen bg-background/50 text-foreground relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse [animation-delay:2s]" />
+            </div>
 
-                {/* Toast Notification */}
+            <div className="max-w-[1536px] mx-auto p-4 md:p-8 lg:p-10 space-y-10 relative z-10">
+                {/* Header Section */}
+                <header className="glass-card p-6 md:p-8 rounded-[2rem] flex flex-col xl:flex-row xl:items-center justify-between gap-6 shadow-2xl relative overflow-hidden group border-primary/10">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
-
-                {/* Header */}
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
-                    <div>
-                        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
-                            {t('title')}
-                        </h1>
-                        <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
+                    <div className="relative z-10 space-y-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
+                                <Activity className="w-6 h-6 text-primary animate-pulse" />
+                            </div>
+                            <div>
+                                <h1 className="text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">
+                                    {t('title')}
+                                </h1>
+                                <p className="text-muted-foreground text-sm font-medium flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                                    {t('subtitle')}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* View Switcher — centered on mobile, inline on desktop */}
-                    <div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
-                        <button
-                            onClick={() => startTransition(() => setActiveView('standard'))}
-                            className={clsx(
-                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                activeView === 'standard'
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                                isPending && "opacity-70 cursor-wait"
-                            )}
-                        >
-                            {t('filters.view_standard')}
-                        </button>
-                        <div className="w-px h-5 bg-border flex-shrink-0" />
-                        <button
-                            onClick={() => startTransition(() => setActiveView('deep'))}
-                            className={clsx(
-                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                activeView === 'deep'
-                                    ? 'bg-status-info-bg text-status-info-fg font-bold shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                                isPending && "opacity-70 cursor-wait"
-                            )}
-                        >
-                            {t('filters.view_deep')}
-                        </button>
-                        <div className="w-px h-5 bg-border flex-shrink-0" />
-                        <button
-                            onClick={() => {
-                                if (isAdmin) {
-                                    startTransition(() => setActiveView('osint'));
-                                }
-                            }}
-                            title={!isAdmin ? 'OSINT features require admin privileges' : undefined}
-                            className={clsx(
-                                "inline-flex items-center gap-1.5 h-9 px-4 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                                activeView === 'osint'
-                                    ? 'bg-status-success-bg text-status-success-fg font-bold shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                                (!isAdmin || isPending) && "opacity-70 cursor-wait",
-                                !isAdmin && "cursor-not-allowed"
-                            )}
-                        >
-                            {!isAdmin && <Lock className="w-3 h-3 opacity-60" />}
-                            {t('filters.view_osint')}
-                        </button>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-
-                        {/* Settings — icon-only, consistent h-9 w-9 */}
-                        <HoverPrefetchLink href="/dashboard/settings" aria-label={t('settings')}>
-                            <button
-                                className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm"
-                                aria-label={t('settings')}
-                            >
-                                <Settings className="w-4 h-4" aria-hidden="true" />
-                            </button>
-                        </HoverPrefetchLink>
-
-                        {/* Manual Entry */}
-                        <button
-                            onClick={() => setManualModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-border bg-muted/50 hover:bg-muted text-foreground text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shadow-sm"
-                        >
-                            <Plus className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
-                            {t('manual_entry')}
-                        </button>
-
-                        {/* Clear All — only shown when articles exist */}
-                        {totalArticles > 0 && (
-                            <Button
-                                variant="danger"
-                                onClick={() => setIsClearDialogOpen(true)}
-                                disabled={isClearing || totalArticles === 0}
-                                isLoading={isClearing}
-                                className="h-9 px-3.5 rounded-lg border border-status-error-fg/20 bg-status-error-bg text-status-error-fg text-xs font-semibold shadow-sm"
-                                leftIcon={!isClearing && <Trash2 className="w-3.5 h-3.5" />}
-                            >
-                                {t('clear_all')}
-                            </Button>
-                        )}
-
-                        {/* Vertical Divider */}
-                        <div className="w-px h-6 bg-border mx-0.5" />
-
-                        {/* Export Buttons — segmented group matching view-switcher style */}
-                        <div className="flex items-center bg-muted/50 rounded-lg border border-border shadow-sm overflow-hidden">
-                            <button
-                                onClick={() => handleExport('pdf')}
-                                disabled={isExporting || filteredArticles.length === 0}
-                                className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold text-foreground/70 hover:text-foreground hover:bg-muted transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            >
-                                {isExporting
-                                    ? <span className="w-3.5 h-3.5 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
-                                    : <FileDown className="w-3.5 h-3.5" aria-hidden="true" />
-                                }
-                                {t('filters.export_pdf')}
-                            </button>
-                            <div className="w-px h-5 bg-border flex-shrink-0" />
-                            <button
-                                onClick={() => handleExport('excel')}
-                                disabled={filteredArticles.length === 0}
-                                className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-semibold text-foreground/70 hover:text-foreground hover:bg-muted transition-all disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                            >
-                                <FileSpreadsheet className="w-3.5 h-3.5" aria-hidden="true" />
-                                {t('filters.export_excel')}
-                            </button>
+                    <div className="flex flex-wrap items-center gap-3 relative z-10">
+                        {/* View Switcher */}
+                        <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50 shadow-inner overflow-hidden">
+                            {[
+                                { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
+                                { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
+                                { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin }
+                            ].map((view) => (
+                                <button
+                                    key={view.id}
+                                    onClick={() => {
+                                        if (view.restricted) return;
+                                        startTransition(() => setActiveView(view.id as any));
+                                    }}
+                                    disabled={view.restricted || isPending}
+                                    className={clsx(
+                                        "relative flex items-center gap-2 h-10 px-5 text-xs font-black uppercase tracking-widest transition-all rounded-xl",
+                                        activeView === view.id
+                                            ? `bg-primary shadow-lg shadow-primary/20 text-primary-foreground`
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                                        view.restricted && "opacity-50 cursor-not-allowed grayscale"
+                                    )}
+                                >
+                                    {view.restricted ? <Lock className="w-3.5 h-3.5" /> : <view.icon className="w-3.5 h-3.5" />}
+                                    {view.label}
+                                    <AnimatePresence>
+                                        {activeView === view.id && (
+                                            <motion.div
+                                                layoutId="active-view"
+                                                className="absolute inset-0 bg-primary rounded-xl -z-10"
+                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                            />
+                                        )}
+                                    </AnimatePresence>
+                                </button>
+                            ))}
                         </div>
 
+                        <div className="flex items-center gap-2 ml-auto xl:ml-0">
+                            {/* Actions Group */}
+                            <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50">
+                                <HoverPrefetchLink href="/dashboard/settings">
+                                    <button
+                                        className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-primary transition-all"
+                                        title={t('settings')}
+                                    >
+                                        <Settings className="w-5 h-5" />
+                                    </button>
+                                </HoverPrefetchLink>
+
+                                <button
+                                    onClick={() => setManualModalOpen(true)}
+                                    className="h-10 px-4 flex items-center gap-2 rounded-xl hover:bg-muted text-foreground text-xs font-black uppercase tracking-widest transition-all"
+                                >
+                                    <Plus className="w-4 h-4 text-primary" />
+                                    {t('manual_entry')}
+                                </button>
+                            </div>
+
+                            {/* Export Group */}
+                            <div className="flex items-center p-1 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
+                                <button
+                                    onClick={() => handleExport('pdf')}
+                                    disabled={isExporting || filteredArticles.length === 0}
+                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                >
+                                    <FileDown className="w-4 h-4" />
+                                    PDF
+                                </button>
+                                <button
+                                    onClick={() => handleExport('excel')}
+                                    disabled={filteredArticles.length === 0}
+                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                >
+                                    <FileSpreadsheet className="w-4 h-4" />
+                                    EXCEL
+                                </button>
+                            </div>
+
+                            {totalArticles > 0 && (
+                                <button
+                                    onClick={() => setIsClearDialogOpen(true)}
+                                    className="h-[52px] px-6 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/20 text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 group"
+                                >
+                                    <Trash2 className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                                    {t('clear_all')}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </header>
 
-                {activeView === 'standard' && (
-                    <>
-                        <NewsGenerator defaultSourceType="Online News" />
-                        <PressReleasePanel />
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                            <div className="lg:col-span-3">
-                                <DashboardGrid articles={filteredArticles} analytics={analytics} />
-                            </div>
-                            <div className="lg:col-span-1">
-                                <RssFeeder 
-                                    initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
-                                    initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
-                                    categories={isAr ? AAWSAT_SOURCES : []}
-                                    maxItems={7}
-                                />
-                            </div>
-                        </div>
-                        <section className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-                            <div className="p-5 border-b border-border space-y-4">
-                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                                    <h2 className="text-lg font-bold text-foreground flex items-center gap-2 text-nowrap">
-                                        <Filter className="w-4 h-4 text-primary" />
-                                        {t('coverage_log')}
-                                        <span className="bg-primary/10 text-primary text-[10px] px-2.5 py-0.5 rounded-full ml-1 border border-primary/20 font-bold">
-                                            {mounted ? `${filteredArticles.length}/${totalArticles}` : '0/0'}
-                                        </span>
-                                    </h2>
 
-                                    <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                                        <div className="relative min-w-[180px]">
+                {activeView === 'standard' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                        {/* Discovery & Analytics Section */}
+                        <DashboardGrid 
+                            articles={filteredArticles} 
+                            analytics={analytics}
+                            topLeftSlot={
+                                <div className="space-y-8">
+                                    <NewsGenerator defaultSourceType="Online News" />
+                                    <PressReleasePanel />
+                                    <div className="flex items-center justify-between mt-6 mb-2">
+                                        <h2 className="text-2xl font-black text-foreground tracking-tight uppercase flex items-center gap-3 italic">
+                                            <BarChart3 className="w-6 h-6 text-primary" />
+                                            {t('media_pulse_analytics_title') || 'Media Pulse Analytics'}
+                                        </h2>
+                                        <div className="h-px bg-gradient-to-r from-primary/20 via-primary/5 to-transparent flex-1 mx-8" />
+                                    </div>
+                                </div>
+                            }
+                            topRightSlot={
+                                <div className="sticky top-8 mb-8 z-20">
+                                    <RssFeeder
+                                        initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
+                                        initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
+                                        categories={isAr ? AAWSAT_SOURCES : []}
+                                        maxItems={10}
+                                    />
+                                </div>
+                            }
+                        />
+
+                        {/* Coverage Section */}
+                        <section className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
+
+                            <div className="p-8 border-b border-border/50 bg-muted/20 backdrop-blur-sm space-y-6">
+                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                                    <div className="space-y-1">
+                                        <h2 className="text-2xl font-black text-foreground flex items-center gap-3 uppercase tracking-tighter italic">
+                                            <div className="p-2 bg-primary/10 rounded-xl">
+                                                <Filter className="w-5 h-5 text-primary" />
+                                            </div>
+                                            {t('coverage_log')}
+                                        </h2>
+                                        <p className="text-sm text-muted-foreground font-medium flex items-center gap-2">
+                                            <span className="text-primary font-black">{totalArticles}</span>
+                                            {t('total_articles_detected') || 'total articles detected in current scope'}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                                        <div className="relative group">
+                                            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
                                             <select
                                                 value={selectedCountry}
                                                 onChange={(e) => setSelectedCountry(e.target.value)}
-                                                id="country-select"
-                                                name="country"
-                                                autoComplete="country"
-                                                aria-label={t('filters.all_countries')}
-                                                className="w-full appearance-none bg-muted/50 border border-border rounded-xl pl-10 pr-8 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-muted font-medium"
+                                                className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"
                                             >
                                                 <option value="All">{t('filters.all_countries')}</option>
                                                 {ALL_COUNTRIES.map((c) => (
                                                     <option key={c.code} value={c.code}>
-                                                        {isAr ? c.ar : c.en} ({c.code})
+                                                        {isAr ? c.ar : c.en}
                                                     </option>
                                                 ))}
                                             </select>
-                                            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                                <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
                                             </div>
                                         </div>
 
-                                        <div className="relative w-full sm:w-64">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <div className="relative w-full sm:w-80 group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary/10 rounded-lg text-primary opacity-60 group-hover:opacity-100 transition-opacity">
+                                                <Search className="w-3.5 h-3.5" />
+                                            </div>
                                             <input
                                                 type="text"
-                                                name="search"
-                                                id="search-input"
-                                                autoComplete="off"
                                                 placeholder={t('search_placeholder')}
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-muted/50 border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground text-foreground"
+                                                className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/60 text-foreground"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="flex flex-wrap gap-2">
                                     {sourceTypes.map((type) => (
                                         <button
                                             key={type.id}
                                             onClick={() => setSelectedType(type.id)}
                                             className={clsx(
-                                                "inline-flex items-center h-8 px-3.5 rounded-lg text-xs font-bold transition-all border",
+                                                "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
                                                 selectedType === type.id
-                                                    ? 'bg-primary/10 border-primary/30 text-primary'
-                                                    : 'bg-muted border-border text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+                                                    ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
+                                                    : 'bg-background/80 border-border/50 text-muted-foreground hover:bg-background hover:text-foreground hover:border-border'
                                             )}
                                         >
                                             {type.label}
@@ -426,31 +437,41 @@ export default function DashboardPage() {
                                 </div>
                             </div>
 
-                            {filteredArticles.length > 0 ? (
-                                <>
-                                    <ArticleTable articles={filteredArticles} limit={50} />
-                                    {result?.nextSkip !== null && (
-                                        <div className="flex justify-center py-4">
-                                            <button
-                                                onClick={() => setSkip(result.nextSkip || 0)}
-                                                className="inline-flex items-center h-9 px-5 bg-muted border border-border rounded-lg text-sm font-semibold text-foreground hover:bg-muted/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                                            >
-                                                {t('filters.load_more')}
-                                            </button>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="p-16 text-center">
-                                    <div className="w-12 h-12 rounded-2xl bg-muted border border-border mx-auto mb-4 flex items-center justify-center">
-                                        <Search className="w-5 h-5 text-muted-foreground" />
+                            <div className="bg-background/30 backdrop-blur-md">
+                                {filteredArticles.length > 0 ? (
+                                    <div className="animate-in fade-in duration-1000">
+                                        <ArticleTable articles={filteredArticles} limit={50} />
+                                        {result?.nextSkip !== null && (
+                                            <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
+                                                <button
+                                                    onClick={() => setSkip(result.nextSkip || 0)}
+                                                    className="inline-flex items-center h-14 px-10 bg-primary shadow-xl shadow-primary/30 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-primary-foreground hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary/20"
+                                                >
+                                                    {t('filters.load_more')}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                    <p className="text-muted-foreground text-sm">{t('no_results')}</p>
-                                    <p className="text-muted-foreground/70 text-xs mt-1">{t('no_results_hint')}</p>
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="py-32 text-center relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.03)_0%,transparent_70%)]" />
+                                        <div className="relative z-10 max-w-sm mx-auto space-y-6">
+                                            <div className="w-24 h-24 rounded-[2rem] bg-muted/50 border border-border/50 mx-auto flex items-center justify-center shadow-xl group hover:scale-110 transition-transform duration-500">
+                                                <Search className="w-10 h-10 text-muted-foreground opacity-30 group-hover:opacity-60 group-hover:rotate-12 transition-all" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="text-xl font-bold text-foreground">{t('no_results')}</h3>
+                                                <p className="text-sm text-muted-foreground/70 font-medium leading-relaxed">{t('no_results_hint')}</p>
+                                            </div>
+                                            <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedType('All'); }} className="font-black uppercase tracking-widest text-[10px]">
+                                                {t('reset_filters') || 'Reset All Filters'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </section>
-                    </>
+                    </div>
                 )}
 
                 {activeView === 'deep' && (

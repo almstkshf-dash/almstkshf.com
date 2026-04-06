@@ -896,7 +896,14 @@
         "Thu": "الخميس",
         "Fri": "الجمعة",
         "Sat": "السبت"
-      }
+      },
+      "risk_factors": {
+        "NEGATIVE_SENTIMENT_SPIKE": "ارتفاع مفاجئ في المشاعر السلبية",
+        "VOLUME_SURGE_NEGATIVE": "زيادة ملحوظة في المحتوى السلبي",
+        "HIGH_REACH_CRITICAL": "إشارة حرجة عالية الانتشار",
+        "SENTIMENT_SHIFT_DETECTION": "رصد تحول مفاجئ في المشاعر"
+      },
+      "top_risk_indicators": "أبرز مؤشرات المخاطر"
     }
   },
   "CrisisManagementDetail": {
@@ -1246,7 +1253,15 @@
       "fear": "الخوف",
       "anticipation": "ترقب",
       "trust": "ثقة"
-    }
+    },
+    "sentiment": {
+      "positive": "إيجابي",
+      "neutral": "محايد",
+      "negative": "سلبي"
+    },
+    "media_pulse_analytics_title": "تحليلات نبض الإعلام",
+    "total_articles_detected": "إجمالي المقالات المرصودة في النطاق الحالي",
+    "reset_filters": "إعادة تعيين جميع الفلاتر"
   },
   "NewsGenerator": {
     "monitor_keyword": "مراقبة الكلمات المفتاحية",
@@ -1378,6 +1393,55 @@
         "desc": "تحقق من بيانات المشغل، أعلام السمعة، والتوجيه الإقليمي.",
         "placeholder": "أدخل الهاتف (مثال: +971...)"
       }
+    },
+    "result_view": {
+      "headers": {
+        "deliverable": "قابل للتسليم",
+        "disposable": "بريد مؤقت",
+        "risk_score": "درجة المخاطرة",
+        "country": "الدولة",
+        "vpn_proxy": "VPN/بروكسي",
+        "threat_level": "مستوى التهديد",
+        "registered": "مسجل",
+        "dnssec": "DNSSEC",
+        "status": "الحالة",
+        "valid": "صالح",
+        "line_type": "نوع الخط",
+        "carrier": "المشغل"
+      },
+      "sections": {
+        "identity_details": "تفاصيل الهوية",
+        "geolocation": "الموقع الجغرافي",
+        "infrastructure": "البنية التحتية للشبكة",
+        "whois": "بيانات WHOIS",
+        "technical_records": "السجلات التقنية",
+        "carrier_details": "تفاصيل المشغل"
+      },
+      "fields": {
+        "username": "اسم المستخدم",
+        "domain": "النطاق",
+        "free_provider": "مزود مجاني",
+        "catch_all": "Catch All",
+        "city": "المدينة",
+        "region": "المنطقة",
+        "postal": "الرمز البريدي",
+        "timezone": "المنطقة الزمنية",
+        "asn": "ASN",
+        "isp": "مزود الخدمة",
+        "organization": "المنظمة",
+        "type": "النوع",
+        "registrar": "المسجل",
+        "created": "تاريخ الإنشاء",
+        "expiry": "تاريخ الانتهاء",
+        "updated": "آخر تحديث",
+        "nameservers": "خوادم الأسماء",
+        "mx_check": "فحص MX",
+        "local_format": "التنسيق المحلي",
+        "international_format": "التنسيق الدولي",
+        "country_prefix": "مفتاح الدولة",
+        "location": "الموقع"
+      },
+      "toggle_raw": "تبديل بيانات المطور الخام"
     },
     "admin_only": "عمليات البحث المتقدمة في OSINT مقتصرة على حسابات المسؤولين. يرجى الاتصال بالمسؤول للوصول.",
     "export_history": "تصدير سجل التحقيق",
