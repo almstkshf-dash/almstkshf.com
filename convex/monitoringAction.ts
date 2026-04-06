@@ -291,17 +291,19 @@ export const fetchNews = action({
             const gnewsKey = await resolveApiKey(ctx, "GNEWS_API_KEY", "gnews");
             const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
             const twitterBearer = await resolveApiKey(ctx, "X_BEARER_TOKEN", "twitterBearer");
-            const twitterApiKey = await resolveApiKey(ctx, "X_API_KEY", "twitterConsumerKey");
-            const twitterApiSecret = await resolveApiKey(ctx, "X_API_SECRET", "twitterConsumerSecret");
-            const twitterAccessToken = await resolveApiKey(ctx, "X_ACCESS_TOKEN", "twitterAccessToken");
-            const twitterTokenSecret = await resolveApiKey(ctx, "X_ACCESS_TOKEN_SECRET", "twitterAccessTokenSecret");
+            const bingKey = await resolveApiKey(ctx, "BING_API_KEY", "bing");
+            const mediastackKey = await resolveApiKey(ctx, "MEDIASTACK_API_KEY", "mediastack");
+            const serperKey = await resolveApiKey(ctx, "SERPER_API_KEY", "serper");
 
             const providers = [
                 { name: 'NewsData.io', key: newsdataKey, type: 'newsdata' },
                 { name: 'NewsAPI.org', key: newsapiKey, type: 'newsapi' },
                 { name: 'GNews.io', key: gnewsKey, type: 'gnews' },
                 { name: 'WorldNews API', key: worldnewsKey, type: 'worldnews' },
-                { name: 'Twitter (X)', key: twitterBearer, type: 'twitter' }
+                { name: 'Twitter (X)', key: twitterBearer, type: 'twitter' },
+                { name: 'Bing News', key: bingKey, type: 'bing' },
+                { name: 'Mediastack', key: mediastackKey, type: 'mediastack' },
+                { name: 'Serper.dev', key: serperKey, type: 'serper' }
             ].filter(p => p.key);
 
             if (providers.length === 0) {
@@ -336,7 +338,7 @@ export const fetchNews = action({
             // Source Type targeting
             const stList = args.sourceTypes ? args.sourceTypes.split(',').map(s => s.trim()) : [];
             if (stList.includes('Press Release')) {
-                enrichedQuery += ' (site:prnewswire.com OR site:businesswire.com OR site:zawya.com OR site:wam.ae)';
+                enrichedQuery += ' (site:prnewswire.com OR site:businesswire.com OR site:zawya.com OR site:wam.ae OR site:globenewswire.com OR site:einpresswire.com OR site:accesswire.com OR site:me-newswire.net OR site:spa.gov.sa OR site:newsfilecorp.com OR site:prweb.com OR site:marketwired.com OR site:prunderground.com OR site:eyeofriyadh.com OR site:eyeofdubai.ae OR site:saudigazette.com.sa OR site:arabnews.com OR site:gulfnews.com)';
             } else if (stList.includes('Social Media')) {
                 enrichedQuery += ' (site:twitter.com OR site:reddit.com OR site:linkedin.com)';
             }
@@ -360,6 +362,7 @@ export const fetchNews = action({
                     rssCombos.push({ url: rssUrl, country: country.toUpperCase(), lang });
                 }
             }
+
 
             let totalSuccess = 0;
             let totalSkipped = 0;
@@ -576,6 +579,115 @@ export const fetchNews = action({
                     } catch (e) {
                         console.error(`❌ Twitter fail`, e);
                         return { name: 'Twitter (X)', error: true };
+                    }
+                })());
+            }
+
+            // 7. Bing News
+            if (bingKey) {
+                fetchPromises.push((async () => {
+                    try {
+                        const country = (countryList[0] || 'us').toUpperCase();
+                        const lang = languageList[0] || 'en';
+                        const bingUrl = `https://api.bing.microsoft.com/v7.0/news/search?q=${encodeURIComponent(cleanQuery)}&setLang=${lang}&cc=${country}&mkt=${lang}-${country}&count=20`;
+                        const bingRes = await fetch(bingUrl, { headers: { 'Ocp-Apim-Subscription-Key': bingKey } });
+
+                        if (bingRes.ok) {
+                            const bingData = await bingRes.json();
+                            if (bingData.value) {
+                                let localSuccess = 0;
+                                for (const item of bingData.value) {
+                                    const success = await processArticle(ctx, {
+                                        title: item.name,
+                                        link: item.url,
+                                        pubDate: item.datePublished,
+                                        contentSnippet: `Source: ${item.provider?.[0]?.name || 'Unknown'}. ${item.description || item.name}`,
+                                        imageUrl: item.image?.thumbnail?.contentUrl
+                                    }, country, lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                    if (success) localSuccess++;
+                                }
+                                return { name: 'Bing News', success: localSuccess };
+                            }
+                        }
+                        return { name: 'Bing News', error: true };
+                    } catch (e) {
+                        console.error(`❌ Bing News fail`, e);
+                        return { name: 'Bing News', error: true };
+                    }
+                })());
+            }
+
+            // 8. Mediastack
+            if (mediastackKey) {
+                fetchPromises.push((async () => {
+                    try {
+                        const msUrl = `http://api.mediastack.com/v1/news?access_key=${mediastackKey}&keywords=${encodeURIComponent(cleanQuery)}&languages=${languageList.join(',')}&countries=${countryList.join(',')}&limit=20`;
+                        const msRes = await fetch(msUrl);
+                        if (msRes.ok) {
+                            const msData = await msRes.json();
+                            if (msData.data) {
+                                let localSuccess = 0;
+                                for (const item of msData.data) {
+                                    const success = await processArticle(ctx, {
+                                        title: item.title,
+                                        link: item.url,
+                                        pubDate: item.published_at,
+                                        contentSnippet: `Source: ${item.source || 'Unknown'}. ${item.description || item.title}`,
+                                        imageUrl: item.image
+                                    }, (item.country || countryList[0]).toUpperCase(), item.language || languageList[0], args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                    if (success) localSuccess++;
+                                }
+                                return { name: 'Mediastack', success: localSuccess };
+                            }
+                        }
+                        return { name: 'Mediastack', error: true };
+                    } catch (e) {
+                        console.error(`❌ Mediastack fail`, e);
+                        return { name: 'Mediastack', error: true };
+                    }
+                })());
+            }
+
+            // 9. Serper.dev (Google News via Serper)
+            if (serperKey) {
+                fetchPromises.push((async () => {
+                    try {
+                        const serperUrl = `https://google.serper.dev/news`;
+                        const serperRes = await fetch(serperUrl, {
+                            method: 'POST',
+                            headers: {
+                                'X-API-KEY': serperKey,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                q: cleanQuery,
+                                gl: countryList[0] || 'us',
+                                hl: languageList[0] || 'en',
+                                num: 20
+                            })
+                        });
+
+                        if (serperRes.ok) {
+                            const serperData = await serperRes.json();
+                            if (serperData.news) {
+                                let localSuccess = 0;
+                                for (const item of serperData.news) {
+                                    const success = await processArticle(ctx, {
+                                        title: item.title,
+                                        link: item.link,
+                                        pubDate: item.date,
+                                        contentSnippet: `Source: ${item.source || 'Unknown'}. ${item.snippet || item.title}`,
+                                        imageUrl: item.imageUrl
+                                    }, (countryList[0] || 'us').toUpperCase(), languageList[0] || 'en', args.keyword, apiKey, stList, dateFromObj, dateToObj, false);
+                                    if (success) localSuccess++;
+                                }
+                                return { name: 'Serper.dev', success: localSuccess };
+                            }
+                        }
+                        return { name: 'Serper.dev', error: true };
+                    } catch (e) {
+                        console.error(`❌ Serper.dev fail`, e);
+                        return { name: 'Serper.dev', error: true };
                     }
                 })());
             }
@@ -829,13 +941,22 @@ const PR_WIRE_FEEDS: Array<{
         { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-list.rss", country: "US", lang: "en" },
         { name: "Business Wire", url: "https://feeds.businesswire.com/rss/home?rss=G1&rssid=rss_bw_all", country: "US", lang: "en" },
         { name: "GlobeNewswire MENA", url: "https://www.globenewswire.com/RssFeed/subjectcode/15/Middle+East+and+Africa", country: "AE", lang: "en" },
+        { name: "Accesswire", url: "https://www.accesswire.com/rss", country: "US", lang: "en" },
+        { name: "Newswire.com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
+
         // MENA / Arab wires
         { name: "Zawya PR", url: "https://www.zawya.com/en/rss/press-releases", country: "AE", lang: "en" },
         { name: "WAM (UAE EN)", url: "https://www.wam.ae/en/rss", country: "AE", lang: "en" },
         { name: "WAM (UAE AR)", url: "https://www.wam.ae/ar/rss", country: "AE", lang: "ar" },
-        { name: "SPA (Saudi)", url: "https://www.spa.gov.sa/rss/feedAll.rss", country: "SA", lang: "ar" },
+        { name: "SPA (Saudi AR)", url: "https://www.spa.gov.sa/rss/feedAll.rss", country: "SA", lang: "ar" },
+        { name: "SPA (Saudi EN)", url: "https://www.spa.gov.sa/en/rss/feedAll.rss", country: "SA", lang: "en" },
+        { name: "KUNA (Kuwait EN)", url: "https://www.kuna.net.kw/Rss/Rss.aspx?lang=en", country: "KW", lang: "en" },
+        { name: "KUNA (Kuwait AR)", url: "https://www.kuna.net.kw/Rss/Rss.aspx?lang=ar", country: "KW", lang: "ar" },
+        { name: "AETOSWire (EN)", url: "https://www.aetoswire.com/rss/en", country: "AE", lang: "en" },
+        { name: "AETOSWire (AR)", url: "https://www.aetoswire.com/rss/ar", country: "AE", lang: "ar" },
         { name: "MENA FN", url: "https://menafn.com/rss/1", country: "AE", lang: "en" },
         { name: "Gulf News PR", url: "https://gulfnews.com/rss/press-releases", country: "AE", lang: "en" },
+        { name: "Al Bawaba PR", url: "https://www.albawaba.com/rss/business", country: "JO", lang: "en" },
     ];
 
 export const fetchPressReleaseSources = action({

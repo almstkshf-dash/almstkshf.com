@@ -81,6 +81,56 @@ export const updateGeminiKey = mutation({
 });
 
 /**
+ * Updates any API key in the nested apiKeys object.
+ */
+export const updateApiKeys = mutation({
+    args: {
+        keys: v.object({
+            gemini: v.optional(v.string()),
+            newsdata: v.optional(v.string()),
+            newsapi: v.optional(v.string()),
+            gnews: v.optional(v.string()),
+            worldnews: v.optional(v.string()),
+            bing: v.optional(v.string()),
+            mediastack: v.optional(v.string()),
+            serper: v.optional(v.string()),
+            twitterBearer: v.optional(v.string()),
+        })
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new ConvexError("Not authenticated");
+        const userId = identity.subject;
+
+        const existing = await ctx.db
+            .query("userSettings")
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
+            .unique();
+
+        const newApiKeys = {
+            ...(existing?.apiKeys || {}),
+            ...args.keys
+        };
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                apiKeys: newApiKeys,
+                updatedAt: Date.now(),
+            });
+        } else {
+            await ctx.db.insert("userSettings", {
+                userId,
+                apiKeys: newApiKeys,
+                isTrialActive: false,
+                isSubscribed: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            });
+        }
+    }
+});
+
+/**
  * Sets the subscription status for a user.
  * ADMIN-ONLY — typically called by the Stripe webhook handler.
  */

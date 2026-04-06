@@ -9,6 +9,7 @@ import {
   FileText, FileSpreadsheet
 } from 'lucide-react';
 import clsx from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import { useTranslations, useMessages } from 'next-intl';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';

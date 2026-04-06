@@ -32,6 +32,9 @@ const nextConfig = {
             'next-themes',
             '@vercel/analytics',
         ],
+        turbopack: {
+            root: '.',
+        },
     },
 
     transpilePackages: ['three', 'troika-three-text', 'troika-worker-utils', 'jspdf', 'jspdf-autotable'],
