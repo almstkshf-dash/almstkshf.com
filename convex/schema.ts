@@ -89,6 +89,8 @@ export default defineSchema({
             abuseipdb: v.optional(v.string()),
             numverify: v.optional(v.string()),
             qstash: v.optional(v.string()),
+            gleif: v.optional(v.string()), // Usually public, but adding for future-proofing
+            opensanctions: v.optional(v.string()), // For Watchlist checks
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -146,7 +148,9 @@ export default defineSchema({
             v.literal("news"),
             v.literal("corporate"),
             v.literal("location"),
-            v.literal("wikipedia")
+            v.literal("wikipedia"),
+            v.literal("gleif"),
+            v.literal("watchlist")
         ),
         query: v.string(),
         result: v.any(),
@@ -202,6 +206,8 @@ export default defineSchema({
             abuseipdb: v.optional(v.string()),
             numverify: v.optional(v.string()),
             qstash: v.optional(v.string()),
+            gleif: v.optional(v.string()),
+            opensanctions: v.optional(v.string()),
         })),
         isSubscribed: v.optional(v.boolean()),
         isTrialActive: v.optional(v.boolean()),

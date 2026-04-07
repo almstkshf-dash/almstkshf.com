@@ -11,7 +11,9 @@ import {
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
-import { useTranslations, useMessages } from 'next-intl';
+import { useTranslations, useMessages, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
@@ -45,7 +47,7 @@ type Resource = {
 };
 
 // ─── Lookup type definition ─────────────────────────────────────────────
-type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia';
+type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist';
 
 interface HistoryItem {
   _id: Id<"osint_results">;
@@ -157,6 +159,19 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
           <>
             <StatusBadge label="Provider" value="Wikipedia" type="info" />
             <StatusBadge label="Match Found" value={get(data, 'wiki') ? 'Yes' : 'No'} type={get(data, 'wiki') ? "success" : "warning"} />
+          </>
+        )}
+        {type === 'gleif' && (
+          <>
+            <StatusBadge label={t('result_view.headers.provider')} value="GLEIF" type="info" />
+            <StatusBadge label={t('result_view.headers.status')} value={get(data, 'records')?.length || '0'} type={get(data, 'records')?.length > 0 ? "success" : "warning"} />
+          </>
+        )}
+        {type === 'watchlist' && (
+          <>
+            <StatusBadge label={t('result_view.headers.provider')} value="OpenSanctions" type="info" />
+            <StatusBadge label={t('result_view.headers.status')} value={get(data, 'isClean') ? t('result_view.headers.valid') : t('result_view.headers.status')} type={get(data, 'isClean') ? "success" : "error"} />
+            <StatusBadge label={t('result_view.fields.match_count') || "Matches"} value={get(data, 'totalMatches') || '0'} type={get(data, 'totalMatches') > 0 ? "error" : "success"} />
           </>
         )}
       </div>
@@ -306,6 +321,57 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
           </div>
         )}
 
+        {type === 'gleif' && (
+          <div className="space-y-6">
+            <DataSection title={t('result_view.sections.lei_registration')} icon={Database}>
+                {get(data, 'records')?.map((r: any, i: number) => (
+                  <div
+                    key={i}
+                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2"
+                  >
+                    <h5 className="text-xs font-bold text-foreground">{r.legalName}</h5>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                       <StatusBadge label={t('result_view.headers.lei')} value={r.lei || 'N/A'} type="default" />
+                       <StatusBadge label={t('result_view.headers.status')} value={r.status || 'N/A'} type="info" />
+                       <StatusBadge label={t('result_view.headers.jurisdiction')} value={r.jurisdiction || 'N/A'} type="default" />
+                    </div>
+                  </div>
+                ))}
+            </DataSection>
+          </div>
+        )}
+
+        {type === 'watchlist' && (
+          <div className="space-y-6">
+            <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
+                {get(data, 'matches')?.map((m: any, i: number) => (
+                  <div
+                    key={i}
+                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
+                      <span className="text-[10px] font-black text-destructive uppercase tracking-widest">
+                        {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                       <StatusBadge label={t('result_view.headers.schema')} value={m.schema || 'N/A'} type="info" />
+                       <StatusBadge label={t('result_view.headers.datasets')} value={m.datasets?.join(', ') || 'N/A'} type="default" />
+                       <StatusBadge label={t('result_view.headers.topics')} value={m.topics?.join(', ') || 'None'} type="default" />
+                    </div>
+                  </div>
+                ))}
+                {!get(data, 'matches')?.length && (
+                   <div className="col-span-1 sm:col-span-2 p-4 text-center border border-emerald-500/20 bg-emerald-500/5 rounded-xl">
+                      <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-50" />
+                      <p className="text-xs font-bold text-emerald-600">{t('result_view.fields.no_matches')}</p>
+                   </div>
+                )}
+            </DataSection>
+          </div>
+        )}
+
         {/* Raw View Toggle */}
         <div className="pt-4 border-t border-border mt-4">
           <button
@@ -352,14 +418,38 @@ export default function OsintTab() {
       { type: 'corporate', label: t('panels.corporate.title'), icon: <Database className="w-4 h-4" />, placeholder: t('panels.corporate.placeholder'), hint: t('panels.corporate.desc') },
       { type: 'location', label: t('panels.location.title'), icon: <Globe className="w-4 h-4" />, placeholder: t('panels.location.placeholder'), hint: t('panels.location.desc') },
       { type: 'wikipedia', label: t('panels.wikipedia.title'), icon: <Info className="w-4 h-4" />, placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
+      { type: 'gleif', label: t('panels.gleif.title'), icon: <Database className="w-4 h-4" />, placeholder: t('panels.gleif.placeholder'), hint: t('panels.gleif.desc') },
+      { type: 'watchlist', label: t('panels.watchlist.title'), icon: <Shield className="w-4 h-4" />, placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
     ];
 
   // ── Hydration guard ──
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   // ── Active lookup state ──
-  const [activeType, setActiveType] = useState<LookupType>('email');
+  // Use a state synchronized with URL for persistence
+  const [activeType, setActiveType] = useState<LookupType>(
+    (searchParams.get('osint_tab') as LookupType) || 'watchlist'
+  );
+
+  // Sync state with URL
+  useEffect(() => {
+    const tab = searchParams.get('osint_tab') as LookupType;
+    if (tab && ['email', 'domain', 'ip', 'username', 'phone', 'news', 'corporate', 'location', 'wikipedia', 'gleif', 'watchlist'].includes(tab)) {
+      setActiveType(tab);
+    }
+  }, [searchParams]);
+
+  const handleTypeChange = (type: LookupType) => {
+    setActiveType(type);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('osint_tab', type);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
@@ -390,6 +480,8 @@ export default function OsintTab() {
   const lookupCorporate = useAction(api.osint.lookupCorporate);
   const lookupLocation = useAction(api.osint.lookupLocation);
   const lookupWikipedia = useAction(api.osint.lookupWikipedia);
+  const lookupGleif = useAction(api.osint.lookupGleif);
+  const lookupWatchlist = useAction(api.osint.lookupWatchlist);
   // ── DB operations (default runtime — osintDb.ts) ──
   const deleteResult = useMutation(api.osintDb.deleteOsintResult);
   const history = useQuery(
@@ -447,6 +539,8 @@ export default function OsintTab() {
         case 'corporate': res = await lookupCorporate({ companyName: query }); break;
         case 'location': res = await lookupLocation({ locationName: query }); break;
         case 'wikipedia': res = await lookupWikipedia({ query: query }); break;
+        case 'gleif': res = await lookupGleif({ companyName: query }); break;
+        case 'watchlist': res = await lookupWatchlist({ query: query }); break;
       }
 
       if (res?.success) {
@@ -477,6 +571,8 @@ export default function OsintTab() {
       case 'corporate': cat = ['business', 'public records']; break;
       case 'location': cat = ['geolocation', 'maps']; break;
       case 'wikipedia': cat = ['search', 'misc']; break;
+      case 'gleif': cat = ['business', 'public records']; break;
+      case 'watchlist': cat = ['security', 'public records']; break;
     }
     return (resources as Resource[]).filter(r => r.categories.some(c => cat.includes(c))).slice(0, 6);
   }, [activeType]);
@@ -505,7 +601,7 @@ export default function OsintTab() {
             {LOOKUP_TYPES.map(lt => (
               <button
                 key={lt.type}
-                onClick={() => { setActiveType(lt.type); setQuery(''); setResult(null); setError(''); }}
+                onClick={() => { handleTypeChange(lt.type); setQuery(''); setResult(null); setError(''); }}
                 className={clsx(
                   'flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all',
                   activeType === lt.type
@@ -653,6 +749,8 @@ export default function OsintTab() {
                         item.type === 'corporate' && 'bg-indigo-500/10 border-indigo-500/20 text-indigo-600',
                         item.type === 'location' && 'bg-teal-500/10 border-teal-500/20 text-teal-600',
                         item.type === 'wikipedia' && 'bg-zinc-500/10 border-zinc-500/20 text-zinc-600',
+                        item.type === 'gleif' && 'bg-blue-600/10 border-blue-600/20 text-blue-700',
+                        item.type === 'watchlist' && 'bg-red-500/10 border-red-500/20 text-red-600',
                       )}>
                         {LOOKUP_TYPES.find(l => l.type === item.type)?.icon || <Shield className="w-4 h-4" />}
                       </div>

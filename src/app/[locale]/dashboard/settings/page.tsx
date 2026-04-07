@@ -10,7 +10,8 @@ import { useAuth } from '@clerk/nextjs';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 import { Link } from '@/i18n/routing';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 interface Payment {
     _id: string;
@@ -47,7 +48,29 @@ export default function SettingsPage() {
     const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
     const [targetCountries, setTargetCountries] = useState('AE,SA');
     const [aveMultiplier, setAveMultiplier] = useState(0.005);
-    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>('general');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>(
+        (searchParams.get('tab') as any) || 'general'
+    );
+
+    // Sync state with URL search parameters
+    useEffect(() => {
+        const tab = searchParams.get('tab') as any;
+        if (tab && ['general', 'ai', 'social', 'integrations'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    const handleTabChange = (newTab: 'general' | 'ai' | 'social' | 'integrations') => {
+        setActiveTab(newTab);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', newTab);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     useEffect(() => {
@@ -196,7 +219,7 @@ export default function SettingsPage() {
                         <Button
                             key={tab.id}
                             variant={activeTab === tab.id ? "primary" : "ghost"}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => handleTabChange(tab.id as any)}
                             className={clsx(
                                 "flex items-center justify-start gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap shadow-none",
                                 activeTab === tab.id

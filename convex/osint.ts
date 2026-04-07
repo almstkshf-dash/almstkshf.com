@@ -806,6 +806,127 @@ export const lookupWikipedia = action({
     }
 });
 
+// ─── GLEIF Intelligence ──────────────────────────────────────────────
+export const lookupGleif = action({
+    args: { companyName: v.string() },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.companyName.trim();
+            if (!query) return { success: false, error: "Company name is required." };
+            const results: Record<string, any> = { query };
+
+            try {
+                const res = await fetch(`https://api.gleif.org/api/v1/lei-records?filter[entity.legalName]=${encodeURIComponent(query)}&page[size]=5`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const records = data?.data || [];
+                    results.records = records.map((r: any) => ({
+                        lei: r.attributes?.lei,
+                        legalName: r.attributes?.entity?.legalName?.name,
+                        status: r.attributes?.registration?.registrationStatus,
+                        jurisdiction: r.attributes?.entity?.jurisdiction,
+                        legalAddress: r.attributes?.entity?.legalAddress,
+                        entityType: r.attributes?.entity?.entityCategory,
+                    }));
+                } else {
+                    results.error = `GLEIF API error: ${res.status}`;
+                }
+            } catch (e: any) {
+                results.error = `GLEIF unavailable: ${e.message}`;
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "gleif" as any,
+                query: query,
+                result: results,
+            });
+
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `GLEIF lookup for ${query} finished.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupGleif failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    }
+});
+
+// ─── Watchlist Intelligence (UN/OFAC) ─────────────────────────────────
+export const lookupWatchlist = action({
+    args: { query: v.string() },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.query.trim();
+            if (!query) return { success: false, error: "Search query is required." };
+            const results: Record<string, any> = { query };
+
+            const osKey = await resolveApiKey(ctx, "OPENSANCTIONS_API_KEY", "opensanctions");
+
+            try {
+                // OpenSanctions "Search" endpoint resolves against UN, OFAC, and more.
+                const url = `https://api.opensanctions.org/search/default?q=${encodeURIComponent(query)}&limit=10`;
+                const headers: Record<string, string> = { "Accept": "application/json" };
+                if (osKey) headers["Authorization"] = `ApiKey ${osKey}`;
+
+                const res = await fetch(url, { headers });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const results_list = data?.results || [];
+                    results.matches = results_list.map((m: any) => ({
+                        id: m.id,
+                        caption: m.caption,
+                        schema: m.schema,
+                        countries: m.properties?.countries,
+                        datasets: m.datasets,
+                        firstSeen: m.first_seen,
+                        lastSeen: m.last_seen,
+                        topics: m.properties?.topics,
+                        matchScore: m.score,
+                    }));
+                    results.totalMatches = results.matches.length;
+                    results.isClean = results.totalMatches === 0;
+                } else {
+                    results.error = `Watchlist API error: ${res.status}`;
+                }
+            } catch (e: any) {
+                results.error = `Watchlist unavailable: ${e.message}`;
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "watchlist" as any,
+                query: query,
+                result: results,
+            });
+
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Watchlist screening for ${query} is complete.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupWatchlist failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    }
+});
+
 // ─── Internal helper: email → MD5 (for Gravatar) ─────────────────────
 async function emailToMd5(email: string): Promise<string> {
     // This file already uses "use node" so this is safe.

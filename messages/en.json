@@ -1413,6 +1413,16 @@
         "title": "Wikipedia Intel",
         "desc": "Retrieve general knowledge and summaries from Wikipedia.",
         "placeholder": "Enter search keyword..."
+      },
+      "gleif": {
+        "title": "LEI Entity Lookup",
+        "desc": "Global Legal Entity Identifier Search for corporate verification.",
+        "placeholder": "Enter company name or LEI..."
+      },
+      "watchlist": {
+        "title": "Watchlist Screening",
+        "desc": "Screen entities against UN, OFAC, and global sanctions lists.",
+        "placeholder": "Enter name or entity keyword..."
       }
     },
     "result_view": {
@@ -1428,7 +1438,14 @@
         "status": "Status",
         "valid": "Valid",
         "line_type": "Line Type",
-        "carrier": "Carrier"
+        "carrier": "Carrier",
+        "lei": "LEI",
+        "jurisdiction": "Jurisdiction",
+        "schema": "Schema",
+        "datasets": "Datasets",
+        "topics": "Topics",
+        "score": "Score",
+        "provider": "Provider"
       },
       "sections": {
         "identity_details": "Identity Details",
@@ -1436,7 +1453,9 @@
         "infrastructure": "Network Infrastructure",
         "whois": "WHOIS Information",
         "technical_records": "Technical Records",
-        "carrier_details": "Carrier Details"
+        "carrier_details": "Carrier Details",
+        "lei_registration": "LEI Registration Records",
+        "sanctions_matches": "Sanctions & PEP Matches"
       },
       "fields": {
         "username": "Username",
@@ -1460,7 +1479,10 @@
         "local_format": "Local Format",
         "international_format": "Intl Format",
         "country_prefix": "Country Prefix",
-        "location": "Location"
+        "location": "Location",
+        "no_matches": "No matching watchlist records found for this query.",
+        "match_percent": "{count}% Match",
+        "match_count": "Direct Matches"
       },
       "toggle_raw": "Toggle Developer Raw Data"
     },

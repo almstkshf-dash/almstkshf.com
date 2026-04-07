@@ -3,8 +3,9 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
@@ -50,8 +51,30 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
 
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const [mounted, setMounted] = useState(false);
-    const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
+    
+    // Initialize filter from URL search parameters, falling back to normalized defaultFilter
+    const [filter, setFilter] = useState<ArticleFilter>(
+        (searchParams.get('mfilter') as ArticleFilter) || normalizeFilter(defaultFilter)
+    );
+
+    // Sync state with URL search parameters to handle back/forward navigation
+    useEffect(() => {
+        const f = searchParams.get('mfilter') as ArticleFilter;
+        if (f && ["All", "Online News", "Social Media", "Press Release", "Blog", "Print"].includes(f)) {
+            setFilter(f);
+        }
+    }, [searchParams]);
+
+    const handleFilterChange = (newFilter: ArticleFilter) => {
+        setFilter(newFilter);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('mfilter', newFilter);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     React.useEffect(() => {
         setMounted(true);
@@ -109,7 +132,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                             if (filter === f.value && f.value !== "All") {
                                 router.push(f.href);
                             } else {
-                                setFilter(f.value);
+                                handleFilterChange(f.value);
                             }
                         }}
                         className={clsx(

@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useTransition } from 'react';
+import { useState, useEffect, useMemo, useTransition, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2, Activity, BarChart3 } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
@@ -40,12 +42,49 @@ export default function DashboardPage() {
     const isAr = locale === 'ar';
     const [isPending, startTransition] = useTransition();
     const [isManualModalOpen, setManualModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
     const [selectedType, setSelectedType] = useState('All');
     const [selectedCountry, setSelectedCountry] = useState('All');
-    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint'>('standard');
+    
+    // Initialize activeView from URL search parameters, defaulting to 'standard'
+    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint'>(
+        (searchParams.get('view') as any) || 'standard'
+    );
+
+    // Sync state with URL search parameters
+    useEffect(() => {
+        const view = searchParams.get('view') as any;
+        if (view && ['standard', 'deep', 'osint'].includes(view)) {
+            setActiveView(view);
+        }
+    }, [searchParams]);
+
+    const changeView = (newView: 'standard' | 'deep' | 'osint') => {
+        setActiveView(newView);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('view', newView);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [skip, setSkip] = useState(0);
     const [loadedArticles, setLoadedArticles] = useState<ArticleItem[]>([]);
+
+    // Sync search query with URL
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            const params = new URLSearchParams(searchParams.toString());
+            if (searchQuery) {
+                params.set('q', searchQuery);
+            } else {
+                params.delete('q');
+            }
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [searchQuery, pathname, router, searchParams]);
     const [isExporting, setIsExporting] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
     const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
@@ -278,7 +317,7 @@ export default function DashboardPage() {
                                     key={view.id}
                                     onClick={() => {
                                         if (view.restricted) return;
-                                        startTransition(() => setActiveView(view.id as any));
+                                        startTransition(() => changeView(view.id as any));
                                     }}
                                     disabled={view.restricted || isPending}
                                     className={clsx(

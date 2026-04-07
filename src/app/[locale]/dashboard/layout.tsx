@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export const metadata: Metadata = {
     robots: {
@@ -18,5 +20,13 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    return <>{children}</>;
+    return (
+        <Suspense fallback={
+            <div className="flex h-screen items-center justify-center bg-background">
+                <Loader2 className="w-10 h-10 text-primary animate-spin" />
+            </div>
+        }>
+            {children}
+        </Suspense>
+    );
 }

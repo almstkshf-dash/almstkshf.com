@@ -692,6 +692,40 @@ export const fetchNews = action({
                 })());
             }
 
+            // 10. GLEIF (Corporate Intelligence / Entity Lookups)
+            fetchPromises.push((async () => {
+                try {
+                    // GLEIF is public, no key needed.
+                    const gleifUrl = `https://api.gleif.org/api/v1/lei-records?filter[entity.legalName]=${encodeURIComponent(cleanQuery)}&page[size]=5`;
+                    const gleifRes = await fetch(gleifUrl);
+                    if (gleifRes.ok) {
+                        const gleifData = await gleifRes.json();
+                        const records = gleifData?.data || [];
+                        if (records.length > 0) {
+                            // Instead of processing as an article, we'll store this as an OSINT result specifically for this keyword.
+                            await ctx.runMutation(api.osintDb.saveOsintResult, {
+                                type: "gleif" as any,
+                                query: cleanQuery,
+                                result: {
+                                    source: "monitoring_pipeline",
+                                    records: records.map((r: any) => ({
+                                        lei: r.attributes?.lei,
+                                        legalName: r.attributes?.entity?.legalName?.name,
+                                        status: r.attributes?.registration?.registrationStatus,
+                                        jurisdiction: r.attributes?.entity?.jurisdiction,
+                                    }))
+                                }
+                            });
+                            return { name: 'GLEIF', success: 1 };
+                        }
+                    }
+                    return { name: 'GLEIF', success: 0 };
+                } catch (e) {
+                    console.error(`❌ GLEIF fail`, e);
+                    return { name: 'GLEIF', error: true };
+                }
+            })());
+
             const results = await Promise.all(fetchPromises);
             results.forEach(r => {
                 if ('success' in r) totalSuccess += r.success || 0;
