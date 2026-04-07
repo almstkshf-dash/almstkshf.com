@@ -55,7 +55,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const router = useRouter();
     const pathname = usePathname();
     const [mounted, setMounted] = useState(false);
-    
+
     // Initialize filter from URL search parameters, falling back to normalized defaultFilter
     const [filter, setFilter] = useState<ArticleFilter>(
         (searchParams.get('mfilter') as ArticleFilter) || normalizeFilter(defaultFilter)
@@ -83,8 +83,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const reports = useQuery(api.queries.getMediaReports, { source: filter });
     const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
 
-    const router = useRouter();
-    const locale = useLocale();
+
 
     const filters = useMemo<FilterOption[]>(() => [
         { label: "All", value: "All", icon: Filter, href: "/media-monitoring/central-media-repository" },
@@ -160,7 +159,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
                         <p className="text-muted-foreground font-medium">{tMedia('no_reports')}</p>
                         <Link
-                            href="/media-monitoring/central-media-repository"                            className="text-primary text-sm hover:underline mt-2 inline-block transition-colors"
+                            href="/media-monitoring/central-media-repository" className="text-primary text-sm hover:underline mt-2 inline-block transition-colors"
                         >
                             {tMedia('visit_repository')}
                         </Link>

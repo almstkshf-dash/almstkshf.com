@@ -837,7 +837,7 @@ export const lookupGleif = action({
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
-                type: "gleif" as any,
+                type: "gleif",
                 query: query,
                 result: results,
             });
@@ -904,7 +904,7 @@ export const lookupWatchlist = action({
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
-                type: "watchlist" as any,
+                type: "watchlist",
                 query: query,
                 result: results,
             });

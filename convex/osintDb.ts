@@ -15,7 +15,9 @@ export const saveOsintResult = mutation({
             v.literal("news"),
             v.literal("corporate"),
             v.literal("location"),
-            v.literal("wikipedia")
+            v.literal("wikipedia"),
+            v.literal("gleif"),
+            v.literal("watchlist")
         ),
         query: v.string(),
         result: v.any(),
