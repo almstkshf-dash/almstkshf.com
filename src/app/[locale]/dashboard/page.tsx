@@ -18,11 +18,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import DeepStatusPanel from '@/components/media-pulse/DeepStatusPanel';
 import OsintTab from '@/components/media-pulse/OsintTab';
+import TerroristListTab from '@/components/media-pulse/TerroristListTab';
 import PressReleasePanel from '@/components/media-pulse/PressReleasePanel';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import RssFeeder from '@/components/dashboard/RssFeeder';
 import { AAWSAT_SOURCES } from '@/config/rss-sources';
+import { Shield } from 'lucide-react';
 
 type ArticleItem = {
     _id: string;
@@ -50,19 +52,19 @@ export default function DashboardPage() {
     const [selectedCountry, setSelectedCountry] = useState('All');
     
     // Initialize activeView from URL search parameters, defaulting to 'standard'
-    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint'>(
+    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list'>(
         (searchParams.get('view') as any) || 'standard'
     );
 
     // Sync state with URL search parameters
     useEffect(() => {
         const view = searchParams.get('view') as any;
-        if (view && ['standard', 'deep', 'osint'].includes(view)) {
+        if (view && ['standard', 'deep', 'osint', 'terrorist_list'].includes(view)) {
             setActiveView(view);
         }
     }, [searchParams]);
 
-    const changeView = (newView: 'standard' | 'deep' | 'osint') => {
+    const changeView = (newView: 'standard' | 'deep' | 'osint' | 'terrorist_list') => {
         setActiveView(newView);
         const params = new URLSearchParams(searchParams.toString());
         params.set('view', newView);
@@ -311,7 +313,8 @@ export default function DashboardPage() {
                             {[
                                 { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
                                 { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
-                                { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin }
+                                { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
+                                { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
                             ].map((view) => (
                                 <button
                                     key={view.id}
@@ -526,6 +529,8 @@ export default function DashboardPage() {
                 )}
 
                 {activeView === 'osint' && <OsintTab />}
+
+                {activeView === 'terrorist_list' && <TerroristListTab />}
             </div>
 
             {/* Global Overlays */}

@@ -225,4 +225,25 @@ export default defineSchema({
         isRead: v.boolean(),
         createdAt: v.number(),
     }).index("by_userId", ["userId"]),
+
+    local_terrorist_list: defineTable({
+        type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),
+        category: v.string(), // e.g., "شخص إرهابي", "تنظيم إرهابي"
+        nameArabic: v.string(),
+        nameLatin: v.string(),
+        nationality: v.optional(v.string()),
+        dob: v.optional(v.string()),
+        pob: v.optional(v.string()),
+        address: v.optional(v.string()),
+        documentNumber: v.optional(v.string()),
+        issuingAuthority: v.optional(v.string()),
+        issueDate: v.optional(v.string()),
+        expiryDate: v.optional(v.string()),
+        otherInfo: v.optional(v.string()),
+        reasons: v.optional(v.string()),
+        searchField: v.string(), // Concatenated string for built-in search
+    }).searchIndex("by_searchField", {
+        searchField: "searchField",
+        filterFields: ["type"],
+    }),
 });

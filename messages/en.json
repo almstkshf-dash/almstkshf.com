@@ -162,6 +162,7 @@
     "copied": "Copied",
     "copy": "Copy",
     "search_placeholder": "Search...",
+    "clear_search": "Clear Search",
     "no_results": "No results found"
   },
   "Footer": {
@@ -1182,6 +1183,7 @@
       "view_standard": "Standard View",
       "view_deep": "Deep View",
       "view_osint": "OSINT View",
+      "view_terrorist_list": "Sanctions List",
       "export_pdf": "Export PDF",
       "export_excel": "Export Excel"
     },
@@ -1625,5 +1627,43 @@
     "error_fetching": "Connection to the intelligence stream failed.",
     "placeholder_url": "Enter RSS link (e.g., https://...)",
     "analyze": "Analyze Stream"
+  },
+  "TerroristList": {
+    "title": "Local Terrorist List",
+    "subtitle": "Securely search and manage the official list of designated individuals and entities.",
+    "search_placeholder": "Search by name, passport, or ID...",
+    "import_data": "Import List Data",
+    "view_details": "View Full Dossier",
+    "no_results_title": "No Matches Found",
+    "no_results_desc": "The query returned no results in our local sanctions database. Please verify name spelling or document numbers.",
+    "types": {
+      "all": "All Categories",
+      "individual": "Individuals",
+      "entity": "Entities",
+      "organization": "Organizations"
+    },
+    "fields": {
+      "nationality": "Nationality",
+      "doc_number": "Document #",
+      "reasons": "Legal Grounds & Reasons",
+      "category": "Category",
+      "name_arabic": "Name (Arabic)",
+      "name_latin": "Name (Latin)",
+      "dob": "Date of Birth",
+      "pob": "Place of Birth",
+      "address": "Address",
+      "issuing_authority": "Issuing Authority",
+      "issue_date": "Issue Date",
+      "expiry_date": "Expiry Date",
+      "other_info": "Additional Information",
+      "metadata": "Technical Metadata"
+    },
+    "import_modal": {
+      "title": "Data Ingestion Utility",
+      "desc": "Upload multi-tab Excel or CSV files to wipe and reload the local database. Only admins can perform this action.",
+      "uploading": "Processing Data...",
+      "drop_file": "Click or Drag File to Upload",
+      "warning": "CRITICAL: This action will permanently PERGE the current terrorist list and replace it with the new file contents. This cannot be undone."
+    }
   }
 }
