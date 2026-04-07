@@ -23,7 +23,7 @@ export const search = query({
     }
 
     // Use built-in Search Index
-    let searchQ = ctx.db
+    const searchQ = ctx.db
       .query("local_terrorist_list")
       .withSearchIndex("by_searchField", (q) => {
         const base = q.search("searchField", args.searchTerm);

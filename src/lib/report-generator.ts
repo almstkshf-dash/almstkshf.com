@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
 
@@ -40,9 +41,9 @@ export interface OsintResult {
 // CONSTANTS & THEME
 // ════════════════════════════════════════════════════════════════════════
 
-const BRAND_DARK = [31, 78, 120] as const;
-const BRAND_AMBER = [218, 165, 32] as const;
-const ACCENT_BG = [245, 247, 250] as const;
+const BRAND_DARK = [15, 23, 42] as const;
+const BRAND_AMBER = [245, 158, 11] as const;
+const ACCENT_BG = [241, 245, 249] as const;
 
 // ════════════════════════════════════════════════════════════════════════
 // UTILITY: REPORT GENERATOR
@@ -91,12 +92,24 @@ export class ReportGenerator {
         return this.generateOsintPDF(data, translations, `${title}: ${data.query}`);
     }
 
+    /**
+     * AI Forensic Inspector Report
+     */
+    static async exportAiInspectorReport(mode: 'text' | 'image' | 'video', data: any, translations: any, format: 'pdf' | 'excel' = 'pdf') {
+        const title = translations.AiInspector?.results_summary || 'AI Forensic Analysis Report';
+        if (format === 'excel') {
+            alert(translations.AiInspector?.export_not_supported_excel || "Excel export is coming soon for AI Forensics.");
+            return;
+        }
+        return this.generateAiInspectorPDF(mode, data, translations, title);
+    }
+
     // ════════════════════════════════════════════════════════════════════════
     // FEATURE-SPECIFIC PDF GENERATORS
     // ════════════════════════════════════════════════════════════════════════
 
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Cover Page
         this.addCoverPage(doc, title, articles.length, translations, logoBase64);
@@ -149,7 +162,7 @@ export class ReportGenerator {
     }
 
     private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: any, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         this.addCoverPage(doc, title, threats.length, translations, logoBase64);
 
@@ -210,7 +223,7 @@ export class ReportGenerator {
     }
 
     private static async generateOsintHistoryPDF(items: OsintResult[], translations: any, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         this.addCoverPage(doc, title, items.length, translations, logoBase64);
 
@@ -245,7 +258,7 @@ export class ReportGenerator {
     }
 
     private static async generateOsintPDF(data: OsintResult, translations: any, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations);
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Custom Dossier Cover
         this.addCoverPage(doc, title, 1, translations, logoBase64);
@@ -272,7 +285,7 @@ export class ReportGenerator {
         if (result && typeof result === 'object') {
             // General Info Table
             const details = Object.entries(result)
-                .filter(([_, v]) => typeof v !== 'object')
+                .filter(([, v]) => typeof v !== 'object')
                 .slice(0, 25);
 
             if (details.length > 0) {
@@ -311,11 +324,123 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations);
     }
 
+    private static async generateAiInspectorPDF(mode: string, data: any, translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+
+        const modeTrans = translations.AiInspector?.[`mode_${mode}`] || mode.toUpperCase();
+        this.addCoverPage(doc, `${title} - ${modeTrans}`, typeof data === 'object' ? Object.keys(data).length : 1, translations, logoBase64);
+
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.AiInspector?.results_summary || 'Analysis Results', 14, y, fontLoaded);
+        y += 10;
+
+        doc.setFontSize(10);
+        doc.setTextColor(...BRAND_DARK);
+
+        let riskLevel = 'Low';
+        let confidence = 0;
+
+        if (mode === 'text' && data) {
+            riskLevel = data.overallRisk;
+            confidence = data.confidenceScore;
+        } else if (mode === 'image' && data) {
+            riskLevel = data.overallRisk;
+            confidence = data.confidenceScore;
+        } else if (mode === 'video' && data) {
+            riskLevel = data.overallRisk;
+            confidence = data.confidenceScore;
+        }
+
+        const colorMap: any = { low: [16, 185, 129], medium: [245, 158, 11], high: [239, 68, 68] };
+        const rColor = colorMap[riskLevel?.toLowerCase()] || BRAND_DARK;
+
+        const localizedRiskLevel = translations.AiInspector?.[`risk_${riskLevel?.toLowerCase()}`] || riskLevel?.toUpperCase() || 'UNKNOWN';
+
+        this.drawMetricBoxes(doc, [
+            { label: translations.AiInspector?.label_mode || 'MODE', value: modeTrans, color: BRAND_DARK },
+            { label: translations.AiInspector?.label_risk || 'RISK LEVEL', value: localizedRiskLevel, color: rColor },
+            { label: translations.AiInspector?.label_confidence || 'CONFIDENCE', value: `${confidence.toFixed(1)}%`, color: BRAND_AMBER }
+        ], y, pageWidth);
+
+        y += 40;
+
+        if (mode === 'text' && data) {
+            this.drawHeading(doc, translations.AiInspector?.linguistic_signals || 'Linguistic Signals', 14, y, fontLoaded);
+            const tableData = data.sentenceBreakdown?.map((s: any) => [
+                this.fixArabic(s.text.slice(0, 80) + (s.text.length > 80 ? '...' : '')),
+                this.fixArabic(s.flags.join(', ') || translations.AiInspector?.none || 'None'),
+                (s.aiProbability * 100).toFixed(1) + '%'
+            ]) || [];
+
+            await this.addAutoTable(doc, {
+                head: [[
+                    translations.AiInspector?.col_sentence || 'Sentence Segment',
+                    translations.AiInspector?.col_flags || 'Detected Flags',
+                    translations.AiInspector?.col_ai_prob || 'AI Probability'
+                ]],
+                body: tableData,
+                startY: y + 8,
+                fontLoaded,
+                logoBase64,
+                translations
+            });
+        } else if (mode === 'image' && data) {
+            this.drawHeading(doc, translations.AiInspector?.visual_signals || 'Visual Signals', 14, y, fontLoaded);
+            const tableData = data.pixelLogicSignals?.map((s: any) => [
+                this.fixArabic(s.label),
+                this.fixArabic(s.description),
+                this.fixArabic(s.detectedValue),
+                this.fixArabic(translations.AiInspector?.[`risk_${s.risk?.toLowerCase()}`] || s.risk?.toUpperCase() || s.risk)
+            ]) || [];
+
+            await this.addAutoTable(doc, {
+                head: [[
+                    translations.AiInspector?.col_signal || 'Signal',
+                    translations.AiInspector?.col_desc || 'Description',
+                    translations.AiInspector?.col_value || 'Value',
+                    translations.AiInspector?.col_risk || 'Risk'
+                ]],
+                body: tableData,
+                startY: y + 8,
+                fontLoaded,
+                logoBase64,
+                translations
+            });
+        } else if (mode === 'video' && data) {
+            this.drawHeading(doc, translations.AiInspector?.frame_analysis || 'Video Frame Analysis', 14, y, fontLoaded);
+            const tableData = data.frameAnomalies?.map((f: any) => [
+                f.timestamp,
+                this.fixArabic(f.type),
+                (f.severity * 100).toFixed(1) + '%',
+                this.fixArabic(f.description)
+            ]) || [];
+
+            await this.addAutoTable(doc, {
+                head: [[
+                    translations.AiInspector?.col_time || 'Timestamp',
+                    translations.AiInspector?.col_anomaly || 'Anomaly Type',
+                    translations.AiInspector?.col_severity || 'Severity',
+                    translations.AiInspector?.col_desc || 'Description'
+                ]],
+                body: tableData,
+                startY: y + 8,
+                fontLoaded,
+                logoBase64,
+                translations
+            });
+        }
+
+        this.finalizePDF(doc, title, translations);
+    }
+
     // ════════════════════════════════════════════════════════════════════════
     // PRIVATE HELPERS: PDF CORE
     // ════════════════════════════════════════════════════════════════════════
 
-    private static async initPDF(translations: any) {
+    private static async initPDF() {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_line_height"] });
         const pageWidth = doc.internal.pageSize.width;

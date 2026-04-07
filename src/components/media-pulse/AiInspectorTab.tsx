@@ -39,17 +39,46 @@ export default function AiInspectorTab() {
   const handleExport = async (format: 'pdf' | 'excel') => {
     setIsExporting(format);
     try {
-      // In a real scenario, ReportGenerator.exportAiInspectorReport would process the specific results.
-      // For this step, we invoke the export method with the available active result.
       const activeData = mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults;
       if (!activeData) return;
 
-      // Fallback to browser print if specifically requesting visual layout
-      if (format === 'pdf') {
-        window.print();
-      } else {
-        alert(t("export_not_supported_excel") || "Excel export is coming soon for AI Forensics.");
-      }
+      await ReportGenerator.exportAiInspectorReport(mode, activeData, {
+        AiInspector: {
+          results_summary: t("results_summary"),
+          export_not_supported_excel: t("export_not_supported_excel"),
+          
+          label_mode: t("export.label_mode") || "MODE",
+          label_risk: t("export.label_risk") || "RISK LEVEL",
+          label_confidence: t("export.label_confidence") || "CONFIDENCE",
+          
+          mode_text: t("modes.text"),
+          mode_image: t("modes.image"),
+          mode_video: t("modes.video"),
+          
+          risk_low: t("export.risk_low") || "Low",
+          risk_medium: t("export.risk_medium") || "Medium",
+          risk_high: t("export.risk_high") || "High",
+          
+          none: t("export.none") || "None",
+          
+          linguistic_signals: t("export.linguistic_signals") || "Linguistic Signals",
+          col_sentence: t("export.col_sentence") || "Sentence Segment",
+          col_flags: t("export.col_flags") || "Detected Flags",
+          col_ai_prob: t("export.col_ai_prob") || "AI Probability",
+          
+          visual_signals: t("export.visual_signals") || "Visual Signals",
+          col_signal: t("export.col_signal") || "Signal",
+          col_desc: t("export.col_desc") || "Description",
+          col_value: t("export.col_value") || "Value",
+          col_risk: t("export.col_risk") || "Risk",
+          
+          frame_analysis: t("export.frame_analysis") || "Video Frame Analysis",
+          col_time: t("export.col_time") || "Timestamp",
+          col_anomaly: t("export.col_anomaly") || "Anomaly Type",
+          col_severity: t("export.col_severity") || "Severity"
+        },
+        brand_name: "ALMSTKSHF"
+      }, format);
     } catch (err) {
       console.error(err);
     } finally {
