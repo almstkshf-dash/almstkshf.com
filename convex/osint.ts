@@ -557,9 +557,257 @@ export const lookupPhone = action({
 // ─── Persistence: moved to convex/osintDb.ts (mutations/queries can't live in Node.js runtime)
 // Import path for frontend: api.osintDb.*
 
+// ─── News Intelligence (Replaces GDELT) ──────────────────────────────────
+export const lookupNews = action({
+    args: {
+        query: v.string(),
+    },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.query.trim();
+            if (!query) return { success: false, error: "Query is required." };
+
+            const results: Record<string, any> = { query };
+
+            // Fetch via Google News RSS (Free and highly reliable)
+            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+            try {
+                const res = await fetch(rssUrl);
+                if (res.ok) {
+                    const text = await res.text();
+
+                    // Simple Regex-based RSS parser to avoid adding heavy dependencies
+                    const items: any[] = [];
+                    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+                    let match;
+                    while ((match = itemRegex.exec(text)) !== null) {
+                        if (items.length >= 15) break; // Limit to Top 15
+                        const itemBlock = match[1];
+
+                        const titleMatch = itemBlock.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/);
+                        const linkMatch = itemBlock.match(/<link>(.*?)<\/link>/);
+                        const pubDateMatch = itemBlock.match(/<pubDate>(.*?)<\/pubDate>/);
+                        const sourceMatch = itemBlock.match(/<source url=".*?">([^<]+)<\/source>/);
+
+                        const title = titleMatch ? (titleMatch[1] || titleMatch[2]) : "Unknown Title";
+                        const link = linkMatch ? linkMatch[1] : "";
+                        const date = pubDateMatch ? pubDateMatch[1] : "";
+                        const source = sourceMatch ? sourceMatch[1] : "Unknown Source";
+
+                        items.push({ title, link, date, source });
+                    }
+
+                    results.totalArticles = items.length;
+                    results.articles = items;
+                    results.provider = "Google News Feed";
+                } else {
+                    return { success: false, error: `News fetch failed: ${res.status}` };
+                }
+            } catch (e: any) {
+                console.warn("News fetch failed:", e);
+                return { success: false, error: "Failed to connect to the news provider." };
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "news",
+                query: query,
+                result: results,
+            });
+
+            // Trigger notification
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `News Analysis for "${query}" is ready.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupNews failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    },
+});
+
+// ─── Corporate Intelligence ───────────────────────────────────────────
+export const lookupCorporate = action({
+    args: { companyName: v.string() },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.companyName.trim();
+            if (!query) return { success: false, error: "Company name is required." };
+            const results: Record<string, any> = { query };
+
+            try {
+                const res = await fetch(`https://api.opencorporates.com/v0.4/companies/search?q=${encodeURIComponent(query)}&per_page=5`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const companies = data?.results?.companies || [];
+                    results.companies = companies.map((c: any) => ({
+                        name: c.company?.name,
+                        number: c.company?.company_number,
+                        jurisdiction: c.company?.jurisdiction_code,
+                        status: c.company?.current_status,
+                        incorporationDate: c.company?.incorporation_date,
+                        url: c.company?.opencorporates_url,
+                    }));
+                } else {
+                    results.error = `OpenCorporates API error: ${res.status}`;
+                }
+            } catch (e: any) {
+                results.error = `OpenCorporates unavailable: ${e.message}`;
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "corporate" as any,
+                query: query,
+                result: results,
+            });
+
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Corporate lookup for ${query} finished.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupCorporate failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    }
+});
+
+// ─── Location Intelligence ────────────────────────────────────────────
+export const lookupLocation = action({
+    args: { locationName: v.string() },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.locationName.trim();
+            if (!query) return { success: false, error: "Location is required." };
+            const results: Record<string, any> = { query, locations: [] };
+
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`;
+                const res = await fetch(url, { headers: { "User-Agent": "ALMSTKSHF-OSINT/1.0" } });
+                if (res.ok) {
+                    const data = await res.json();
+                    results.locations = data.map((item: any) => ({
+                        displayName: item.display_name,
+                        type: item.type,
+                        lat: item.lat,
+                        lon: item.lon,
+                        city: item.address?.city || item.address?.town || "",
+                        country: item.address?.country || "",
+                        osmUrl: `https://www.openstreetmap.org/${item.osm_type}/${item.osm_id}`
+                    }));
+                } else {
+                    results.error = `Nominatim API error: ${res.status}`;
+                }
+            } catch (e: any) {
+                results.error = `Nominatim unavailable: ${e.message}`;
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "location" as any,
+                query: query,
+                result: results,
+            });
+
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Location lookup for ${query} finished.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupLocation failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    }
+});
+
+// ─── Wikipedia Intelligence ───────────────────────────────────────────
+export const lookupWikipedia = action({
+    args: { query: v.string() },
+    handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
+        try {
+            await requireAdmin(ctx.auth);
+            const query = args.query.trim();
+            if (!query) return { success: false, error: "Query is required." };
+            const results: Record<string, any> = { query };
+            const API_URL = "https://en.wikipedia.org/w/api.php";
+
+            try {
+                const res = await fetch(`${API_URL}?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&srlimit=1`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const searchResults = data?.query?.search || [];
+                    if (searchResults.length > 0) {
+                        const topTitle = searchResults[0].title;
+                        const pageRes = await fetch(`${API_URL}?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(topTitle)}&format=json`);
+                        if (pageRes.ok) {
+                            const pageData = await pageRes.json();
+                            const pages = pageData?.query?.pages || {};
+                            const pageKeys = Object.keys(pages);
+                            if (pageKeys.length > 0) {
+                                const page = pages[pageKeys[0]];
+                                const extract = page.extract || "";
+                                results.wiki = {
+                                    title: page.title,
+                                    summary: extract.length > 500 ? extract.substring(0, 500) + "..." : extract,
+                                    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.title)}`
+                                };
+                            }
+                        }
+                    }
+                }
+            } catch (e: any) {
+                results.error = `Wikipedia unavailable: ${e.message}`;
+            }
+
+            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+                type: "wikipedia" as any,
+                query: query,
+                result: results,
+            });
+
+            const ident = await ctx.auth.getUserIdentity();
+            if (ident) {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: ident.subject,
+                    title: "osint_ready",
+                    message: `Wikipedia lookup for ${query} finished.`,
+                    type: "system"
+                });
+            }
+
+            return { success: true, data: results, recordId };
+        } catch (e: any) {
+            console.error("lookupWikipedia failed:", e);
+            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        }
+    }
+});
+
 // ─── Internal helper: email → MD5 (for Gravatar) ─────────────────────
 async function emailToMd5(email: string): Promise<string> {
-    // crypto.subtle does NOT support MD5. Use Node's native crypto module instead.
     // This file already uses "use node" so this is safe.
     const { createHash } = await import("crypto");
     return createHash("md5").update(email).digest("hex");

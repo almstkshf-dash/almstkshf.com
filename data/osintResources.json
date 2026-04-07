@@ -1,5 +1,17 @@
 [
   {
+    "id": "gdelt-visualizer",
+    "name": "GDELT Word Cloud Visualizer",
+    "url": "https://blog.gdeltproject.org/announcing-gkg-word-cloud-visualizer/",
+    "description": "Rapidly construct word clouds from GDELT Global Knowledge Graph fields.",
+    "categories": ["news", "misc"],
+    "labels": ["M"],
+    "language": "en",
+    "region": null,
+    "freeTier": true,
+    "notes": "Generates publication-ready word clouds and CSV exports."
+  },
+  {
     "id": "osintframework",
     "name": "OSINT Framework",
     "url": "https://osintframework.com/",

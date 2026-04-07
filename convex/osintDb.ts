@@ -10,7 +10,12 @@ export const saveOsintResult = mutation({
             v.literal("domain"),
             v.literal("ip"),
             v.literal("username"),
-            v.literal("phone")
+            v.literal("phone"),
+            v.literal("gdelt"),
+            v.literal("news"),
+            v.literal("corporate"),
+            v.literal("location"),
+            v.literal("wikipedia")
         ),
         query: v.string(),
         result: v.any(),

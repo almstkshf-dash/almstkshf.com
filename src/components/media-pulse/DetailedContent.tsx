@@ -23,7 +23,7 @@ export function DetailedContent() {
                     <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                         {t("intro.title")}
                     </h2>
-                    <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
+                    <p className="text-foreground/70 dark:text-slate-400 text-lg leading-relaxed transition-colors">
                         {t("intro.description")}
                     </p>
                 </div>
@@ -45,7 +45,7 @@ export function DetailedContent() {
                                     <h3 className="text-xl font-bold text-foreground uppercase tracking-wider text-sm transition-colors">
                                         {t(`features.${f.key}.title`)}
                                     </h3>
-                                    <p className="text-muted-foreground text-sm leading-relaxed transition-colors">
+                                    <p className="text-foreground/70 dark:text-slate-400 text-sm leading-relaxed transition-colors">
                                         {t(`features.${f.key}.description`)}
                                     </p>
                                 </div>
@@ -66,7 +66,7 @@ export function DetailedContent() {
             {/* Services Sections */}
             <section className="space-y-24">
                 <div className="space-y-6">
-                    <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
+                    <div className="inline-block px-4 py-1 rounded-full bg-primary/15 border border-primary/20 text-primary dark:text-blue-300 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
                         {t("dashboard_grid.specialized_services")}
                     </div>
                     <h2 className="text-4xl font-bold text-foreground transition-colors">{t("dashboard_grid.advanced_solutions")}</h2>
@@ -78,7 +78,7 @@ export function DetailedContent() {
                         <h3 className="text-2xl font-bold text-foreground border-l-4 border-primary pl-4 transition-all">
                             {t("services.monitoring.title")}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                        <p className="text-foreground/70 dark:text-slate-400 leading-relaxed text-sm transition-colors">
                             {t("services.monitoring.description")}
                         </p>
                     </div>
@@ -86,7 +86,7 @@ export function DetailedContent() {
                         <h3 className="text-2xl font-bold text-foreground border-l-4 border-emerald-500 pl-4 transition-all">
                             {t("services.listening.title")}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                        <p className="text-foreground/70 dark:text-slate-400 leading-relaxed text-sm transition-colors">
                             {t("services.listening.description")}
                         </p>
                     </div>
@@ -96,7 +96,7 @@ export function DetailedContent() {
                 <div className="p-12 rounded-[3rem] bg-card border border-border space-y-12 shadow-lg transition-all">
                     <div className="max-w-3xl space-y-6">
                         <h3 className="text-3xl font-bold text-foreground transition-colors">{t("services.web.title")}</h3>
-                        <p className="text-muted-foreground leading-relaxed transition-colors">
+                        <p className="text-foreground/70 dark:text-slate-400 leading-relaxed transition-colors">
                             {t("services.web.description")}
                         </p>
                     </div>
@@ -107,7 +107,7 @@ export function DetailedContent() {
                                 <h4 className="font-bold text-primary uppercase tracking-widest text-[10px] transition-colors">
                                     {t(`services.web.features.${fKey}.title`)}
                                 </h4>
-                                <p className="text-muted-foreground text-xs leading-relaxed transition-colors">
+                                <p className="text-foreground/70 dark:text-slate-400 text-xs leading-relaxed transition-colors">
                                     {t(`services.web.features.${fKey}.description`)}
                                 </p>
                             </div>

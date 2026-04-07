@@ -6,7 +6,7 @@ import {
   ExternalLink, Filter, Shield, Search, Mail, Globe,
   Wifi, User, Phone, CheckCircle2, XCircle,
   ChevronDown, ChevronUp, Clock, Trash2,
-  FileText, FileSpreadsheet
+  FileText, FileSpreadsheet, Cloud
 } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,158 +45,286 @@ type Resource = {
 };
 
 // ─── Lookup type definition ─────────────────────────────────────────────
-type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone';
+type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia';
+
+interface HistoryItem {
+  _id: Id<"osint_results">;
+  _creationTime: number;
+  type: LookupType;
+  query: string;
+  result: any;
+  userId: string;
+  createdAt: number;
+}
 
 // ─── Result Components ──────────────────────────────────────────────────
 const StatusBadge = ({ label, value, type = 'default' }: { label: string; value: string | boolean; type?: 'default' | 'success' | 'warning' | 'error' | 'info' }) => {
-    const isTrue = value === true || value === 'true' || value === 'yes';
-    const isFalse = value === false || value === 'false' || value === 'no';
+  const isTrue = value === true || value === 'true' || value === 'yes';
+  const isFalse = value === false || value === 'false' || value === 'no';
 
-    const colors = {
-        success: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-        warning: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-        error: 'bg-destructive/10 text-destructive border-destructive/20',
-        info: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        default: 'bg-muted/50 text-muted-foreground border-border'
-    };
+  const colors = {
+    success: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
+    warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
+    error: 'bg-destructive/10 text-destructive border-destructive/20',
+    info: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
+    default: 'bg-muted/50 text-foreground/70 dark:text-slate-400 border-border'
+  };
 
-    let activeColor = colors[type];
-    if (type === 'default') {
-        if (isTrue) activeColor = colors.success;
-        if (isFalse) activeColor = colors.error;
-    }
+  let activeColor = colors[type];
+  if (type === 'default') {
+    if (isTrue) activeColor = colors.success;
+    if (isFalse) activeColor = colors.error;
+  }
 
-    return (
-        <div className={clsx("flex items-center justify-between px-3 py-2 rounded-xl border transition-all", activeColor)}>
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{label}</span>
-            <span className="text-xs font-bold">{String(value)}</span>
-        </div>
-    );
+  return (
+    <div className={clsx("flex items-center justify-between px-3 py-2 rounded-xl border transition-all", activeColor)}>
+      <span className="text-[10px] font-black uppercase tracking-widest opacity-70">{label}</span>
+      <span className="text-xs font-bold">{String(value)}</span>
+    </div>
+  );
 };
 
 const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) => (
-    <div className="space-y-3">
-        <div className="flex items-center gap-2 px-1">
-            <Icon className="w-3.5 h-3.5 text-primary/60" />
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{title}</h4>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {children}
-        </div>
+  <div className="space-y-3">
+    <div className="flex items-center gap-2 px-1">
+      <Icon className="w-3.5 h-3.5 text-primary/70" />
+      <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/70 dark:text-slate-400">{title}</h4>
     </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {children}
+    </div>
+  </div>
 );
 
 const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: any }) => {
-    if (!data) return null;
+  if (!data) return null;
 
-    // Helper to get nested values safely
-    const get = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  // Helper to get nested values safely
+  const get = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
 
-    return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Header/Summary Card */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {type === 'email' && (
-                    <>
-                        <StatusBadge label="Deliverable" value={get(data, 'deliverability') || get(data, 'format_valid') || 'Unknown'} />
-                        <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
-                        <StatusBadge label="Risk Score" value={get(data, 'reputation') || 'Low'} type={get(data, 'reputation') === 'High' ? 'error' : 'success'} />
-                    </>
-                )}
-                {type === 'ip' && (
-                    <>
-                        <StatusBadge label="Country" value={get(data, 'country_name') || get(data, 'country') || 'Unknown'} type="info" />
-                        <StatusBadge label="VPN/Proxy" value={get(data, 'security.is_vpn') || get(data, 'is_proxy') || false} type={get(data, 'security.is_vpn') ? 'warning' : 'success'} />
-                        <StatusBadge label="Threat Level" value={get(data, 'security.threat_level') || 'Low'} type={get(data, 'security.threat_level') === 'High' ? 'error' : 'success'} />
-                    </>
-                )}
-                {type === 'domain' && (
-                    <>
-                        <StatusBadge label="Registered" value={get(data, 'registered') || 'Yes'} />
-                        <StatusBadge label="DNSSEC" value={get(data, 'dnssec') || 'Unknown'} type="info" />
-                        <StatusBadge label="Status" value={get(data, 'status') || 'Active'} type="success" />
-                    </>
-                )}
-                {type === 'phone' && (
-                    <>
-                        <StatusBadge label="Valid" value={get(data, 'valid') || false} />
-                        <StatusBadge label="Line Type" value={get(data, 'line_type') || 'Mobile'} type="info" />
-                        <StatusBadge label="Carrier" value={get(data, 'carrier') || 'Unknown'} type="info" />
-                    </>
-                )}
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      {/* Header/Summary Card */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {type === 'email' && (
+          <>
+            <StatusBadge label="Deliverable" value={get(data, 'deliverability') || get(data, 'format_valid') || 'Unknown'} />
+            <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
+            <StatusBadge label="Risk Score" value={get(data, 'reputation') || 'Low'} type={get(data, 'reputation') === 'High' ? 'error' : 'success'} />
+          </>
+        )}
+        {type === 'ip' && (
+          <>
+            <StatusBadge label="Country" value={get(data, 'country_name') || get(data, 'country') || 'Unknown'} type="info" />
+            <StatusBadge label="VPN/Proxy" value={get(data, 'security.is_vpn') || get(data, 'is_proxy') || false} type={get(data, 'security.is_vpn') ? 'warning' : 'success'} />
+            <StatusBadge label="Threat Level" value={get(data, 'security.threat_level') || 'Low'} type={get(data, 'security.threat_level') === 'High' ? 'error' : 'success'} />
+          </>
+        )}
+        {type === 'domain' && (
+          <>
+            <StatusBadge label="Registered" value={get(data, 'registered') || 'Yes'} />
+            <StatusBadge label="DNSSEC" value={get(data, 'dnssec') || 'Unknown'} type="info" />
+            <StatusBadge label="Status" value={get(data, 'status') || 'Active'} type="success" />
+          </>
+        )}
+        {type === 'phone' && (
+          <>
+            <StatusBadge label="Valid" value={get(data, 'valid') || false} />
+            <StatusBadge label="Line Type" value={get(data, 'line_type') || 'Mobile'} type="info" />
+            <StatusBadge label="Carrier" value={get(data, 'carrier') || 'Unknown'} type="info" />
+          </>
+        )}
+        {type === 'news' && (
+          <>
+            <StatusBadge label="Provider" value={get(data, 'provider') || 'Unknown'} type="info" />
+            <StatusBadge label="Data Feeds" value="Global RSS" type="info" />
+            <StatusBadge label="Articles Found" value={get(data, 'totalArticles') || '0'} type="success" />
+          </>
+        )}
+        {type === 'corporate' && (
+          <>
+            <StatusBadge label="Provider" value="OpenCorporates" type="info" />
+            <StatusBadge label="Companies Found" value={get(data, 'companies')?.length || '0'} type={get(data, 'companies')?.length > 0 ? "success" : "warning"} />
+          </>
+        )}
+        {type === 'location' && (
+          <>
+            <StatusBadge label="Provider" value="Nominatim OSM" type="info" />
+            <StatusBadge label="Locations Found" value={get(data, 'locations')?.length || '0'} type={get(data, 'locations')?.length > 0 ? "success" : "warning"} />
+          </>
+        )}
+        {type === 'wikipedia' && (
+          <>
+            <StatusBadge label="Provider" value="Wikipedia" type="info" />
+            <StatusBadge label="Match Found" value={get(data, 'wiki') ? 'Yes' : 'No'} type={get(data, 'wiki') ? "success" : "warning"} />
+          </>
+        )}
+      </div>
+
+      {/* Detailed Sections */}
+      <div className="bg-muted/10 border border-border rounded-2xl p-5 space-y-6">
+        {type === 'email' && (
+          <DataSection title="Identity Details" icon={User}>
+            <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
+            <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
+            <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
+            <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
+          </DataSection>
+        )}
+
+        {type === 'ip' && (
+          <>
+            <DataSection title="Geolocation" icon={Globe}>
+              <StatusBadge label="City" value={get(data, 'city') || 'Unknown'} />
+              <StatusBadge label="Region" value={get(data, 'region') || 'Unknown'} />
+              <StatusBadge label="Postal" value={get(data, 'zip') || 'N/A'} />
+              <StatusBadge label="Timezone" value={get(data, 'time_zone.name') || 'N/A'} />
+            </DataSection>
+            <DataSection title="Network Infrastructure" icon={Server}>
+              <StatusBadge label="ASN" value={get(data, 'asn') || 'N/A'} />
+              <StatusBadge label="ISP" value={get(data, 'isp') || 'N/A'} />
+              <StatusBadge label="Organization" value={get(data, 'org') || 'N/A'} />
+              <StatusBadge label="Type" value={get(data, 'type') || 'IPv4'} />
+            </DataSection>
+          </>
+        )}
+
+        {type === 'domain' && (
+          <>
+            <DataSection title="WHOIS Information" icon={Database}>
+              <StatusBadge label="Registrar" value={get(data, 'registrar') || 'N/A'} />
+              <StatusBadge label="Created" value={get(data, 'created_date') || 'N/A'} />
+              <StatusBadge label="Expiry" value={get(data, 'expiration_date') || 'N/A'} />
+              <StatusBadge label="Updated" value={get(data, 'updated_date') || 'N/A'} />
+            </DataSection>
+            <DataSection title="Technical Records" icon={Wifi}>
+              <StatusBadge label="Nameservers" value={Array.isArray(get(data, 'name_servers')) ? get(data, 'name_servers').length : 0} />
+              <StatusBadge label="MX Check" value={get(data, 'mx_found') || false} />
+            </DataSection>
+          </>
+        )}
+
+        {type === 'phone' && (
+          <DataSection title="Carrier Details" icon={Smartphone}>
+            <StatusBadge label="Local Format" value={get(data, 'local_format') || 'N/A'} />
+            <StatusBadge label="Intl Format" value={get(data, 'international_format') || 'N/A'} />
+            <StatusBadge label="Country Prefix" value={get(data, 'country_prefix') || 'N/A'} />
+            <StatusBadge label="Location" value={get(data, 'location') || 'N/A'} />
+          </DataSection>
+        )}
+
+        {type === 'news' && (
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 px-1">
+                <Cloud className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/70 tracking-widest">Global News Feed</h4>
+              </div>
             </div>
 
-            {/* Detailed Sections */}
-            <div className="bg-muted/10 border border-border rounded-2xl p-5 space-y-6">
-                {type === 'email' && (
-                    <DataSection title="Identity Details" icon={User}>
-                        <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
-                        <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
-                        <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
-                        <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
-                    </DataSection>
-                )}
+            {get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
+              <DataSection title="Recent News Mentions" icon={FileText}>
+                {get(data, 'articles').slice(0, 10).map((art: any, i: number) => (
+                  <a
+                    key={i}
+                    href={art.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <h5 className="text-xs font-bold text-foreground line-clamp-2">{art.title}</h5>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-[9px] text-muted-foreground uppercase font-black">{art.source}</span>
+                      <span className="text-[9px] text-primary font-bold line-clamp-1">{art.date}</span>
+                    </div>
+                  </a>
+                ))}
+              </DataSection>
+            )}
+          </div>
+        )}
 
-                {type === 'ip' && (
-                    <>
-                        <DataSection title="Geolocation" icon={Globe}>
-                            <StatusBadge label="City" value={get(data, 'city') || 'Unknown'} />
-                            <StatusBadge label="Region" value={get(data, 'region') || 'Unknown'} />
-                            <StatusBadge label="Postal" value={get(data, 'zip') || 'N/A'} />
-                            <StatusBadge label="Timezone" value={get(data, 'time_zone.name') || 'N/A'} />
-                        </DataSection>
-                        <DataSection title="Network Infrastructure" icon={Server}>
-                            <StatusBadge label="ASN" value={get(data, 'asn') || 'N/A'} />
-                            <StatusBadge label="ISP" value={get(data, 'isp') || 'N/A'} />
-                            <StatusBadge label="Organization" value={get(data, 'org') || 'N/A'} />
-                            <StatusBadge label="Type" value={get(data, 'type') || 'IPv4'} />
-                        </DataSection>
-                    </>
-                )}
+        {type === 'corporate' && (
+          <div className="space-y-6">
+            <DataSection title="Corporate Entities" icon={Database}>
+                {get(data, 'companies')?.map((c: any, i: number) => (
+                  <a
+                    key={i}
+                    href={c.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+                  >
+                    <h5 className="text-xs font-bold text-foreground">{c.name}</h5>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <StatusBadge label="Jurisdiction" value={c.jurisdiction || 'N/A'} type="default" />
+                      <StatusBadge label="Status" value={c.status || 'N/A'} type="info" />
+                      <StatusBadge label="Company Number" value={c.number || 'N/A'} type="default" />
+                    </div>
+                  </a>
+                ))}
+            </DataSection>
+          </div>
+        )}
 
-                {type === 'domain' && (
-                    <>
-                        <DataSection title="WHOIS Information" icon={Database}>
-                            <StatusBadge label="Registrar" value={get(data, 'registrar') || 'N/A'} />
-                            <StatusBadge label="Created" value={get(data, 'created_date') || 'N/A'} />
-                            <StatusBadge label="Expiry" value={get(data, 'expiration_date') || 'N/A'} />
-                            <StatusBadge label="Updated" value={get(data, 'updated_date') || 'N/A'} />
-                        </DataSection>
-                        <DataSection title="Technical Records" icon={Wifi}>
-                            <StatusBadge label="Nameservers" value={Array.isArray(get(data, 'name_servers')) ? get(data, 'name_servers').length : 0} />
-                            <StatusBadge label="MX Check" value={get(data, 'mx_found') || false} />
-                        </DataSection>
-                    </>
-                )}
+        {type === 'location' && (
+          <div className="space-y-6">
+            <DataSection title="Geographic Targets" icon={Globe}>
+                {get(data, 'locations')?.map((loc: any, i: number) => (
+                  <a
+                    key={i}
+                    href={loc.osmUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+                  >
+                    <h5 className="text-xs font-bold text-foreground">{loc.displayName}</h5>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                       <StatusBadge label="Type" value={loc.type || 'N/A'} type="info" />
+                       <StatusBadge label="City" value={loc.city || 'N/A'} type="default" />
+                       <StatusBadge label="Country" value={loc.country || 'N/A'} type="default" />
+                    </div>
+                  </a>
+                ))}
+            </DataSection>
+          </div>
+        )}
 
-                {type === 'phone' && (
-                    <DataSection title="Carrier Details" icon={Smartphone}>
-                        <StatusBadge label="Local Format" value={get(data, 'local_format') || 'N/A'} />
-                        <StatusBadge label="Intl Format" value={get(data, 'international_format') || 'N/A'} />
-                        <StatusBadge label="Country Prefix" value={get(data, 'country_prefix') || 'N/A'} />
-                        <StatusBadge label="Location" value={get(data, 'location') || 'N/A'} />
-                    </DataSection>
-                )}
+        {type === 'wikipedia' && get(data, 'wiki') && (
+          <div className="space-y-6">
+            <DataSection title="General Information" icon={Info}>
+                  <a
+                    href={get(data, 'wiki.url')}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block p-4 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+                  >
+                    <h5 className="text-sm font-bold text-foreground">{get(data, 'wiki.title')}</h5>
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{get(data, 'wiki.summary')}</p>
+                  </a>
+            </DataSection>
+          </div>
+        )}
 
-                {/* Raw View Toggle */}
-                <div className="pt-4 border-t border-border mt-4">
-                    <button 
-                        onClick={() => {
-                            const pre = document.getElementById('raw-json-view');
-                            if (pre) pre.classList.toggle('hidden');
-                        }}
-                        className="text-[9px] font-black text-muted-foreground hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
-                    >
-                        <Info className="w-3 h-3" />
-                        Toggle Developer Raw Data
-                    </button>
-                    <pre id="raw-json-view" className="hidden mt-3 text-[10px] text-foreground/60 whitespace-pre-wrap break-all bg-black/5 p-4 rounded-xl font-mono">
-                        {JSON.stringify(data, null, 2)}
-                    </pre>
-                </div>
-            </div>
+        {/* Raw View Toggle */}
+        <div className="pt-4 border-t border-border mt-4">
+          <button
+            onClick={() => {
+              const pre = document.getElementById('raw-json-view');
+              if (pre) pre.classList.toggle('hidden');
+            }}
+            className="text-[9px] font-black text-muted-foreground hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
+          >
+            <Info className="w-3 h-3" />
+            Toggle Developer Raw Data
+          </button>
+          <pre id="raw-json-view" className="hidden mt-3 text-[10px] text-foreground/60 whitespace-pre-wrap break-all bg-black/5 p-4 rounded-xl font-mono">
+            {JSON.stringify(data, null, 2)}
+          </pre>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 // ─── Main component ─────────────────────────────────────────────────────
@@ -220,6 +348,10 @@ export default function OsintTab() {
       { type: 'ip', label: t('panels.ip.title'), icon: <Wifi className="w-4 h-4" />, placeholder: t('panels.ip.placeholder'), hint: t('panels.ip.desc') },
       { type: 'username', label: t('panels.username.title'), icon: <User className="w-4 h-4" />, placeholder: t('panels.username.placeholder'), hint: t('panels.username.desc') },
       { type: 'phone', label: t('panels.phone.title'), icon: <Phone className="w-4 h-4" />, placeholder: t('panels.phone.placeholder'), hint: t('panels.phone.desc') },
+      { type: 'news', label: t('panels.news.title'), icon: <Cloud className="w-4 h-4" />, placeholder: t('panels.news.placeholder'), hint: t('panels.news.desc') },
+      { type: 'corporate', label: t('panels.corporate.title'), icon: <Database className="w-4 h-4" />, placeholder: t('panels.corporate.placeholder'), hint: t('panels.corporate.desc') },
+      { type: 'location', label: t('panels.location.title'), icon: <Globe className="w-4 h-4" />, placeholder: t('panels.location.placeholder'), hint: t('panels.location.desc') },
+      { type: 'wikipedia', label: t('panels.wikipedia.title'), icon: <Info className="w-4 h-4" />, placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
     ];
 
   // ── Hydration guard ──
@@ -254,6 +386,10 @@ export default function OsintTab() {
   const lookupIp = useAction(api.osint.lookupIp);
   const lookupUsername = useAction(api.osint.lookupUsername);
   const lookupPhone = useAction(api.osint.lookupPhone);
+  const lookupNews = useAction(api.osint.lookupNews);
+  const lookupCorporate = useAction(api.osint.lookupCorporate);
+  const lookupLocation = useAction(api.osint.lookupLocation);
+  const lookupWikipedia = useAction(api.osint.lookupWikipedia);
   // ── DB operations (default runtime — osintDb.ts) ──
   const deleteResult = useMutation(api.osintDb.deleteOsintResult);
   const history = useQuery(
@@ -307,8 +443,12 @@ export default function OsintTab() {
         case 'ip': res = await lookupIp({ ip: query }); break;
         case 'username': res = await lookupUsername({ username: query }); break;
         case 'phone': res = await lookupPhone({ phone: query }); break;
+        case 'news': res = await lookupNews({ query: query }); break;
+        case 'corporate': res = await lookupCorporate({ companyName: query }); break;
+        case 'location': res = await lookupLocation({ locationName: query }); break;
+        case 'wikipedia': res = await lookupWikipedia({ query: query }); break;
       }
-      
+
       if (res?.success) {
         setResult(res.data ?? null);
         setError('');
@@ -333,6 +473,10 @@ export default function OsintTab() {
       case 'ip': cat = ['geolocation', 'security']; break;
       case 'username': cat = ['social', 'people', 'dating']; break;
       case 'phone': cat = ['phone']; break;
+      case 'news': cat = ['news', 'misc']; break;
+      case 'corporate': cat = ['business', 'public records']; break;
+      case 'location': cat = ['geolocation', 'maps']; break;
+      case 'wikipedia': cat = ['search', 'misc']; break;
     }
     return (resources as Resource[]).filter(r => r.categories.some(c => cat.includes(c))).slice(0, 6);
   }, [activeType]);
@@ -451,7 +595,7 @@ export default function OsintTab() {
                     {tCommon('copy')}
                   </Button>
                 </div>
-                
+
                 <StructuredResultView type={activeType} data={result} t={t} />
               </div>
             )}
@@ -506,6 +650,9 @@ export default function OsintTab() {
                         item.type === 'ip' && 'bg-orange-500/10 border-orange-500/20 text-orange-600',
                         item.type === 'username' && 'bg-green-500/10 border-green-500/20 text-green-600',
                         item.type === 'phone' && 'bg-pink-500/10 border-pink-500/20 text-pink-600',
+                        item.type === 'corporate' && 'bg-indigo-500/10 border-indigo-500/20 text-indigo-600',
+                        item.type === 'location' && 'bg-teal-500/10 border-teal-500/20 text-teal-600',
+                        item.type === 'wikipedia' && 'bg-zinc-500/10 border-zinc-500/20 text-zinc-600',
                       )}>
                         {LOOKUP_TYPES.find(l => l.type === item.type)?.icon || <Shield className="w-4 h-4" />}
                       </div>
@@ -593,12 +740,17 @@ export default function OsintTab() {
 
       {/* ══ FULL DIRECTORY MODAL (reusing directory UI) ════════════ */}
       {dirOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="osint-directory-title"
+        >
           <div className="bg-card border border-border w-full max-w-6xl max-h-full overflow-hidden rounded-3xl shadow-2xl flex flex-col scale-in-center">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30">
               <div className="flex items-center gap-3">
                 <Filter className="w-5 h-5 text-primary" />
-                <h3 className="font-bold">{tOsint('title')}</h3>
+                <h3 id="osint-directory-title" className="font-bold">{tOsint('title')}</h3>
                 <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-primary/20">
                   {resources.length} {tOsint('filters.search')}
                 </span>
@@ -610,21 +762,21 @@ export default function OsintTab() {
               {/* Reuse of standard filters */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
-                  <label htmlFor="dir-category" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.category')}</label>
+                  <label htmlFor="dir-category" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.category')}</label>
                   <select id="dir-category" name="category" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={category} onChange={e => { setCategory(e.target.value); setPage(0); }}>
                     <option value="all">Global (All)</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label htmlFor="dir-label" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.label')}</label>
+                  <label htmlFor="dir-label" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.label')}</label>
                   <select id="dir-label" name="label" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={labelFilter} onChange={e => { setLabelFilter(e.target.value); setPage(0); }}>
                     <option value="all">Any Access</option>
                     {LABELS.map(l => <option key={l.code} value={l.code}>{l.text}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label htmlFor="dir-lang" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.language')}</label>
+                  <label htmlFor="dir-lang" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.language')}</label>
                   <select id="dir-lang" name="language" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={language} onChange={e => { setLanguage(e.target.value); setPage(0); }}>
                     <option value="all">Multi-language</option>
                     <option value="en">English Only</option>
@@ -632,7 +784,7 @@ export default function OsintTab() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label htmlFor="dir-search" className="text-[10px] font-black text-muted-foreground uppercase px-1">{tOsint('filters.search')}</label>
+                  <label htmlFor="dir-search" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.search')}</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                     <input id="dir-search" name="search" className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />

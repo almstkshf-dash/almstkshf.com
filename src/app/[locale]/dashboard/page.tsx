@@ -149,6 +149,31 @@ export default function DashboardPage() {
 
     const tExport = useTranslations('Export');
 
+    const topLeftSlotMemo = useMemo(() => (
+        <div className="space-y-8">
+            <NewsGenerator defaultSourceType="Online News" />
+            <PressReleasePanel />
+            <div className="flex items-center justify-between mt-6 mb-2">
+                <h2 className="text-2xl font-black text-foreground tracking-tight uppercase flex items-center gap-3 italic">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                    {t('media_pulse_analytics_title') || 'Media Pulse Analytics'}
+                </h2>
+                <div className="h-px bg-gradient-to-r from-primary/20 via-primary/5 to-transparent flex-1 mx-8" />
+            </div>
+        </div>
+    ), [t]);
+
+    const topRightSlotMemo = useMemo(() => (
+        <div className="sticky top-8 mb-8 z-20">
+            <RssFeeder
+                initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
+                initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
+                categories={isAr ? AAWSAT_SOURCES : []}
+                maxItems={10}
+            />
+        </div>
+    ), [isAr]);
+
     const handleExport = async (type: 'excel' | 'pdf') => {
         if (filteredArticles.length === 0) {
             showToast('error', t('export_empty'));
@@ -340,29 +365,8 @@ export default function DashboardPage() {
                         <DashboardGrid 
                             articles={filteredArticles} 
                             analytics={analytics}
-                            topLeftSlot={
-                                <div className="space-y-8">
-                                    <NewsGenerator defaultSourceType="Online News" />
-                                    <PressReleasePanel />
-                                    <div className="flex items-center justify-between mt-6 mb-2">
-                                        <h2 className="text-2xl font-black text-foreground tracking-tight uppercase flex items-center gap-3 italic">
-                                            <BarChart3 className="w-6 h-6 text-primary" />
-                                            {t('media_pulse_analytics_title') || 'Media Pulse Analytics'}
-                                        </h2>
-                                        <div className="h-px bg-gradient-to-r from-primary/20 via-primary/5 to-transparent flex-1 mx-8" />
-                                    </div>
-                                </div>
-                            }
-                            topRightSlot={
-                                <div className="sticky top-8 mb-8 z-20">
-                                    <RssFeeder
-                                        initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
-                                        initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
-                                        categories={isAr ? AAWSAT_SOURCES : []}
-                                        maxItems={10}
-                                    />
-                                </div>
-                            }
+                            topLeftSlot={topLeftSlotMemo}
+                            topRightSlot={topRightSlotMemo}
                         />
 
                         {/* Coverage Section */}
@@ -378,7 +382,7 @@ export default function DashboardPage() {
                                             </div>
                                             {t('coverage_log')}
                                         </h2>
-                                        <p className="text-sm text-muted-foreground font-medium flex items-center gap-2">
+                                        <p className="text-sm text-foreground/70 dark:text-slate-400 font-medium flex items-center gap-2">
                                             <span className="text-primary font-black">{totalArticles}</span>
                                             {t('total_articles_detected') || 'total articles detected in current scope'}
                                         </p>
@@ -413,7 +417,7 @@ export default function DashboardPage() {
                                                 placeholder={t('search_placeholder')}
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/60 text-foreground"
+                                                className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-foreground/50 text-foreground"
                                             />
                                         </div>
                                     </div>
@@ -428,7 +432,7 @@ export default function DashboardPage() {
                                                 "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
                                                 selectedType === type.id
                                                     ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
-                                                    : 'bg-background/80 border-border/50 text-muted-foreground hover:bg-background hover:text-foreground hover:border-border'
+                                                    : 'bg-background/80 border-border/50 text-foreground/70 dark:text-slate-400 hover:bg-background hover:text-foreground hover:border-border'
                                             )}
                                         >
                                             {type.label}

@@ -40,18 +40,18 @@ const getSourceIcon = (type: string) => {
 /**
  * Granularly memoized row component to minimize re-render impact.
  */
-const ArticleRow = memo(({ 
-    article, 
-    isSelected, 
+const ArticleRow = memo(({
+    article,
+    isSelected,
     isDeleting,
     isUpdating,
-    onToggleSelect, 
-    onDeleteClick, 
+    onToggleSelect,
+    onDeleteClick,
     onUpdateSentiment,
-    t 
-}: { 
-    article: any, 
-    isSelected: boolean, 
+    t
+}: {
+    article: any,
+    isSelected: boolean,
     isDeleting: boolean,
     isUpdating: boolean,
     onToggleSelect: (id: string) => void,
@@ -60,7 +60,7 @@ const ArticleRow = memo(({
     t: any
 }) => {
     const theme = getSourceBadgeColor(article.sourceType);
-    
+
     return (
         <tr
             className={clsx(
@@ -102,7 +102,7 @@ const ArticleRow = memo(({
                                             article.sourceType === 'Print' ? t('types.print') :
                                                 article.sourceType}
                         </span>
-                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
+                        <span className="text-[10px] text-foreground/70 dark:text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
                             <span className="w-1 h-1 rounded-full bg-border" />
                             {article.sourceCountry || article.country}
                         </span>
@@ -126,7 +126,7 @@ const ArticleRow = memo(({
                         {article.depth || 'standard'}
                     </span>
                     {article.relevancy_score !== undefined && (
-                        <div className="flex items-center gap-1 text-[9px] font-bold text-muted-foreground/60 uppercase tracking-tighter" title={t('relevancy')}>
+                        <div className="flex items-center gap-1 text-[9px] font-bold text-foreground/70 dark:text-slate-400 uppercase tracking-tighter" title={t('relevancy')}>
                             <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
                                 <div
                                     className={clsx(
@@ -192,10 +192,10 @@ const ArticleRow = memo(({
                     </div>
                 </div>
             </td>
-            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors" suppressHydrationWarning>
+            <td className="p-4 text-right text-xs font-mono text-foreground/70 dark:text-slate-400 transition-colors" suppressHydrationWarning>
                 {article.reach?.toLocaleString() || '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+            <td className="p-4 text-right text-xs font-mono text-foreground/70 dark:text-slate-400 transition-colors">
                 {article.likes !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
@@ -354,7 +354,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
             {selectedIds.size > 0 && (
                 <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border-y border-primary/20 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-primary">
+                        <span className="text-sm font-bold text-primary dark:text-blue-300">
                             {t('items_selected', { count: selectedIds.size })}
                         </span>
                     </div>
@@ -401,7 +401,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                     </thead>
                     <tbody className="divide-y divide-border/50">
                         {displayedArticles.map((article: any) => (
-                            <ArticleRow 
+                            <ArticleRow
                                 key={article._id}
                                 article={article}
                                 isSelected={selectedIds.has(article._id)}

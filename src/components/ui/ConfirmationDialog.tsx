@@ -66,7 +66,7 @@ export default function ConfirmationDialog({
                                     transition={{ duration: 0.4 }}
                                     className={`p-3 rounded-2xl ${variant === 'danger' ? 'bg-status-error-bg text-status-error-fg border border-status-error-fg/20' :
                                         variant === 'warning' ? 'bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/20' :
-                                            'bg-primary/10 text-primary border border-primary/20'
+                                            'bg-primary/15 text-primary dark:text-blue-300 border border-primary/20 transition-colors'
                                         }`}>
                                     <Icon className="w-6 h-6" />
                                 </motion.div>

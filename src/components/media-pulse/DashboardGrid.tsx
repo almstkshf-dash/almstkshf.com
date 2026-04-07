@@ -181,7 +181,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                         </Button>
                                     </div>
                                 )}
-                                <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-widest">{t('real_time')}</div>
+                                <div className="px-3 py-1 bg-primary/15 border border-primary/20 rounded-full text-[10px] font-bold text-primary dark:text-blue-300 transition-colors uppercase tracking-widest">{t('real_time')}</div>
                                 <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center transition-colors">{t('global')}</div>
                             </div>
                         </div>
@@ -192,7 +192,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                     {t('keywords') || 'Keywords'}:
                                 </span>
                                 {uniqueKeywords.map((kw: string) => (
-                                    <div key={kw} className="inline-flex items-center bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
+                                    <div key={kw} className="inline-flex items-center bg-primary/15 text-primary dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
                                         {editingKeyword === kw ? (
                                             <input
                                                 type="text"
@@ -248,7 +248,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 }}
                                 nssIndex={nss}
                             />
-                            <div className="mt-2 text-[10px] font-bold text-destructive flex items-center justify-center gap-1">
+                            <div className="mt-2 text-[10px] font-bold text-destructive dark:text-red-400 flex items-center justify-center gap-1">
                                 <ShieldAlert className="w-3 h-3" />
                                 {t('risk')}: {riskScore}%
                             </div>
@@ -390,7 +390,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                     <Globe className="w-4 h-4 text-primary" />
                                     {tDashboard('geography')}
                                 </h4>
-                                <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                <span className="text-[10px] font-black text-primary dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
                                     TOP {geoEntries.length}
                                 </span>
                             </div>
@@ -559,7 +559,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         </div>
                         <div className="space-y-1">
                             <h4 className="text-2xl font-black text-foreground tracking-tight">{t('volume_heatmap_title')}</h4>
-                            <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest opacity-70">{t('volume_heatmap_desc')}</p>
+                            <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest">{t('volume_heatmap_desc')}</p>
                         </div>
                     </div>
                 </div>

@@ -47,7 +47,6 @@
     "signup": "Sign Up",
     "settings": "Settings"
   },
-
   "ArticleTable": {
     "no_articles": "No articles found. Start monitoring or add manually.",
     "showing": "Showing {count} of {total} articles",
@@ -862,7 +861,8 @@
         "HIGH_REACH_CRITICAL": "High Reach Critical Mention",
         "SENTIMENT_SHIFT_DETECTION": "Sudden Sentiment Shift"
       },
-      "top_risk_indicators": "Top Risk Indicators"
+      "top_risk_indicators": "Top Risk Indicators",
+      "new": "NEW"
     }
   },
   "CrisisManagementDetail": {
@@ -1223,7 +1223,8 @@
     "error": "Error",
     "media_pulse_analytics_title": "Media Pulse Analytics",
     "total_articles_detected": "total articles detected in current scope",
-    "reset_filters": "Reset All Filters"
+    "reset_filters": "Reset All Filters",
+    "investigation_engine": "Investigation Engine"
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1392,6 +1393,26 @@
         "title": "Phone Validator",
         "desc": "Verify carrier data, reputation flags, and regional routing.",
         "placeholder": "Enter phone (e.g. +971...)"
+      },
+      "news": {
+        "title": "Global News Lookup",
+        "desc": "Retrieve the latest global news stories via online feeds.",
+        "placeholder": "Enter search keyword (e.g. Artificial Intelligence)..."
+      },
+      "corporate": {
+        "title": "Corporate Intel",
+        "desc": "Search global corporate records via OpenCorporates.",
+        "placeholder": "Enter company name..."
+      },
+      "location": {
+        "title": "Location Intel",
+        "desc": "Search geographical coordinates and addresses via Nominatim OSM.",
+        "placeholder": "Enter location name..."
+      },
+      "wikipedia": {
+        "title": "Wikipedia Intel",
+        "desc": "Retrieve general knowledge and summaries from Wikipedia.",
+        "placeholder": "Enter search keyword..."
       }
     },
     "result_view": {
