@@ -20,6 +20,7 @@ const routes = [
     '/pricing',
     '/privacy',
     '/terms',
+    '/inspect',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

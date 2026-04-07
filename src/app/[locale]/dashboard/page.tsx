@@ -24,7 +24,8 @@ import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import RssFeeder from '@/components/dashboard/RssFeeder';
 import { AAWSAT_SOURCES } from '@/config/rss-sources';
-import { Shield } from 'lucide-react';
+import { Shield, Fingerprint as InspectIcon } from 'lucide-react';
+import AiInspectorTab from '@/components/media-pulse/AiInspectorTab';
 
 type ArticleItem = {
     _id: string;
@@ -52,19 +53,19 @@ export default function DashboardPage() {
     const [selectedCountry, setSelectedCountry] = useState('All');
     
     // Initialize activeView from URL search parameters, defaulting to 'standard'
-    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list'>(
+    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect'>(
         (searchParams.get('view') as any) || 'standard'
     );
 
     // Sync state with URL search parameters
     useEffect(() => {
         const view = searchParams.get('view') as any;
-        if (view && ['standard', 'deep', 'osint', 'terrorist_list'].includes(view)) {
+        if (view && ['standard', 'deep', 'osint', 'terrorist_list', 'inspect'].includes(view)) {
             setActiveView(view);
         }
     }, [searchParams]);
 
-    const changeView = (newView: 'standard' | 'deep' | 'osint' | 'terrorist_list') => {
+    const changeView = (newView: 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect') => {
         setActiveView(newView);
         const params = new URLSearchParams(searchParams.toString());
         params.set('view', newView);
@@ -314,6 +315,7 @@ export default function DashboardPage() {
                                 { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
                                 { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
                                 { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
+                                { id: 'inspect', label: t('filters.view_inspect') || 'AI Inspector', icon: InspectIcon, color: 'primary' },
                                 { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
                             ].map((view) => (
                                 <button
@@ -530,7 +532,9 @@ export default function DashboardPage() {
 
                 {activeView === 'osint' && <OsintTab />}
 
-                {activeView === 'terrorist_list' && <TerroristListTab />}
+                { activeView === 'terrorist_list' && <TerroristListTab /> }
+
+                { activeView === 'inspect' && <AiInspectorTab /> }
             </div>
 
             {/* Global Overlays */}

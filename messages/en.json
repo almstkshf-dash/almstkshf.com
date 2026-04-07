@@ -1181,9 +1181,10 @@
       "country": "Country",
       "language": "Language",
       "view_standard": "Standard View",
-      "view_deep": "Deep View",
-      "view_osint": "OSINT View",
-      "view_terrorist_list": "Sanctions List",
+      "view_deep": "Deep Status",
+      "view_osint": "OSINT Engine",
+      "view_inspect": "AI Inspector",
+      "view_terrorist_list": "Watchlist",
       "export_pdf": "Export PDF",
       "export_excel": "Export Excel"
     },
@@ -1665,5 +1666,69 @@
       "drop_file": "Click or Drag File to Upload",
       "warning": "CRITICAL: This action will permanently PERGE the current terrorist list and replace it with the new file contents. This cannot be undone."
     }
+  },
+  "AiInspector": {
+    "title": "AI Content Inspector",
+    "subtitle": "Professional-grade forensic tool for detecting AI-generated text, images, and video. 100% local, 100% private.",
+    "modes": {
+      "text": "Text Analysis",
+      "image": "Visual Analysis",
+      "video": "Motion Analysis"
+    },
+    "text": {
+      "placeholder": "Paste the text you want to analyze here...",
+      "cta": "Analyze Text Patterns",
+      "detailed_breakdown": "Linguistic Breakdown",
+      "low_ai_probability": "Low AI probability"
+    },
+    "image": {
+      "noise_level": "Noise Level",
+      "low_noise_warning": "Too smooth; likely synthetic",
+      "natural_noise": "Natural sensor grain detected",
+      "symmetry_score": "Symmetry Variance",
+      "uncanny_symmetry_warning": "Hyper-perfect symmetry detected",
+      "natural_symmetry": "Natural biological variance",
+      "ai_probability": "AI Probability",
+      "high_risk": "High AI Probability",
+      "medium_risk": "Potential AI Content",
+      "low_risk": "Likely Human/Organic",
+      "pixel_signals": "Pixel Logic Signals",
+      "no_signals_found": "No suspicious pixel patterns detected."
+    },
+    "video": {
+      "video_probability": "Video AI Probability",
+      "highly_suspicious": "Highly Suspicious",
+      "likely_manipulated": "Likely Manipulated",
+      "appears_natural": "Appears Natural",
+      "temporal_flicker": "Temporal Flicker",
+      "flicker_info": "Variance in frame consistency usually indicates AI generation.",
+      "frame_timeline": "Frame Extraction Timeline",
+      "high_risk_frames": "High Risk Frames",
+      "no_high_risk_frames": "No specific frames flagged as high risk.",
+      "detection_methodology": "Detection Methodology",
+      "video_methodology_desc": "We sample frames across the duration, analyzing pixel noise and temporal consistency. AI videos often exhibit 'flicker' where textures shift unnaturally between frames.",
+      "analysis_report": "Motion Analysis Report",
+      "report_desc": "Deep scan of frame-by-frame consistency and pixel integrity."
+    },
+    "upload": {
+      "title": "Drop files here or click to upload",
+      "image_desc": "Supports JPG, PNG, WEBP (Max 10MB)",
+      "video_desc": "Supports MP4, MOV (Max 50MB)",
+      "text_desc": "Supports direct text input"
+    },
+    "analyzing": "Running local forensics...",
+    "results_summary": "Analysis Results",
+    "start_over": "New Analysis",
+    "file_info": "File Information",
+    "footer_disclaimer": "This tool uses rule-based heuristics and local pixel analysis. Results are probabilistic indicators, not definitive proof.",
+    "browser_only": "Processed locally in your browser",
+    "zero_api_notice": "100% Client-Side Processing",
+    "privacy_notice": "ALMSTKSHF uses on-device linguistic analysis. Your text never leaves your browser, ensuring total confidentiality and compliance with secure data handling standards.",
+    "verification_protocol": "Verified ALMSTKSHF Local Forensic Protocol v1.4",
+    "select_file": "Browse Local Storage",
+    "video_processing_wasm": "Running FFmpeg on WASM Core...",
+    "processing_local": "Computing Visual Signals...",
+    "export_pdf": "Export PDF Report",
+    "export_excel": "Export Forensic Data (CSV)"
   }
 }
