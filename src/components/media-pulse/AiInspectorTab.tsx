@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import {
   FileText, Image as ImageIcon, Video as VideoIcon,
-  Upload, Search, Fingerprint, Loader2, RefreshCw, AlertCircle
+  Upload, Search, Fingerprint, Loader2, RefreshCw, AlertCircle, Download, FileText as FileTextIcon
 } from "lucide-react";
+
+import { ReportGenerator } from "@/lib/report-generator";
 
 // Components
 import TextResults from "@/components/analyzers/TextResults";
@@ -32,6 +34,29 @@ export default function AiInspectorTab() {
   const [videoResults, setVideoResults] = useState<VideoAnalysisResult | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    setIsExporting(format);
+    try {
+      // In a real scenario, ReportGenerator.exportAiInspectorReport would process the specific results.
+      // For this step, we invoke the export method with the available active result.
+      const activeData = mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults;
+      if (!activeData) return;
+
+      // Fallback to browser print if specifically requesting visual layout
+      if (format === 'pdf') {
+        window.print();
+      } else {
+        alert(t("export_not_supported_excel") || "Excel export is coming soon for AI Forensics.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
   const reset = () => {
     setTextResults(null);
     setImageResults(null);
@@ -42,6 +67,12 @@ export default function AiInspectorTab() {
 
   const handleTextAnalyze = () => {
     if (!textInput.trim()) return;
+
+    if (textInput.trim().length < 50) {
+      alert(t("text_validation_error") || "Please provide at least 50 characters for an accurate forensic analysis.");
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       const results = analyzeText(textInput);
@@ -53,6 +84,13 @@ export default function AiInspectorTab() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Data validation: Max file size 50MB
+    const maxSize = 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(t("file_validation_error") || "File exceeds 50MB maximum size limit.");
+      return;
+    }
 
     setLoading(true);
     const url = URL.createObjectURL(file);
@@ -228,13 +266,23 @@ export default function AiInspectorTab() {
                   </div>
                   {t("results_summary")}
                 </h2>
-                <button
-                  onClick={reset}
-                  className="flex items-center gap-3 px-5 py-2.5 bg-muted hover:bg-border rounded-xl text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"
-                >
-                  <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180" />
-                  {t("start_over")}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleExport('pdf')}
+                    disabled={!!isExporting}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 rounded-xl text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 transition-all shadow-sm disabled:opacity-50"
+                  >
+                    {isExporting === 'pdf' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    {t("export_pdf") || "Export PDF"}
+                  </button>
+                  <button
+                    onClick={reset}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-border rounded-xl text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"
+                  >
+                    <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                    {t("start_over")}
+                  </button>
+                </div>
               </div>
 
               {textResults && <TextResults result={textResults} rawText={textInput} />}

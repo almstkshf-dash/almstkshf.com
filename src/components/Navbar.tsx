@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Globe, ChevronDown, Search } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
@@ -31,6 +32,7 @@ export default function Navbar() {
     const locale = useLocale();
     const pathname = usePathname();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
@@ -43,7 +45,9 @@ export default function Navbar() {
 
     const toggleLocale = () => {
         const newLocale = locale === "en" ? "ar" : "en";
-        router.replace(pathname, { locale: newLocale });
+        const paramsString = searchParams?.toString();
+        const query = paramsString ? `?${paramsString}` : "";
+        router.replace(`${pathname}${query}` as any, { locale: newLocale });
     };
 
     const isRTL = locale === "ar";
