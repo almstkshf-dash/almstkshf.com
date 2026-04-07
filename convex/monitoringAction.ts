@@ -1003,9 +1003,6 @@ export const fetchPressReleaseSources = action({
     handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: Record<string, unknown>[]; message: string }> => {
         await requireAdmin(ctx.auth);
 
-        // Get Gemini API key from hierarchical settings
-        const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-
         const fetchedKeyword = args.keyword?.trim() || "";
         // Support Boolean logic in Press Release filtering
         const booleanExpr = parseBooleanKeyword(fetchedKeyword);
@@ -1072,33 +1069,18 @@ export const fetchPressReleaseSources = action({
                             const snippet = item.contentSnippet || item.content || item.title;
                             const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
 
-                            // ── GATE 2: Relevancy Scoring ────────────────────────────────────
-                            // Even for PR wires, ensure it's high quality if keyword logic is complex
-                            if (geminiKey && fetchedKeyword) {
-                                try {
-                                    const relScore = await callGeminiRelevancyScore(geminiKey, item.title, snippet, fetchedKeyword);
-                                    if (relScore < 70) {
-                                        console.log(`⚠️ PR Low relevancy (${relScore}): ${item.title.substring(0, 50)}...`);
-                                        continue;
-                                    }
-                                } catch (e) { console.error("Relevancy gate error (PR):", e); }
-                            }
-
                             let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
                             let summary = snippet.slice(0, 300);
                             let reach = 75000;
                             let emotions: any = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
 
-                            if (geminiKey) {
-                                try {
-                                    const aiData = await callGeminiForAnalysis(
-                                        geminiKey, item.title, snippet, keyword, ["Press Release"]
-                                    );
-                                    sentiment = aiData.sentiment;
-                                    summary = aiData.summary || summary;
-                                    reach = aiData.reach_estimate || reach;
-                                    emotions = aiData.emotions || emotions;
-                                } catch (_) { /* use defaults if AI fails */ }
+                            // ── Cost-Cutting Sentiment Analysis ────────────────────────────────
+                            // Simplified regex-based sentiment detection instead of AI API
+                            const lowerSnippet = snippet.toLowerCase();
+                            if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
+                                sentiment = "Positive";
+                            } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
+                                sentiment = "Negative";
                             }
 
                             const ave = Math.round(reach * 0.02 * 5);

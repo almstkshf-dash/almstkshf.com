@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -26,7 +26,7 @@ const MobileAuthFooter = dynamic(
     { ssr: false }
 );
 
-export default function Navbar() {
+function NavbarContent() {
     const t = useTranslations("Navigation");
     const tCommon = useTranslations("Common");
     const locale = useLocale();
@@ -377,5 +377,13 @@ export default function Navbar() {
                 )}
             </AnimatePresence >
         </>
+    );
+}
+
+export default function Navbar() {
+    return (
+        <Suspense fallback={<div className="h-16 w-full border-b border-border bg-background backdrop-blur-md" />}>
+            <NavbarContent />
+        </Suspense>
     );
 }

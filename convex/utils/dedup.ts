@@ -54,12 +54,17 @@ function buildDedupHash(url: string, title: string): string {
  * @returns `true`  → article was already seen (DUPLICATE — skip it)
  * @returns `false` → article is new (proceed with ingestion)
  */
+let hasWarnedMissingRedis = false;
+
 export async function checkAndSetSeen(url: string, title: string): Promise<boolean> {
   const client = getRedisClient();
 
   if (!client) {
     // Redis not configured — allow all articles through (no dedup)
-    console.warn("⚠️ Dedup: UPSTASH_REDIS_REST_URL/TOKEN not set. Deduplication disabled.");
+    if (!hasWarnedMissingRedis) {
+      console.warn("⚠️ Dedup: UPSTASH_REDIS_REST_URL/TOKEN not set. Deduplication disabled.");
+      hasWarnedMissingRedis = true;
+    }
     return false;
   }
 
