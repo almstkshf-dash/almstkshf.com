@@ -246,4 +246,27 @@ export default defineSchema({
         searchField: "searchField",
         filterFields: ["type"],
     }),
+
+    collections: defineTable({
+        userId: v.string(),
+        name: v.string(),
+        description: v.optional(v.string()),
+        items: v.array(v.object({
+            id: v.string(),
+            type: v.union(
+                v.literal("media_monitoring"),
+                v.literal("osint"),
+                v.literal("ai_inspector"),
+                v.literal("watchlist"),
+                v.literal("deep_web"),
+                v.literal("custom")
+            ),
+            title: v.string(),
+            sourceId: v.optional(v.string()),
+            data: v.any(),
+            addedAt: v.number(),
+        })),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_userId", ["userId"]),
 });

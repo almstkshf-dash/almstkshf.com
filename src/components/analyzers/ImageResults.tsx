@@ -251,6 +251,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             src={originalImage}
             alt="Analyzed content"
             className="w-full h-full object-contain grayscale-[0.3] group-hover:grayscale-0 transition-all duration-700"
+            crossOrigin="anonymous"
           />
 
           {/* Diagnostic overlay */}

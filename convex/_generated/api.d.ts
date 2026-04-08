@@ -11,6 +11,7 @@
 import type * as analyses from "../analyses.js";
 import type * as authQueries from "../authQueries.js";
 import type * as case_studies from "../case_studies.js";
+import type * as collections from "../collections.js";
 import type * as contact from "../contact.js";
 import type * as crons from "../crons.js";
 import type * as debug from "../debug.js";
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   analyses: typeof analyses;
   authQueries: typeof authQueries;
   case_studies: typeof case_studies;
+  collections: typeof collections;
   contact: typeof contact;
   crons: typeof crons;
   debug: typeof debug;

@@ -10,6 +10,8 @@ import Button from '@/components/ui/Button';
 import { useTranslations, useMessages } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { ReportGenerator } from '@/lib/report-generator';
+import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
+import { FolderPlus } from 'lucide-react';
 
 export default function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
@@ -37,12 +39,13 @@ export default function DeepStatusPanel() {
     const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [runToSave, setRunToSave] = useState<any>(null);
 
     const handleExport = async (format: 'pdf' | 'excel') => {
         if (!runs || runs.length === 0) return;
         setIsExporting(format);
         try {
-            await ReportGenerator.exportDeepWebReport(runs, messages, format);
+            await ReportGenerator.exportDeepWebReport(runs, [], messages, format);
         } catch (err) {
             console.error('Deep Web export failed:', err);
         } finally {
@@ -264,10 +267,33 @@ export default function DeepStatusPanel() {
                                     {run.error}
                                 </span>
                             )}
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="p-1.5 h-auto text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors"
+                                    onClick={() => setRunToSave(run)}
+                                >
+                                    <FolderPlus className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
                 </div>
             </div>
+
+            {runToSave && (
+                <SaveToCollectionModal 
+                    isOpen={!!runToSave} 
+                    onClose={() => setRunToSave(null)}
+                    item={{
+                        id: runToSave._id,
+                        type: "deep_web",
+                        title: `Deep Web Run: ${new Date(runToSave.startedAt).toLocaleString()}`,
+                        data: runToSave
+                    }}
+                />
+            )}
         </section>
     );
 }

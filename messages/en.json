@@ -1729,6 +1729,7 @@
     "video_processing_wasm": "Running FFmpeg on WASM Core...",
     "processing_local": "Computing Visual Signals...",
     "export_pdf": "Export PDF Report",
-    "export_excel": "Export Forensic Data (CSV)"
+    "export_excel": "Export Forensic Data (CSV)",
+    "export_not_supported_excel": "Excel export is coming soon for AI Forensics. Use PDF export in the meantime."
   }
 }

@@ -68,9 +68,13 @@ export class ReportGenerator {
     /**
      * Deep Web Risk Assessment Report
      */
-    static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[], translations: any) {
+    static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[] | Record<string, unknown>, translations: any, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.reports?.deep_title || 'Deep Web Risk Assessment';
-        return this.generateDeepWebPDF(runs, threats, translations, title);
+        const threatList: ReportArticle[] = Array.isArray(threats) ? threats : [];
+        if (format === 'excel') {
+            return this.generateExcel(threatList, translations, title);
+        }
+        return this.generateDeepWebPDF(runs, threatList, translations, title);
     }
 
     /**

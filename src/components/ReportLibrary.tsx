@@ -13,8 +13,7 @@ import { useTranslations } from "next-intl";
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
-    const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 }) as any;
-    const articles = articlesResult?.items;
+    const collectionsResult = useQuery(api.collections.getCollections) || [];
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
@@ -25,9 +24,9 @@ export default function ReportLibrary() {
         return () => clearTimeout(timer);
     }, [inputValue]);
 
-    const filteredArticles = articles?.filter((a: any) =>
-        a.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        a.keyword.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    const filteredCollections = collectionsResult?.filter((c: any) =>
+        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        c.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
     return (
@@ -58,19 +57,19 @@ export default function ReportLibrary() {
             </div>
 
             <div className="space-y-3">
-                {articles === undefined ? (
+                {!collectionsResult ? (
                     Array.from({ length: 5 }).map((_, i) => (
                         <SkeletonReportRow key={i} />
                     ))
-                ) : filteredArticles?.length === 0 ? (
+                ) : filteredCollections?.length === 0 ? (
                     <div className="py-20 text-center space-y-4">
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto" aria-hidden="true" />
                         <p className="text-muted-foreground font-medium">{t('no_results')}</p>
                     </div>
                 ) : (
-                    filteredArticles?.map((article: any) => (
+                    filteredCollections?.map((collection: any) => (
                         <div
-                            key={article._id}
+                            key={collection._id}
                             className="bg-card/40 border border-border hover:border-border/80 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:bg-card/60 group"
                         >
                             <div className="flex items-center gap-4">
@@ -79,24 +78,15 @@ export default function ReportLibrary() {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <h4 className="text-foreground font-semibold group-hover:text-primary transition-colors line-clamp-1">
-                                        {article.title}
+                                        {collection.name}
                                     </h4>
                                     <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" aria-hidden="true" />
-                                            {article.publishedDate}
+                                            {new Date(collection.updatedAt).toLocaleDateString()}
                                         </span>
                                         <span>•</span>
-                                        <span className={clsx(
-                                            "px-2 py-0.5 rounded-full border",
-                                            article.sentiment === "Positive" ? "border-emerald-500/20 text-emerald-400 bg-emerald-500/5" :
-                                                article.sentiment === "Negative" ? "border-rose-500/20 text-rose-400 bg-rose-500/5" :
-                                                    "border-amber-500/20 text-amber-400 bg-amber-500/5"
-                                        )}>
-                                            {article.sentiment}
-                                        </span>
-                                        <span>•</span>
-                                        <span className="text-muted-foreground">{article.sourceType}</span>
+                                        <span className="text-muted-foreground">{collection.items?.length || 0} Items</span>
                                     </div>
                                 </div>
                             </div>
@@ -106,9 +96,8 @@ export default function ReportLibrary() {
                                     variant="outline"
                                     size="sm"
                                     className="border-border hover:bg-muted"
-                                    onClick={() => window.open(article.url, '_blank')}
                                 >
-                                    {t('preview')}
+                                    {tCommon('view_details')}
                                 </Button>
                                 <Button
                                     variant="primary"

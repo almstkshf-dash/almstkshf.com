@@ -313,7 +313,7 @@ export default function AIInspectorPage() {
               <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">{t('footer_disclaimer')}</p>
            </div>
            <div className="flex items-start justify-end">
-              <img src="/logo.png" alt="ALMSTKSHF" className="h-8 grayscale opacity-20" />
+              <img src="/logo.png" alt="ALMSTKSHF" className="h-8 grayscale opacity-20" crossOrigin="anonymous" />
            </div>
         </footer>
       </div>
@@ -321,7 +321,7 @@ export default function AIInspectorPage() {
       {/* Hidden processing elements */}
       <div className="sr-only">
         {mode === 'video' && filePreview && (
-           <video ref={videoRef} src={filePreview} muted className="hidden" />
+           <video ref={videoRef} src={filePreview} muted className="hidden" crossOrigin="anonymous" />
         )}
         <canvas ref={canvasRef} className="hidden" />
       </div>

@@ -7,10 +7,10 @@ type KeyContext = QueryCtx | ActionCtx;
  * Validates that an API key is not a placeholder or empty string.
  * Strictly checks Gemini keys for the standard 'AIzaSy' prefix.
  */
-function isValidKey(key: any, isGemini: boolean = false): boolean {
+function isValidKey(key: unknown, isGemini: boolean = false): boolean {
   if (!key || typeof key !== 'string') return false;
   const k = key.trim();
-  
+
   // Basic placeholders
   const lowerK = k.toLowerCase();
   if (["", "undefined", "null", "none", "placeholder"].includes(lowerK)) return false;
@@ -41,11 +41,11 @@ export async function resolveApiKey(
   settingsField?: string
 ): Promise<string | null> {
   const isGemini = settingsField === 'gemini';
-  
+
   // 1. Get identity and check if Admin
   const identity = await ctx.auth.getUserIdentity();
   const userId = identity?.subject;
-  
+
   let isAdmin = false;
   if (identity) {
     // Check if admin matches process.env.ADMIN_USER_IDS or Node Dev mode
@@ -54,7 +54,7 @@ export async function resolveApiKey(
   }
 
   // 2. Fetch User Settings (if authenticated)
-  let userSettings: any = null;
+  let userSettings: Record<string, any> | null = null;
   if (userId && 'runQuery' in ctx) {
     try {
       userSettings = await (ctx as ActionCtx).runQuery(
@@ -72,13 +72,13 @@ export async function resolveApiKey(
 
     const isSubscribed = userSettings?.isSubscribed || false;
     const isTrialActive = userSettings?.isTrialActive && (userSettings?.trialEndsAt || 0) > Date.now();
-    
+
     // b) Admins, Subscribed, and Trial users fallback to System Key if no BYOK
     if (isAdmin || isSubscribed || isTrialActive) {
       const systemKey = await getSystemKey(ctx, "GEMINI_API_KEY", "gemini");
       if (systemKey) return systemKey;
     }
-    
+
     // c) Final fallback for any other context
     return await getSystemKey(ctx, "GEMINI_API_KEY", "gemini");
   }
@@ -110,16 +110,16 @@ async function getSystemKey(
       api.settings.getSettings,
       {}
     );
-    if (settingsField && appSettings?.apiKeys?.[settingsField]) {
-      const key = appSettings.apiKeys[settingsField];
-      if (isValidKey(key, isGemini)) return key.trim();
+    if (settingsField && appSettings && (appSettings.apiKeys as Record<string, string | undefined>)?.[settingsField]) {
+      const key = (appSettings.apiKeys as Record<string, string | undefined>)[settingsField];
+      if (isValidKey(key, isGemini)) return key!.trim();
     }
   } catch (e) { /* ignore */ }
 
   // 2. Check Environment variable
   const envKey = process.env[envVarName];
   if (isValidKey(envKey, isGemini)) return envKey!.trim();
-  
+
   return null;
 }
 

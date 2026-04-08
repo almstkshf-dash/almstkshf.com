@@ -1733,6 +1733,7 @@
       "video_processing_wasm": "تشغيل FFmpeg على قلب WASM...",
       "processing_local": "حوسبة الإشارات البصرية...",
       "export_pdf": "تصدير تقرير PDF",
-      "export_excel": "تصدير البيانات الجنائية (CSV)"
+      "export_excel": "تصدير البيانات الجنائية (CSV)",
+      "export_not_supported_excel": "تصدير Excel قادم قريباً للأدلة الجنائية بالذكاء الاصطناعي. استخدم تصدير PDF في الوقت الحالي."
   }
 }

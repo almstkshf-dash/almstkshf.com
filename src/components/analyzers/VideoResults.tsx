@@ -392,6 +392,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     src={thumb}
                     className="w-full h-full object-cover"
                     alt={`Frame at ${ts}s`}
+                    crossOrigin="anonymous"
                   />
                   <div className="absolute top-2 right-2 flex gap-1">
                     {isHigh && (
@@ -464,6 +465,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 }
                 className="w-full h-full object-cover grayscale-[0.25] transition-all group-hover:grayscale-0 duration-500"
                 alt="Selected frame"
+                crossOrigin="anonymous"
               />
               {/* Scan line */}
               <motion.div

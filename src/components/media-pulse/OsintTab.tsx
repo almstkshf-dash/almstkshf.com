@@ -18,7 +18,8 @@ import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { ReportGenerator } from '@/lib/report-generator';
-import { AlertCircle, ArrowRight, ShieldCheck, Database, Server, Smartphone, Info } from 'lucide-react';
+import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
+import { AlertCircle, ArrowRight, ShieldCheck, Database, Server, Smartphone, Info, FolderPlus } from 'lucide-react';
 
 // ─── Static directory data ─────────────────────────────────────────────
 const CATEGORIES = [
@@ -457,6 +458,8 @@ export default function OsintTab() {
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState('');
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [historyItemToSave, setHistoryItemToSave] = useState<HistoryItem | null>(null);
 
   const handleExport = async (format: 'pdf' | 'excel') => {
     if (!history || history.length === 0) return;
@@ -682,15 +685,32 @@ export default function OsintTab() {
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
+                    <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
                       <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Analysis Completed Successfully</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
-                    <Database className="w-3 h-3" />
-                    {tCommon('copy')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => setIsCollectionModalOpen(true)}>
+                        <FolderPlus className="w-3 h-3" />
+                        Save to Collection
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
+                      <Database className="w-3 h-3" />
+                      {tCommon('copy')}
+                    </Button>
+                  </div>
                 </div>
+
+                <SaveToCollectionModal 
+                    isOpen={isCollectionModalOpen} 
+                    onClose={() => setIsCollectionModalOpen(false)}
+                    item={{
+                        id: Math.random().toString(36).substring(7),
+                        type: "osint",
+                        title: `OSINT: ${activeType} lookup for ${query}`,
+                        data: result
+                    }}
+                />
 
                 <StructuredResultView type={activeType} data={result} t={t} />
               </div>
@@ -768,6 +788,12 @@ export default function OsintTab() {
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setHistoryItemToSave(item); }}
+                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-500 transition-all"
+                      >
+                        <FolderPlus className="w-3.5 h-3.5" />
+                      </button>
                       <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         {expandedHistory === item._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </div>
@@ -781,6 +807,18 @@ export default function OsintTab() {
                 </div>
               ))}
             </div>
+            {historyItemToSave && (
+               <SaveToCollectionModal 
+                    isOpen={!!historyItemToSave} 
+                    onClose={() => setHistoryItemToSave(null)}
+                    item={{
+                        id: historyItemToSave._id,
+                        type: "osint",
+                        title: `OSINT: ${historyItemToSave.type} lookup for ${historyItemToSave.query}`,
+                        data: historyItemToSave.result
+                    }}
+                />
+            )}
           </div>
         )}
       </div>

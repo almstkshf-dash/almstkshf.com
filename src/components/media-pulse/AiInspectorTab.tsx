@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 
 import { ReportGenerator } from "@/lib/report-generator";
+import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
+import { FolderPlus } from "lucide-react";
 
 // Components
 import TextResults from "@/components/analyzers/TextResults";
@@ -35,6 +37,7 @@ export default function AiInspectorTab() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
 
   const handleExport = async (format: 'pdf' | 'excel') => {
     setIsExporting(format);
@@ -305,6 +308,13 @@ export default function AiInspectorTab() {
                     {t("export_pdf") || "Export PDF"}
                   </button>
                   <button
+                    onClick={() => setIsCollectionModalOpen(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 transition-all shadow-sm"
+                  >
+                    <FolderPlus className="w-4 h-4" />
+                    Save to Collection
+                  </button>
+                  <button
                     onClick={reset}
                     className="flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-border rounded-xl text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"
                   >
@@ -314,6 +324,17 @@ export default function AiInspectorTab() {
                 </div>
               </div>
 
+              <SaveToCollectionModal 
+                isOpen={isCollectionModalOpen} 
+                onClose={() => setIsCollectionModalOpen(false)}
+                item={{
+                    id: Math.random().toString(36).substring(7),
+                    type: "ai_inspector",
+                    title: `AI Inspector: ${mode} analysis`,
+                    data: mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults
+                }}
+              />
+
               {textResults && <TextResults result={textResults} rawText={textInput} />}
 
               {imageResults && (
@@ -321,7 +342,7 @@ export default function AiInspectorTab() {
                   <div className="lg:col-span-4 lg:sticky lg:top-8">
                     <div className="space-y-6">
                       <div className="aspect-square rounded-[2.5rem] overflow-hidden border border-border shadow-2xl bg-card">
-                        <img src={previewUrl!} className="w-full h-full object-cover" alt="Source" />
+                        <img src={previewUrl!} className="w-full h-full object-cover" alt="Source" crossOrigin="anonymous" />
                       </div>
                       <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
                         <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-3 opacity-60 italic">{t("file_info")}</p>
@@ -343,7 +364,7 @@ export default function AiInspectorTab() {
                 <div className="space-y-10">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div className="aspect-video rounded-[2.5rem] overflow-hidden border border-border bg-black relative group shadow-2xl">
-                      <video src={previewUrl!} controls className="w-full h-full object-contain" />
+                      <video src={previewUrl!} controls className="w-full h-full object-contain" crossOrigin="anonymous" />
                     </div>
                     <div className="flex flex-col justify-center space-y-6 lg:pl-10">
                       <div className="space-y-3">

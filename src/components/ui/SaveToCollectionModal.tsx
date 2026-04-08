@@ -1,0 +1,167 @@
+"use client";
+
+import React, { useState } from "react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { X, Plus, FolderPlus, Loader2, Check } from "lucide-react";
+import Button from "./Button";
+import { useTranslations } from "next-intl";
+
+interface SaveToCollectionModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    item: {
+        id: string;
+        type: "media_monitoring" | "osint" | "ai_inspector" | "watchlist" | "deep_web" | "custom";
+        title: string;
+        sourceId?: string;
+        data: any;
+    };
+}
+
+export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToCollectionModalProps) {
+    const tCommon = useTranslations("Common");
+    const collections = useQuery(api.collections.getCollections);
+    const createCollection = useMutation(api.collections.createCollection);
+    const addToCollection = useMutation(api.collections.addToCollection);
+
+    const [isCreating, setIsCreating] = useState(false);
+    const [newCollectionName, setNewCollectionName] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    if (!isOpen) return null;
+
+    const handleSave = async (collectionId: string) => {
+        setLoading(true);
+        try {
+            await addToCollection({ collectionId: collectionId as any, item });
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+                onClose();
+            }, 1000);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateAndSave = async () => {
+        if (!newCollectionName.trim()) return;
+        setLoading(true);
+        try {
+            const newId = await createCollection({ name: newCollectionName.trim() });
+            await addToCollection({ collectionId: newId, item });
+            setSuccess(true);
+            setTimeout(() => {
+                setSuccess(false);
+                setIsCreating(false);
+                setNewCollectionName("");
+                onClose();
+            }, 1000);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative">
+                <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">
+                    <h3 className="text-lg font-bold text-foreground">Save to Collection</h3>
+                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+                    {success ? (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                                <Check className="w-8 h-8" />
+                            </div>
+                            <p className="font-bold text-lg text-emerald-600 dark:text-emerald-400">Saved Successfully!</p>
+                        </div>
+                    ) : (
+                        <>
+                            {isCreating ? (
+                                <div className="space-y-4 animate-in slide-in-from-right-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-foreground">Collection Name</label>
+                                        <input 
+                                            autoFocus
+                                            type="text" 
+                                            value={newCollectionName}
+                                            onChange={(e) => setNewCollectionName(e.target.value)}
+                                            placeholder="e.g. Investigation Q3"
+                                            className="w-full bg-background border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-3 pt-2">
+                                        <Button variant="outline" className="flex-1" onClick={() => setIsCreating(false)}>
+                                            {tCommon('cancel')}
+                                        </Button>
+                                        <Button 
+                                            variant="primary" 
+                                            className="flex-1" 
+                                            onClick={handleCreateAndSave}
+                                            disabled={!newCollectionName.trim() || loading}
+                                            leftIcon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                        >
+                                            Create & Save
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <button 
+                                        onClick={() => setIsCreating(true)}
+                                        className="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
+                                    >
+                                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                                            <Plus className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-foreground">Create New Collection</p>
+                                            <p className="text-xs text-muted-foreground">Start a new report collection</p>
+                                        </div>
+                                    </button>
+
+                                    {collections === undefined ? (
+                                        <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                                    ) : collections.length === 0 ? (
+                                        <div className="text-center p-6 text-sm text-muted-foreground">
+                                            No collections yet.
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 pt-2">
+                                            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 mb-2">Existing Collections</p>
+                                            {collections.map(col => (
+                                                <button 
+                                                    key={col._id}
+                                                    onClick={() => handleSave(col._id)}
+                                                    disabled={loading}
+                                                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all text-left group disabled:opacity-50"
+                                                >
+                                                    <div className="flex items-center gap-3 min-w-0">
+                                                        <FolderPlus className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                                                        <span className="font-medium text-sm text-foreground truncate">{col.name}</span>
+                                                    </div>
+                                                    <span className="text-xs text-muted-foreground bg-background px-2 py-1 rounded-full border border-border">{col.items.length} items</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

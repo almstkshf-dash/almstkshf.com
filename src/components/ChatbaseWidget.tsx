@@ -69,6 +69,7 @@ export default function ChatbaseWidget() {
                         const onLoad = function() {
                             if (document.getElementById("${chatbotId}")) return;
                             const script = document.createElement("script");
+                            script.crossOrigin = "anonymous";
                             script.src = "https://www.chatbase.co/embed.min.js";
                             script.id = "${chatbotId}";
                             script.setAttribute("chatbotId", "${chatbotId}");

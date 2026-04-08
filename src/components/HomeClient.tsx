@@ -107,6 +107,7 @@ export default function HomeClient() {
                                 height={48}
                                 loading="lazy"
                                 decoding="async"
+                                crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
@@ -118,6 +119,7 @@ export default function HomeClient() {
                                 height={64}
                                 loading="lazy"
                                 decoding="async"
+                                crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
@@ -129,6 +131,7 @@ export default function HomeClient() {
                                 height={48}
                                 loading="lazy"
                                 decoding="async"
+                                crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>
@@ -140,6 +143,7 @@ export default function HomeClient() {
                                 height={48}
                                 loading="lazy"
                                 decoding="async"
+                                crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
                             />
                         </div>

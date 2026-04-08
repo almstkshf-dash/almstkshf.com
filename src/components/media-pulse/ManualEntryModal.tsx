@@ -386,7 +386,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                             {formData.imageUrl && (
                                 <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
-                                    <img src={formData.imageUrl} alt="" className="h-full w-full object-cover" aria-hidden="true" />
+                                    <img src={formData.imageUrl} alt="" className="h-full w-full object-cover" aria-hidden="true" crossOrigin="anonymous" />
                                 </div>
                             )}
                         </div>

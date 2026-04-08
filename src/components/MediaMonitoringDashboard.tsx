@@ -12,6 +12,8 @@ import clsx from "clsx";
 import CrisisPlanCard from "./CrisisPlanCard";
 import { SkeletonReportRow, SkeletonCard } from "./ui/Skeleton";
 import ReportsChart from "./ReportsChart";
+import SaveToCollectionModal from "./ui/SaveToCollectionModal";
+import { FolderPlus } from "lucide-react";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
 type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
@@ -60,6 +62,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const [filter, setFilter] = useState<ArticleFilter>(
         (searchParams.get('mfilter') as ArticleFilter) || normalizeFilter(defaultFilter)
     );
+    const [itemToSave, setItemToSave] = useState<any>(null);
 
     // Sync state with URL search parameters to handle back/forward navigation
     useEffect(() => {
@@ -186,19 +189,42 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                 <span>•</span>
                                 <span>{new Date(report.timestamp || report.publishedDate || report.createdAt).toLocaleDateString()}</span>
                             </div>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                leftIcon={<Download className="w-3 h-3" />}
-                                onClick={() => report.url && window.open(report.url, '_blank')}
-                            >
-                                {tCommon('view_details')}
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex-1"
+                                    leftIcon={<Download className="w-3 h-3" />}
+                                    onClick={() => report.url && window.open(report.url, '_blank')}
+                                >
+                                    {tCommon('view_details')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="px-3 bg-emerald-500/5 hover:bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                                    onClick={() => setItemToSave(report)}
+                                >
+                                    <FolderPlus className="w-4 h-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))
                 )}
             </div>
+
+            {itemToSave && (
+                <SaveToCollectionModal 
+                    isOpen={!!itemToSave} 
+                    onClose={() => setItemToSave(null)}
+                    item={{
+                        id: itemToSave._id,
+                        type: "media_monitoring",
+                        title: itemToSave.reportName || itemToSave.title,
+                        data: itemToSave
+                    }}
+                />
+            )}
 
             {/* Crisis Management Section */}
             <div>
