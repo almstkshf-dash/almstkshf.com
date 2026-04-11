@@ -13,6 +13,8 @@ import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import * as XLSX from 'xlsx';
+import { ReportGenerator } from '@/lib/report-generator';
+
 
 // ─── Constants ─────────────────────────────────────────────────────────
 const ENTRY_TYPES = ['all', 'individual', 'entity', 'organization'] as const;
@@ -40,6 +42,34 @@ export default function TerroristListTab() {
 
   const wipeAll = useMutation(api.terroristList.wipeAll);
   const addItems = useMutation(api.terroristList.addItems);
+  const messages = useTranslations(); // For passing to ReportGenerator if needed, but we'll use t scopes
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    if (!entries || entries.length === 0) return;
+    try {
+      // Create a simplified translations object for ReportGenerator
+      const exportTranslations = {
+        TerroristList: {
+          title: t('title'),
+          fields: {
+            name_arabic: t('fields.name_arabic'),
+            name_latin: t('fields.name_latin'),
+            nationality: t('fields.nationality'),
+            doc_number: t('fields.doc_number'),
+            category: t('fields.category'),
+            reasons: t('fields.reasons')
+          }
+        },
+        Reports: {
+          generated_at: tCommon('status') // Or a more appropriate key if available
+        }
+      };
+
+      await ReportGenerator.exportTerroristListReport(entries, exportTranslations, format);
+    } catch (err) {
+      console.error('Watchlist export failed:', err);
+    }
+  };
 
   // ─── Handlers ─────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +84,8 @@ export default function TerroristListTab() {
       const reader = new FileReader();
       reader.onload = async (evt) => {
         try {
-          const bstr = evt.target?.result;
-          const wb = XLSX.read(bstr, { type: 'binary' });
+          const data = evt.target?.result;
+          const wb = XLSX.read(data, { type: 'array' });
 
           let allData: any[] = [];
 
@@ -115,7 +145,7 @@ export default function TerroristListTab() {
 
           // Trigger Convex Mutation
           await wipeAll({});
-          
+
           const totalChunks = Math.ceil(allData.length / 200);
           setImportProgress({ current: 0, total: totalChunks });
 
@@ -135,7 +165,7 @@ export default function TerroristListTab() {
           setImportLoading(false);
         }
       };
-      reader.readAsBinaryString(file);
+      reader.readAsArrayBuffer(file);
     } catch (err: any) {
       setImportError("File read error");
       setImportLoading(false);
@@ -168,6 +198,24 @@ export default function TerroristListTab() {
                 <Upload className="w-3.5 h-3.5" />
                 {t('import_data')}
               </Button>
+            )}
+            {entries && entries.length > 0 && (
+              <div className="flex items-center gap-1.5 p-1 bg-muted/30 rounded-xl border border-border">
+                <button
+                  onClick={() => handleExport('pdf')}
+                  className="h-8 px-3 flex items-center gap-2 rounded-lg hover:bg-muted text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  PDF
+                </button>
+                <button
+                  onClick={() => handleExport('excel')}
+                  className="h-8 px-3 flex items-center gap-2 rounded-lg hover:bg-muted text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  EXCEL
+                </button>
+              </div>
             )}
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -388,8 +436,8 @@ export default function TerroristListTab() {
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-bold">
-                      {importLoading 
-                        ? `${t('import_modal.uploading')} (${importProgress.current}/${importProgress.total})` 
+                      {importLoading
+                        ? `${t('import_modal.uploading')} (${importProgress.current}/${importProgress.total})`
                         : t('import_modal.drop_file')}
                     </p>
                     <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-1">.xlsx, .xls, .csv ONLY</p>

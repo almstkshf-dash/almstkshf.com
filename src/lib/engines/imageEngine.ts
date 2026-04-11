@@ -1,22 +1,7 @@
-/**
- * AI Content Detection Engine — Image Forensics
- *
- * Rule-based AI image detection via canvas pixel analysis — zero API, fully client-side.
- * Detects: synthetic grain absence, skin airbrushing, lighting uniformity, AI bokeh,
- * symmetry bias, color flatness, edge dissolution, aspect ratio fingerprints, EXIF heuristics.
- *
- * Exports (new API):
- *   analyzeImageFile(file: File): Promise<ImageAnalysisResult>
- *
- * Legacy backward-compat exports (existing consumers unchanged):
- *   analyzeImage(img: HTMLImageElement): Promise<ImageAnalysisReport>
- *   analyzeImageCanvas(canvas: HTMLCanvasElement): ImageAnalysisReport
- *   ImageAnalysisReport
- */
-
-// ─── New rich interfaces ──────────────────────────────────────────────────────
+import { analyzeOCR, detectBiometricAnomalies, detectWatermarks, ForensicAnomaly } from './mlHelper';
 
 export interface ImageSignal {
+  id: string;
   name: string;
   detected: boolean;
   weight: number;
@@ -25,9 +10,11 @@ export interface ImageSignal {
 }
 
 export interface ChecklistItem {
+  id: string;
   label: string;
   passed: boolean;
   note: string;
+  val?: string | number;
 }
 
 export interface PixelStats {
@@ -47,9 +34,15 @@ export interface PixelStats {
 export interface ImageAnalysisResult {
   overallScore: number;
   verdict: string;
+  verdictKey: string;
   signals: ImageSignal[];
   checklist: ChecklistItem[];
   stats: PixelStats;
+  deepMl?: {
+    ocr: { text: string; isGarbled: boolean; confidence: number };
+    biometrics: { faceAnomalies: ForensicAnomaly[]; handAnomalies: ForensicAnomaly[] };
+    watermarks: ForensicAnomaly[];
+  };
 }
 
 // ─── Legacy interface (kept for backward compat) ──────────────────────────────
@@ -88,11 +81,32 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // ── Standard pixel heuristics ──
         const stats = computePixelStats(imageData, canvas.width, canvas.height, img.width, img.height, file);
-        const result = buildImageResult(stats, file);
+        
+        // ── Deep ML Analysis (Async) ──
+        (async () => {
+          try {
+            const ocrResult = await analyzeOCR(canvas);
+            const biometricResult = await detectBiometricAnomalies(canvas);
+            const watermarkResult = detectWatermarks(ctx, canvas.width, canvas.height);
 
-        URL.revokeObjectURL(url);
-        resolve(result);
+            const result = buildImageResult(stats, file, {
+              ocr: ocrResult,
+              biometrics: biometricResult,
+              watermarks: watermarkResult
+            });
+
+            URL.revokeObjectURL(url);
+            resolve(result);
+          } catch (e) {
+            // Fallback to basic results if ML fails
+            const result = buildImageResult(stats, file);
+            URL.revokeObjectURL(url);
+            resolve(result);
+          }
+        })();
       } catch (e) {
         URL.revokeObjectURL(url);
         reject(e);
@@ -116,105 +130,46 @@ export const analyzeImage = async (img: HTMLImageElement): Promise<ImageAnalysis
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas context unavailable");
   ctx.drawImage(img, 0, 0);
-  return analyzeImageCanvas(canvas);
+  return analyzeImageCanvasDeep(canvas); // Upgrade to deep analysis
 };
 
-export const analyzeImageCanvas = (canvas: HTMLCanvasElement): ImageAnalysisReport => {
+export const analyzeImageCanvasDeep = async (canvas: HTMLCanvasElement): Promise<ImageAnalysisReport> => {
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) throw new Error("Canvas context unavailable");
 
   const { width, height } = canvas;
   const imageData = ctx.getImageData(0, 0, width, height);
-  const data = imageData.data;
 
-  // ── Noise floor (local luminance variance) ────────────────────────────────
-  let varianceSum = 0;
-  const sampleDensity = 1000;
-  for (let i = 0; i < sampleDensity; i++) {
-    const x = Math.floor(Math.random() * (width - 1));
-    const y = Math.floor(Math.random() * (height - 1));
-    const idx = (y * width + x) * 4;
-    const nextIdx = (y * width + (x + 1)) * 4;
-    const l1 = data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114;
-    const l2 = data[nextIdx] * 0.299 + data[nextIdx + 1] * 0.587 + data[nextIdx + 2] * 0.114;
-    varianceSum += Math.abs(l1 - l2);
-  }
-  const avgVariance = varianceSum / sampleDensity;
+  const stats = computePixelStats(imageData, width, height, width, height, new File([], "canvas.png"));
+  
+  const ocrResult = await analyzeOCR(canvas);
+  const biometricResult = await detectBiometricAnomalies(canvas);
+  const watermarkResult = detectWatermarks(ctx, width, height);
 
-  // ── Entropy (color distribution) ──────────────────────────────────────────
-  const colorBaskets = new Int32Array(256);
-  for (let i = 0; i < data.length; i += Math.floor(data.length / 2000) * 4) {
-    const l = Math.floor(data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114);
-    colorBaskets[l]++;
-  }
-  let entropy = 0;
-  const totalSamples = colorBaskets.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < 256; i++) {
-    if (colorBaskets[i] > 0) {
-      const p = colorBaskets[i] / totalSamples;
-      entropy -= p * Math.log2(p);
-    }
-  }
+  const richResult = buildImageResult(stats, new File([], "canvas.png"), {
+    ocr: ocrResult,
+    biometrics: biometricResult,
+    watermarks: watermarkResult
+  });
 
-  // Now compute full rich stats for the legacy report too
-  const dummyFile = new File([], "canvas.png", { type: "image/png" });
-  const stats = computePixelStats(imageData, width, height, width, height, dummyFile);
-  const richResult = buildImageResult(stats, dummyFile);
+  return finalizeReport(richResult, stats);
+};
 
-  // ── Scoring ───────────────────────────────────────────────────────────────
-  let riskScore = 0;
+// Helper to consolidate scoring logic
+export function finalizeReport(richResult: ImageAnalysisResult, stats: PixelStats): ImageAnalysisReport {
+  let riskScore = richResult.overallScore;
   const signals: ImageAnalysisReport["pixelLogicSignals"] = [];
 
-  if (avgVariance < 1.2) {
-    riskScore += 45;
-    signals.push({
-      id: "low_noise",
-      label: "Synthetic Grain",
-      description: "Lack of natural sensor noise detected in pixel transitions.",
-      detectedValue: avgVariance.toFixed(2),
-      threshold: "1.20",
-      risk: "flag",
-    });
-  } else {
-    signals.push({
-      id: "natural_grain",
-      label: "Natural Grain",
-      description: "Sensor grain levels consistent with realistic photography.",
-      detectedValue: avgVariance.toFixed(2),
-      threshold: "1.20",
-      risk: "none",
-    });
-  }
-
-  if (entropy < 4.5) {
-    riskScore += 30;
-    signals.push({
-      id: "low_entropy",
-      label: "Color Entropy",
-      description: "Uniformity in color distribution suggests artificial rendering.",
-      detectedValue: entropy.toFixed(2),
-      threshold: "4.50+",
-      risk: "concern",
-    });
-  }
-
-  // Surface high-weight rich signals into legacy format
   for (const sig of richResult.signals) {
-    if (sig.detected && sig.weight >= 14) {
-      const alreadyMapped = signals.some(
-        (s) => s.label.toLowerCase().includes(sig.name.substring(0, 8).toLowerCase())
-      );
-      if (!alreadyMapped) {
-        riskScore += Math.round(sig.weight * 0.5);
-        signals.push({
-          id: sig.name.replace(/\s+/g, "_").toLowerCase().slice(0, 32),
-          label: sig.name,
-          description: sig.description,
-          detectedValue: sig.category,
-          threshold: "-",
-          risk: sig.weight >= 18 ? "flag" : "concern",
-        });
-      }
+    if (sig.detected) {
+      signals.push({
+        id: sig.id,
+        label: sig.name,
+        description: sig.description,
+        detectedValue: "detected",
+        threshold: "-",
+        risk: sig.weight >= 20 ? "flag" : "concern",
+      });
     }
   }
 
@@ -227,6 +182,21 @@ export const analyzeImageCanvas = (canvas: HTMLCanvasElement): ImageAnalysisRepo
     pixelLogicSignals: signals,
     richResult,
   };
+}
+
+export const analyzeImageCanvas = (canvas: HTMLCanvasElement): ImageAnalysisReport => {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) throw new Error("Canvas context unavailable");
+
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+
+  // Now compute full rich stats for the legacy report too
+  const dummyFile = new File([], "canvas.png", { type: "image/png" });
+  const stats = computePixelStats(imageData, width, height, width, height, dummyFile);
+  const richResult = buildImageResult(stats, dummyFile);
+
+  return finalizeReport(richResult, stats);
 };
 
 // ─── Pixel computation ────────────────────────────────────────────────────────
@@ -334,7 +304,7 @@ function computePixelStats(
   const backgroundBlur =
     centerAvg > 0 ? Math.min(1, Math.max(0, centerEdgeDelta / centerAvg)) : 0;
 
-  // Local contrast variance across 3×3 zones
+  // Local contrast variance across 3\u00D73 zones
   const zoneW = Math.floor(w / 3), zoneH = Math.floor(h / 3);
   const zoneMeans: number[] = [];
   for (let zy = 0; zy < 3; zy++) {
@@ -372,151 +342,173 @@ function stdDev(arr: number[]): number {
   return Math.sqrt(arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length);
 }
 
-// ─── Signal builder ───────────────────────────────────────────────────────────
+// \u2500\u2500\u2500 Signal builder \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
-function buildImageResult(stats: PixelStats, file: File): ImageAnalysisResult {
+function buildImageResult(
+  stats: PixelStats, 
+  file: File,
+  deepMl?: {
+    ocr: { text: string; isGarbled: boolean; confidence: number };
+    biometrics: { faceAnomalies: ForensicAnomaly[]; handAnomalies: ForensicAnomaly[] };
+    watermarks: ForensicAnomaly[];
+  }
+): ImageAnalysisResult {
   const signals: ImageSignal[] = [
-
-    // ── TEXTURE ────────────────────────────────────────────────────────────
     {
+      id: "smooth_texture",
       name: "Unnaturally smooth texture / skin",
-      detected: stats.noiseLevel < 16 || stats.skinSmoothness > 0.82,
-      weight: 22,
+      detected: stats.noiseLevel < 18 || stats.skinSmoothness > 0.82,
+      weight: 55,
       category: "texture",
-      description:
-        "AI images lack camera sensor noise; skin in AI portraits is airbrushed-perfect.",
+      description: "AI images lack camera sensor noise; skin in AI portraits is airbrushed-perfect.",
     },
     {
+      id: "low_sat",
       name: "Low saturation variance",
-      detected: stats.saturationVariance < 0.11,
-      weight: 14,
+      detected: stats.saturationVariance < 0.12,
+      weight: 15,
       category: "texture",
-      description:
-        "Human photos have chaotic, uneven colour across regions — AI flattens it.",
+      description: "Human photos have chaotic, uneven colour across regions — AI flattens it.",
     },
-
-    // ── STRUCTURE ──────────────────────────────────────────────────────────
     {
+      id: "symmetry",
       name: "Suspicious bilateral symmetry",
-      detected: stats.symmetryScore > 0.84,
-      weight: 14,
+      detected: stats.symmetryScore > 0.85,
+      weight: 25,
       category: "structure",
-      description:
-        "AI faces and compositions trend toward near-perfect symmetry — real life doesn't.",
+      description: "AI faces and compositions trend toward near-perfect symmetry.",
     },
     {
+      id: "uniform_color",
       name: "Over-uniform color distribution",
-      detected: stats.colorUniformity > 0.74,
-      weight: 16,
+      detected: stats.colorUniformity > 0.72,
+      weight: 20,
       category: "structure",
-      description:
-        "Real photos have varied R/G/B distribution; AI flattens it uniformly.",
+      description: "Real photos have varied R/G/B distribution; AI flattens it uniformly.",
     },
-
-    // ── LIGHTING ───────────────────────────────────────────────────────────
     {
+      id: "uniform_lighting",
       name: "Unnaturally uniform lighting",
-      detected: stats.localContrastVariance < 8,
-      weight: 18,
+      detected: stats.localContrastVariance < 9.5,
+      weight: 45,
       category: "lighting",
-      description:
-        "Real scenes have uneven light (shadows, reflections, highlights). AI lighting is studio-perfect.",
+      description: "Real scenes have uneven light. AI lighting is studio-perfect.",
     },
     {
+      id: "bg_separation",
       name: "Artificial subject / background separation",
-      detected: stats.backgroundBlur > 0.55 && stats.centerEdgeDelta > 10,
-      weight: 12,
+      detected: stats.backgroundBlur > 0.60 && stats.centerEdgeDelta > 15,
+      weight: 15,
       category: "lighting",
-      description:
-        "AI aggressively isolates subjects from backgrounds with unnatural bokeh-like blur.",
+      description: "AI aggressively isolates subjects with unnatural bokeh.",
     },
-
-    // ── ARTIFACT ───────────────────────────────────────────────────────────
     {
+      id: "blurred_edges",
       name: "Blurred / dissolving edge detail",
-      detected: stats.edgeSharpness < 7,
-      weight: 16,
+      detected: stats.edgeSharpness < 7.2,
+      weight: 35,
       category: "artifact",
-      description:
-        "Hair edges, fingers, background transitions — AI smears fine detail.",
+      description: "AI often smears fine detail like hair edges and fingers.",
     },
     {
+      id: "ai_aspect_ratio",
       name: "Suspicious common AI aspect ratio",
-      detected: [1.0, 1.5, 1.77, 0.666, 0.75].some(
-        (r) => Math.abs(stats.aspectRatio - r) < 0.04
-      ),
-      weight: 6,
+      detected: [1.0, 1.5, 1.77, 0.666, 0.75].some(r => Math.abs(stats.aspectRatio - r) < 0.005),
+      weight: 15,
       category: "artifact",
-      description:
-        "Midjourney, DALL-E, Stable Diffusion default to specific ratios (1:1, 3:2, 16:9, 3:4).",
+      description: "Defaults for MJ, DALL-E, SD often hit specific exact ratios.",
     },
     {
+      id: "round_mp",
       name: "Suspiciously round megapixel count",
-      detected: [1, 2, 4, 8, 16].some((mp) => Math.abs(stats.megapixels - mp) < 0.15),
-      weight: 4,
+      detected: [1, 2, 4, 8, 16].some(mp => Math.abs(stats.megapixels - mp) < 0.05),
+      weight: 10,
       category: "artifact",
-      description:
-        "AI generators output exact round megapixel counts — cameras don't.",
+      description: "AI generators output exact round megapixel counts — cameras don't.",
     },
-
-    // ── METADATA ───────────────────────────────────────────────────────────
     {
-      name: "No EXIF / camera metadata (inferred)",
-      detected: file.size < 200_000 && stats.megapixels > 1,
-      weight: 8,
+      id: "no_exif",
+      name: "No EXIF / camera metadata",
+      detected: file.size < 300_000 && stats.megapixels > 0.8,
+      weight: 20,
       category: "metadata",
-      description:
-        "Real camera photos embed EXIF data, making files larger relative to resolution.",
+      description: "Real camera photos embed EXIF data.",
+    },
+    {
+      id: "vibrant_palette",
+      name: "Synthetic / Vibrant color palette",
+      detected: stats.saturationVariance > 0.35 && stats.colorUniformity > 0.75,
+      weight: 20,
+      category: "artifact",
+      description: "AI models often default to vibrant, high-contrast color mapping.",
+    },
+    {
+      id: "uniform_focus",
+      name: "Suspiciously uniform edge focus",
+      detected: Math.abs(stats.centerEdgeDelta) < 1.2 && stats.edgeSharpness > 12,
+      weight: 20,
+      category: "artifact",
+      description: "Real lenses have focus falloff; AI often sharpens frame-wide.",
+    },
+    {
+      id: "biometric_anomalies",
+      name: "Biometric / Anatomy anomalies",
+      detected: (deepMl?.biometrics.faceAnomalies.length || 0) > 0 || (deepMl?.biometrics.handAnomalies.length || 0) > 0,
+      weight: 90,
+      category: "artifact",
+      description: "Detected impossible anatomy or structural biological errors.",
+    },
+    {
+      id: "garbled_text",
+      name: "Garbled / Unreadable text artifacts",
+      detected: deepMl?.ocr.isGarbled || false,
+      weight: 65,
+      category: "artifact",
+      description: "Presence of nonsensical or distorted text patterns.",
+    },
+    {
+      id: "ai_watermark",
+      name: "Identified AI signature / Watermark",
+      detected: (deepMl?.watermarks.length || 0) > 0,
+      weight: 95,
+      category: "artifact",
+      description: "Found hardcoded pixel patterns matching AI generator signatures.",
     },
   ];
 
-  const detectedWeight = signals.filter((s) => s.detected).reduce((a, s) => a + s.weight, 0);
-  const totalWeight = signals.reduce((a, s) => a + s.weight, 0);
-  const overallScore = Math.round((detectedWeight / totalWeight) * 100);
+  let detectedWeightsSum = 0;
+  let detectedCount = 0;
+  signals.forEach(s => { 
+    if (s.detected) {
+      detectedWeightsSum += s.weight;
+      detectedCount++;
+    }
+  });
+
+  // Added logic: If multiple AI signals are detected together, boost the probability
+  // as the combination is mathematically much more unlikely in real photos.
+  if (detectedCount >= 4) detectedWeightsSum *= 1.2;
+  if (detectedCount >= 7) detectedWeightsSum *= 1.4;
+
+  const overallScore = Math.min(100, Math.round(detectedWeightsSum));
 
   const checklist: ChecklistItem[] = [
-    {
-      label: "Natural sensor noise present",
-      passed: stats.noiseLevel >= 16,
-      note: `Noise: ${stats.noiseLevel.toFixed(1)} (≥16 = real camera)`,
-    },
-    {
-      label: "Skin texture has imperfection",
-      passed: stats.skinSmoothness <= 0.82,
-      note: `Skin smoothness: ${(stats.skinSmoothness * 100).toFixed(0)}% (≤82% = natural)`,
-    },
-    {
-      label: "Uneven lighting across scene",
-      passed: stats.localContrastVariance >= 8,
-      note: `Zone contrast variance: ${stats.localContrastVariance.toFixed(1)}`,
-    },
-    {
-      label: "Natural edge detail at periphery",
-      passed: stats.backgroundBlur <= 0.55,
-      note: `Background blur ratio: ${(stats.backgroundBlur * 100).toFixed(0)}%`,
-    },
-    {
-      label: "Asymmetric composition",
-      passed: stats.symmetryScore <= 0.84,
-      note: `Symmetry: ${(stats.symmetryScore * 100).toFixed(0)}%`,
-    },
-    {
-      label: "Rich saturation variance",
-      passed: stats.saturationVariance >= 0.11,
-      note: `Sat variance: ${stats.saturationVariance.toFixed(3)}`,
-    },
-    {
-      label: "Sharp fine detail",
-      passed: stats.edgeSharpness >= 7,
-      note: `Edge sharpness: ${stats.edgeSharpness.toFixed(1)}`,
-    },
+    { id: "noise", label: "Natural sensor noise present", passed: stats.noiseLevel >= 16, note: `Noise: ${stats.noiseLevel.toFixed(1)}`, val: stats.noiseLevel.toFixed(1) },
+    { id: "skin", label: "Skin texture has imperfection", passed: stats.skinSmoothness <= 0.82, note: `Smoothness: ${(stats.skinSmoothness * 100).toFixed(0)}%`, val: (stats.skinSmoothness * 100).toFixed(0) },
+    { id: "lighting", label: "Uneven lighting across scene", passed: stats.localContrastVariance >= 8, note: `Variance: ${stats.localContrastVariance.toFixed(1)}`, val: stats.localContrastVariance.toFixed(1) },
+    { id: "edge", label: "Natural edge detail at periphery", passed: stats.backgroundBlur <= 0.55, note: `Blur: ${(stats.backgroundBlur * 100).toFixed(0)}%`, val: (stats.backgroundBlur * 100).toFixed(0) },
+    { id: "symmetry", label: "Asymmetric composition", passed: stats.symmetryScore <= 0.86, note: `Symmetry: ${(stats.symmetryScore * 100).toFixed(0)}%`, val: (stats.symmetryScore * 100).toFixed(0) },
+    { id: "saturation", label: "Rich saturation variance", passed: stats.saturationVariance >= 0.11, note: `Var: ${stats.saturationVariance.toFixed(3)}`, val: stats.saturationVariance.toFixed(3) },
+    { id: "sharpness", label: "Sharp fine detail", passed: stats.edgeSharpness >= 7, note: `Sharp: ${stats.edgeSharpness.toFixed(1)}`, val: stats.edgeSharpness.toFixed(1) },
   ];
 
-  const verdict =
-    overallScore >= 75 ? "Likely AI Generated" :
-      overallScore >= 52 ? "Possibly AI Generated" :
-        overallScore >= 28 ? "Likely Human / Edited" :
-          "Likely Human Photo";
+  const verdictKey =
+    overallScore >= 70 ? "verdict_likely_ai" :
+      overallScore >= 45 ? "verdict_possibly_ai" :
+        overallScore >= 20 ? "verdict_likely_edited" : "verdict_likely_human";
 
-  return { overallScore, verdict, signals, checklist, stats };
+  // Use keys in English by default, but UI should prefer verdictKey for i18n
+  const verdict = overallScore >= 70 ? "Likely AI Generated" : overallScore >= 45 ? "Possibly AI Generated" : "Likely Human Photo";
+
+  return { overallScore, verdict, verdictKey, signals, checklist, stats, deepMl };
 }

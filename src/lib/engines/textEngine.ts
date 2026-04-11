@@ -84,6 +84,43 @@ const AI_OPENERS: RegExp[] = [
   /^allow me to (explain|walk|guide|help)/i,
   /^i understand (that|your|the|how)/i,
   /^i appreciate (your|the|that)/i,
+  // New Openers (Expansion to 55+)
+  /^precisely[,!]?/i,
+  /^naturally[,!]?/i,
+  /^understood[,!]?/i,
+  /^you're absolutely right[,!]?/i,
+  /^correct[,!]?/i,
+  /^spot on[,!]?/i,
+  /^agreed[,!]?/i,
+  /^excellent question[,!]?/i,
+  /^what an interesting perspective[,!]?/i,
+  /^you've raised a valid point[,!]?/i,
+  /^that is (a |)profound question[,!]?/i,
+  /^intriguing question[,!]?/i,
+  /^let me walk you through[,!]?/i,
+  /^i'll walk you through[,!]?/i,
+  /^let me guide you[,!]?/i,
+  /^allow me to explain[,!]?/i,
+  /^i can certainly assist[,!]?/i,
+  /^i would be pleased to[,!]?/i,
+  /^in recent years[,!]?/i,
+  /^in an era of[,!]?/i,
+  /^we live in a world[,!]?/i,
+  /^as technology continues to (evolve|advance)/i,
+  /^in the rapidly changing landscape/i,
+  /^in this day and age/i,
+  /^throughout history/i,
+  /^in a globalized world/i,
+  /^when it comes to/i,
+  /^understanding this/i,
+  /^the concept of/i,
+  /^to understand the/i,
+  /^let's look at/i,
+  /^taking a closer look/i,
+  /^let's (explore|dive|examine)/i,
+  /^it is (important|essential|crucial) to note/i,
+  /^to get started/i,
+  /^to begin with/i,
   // Arabic openers
   /^بالتأكيد[،!]?/,
   /^بكل سرور[،!]?/,
@@ -120,6 +157,48 @@ const AI_TRANSITIONS: RegExp[] = [
   /\bwith that (said|in mind)\b/i,
   /\bto that end\b/i,
   /\bbuilding on (this|that)\b/i,
+  // New Transitions (Expansion to 55+)
+  /\bto sum up\b/i,
+  /\ball in all\b/i,
+  /\btaken together\b/i,
+  /\bon balance\b/i,
+  /\bin a nutshell\b/i,
+  /\bbriefly\b/i,
+  /\bto recap\b/i,
+  /\bultimately\b/i,
+  /\bat the end of the day\b/i,
+  /\bit bears mentioning\b/i,
+  /\bit should be noted\b/i,
+  /\bit can be mentioned\b/i,
+  /\bimportantly\b/i,
+  /\bcrucially\b/i,
+  /\bsignificantly\b/i,
+  /\bof particular importance\b/i,
+  /\bit is vital to recognize\b/i,
+  /\bput simply\b/i,
+  /\bto frame this\b/i,
+  /\bto clarify further\b/i,
+  /\bin a different light\b/i,
+  /\bmore specifically\b/i,
+  /\bto put it another way\b/i,
+  /\bthat said\b/i,
+  /\bnevertheless\b/i,
+  /\balbeit\b/i,
+  /\bwhile this may be true\b/i,
+  /\bdespite this\b/i,
+  /\bnotwithstanding\b/i,
+  /\bbe that as it may\b/i,
+  /\btherefore\b/i,
+  /\bthus\b/i,
+  /\bhence\b/i,
+  /\bas a result\b/i,
+  /\bby extension\b/i,
+  /\bin light of this\b/i,
+  /\baccordingly\b/i,
+  /\bfor this reason\b/i,
+  /\bgiven these facts\b/i,
+  /\bto put it frankly\b/i,
+  /\bas mentioned earlier\b/i,
   // Arabic transitions
   /\bعلاوة على ذلك\b/,
   /\bبالإضافة إلى ذلك\b/,
@@ -186,6 +265,35 @@ const AI_HEDGES: RegExp[] = [
   /\bkey takeaway\b/i,
   /\bearmark\b/i,
   /\bdeep.?dive\b/i,
+  // New Buzzwords (Expansion to 65+)
+  /\bsustainable\b/i,
+  /\bbest practices\b/i,
+  /\bgame-changer\b/i,
+  /\bforward-thinking\b/i,
+  /\bmission-critical\b/i,
+  /\bcore competency\b/i,
+  /\bimpactful\b/i,
+  /\bmeaningful\b/i,
+  /\bdriving change\b/i,
+  /\bmoving forward\b/i,
+  /\bmoving the needle\b/i,
+  /\bcatalytic\b/i,
+  /\bvalue-driven\b/i,
+  /\bmyriad of\b/i,
+  /\ba plethora of\b/i,
+  /\bplays a crucial role\b/i,
+  /\bserves as a cornerstone\b/i,
+  /\bserves as a testament\b/i,
+  /\bparamount\b/i,
+  /\bat its core\b/i,
+  /\bsuffice it to say\b/i,
+  /\bit goes without saying\b/i,
+  /\bneedless to say\b/i,
+  /\bwithout further ado\b/i,
+  /\ba multifaceted issue\b/i,
+  /\ba complex tapestry\b/i,
+  /\bfostering a sense of\b/i,
+  /\bshaping the future\b/i,
   // Arabic hedges
   /\bمن الأهمية بمكان\b/,
   /\bتجدر الإشارة\b/,
@@ -232,6 +340,35 @@ const AI_OVER_EXPLAIN: RegExp[] = [
   /\bto be (more |)precise\b/i,
   /\bto clarify\b/i,
   /\bin other words\b/i,
+  // New Over-explanation (Expansion to 40+)
+  /\bsimply stated\b/i,
+  /\bplainly put\b/i,
+  /\bin plain english\b/i,
+  /\bfor the sake of clarity\b/i,
+  /\bto put it mildly\b/i,
+  /\bfor ease of understanding\b/i,
+  /\bbreaking it down\b/i,
+  /\blet's break this down\b/i,
+  /\bbroken down into\b/i,
+  /\bif we analyze the components\b/i,
+  /\bto dissect this\b/i,
+  /\bthe takeaway here\b/i,
+  /\bthe upshot\b/i,
+  /\bwhat you need to understand\b/i,
+  /\bthe bottom line is\b/i,
+  /\bthe key point to remember\b/i,
+  /\bmuch like\b/i,
+  /\bjust like a\b/i,
+  /\bsimilar to how\b/i,
+  /\bcomparable to\b/i,
+  /\banalogous to\b/i,
+  /\bconsider the following\b/i,
+  /\bimagine a\b/i,
+  /\bpicture this\b/i,
+  /\blet's examine\b/i,
+  /\bto illustrate this\b/i,
+  /\ba good way to think about this\b/i,
+  /\bto better understand\b/i,
 ];
 
 /** Contraction patterns — AI avoids these in formal mode */
@@ -577,19 +714,19 @@ function buildSignalEntries(
   signalBreakdown: Record<string, number>
 ): SignalEntry[] {
   const META: Record<string, { id: string; label: string; description: string; severity: "low" | "medium" | "high" }> = {
-    "AI opener phrase":           { id: "ai_opener",        label: "AI Opener Phrase",          description: "Response starts with typical LLM affirmation or greeting.",                severity: "high"   },
-    "AI transition word":         { id: "ai_transition",    label: "AI Transition Word",         description: "Formal connective words strongly correlated with LLM output.",            severity: "medium" },
-    "AI buzzword/hedge":          { id: "ai_hedge",         label: "AI Buzzword / Hedge",        description: "Corporate or assistant-voice vocabulary typical of AI generation.",        severity: "medium" },
-    "AI over-explanation pattern":{ id: "ai_overexplain",   label: "Over-Explanation",           description: "Unnecessary clarification added as filler, a key LLM behavior.",           severity: "medium" },
-    "AI closing phrase":          { id: "ai_closer",        label: "AI Closing Phrase",          description: "Text ends with a typical LLM sign-off or offer to help.",                 severity: "high"   },
-    "Formulaic sentence structure":{ id: "ai_structure",    label: "Formulaic Structure",        description: "Sentence follows rigid formula patterns favored by language models.",       severity: "medium" },
-    "Passive voice construction": { id: "passive_voice",    label: "Passive Voice",              description: "AI tends to over-use passive constructions to sound neutral.",             severity: "low"    },
-    "No contractions (formal AI style)": { id: "no_contractions", label: "Contraction Absence", description: "Absence of contractions in long sentences signals non-human tone.",        severity: "low"    },
-    "List-style structure":       { id: "list_structure",   label: "List-Style Structure",       description: "Enumerated structure in prose, an AI preference for clarity-signaling.",   severity: "low"    },
-    "Uniform sentence length (AI sweet spot)":{ id: "uniform_length", label: "Uniform Cadence", description: "Consistent 15–28 word sentences without length variation.",                severity: "medium" },
-    "Run-on without natural pause":{ id: "run_on",          label: "Run-On Sentence",            description: "Long sentence with no commas or dashes — unnatural for human writers.",    severity: "low"    },
-    "Human signal detected":      { id: "human_signal",     label: "Human Signal",               description: "Informal language, slang, or emotional cues indicating human authorship.", severity: "high"   },
-    "AI callout/label heading":   { id: "callout_label",    label: "Callout Label Heading",      description: "Short imperative labels (Note:, Tip:) used as formatting devices by AI.",  severity: "medium" },
+    "AI opener phrase": { id: "ai_opener", label: "AI Opener Phrase", description: "Response starts with typical LLM affirmation or greeting.", severity: "high" },
+    "AI transition word": { id: "ai_transition", label: "AI Transition Word", description: "Formal connective words strongly correlated with LLM output.", severity: "medium" },
+    "AI buzzword/hedge": { id: "ai_hedge", label: "AI Buzzword / Hedge", description: "Corporate or assistant-voice vocabulary typical of AI generation.", severity: "medium" },
+    "AI over-explanation pattern": { id: "ai_overexplain", label: "Over-Explanation", description: "Unnecessary clarification added as filler, a key LLM behavior.", severity: "medium" },
+    "AI closing phrase": { id: "ai_closer", label: "AI Closing Phrase", description: "Text ends with a typical LLM sign-off or offer to help.", severity: "high" },
+    "Formulaic sentence structure": { id: "ai_structure", label: "Formulaic Structure", description: "Sentence follows rigid formula patterns favored by language models.", severity: "medium" },
+    "Passive voice construction": { id: "passive_voice", label: "Passive Voice", description: "AI tends to over-use passive constructions to sound neutral.", severity: "low" },
+    "No contractions (formal AI style)": { id: "no_contractions", label: "Contraction Absence", description: "Absence of contractions in long sentences signals non-human tone.", severity: "low" },
+    "List-style structure": { id: "list_structure", label: "List-Style Structure", description: "Enumerated structure in prose, an AI preference for clarity-signaling.", severity: "low" },
+    "Uniform sentence length (AI sweet spot)": { id: "uniform_length", label: "Uniform Cadence", description: "Consistent 15–28 word sentences without length variation.", severity: "medium" },
+    "Run-on without natural pause": { id: "run_on", label: "Run-On Sentence", description: "Long sentence with no commas or dashes — unnatural for human writers.", severity: "low" },
+    "Human signal detected": { id: "human_signal", label: "Human Signal", description: "Informal language, slang, or emotional cues indicating human authorship.", severity: "high" },
+    "AI callout/label heading": { id: "callout_label", label: "Callout Label Heading", description: "Short imperative labels (Note:, Tip:) used as formatting devices by AI.", severity: "medium" },
   };
 
   const entries: SignalEntry[] = [];
@@ -660,13 +797,13 @@ export function analyzeText(text: string): TextAnalysisResult {
   const vocabularyRichness = calcVocabularyRichness(text);
 
   // Global penalties
-  const burstinessPenalty   = burstiness < 20  ? 20 : burstiness < 40  ? 10 : 0;
-  const contractionPenalty  = !isArabic && contractionRatio < 0.01  ? 12
-                            : !isArabic && contractionRatio < 0.03  ? 6
-                            : 0;
-  const listPenalty         = listDensity > 50  ? 14 : listDensity > 30  ? 7 : 0;
-  const passivePenalty      = passiveVoiceRatio > 60 ? 10 : passiveVoiceRatio > 40 ? 5 : 0;
-  const ttrBoost            = vocabularyRichness < 35 && words.length > 50 ? 10 : 0; // Low TTR = AI
+  const burstinessPenalty = burstiness < 20 ? 20 : burstiness < 40 ? 10 : 0;
+  const contractionPenalty = !isArabic && contractionRatio < 0.01 ? 12
+    : !isArabic && contractionRatio < 0.03 ? 6
+      : 0;
+  const listPenalty = listDensity > 50 ? 14 : listDensity > 30 ? 7 : 0;
+  const passivePenalty = passiveVoiceRatio > 60 ? 10 : passiveVoiceRatio > 40 ? 5 : 0;
+  const ttrBoost = vocabularyRichness < 35 && words.length > 50 ? 10 : 0; // Low TTR = AI
 
   const rawAvgScore = scoredSentences.length
     ? scoredSentences.reduce((a, b) => a + b.score, 0) / scoredSentences.length
@@ -688,11 +825,11 @@ export function analyzeText(text: string): TextAnalysisResult {
   });
 
   const verdict: TextAnalysisResult["verdict"] =
-    overallScore >= 82 ? "Fully AI"     :
-    overallScore >= 62 ? "Mostly AI"    :
-    overallScore >= 40 ? "Mixed"        :
-    overallScore >= 20 ? "Mostly Human" :
-    "Fully Human";
+    overallScore >= 82 ? "Fully AI" :
+      overallScore >= 62 ? "Mostly AI" :
+        overallScore >= 40 ? "Mixed" :
+          overallScore >= 20 ? "Mostly Human" :
+            "Fully Human";
 
   const namedSignals = buildSignalEntries(breakdown);
   const highlightedRanges = buildHighlightedRanges(text);

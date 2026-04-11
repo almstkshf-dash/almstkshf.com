@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import {
   Eye, ShieldCheck, AlertCircle, Fingerprint, Activity,
   BarChart3, Scan, Layers, Lightbulb, Cpu, Info, CheckCircle2, XCircle,
+  AlertTriangle, FileText
 } from "lucide-react";
 
 // ─── Props accept either report shape ────────────────────────────────────────
@@ -26,15 +27,16 @@ interface ImageResultsProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const CATEGORY_META: Record<
+// Category labels are resolved at render time via t() — keys stored here
+const CATEGORY_KEYS: Record<
   ImageSignal["category"],
-  { label: string; icon: React.ElementType; color: string }
+  { labelKey: string; icon: React.ElementType; color: string }
 > = {
-  texture: { label: "Texture", icon: Layers, color: "violet" },
-  structure: { label: "Structure", icon: Cpu, color: "blue" },
-  lighting: { label: "Lighting", icon: Lightbulb, color: "amber" },
-  artifact: { label: "Artifact", icon: AlertCircle, color: "rose" },
-  metadata: { label: "Metadata", icon: Info, color: "slate" },
+  texture: { labelKey: "category_texture", icon: Layers, color: "violet" },
+  structure: { labelKey: "category_structure", icon: Cpu, color: "blue" },
+  lighting: { labelKey: "category_lighting", icon: Lightbulb, color: "amber" },
+  artifact: { labelKey: "category_artifact", icon: AlertCircle, color: "rose" },
+  metadata: { labelKey: "category_metadata", icon: Info, color: "slate" },
 };
 
 const SIGNAL_COLORS = {
@@ -43,9 +45,9 @@ const SIGNAL_COLORS = {
 };
 
 function riskMeta(overallRisk: "low" | "medium" | "high") {
-  if (overallRisk === "high") return { text: "text-rose-500", bg: "bg-rose-500/5 border-rose-500/10", label: "HIGH RISK" };
-  if (overallRisk === "medium") return { text: "text-amber-500", bg: "bg-amber-500/5 border-amber-500/10", label: "POSSIBLE AI" };
-  return { text: "text-emerald-500", bg: "bg-emerald-500/5 border-emerald-500/10", label: "LIKELY REAL" };
+  if (overallRisk === "high") return { text: "text-rose-500", bg: "bg-rose-500/5 border-rose-500/10", labelKey: "risk_high" };
+  if (overallRisk === "medium") return { text: "text-amber-500", bg: "bg-amber-500/5 border-amber-500/10", labelKey: "risk_possible" };
+  return { text: "text-emerald-500", bg: "bg-emerald-500/5 border-emerald-500/10", labelKey: "risk_likely_real" };
 }
 
 function SignalIcon({ risk }: { risk: string }) {
@@ -64,11 +66,11 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
   // Prefer rich result when available (analyzeImage / analyzeImageCanvas attach it)
   const rich: ImageAnalysisResult | undefined = report.richResult;
 
-  const { text: riskText, bg: riskBg, label: riskLabel } = riskMeta(report.overallRisk);
+  const { text: riskText, bg: riskBg, labelKey: riskLabelKey } = riskMeta(report.overallRisk);
 
   // Map signals by category for grouped rendering
   const byCategory = rich
-    ? (Object.keys(CATEGORY_META) as ImageSignal["category"][]).map((cat) => ({
+    ? (Object.keys(CATEGORY_KEYS) as ImageSignal["category"][]).map((cat) => ({
       cat,
       signals: rich.signals.filter((s) => s.category === cat),
     }))
@@ -100,17 +102,17 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                 {rich.overallScore}%
               </motion.div>
               <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${riskBg} ${riskText}`}>
-                {rich.verdict}
+                {t(rich.verdictKey)}
               </p>
 
               {/* Mini checklist summary */}
               <div className="mt-6 w-full space-y-1.5">
                 {rich.checklist.map((item) => (
-                  <div key={item.label} className="flex items-center gap-2 text-left">
+                  <div key={item.id} className="flex items-center gap-2 text-left">
                     {item.passed
                       ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       : <XCircle className="w-3.5 h-3.5 text-rose-500    shrink-0" />}
-                    <span className="text-[10px] text-zinc-500 truncate">{item.label}</span>
+                    <span className="text-[10px] text-zinc-500 truncate">{t(`check_${item.id}_label`)}</span>
                   </div>
                 ))}
               </div>
@@ -126,7 +128,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                 {report.confidenceScore}%
               </motion.div>
               <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${riskBg} ${riskText}`}>
-                {riskLabel}
+                {t(riskLabelKey)}
               </p>
             </>
           )}
@@ -143,7 +145,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             /* ── Rich grouped signals ──────────────────────────────────── */
             <div className="space-y-4">
               {byCategory.map(({ cat, signals }) => {
-                const meta = CATEGORY_META[cat];
+                const meta = CATEGORY_KEYS[cat];
                 const Icon = meta.icon as React.ComponentType<{ className?: string }>;
                 const anyDetected = signals.some((s) => s.detected);
                 return (
@@ -157,21 +159,21 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                         <Icon className={`w-3.5 h-3.5 text-${meta.color}-500`} />
                       </div>
                       <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
-                        {meta.label}
+                        {t(meta.labelKey)}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {signals.map((sig) => (
                         <div
-                          key={sig.name}
+                          key={sig.id}
                           className={`flex items-start gap-2 p-3 rounded-xl border text-[11px] ${sig.detected ? SIGNAL_COLORS.detected : SIGNAL_COLORS.clean}`}
                         >
                           {sig.detected
                             ? <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                             : <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
-                          <div>
-                            <p className="font-bold leading-tight">{sig.name}</p>
-                            <p className="opacity-60 mt-0.5 leading-snug">{sig.description}</p>
+                          <div className="flex-1">
+                            <p className="font-bold leading-tight">{t(`signal_${sig.id}_name`)}</p>
+                            <p className="opacity-60 mt-0.5 leading-snug">{t(`signal_${sig.id}_desc`)}</p>
                           </div>
                         </div>
                       ))}
@@ -203,23 +205,116 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               ))}
             </div>
           )}
+
+          {/* ── Native AI Forensic Scouts (Deep ML) ─────────────────────── */}
+          {rich?.deepMl && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-6 rounded-[2rem] bg-gradient-to-br from-blue-500/5 to-emerald-500/5 border border-blue-500/10 shadow-sm space-y-4"
+            >
+              <div className="flex items-center justify-between border-b border-blue-500/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                    <Scan className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-500/80">
+                      {tCommon("biometric_scouts")}
+                    </h4>
+                    <p className="text-[10px] text-muted-foreground font-medium">
+                      {tCommon("biometric_scouts_desc")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1 bg-white/50 dark:bg-black/50 rounded-full border border-border/50">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[9px] font-black uppercase tracking-tight text-muted-foreground italic">
+                    {tCommon("zero_api_notice")}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Biometric Results */}
+                <div className="space-y-3">
+                  <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <Fingerprint className="w-3 h-3" />
+                    {t("anatomy_consistency")}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {rich.deepMl.biometrics.faceAnomalies.length > 0 || rich.deepMl.biometrics.handAnomalies.length > 0 ? (
+                      [...rich.deepMl.biometrics.faceAnomalies, ...rich.deepMl.biometrics.handAnomalies].map((anomaly, idx) => (
+                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          {tCommon.has(`anomalies.${anomaly.id}`) ? tCommon(`anomalies.${anomaly.id}`) : anomaly.name}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3 h-3" />
+                        {tCommon("anomaly_low_risk")}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* OCR / Text Layer */}
+                <div className="space-y-3">
+                  <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <FileText className="w-3 h-3" />
+                    {tCommon("ocr_detect")}
+                  </span>
+                  <div className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[9px] font-bold text-muted-foreground uppercase">{t("pattern_match")}</span>
+                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${rich.deepMl.ocr.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                        {rich.deepMl.ocr.isGarbled ? t("status_suspicious") : t("status_clean")}
+                      </span>
+                    </div>
+                    <p className="text-[10px] font-mono leading-relaxed truncate opacity-60">
+                      {rich.deepMl.ocr.text || t("no_text_detected")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Watermarks */}
+              {rich.deepMl.watermarks.length > 0 && (
+                <div className="pt-2 border-t border-blue-500/5">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/5 border border-amber-500/10 rounded-xl">
+                    <Layers className="w-3 h-3 text-amber-600" />
+                    <span className="text-[10px] font-bold text-amber-700 dark:text-amber-500">
+                      {t("detected_ai_signature")}{" "}
+                      <span className="font-black italic">
+                        {rich.deepMl.watermarks
+                          .map((w) => (tCommon.has(`watermarks.${w.id}`) ? tCommon(`watermarks.${w.id}`) : w.name))
+                          .join(", ")}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
+
       </div>
 
       {/* ── Pixel Stats Bar (only when rich data available) ─────────────── */}
       {rich && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
-            { label: "Noise", value: rich.stats.noiseLevel.toFixed(1), unit: "" },
-            { label: "Edge Detail", value: rich.stats.edgeSharpness.toFixed(1), unit: "" },
-            { label: "Symmetry", value: (rich.stats.symmetryScore * 100).toFixed(0), unit: "%" },
-            { label: "Skin Smooth", value: (rich.stats.skinSmoothness * 100).toFixed(0), unit: "%" },
-            { label: "BG Blur", value: (rich.stats.backgroundBlur * 100).toFixed(0), unit: "%" },
-            { label: "Sat. Var.", value: rich.stats.saturationVariance.toFixed(3), unit: "" },
-            { label: "Megapix", value: rich.stats.megapixels.toFixed(2), unit: "MP" },
-          ].map(({ label, value, unit }) => (
-            <div key={label} className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
-              <span className="block text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">{label}</span>
+            { labelKey: "stat_noise", value: rich.stats.noiseLevel.toFixed(1), unit: "" },
+            { labelKey: "stat_edge_detail", value: rich.stats.edgeSharpness.toFixed(1), unit: "" },
+            { labelKey: "stat_symmetry", value: (rich.stats.symmetryScore * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_skin_smooth", value: (rich.stats.skinSmoothness * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_bg_blur", value: (rich.stats.backgroundBlur * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_sat_var", value: rich.stats.saturationVariance.toFixed(3), unit: "" },
+            { labelKey: "stat_megapix", value: rich.stats.megapixels.toFixed(2), unit: "MP" },
+          ].map(({ labelKey, value, unit }) => (
+            <div key={labelKey} className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
+              <span className="block text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">{t(labelKey)}</span>
               <span className="block font-mono text-lg font-bold text-zinc-900 dark:text-zinc-100">{value}{unit}</span>
             </div>
           ))}
@@ -231,11 +326,11 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
             <Eye className="w-4 h-4" />
-            Forensic Visualization View
+            {t("forensic_view")}
           </h3>
           <span className="text-[10px] font-mono font-bold px-3 py-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 rounded-full flex items-center gap-1.5 uppercase tracking-tighter">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Live Logic Overlay Active
+            {t("live_overlay")}
           </span>
         </div>
 
@@ -257,7 +352,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
           {/* Diagnostic overlay */}
           <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-start gap-12 text-white/90">
             <div className="space-y-1">
-              <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Noise Level</span>
+              <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">{t("overlay_noise")}</span>
               <span className="block font-mono text-xl">
                 {rich
                   ? rich.stats.noiseLevel.toFixed(1)
@@ -266,17 +361,17 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             </div>
             <div className="space-y-1">
               <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">
-                {rich ? "Verdict" : "Entropy Factor"}
+                {rich ? t("overlay_verdict") : t("overlay_entropy")}
               </span>
               <span className="block font-mono text-xl">
                 {rich
-                  ? rich.verdict
+                  ? t(rich.verdictKey)
                   : report.pixelLogicSignals.find((s) => s.id === "low_entropy")?.detectedValue ?? "0.00"}
               </span>
             </div>
             {rich && (
               <div className="space-y-1">
-                <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">AI Score</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">{t("overlay_ai_score")}</span>
                 <span className="block font-mono text-xl">{rich.overallScore}%</span>
               </div>
             )}

@@ -20,7 +20,7 @@ import VideoResults from "@/components/analyzers/VideoResults";
 // Engines
 import { analyzeText, TextAnalysisResult } from "@/lib/engines/textEngine";
 import { analyzeImageFile, ImageAnalysisReport } from "@/lib/engines/imageEngine";
-import { analyzeVideo, VideoAnalysisResult } from "@/lib/engines/videoEngine";
+import { analyzeVideoFile, VideoAnalysisResult } from "@/lib/engines/videoEngine";
 
 type Mode = "text" | "image" | "video";
 
@@ -147,7 +147,7 @@ export default function AiInspectorTab() {
         };
         setImageResults(res);
       } else if (mode === "video") {
-        const res = await analyzeVideo(file);
+        const res = await analyzeVideoFile(file);
         setVideoResults(res);
       }
     } catch (err) {
@@ -312,7 +312,7 @@ export default function AiInspectorTab() {
                     className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 transition-all shadow-sm"
                   >
                     <FolderPlus className="w-4 h-4" />
-                    Save to Collection
+                    {t("save_to_collection")}
                   </button>
                   <button
                     onClick={reset}
@@ -330,7 +330,7 @@ export default function AiInspectorTab() {
                 item={{
                     id: Math.random().toString(36).substring(7),
                     type: "ai_inspector",
-                    title: `AI Inspector: ${mode} analysis`,
+                    title: t("collection_title", { mode: t(`modes.${mode}`) }),
                     data: mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults
                 }}
               />
@@ -349,7 +349,7 @@ export default function AiInspectorTab() {
                         <p className="text-sm font-bold truncate text-foreground/80">{previewUrl?.split('/').pop()}</p>
                         <div className="mt-6 pt-6 border-t border-border flex items-center gap-3">
                           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                          <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Analysis Valid</span>
+                          <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{t("analysis_valid")}</span>
                         </div>
                       </div>
                     </div>
@@ -369,7 +369,7 @@ export default function AiInspectorTab() {
                     <div className="flex flex-col justify-center space-y-6 lg:pl-10">
                       <div className="space-y-3">
                         <div className="inline-block px-4 py-1 bg-primary/10 rounded-full border border-primary/20 text-[10px] font-black text-primary tracking-widest uppercase">
-                          Forensic Extraction
+                          {t("forensic_extraction")}
                         </div>
                         <h3 className="text-4xl font-black tracking-tighter text-foreground">{t("video.analysis_report")}</h3>
                         <p className="text-muted-foreground font-medium leading-relaxed">{t("video.report_desc")}</p>

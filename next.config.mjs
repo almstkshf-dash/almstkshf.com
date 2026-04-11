@@ -32,8 +32,21 @@ const nextConfig = {
             'next-themes',
             '@vercel/analytics',
         ],
-        turbopack: {
-            root: '.',
+
+    },
+
+    // Top-level turbopack config (Next.js 15.5+)
+    turbopack: {
+        root: '.',
+        resolveAlias: {
+            // Stub @mediapipe/face_mesh so Turbopack never tries to statically
+            // resolve the broken FaceMesh export. mlHelper.ts uses dynamic
+            // import() so the real package is resolved at runtime by the browser.
+            '@mediapipe/face_mesh': './src/lib/engines/stubs/mediapipe-face-mesh.stub.js',
+
+            // Stub @mediapipe/hands for the same reason — hand-pose-detection's
+            // ESM bundle imports `Hands` which Turbopack can't find statically.
+            '@mediapipe/hands': './src/lib/engines/stubs/mediapipe-hands.stub.js',
         },
     },
 
@@ -60,14 +73,10 @@ const nextConfig = {
                         key: 'X-DNS-Prefetch-Control',
                         value: 'on'
                     },
-                    {
-                        key: 'Cross-Origin-Embedder-Policy',
-                        value: 'require-corp',
-                    },
-                    {
-                        key: 'Cross-Origin-Opener-Policy',
-                        value: 'same-origin',
-                    },
+                    // COEP/COOP removed — require-corp blocks Next.js internal
+                    // fetch() calls used for client-side RSC navigation.
+                    // If SharedArrayBuffer is needed for ML pages, scope it via
+                    // a service worker or route-specific middleware instead.
                 ],
             },
         ];

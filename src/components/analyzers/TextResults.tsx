@@ -45,12 +45,12 @@ interface TextResultsProps {
 
 function scoreMeta(score: number) {
   if (score >= 70)
-    return { text: 'text-rose-500', bg: 'bg-rose-500/5', border: 'border-rose-500/20', bar: 'bg-rose-500', label: 'FULLY AI' };
+    return { text: 'text-rose-500', bg: 'bg-rose-500/5', border: 'border-rose-500/20', bar: 'bg-rose-500', labelKey: 'score_fully_ai' as const };
   if (score >= 50)
-    return { text: 'text-orange-500', bg: 'bg-orange-500/5', border: 'border-orange-500/20', bar: 'bg-orange-400', label: 'MOSTLY AI' };
+    return { text: 'text-orange-500', bg: 'bg-orange-500/5', border: 'border-orange-500/20', bar: 'bg-orange-400', labelKey: 'score_mostly_ai' as const };
   if (score >= 30)
-    return { text: 'text-amber-500', bg: 'bg-amber-500/5', border: 'border-amber-500/20', bar: 'bg-amber-400', label: 'MIXED' };
-  return { text: 'text-emerald-500', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', bar: 'bg-emerald-500', label: 'LIKELY HUMAN' };
+    return { text: 'text-amber-500', bg: 'bg-amber-500/5', border: 'border-amber-500/20', bar: 'bg-amber-400', labelKey: 'score_mixed' as const };
+  return { text: 'text-emerald-500', bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', bar: 'bg-emerald-500', labelKey: 'score_likely_human' as const };
 }
 
 function sentenceMeta(s: SentenceResult) {
@@ -170,17 +170,17 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
             {result.score}%
           </motion.div>
           <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${risk.bg} ${risk.border} ${risk.text}`}>
-            {result.verdict ?? risk.label}
+            {result.verdict ?? t(risk.labelKey)}
           </p>
 
           {/* Mini stats */}
           <div className="mt-6 w-full space-y-1.5 text-left">
             {[
-              { icon: Type, label: 'Words', value: String(result.wordCount) },
-              { icon: AlignLeft, label: 'Sentences', value: String(result.sentences.length) },
-              { icon: BookOpen, label: 'Language', value: result.isArabicDominant ? 'Arabic' : 'English' },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center gap-2">
+              { icon: Type, label: t('words'), value: String(result.wordCount), key: 'words' },
+              { icon: AlignLeft, label: t('sentences'), value: String(result.sentences.length), key: 'sentences' },
+              { icon: BookOpen, label: t('language'), value: result.isArabicDominant ? t('lang_arabic') : t('lang_english'), key: 'language' },
+            ].map(({ icon: Icon, label, value, key }) => (
+              <div key={key} className="flex items-center gap-2">
                 <Icon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                 <span className="text-[10px] text-zinc-500 truncate">
                   {label}:{' '}
@@ -195,62 +195,68 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         <div className="lg:col-span-2 space-y-4">
           <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
             <BarChart3 className="w-4 h-4" />
-            Linguistic Forensic Metrics
+            {t('forensic_metrics')}
           </h3>
 
           <div className="grid grid-cols-2 gap-4">
             {[
               {
                 icon: Activity,
-                label: 'Burstiness',
+                label: t('burstiness'),
                 value: result.burstinessScore,
                 unit: '/100',
-                desc: 'Sentence-length variance. Low = AI robot cadence, high = human irregularity.',
+                desc: t('burstiness_desc'),
                 warn: result.burstinessScore < 30,
+                key: 'burstiness',
               },
               {
                 icon: BookOpen,
-                label: 'Vocabulary Richness',
+                label: t('vocabulary_richness'),
                 value: result.vocabularyRichness,
                 unit: '%',
-                desc: 'Type-Token Ratio. Low TTR on long text = AI repetition.',
+                desc: t('vocabulary_richness_desc'),
                 warn: result.wordCount > 50 && result.vocabularyRichness < 35,
+                key: 'vocabulary',
               },
               {
                 icon: Wind,
-                label: 'Passive Voice',
+                label: t('passive_voice'),
                 value: result.passiveVoiceRatio,
                 unit: '%',
-                desc: 'Percentage of sentences using passive construction. AI over-uses this.',
+                desc: t('passive_voice_desc'),
                 warn: result.passiveVoiceRatio > 50,
+                key: 'passive',
               },
               {
                 icon: Zap,
-                label: 'Contraction Rate',
+                label: t('contraction_rate'),
                 value: result.contractionRatio,
                 unit: '%',
-                desc: 'Contractions per 100 words. Near-zero = formal AI tone.',
+                desc: t('contraction_rate_desc'),
                 warn: !result.isArabicDominant && result.contractionRatio < 1,
+                key: 'contraction',
               },
               {
                 icon: AlignLeft,
-                label: 'List Density',
+                label: t('list_density'),
                 value: result.listDensity,
                 unit: '%',
-                desc: 'Fraction of sentences with list/enumeration markers.',
+                desc: t('list_density_desc'),
                 warn: result.listDensity > 40,
+                key: 'list',
               },
               {
                 icon: MessageSquare,
-                label: 'Avg Sentence Length',
+                label: t('avg_sentence_length'),
                 value: result.avgSentenceLength,
-                unit: ' words',
-                desc: 'Mean words per sentence. 15–28 word uniformity is an AI tell.',
+                unit: ` ${t('words')}`,
+                desc: t('avg_sentence_length_desc'),
                 warn: result.avgSentenceLength >= 15 && result.avgSentenceLength <= 28,
+                key: 'avglen',
               },
-            ].map(({ icon: Icon, label, value, unit, desc, warn }) => (
+            ].map(({ icon: Icon, label, value, unit, desc, warn, key }) => (
               <motion.div
-                key={label}
+                key={key}
                 whileHover={{ y: -2 }}
                 className={`p-5 rounded-2xl border bg-white dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${warn ? 'border-rose-500/20' : 'border-zinc-200 dark:border-zinc-800'}`}
               >
@@ -310,7 +316,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         <div className="space-y-6">
           <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
             <Activity className="w-4 h-4" />
-            Sentence-Level Breakdown
+            {t('sentence_breakdown')}
           </h3>
 
           {/* Score bar strip */}
@@ -371,7 +377,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                 <div className="flex items-center gap-3">
                   <MessageSquare className="w-4 h-4 text-zinc-400" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                    Sentence #{(selectedSentence ?? 0) + 1} — Detected Signals
+                    {t('sentence_detail', { num: String((selectedSentence ?? 0) + 1) })}
                   </span>
                 </div>
                 <blockquote className="text-sm text-zinc-700 dark:text-zinc-300 italic border-l-2 border-zinc-300 dark:border-zinc-700 pl-4 leading-relaxed">
@@ -417,26 +423,26 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
               <Search className="w-4 h-4" />
-              Source Analysis View
+              {t('source_view')}
             </h3>
             <span className="text-[10px] font-mono font-bold px-3 py-1 bg-zinc-100 dark:bg-zinc-900 text-zinc-500 rounded-full flex items-center gap-1.5 uppercase tracking-tighter">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              Live Logic Overlay Active
+              {t('live_overlay')}
             </span>
           </div>
 
           {/* Legend */}
           <div className="flex flex-wrap gap-3">
             {[
-              { type: 'opener', label: 'AI Opener', color: 'bg-rose-400' },
-              { type: 'closer', label: 'AI Closer', color: 'bg-rose-300' },
-              { type: 'transition', label: 'Transition', color: 'bg-amber-400' },
-              { type: 'hedge', label: 'Hedge/Buzzword', color: 'bg-purple-400' },
-              { type: 'human', label: 'Human Signal', color: 'bg-emerald-400' },
-            ].map(({ type, label, color }) => (
+              { type: 'opener', labelKey: 'legend_opener', color: 'bg-rose-400' },
+              { type: 'closer', labelKey: 'legend_closer', color: 'bg-rose-300' },
+              { type: 'transition', labelKey: 'legend_transition', color: 'bg-amber-400' },
+              { type: 'hedge', labelKey: 'legend_hedge', color: 'bg-purple-400' },
+              { type: 'human', labelKey: 'legend_human', color: 'bg-emerald-400' },
+            ].map(({ type, labelKey, color }) => (
               <span key={type} className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-zinc-500">
                 <span className={`w-2 h-2 rounded-full ${color}`} />
-                {label}
+                {t(labelKey)}
               </span>
             ))}
           </div>

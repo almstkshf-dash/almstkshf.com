@@ -51,7 +51,7 @@ export default function DashboardPage() {
 
     const [selectedType, setSelectedType] = useState('All');
     const [selectedCountry, setSelectedCountry] = useState('All');
-    
+
     // Initialize activeView from URL search parameters, defaulting to 'standard'
     const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect'>(
         (searchParams.get('view') as any) || 'standard'
@@ -261,7 +261,7 @@ export default function DashboardPage() {
 
         if (type === 'excel') {
             try {
-                exportToExcel(filteredArticles, exportTranslations);
+                exportToExcel(filteredArticles, exportTranslations, exportTranslations.report_title);
                 showToast('success', t('export_success'));
             } catch { showToast('error', t('export_failed')); }
         } else {
@@ -369,25 +369,27 @@ export default function DashboardPage() {
                                 </button>
                             </div>
 
-                            {/* Export Group */}
-                            <div className="flex items-center p-1 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
-                                <button
-                                    onClick={() => handleExport('pdf')}
-                                    disabled={isExporting || filteredArticles.length === 0}
-                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                                >
-                                    <FileDown className="w-4 h-4" />
-                                    PDF
-                                </button>
-                                <button
-                                    onClick={() => handleExport('excel')}
-                                    disabled={filteredArticles.length === 0}
-                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                                >
-                                    <FileSpreadsheet className="w-4 h-4" />
-                                    EXCEL
-                                </button>
-                            </div>
+                            {/* Export Group - Only for Article-based views */}
+                            {(activeView === 'standard' || activeView === 'deep') && (
+                                <div className="flex items-center p-1 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
+                                    <button
+                                        onClick={() => handleExport('pdf')}
+                                        disabled={isExporting || filteredArticles.length === 0}
+                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                    >
+                                        <FileDown className="w-4 h-4" />
+                                        PDF
+                                    </button>
+                                    <button
+                                        onClick={() => handleExport('excel')}
+                                        disabled={filteredArticles.length === 0}
+                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                    >
+                                        <FileSpreadsheet className="w-4 h-4" />
+                                        EXCEL
+                                    </button>
+                                </div>
+                            )}
 
                             {totalArticles > 0 && (
                                 <button
@@ -406,8 +408,8 @@ export default function DashboardPage() {
                 {activeView === 'standard' && (
                     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
                         {/* Discovery & Analytics Section */}
-                        <DashboardGrid 
-                            articles={filteredArticles} 
+                        <DashboardGrid
+                            articles={filteredArticles}
                             analytics={analytics}
                             topLeftSlot={topLeftSlotMemo}
                             topRightSlot={topRightSlotMemo}
@@ -532,9 +534,9 @@ export default function DashboardPage() {
 
                 {activeView === 'osint' && <OsintTab />}
 
-                { activeView === 'terrorist_list' && <TerroristListTab /> }
+                {activeView === 'terrorist_list' && <TerroristListTab />}
 
-                { activeView === 'inspect' && <AiInspectorTab /> }
+                {activeView === 'inspect' && <AiInspectorTab />}
             </div>
 
             {/* Global Overlays */}
