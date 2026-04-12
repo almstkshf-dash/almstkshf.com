@@ -129,13 +129,13 @@
 
   /* Design System Status Tokens */
   --status-success: 158 64% 52%;
-  --status-success-fg: hsl(158 64% 35%);
+  --status-success-fg: hsl(158 64% 20%);
   --status-success-bg: hsl(158 64% 52% / 0.1);
   --status-warning: 38 92% 50%;
-  --status-warning-fg: hsl(35 92% 30%);
+  --status-warning-fg: hsl(35 92% 25%);
   --status-warning-bg: hsl(38 92% 50% / 0.1);
   --status-error: 346 84% 61%;
-  --status-error-fg: hsl(346 84% 40%);
+  --status-error-fg: hsl(346 84% 30%);
   --status-error-bg: hsl(346 84% 61% / 0.1);
 
   --status-info-fg: hsl(221 83% 45%);
@@ -176,13 +176,13 @@
 
   /* Dark mode status refinements */
   --status-success: 158 64% 52%;
-  --status-success-fg: hsl(158 64% 65%);
+  --status-success-fg: hsl(158 64% 80%);
   --status-success-bg: hsl(158 64% 52% / 0.15);
   --status-warning: 45 93% 47%;
-  --status-warning-fg: hsl(45 93% 70%);
+  --status-warning-fg: hsl(45 93% 85%);
   --status-warning-bg: hsl(45 93% 47% / 0.15);
   --status-error: 0 84% 60%;
-  --status-error-fg: hsl(0 84% 75%);
+  --status-error-fg: hsl(0 84% 85%);
   --status-error-bg: hsl(0 84% 60% / 0.15);
 
   --status-info-fg: hsl(217 91% 75%);

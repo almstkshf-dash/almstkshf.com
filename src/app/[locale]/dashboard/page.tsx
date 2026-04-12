@@ -117,16 +117,19 @@ export default function DashboardPage() {
     const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {});
 
     // Combine into a single analytics object for DashboardGrid
-    const analytics = analyticsOverview ? {
-        nss: analyticsOverview.nss ?? 0,
-        riskScore: analyticsOverview.riskScore ?? 0,
-        velocity: analyticsOverview.velocity ?? 0,
-        totalReach: analyticsOverview.totalReach ?? 0,
-        sentimentDistribution: analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 },
-        crisisProbability: analyticsOverview.crisisProbability ?? 0,
-        emotions: (emotionAggregates as Record<string, number>) ?? {},
-        geography: (geographyAggregates as Record<string, number>) ?? {},
-    } : undefined;
+    const analytics = useMemo(() => {
+        if (!analyticsOverview) return undefined;
+        return {
+            nss: analyticsOverview.nss ?? 0,
+            riskScore: analyticsOverview.riskScore ?? 0,
+            velocity: analyticsOverview.velocity ?? 0,
+            totalReach: analyticsOverview.totalReach ?? 0,
+            sentimentDistribution: analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 },
+            crisisProbability: analyticsOverview.crisisProbability ?? 0,
+            emotions: (emotionAggregates as Record<string, number>) ?? {},
+            geography: (geographyAggregates as Record<string, number>) ?? {},
+        };
+    }, [analyticsOverview, emotionAggregates, geographyAggregates]);
 
     const totalArticles = result?.total || 0;
 
@@ -259,23 +262,32 @@ export default function DashboardPage() {
             sentiment_neg: t('sentiment.negative'),
         };
 
-        if (type === 'excel') {
-            try {
-                exportToExcel(filteredArticles, exportTranslations, exportTranslations.report_title);
-                showToast('success', t('export_success'));
-            } catch { showToast('error', t('export_failed')); }
-        } else {
-            setIsExporting(true);
-            try {
-                await exportToPDF(filteredArticles, exportTranslations);
-                showToast('success', t('export_success'));
-            } catch (e) {
-                console.error("Export failed", e);
-                showToast('error', t('export_failed'));
-            } finally {
-                setIsExporting(false);
+        setIsExporting(true);
+        
+        // Yield thread so React can paint the "Exporting..." loading state
+        // before executing the heavy, synchronous export logic.
+        setTimeout(async () => {
+            if (type === 'excel') {
+                try {
+                    exportToExcel(filteredArticles, exportTranslations, exportTranslations.report_title);
+                    showToast('success', t('export_success'));
+                } catch { 
+                    showToast('error', t('export_failed')); 
+                } finally {
+                    setIsExporting(false);
+                }
+            } else {
+                try {
+                    await exportToPDF(filteredArticles, exportTranslations);
+                    showToast('success', t('export_success'));
+                } catch (e) {
+                    console.error("Export failed", e);
+                    showToast('error', t('export_failed'));
+                } finally {
+                    setIsExporting(false);
+                }
             }
-        }
+        }, 16);
     };
 
     return (
@@ -377,15 +389,15 @@ export default function DashboardPage() {
                                         disabled={isExporting || filteredArticles.length === 0}
                                         className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                     >
-                                        <FileDown className="w-4 h-4" />
+                                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
                                         PDF
                                     </button>
                                     <button
                                         onClick={() => handleExport('excel')}
-                                        disabled={filteredArticles.length === 0}
+                                        disabled={isExporting || filteredArticles.length === 0}
                                         className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                     >
-                                        <FileSpreadsheet className="w-4 h-4" />
+                                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
                                         EXCEL
                                     </button>
                                 </div>
@@ -439,7 +451,7 @@ export default function DashboardPage() {
                                             <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
                                             <select
                                                 value={selectedCountry}
-                                                onChange={(e) => setSelectedCountry(e.target.value)}
+                                                onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
                                                 className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"
                                             >
                                                 <option value="All">{t('filters.all_countries')}</option>
@@ -473,7 +485,7 @@ export default function DashboardPage() {
                                     {sourceTypes.map((type) => (
                                         <button
                                             key={type.id}
-                                            onClick={() => setSelectedType(type.id)}
+                                            onClick={() => startTransition(() => setSelectedType(type.id))}
                                             className={clsx(
                                                 "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
                                                 selectedType === type.id

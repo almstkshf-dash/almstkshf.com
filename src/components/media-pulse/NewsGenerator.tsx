@@ -1,6 +1,7 @@
 'use client';
 import clsx from 'clsx';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X, Globe } from "lucide-react";
@@ -207,9 +208,11 @@ function MultiSelectDropdown({
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const filtered = items.filter(
-        (item) => search.length === 0 || item.searchStr.toLowerCase().includes(search.toLowerCase())
-    );
+    const filtered = React.useMemo(() => {
+        return items.filter(
+            (item) => search.length === 0 || item.searchStr.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [items, search]);
 
     const toggle = (id: string) => {
         onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
@@ -298,12 +301,12 @@ function MultiSelectDropdown({
                         ) : (
                             <div className="p-1.5 grid grid-cols-1 gap-0.5">
                                 {filtered.map((item) => (
-                                    <Button
+                                    <button
                                         key={item.id}
-                                        variant="ghost"
+                                        type="button"
                                         onClick={() => toggle(item.id)}
                                         className={clsx(
-                                            "w-full flex justify-start gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto",
+                                            "w-full flex justify-start gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors",
                                             selected.includes(item.id)
                                                 ? 'bg-primary/10 text-primary font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
@@ -319,8 +322,8 @@ function MultiSelectDropdown({
                                                 <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" />
                                             )}
                                         </div>
-                                        <div className="flex-1 truncate">{finalRenderItem(item)}</div>
-                                    </Button>
+                                        <div className="flex-1 truncate text-left">{finalRenderItem(item)}</div>
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -410,20 +413,20 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     };
 
     // Country helpers
-    const countryItems = ALL_COUNTRIES.map((c) => ({
+    const countryItems = React.useMemo(() => ALL_COUNTRIES.map((c) => ({
         id: c.code,
         label: isAr ? c.ar : c.en,
         searchStr: `${c.en} ${c.ar} ${c.code}`,
-    }));
+    })), [isAr]);
 
     const getCountryByCode = useCallback((code: string) => ALL_COUNTRIES.find((c) => c.code === code), []);
 
     // Language helpers
-    const languageItems = LANGUAGES.map((l) => ({
+    const languageItems = React.useMemo(() => LANGUAGES.map((l) => ({
         id: l.code,
         label: isAr ? l.ar : l.en,
         searchStr: `${l.en} ${l.ar} ${l.code}`,
-    }));
+    })), [isAr]);
 
     const getLangByCode = useCallback((code: string) => LANGUAGES.find((l) => l.code === code), []);
 
@@ -489,7 +492,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                         <Search className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div>
-                        <h3 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h3>
+                        <h2 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h2>
                         <p className="text-muted-foreground text-[11px] transition-colors">{t('subtitle')}</p>
                     </div>
                 </div>

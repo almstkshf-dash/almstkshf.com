@@ -126,7 +126,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h4 className="text-foreground font-bold text-sm tracking-tight">{data.source}</h4>
-                                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-medium opacity-70">
+                                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-medium">
                                             {t('source_analysis')} · {data.count} {t('articles')}
                                         </p>
                                     </div>
