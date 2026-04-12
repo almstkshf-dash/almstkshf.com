@@ -971,26 +971,32 @@ const PR_WIRE_FEEDS: Array<{
     country: string;
     lang: "en" | "ar";
 }> = [
-        // Global wires (English)
+        // Global / Regional Verified Wires (English)
         { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-list.rss", country: "US", lang: "en" },
-        { name: "Business Wire", url: "https://feeds.businesswire.com/rss/home?rss=G1&rssid=rss_bw_all", country: "US", lang: "en" },
-        { name: "GlobeNewswire MENA", url: "https://www.globenewswire.com/RssFeed/subjectcode/15/Middle+East+and+Africa", country: "AE", lang: "en" },
-        { name: "Accesswire", url: "https://www.accesswire.com/rss", country: "US", lang: "en" },
         { name: "Newswire.com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
+        { name: "Al Bawaba PR", url: "https://www.albawaba.com/rss/business", country: "JO", lang: "en" },
+        { name: "AETOSWire (EN)", url: "https://aetoswire.com/rss", country: "AE", lang: "en" },
+        { name: "Middle East Eye", url: "https://www.middleeasteye.net/rss", country: "UK", lang: "en" },
+        { name: "MEED Business", url: "https://www.meed.com/rss", country: "AE", lang: "en" },
+        { name: "Mehr News (EN)", url: "https://en.mehrnews.com/rss", country: "IR", lang: "en" },
+        { name: "Egyptian Streets", url: "https://egyptianstreets.com/feed", country: "EG", lang: "en" },
+
+        // WAM - Emirates News Agency (EN Categories)
+        { name: "WAM (Economy EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-002-1jc72emk1y2i&type=rss", country: "AE", lang: "en" },
+        { name: "WAM (Sport EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-002-1jc73gac78yp&type=rss", country: "AE", lang: "en" },
+        { name: "WAM (Culture EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73gac79l5&type=rss", country: "AE", lang: "en" },
+        { name: "WAM (Latest news EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx3w&type=rss", country: "AE", lang: "en" },
+        { name: "WAM (Science/Tech EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx70&type=rss", country: "AE", lang: "en" },
+
+        // WAM - Emirates News Agency (AR Categories)
+        { name: "WAM (Economy AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-001-1jc74qmetxqw&type=rss", country: "AE", lang: "ar" },
+        { name: "WAM (Sport AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-001-1jc74qmetyul&type=rss", country: "AE", lang: "ar" },
+        { name: "WAM (Culture AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmetzbr&type=rss", country: "AE", lang: "ar" },
+        { name: "WAM (Latest News AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmeu03a&type=rss", country: "AE", lang: "ar" },
+        { name: "WAM (Science/Tech AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmeu0pl&type=rss", country: "AE", lang: "ar" },
 
         // MENA / Arab wires
-        { name: "Zawya PR", url: "https://www.zawya.com/en/rss/press-releases", country: "AE", lang: "en" },
-        { name: "WAM (UAE EN)", url: "https://www.wam.ae/en/rss", country: "AE", lang: "en" },
-        { name: "WAM (UAE AR)", url: "https://www.wam.ae/ar/rss", country: "AE", lang: "ar" },
-        { name: "SPA (Saudi AR)", url: "https://www.spa.gov.sa/rss/feedAll.rss", country: "SA", lang: "ar" },
-        { name: "SPA (Saudi EN)", url: "https://www.spa.gov.sa/en/rss/feedAll.rss", country: "SA", lang: "en" },
-        { name: "KUNA (Kuwait EN)", url: "https://www.kuna.net.kw/Rss/Rss.aspx?lang=en", country: "KW", lang: "en" },
-        { name: "KUNA (Kuwait AR)", url: "https://www.kuna.net.kw/Rss/Rss.aspx?lang=ar", country: "KW", lang: "ar" },
-        { name: "AETOSWire (EN)", url: "https://www.aetoswire.com/rss/en", country: "AE", lang: "en" },
-        { name: "AETOSWire (AR)", url: "https://www.aetoswire.com/rss/ar", country: "AE", lang: "ar" },
-        { name: "MENA FN", url: "https://menafn.com/rss/1", country: "AE", lang: "en" },
-        { name: "Gulf News PR", url: "https://gulfnews.com/rss/press-releases", country: "AE", lang: "en" },
-        { name: "Al Bawaba PR", url: "https://www.albawaba.com/rss/business", country: "JO", lang: "en" },
+        { name: "AETOSWire (AR)", url: "https://aetoswire.com/rss?lang=ar", country: "AE", lang: "ar" },
     ];
 
 export const fetchPressReleaseSources = action({
