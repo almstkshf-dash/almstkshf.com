@@ -331,9 +331,9 @@ export default function TerroristListTab() {
                     <td className="px-4 py-3 text-center sticky left-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60">
                       <div className={clsx(
                         "inline-flex p-1.5 rounded-lg border",
-                        entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400" :
-                          entry.type === 'entity' ? "bg-amber-500/10 border-amber-500/20 text-amber-600" :
-                            "bg-purple-500/10 border-purple-500/20 text-purple-600"
+                        entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400" :
+                          entry.type === 'entity' ? "bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400" :
+                            "bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-400"
                       )}>
                         {entry.type === 'individual' ? <User className="w-3.5 h-3.5" /> :
                           entry.type === 'entity' ? <Building2 className="w-3.5 h-3.5" /> : <Users className="w-3.5 h-3.5" />}
@@ -348,11 +348,11 @@ export default function TerroristListTab() {
                     <td className="px-4 py-3 text-xs font-bold border-r border-border/40">
                       {entry.nationality || '—'}
                     </td>
-                    <td className="px-4 py-3 text-[11px] font-mono font-bold text-primary border-r border-border/40">
+                    <td className="px-4 py-3 text-[11px] font-mono font-bold text-foreground border-r border-border/40">
                       {entry.documentNumber || '—'}
                     </td>
                     <td className="px-4 py-3 border-r border-border/40">
-                      <span className="px-2 py-1 rounded-md bg-destructive/10 text-destructive text-[10px] font-black uppercase tracking-tight border border-destructive/20 whitespace-nowrap">
+                      <span className="px-2 py-1 rounded-md bg-destructive/10 text-red-700 dark:text-red-400 text-[10px] font-black uppercase tracking-tight border border-destructive/20 whitespace-nowrap">
                         {entry.category}
                       </span>
                     </td>

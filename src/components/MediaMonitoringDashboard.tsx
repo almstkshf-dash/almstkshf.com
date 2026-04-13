@@ -113,15 +113,21 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         );
     }
 
+    // Memoize the chart data mapping to avoid inline array creation on every render
+    const chartData = useMemo(() => {
+        if (!reports || reports.length === 0) return null;
+        return reports.map((a: any) => ({
+            reportName: a.title || a.reportName,
+            source: a.sourceType || a.source,
+            timestamp: a.publishedDate || a.createdAt || a.timestamp,
+            sentiment: a.sentiment
+        }));
+    }, [reports]);
+
     return (
         <div className="space-y-8">
             {/* Chart Section */}
-            {reports && reports.length > 0 && <ReportsChart data={reports.map((a: any) => ({
-                reportName: a.title || a.reportName,
-                source: a.sourceType || a.source,
-                timestamp: a.publishedDate || a.createdAt || a.timestamp,
-                sentiment: a.sentiment
-            }))} />}
+            {chartData && <ReportsChart data={chartData} />}
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2">

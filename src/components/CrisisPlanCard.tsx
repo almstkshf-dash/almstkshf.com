@@ -10,7 +10,7 @@ interface CrisisPlanCardProps {
     status: string;
 }
 
-export default function CrisisPlanCard({ title, priority, actions, status }: CrisisPlanCardProps) {
+export default React.memo(function CrisisPlanCard({ title, priority, actions, status }: CrisisPlanCardProps) {
     const t = useTranslations("CrisisManagementDetail.card");
 
     const priorityColors = {
@@ -57,4 +57,4 @@ export default function CrisisPlanCard({ title, priority, actions, status }: Cri
             </div>
         </div>
     );
-}
+});

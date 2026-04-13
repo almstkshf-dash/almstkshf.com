@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 interface ReportsChartPoint {
@@ -13,7 +13,7 @@ interface ReportsChartProps {
     data: ReportsChartPoint[];
 }
 
-export default function ReportsChart({ data }: ReportsChartProps) {
+export default React.memo(function ReportsChart({ data }: ReportsChartProps) {
     const t = useTranslations("MediaMonitoring.dashboard");
     const [mounted, setMounted] = useState(false);
 
@@ -33,24 +33,26 @@ export default function ReportsChart({ data }: ReportsChartProps) {
     };
 
     // Process data to group by date
-    const processedData = data?.reduce((acc: { date: string; count: number }[], report) => {
-        const reportDate = typeof report.timestamp === "number"
-            ? new Date(report.timestamp)
-            : parsePublishedDate(report.publishedDate);
+    const processedData = useMemo(() => {
+        return data?.reduce((acc: { date: string; count: number }[], report) => {
+            const reportDate = typeof report.timestamp === "number"
+                ? new Date(report.timestamp)
+                : parsePublishedDate(report.publishedDate);
 
-        if (!reportDate || Number.isNaN(reportDate.getTime())) {
+            if (!reportDate || Number.isNaN(reportDate.getTime())) {
+                return acc;
+            }
+
+            const date = reportDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+            const existing = acc.find(item => item.date === date);
+            if (existing) {
+                existing.count += 1;
+            } else {
+                acc.push({ date, count: 1 });
+            }
             return acc;
-        }
-
-        const date = reportDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        const existing = acc.find(item => item.date === date);
-        if (existing) {
-            existing.count += 1;
-        } else {
-            acc.push({ date, count: 1 });
-        }
-        return acc;
-    }, []) || [];
+        }, []) || [];
+    }, [data]);
 
     // Sort by date (assuming rough chronological order or needing explicit sort)
     // For simplicity, we'll assume data comes or is mapped somewhat chronologically, 
@@ -170,4 +172,4 @@ export default function ReportsChart({ data }: ReportsChartProps) {
             </div>
         </div>
     );
-}
+});
