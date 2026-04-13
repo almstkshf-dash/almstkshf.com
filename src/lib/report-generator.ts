@@ -436,7 +436,7 @@ export class ReportGenerator {
         this.drawMetricBoxes(doc, [
             { label: translations.AiInspector?.label_mode || 'MODE', value: modeTrans, color: BRAND_DARK },
             { label: translations.AiInspector?.label_risk || 'RISK LEVEL', value: localizedRiskLevel, color: rColor },
-            { label: translations.AiInspector?.label_confidence || 'CONFIDENCE', value: `${confidence.toFixed(1)}%`, color: BRAND_AMBER }
+            { label: translations.AiInspector?.label_confidence || 'CONFIDENCE', value: `${(confidence ?? 0).toFixed(1)}%`, color: BRAND_AMBER }
         ], y, pageWidth, fontLoaded);
 
         y += 40;
@@ -446,7 +446,7 @@ export class ReportGenerator {
             const tableData = data.sentenceBreakdown?.map((s: any) => [
                 this.fixArabic(s.text.slice(0, 80) + (s.text.length > 80 ? '...' : '')),
                 this.fixArabic(s.flags.join(', ') || translations.AiInspector?.none || 'None'),
-                (s.aiProbability * 100).toFixed(1) + '%'
+                `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
             ]) || [];
 
             await this.addAutoTable(doc, {
@@ -555,7 +555,7 @@ export class ReportGenerator {
             const tableData = data.frameAnomalies?.map((f: any) => [
                 f.timestamp,
                 this.fixArabic(f.type),
-                (f.severity * 100).toFixed(1) + '%',
+                `${((f.severity ?? 0) * 100).toFixed(1)}%`,
                 this.fixArabic(f.description)
             ]) || [];
 
@@ -825,7 +825,7 @@ export class ReportGenerator {
                 sheet.addRow([
                     s.text,
                     s.flags.join(', ') || translations.AiInspector?.none || 'None',
-                    `${(s.aiProbability * 100).toFixed(1)}%`
+                    `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
                 ]);
             });
         } else if (mode === 'image') {
@@ -914,7 +914,7 @@ export class ReportGenerator {
                 sheet.addRow([
                     f.timestamp,
                     f.type,
-                    `${(f.severity * 100).toFixed(1)}%`,
+                    `${((f.severity ?? 0) * 100).toFixed(1)}%`,
                     f.description
                 ]);
             });

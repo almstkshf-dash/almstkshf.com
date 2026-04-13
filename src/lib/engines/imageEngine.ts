@@ -516,13 +516,13 @@ function buildImageResult(
   const overallScore = Math.min(100, Math.round(rawWeightsSum * integratedMultiplier));
 
   const checklist: ChecklistItem[] = [
-    { id: "noise", label: "Natural sensor noise present", passed: stats.noiseLevel >= 16, note: `Noise: ${stats.noiseLevel.toFixed(1)}`, val: stats.noiseLevel.toFixed(1) },
-    { id: "skin", label: "Skin texture has imperfection", passed: stats.skinSmoothness <= 0.82, note: `Smoothness: ${(stats.skinSmoothness * 100).toFixed(0)}%`, val: (stats.skinSmoothness * 100).toFixed(0) },
-    { id: "lighting", label: "Uneven lighting across scene", passed: stats.localContrastVariance >= 8, note: `Variance: ${stats.localContrastVariance.toFixed(1)}`, val: stats.localContrastVariance.toFixed(1) },
-    { id: "edge", label: "Natural edge detail at periphery", passed: stats.backgroundBlur <= 0.55, note: `Blur: ${(stats.backgroundBlur * 100).toFixed(0)}%`, val: (stats.backgroundBlur * 100).toFixed(0) },
-    { id: "symmetry", label: "Asymmetric composition", passed: stats.symmetryScore <= 0.86, note: `Symmetry: ${(stats.symmetryScore * 100).toFixed(0)}%`, val: (stats.symmetryScore * 100).toFixed(0) },
-    { id: "saturation", label: "Rich saturation variance", passed: stats.saturationVariance >= 0.11, note: `Var: ${stats.saturationVariance.toFixed(3)}`, val: stats.saturationVariance.toFixed(3) },
-    { id: "sharpness", label: "Sharp fine detail", passed: stats.edgeSharpness >= 7, note: `Sharp: ${stats.edgeSharpness.toFixed(1)}`, val: stats.edgeSharpness.toFixed(1) },
+    { id: "noise", label: "Natural sensor noise present", passed: stats.noiseLevel >= 16, note: `Noise: ${(stats.noiseLevel ?? 0).toFixed(1)}`, val: (stats.noiseLevel ?? 0).toFixed(1) },
+    { id: "skin", label: "Skin texture has imperfection", passed: stats.skinSmoothness <= 0.82, note: `Smoothness: ${((stats.skinSmoothness ?? 0) * 100).toFixed(0)}%`, val: ((stats.skinSmoothness ?? 0) * 100).toFixed(0) },
+    { id: "lighting", label: "Uneven lighting across scene", passed: stats.localContrastVariance >= 8, note: `Variance: ${(stats.localContrastVariance ?? 0).toFixed(1)}`, val: (stats.localContrastVariance ?? 0).toFixed(1) },
+    { id: "edge", label: "Natural edge detail at periphery", passed: stats.backgroundBlur <= 0.55, note: `Blur: ${((stats.backgroundBlur ?? 0) * 100).toFixed(0)}%`, val: ((stats.backgroundBlur ?? 0) * 100).toFixed(0) },
+    { id: "symmetry", label: "Asymmetric composition", passed: stats.symmetryScore <= 0.86, note: `Symmetry: ${((stats.symmetryScore ?? 0) * 100).toFixed(0)}%`, val: ((stats.symmetryScore ?? 0) * 100).toFixed(0) },
+    { id: "saturation", label: "Rich saturation variance", passed: stats.saturationVariance >= 0.11, note: `Var: ${(stats.saturationVariance ?? 0).toFixed(3)}`, val: (stats.saturationVariance ?? 0).toFixed(3) },
+    { id: "sharpness", label: "Sharp fine detail", passed: stats.edgeSharpness >= 7, note: `Sharp: ${(stats.edgeSharpness ?? 0).toFixed(1)}`, val: (stats.edgeSharpness ?? 0).toFixed(1) },
   ];
 
   const verdictKey =

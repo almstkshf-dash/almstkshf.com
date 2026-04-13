@@ -297,7 +297,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               return (
                 <motion.button
                   key={idx}
-                  title={`${frame.timestamp.toFixed(2)}s — ${frame.label} (${frame.score}%)`}
+                  title={`${(frame.timestamp ?? 0).toFixed(2)}s — ${frame.label} (${frame.score}%)`}
                   onClick={() => setSelectedFrame(idx)}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{
@@ -424,7 +424,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                   )}
                   <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
                     <span className="text-[10px] font-mono text-white/80">
-                      {ts.toFixed(2)}s
+                      {(ts ?? 0).toFixed(2)}s
                     </span>
                   </div>
                 </motion.button>
@@ -506,7 +506,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                       {t('overlay_timestamp')}
                     </span>
                     <span className="block font-mono text-lg">
-                      {currentFrame.timestamp.toFixed(2)}s
+                      {(currentFrame.timestamp ?? 0).toFixed(2)}s
                     </span>
                   </div>
                 </div>
@@ -586,45 +586,45 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     {[
                       {
                         labelKey: 'stat_noise',
-                        value: currentStats.noiseLevel.toFixed(1),
-                        warn: currentStats.noiseLevel < 14,
+                        value: (currentStats.noiseLevel ?? 0).toFixed(1),
+                        warn: (currentStats.noiseLevel ?? 0) < 14,
                       },
                       {
                         labelKey: 'stat_uniformity',
-                        value: (currentStats.colorUniformity * 100).toFixed(0),
+                        value: ((currentStats.colorUniformity ?? 0) * 100).toFixed(0),
                         unit: '%',
-                        warn: currentStats.colorUniformity > 0.76,
+                        warn: (currentStats.colorUniformity ?? 0) > 0.76,
                       },
                       {
                         labelKey: 'stat_edge_sharp',
-                        value: currentStats.edgeSharpness.toFixed(1),
-                        warn: currentStats.edgeSharpness < 7,
+                        value: (currentStats.edgeSharpness ?? 0).toFixed(1),
+                        warn: (currentStats.edgeSharpness ?? 0) < 7,
                       },
                       {
                         labelKey: 'stat_brightness',
-                        value: currentStats.avgBrightness.toFixed(0),
+                        value: (currentStats.avgBrightness ?? 0).toFixed(0),
                       },
                       {
                         labelKey: 'stat_center_sharp',
-                        value: currentStats.centerSharpness.toFixed(1),
+                        value: (currentStats.centerSharpness ?? 0).toFixed(1),
                       },
                       {
                         labelKey: 'stat_border_sharp',
-                        value: currentStats.borderSharpness.toFixed(1),
+                        value: (currentStats.borderSharpness ?? 0).toFixed(1),
                         warn:
-                          currentStats.centerSharpness > 0 &&
-                          currentStats.borderSharpness <
-                          currentStats.centerSharpness * 0.45,
+                          (currentStats.centerSharpness ?? 0) > 0 &&
+                          (currentStats.borderSharpness ?? 0) <
+                          (currentStats.centerSharpness ?? 0) * 0.45,
                       },
                       {
                         labelKey: 'stat_color_blocks',
-                        value: String(currentStats.localColorBlocks),
-                        warn: currentStats.localColorBlocks < 18,
+                        value: String(currentStats.localColorBlocks ?? 0),
+                        warn: (currentStats.localColorBlocks ?? 0) < 18,
                       },
                       {
                         labelKey: 'stat_bg_variance',
-                        value: currentStats.bgZoneVariance.toFixed(1),
-                        warn: currentStats.bgZoneVariance > 8,
+                        value: (currentStats.bgZoneVariance ?? 0).toFixed(1),
+                        warn: (currentStats.bgZoneVariance ?? 0) > 8,
                       },
                     ].map(({ labelKey, value, unit = '', warn }) => (
                       <StatPill

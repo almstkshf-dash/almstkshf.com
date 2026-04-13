@@ -305,13 +305,13 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
       {rich && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
-            { labelKey: "stat_noise", value: rich.stats.noiseLevel.toFixed(1), unit: "" },
-            { labelKey: "stat_edge_detail", value: rich.stats.edgeSharpness.toFixed(1), unit: "" },
-            { labelKey: "stat_symmetry", value: (rich.stats.symmetryScore * 100).toFixed(0), unit: "%" },
-            { labelKey: "stat_skin_smooth", value: (rich.stats.skinSmoothness * 100).toFixed(0), unit: "%" },
-            { labelKey: "stat_bg_blur", value: (rich.stats.backgroundBlur * 100).toFixed(0), unit: "%" },
-            { labelKey: "stat_sat_var", value: rich.stats.saturationVariance.toFixed(3), unit: "" },
-            { labelKey: "stat_megapix", value: rich.stats.megapixels.toFixed(2), unit: "MP" },
+            { labelKey: "stat_noise", value: (rich.stats.noiseLevel ?? 0).toFixed(1), unit: "" },
+            { labelKey: "stat_edge_detail", value: (rich.stats.edgeSharpness ?? 0).toFixed(1), unit: "" },
+            { labelKey: "stat_symmetry", value: ((rich.stats.symmetryScore ?? 0) * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_skin_smooth", value: ((rich.stats.skinSmoothness ?? 0) * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_bg_blur", value: ((rich.stats.backgroundBlur ?? 0) * 100).toFixed(0), unit: "%" },
+            { labelKey: "stat_sat_var", value: (rich.stats.saturationVariance ?? 0).toFixed(3), unit: "" },
+            { labelKey: "stat_megapix", value: (rich.stats.megapixels ?? 0).toFixed(2), unit: "MP" },
           ].map(({ labelKey, value, unit }) => (
             <div key={labelKey} className="p-4 bg-card dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
               <span className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{t(labelKey)}</span>
@@ -355,7 +355,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">{t("overlay_noise")}</span>
               <span className="block font-mono text-xl">
                 {rich
-                  ? rich.stats.noiseLevel.toFixed(1)
+                  ? (rich.stats.noiseLevel ?? 0).toFixed(1)
                   : report.pixelLogicSignals.find((s) => s.id === "low_noise" || s.id === "natural_grain")?.detectedValue ?? "0.00"}
               </span>
             </div>
