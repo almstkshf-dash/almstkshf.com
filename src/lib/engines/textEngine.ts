@@ -33,9 +33,12 @@ export interface HighlightedRange {
 /** Named signal entry for the signals panel */
 export interface SignalEntry {
   id: string;
-  label: string;
-  description: string;
+  label: string;       // For legacy or non-localized export
+  description: string; // For legacy or non-localized export
+  labelKey: string;    // i18n key (prefix AiInspector.text.)
+  descKey: string;     // i18n key (prefix AiInspector.text.)
   severity: "low" | "medium" | "high";
+  count?: number;
 }
 
 /** Full analysis result — unified interface */
@@ -47,6 +50,7 @@ export interface TextAnalysisResult {
 
   // ── Extended forensic breakdown ──
   verdict: "Fully Human" | "Mostly Human" | "Mixed" | "Mostly AI" | "Fully AI";
+  verdictKey: string;                    // i18n key
   sentences: SentenceResult[];           // Per-sentence scores
   signalBreakdown: Record<string, number>; // Aggregated signal → count map
   wordCount: number;
@@ -713,20 +717,111 @@ function buildHighlightedRanges(text: string): HighlightedRange[] {
 function buildSignalEntries(
   signalBreakdown: Record<string, number>
 ): SignalEntry[] {
-  const META: Record<string, { id: string; label: string; description: string; severity: "low" | "medium" | "high" }> = {
-    "AI opener phrase": { id: "ai_opener", label: "AI Opener Phrase", description: "Response starts with typical LLM affirmation or greeting.", severity: "high" },
-    "AI transition word": { id: "ai_transition", label: "AI Transition Word", description: "Formal connective words strongly correlated with LLM output.", severity: "medium" },
-    "AI buzzword/hedge": { id: "ai_hedge", label: "AI Buzzword / Hedge", description: "Corporate or assistant-voice vocabulary typical of AI generation.", severity: "medium" },
-    "AI over-explanation pattern": { id: "ai_overexplain", label: "Over-Explanation", description: "Unnecessary clarification added as filler, a key LLM behavior.", severity: "medium" },
-    "AI closing phrase": { id: "ai_closer", label: "AI Closing Phrase", description: "Text ends with a typical LLM sign-off or offer to help.", severity: "high" },
-    "Formulaic sentence structure": { id: "ai_structure", label: "Formulaic Structure", description: "Sentence follows rigid formula patterns favored by language models.", severity: "medium" },
-    "Passive voice construction": { id: "passive_voice", label: "Passive Voice", description: "AI tends to over-use passive constructions to sound neutral.", severity: "low" },
-    "No contractions (formal AI style)": { id: "no_contractions", label: "Contraction Absence", description: "Absence of contractions in long sentences signals non-human tone.", severity: "low" },
-    "List-style structure": { id: "list_structure", label: "List-Style Structure", description: "Enumerated structure in prose, an AI preference for clarity-signaling.", severity: "low" },
-    "Uniform sentence length (AI sweet spot)": { id: "uniform_length", label: "Uniform Cadence", description: "Consistent 15–28 word sentences without length variation.", severity: "medium" },
-    "Run-on without natural pause": { id: "run_on", label: "Run-On Sentence", description: "Long sentence with no commas or dashes — unnatural for human writers.", severity: "low" },
-    "Human signal detected": { id: "human_signal", label: "Human Signal", description: "Informal language, slang, or emotional cues indicating human authorship.", severity: "high" },
-    "AI callout/label heading": { id: "callout_label", label: "Callout Label Heading", description: "Short imperative labels (Note:, Tip:) used as formatting devices by AI.", severity: "medium" },
+  const META: Record<string, { id: string; label: string; description: string; labelKey: string; descKey: string; severity: "low" | "medium" | "high" }> = {
+    "AI opener phrase": { 
+      id: "ai_opener", 
+      label: "AI Opener Phrase", 
+      description: "Response starts with typical LLM affirmation or greeting.", 
+      labelKey: "signal_ai_opener_label",
+      descKey: "signal_ai_opener_desc",
+      severity: "high" 
+    },
+    "AI transition word": { 
+      id: "ai_transition", 
+      label: "AI Transition Word", 
+      description: "Formal connective words strongly correlated with LLM output.", 
+      labelKey: "signal_ai_transition_label",
+      descKey: "signal_ai_transition_desc",
+      severity: "medium" 
+    },
+    "AI buzzword/hedge": { 
+      id: "ai_hedge", 
+      label: "AI Buzzword / Hedge", 
+      description: "Corporate or assistant-voice vocabulary typical of AI generation.", 
+      labelKey: "signal_ai_hedge_label",
+      descKey: "signal_ai_hedge_desc",
+      severity: "medium" 
+    },
+    "AI over-explanation pattern": { 
+      id: "ai_overexplain", 
+      label: "Over-Explanation", 
+      description: "Unnecessary clarification added as filler, a key LLM behavior.", 
+      labelKey: "signal_ai_overexplain_label",
+      descKey: "signal_ai_overexplain_desc",
+      severity: "medium" 
+    },
+    "AI closing phrase": { 
+      id: "ai_closer", 
+      label: "AI Closing Phrase", 
+      description: "Text ends with a typical LLM sign-off or offer to help.", 
+      labelKey: "signal_ai_closer_label",
+      descKey: "signal_ai_closer_desc",
+      severity: "high" 
+    },
+    "Formulaic sentence structure": { 
+      id: "ai_structure", 
+      label: "Formulaic Structure", 
+      description: "Sentence follows rigid formula patterns favored by language models.", 
+      labelKey: "signal_ai_structure_label",
+      descKey: "signal_ai_structure_desc",
+      severity: "medium" 
+    },
+    "Passive voice construction": { 
+      id: "passive_voice", 
+      label: "Passive Voice", 
+      description: "AI tends to over-use passive constructions to sound neutral.", 
+      labelKey: "signal_passive_voice_label",
+      descKey: "signal_passive_voice_desc",
+      severity: "low" 
+    },
+    "No contractions (formal AI style)": { 
+      id: "no_contractions", 
+      label: "Contraction Absence", 
+      description: "Absence of contractions in long sentences signals non-human tone.", 
+      labelKey: "signal_no_contractions_label",
+      descKey: "signal_no_contractions_desc",
+      severity: "low" 
+    },
+    "List-style structure": { 
+      id: "list_structure", 
+      label: "List-Style Structure", 
+      description: "Enumerated structure in prose, an AI preference for clarity-signaling.", 
+      labelKey: "signal_list_structure_label",
+      descKey: "signal_list_structure_desc",
+      severity: "low" 
+    },
+    "Uniform sentence length (AI sweet spot)": { 
+      id: "uniform_length", 
+      label: "Uniform Cadence", 
+      description: "Consistent 15–28 word sentences without length variation.", 
+      labelKey: "signal_uniform_length_label",
+      descKey: "signal_uniform_length_desc",
+      severity: "medium" 
+    },
+    "Run-on without natural pause": { 
+      id: "run_on", 
+      label: "Run-On Sentence", 
+      description: "Long sentence with no commas or dashes — unnatural for human writers.", 
+      labelKey: "signal_run_on_label",
+      descKey: "signal_run_on_desc",
+      severity: "low" 
+    },
+    "Human signal detected": { 
+      id: "human_signal", 
+      label: "Human Signal", 
+      description: "Informal language, slang, or emotional cues indicating human authorship.", 
+      labelKey: "signal_human_signal_label",
+      descKey: "signal_human_signal_desc",
+      severity: "high" 
+    },
+    "AI callout/label heading": { 
+      id: "callout_label", 
+      label: "Callout Label Heading", 
+      description: "Short imperative labels (Note:, Tip:) used as formatting devices by AI.", 
+      labelKey: "signal_callout_label",
+      descKey: "signal_callout_desc",
+      severity: "medium" 
+    },
   };
 
   const entries: SignalEntry[] = [];
@@ -737,15 +832,20 @@ function buildSignalEntries(
       const meta = META[metaKey];
       entries.push({
         ...meta,
+        count,
         label: count > 1 ? `${meta.label} (×${count})` : meta.label,
       });
     } else if (key !== "No strong signals") {
       // Fallback for unknown signals
+      const safeId = key.toLowerCase().replace(/\s+/g, "_");
       entries.push({
-        id: key.toLowerCase().replace(/\s+/g, "_"),
+        id: safeId,
         label: key,
         description: `Detected ${count} time(s).`,
+        labelKey: `signal_${safeId}_label`, // Generic fallback
+        descKey: `signal_${safeId}_desc`,    // Generic fallback
         severity: "low",
+        count,
       });
     }
   }
@@ -764,6 +864,7 @@ export function analyzeText(text: string): TextAnalysisResult {
       signals: [],
       highlightedRanges: [],
       verdict: "Fully Human",
+      verdictKey: "verdict_fully_human",
       sentences: [],
       signalBreakdown: {},
       wordCount: 0,
@@ -831,6 +932,13 @@ export function analyzeText(text: string): TextAnalysisResult {
           overallScore >= 20 ? "Mostly Human" :
             "Fully Human";
 
+  const verdictKey =
+    overallScore >= 82 ? "verdict_fully_ai" :
+      overallScore >= 62 ? "verdict_mostly_ai" :
+        overallScore >= 40 ? "verdict_mixed" :
+          overallScore >= 20 ? "verdict_mostly_human" :
+            "verdict_fully_human";
+
   const namedSignals = buildSignalEntries(breakdown);
   const highlightedRanges = buildHighlightedRanges(text);
 
@@ -842,6 +950,7 @@ export function analyzeText(text: string): TextAnalysisResult {
 
     // Extended forensic breakdown
     verdict,
+    verdictKey,
     sentences: scoredSentences,
     signalBreakdown: breakdown,
     wordCount: words.length,

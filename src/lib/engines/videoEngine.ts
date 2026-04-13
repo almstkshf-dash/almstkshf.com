@@ -4,13 +4,15 @@ import { ImageAnalysisReport, analyzeImageCanvas, analyzeImageCanvasDeep } from 
 export interface VideoFrameSignal {
   id: string;
   name: string;
+  nameKey: string; // i18n key
   detected: boolean;
 }
 
 export interface VideoFrame {
   timestamp: number;
   score: number;
-  label: 'Human' | 'Mixed' | 'AI';
+  label: string;
+  labelKey: string; // i18n key
   signals: VideoFrameSignal[];
   thumbnail: string;
   stats: FramePixelStats;
@@ -225,48 +227,48 @@ function scoreFrame(
 
   const s_smooth = stats.noiseLevel < 14;
   if (s_smooth) score += 25;
-  signals.push({ id: 'v_smooth_texture', name: 'Unnaturally smooth frame texture', detected: s_smooth });
+  signals.push({ id: 'v_smooth_texture', name: 'Unnaturally smooth frame texture', nameKey: 'signal_v_smooth_texture_name', detected: s_smooth });
 
   const s_flat = stats.colorUniformity > 0.76;
   if (s_flat) score += 20;
-  signals.push({ id: 'v_flat_bg', name: 'Flat/uniform background color', detected: s_flat });
+  signals.push({ id: 'v_flat_bg', name: 'Flat/uniform background color', nameKey: 'signal_v_flat_bg_name', detected: s_flat });
 
   const s_low_complexity = stats.localColorBlocks < 18;
   if (s_low_complexity) score += 15;
-  signals.push({ id: 'v_low_complexity', name: 'Low color complexity — AI background', detected: s_low_complexity });
+  signals.push({ id: 'v_low_complexity', name: 'Low color complexity — AI background', nameKey: 'signal_v_low_complexity_name', detected: s_low_complexity });
 
   const s_hair_blur = stats.centerSharpness > 0 && stats.borderSharpness < stats.centerSharpness * 0.45;
   if (s_hair_blur) score += 20;
-  signals.push({ id: 'v_hair_blur', name: 'Unnatural subject isolation / hair edge blur', detected: s_hair_blur });
+  signals.push({ id: 'v_hair_blur', name: 'Unnatural subject isolation / hair edge blur', nameKey: 'signal_v_hair_blur_name', detected: s_hair_blur });
 
   // ── Temporal signals (require previous frame) ─────────────────────────────
 
   if (prevStats) {
     const s_flicker = Math.abs(stats.avgBrightness - prevStats.avgBrightness) > 28;
     if (s_flicker) score += 25;
-    signals.push({ id: 'v_flicker', name: 'Brightness flicker between frames', detected: s_flicker });
+    signals.push({ id: 'v_flicker', name: 'Brightness flicker between frames', nameKey: 'signal_v_flicker_name', detected: s_flicker });
 
     const s_texture_variance = Math.abs(stats.noiseLevel - prevStats.noiseLevel) > 18;
     if (s_texture_variance) score += 15;
-    signals.push({ id: 'v_texture_variance', name: 'Texture inconsistency across frames', detected: s_texture_variance });
+    signals.push({ id: 'v_texture_variance', name: 'Texture inconsistency across frames', nameKey: 'signal_v_texture_variance_name', detected: s_texture_variance });
 
     const borderDelta = Math.abs(stats.borderSharpness - prevStats.borderSharpness);
     const centerDelta = Math.abs(stats.centerSharpness - prevStats.centerSharpness);
     const s_hair_edge_flicker = borderDelta > 6 && centerDelta < 3;
     if (s_hair_edge_flicker) score += 25;
-    signals.push({ id: 'v_hair_edge_flicker', name: 'Hair/edge flicker (border unstable)', detected: s_hair_edge_flicker });
+    signals.push({ id: 'v_hair_edge_flicker', name: 'Hair/edge flicker (border unstable)', nameKey: 'signal_v_hair_edge_flicker_name', detected: s_hair_edge_flicker });
 
     const s_bg_inconsistent = Math.abs(stats.bgZoneVariance - prevStats.bgZoneVariance) > 8;
     if (s_bg_inconsistent) score += 15;
-    signals.push({ id: 'v_bg_inconsistent', name: 'Background inconsistency between frames', detected: s_bg_inconsistent });
+    signals.push({ id: 'v_bg_inconsistent', name: 'Background inconsistency between frames', nameKey: 'signal_v_bg_inconsistent_name', detected: s_bg_inconsistent });
 
     const s_lip_sync = Math.abs(stats.lowerThirdMean - prevStats.lowerThirdMean) > 20;
     if (s_lip_sync) score += 15;
-    signals.push({ id: 'v_lip_sync', name: 'Abrupt lower-face brightness jump', detected: s_lip_sync });
+    signals.push({ id: 'v_lip_sync', name: 'Abrupt lower-face brightness jump', nameKey: 'signal_v_lip_sync_name', detected: s_lip_sync });
 
     const s_bg_color_variance = Math.abs(stats.colorUniformity - prevStats.colorUniformity) > 0.15;
     if (s_bg_color_variance) score += 15;
-    signals.push({ id: 'v_bg_color_variance', name: 'Background color style inconsistency', detected: s_bg_color_variance });
+    signals.push({ id: 'v_bg_color_variance', name: 'Background color style inconsistency', nameKey: 'signal_v_bg_color_variance_name', detected: s_bg_color_variance });
 
     // ── Blink proxy: eye zone frozen over 3 consecutive frames ────────────
     if (prev2Stats) {
@@ -274,16 +276,16 @@ function scoreFrame(
       const upperDelta2 = Math.abs(prevStats.upperThirdMean - prev2Stats.upperThirdMean);
       const s_blink_freeze = upperDelta1 < 1.5 && upperDelta2 < 1.5;
       if (s_blink_freeze) score += 15;
-      signals.push({ id: 'v_blink_freeze', name: 'Eye zone frozen — no blink rhythm', detected: s_blink_freeze });
+      signals.push({ id: 'v_blink_freeze', name: 'Eye zone frozen — no blink rhythm', nameKey: 'signal_v_blink_freeze_name', detected: s_blink_freeze });
     }
 
     const s_edge_jitter = Math.abs(stats.edgeSharpness - prevStats.edgeSharpness) > 15;
     if (s_edge_jitter) score += 20;
-    signals.push({ id: 'v_edge_jitter', name: 'Temporal edge jitter — flickering detail', detected: s_edge_jitter });
+    signals.push({ id: 'v_edge_jitter', name: 'Temporal edge jitter — flickering detail', nameKey: 'signal_v_edge_jitter_name', detected: s_edge_jitter });
 
     const s_static_bg = stats.bgZoneVariance < 2 && prevStats.bgZoneVariance < 2;
     if (s_static_bg) score += 10;
-    signals.push({ id: 'v_static_bg', name: 'Suspiciously static backdrop', detected: s_static_bg });
+    signals.push({ id: 'v_static_bg', name: 'Suspiciously static backdrop', nameKey: 'signal_v_static_bg_name', detected: s_static_bg });
   }
 
   return {
@@ -292,7 +294,125 @@ function scoreFrame(
   };
 }
 
-// ─── Main rich entry point ────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Map a [0-100] score to a localized frame label + its i18n key. */
+function buildFrameLabel(score: number): { label: string; labelKey: string } {
+  if (score >= 60) return { label: 'AI',    labelKey: 'label_ai' };
+  if (score >= 30) return { label: 'Mixed', labelKey: 'label_mixed' };
+  return              { label: 'Human', labelKey: 'label_human' };
+}
+
+/**
+ * Compute a set of sample timestamps using adaptive scene-change detection.
+ *
+ * Strategy:
+ *  1. Start with a baseline of evenly-spaced timestamps (one per ≈2 s, capped at `baseMax`).
+ *  2. Pre-scan every second to measure frame-to-frame brightness delta.
+ *  3. Insert an extra keyframe around each detected scene cut (delta > `cutThreshold`).
+ *  4. De-duplicate and sort, capping the final list at `hardMax`.
+ */
+async function computeAdaptiveTimestamps(
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  duration: number,
+  baseMax: number = 16,
+  hardMax: number = 24,
+  cutThreshold: number = 30,
+): Promise<number[]> {
+  // --- Baseline uniform grid ---
+  const baseCount = Math.min(baseMax, Math.max(6, Math.floor(duration / 2)));
+  const base = Array.from(
+    { length: baseCount },
+    (_, i) => (duration / baseCount) * i + 0.3,
+  );
+
+  // --- Scene-cut scan (1-FPS lightweight pass) ---
+  const scanStep = Math.max(1, Math.floor(duration / 60)); // ≤60 probes
+  const scanTimes: number[] = [];
+  for (let t = scanStep; t < duration - 0.5; t += scanStep) {
+    scanTimes.push(parseFloat(t.toFixed(2)));
+  }
+
+  let prevBrightness: number | null = null;
+  const cutTimes: number[] = [];
+
+  for (const t of scanTimes) {
+    const data = await extractFrame(video, t, canvas);
+    if (!data) { prevBrightness = null; continue; }
+    const px = data.data;
+    const total = data.width * data.height;
+    let sum = 0;
+    for (let i = 0; i < total; i++) {
+      const pi = i * 4;
+      sum += 0.299 * px[pi] + 0.587 * px[pi + 1] + 0.114 * px[pi + 2];
+    }
+    const brightness = sum / total;
+    if (prevBrightness !== null && Math.abs(brightness - prevBrightness) > cutThreshold) {
+      // Capture one frame just before and just after the cut
+      cutTimes.push(Math.max(0.1, t - scanStep * 0.5));
+      cutTimes.push(Math.min(duration - 0.1, t + scanStep * 0.5));
+    }
+    prevBrightness = brightness;
+  }
+
+  // --- Merge, de-duplicate (within 0.5 s), sort, cap ---
+  const merged = [...base, ...cutTimes].sort((a, b) => a - b);
+  const deduped: number[] = [];
+  for (const t of merged) {
+    if (deduped.length === 0 || t - deduped[deduped.length - 1] > 0.5) {
+      deduped.push(t);
+    }
+  }
+  return deduped.slice(0, hardMax);
+}
+
+/** Compute aggregate temporal metrics from a set of frames. */
+function computeAggregates(frames: VideoFrame[]): {
+  temporalInconsistency: number;
+  flickerScore: number;
+  hairEdgeFlicker: number;
+  backgroundInconsistency: number;
+  temporalFlicker: number;
+} {
+  if (frames.length === 0) {
+    return { temporalInconsistency: 0, flickerScore: 0, hairEdgeFlicker: 0, backgroundInconsistency: 0, temporalFlicker: 0 };
+  }
+  const scores = frames.map(f => f.score);
+  const scoreMean = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const temporalInconsistency = Math.round(
+    Math.sqrt(scores.reduce((a, b) => a + Math.pow(b - scoreMean, 2), 0) / scores.length),
+  );
+
+  const flickerCount = frames.filter(f => f.signals.some(s => s.id === 'v_flicker' && s.detected)).length;
+  const flickerScore = Math.round((flickerCount / frames.length) * 100);
+
+  const hairFlickerCount = frames.filter(f => f.signals.some(s => s.id === 'v_hair_edge_flicker' && s.detected)).length;
+  const hairEdgeFlicker = Math.round((hairFlickerCount / frames.length) * 100);
+
+  const bgScores = frames.map(f => f.stats.bgZoneVariance);
+  const bgMean = bgScores.reduce((a, b) => a + b, 0) / bgScores.length;
+  const backgroundInconsistency = Math.round(
+    Math.sqrt(bgScores.reduce((a, b) => a + Math.pow(b - bgMean, 2), 0) / bgScores.length),
+  );
+
+  let temporalFlickerSum = 0;
+  for (let i = 1; i < frames.length; i++) {
+    temporalFlickerSum += Math.abs(frames[i].stats.avgBrightness - frames[i - 1].stats.avgBrightness);
+  }
+  const temporalFlicker = temporalFlickerSum / Math.max(1, frames.length - 1);
+
+  return { temporalInconsistency, flickerScore, hairEdgeFlicker, backgroundInconsistency, temporalFlicker };
+}
+
+/** Build a typed VerdictKey from an overall score. */
+function buildVerdictKey(overallScore: number): { verdict: string; verdictKey: string } {
+  if (overallScore >= 75) return { verdict: 'Likely AI Generated',   verdictKey: 'verdict_likely_ai' };
+  if (overallScore >= 55) return { verdict: 'Possibly AI Generated', verdictKey: 'verdict_possibly_ai' };
+  if (overallScore >= 30) return { verdict: 'Mixed / Edited',        verdictKey: 'verdict_mixed' };
+  return                         { verdict: 'Likely Human Recorded', verdictKey: 'verdict_human' };
+}
+
 
 export async function analyzeVideoFile(
   file: File,
@@ -307,15 +427,14 @@ export async function analyzeVideoFile(
     video.onloadedmetadata = async () => {
       try {
         const duration = video.duration;
+        // 480×270 gives richer spatial signal without excessive memory pressure
         const canvas = document.createElement('canvas');
-        canvas.width = 320;
-        canvas.height = 180;
+        canvas.width = 480;
+        canvas.height = 270;
 
-        const sampleCount = Math.min(16, Math.max(6, Math.floor(duration / 2)));
-        const timestamps = Array.from(
-          { length: sampleCount },
-          (_, i) => (duration / sampleCount) * i + 0.3,
-        );
+        // ── Adaptive sampling: uniform baseline + scene-cut keyframes ──
+        onProgress?.(2);
+        const timestamps = await computeAdaptiveTimestamps(video, canvas, duration);
 
         const frames: VideoFrame[] = [];
         const frameReports: VideoAnalysisResult['frameReports'] = [];
@@ -324,113 +443,73 @@ export async function analyzeVideoFile(
         let prev2Stats: FramePixelStats | null = null;
         let capturedDeepMl: VideoAnalysisResult['deepMl'] | undefined;
 
+        // Run the single deep-ML pass at the video midpoint
+        const deepMlIdx = Math.floor(timestamps.length / 2);
+
         for (let i = 0; i < timestamps.length; i++) {
           const t = timestamps[i];
           const imageData = await extractFrame(video, t, canvas);
           if (!imageData) continue;
 
-          // ── Fast pixel heuristics (Synchronous) ──
+          // ── Fast pixel heuristics ──
           const stats = analyzeFrameData(imageData);
           const { score: ruleScore, signals: ruleSignals } = scoreFrame(stats, prevStats, prev2Stats);
           const thumb = getThumbnail(canvas);
 
-          // ── Deep ML Analysis (Async, sampled once for efficiency) ──
+          // ── Deep ML (once, at midpoint) ──
           let deepReport: ImageAnalysisReport | null = null;
-          if (i === Math.floor(timestamps.length / 2)) {
+          if (i === deepMlIdx) {
             deepReport = await analyzeImageCanvasDeep(canvas);
             capturedDeepMl = deepReport?.richResult?.deepMl;
           }
 
-          const combinedScore = deepReport 
-            ? Math.max(ruleScore, deepReport.richResult?.overallScore || 0) 
+          const combinedScore = deepReport
+            ? Math.max(ruleScore, deepReport.richResult?.overallScore ?? 0)
             : ruleScore;
+
+          const { label, labelKey } = buildFrameLabel(combinedScore);
+
+          const mlSignals: VideoFrameSignal[] = deepReport
+            ? (deepReport.richResult?.signals
+                .filter(s => s.detected)
+                .map(s => ({
+                  id: `img_${s.id}`,
+                  name: s.name,
+                  nameKey: `signal_${s.id}_name`,
+                  detected: true,
+                })) ?? [])
+            : [];
 
           frames.push({
             timestamp: t,
             score: combinedScore,
-            label: combinedScore >= 60 ? 'AI' : combinedScore >= 30 ? 'Mixed' : 'Human',
-            signals: deepReport 
-              ? [...ruleSignals, ...(deepReport.richResult?.signals.filter(s => s.detected).map(s => ({
-                  id: `img_${s.id}`,
-                  name: s.name,
-                  detected: true
-                })) || [])]
-              : ruleSignals,
+            label,
+            labelKey,
+            signals: [...ruleSignals, ...mlSignals],
             thumbnail: thumb,
             stats,
           });
 
-          // Legacy compat: build a mini ImageAnalysisReport for the frame
-          const legacyReport = deepReport || analyzeImageCanvas(canvas);
+          const legacyReport = deepReport ?? analyzeImageCanvas(canvas);
           frameReports.push({ timestamp: t, report: legacyReport, thumbnail: thumb });
 
           prev2Stats = prevStats;
           prevStats = stats;
-          onProgress?.(Math.round(((i + 1) / timestamps.length) * 100));
+          onProgress?.(5 + Math.round(((i + 1) / timestamps.length) * 90));
         }
 
         URL.revokeObjectURL(url);
 
-        // ── Aggregate stats ──────────────────────────────────────────────
+        const overallScore = frames.length
+          ? Math.round(frames.reduce((a, f) => a + f.score, 0) / frames.length)
+          : 0;
 
-        const scores = frames.map(f => f.score);
-        const overallScore = Math.round(
-          scores.reduce((a, b) => a + b, 0) / scores.length,
-        );
-
-        const scoreMean = overallScore;
-        const scoreVariance =
-          scores.reduce((a, b) => a + Math.pow(b - scoreMean, 2), 0) /
-          scores.length;
-        const temporalInconsistency = Math.round(Math.sqrt(scoreVariance));
-
-        const flickerCount = frames.filter(f =>
-          f.signals.some(s => s.id === 'v_flicker' && s.detected),
-        ).length;
-        const flickerScore = Math.round((flickerCount / frames.length) * 100);
-
-        const hairFlickerCount = frames.filter(f =>
-          f.signals.some(s => s.id === 'v_hair_edge_flicker' && s.detected),
-        ).length;
-        const hairEdgeFlicker = Math.round(
-          (hairFlickerCount / frames.length) * 100,
-        );
-
-        const bgScores = frames.map(f => f.stats.bgZoneVariance);
-        const bgMean = bgScores.reduce((a, b) => a + b, 0) / bgScores.length;
-        const backgroundInconsistency = Math.round(
-          Math.sqrt(
-            bgScores.reduce((a, b) => a + Math.pow(b - bgMean, 2), 0) /
-            bgScores.length,
-          ),
-        );
-
-        let verdict = 'Likely Human Recorded';
-        let verdictKey = 'verdict_human';
-
-        if (overallScore >= 75) {
-          verdict = 'Likely AI Generated';
-          verdictKey = 'verdict_likely_ai';
-        } else if (overallScore >= 55) {
-          verdict = 'Possibly AI Generated';
-          verdictKey = 'verdict_possibly_ai';
-        } else if (overallScore >= 30) {
-          verdict = 'Mixed / Edited';
-          verdictKey = 'verdict_mixed';
-        }
-
-        // Legacy risk mapping
+        const { verdict, verdictKey } = buildVerdictKey(overallScore);
+        const aggregates = computeAggregates(frames);
         const overallRisk: 'low' | 'medium' | 'high' =
           overallScore >= 60 ? 'high' : overallScore >= 30 ? 'medium' : 'low';
 
-        // Legacy temporalFlicker
-        let temporalFlickerSum = 0;
-        for (let i = 1; i < frames.length; i++) {
-          temporalFlickerSum += Math.abs(
-            frames[i].stats.avgBrightness - frames[i - 1].stats.avgBrightness,
-          );
-        }
-
+        onProgress?.(100);
         resolve({
           overallScore,
           verdict,
@@ -438,14 +517,10 @@ export async function analyzeVideoFile(
           framesAnalyzed: frames.length,
           duration,
           frames,
-          temporalInconsistency,
-          flickerScore,
-          hairEdgeFlicker,
-          backgroundInconsistency,
+          ...aggregates,
           deepMl: capturedDeepMl,
           combinedScore: overallScore,
           overallRisk,
-          temporalFlicker: temporalFlickerSum / Math.max(1, frames.length - 1),
           frameReports,
         });
       } catch (e) {
@@ -466,6 +541,11 @@ export async function analyzeVideoFile(
 /** Legacy alias wrappers */
 export const analyzeVideo = async (file: File, p?: (n: number) => void) => analyzeVideoFile(file, p);
 
+/**
+ * Analyse a pre-loaded HTMLVideoElement.
+ * Produces the same rich VideoAnalysisResult as analyzeVideoFile, including
+ * all aggregate metrics. Deep ML is skipped to keep latency low for realtime use.
+ */
 export const analyzeVideoElement = async (
   video: HTMLVideoElement,
   onProgress?: (progress: number) => void,
@@ -480,11 +560,15 @@ export const analyzeVideoElement = async (
       try {
         const duration = video.duration;
         const canvas = document.createElement('canvas');
-        canvas.width = 320;
-        canvas.height = 180;
+        canvas.width = 480;
+        canvas.height = 270;
 
+        // Adaptive sampling reuses the same helper (no deep-ML scan pass here)
         const sampleCount = Math.min(16, Math.max(6, Math.floor(duration / 2)));
-        const timestamps = Array.from({ length: sampleCount }, (_, i) => (duration / sampleCount) * i + 0.3);
+        const timestamps = Array.from(
+          { length: sampleCount },
+          (_, i) => (duration / sampleCount) * i + 0.3,
+        );
 
         const frames: VideoFrame[] = [];
         const frameReports: VideoAnalysisResult['frameReports'] = [];
@@ -499,15 +583,9 @@ export const analyzeVideoElement = async (
           const stats = analyzeFrameData(imageData);
           const { score, signals } = scoreFrame(stats, prevStats, prev2Stats);
           const thumb = getThumbnail(canvas);
+          const { label, labelKey } = buildFrameLabel(score);
 
-          frames.push({
-            timestamp: t,
-            score,
-            label: score >= 60 ? 'AI' : score >= 30 ? 'Mixed' : 'Human',
-            signals,
-            thumbnail: thumb,
-            stats,
-          });
+          frames.push({ timestamp: t, score, label, labelKey, signals, thumbnail: thumb, stats });
 
           const legacyReport = analyzeImageCanvas(canvas);
           frameReports.push({ timestamp: t, report: legacyReport, thumbnail: thumb });
@@ -517,14 +595,14 @@ export const analyzeVideoElement = async (
           onProgress?.(Math.round(((i + 1) / timestamps.length) * 100));
         }
 
-        const scores = frames.map(f => f.score);
-        const overallScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        const overallScore = frames.length
+          ? Math.round(frames.reduce((a, f) => a + f.score, 0) / frames.length)
+          : 0;
 
-        let verdict = 'Likely Human Recorded';
-        let verdictKey = 'verdict_human';
-        if (overallScore >= 75) { verdict = 'Likely AI Generated'; verdictKey = 'verdict_likely_ai'; }
-        else if (overallScore >= 55) { verdict = 'Possibly AI Generated'; verdictKey = 'verdict_possibly_ai'; }
-        else if (overallScore >= 30) { verdict = 'Mixed / Edited'; verdictKey = 'verdict_mixed'; }
+        const { verdict, verdictKey } = buildVerdictKey(overallScore);
+        const aggregates = computeAggregates(frames);
+        const overallRisk: 'low' | 'medium' | 'high' =
+          overallScore >= 60 ? 'high' : overallScore >= 30 ? 'medium' : 'low';
 
         resolve({
           overallScore,
@@ -533,13 +611,9 @@ export const analyzeVideoElement = async (
           framesAnalyzed: frames.length,
           duration,
           frames,
-          temporalInconsistency: 0,
-          flickerScore: 0,
-          hairEdgeFlicker: 0,
-          backgroundInconsistency: 0,
+          ...aggregates,
           combinedScore: overallScore,
-          overallRisk: overallScore >= 60 ? 'high' : overallScore >= 30 ? 'medium' : 'low',
-          temporalFlicker: 0,
+          overallRisk,
           frameReports,
         });
       } catch (e) {

@@ -6,12 +6,15 @@ export interface ImageSignal {
   detected: boolean;
   weight: number;
   description: string;
+  labelKey: string;   // i18n key
+  descKey: string;    // i18n key
   category: "texture" | "structure" | "lighting" | "artifact" | "metadata";
 }
 
 export interface ChecklistItem {
   id: string;
   label: string;
+  labelKey: string;  // i18n key
   passed: boolean;
   note: string;
   val?: string | number;
@@ -342,7 +345,7 @@ function stdDev(arr: number[]): number {
   return Math.sqrt(arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length);
 }
 
-// \u2500\u2500\u2500 Signal builder \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// ─── Signal builder ────────────────────────────────────────────────────────
 
 function buildImageResult(
   stats: PixelStats, 
@@ -361,6 +364,8 @@ function buildImageResult(
       weight: 60,
       category: "texture",
       description: "AI images lack camera sensor noise; skin in AI portraits is airbrushed-perfect.",
+      labelKey: "signal_smooth_texture_name",
+      descKey: "signal_smooth_texture_desc",
     },
     {
       id: "low_sat",
@@ -368,7 +373,9 @@ function buildImageResult(
       detected: stats.saturationVariance < 0.10,
       weight: 20,
       category: "texture",
-      description: "Human photos have chaotic, uneven colour across regions \u2014 AI flattens it.",
+      description: "Human photos have chaotic, uneven colour across regions — AI flattens it.",
+      labelKey: "signal_low_sat_name",
+      descKey: "signal_low_sat_desc",
     },
     {
       id: "symmetry",
@@ -377,6 +384,8 @@ function buildImageResult(
       weight: 35,
       category: "structure",
       description: "AI faces and compositions trend toward near-perfect symmetry.",
+      labelKey: "signal_symmetry_name",
+      descKey: "signal_symmetry_desc",
     },
     {
       id: "uniform_color",
@@ -385,6 +394,8 @@ function buildImageResult(
       weight: 30,
       category: "structure",
       description: "Real photos have varied R/G/B distribution; AI flattens it uniformly.",
+      labelKey: "signal_uniform_color_name",
+      descKey: "signal_uniform_color_desc",
     },
     {
       id: "uniform_lighting",
@@ -393,6 +404,8 @@ function buildImageResult(
       weight: 50,
       category: "lighting",
       description: "Real scenes have uneven light. AI lighting is studio-perfect.",
+      labelKey: "signal_uniform_lighting_name",
+      descKey: "signal_uniform_lighting_desc",
     },
     {
       id: "bg_separation",
@@ -401,6 +414,8 @@ function buildImageResult(
       weight: 25,
       category: "lighting",
       description: "AI aggressively isolates subjects with unnatural bokeh.",
+      labelKey: "signal_bg_separation_name",
+      descKey: "signal_bg_separation_desc",
     },
     {
       id: "blurred_edges",
@@ -409,6 +424,8 @@ function buildImageResult(
       weight: 40,
       category: "artifact",
       description: "AI often smears fine detail like hair edges and fingers.",
+      labelKey: "signal_blurred_edges_name",
+      descKey: "signal_blurred_edges_desc",
     },
     {
       id: "ai_aspect_ratio",
@@ -417,6 +434,8 @@ function buildImageResult(
       weight: 15,
       category: "artifact",
       description: "Defaults for MJ, DALL-E, SD often hit specific exact ratios.",
+      labelKey: "signal_ai_aspect_ratio_name",
+      descKey: "signal_ai_aspect_ratio_desc",
     },
     {
       id: "round_mp",
@@ -424,7 +443,9 @@ function buildImageResult(
       detected: [1, 2, 4, 8, 16].some(mp => Math.abs(stats.megapixels - mp) < 0.02),
       weight: 15,
       category: "artifact",
-      description: "AI generators output exact round megapixel counts \u2014 cameras don't.",
+      description: "AI generators output exact round megapixel counts — cameras don't.",
+      labelKey: "signal_round_mp_name",
+      descKey: "signal_round_mp_desc",
     },
     {
       id: "no_exif",
@@ -433,6 +454,8 @@ function buildImageResult(
       weight: 25,
       category: "metadata",
       description: "Real camera photos embed EXIF data.",
+      labelKey: "signal_no_exif_name",
+      descKey: "signal_no_exif_desc",
     },
     {
       id: "vibrant_palette",
@@ -441,6 +464,8 @@ function buildImageResult(
       weight: 25,
       category: "artifact",
       description: "AI models often default to vibrant, high-contrast color mapping.",
+      labelKey: "signal_vibrant_palette_name",
+      descKey: "signal_vibrant_palette_desc",
     },
     {
       id: "uniform_focus",
@@ -449,6 +474,8 @@ function buildImageResult(
       weight: 25,
       category: "artifact",
       description: "Real lenses have focus falloff; AI often sharpens frame-wide.",
+      labelKey: "signal_uniform_focus_name",
+      descKey: "signal_uniform_focus_desc",
     },
     {
       id: "biometric_anomalies",
@@ -457,6 +484,8 @@ function buildImageResult(
       weight: 95,
       category: "artifact",
       description: "Detected impossible anatomy or structural biological errors.",
+      labelKey: "signal_biometric_anomalies_name",
+      descKey: "signal_biometric_anomalies_desc",
     },
     {
       id: "garbled_text",
@@ -465,6 +494,8 @@ function buildImageResult(
       weight: 85,
       category: "artifact",
       description: "Presence of nonsensical or distorted text patterns.",
+      labelKey: "signal_garbled_text_name",
+      descKey: "signal_garbled_text_desc",
     },
     {
       id: "ai_watermark",
@@ -473,6 +504,8 @@ function buildImageResult(
       weight: 100,
       category: "artifact",
       description: "Found hardcoded pixel patterns matching AI generator signatures.",
+      labelKey: "signal_ai_watermark_name",
+      descKey: "signal_ai_watermark_desc",
     },
   ];
 
@@ -516,13 +549,13 @@ function buildImageResult(
   const overallScore = Math.min(100, Math.round(rawWeightsSum * integratedMultiplier));
 
   const checklist: ChecklistItem[] = [
-    { id: "noise", label: "Natural sensor noise present", passed: stats.noiseLevel >= 16, note: `Noise: ${(stats.noiseLevel ?? 0).toFixed(1)}`, val: (stats.noiseLevel ?? 0).toFixed(1) },
-    { id: "skin", label: "Skin texture has imperfection", passed: stats.skinSmoothness <= 0.82, note: `Smoothness: ${((stats.skinSmoothness ?? 0) * 100).toFixed(0)}%`, val: ((stats.skinSmoothness ?? 0) * 100).toFixed(0) },
-    { id: "lighting", label: "Uneven lighting across scene", passed: stats.localContrastVariance >= 8, note: `Variance: ${(stats.localContrastVariance ?? 0).toFixed(1)}`, val: (stats.localContrastVariance ?? 0).toFixed(1) },
-    { id: "edge", label: "Natural edge detail at periphery", passed: stats.backgroundBlur <= 0.55, note: `Blur: ${((stats.backgroundBlur ?? 0) * 100).toFixed(0)}%`, val: ((stats.backgroundBlur ?? 0) * 100).toFixed(0) },
-    { id: "symmetry", label: "Asymmetric composition", passed: stats.symmetryScore <= 0.86, note: `Symmetry: ${((stats.symmetryScore ?? 0) * 100).toFixed(0)}%`, val: ((stats.symmetryScore ?? 0) * 100).toFixed(0) },
-    { id: "saturation", label: "Rich saturation variance", passed: stats.saturationVariance >= 0.11, note: `Var: ${(stats.saturationVariance ?? 0).toFixed(3)}`, val: (stats.saturationVariance ?? 0).toFixed(3) },
-    { id: "sharpness", label: "Sharp fine detail", passed: stats.edgeSharpness >= 7, note: `Sharp: ${(stats.edgeSharpness ?? 0).toFixed(1)}`, val: (stats.edgeSharpness ?? 0).toFixed(1) },
+    { id: "noise", label: "Natural sensor noise present", labelKey: "check_noise_label", passed: stats.noiseLevel >= 16, note: `Noise: ${(stats.noiseLevel ?? 0).toFixed(1)}`, val: (stats.noiseLevel ?? 0).toFixed(1) },
+    { id: "skin", label: "Skin texture has imperfection", labelKey: "check_skin_label", passed: stats.skinSmoothness <= 0.82, note: `Smoothness: ${((stats.skinSmoothness ?? 0) * 100).toFixed(0)}%`, val: ((stats.skinSmoothness ?? 0) * 100).toFixed(0) },
+    { id: "lighting", label: "Uneven lighting across scene", labelKey: "check_lighting_label", passed: stats.localContrastVariance >= 8, note: `Variance: ${(stats.localContrastVariance ?? 0).toFixed(1)}`, val: (stats.localContrastVariance ?? 0).toFixed(1) },
+    { id: "edge", label: "Natural edge detail at periphery", labelKey: "check_edge_label", passed: stats.backgroundBlur <= 0.55, note: `Blur: ${((stats.backgroundBlur ?? 0) * 100).toFixed(0)}%`, val: ((stats.backgroundBlur ?? 0) * 100).toFixed(0) },
+    { id: "symmetry", label: "Asymmetric composition", labelKey: "check_symmetry_label", passed: stats.symmetryScore <= 0.86, note: `Symmetry: ${((stats.symmetryScore ?? 0) * 100).toFixed(0)}%`, val: ((stats.symmetryScore ?? 0) * 100).toFixed(0) },
+    { id: "saturation", label: "Rich saturation variance", labelKey: "check_saturation_label", passed: stats.saturationVariance >= 0.11, note: `Var: ${(stats.saturationVariance ?? 0).toFixed(3)}`, val: (stats.saturationVariance ?? 0).toFixed(3) },
+    { id: "sharpness", label: "Sharp fine detail", labelKey: "check_sharpness_label", passed: stats.edgeSharpness >= 7, note: `Sharp: ${(stats.edgeSharpness ?? 0).toFixed(1)}`, val: (stats.edgeSharpness ?? 0).toFixed(1) },
   ];
 
   const verdictKey =

@@ -170,7 +170,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
             {result.score}%
           </motion.div>
           <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${risk.bg} ${risk.border} ${risk.text}`}>
-            {result.verdict ?? t(risk.labelKey)}
+            {result.verdictKey ? t(result.verdictKey) : t(risk.labelKey)}
           </p>
 
           {/* Mini stats */}
@@ -294,8 +294,12 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                   {sig.severity}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{sig.label}</p>
-                  <p className="text-[11px] text-zinc-500 mt-0.5 leading-snug">{sig.description}</p>
+                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                    {sig.labelKey ? t(sig.labelKey) : sig.label}
+                  </p>
+                  <p className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                    {sig.descKey ? t(sig.descKey) : sig.description}
+                  </p>
                 </div>
               </motion.div>
             ))}
@@ -357,7 +361,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                     {s.text}
                   </p>
                   <span className={`ml-auto flex-shrink-0 text-[9px] font-black uppercase tracking-wider ${meta.badge.replace('bg-', 'text-').replace(' text-white', '').replace(' text-black', '')}`}>
-                    {s.label}
+                    {t(`label_${s.label.toLowerCase()}`)}
                   </span>
                 </motion.button>
               );
@@ -386,6 +390,9 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                 <div className="flex flex-wrap gap-2">
                   {sel.signals.map(sig => {
                     const clean = sig === 'No strong signals';
+                    // Try to resolve via i18n using the signal string as a key stub
+                    const sigKey = `signal_${sig.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_label`;
+                    const displayLabel = !clean && t.has(sigKey) ? t(sigKey) : sig;
                     return (
                       <span
                         key={sig}
@@ -394,7 +401,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                           : 'bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400'}`}
                       >
                         {clean ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
-                        {sig}
+                        {displayLabel}
                       </span>
                     );
                   })}
