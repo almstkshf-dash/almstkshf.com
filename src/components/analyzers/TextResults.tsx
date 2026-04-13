@@ -60,9 +60,9 @@ function sentenceMeta(s: SentenceResult) {
 }
 
 function severityStyle(sev: string) {
-  if (sev === 'high') return 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400';
-  if (sev === 'medium') return 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400';
-  return 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400';
+  if (sev === 'high') return 'bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400 font-bold';
+  if (sev === 'medium') return 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold';
+  return 'bg-blue-500/15 border-blue-500/30 text-blue-600 dark:text-blue-400 font-bold';
 }
 
 // Highlight type colours
@@ -389,11 +389,11 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                     return (
                       <span
                         key={sig}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${clean
-                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'}`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black border shadow-sm ${clean
+                          ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400'}`}
                       >
-                        {clean ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                        {clean ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                         {sig}
                       </span>
                     );

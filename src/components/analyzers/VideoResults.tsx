@@ -525,16 +525,16 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     {currentFrame.signals.filter(s => s.detected).map(sig => (
                       <span
                         key={sig.id}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black border shadow-sm bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400"
                       >
-                        <AlertCircle className="w-3 h-3" />
+                        <AlertCircle className="w-3.5 h-3.5" />
                         {/* Try to translate the ID, fall back to name provided by engine */}
                         {t.has(`signal_${sig.id}_name`) ? t(`signal_${sig.id}_name`) : sig.name}
                       </span>
                     ))}
                     {currentFrame.signals.every(s => !s.detected) && (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black border shadow-sm bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         {tCommon('anomaly_low_risk')}
                       </span>
                     )}
@@ -682,13 +682,13 @@ export default function VideoResults({ result }: VideoResultsProps) {
               <div className="flex flex-wrap gap-2">
                 {result.deepMl.biometrics.faceAnomalies.length > 0 || result.deepMl.biometrics.handAnomalies.length > 0 ? (
                   ([...result.deepMl.biometrics.faceAnomalies, ...result.deepMl.biometrics.handAnomalies] as ForensicAnomaly[]).map((anomaly: any, idx) => (
-                    <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[11px] font-bold text-rose-600 dark:text-rose-400">
+                    <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-[11px] font-black text-rose-500 dark:text-rose-400 shadow-sm">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       {t.has(`anomaly_${anomaly.id}_name`) ? t(`anomaly_${anomaly.id}_name`) : anomaly.name}
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-[11px] font-black text-emerald-600 dark:text-emerald-400 shadow-sm">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {tCommon("anomaly_low_risk")}
                   </div>

@@ -357,63 +357,63 @@ function buildImageResult(
     {
       id: "smooth_texture",
       name: "Unnaturally smooth texture / skin",
-      detected: stats.noiseLevel < 18 || stats.skinSmoothness > 0.82,
-      weight: 55,
+      detected: stats.noiseLevel < 15 || stats.skinSmoothness > 0.85,
+      weight: 60,
       category: "texture",
       description: "AI images lack camera sensor noise; skin in AI portraits is airbrushed-perfect.",
     },
     {
       id: "low_sat",
       name: "Low saturation variance",
-      detected: stats.saturationVariance < 0.12,
-      weight: 15,
+      detected: stats.saturationVariance < 0.10,
+      weight: 20,
       category: "texture",
-      description: "Human photos have chaotic, uneven colour across regions — AI flattens it.",
+      description: "Human photos have chaotic, uneven colour across regions \u2014 AI flattens it.",
     },
     {
       id: "symmetry",
       name: "Suspicious bilateral symmetry",
-      detected: stats.symmetryScore > 0.85,
-      weight: 25,
+      detected: stats.symmetryScore > 0.88,
+      weight: 35,
       category: "structure",
       description: "AI faces and compositions trend toward near-perfect symmetry.",
     },
     {
       id: "uniform_color",
       name: "Over-uniform color distribution",
-      detected: stats.colorUniformity > 0.72,
-      weight: 20,
+      detected: stats.colorUniformity > 0.75,
+      weight: 30,
       category: "structure",
       description: "Real photos have varied R/G/B distribution; AI flattens it uniformly.",
     },
     {
       id: "uniform_lighting",
       name: "Unnaturally uniform lighting",
-      detected: stats.localContrastVariance < 9.5,
-      weight: 45,
+      detected: stats.localContrastVariance < 8.5,
+      weight: 50,
       category: "lighting",
       description: "Real scenes have uneven light. AI lighting is studio-perfect.",
     },
     {
       id: "bg_separation",
       name: "Artificial subject / background separation",
-      detected: stats.backgroundBlur > 0.60 && stats.centerEdgeDelta > 15,
-      weight: 15,
+      detected: stats.backgroundBlur > 0.65 && stats.centerEdgeDelta > 20,
+      weight: 25,
       category: "lighting",
       description: "AI aggressively isolates subjects with unnatural bokeh.",
     },
     {
       id: "blurred_edges",
       name: "Blurred / dissolving edge detail",
-      detected: stats.edgeSharpness < 7.2,
-      weight: 35,
+      detected: stats.edgeSharpness < 6.8,
+      weight: 40,
       category: "artifact",
       description: "AI often smears fine detail like hair edges and fingers.",
     },
     {
       id: "ai_aspect_ratio",
       name: "Suspicious common AI aspect ratio",
-      detected: [1.0, 1.5, 1.77, 0.666, 0.75].some(r => Math.abs(stats.aspectRatio - r) < 0.005),
+      detected: [1.0, 1.5, 1.77, 0.666, 0.75].some(r => Math.abs(stats.aspectRatio - r) < 0.001),
       weight: 15,
       category: "artifact",
       description: "Defaults for MJ, DALL-E, SD often hit specific exact ratios.",
@@ -421,32 +421,32 @@ function buildImageResult(
     {
       id: "round_mp",
       name: "Suspiciously round megapixel count",
-      detected: [1, 2, 4, 8, 16].some(mp => Math.abs(stats.megapixels - mp) < 0.05),
-      weight: 10,
+      detected: [1, 2, 4, 8, 16].some(mp => Math.abs(stats.megapixels - mp) < 0.02),
+      weight: 15,
       category: "artifact",
-      description: "AI generators output exact round megapixel counts — cameras don't.",
+      description: "AI generators output exact round megapixel counts \u2014 cameras don't.",
     },
     {
       id: "no_exif",
       name: "No EXIF / camera metadata",
-      detected: file.size < 300_000 && stats.megapixels > 0.8,
-      weight: 20,
+      detected: file.size < 400_000 && stats.megapixels > 0.5,
+      weight: 25,
       category: "metadata",
       description: "Real camera photos embed EXIF data.",
     },
     {
       id: "vibrant_palette",
       name: "Synthetic / Vibrant color palette",
-      detected: stats.saturationVariance > 0.35 && stats.colorUniformity > 0.75,
-      weight: 20,
+      detected: stats.saturationVariance > 0.38 && stats.colorUniformity > 0.78,
+      weight: 25,
       category: "artifact",
       description: "AI models often default to vibrant, high-contrast color mapping.",
     },
     {
       id: "uniform_focus",
       name: "Suspiciously uniform edge focus",
-      detected: Math.abs(stats.centerEdgeDelta) < 1.2 && stats.edgeSharpness > 12,
-      weight: 20,
+      detected: Math.abs(stats.centerEdgeDelta) < 1.0 && stats.edgeSharpness > 15,
+      weight: 25,
       category: "artifact",
       description: "Real lenses have focus falloff; AI often sharpens frame-wide.",
     },
@@ -454,7 +454,7 @@ function buildImageResult(
       id: "biometric_anomalies",
       name: "Biometric / Anatomy anomalies",
       detected: (deepMl?.biometrics.faceAnomalies.length || 0) > 0 || (deepMl?.biometrics.handAnomalies.length || 0) > 0,
-      weight: 90,
+      weight: 95,
       category: "artifact",
       description: "Detected impossible anatomy or structural biological errors.",
     },
@@ -462,7 +462,7 @@ function buildImageResult(
       id: "garbled_text",
       name: "Garbled / Unreadable text artifacts",
       detected: deepMl?.ocr.isGarbled || false,
-      weight: 65,
+      weight: 85,
       category: "artifact",
       description: "Presence of nonsensical or distorted text patterns.",
     },
@@ -470,27 +470,50 @@ function buildImageResult(
       id: "ai_watermark",
       name: "Identified AI signature / Watermark",
       detected: (deepMl?.watermarks.length || 0) > 0,
-      weight: 95,
+      weight: 100,
       category: "artifact",
       description: "Found hardcoded pixel patterns matching AI generator signatures.",
     },
   ];
 
-  let detectedWeightsSum = 0;
+  let rawWeightsSum = 0;
   let detectedCount = 0;
+  const activeIds = new Set<string>();
+
   signals.forEach(s => { 
     if (s.detected) {
-      detectedWeightsSum += s.weight;
+      rawWeightsSum += s.weight;
       detectedCount++;
+      activeIds.add(s.id);
     }
   });
 
-  // Added logic: If multiple AI signals are detected together, boost the probability
-  // as the combination is mathematically much more unlikely in real photos.
-  if (detectedCount >= 4) detectedWeightsSum *= 1.2;
-  if (detectedCount >= 7) detectedWeightsSum *= 1.4;
+  // \u2500\u2500\u2500 Integrated Algorithm Boosts \u2500\u2500\u2500
+  // combinations that are virtually impossible in real-world photography
+  let integratedMultiplier = 1.0;
 
-  const overallScore = Math.min(100, Math.round(detectedWeightsSum));
+  // 1. Textures & Lighting: Smooth skin + studio lighting in the same region
+  if (activeIds.has("smooth_texture") && activeIds.has("uniform_lighting")) integratedMultiplier += 0.35;
+
+  // 2. High Detail + No Noise: Sharp focus but lacks grain entirely (typical upscaled AI)
+  if (activeIds.has("uniform_focus") && activeIds.has("smooth_texture")) integratedMultiplier += 0.25;
+
+  // 3. Digital Signature: Aspect ratio + Round Megapixels + No EXIF
+  if (activeIds.has("ai_aspect_ratio") && activeIds.has("round_mp") && activeIds.has("no_exif")) integratedMultiplier += 0.30;
+
+  // 4. Structural Uniformity: Symmetry + Uniform Color
+  if (activeIds.has("symmetry") && activeIds.has("uniform_color")) integratedMultiplier += 0.25;
+
+  // 5. Artifact Multiplier: The more types of technical artifacts, the higher the integration
+  if (detectedCount >= 4) integratedMultiplier += 0.2;
+  if (detectedCount >= 6) integratedMultiplier += 0.4;
+  
+  // Biometric/Watermark triggers should be nearly definitive
+  if (activeIds.has("biometric_anomalies") || activeIds.has("ai_watermark")) {
+    integratedMultiplier = Math.max(integratedMultiplier, 2.0); 
+  }
+
+  const overallScore = Math.min(100, Math.round(rawWeightsSum * integratedMultiplier));
 
   const checklist: ChecklistItem[] = [
     { id: "noise", label: "Natural sensor noise present", passed: stats.noiseLevel >= 16, note: `Noise: ${stats.noiseLevel.toFixed(1)}`, val: stats.noiseLevel.toFixed(1) },

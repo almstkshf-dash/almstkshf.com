@@ -40,8 +40,8 @@ const CATEGORY_KEYS: Record<
 };
 
 const SIGNAL_COLORS = {
-  detected: "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400",
-  clean: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+  detected: "bg-rose-500/15 border-rose-500/30 text-rose-500 dark:text-rose-400 font-medium",
+  clean: "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-medium",
 };
 
 function riskMeta(overallRisk: "low" | "medium" | "high") {
@@ -166,14 +166,14 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                       {signals.map((sig) => (
                         <div
                           key={sig.id}
-                          className={`flex items-start gap-2 p-3 rounded-xl border text-[11px] ${sig.detected ? SIGNAL_COLORS.detected : SIGNAL_COLORS.clean}`}
+                          className={`flex items-start gap-2 p-3 rounded-xl border text-[11px] shadow-sm transition-colors duration-300 ${sig.detected ? SIGNAL_COLORS.detected : SIGNAL_COLORS.clean}`}
                         >
                           {sig.detected
                             ? <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                             : <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
                           <div className="flex-1">
-                            <p className="font-bold leading-tight">{t(`signal_${sig.id}_name`)}</p>
-                            <p className="opacity-60 mt-0.5 leading-snug">{t(`signal_${sig.id}_desc`)}</p>
+                            <p className="font-bold leading-tight decoration-current/30">{t(`signal_${sig.id}_name`)}</p>
+                            <p className="opacity-80 mt-1 leading-snug font-medium">{t(`signal_${sig.id}_desc`)}</p>
                           </div>
                         </div>
                       ))}
