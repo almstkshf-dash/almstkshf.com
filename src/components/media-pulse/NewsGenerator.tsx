@@ -157,7 +157,10 @@ const LANGUAGES = [
 // ═══════════════════════════════════════════════════════════════
 // SEARCHABLE MULTI-SELECT DROPDOWN COMPONENT
 // ═══════════════════════════════════════════════════════════════
-function MultiSelectDropdown({
+// ═══════════════════════════════════════════════════════════════
+// MEMOIZED MULTI-SELECT DROPDOWN COMPONENT
+// ═══════════════════════════════════════════════════════════════
+const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     items,
     selected,
     onChange,
@@ -188,11 +191,11 @@ function MultiSelectDropdown({
     "aria-labelledby"?: string;
     id?: string;
 }) {
-    const defaultRenderItem = (item: { id: string; label: string }) => <span>{item.label}</span>;
-    const defaultRenderTag = (id: string) => {
+    const defaultRenderItem = useCallback((item: { id: string; label: string }) => <span>{item.label}</span>, []);
+    const defaultRenderTag = useCallback((id: string) => {
         const item = items.find(i => i.id === id);
         return <span>{item?.label || id}</span>;
-    };
+    }, [items]);
 
     const finalRenderItem = renderItem || defaultRenderItem;
     const finalRenderTag = renderTag || defaultRenderTag;
@@ -214,9 +217,9 @@ function MultiSelectDropdown({
         );
     }, [items, search]);
 
-    const toggle = (id: string) => {
-        onChange(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
-    };
+    const toggle = useCallback((id_to_toggle: string) => {
+        onChange(selected.includes(id_to_toggle) ? selected.filter((s) => s !== id_to_toggle) : [...selected, id_to_toggle]);
+    }, [selected, onChange]);
 
     return (
         <div ref={ref} className="relative">
@@ -239,18 +242,18 @@ function MultiSelectDropdown({
                     {selected.length === 0 ? (
                         <span className="text-muted-foreground text-sm transition-colors">{placeholder}</span>
                     ) : (
-                        selected.map((id) => (
+                        selected.map((selected_id) => (
                             <span
-                                key={id}
+                                key={selected_id}
                                 className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
-                                {finalRenderTag(id)}
+                                {finalRenderTag(selected_id)}
                                 <span
                                     role="button"
-                                    aria-label={`Remove ${items.find(i => i.id === id)?.label || id}`}
+                                    aria-label={`Remove ${items.find(i => i.id === selected_id)?.label || selected_id}`}
                                     tabIndex={0}
-                                    onClick={(e) => { e.stopPropagation(); toggle(id); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(id); } }}
+                                    onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(selected_id); } }}
                                     className="hover:text-primary/70 ml-0.5 cursor-pointer transition-colors"
                                 >
                                     <X className="w-3 h-3" aria-hidden="true" />
@@ -350,7 +353,7 @@ function MultiSelectDropdown({
             )}
         </div>
     );
-}
+});
 
 // ═══════════════════════════════════════════════════════════════
 // MAIN NEWS GENERATOR
@@ -376,13 +379,13 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     const [loading, setLoading] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const sourceTypes = [
+    const sourceTypes = useMemo(() => [
         { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
         { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release بيان صحفي' },
         { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog مدونة' },
         { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
         { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
-    ];
+    ], [t]);
     const [result, setResult] = useState<{ count: number; skipped: number; feeds: number } | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -400,17 +403,17 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     }, []);
 
     // Convert HTML date (YYYY-MM-DD) → DD/MM/YYYY for backend
-    const formatDateForBackend = (htmlDate: string): string => {
+    const formatDateForBackend = useCallback((htmlDate: string): string => {
         if (!htmlDate) return '';
         const [y, m, d] = htmlDate.split('-');
         return `${d}/${m}/${y}`;
-    };
+    }, []);
 
-    const formatDateDisplay = (htmlDate: string): string => {
+    const formatDateDisplay = useCallback((htmlDate: string): string => {
         if (!htmlDate) return '';
         const d = new Date(htmlDate);
         return d.toLocaleDateString(locale === 'ar' ? 'ar-AE' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    };
+    }, [locale]);
 
     // Country helpers
     const countryItems = React.useMemo(() => ALL_COUNTRIES.map((c) => ({
@@ -430,16 +433,16 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
     const getLangByCode = useCallback((code: string) => LANGUAGES.find((l) => l.code === code), []);
 
-    const validate = (): boolean => {
+    const validate = useCallback((): boolean => {
         const newErrors: typeof errors = {};
         if (!keyword.trim()) newErrors.keyword = t('error_keyword_required');
         if (selectedCountries.length === 0) newErrors.countries = t('error_country_required');
         if (selectedLanguages.length === 0) newErrors.languages = t('error_language_required');
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    };
+    }, [keyword, selectedCountries, selectedLanguages, t]);
 
-    const handleGenerate = async () => {
+    const handleGenerate = useCallback(async () => {
         if (!validate()) return;
         // Safety: never invoke an authenticated action when Convex hasn't received the token yet
         if (!isAuthenticated) {
@@ -470,9 +473,9 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         } finally {
             setLoading(false);
         }
-    };
+    }, [validate, isAuthenticated, keyword, selectedCountries, selectedLanguages, selectedSourceTypes, dateFrom, dateTo, fetchNews, t, isAr, formatDateForBackend]);
 
-    const clearForm = () => {
+    const clearForm = useCallback(() => {
         setKeyword('');
         setSelectedCountries(['AE']);
         setSelectedLanguages(isAr ? ['ar', 'en'] : ['en', 'ar']);
@@ -481,7 +484,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         setResult(null);
         setErrorMsg('');
         setErrors({});
-    };
+    }, [isAr]);
 
     return (
         <section className="relative z-20 bg-card border border-border rounded-2xl overflow-visible backdrop-blur-sm shadow-sm transition-all">
@@ -522,9 +525,15 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                             type="text"
                             placeholder={t('placeholder')}
                             value={keyword}
-                            onChange={(e) => { setKeyword(e.target.value); setErrors(prev => ({ ...prev, keyword: undefined })); }}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setKeyword(val);
+                                if (errors.keyword) {
+                                    setErrors(prev => ({ ...prev, keyword: undefined }));
+                                }
+                            }}
                             autoComplete="on"
-                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground border ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
+                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none placeholder:text-muted-foreground border transition-colors ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
                                 }`}
                         />
                     </div>
@@ -614,7 +623,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                     value={dateFrom}
                                     onChange={(e) => setDateFrom(e.target.value)}
                                     autoComplete="off"
-                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
                                 />
                             </div>
                             <div className="space-y-1">
@@ -627,7 +636,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
                                     autoComplete="off"
-                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                                    className="w-full bg-muted/50 border border-border rounded-xl px-2 py-2.5 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
                                 />
                             </div>
                         </div>

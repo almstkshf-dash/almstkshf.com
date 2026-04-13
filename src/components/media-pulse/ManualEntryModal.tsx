@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -27,6 +27,17 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Keyboard: close on Escape
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (e.key === 'Escape' && !isLoading) onClose();
+    }, [onClose, isLoading]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, handleKeyDown]);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -153,10 +164,17 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-all">
-            <div className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border flex flex-col transition-all">
+        /* Overlay — no ARIA role, purely visual */
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            {/* Dialog panel — role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="manual-entry-title"
+                className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border flex flex-col"
+            >
                 <div className="p-6 border-b border-border flex justify-between items-center bg-muted/50 transition-colors">
-                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2 transition-colors">
+                    <h2 id="manual-entry-title" className="text-xl font-bold text-foreground flex items-center gap-2 transition-colors">
                         <Plus className="w-5 h-5 text-primary" aria-hidden="true" />
                         {t('title')}
                     </h2>
@@ -164,6 +182,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         variant="ghost"
                         size="icon"
                         onClick={onClose}
+                        disabled={isLoading}
                         className="text-muted-foreground hover:text-foreground transition-colors"
                         aria-label={t('cancel')}
                     >
@@ -409,7 +428,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         </Button>
                     </div>
                 </form>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }

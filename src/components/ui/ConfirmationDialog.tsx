@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import Button from './Button';
@@ -32,6 +32,17 @@ export default function ConfirmationDialog({
     const t = useTranslations('Common');
 
     const Icon = variant === 'danger' ? AlertTriangle : variant === 'warning' ? AlertCircle : Info;
+
+    // Keyboard: close on Escape
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (e.key === 'Escape' && !isLoading) onClose();
+    }, [onClose, isLoading]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, handleKeyDown]);
 
     return (
         <AnimatePresence>
@@ -77,9 +88,10 @@ export default function ConfirmationDialog({
                                 <button
                                     onClick={onClose}
                                     disabled={isLoading}
+                                    aria-label={t('cancel')}
                                     className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground transition-all disabled:opacity-50"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-4 h-4" aria-hidden="true" />
                                 </button>
                             </div>
 

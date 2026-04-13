@@ -163,7 +163,8 @@
     "copy": "Copy",
     "search_placeholder": "Search...",
     "clear_search": "Clear Search",
-    "no_results": "No results found"
+    "no_results": "No results found",
+    "save_to_collection": "Save to Collection"
   },
   "Footer": {
     "about": "About ALMSTKSHF",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { X, Plus, FolderPlus, Loader2, Check } from "lucide-react";
@@ -29,6 +29,17 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     const [newCollectionName, setNewCollectionName] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+
+    // Keyboard: close on Escape
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (e.key === 'Escape' && !loading) onClose();
+    }, [onClose, loading]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, handleKeyDown]);
 
     if (!isOpen) return null;
 
@@ -69,17 +80,32 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-            <div 
+        /* Overlay — no ARIA role, purely visual */
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
+            onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
+            aria-hidden="true"
+        >
+            {/* Dialog panel — where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
+            <div
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="modal-title"
+                aria-labelledby="save-collection-title"
                 className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative"
+                aria-hidden="false"
+                onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">
-                    <h3 id="modal-title" className="text-lg font-bold text-foreground">Save to Collection</h3>
-                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
-                        <X className="w-5 h-5" />
+                    <h3 id="save-collection-title" className="text-lg font-bold text-foreground">
+                        {tCommon('save_to_collection')}
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        disabled={loading}
+                        aria-label={tCommon('cancel')}
+                        className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+                    >
+                        <X className="w-5 h-5" aria-hidden="true" />
                     </button>
                 </div>
 

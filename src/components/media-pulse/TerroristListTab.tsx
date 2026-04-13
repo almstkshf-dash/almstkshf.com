@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Search, Shield, AlertTriangle, User, Users, Building2,
   FileText, Upload, Trash2, Clock, CheckCircle2, XCircle,
-  ExternalLink, Info, Filter, Download, ChevronDown, ChevronUp
+  ExternalLink, Info, Filter, Download, ChevronDown, ChevronUp, X
 } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,6 +33,17 @@ export default function TerroristListTab() {
   const [importLoading, setImportLoading] = useState(false);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
   const [importError, setImportError] = useState<string | null>(null);
+
+  // Keyboard: close modal on Escape
+  const handleImportModalKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && !importLoading) setIsImportModalOpen(false);
+  }, [importLoading]);
+
+  useEffect(() => {
+    if (!isImportModalOpen) return;
+    document.addEventListener('keydown', handleImportModalKeyDown);
+    return () => document.removeEventListener('keydown', handleImportModalKeyDown);
+  }, [isImportModalOpen, handleImportModalKeyDown]);
 
   // ─── Convex Operations ────────────────────────────────────────────────
   const entries = useQuery(api.terroristList.search, {
@@ -398,82 +409,100 @@ export default function TerroristListTab() {
       {/* ─── Import Modal ─── */}
       <AnimatePresence>
         {isImportModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => !importLoading && setIsImportModalOpen(false)}
-              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-card border border-border rounded-3xl shadow-2xl p-8 space-y-6"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Upload className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">{t('import_modal.title')}</h3>
-                  <p className="text-xs text-muted-foreground font-medium">{t('import_modal.desc')}</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="p-6 border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center space-y-4 hover:border-primary/50 transition-colors relative group">
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls,.csv"
-                    onChange={handleFileUpload}
+          <>
+            {/* Overlay — no ARIA role, purely visual */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => !importLoading && setIsImportModalOpen(false)}
+                className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                aria-hidden="true"
+              />
+              {/* Dialog panel — role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="import-watchlist-title"
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-md bg-card border border-border rounded-3xl shadow-2xl p-8 space-y-6"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Upload className="w-6 h-6 text-primary" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h3 id="import-watchlist-title" className="text-xl font-bold">{t('import_modal.title')}</h3>
+                      <p className="text-xs text-muted-foreground font-medium">{t('import_modal.desc')}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => !importLoading && setIsImportModalOpen(false)}
                     disabled={importLoading}
-                    className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                  />
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
-                    {importLoading ? <Clock className="w-6 h-6 text-primary animate-spin" /> : <Download className="w-6 h-6 text-muted-foreground" />}
+                    aria-label={tCommon('cancel')}
+                    className="p-2 rounded-xl hover:bg-muted text-muted-foreground transition-all disabled:opacity-50 flex-shrink-0"
+                  >
+                    <X className="w-4 h-4" aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-6 border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center space-y-4 hover:border-primary/50 transition-colors relative group">
+                    <input
+                      type="file"
+                      accept=".xlsx,.xls,.csv"
+                      onChange={handleFileUpload}
+                      disabled={importLoading}
+                      className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                    />
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
+                      {importLoading ? <Clock className="w-6 h-6 text-primary animate-spin" /> : <Download className="w-6 h-6 text-muted-foreground" />}
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold">
+                        {importLoading
+                          ? `${t('import_modal.uploading')} (${importProgress.current}/${importProgress.total})`
+                          : t('import_modal.drop_file')}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-1">.xlsx, .xls, .csv ONLY</p>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-sm font-bold">
-                      {importLoading
-                        ? `${t('import_modal.uploading')} (${importProgress.current}/${importProgress.total})`
-                        : t('import_modal.drop_file')}
+
+                  {importError && (
+                    <div className="flex items-center gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-xs font-bold">
+                      <XCircle className="w-4 h-4" />
+                      {importError}
+                    </div>
+                  )}
+
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 underline">Critical Warning</span>
+                    </div>
+                    <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
+                      {t('import_modal.warning')}
                     </p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-1">.xlsx, .xls, .csv ONLY</p>
                   </div>
                 </div>
 
-                {importError && (
-                  <div className="flex items-center gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-xs font-bold">
-                    <XCircle className="w-4 h-4" />
-                    {importError}
-                  </div>
-                )}
-
-                <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 underline">Critical Warning</span>
-                  </div>
-                  <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                    {t('import_modal.warning')}
-                  </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={() => setIsImportModalOpen(false)}
+                    disabled={importLoading}
+                  >
+                    {tCommon('cancel')}
+                  </Button>
                 </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={() => setIsImportModalOpen(false)}
-                  disabled={importLoading}
-                >
-                  {tCommon('cancel')}
-                </Button>
-              </div>
-            </motion.div>
-          </div>
+              </motion.div>
+            </div>
+          </>
         )}
       </AnimatePresence>
     </div>

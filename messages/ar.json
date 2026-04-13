@@ -81,7 +81,8 @@
     "image_unavailable": "الصورة غير متوفرة",
     "search_placeholder": "ابحث...",
     "clear_search": "مسح البحث",
-    "no_results": "لا توجد نتائج"
+    "no_results": "لا توجد نتائج",
+    "save_to_collection": "حفظ في المجموعة"
   },
   "ArticleTable": {
     "no_articles": "لم يتم العثور على مقالات. ابدأ المراقبة أو أضف يدوياً.",
