@@ -90,7 +90,7 @@ function HighlightedText({
 }) {
   if (!ranges.length) {
     return (
-      <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed text-sm">
+      <p className="text-zinc-600 dark:text-muted-foreground whitespace-pre-wrap leading-relaxed text-sm">
         {rawText}
       </p>
     );
@@ -130,7 +130,7 @@ function HighlightedText({
   }
 
   return (
-    <div className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed text-sm">
+    <div className="text-zinc-600 dark:text-muted-foreground whitespace-pre-wrap leading-relaxed text-sm">
       {segments}
     </div>
   );
@@ -158,7 +158,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
-          <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">
+          <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">
             {tCommon('results_summary')}
           </h3>
           <motion.div
@@ -181,7 +181,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
               { icon: BookOpen, label: t('language'), value: result.isArabicDominant ? t('lang_arabic') : t('lang_english'), key: 'language' },
             ].map(({ icon: Icon, label, value, key }) => (
               <div key={key} className="flex items-center gap-2">
-                <Icon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 <span className="text-[10px] text-zinc-500 truncate">
                   {label}:{' '}
                   <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{value}</span>
@@ -193,7 +193,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
 
         {/* Aggregate metrics (2/3 cols) */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
             <BarChart3 className="w-4 h-4" />
             {t('forensic_metrics')}
           </h3>
@@ -258,18 +258,18 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
               <motion.div
                 key={key}
                 whileHover={{ y: -2 }}
-                className={`p-5 rounded-2xl border bg-white dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${warn ? 'border-rose-500/20' : 'border-zinc-200 dark:border-zinc-800'}`}
+                className={`p-5 rounded-2xl border bg-card dark:bg-muted/50 shadow-sm shadow-zinc-200/50 dark:shadow-none ${warn ? 'border-rose-500/20' : 'border-zinc-200 dark:border-zinc-800'}`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`p-1.5 rounded-lg ${warn ? 'bg-rose-500/10 border border-rose-500/20' : 'bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800'}`}>
                     <Icon className={`w-3.5 h-3.5 ${warn ? 'text-rose-500' : 'text-zinc-500'}`} />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{label}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{label}</span>
                 </div>
                 <p className={`text-2xl font-black font-mono ${warn ? 'text-rose-500' : 'text-zinc-900 dark:text-zinc-100'}`}>
                   {value}<span className="text-sm">{unit}</span>
                 </p>
-                <p className="text-[10px] text-zinc-400 mt-1 leading-snug">{desc}</p>
+                <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{desc}</p>
               </motion.div>
             ))}
           </div>
@@ -279,7 +279,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       {/* ── Row 2 : Named signals ─────────────────────────────────────────── */}
       {result.signals.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
             <Info className="w-4 h-4" />
             {t('detailed_breakdown')}
           </h3>
@@ -288,7 +288,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
               <motion.div
                 key={sig.id}
                 whileHover={{ y: -2 }}
-                className={`p-5 rounded-2xl border flex items-start gap-3 bg-white dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${severityStyle(sig.severity).includes('rose') ? 'border-rose-500/15' : sig.severity === 'medium' ? 'border-amber-500/15' : 'border-zinc-200 dark:border-zinc-800'}`}
+                className={`p-5 rounded-2xl border flex items-start gap-3 bg-white dark:bg-muted shadow-sm shadow-zinc-200/50 dark:shadow-none ${severityStyle(sig.severity).includes('rose') ? 'border-rose-500/15' : sig.severity === 'medium' ? 'border-amber-500/15' : 'border-zinc-200 dark:border-zinc-800'}`}
               >
                 <div className={`mt-0.5 flex-shrink-0 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${severityStyle(sig.severity)}`}>
                   {sig.severity}
@@ -314,7 +314,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       {/* ── Row 3 : Sentence timeline ─────────────────────────────────────── */}
       {result.sentences.length > 0 && (
         <div className="space-y-6">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
             <Activity className="w-4 h-4" />
             {t('sentence_breakdown')}
           </h3>
@@ -348,12 +348,12 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                   key={idx}
                   onClick={() => setSelectedSentence(isSelected ? null : idx)}
                   whileHover={{ x: 2 }}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 ${isSelected ? `${meta.ring} bg-zinc-50 dark:bg-zinc-900` : 'border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-950'}`}
+                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 ${isSelected ? `${meta.ring} bg-zinc-50 dark:bg-zinc-900` : 'border-zinc-100 dark:border-zinc-900 bg-card dark:bg-muted/50'}`}
                 >
                   <span className={`flex-shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded font-mono mt-0.5 ${meta.badge}`}>
                     {s.score}%
                   </span>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-snug line-clamp-2">
+                  <p className="text-xs text-zinc-600 dark:text-muted-foreground leading-snug line-clamp-2">
                     {s.text}
                   </p>
                   <span className={`ml-auto flex-shrink-0 text-[9px] font-black uppercase tracking-wider ${meta.badge.replace('bg-', 'text-').replace(' text-white', '').replace(' text-black', '')}`}>
@@ -372,11 +372,11 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                className="p-6 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-lg shadow-zinc-200/40 dark:shadow-none space-y-4"
+                className="p-6 bg-card dark:bg-muted/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-lg shadow-zinc-200/40 dark:shadow-none space-y-4"
               >
                 <div className="flex items-center gap-3">
-                  <MessageSquare className="w-4 h-4 text-zinc-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     {t('sentence_detail', { num: String((selectedSentence ?? 0) + 1) })}
                   </span>
                 </div>
@@ -406,7 +406,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       )}
 
       {/* ── Row 4 : Forensic highlight view ──────────────────────────────── */}
-      <div className="p-10 bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative">
+      <div className="p-10 bg-card dark:bg-muted/50 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative">
         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
           <Search className="w-32 h-32" />
         </div>
@@ -421,7 +421,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
 
         <div className="relative z-10 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Search className="w-4 h-4" />
               {t('source_view')}
             </h3>
@@ -457,7 +457,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       </div>
 
       {/* ── Footer disclaimer ──────────────────────────────────────────────── */}
-      <p className="text-xs text-zinc-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+      <p className="text-xs text-muted-foreground leading-relaxed italic text-center max-w-2xl mx-auto">
         {tCommon('footer_disclaimer')}
       </p>
 

@@ -39,16 +39,16 @@ export default function CrisisPlanCard({ title, priority, actions, status }: Cri
                         <span className="text-xs font-mono uppercase tracking-wider opacity-80">{priority} {t('priority')}</span>
                     </div>
                 </div>
-                <span className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground border border-border transition-colors">
+                <span className="px-2 py-1 text-xs rounded-full bg-muted text-foreground/70 border border-border transition-colors">
                     {status}
                 </span>
             </div>
 
             <div className="space-y-2">
-                <div className="text-xs font-semibold text-muted-foreground uppercase opacity-70 transition-colors">{t('action_protocol')}</div>
+                <div className="text-xs font-bold text-foreground/60 uppercase tracking-widest transition-colors">{t('action_protocol')}</div>
                 <ul className="space-y-1">
                     {actions.map((action, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2 transition-colors">
+                        <li key={idx} className="text-sm text-foreground/70 flex items-start gap-2 transition-colors">
                             <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-50" />
                             {action}
                         </li>

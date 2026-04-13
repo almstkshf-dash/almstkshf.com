@@ -53,7 +53,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                 <div className="flex flex-col gap-1.5 pt-6 justify-between select-none">
                     {DAYS.map(day => (
                         <div key={day} className="h-[22px] sm:h-[28px] flex items-center pr-2">
-                            <span className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">{day}</span>
+                            <span className="text-[10px] sm:text-xs font-bold text-foreground/70 uppercase tracking-widest">{day}</span>
                         </div>
                     ))}
                 </div>
@@ -126,7 +126,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                                             {/* Custom floating tooltip for higher fidelity (desktop only) */}
                                             {val > 0 && (
                                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 bg-popover border border-border text-popover-foreground text-[10px] sm:text-xs py-1.5 px-3 rounded-lg shadow-xl shadow-black/10 pointer-events-none transition-all duration-300 z-50">
-                                                    <div className="font-bold mb-0.5 text-muted-foreground">{DAYS[dayIndex]} {t("at", { defaultValue: "at" })} {formatHour(hour)}</div>
+                                                    <div className="font-bold mb-0.5 text-foreground/70">{DAYS[dayIndex]} {t("at", { defaultValue: "at" })} {formatHour(hour)}</div>
                                                     <div className={clsx("font-black text-sm flex items-center gap-1", textClass)}>
                                                         {val} <span className="text-[10px] uppercase tracking-wider font-semibold opacity-70">{t("articles_count", { defaultValue: "articles" })}</span>
                                                     </div>
@@ -147,7 +147,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                             <div key={hour} className="flex-1 flex justify-center">
                                 {/* Only show every 2 hours to avoid crowding */}
                                 {hour % 2 === 0 && (
-                                    <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground whitespace-nowrap -rotate-45 sm:rotate-0 translate-y-2 sm:translate-y-0">
+                                    <span className="text-[9px] sm:text-[10px] font-bold text-foreground/60 whitespace-nowrap -rotate-45 sm:rotate-0 translate-y-2 sm:translate-y-0">
                                         {formatHour(hour)}
                                     </span>
                                 )}
@@ -159,7 +159,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
 
             {/* Legend Component */}
             <div className="flex items-center justify-end gap-3 pt-6 border-t border-border mt-4">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('Less', { defaultValue: 'Less' })}</span>
+                <span className="text-[10px] font-bold text-foreground/70 uppercase tracking-widest">{t('Less', { defaultValue: 'Less' })}</span>
                 <div className="flex gap-1.5">
                     <div className="w-4 h-4 rounded-sm bg-muted/40 border border-border/50" />
                     <div className="w-4 h-4 rounded-sm bg-cyan-400 dark:bg-cyan-500 border border-border/50" />

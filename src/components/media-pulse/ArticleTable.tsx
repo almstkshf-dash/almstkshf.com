@@ -77,7 +77,7 @@ const ArticleRow = memo(({
                     className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                 />
             </td>
-            <td className="p-4 whitespace-nowrap text-xs font-mono text-muted-foreground transition-colors">
+            <td className="p-4 whitespace-nowrap text-xs font-mono text-foreground/80 transition-colors">
                 {article.publishedDate}
             </td>
             <td className="p-4 max-w-sm">
@@ -115,7 +115,7 @@ const ArticleRow = memo(({
                     </div>
                 </div>
             </td>
-            <td className="p-4 text-sm text-muted-foreground">
+            <td className="p-4 text-sm text-foreground/80">
                 {article.source || article.sourceCountry || '—'}
             </td>
             <td className="p-4 text-center">
@@ -203,7 +203,7 @@ const ArticleRow = memo(({
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
                 {article.retweets !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
@@ -211,7 +211,7 @@ const ArticleRow = memo(({
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-muted-foreground transition-colors">
+            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
                 {article.replies !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
@@ -242,7 +242,7 @@ const ArticleRow = memo(({
                     size="icon"
                     onClick={() => onDeleteClick(article._id)}
                     isLoading={isDeleting}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive h-8 w-8 shadow-none"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-destructive h-8 w-8 shadow-none"
                     title={t('delete')}
                     aria-label={t('delete')}
                 >
@@ -375,7 +375,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
             <div className="overflow-x-auto">
                 <table className="w-full text-left rtl:text-right border-collapse">
                     <thead>
-                        <tr className="border-b border-border text-muted-foreground text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
+                        <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
                             <th className="p-4 w-10">
                                 <input
                                     type="checkbox"

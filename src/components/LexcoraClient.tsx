@@ -82,7 +82,7 @@ export default function LexcoraClient() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed transition-colors duration-300"
+                                className="text-xl text-foreground/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed transition-colors duration-300"
                             >
                                 {t("subtitle")}
                             </motion.p>
@@ -180,7 +180,7 @@ export default function LexcoraClient() {
                                             <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
                                                 {t(`sections.${cat.id}.items.${item}.title`)}
                                             </h3>
-                                            <p className="text-muted-foreground text-sm leading-relaxed transition-colors duration-300">
+                                            <p className="text-foreground/70 text-sm leading-relaxed transition-colors duration-300">
                                                 {t(`sections.${cat.id}.items.${item}.desc`)}
                                             </p>
                                         </motion.div>
@@ -197,7 +197,7 @@ export default function LexcoraClient() {
                 <Container>
                     <div className="text-center space-y-4 mb-20">
                         <h2 className="text-4xl md:text-6xl font-bold text-foreground transition-colors duration-300">{t("faq.title")}</h2>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-light transition-colors duration-300">
+                        <p className="text-foreground/70 text-lg max-w-2xl mx-auto font-light transition-colors duration-300">
                             {t("faq.subtitle")}
                         </p>
                     </div>
@@ -225,7 +225,7 @@ export default function LexcoraClient() {
                                             {t(`faq.items.${key}.q`)}
                                         </h3>
                                     </div>
-                                    <p className="text-muted-foreground text-sm leading-relaxed font-light transition-colors duration-300">
+                                    <p className="text-foreground/70 text-sm leading-relaxed font-light transition-colors duration-300">
                                         {t(`faq.items.${key}.a`)}
                                     </p>
 
@@ -259,7 +259,7 @@ export default function LexcoraClient() {
                                             </div>
                                         )}
                                         {(key === "what_is" || key === "database") && (
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/70 uppercase tracking-widest">
                                                 <TrendingUp className="w-3 h-3 text-primary" />
                                                 <span className="group-hover:text-primary transition-colors">Optimized System</span>
                                             </div>
@@ -276,7 +276,7 @@ export default function LexcoraClient() {
             <section className="py-24 border-t border-border bg-background transition-colors duration-300">
                 <Container>
                     <div className="text-center space-y-12">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors duration-300">{t("trusted")}</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-foreground/70 transition-colors duration-300">{t("trusted")}</h2>
                         <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
                             {/* Placeholder Logos */}
                             <div className="text-2xl font-black italic text-foreground transition-colors duration-300">LAW FIRM ALPHA</div>

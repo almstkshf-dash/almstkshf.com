@@ -101,7 +101,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                         onClick={onClose}
                         disabled={loading}
                         aria-label={tCommon('cancel')}
-                        className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+                        className="p-2 hover:bg-muted rounded-full transition-colors text-foreground/60 hover:text-foreground disabled:opacity-50"
                     >
                         <X className="w-5 h-5" aria-hidden="true" />
                     </button>
@@ -156,19 +156,19 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                         </div>
                                         <div>
                                             <p className="font-bold text-sm text-foreground">Create New Collection</p>
-                                            <p className="text-xs text-muted-foreground">Start a new report collection</p>
+                                            <p className="text-xs text-foreground/60">Start a new report collection</p>
                                         </div>
                                     </button>
 
                                     {collections === undefined ? (
-                                        <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                                        <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-foreground/60" /></div>
                                     ) : collections.length === 0 ? (
-                                        <div className="text-center p-6 text-sm text-muted-foreground">
+                                        <div className="text-center p-6 text-sm text-foreground/60">
                                             No collections yet.
                                         </div>
                                     ) : (
                                         <div className="space-y-2 pt-2">
-                                            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 mb-2">Existing Collections</p>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-foreground/60 px-1 mb-2">Existing Collections</p>
                                             {collections.map(col => (
                                                 <button
                                                     key={col._id}
@@ -177,10 +177,10 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                                     className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all text-left group disabled:opacity-50"
                                                 >
                                                     <div className="flex items-center gap-3 min-w-0">
-                                                        <FolderPlus className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                                                        <FolderPlus className="w-5 h-5 text-foreground/60 group-hover:text-primary transition-colors shrink-0" />
                                                         <span className="font-medium text-sm text-foreground truncate">{col.name}</span>
                                                     </div>
-                                                    <span className="text-xs text-muted-foreground bg-background px-2 py-1 rounded-full border border-border">{col.items.length} items</span>
+                                                    <span className="text-xs text-foreground/60 bg-background px-2 py-1 rounded-full border border-border">{col.items.length} items</span>
                                                 </button>
                                             ))}
                                         </div>

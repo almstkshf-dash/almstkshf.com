@@ -105,7 +105,7 @@ export default function SmartMediaAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-xl text-muted-foreground font-light leading-relaxed max-w-2xl"
+                            className="text-xl text-foreground/80 font-light leading-relaxed max-w-2xl"
                         >
                             {tWhy("ai_agent.desc")}
                         </motion.p>
@@ -125,7 +125,7 @@ export default function SmartMediaAssistantClient() {
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder={tAi("instruction")}
                                 autoComplete="on"
-                                className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground/75"
+                                className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-foreground/50"
                             />
                             <Button
                                 onClick={handleGenerate}
@@ -165,7 +165,7 @@ export default function SmartMediaAssistantClient() {
                                                 className="space-y-4"
                                             >
                                                 <div className="p-4 bg-background/50 border border-border rounded-2xl">
-                                                    <p className="text-xs text-muted-foreground mb-2">{tAi("prompt")}</p>
+                                                    <p className="text-xs text-foreground/70 mb-2">{tAi("prompt")}</p>
                                                     <p className="text-sm font-medium">{prompt || "..."}</p>
                                                 </div>
 
@@ -203,7 +203,7 @@ export default function SmartMediaAssistantClient() {
                                                                     </p>
                                                                 </>
                                                             ) : (
-                                                                <p className="text-muted-foreground italic">{tAi("awaiting_instruction")}</p>
+                                                                <p className="text-foreground/80 italic">{tAi("awaiting_instruction")}</p>
                                                             )}
                                                         </motion.div>
                                                     )}
@@ -238,7 +238,7 @@ export default function SmartMediaAssistantClient() {
                                     <cap.icon className={clsx("w-7 h-7", cap.color)} aria-hidden="true" />
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4">{cap.title}</h3>
-                                <p className="text-muted-foreground font-light leading-relaxed">{cap.desc}</p>
+                                <p className="text-foreground/80 font-light leading-relaxed">{cap.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -248,7 +248,7 @@ export default function SmartMediaAssistantClient() {
                 <section className="mt-40 bg-gradient-to-br from-primary/10 to-transparent p-12 md:p-24 rounded-[4rem] border border-primary/10 text-center space-y-8">
                     <Layout className="w-16 h-16 text-primary mx-auto" aria-hidden="true" />
                     <h2 className="text-4xl md:text-6xl font-bold max-w-3xl mx-auto tracking-tight">{tAi("integration.title")}</h2>
-                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-light">
+                    <p className="text-foreground/80 text-lg max-w-2xl mx-auto font-light">
                         {tAi("integration.desc")}
                     </p>
                     <div className="flex justify-center flex-wrap gap-8 opacity-40">

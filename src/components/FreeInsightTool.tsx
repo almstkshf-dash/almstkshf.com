@@ -79,7 +79,7 @@ export default function FreeInsightTool() {
                             <span>Free Service</span>
                         </motion.div>
                         <h2 className="text-4xl md:text-6xl font-bold text-foreground tracking-tight">{t("title")}</h2>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("subtitle")}</p>
+                        <p className="text-foreground/70 text-lg max-w-2xl mx-auto">{t("subtitle")}</p>
                     </div>
 
                     <div className="bg-card/40 border border-border rounded-[2.5rem] p-6 md:p-10 backdrop-blur-xl shadow-2xl relative">
@@ -99,7 +99,7 @@ export default function FreeInsightTool() {
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={t("placeholder")}
                                     autoComplete="on"
-                                    className="w-full bg-background border border-border rounded-3xl p-6 md:p-8 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors min-h-[160px] resize-none text-lg"
+                                    className="w-full bg-background border border-border rounded-3xl p-6 md:p-8 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors min-h-[160px] resize-none text-lg"
                                 />
                                 <div className="absolute bottom-6 right-6 flex gap-2">
                                     <Button
@@ -139,7 +139,7 @@ export default function FreeInsightTool() {
                                         {/* Sentiment Card */}
                                         <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("sentiment")}</p>
+                                                <p className="text-xs font-bold text-foreground/60 uppercase tracking-widest">{t("sentiment")}</p>
                                                 <TrendingUp className={clsx(
                                                     "w-4 h-4",
                                                     result.sentiment.toLowerCase() === "positive" ? "text-emerald-600 dark:text-emerald-400" :
@@ -172,7 +172,7 @@ export default function FreeInsightTool() {
                                         {/* Risk & Velocity Card */}
                                         <div className="p-6 rounded-3xl bg-card/50 border border-border space-y-4 transition-all duration-300">
                                             <div className="flex justify-between items-center">
-                                                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("risk")}</p>
+                                                <p className="text-xs font-bold text-foreground/60 uppercase tracking-widest">{t("risk")}</p>
                                                 <ShieldAlert className={clsx(
                                                     "w-4 h-4",
                                                     result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
@@ -201,7 +201,7 @@ export default function FreeInsightTool() {
                                                                     style={{ width: `${(value as number) * 100}%` }}
                                                                 />
                                                             </div>
-                                                            <span className="text-[8px] uppercase tracking-tighter opacity-50">{emotion}</span>
+                                                            <span className="text-[10px] uppercase tracking-tighter text-foreground/70 font-bold">{emotion}</span>
                                                         </div>
                                                     ))}
                                                 </div>

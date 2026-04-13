@@ -30,7 +30,7 @@ export default function Footer() {
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-foreground/60 hover:text-primary hover:bg-muted/80 transition-all">
+                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-foreground/85 hover:text-primary hover:bg-muted/80 transition-all">
                                 <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
@@ -127,12 +127,12 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-4">
                             <li>
-                                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                                <Link href="/privacy" className="text-foreground/85 hover:text-foreground transition-colors text-sm">
                                     {t('privacy')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                                <Link href="/terms" className="text-foreground/85 hover:text-foreground transition-colors text-sm">
                                     {t('terms')}
                                 </Link>
                             </li>
@@ -140,17 +140,17 @@ export default function Footer() {
 
                         {/* Domain Switcher Placeholder */}
                         <div className="mt-8 p-4 bg-muted/50 rounded-xl border border-border">
-                            <p className="text-xs text-muted-foreground mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
+                            <p className="text-xs text-foreground/70 mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-2 py-1 bg-muted text-[10px] text-foreground rounded font-medium border border-border">{t('regions.uae')}</span>
-                                <span className="px-2 py-1 bg-muted text-[10px] text-muted-foreground/80 rounded font-medium border border-border">{t('regions.ksa')} ({t('coming_soon')})</span>
+                                <span className="px-2 py-1 bg-muted text-[10px] text-foreground/90 rounded font-medium border border-border">{t('regions.ksa')} ({t('coming_soon')})</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground uppercase tracking-widest font-medium">
+                <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-foreground/85 uppercase tracking-widest font-medium">
                     <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>

@@ -64,7 +64,7 @@ export default function TvRadioClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto transition-colors"
+                            className="text-foreground/80 text-lg leading-relaxed max-w-3xl mx-auto transition-colors"
                         >
                             {t("description")}
                         </motion.p>
@@ -89,7 +89,7 @@ export default function TvRadioClient() {
                                 </div>
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t('channels_stats')}</h3>
-                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                                    <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
                                         {t("analytics")}
                                     </p>
                                 </div>
@@ -109,7 +109,7 @@ export default function TvRadioClient() {
                                 </div>
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("alerts.title")}</h3>
-                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                                    <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
                                         {t("alerts.description")}
                                     </p>
                                 </div>
@@ -129,7 +129,7 @@ export default function TvRadioClient() {
                                 </div>
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("clips.title")}</h3>
-                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                                    <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
                                         {t("clips.description")}
                                     </p>
                                 </div>
@@ -149,7 +149,7 @@ export default function TvRadioClient() {
                                 </div>
                                 <div className="space-y-4">
                                     <h3 className="text-xl font-bold text-foreground tracking-tight transition-colors">{t("media_pulse_integration.title")}</h3>
-                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                                    <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
                                         {t("media_pulse_integration.description")}
                                     </p>
                                 </div>
@@ -173,15 +173,15 @@ export default function TvRadioClient() {
                                         </div>
                                         <h3 className="text-2xl font-bold text-foreground transition-colors">{t("custom_profiles.title")}</h3>
                                     </div>
-                                    <p className="text-muted-foreground leading-relaxed transition-colors">
+                                    <p className="text-foreground/80 leading-relaxed transition-colors">
                                         {t("custom_profiles.description")}
                                     </p>
                                     <div className="flex flex-wrap gap-4 pt-4">
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-foreground/70 transition-colors">
                                             <Monitor className="w-4 h-4 text-primary" />
                                             <span>{t('real_time_clips')}</span>
                                         </div>
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-muted-foreground transition-colors">
+                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted border border-border text-xs text-foreground/70 transition-colors">
                                             <Zap className="w-4 h-4 text-primary dark:text-primary" />
                                             <span>{t('immediate_alerts')}</span>
                                         </div>
@@ -189,7 +189,7 @@ export default function TvRadioClient() {
                                 </div>
                                 <div className="relative aspect-video rounded-2xl overflow-hidden bg-muted border border-border shadow-2xl">
                                     <div className="absolute inset-0 flex items-center justify-center bg-card">
-                                        <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                                        <div className="flex flex-col items-center gap-4 text-foreground/70">
                                             <Radio className="w-12 h-12 animate-pulse" />
                                             <span className="text-xs font-bold uppercase tracking-widest">{t('global_stream')}</span>
                                         </div>
@@ -210,7 +210,7 @@ export default function TvRadioClient() {
                         <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                             {t("use_cases.title")}
                         </h2>
-                        <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
+                        <p className="text-foreground/70 text-lg leading-relaxed transition-colors">
                             {t("use_cases.intro")}
                         </p>
                     </div>
@@ -235,7 +235,7 @@ export default function TvRadioClient() {
                                             {t(`use_cases.items.${caseId}.role`)}
                                         </p>
                                     </div>
-                                    <p className="text-muted-foreground leading-relaxed text-sm transition-colors">
+                                    <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
                                         {t(`use_cases.items.${caseId}.scenario`)}
                                     </p>
                                 </div>
@@ -261,7 +261,7 @@ export default function TvRadioClient() {
                 <Container>
                     <div className="mb-12">
                         <h2 className="text-3xl font-bold text-foreground mb-4 transition-colors">{t('console_title')}</h2>
-                        <p className="text-muted-foreground transition-colors">{t('console_desc')}</p>
+                        <p className="text-foreground/70 transition-colors">{t('console_desc')}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>

@@ -100,7 +100,7 @@ export default function CentralMediaRepositoryClient() {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-muted-foreground text-xl leading-relaxed max-w-3xl mx-auto"
+                            className="text-foreground/80 text-xl leading-relaxed max-w-3xl mx-auto"
                         >
                             {t("description")}
                         </motion.p>
@@ -124,12 +124,12 @@ export default function CentralMediaRepositoryClient() {
                             <h2 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
                                 {t("enterprise_hub.title")}
                             </h2>
-                            <p className="text-muted-foreground text-lg leading-relaxed">
+                            <p className="text-foreground/70 text-lg leading-relaxed">
                                 {t("enterprise_hub.description")}
                             </p>
                             <ul className="space-y-4 pt-4">
                                 {(t.raw("enterprise_hub.items") as string[]).map((item, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-muted-foreground">
+                                    <li key={i} className="flex items-center gap-3 text-foreground/70 font-medium">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
                                         <span>{item}</span>
                                     </li>
@@ -179,7 +179,7 @@ export default function CentralMediaRepositoryClient() {
                 <Container>
                     <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
                         <h2 className="text-4xl font-bold text-foreground tracking-tight">{t("advanced_capabilities.title")}</h2>
-                        <p className="text-muted-foreground text-lg">{t("advanced_capabilities.subtitle")}</p>
+                        <p className="text-foreground/70 text-lg">{t("advanced_capabilities.subtitle")}</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {features.map((feature, idx) => (
@@ -197,7 +197,7 @@ export default function CentralMediaRepositoryClient() {
                                 <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
                                     {t(feature.titleKey)}
                                 </h3>
-                                <p className="text-muted-foreground leading-relaxed text-sm">
+                                <p className="text-foreground/70 leading-relaxed text-sm">
                                     {t(feature.descKey)}
                                 </p>
                             </motion.div>

@@ -50,7 +50,7 @@ export default async function HeroSection() {
 
                 <p
                     id="hero-description"
-                    className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light"
+                    className="text-lg md:text-xl text-foreground/85 mb-12 max-w-3xl mx-auto leading-relaxed font-light"
                     style={{ opacity: 1 }} // LCP FIX: Explicitly set to 1 in SSR to override any global hydration-based opacity:0 rules
                 >
                     {t("Common.description")}
@@ -73,7 +73,7 @@ export default async function HeroSection() {
 
                     <a
                         href="#features"
-                        className="px-10 py-5 bg-card border border-border hover:border-primary text-muted-foreground rounded-2xl font-semibold transition-all hover:text-foreground"
+                        className="px-10 py-5 bg-card border border-border hover:border-primary text-foreground/85 rounded-2xl font-semibold transition-all hover:text-foreground"
                     >
                         {t("Common.view_details")}
                     </a>

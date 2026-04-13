@@ -32,9 +32,9 @@ export default function KYCVerification() {
                     </div>
                     <div>
                         <h3 className="text-foreground font-bold text-xl">Verification Status: Tier 1</h3>
-                        <p className="text-muted-foreground text-sm">You are currently verified for basic platform features.</p>
+                        <p className="text-foreground/70 text-sm">You are currently verified for basic platform features.</p>
                     </div>
-                    <div className="ml-auto px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-muted-foreground">
+                    <div className="ml-auto px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-foreground/70">
                         PENDING FULL ACCESS
                     </div>
                 </div>
@@ -48,7 +48,7 @@ export default function KYCVerification() {
                                 "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 transition-all",
                                 step.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
                                     step.status === "active" ? "bg-primary/10 text-primary border border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.2)]" :
-                                        "bg-muted text-muted-foreground border border-border"
+                                        "bg-muted text-foreground/60 border border-border"
                             )}>
                                 <step.icon className="w-7 h-7" />
                             </div>
@@ -57,13 +57,13 @@ export default function KYCVerification() {
                                 <div className="flex justify-between items-center mb-1">
                                     <h4 className={clsx(
                                         "font-bold text-lg transition-colors",
-                                        step.status === "pending" ? "text-muted-foreground" : "text-foreground"
+                                        step.status === "pending" ? "text-foreground/60" : "text-foreground"
                                     )}>
                                         {step.title}
                                     </h4>
                                     {step.status === "completed" && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
                                 </div>
-                                <p className="text-muted-foreground text-sm">{step.description}</p>
+                                <p className="text-foreground/70 text-sm">{step.description}</p>
 
                                 {step.status === "active" && (
                                     <motion.div
@@ -76,7 +76,7 @@ export default function KYCVerification() {
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-foreground text-sm font-bold">Ready for Scanned Document</p>
-                                            <p className="text-muted-foreground text-xs">Maximum file size: 10MB (JPG, PNG, PDF)</p>
+                                            <p className="text-foreground/60 text-xs">Maximum file size: 10MB (JPG, PNG, PDF)</p>
                                         </div>
                                         <Button size="sm" className="bg-primary hover:bg-primary/90">
                                             Select File
@@ -95,18 +95,18 @@ export default function KYCVerification() {
                         <AlertCircle className="w-4 h-4 text-amber-500" />
                         Why verify?
                     </h5>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-foreground/70 text-sm leading-relaxed">
                         Full verification (Tier 2) allows for automated legal drafting, API production access, and secure cloud storage exports.
                     </p>
                 </div>
                 <div className="p-6 rounded-2xl border border-border bg-card">
-                    <h5 className="text-foreground font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-widest text-[10px] text-muted-foreground">
+                    <h5 className="text-foreground font-bold mb-3 flex items-center gap-2 text-sm uppercase tracking-widest text-[10px] text-foreground/70">
                         Help Center
                     </h5>
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-muted-foreground hover:text-foreground flex items-center gap-2 group text-sm transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                        className="text-foreground/70 hover:text-foreground flex items-center gap-2 group text-sm transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                         rightIcon={<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                     >
                         Read verification requirements
@@ -114,7 +114,7 @@ export default function KYCVerification() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-muted-foreground hover:text-foreground flex items-center gap-2 group text-sm mt-3 transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                        className="text-foreground/70 hover:text-foreground flex items-center gap-2 group text-sm mt-3 transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                         rightIcon={<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                     >
                         Enterprise onboarding guide

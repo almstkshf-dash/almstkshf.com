@@ -240,7 +240,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                 {icon && <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>}
                 <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px]">
                     {selected.length === 0 ? (
-                        <span className="text-muted-foreground text-sm transition-colors">{placeholder}</span>
+                        <span className="text-foreground/60 text-sm transition-colors">{placeholder}</span>
                     ) : (
                         selected.map((selected_id) => (
                             <span
@@ -262,7 +262,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         ))
                     )}
                 </div>
-                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-foreground/70 transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
 
             {/* Error Message */}
@@ -288,7 +288,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 autoComplete="off"
-                                className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
+                                className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
                                 autoFocus
                             />
                         </div>
@@ -298,8 +298,8 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     <div className="max-h-64 overflow-y-auto scrollbar-thin transition-colors">
                         {filtered.length === 0 ? (
                             <div className="py-10 text-center">
-                                <Search className="w-8 h-8 text-muted-foreground/20 mx-auto mb-2" />
-                                <p className="text-muted-foreground text-xs font-medium">{noResultsText || 'No results found'}</p>
+                                <Search className="w-8 h-8 text-foreground/20 mx-auto mb-2" />
+                                <p className="text-foreground/60 text-xs font-medium">{noResultsText || 'No results found'}</p>
                             </div>
                         ) : (
                             <div className="p-1.5 grid grid-cols-1 gap-0.5">
@@ -334,7 +334,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
 
                     {/* Footer */}
                     <div className="p-3 border-t border-border/50 bg-muted/10 flex items-center justify-between transition-colors">
-                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-2">
+                        <span className="text-[10px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-2">
                             {selected.length} {selectedText || 'selected'}
                         </span>
                         {selected.length > 0 && (
@@ -496,7 +496,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                     </div>
                     <div>
                         <h2 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h2>
-                        <p className="text-muted-foreground text-[11px] transition-colors">{t('subtitle')}</p>
+                        <p className="text-foreground/70 text-[11px] transition-colors">{t('subtitle')}</p>
                     </div>
                 </div>
                 {(keyword || result || errorMsg) && (
@@ -504,7 +504,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                         variant="ghost"
                         size="sm"
                         onClick={clearForm}
-                        className="text-xs text-muted-foreground hover:text-foreground gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50 h-auto shadow-none"
+                        className="text-xs text-foreground/80 hover:text-foreground gap-1 border border-border rounded-lg px-3 py-1.5 hover:bg-muted/50 h-auto shadow-none"
                     >
                         <X className="w-3 h-3" />
                         {t('clear')}
@@ -517,7 +517,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div>
                     <label htmlFor="monitor_keyword" className="sr-only">{t('monitor_keyword')}</label>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
                         <input
                             id="monitor_keyword"
                             name="monitor_keyword"
@@ -533,7 +533,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                 }
                             }}
                             autoComplete="on"
-                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none placeholder:text-muted-foreground border transition-colors ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
+                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none placeholder:text-foreground/40 border transition-colors ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
                                 }`}
                         />
                     </div>
@@ -542,7 +542,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Countries */}
                     <div className="space-y-2">
-                        <label id="region-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</label>
+                        <label id="region-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</label>
                         <MultiSelectDropdown
                             id="region-select"
                             aria-labelledby="region-label"
@@ -570,7 +570,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Languages */}
                     <div className="space-y-2">
-                        <label id="language-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</label>
+                        <label id="language-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</label>
                         <MultiSelectDropdown
                             id="language-select"
                             aria-labelledby="language-label"
@@ -595,7 +595,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Source Types */}
                     <div className="space-y-2">
-                        <label id="sources-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</label>
+                        <label id="sources-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</label>
                         <MultiSelectDropdown
                             id="sources-select"
                             aria-labelledby="sources-label"
@@ -611,7 +611,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Dates */}
                     <div className="space-y-2">
-                        <label id="date-range-label" className="block text-[11px] text-muted-foreground font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</label>
+                        <label id="date-range-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</label>
                         <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="date-range-label">
                             <div className="space-y-1">
                                 <label htmlFor="date-from" className="sr-only">Date From</label>

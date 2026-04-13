@@ -173,7 +173,7 @@ export default function AiInspectorTab() {
               </div>
               <h2 className="text-2xl font-black text-foreground tracking-tight uppercase italic">{t("title")}</h2>
             </div>
-            <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+            <p className="text-foreground/80 font-medium text-sm leading-relaxed">
               {t("subtitle")}
             </p>
             <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-blue-500/60 dark:text-blue-400/60">
@@ -197,7 +197,7 @@ export default function AiInspectorTab() {
                 onClick={() => { setMode(item.id as Mode); reset(); }}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${mode === item.id
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  : "text-foreground/80 hover:text-foreground hover:bg-muted/50"
                   }`}
               >
                 <item.icon className="w-3.5 h-3.5" />
@@ -251,13 +251,13 @@ export default function AiInspectorTab() {
                   <label className="block w-full cursor-pointer">
                     <div className="border-4 border-dashed border-border/50 bg-card/60 backdrop-blur-sm rounded-[3rem] p-24 flex flex-col items-center gap-6 hover:bg-card hover:border-primary/30 transition-all group shadow-xl">
                       <div className="w-24 h-24 rounded-[2rem] bg-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-110 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all shadow-inner">
-                        <Upload className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <Upload className="w-12 h-12 text-foreground/80 group-hover:text-primary transition-colors" />
                       </div>
                       <div className="text-center space-y-2">
                         <p className="text-2xl font-black tracking-tight text-foreground">{t("upload.title")}</p>
-                        <p className="text-muted-foreground font-medium text-sm tracking-wide">{t(`upload.${mode}_desc`)}</p>
+                        <p className="text-foreground/80 font-medium text-sm tracking-wide">{t(`upload.${mode}_desc`)}</p>
                       </div>
-                      <div className="mt-4 px-8 py-3 bg-muted rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground border border-border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary/50 transition-all">
+                      <div className="mt-4 px-8 py-3 bg-muted rounded-full text-[10px] font-black uppercase tracking-widest text-foreground/70 border border-border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary/50 transition-all">
                         {t("select_file") || "Browse Local Storage"}
                       </div>
                       <input
@@ -274,7 +274,7 @@ export default function AiInspectorTab() {
                       <Loader2 className="w-16 h-16 text-primary animate-spin" />
                       <div className="text-center space-y-1">
                         <p className="font-black tracking-[0.3em] text-sm uppercase text-primary animate-pulse">{t("analyzing")}</p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-60 tracking-wider">
+                        <p className="text-[10px] font-bold text-foreground/80 uppercase opacity-60 tracking-wider">
                           {mode === "video" ? t("video_processing_wasm") || "Running FFmpeg on WASM Core..." : t("processing_local") || "Computing Visual Signals..."}
                         </p>
                       </div>
@@ -316,7 +316,7 @@ export default function AiInspectorTab() {
                   </button>
                   <button
                     onClick={reset}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-border rounded-xl text-[11px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all shadow-sm"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-border rounded-xl text-[11px] font-black uppercase tracking-widest text-foreground/80 hover:text-foreground transition-all shadow-sm"
                   >
                     <RefreshCw className="w-4 h-4 transition-transform group-hover:rotate-180" />
                     {t("start_over")}
@@ -345,7 +345,7 @@ export default function AiInspectorTab() {
                         <img src={previewUrl!} className="w-full h-full object-cover" alt="Source" crossOrigin="anonymous" />
                       </div>
                       <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-                        <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-3 opacity-60 italic">{t("file_info")}</p>
+                        <p className="text-[10px] text-foreground/80 uppercase font-black tracking-widest mb-3 opacity-60 italic">{t("file_info")}</p>
                         <p className="text-sm font-bold truncate text-foreground/80">{previewUrl?.split('/').pop()}</p>
                         <div className="mt-6 pt-6 border-t border-border flex items-center gap-3">
                           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -372,7 +372,7 @@ export default function AiInspectorTab() {
                           {t("forensic_extraction")}
                         </div>
                         <h3 className="text-4xl font-black tracking-tighter text-foreground">{t("video.analysis_report")}</h3>
-                        <p className="text-muted-foreground font-medium leading-relaxed">{t("video.report_desc")}</p>
+                        <p className="text-foreground/80 font-medium leading-relaxed">{t("video.report_desc")}</p>
                       </div>
                     </div>
                   </div>
@@ -391,8 +391,8 @@ export default function AiInspectorTab() {
           <ShieldCheck className="w-6 h-6 text-emerald-500/50" />
           <div className="h-px bg-border flex-1 max-w-[100px]" />
         </div>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">{t("verification_protocol") || "Verified ALMSTKSHF Local Forensic Protocol v1.4"}</p>
-        <p className="text-sm font-medium text-muted-foreground/70 max-w-2xl mx-auto leading-relaxed">{t("footer_disclaimer")}</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-foreground/80">{t("verification_protocol") || "Verified ALMSTKSHF Local Forensic Protocol v1.4"}</p>
+        <p className="text-sm font-medium text-foreground/70 max-w-2xl mx-auto leading-relaxed">{t("footer_disclaimer")}</p>
       </footer>
     </div>
   );

@@ -55,7 +55,7 @@ export default function BehindTheSceneClient() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-xl text-muted-foreground font-light leading-relaxed"
+                        className="text-xl text-foreground/80 font-light leading-relaxed"
                     >
                         {t("subtitle")}
                     </motion.p>
@@ -119,20 +119,20 @@ export default function BehindTheSceneClient() {
                                 <div className="relative">
                                     <div className="absolute -left-6 top-0 bottom-0 w-1 bg-primary/10 opacity-30 rounded-full hidden lg:block rtl:hidden"></div>
                                     <div className="absolute -right-6 top-0 bottom-0 w-1 bg-primary/10 opacity-30 rounded-full hidden lg:block ltr:hidden"></div>
-                                    <p className="text-lg text-muted-foreground leading-relaxed font-light">
+                                    <p className="text-lg text-foreground/80 leading-relaxed font-light">
                                         {t(`members.${member.key}.desc`)}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
-                                        <GraduationCap className="w-5 h-5 text-muted-foreground" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("expertise")}</p>
+                                        <GraduationCap className="w-5 h-5 text-foreground/70" />
+                                        <p className="text-xs font-bold uppercase tracking-widest text-foreground/70">{t("expertise")}</p>
                                         <p className="text-sm text-foreground/80">{t("strategy")}</p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
-                                        <Award className="w-5 h-5 text-muted-foreground" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("focus")}</p>
+                                        <Award className="w-5 h-5 text-foreground/70" />
+                                        <p className="text-xs font-bold uppercase tracking-widest text-foreground/70">{t("focus")}</p>
                                         <p className="text-sm text-foreground/80">{t("innovation")}</p>
                                     </div>
                                 </div>
@@ -179,7 +179,7 @@ function WhoWeAreSection() {
                     <h2 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
                         {t("title")}
                     </h2>
-                    <p className="text-muted-foreground text-lg leading-relaxed font-light">
+                    <p className="text-foreground/80 text-lg leading-relaxed font-light">
                         {t("intro")}
                     </p>
                 </div>
@@ -200,12 +200,12 @@ function WhoWeAreSection() {
                         <h3 className="text-3xl font-bold text-foreground tracking-tight">
                             {t("tech_driven.title")}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed font-light">
+                        <p className="text-foreground/80 leading-relaxed font-light">
                             {t("tech_driven.desc")}
                         </p>
                         <div className="flex flex-wrap gap-4">
                             {["speech_to_text", "deep_learning", "fingerprinting", "secure_architecture"].map((tag) => (
-                                <span key={tag} className="px-4 py-2 rounded-xl bg-muted border border-border text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                <span key={tag} className="px-4 py-2 rounded-xl bg-muted border border-border text-[10px] font-bold uppercase tracking-widest text-foreground/70">
                                     {t(`tech_driven.tags.${tag}`)}
                                 </span>
                             ))}

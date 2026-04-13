@@ -43,7 +43,7 @@ export function AnalyticsStrategy() {
                 <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                     {t("intro.title")}
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed transition-colors">
+                <p className="text-foreground/85 text-lg leading-relaxed transition-colors">
                     {t("intro.description")}
                 </p>
             </div>
@@ -68,7 +68,7 @@ export function AnalyticsStrategy() {
                                     </div>
                                     <h3 className="text-3xl font-bold text-foreground tracking-tight transition-colors">{t(`${s.key}.title`)}</h3>
                                 </div>
-                                <p className="text-muted-foreground leading-relaxed font-light transition-colors">
+                                <p className="text-foreground/80 leading-relaxed font-light transition-colors">
                                     {t(`${s.key}.description`)}
                                 </p>
                             </div>
@@ -78,7 +78,7 @@ export function AnalyticsStrategy() {
                                         <h4 className={clsx("font-bold text-sm uppercase tracking-wider transition-colors", s.color)}>
                                             {item.title}
                                         </h4>
-                                        <p className="text-muted-foreground text-xs leading-relaxed group-hover/item:text-foreground transition-colors">
+                                        <p className="text-foreground/80 text-xs leading-relaxed group-hover/item:text-foreground transition-colors">
                                             {item.desc}
                                         </p>
                                     </div>

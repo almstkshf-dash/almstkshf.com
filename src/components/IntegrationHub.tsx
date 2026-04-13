@@ -50,7 +50,7 @@ export default function IntegrationHub() {
                             <div className="flex gap-4">
                                 <div className={clsx(
                                     "w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
-                                    item.status === "connected" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                                    item.status === "connected" ? "bg-primary/10 text-primary" : "bg-muted text-foreground/60"
                                 )}>
                                     <Key className="w-6 h-6" />
                                 </div>
@@ -59,12 +59,12 @@ export default function IntegrationHub() {
                                         <h4 className="text-foreground font-bold">{item.name}</h4>
                                         <span className={clsx(
                                             "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
-                                            item.status === "connected" ? "border-emerald-500/20 text-emerald-500 bg-emerald-500/5" : "border-border text-muted-foreground bg-muted"
+                                            item.status === "connected" ? "border-emerald-500/20 text-emerald-500 bg-emerald-500/5" : "border-border text-foreground/60 bg-muted"
                                         )}>
                                             {item.status}
                                         </span>
                                     </div>
-                                    <p className="text-muted-foreground text-sm mt-1">{item.description}</p>
+                                    <p className="text-foreground/70 text-sm mt-1">{item.description}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -83,16 +83,16 @@ export default function IntegrationHub() {
                         {item.apiKey && (
                             <div className="px-6 py-4 bg-muted/50 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">API Key</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60 mb-2">API Key</p>
                                     <div className="flex items-center gap-3 font-mono text-sm">
-                                        <span className="text-muted-foreground truncate max-w-[200px] md:max-w-none">
+                                        <span className="text-foreground/60 truncate max-w-[200px] md:max-w-none">
                                             {showKey[item.id] ? item.apiKey : "••••••••••••••••••••••••••••"}
                                         </span>
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => toggleKey(item.id)}
-                                            className="text-muted-foreground hover:text-foreground transition-colors h-auto p-0 hover:bg-transparent shadow-none"
+                                            className="text-foreground/60 hover:text-foreground transition-colors h-auto p-0 hover:bg-transparent shadow-none"
                                         >
                                             {showKey[item.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </Button>
@@ -103,8 +103,8 @@ export default function IntegrationHub() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => copyToClipboard(item.apiKey!, item.id)}
-                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border text-muted-foreground text-xs font-semibold hover:bg-muted transition-colors h-auto shadow-none"
-                                        leftIcon={copied === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border text-foreground/70 text-xs font-semibold hover:bg-muted transition-colors h-auto shadow-none"
+                                        leftIcon={copied === item.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-foreground/60" />}
                                     >
                                         {copied === item.id ? (
                                             <span className="text-emerald-400">Copied</span>
@@ -115,7 +115,7 @@ export default function IntegrationHub() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="p-1.5 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors h-8 w-8 shadow-none"
+                                        className="p-1.5 rounded-lg bg-card border border-border text-foreground/60 hover:text-foreground hover:bg-muted transition-colors h-8 w-8 shadow-none"
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                     </Button>
@@ -132,7 +132,7 @@ export default function IntegrationHub() {
                 </div>
                 <div className="space-y-2">
                     <h4 className="text-foreground font-bold text-lg">Secure Integration Layer</h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xl">
+                    <p className="text-foreground/70 text-sm leading-relaxed max-w-xl">
                         All API keys are encrypted at rest using AES-256 and stored in your dedicated secure vault. No personnel can access these keys directly.
                     </p>
                 </div>

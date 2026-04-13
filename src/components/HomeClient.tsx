@@ -56,7 +56,7 @@ export default function HomeClient() {
                 style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
             >
                 <div className="mb-10 text-center">
-                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">{t('Clients.title')}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/70">{t('Clients.title')}</p>
                 </div>
 
                 <div className="relative flex overflow-x-hidden">
@@ -76,7 +76,7 @@ export default function HomeClient() {
                                 {Object.keys(t.raw('Clients.list')).map((key) => (
                                     <span
                                         key={`${outerIdx}-${key}`}
-                                        className="text-2xl md:text-3xl font-bold text-muted-foreground hover:text-primary transition-colors cursor-default select-none tracking-tight"
+                                        className="text-2xl md:text-3xl font-bold text-foreground/70 hover:text-primary transition-colors cursor-default select-none tracking-tight"
                                     >
                                         {t(`Clients.list.${key}`)}
                                     </span>
@@ -198,7 +198,7 @@ export default function HomeClient() {
                                     {t(`WhyChooseUs.${feature.id}.title`)}
                                 </h3>
 
-                                <p className="text-muted-foreground leading-relaxed font-light text-lg">
+                                <p className="text-foreground/80 leading-relaxed font-light text-lg">
                                     {t(`WhyChooseUs.${feature.id}.desc`)}
                                 </p>
 
@@ -222,8 +222,8 @@ export default function HomeClient() {
 
                                 {feature.id === 'ai_agent' && (
                                     <div className="mt-8 flex gap-3">
-                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.generate_report')}</div>
-                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t('Common.analyze_tone')}</div>
+                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-foreground/70">{t('Common.generate_report')}</div>
+                                        <div className="px-4 py-2 bg-muted/30 border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest text-foreground/70">{t('Common.analyze_tone')}</div>
                                     </div>
                                 )}
 
@@ -232,7 +232,7 @@ export default function HomeClient() {
                                         <div className="flex -space-x-2">
                                             {[1, 2, 3].map(i => (
                                                 <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-muted flex items-center justify-center">
-                                                    <Search className="w-3 h-3 text-muted-foreground" />
+                                                    <Search className="w-3 h-3 text-foreground/60" />
                                                 </div>
                                             ))}
                                         </div>

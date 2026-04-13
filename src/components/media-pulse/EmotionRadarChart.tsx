@@ -45,7 +45,7 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
                         <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
                         <PolarAngleAxis 
                             dataKey="subject" 
-                            tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
                         />
                         <Radar
                             name="Emotion"

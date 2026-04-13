@@ -194,7 +194,7 @@ export default function TerroristListTab() {
             </div>
             <div>
               <h2 className="text-lg font-bold tracking-tight">{t('title')}</h2>
-              <p className="text-xs text-muted-foreground font-medium">{t('subtitle')}</p>
+              <p className="text-xs text-foreground/70 font-medium">{t('subtitle')}</p>
             </div>
           </div>
 
@@ -238,7 +238,7 @@ export default function TerroristListTab() {
         {/* ─── Search & Filters ─── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
             <input
               type="text"
               value={searchQuery}
@@ -257,7 +257,7 @@ export default function TerroristListTab() {
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap",
                   filterType === type
                     ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                    : "bg-muted/20 border-border/60 text-muted-foreground hover:border-primary/30"
+                    : "bg-muted/20 border-border/60 text-foreground/60 hover:border-primary/30"
                 )}
               >
                 {t(`types.${type}`)}
@@ -273,46 +273,46 @@ export default function TerroristListTab() {
           <table className="w-full text-sm text-left border-collapse min-w-[1400px]">
             <thead>
               <tr className="bg-muted/40 border-b border-border">
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center min-w-[80px] sticky left-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center min-w-[80px] sticky left-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border">
                   {tCommon('status')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground sticky left-16 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border min-w-[200px]">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 sticky left-16 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border min-w-[200px]">
                   {t('fields.name_arabic')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[200px]">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[200px]">
                   {t('fields.name_latin')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[120px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.nationality')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[150px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[150px]">
                   {t('fields.doc_number')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[150px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[150px]">
                   {t('fields.category')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[120px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.dob')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[120px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.pob')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[250px]">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[250px]">
                   {t('fields.address')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[180px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[180px]">
                   {t('fields.issuing_authority')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[120px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.issue_date')}
                 </th>
-                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[120px]">
+                <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.expiry_date')}
                 </th>
-                <th className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-r border-border min-w-[400px]">
+                <th className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[400px]">
                   {t('fields.reasons')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground min-w-[250px]">
+                <th className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[250px]">
                   {t('fields.other_info')}
                 </th>
               </tr>
@@ -342,7 +342,7 @@ export default function TerroristListTab() {
                     <td className="px-6 py-3 font-bold text-foreground sticky left-16 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60">
                       {entry.nameArabic}
                     </td>
-                    <td className="px-6 py-3 text-xs font-semibold text-muted-foreground italic border-r border-border/40">
+                    <td className="px-6 py-3 text-xs font-semibold text-foreground/70 italic border-r border-border/40">
                       {entry.nameLatin || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs font-bold border-r border-border/40">
@@ -356,16 +356,16 @@ export default function TerroristListTab() {
                         {entry.category}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap border-r border-border/40">
+                    <td className="px-4 py-3 text-xs text-foreground/70 whitespace-nowrap border-r border-border/40">
                       {entry.dob || '—'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap border-r border-border/40">
+                    <td className="px-4 py-3 text-xs text-foreground/70 whitespace-nowrap border-r border-border/40">
                       {entry.pob || '—'}
                     </td>
-                    <td className="px-6 py-3 text-xs text-muted-foreground border-r border-border/40 leading-relaxed min-w-[250px]">
+                    <td className="px-6 py-3 text-xs text-foreground/70 border-r border-border/40 leading-relaxed min-w-[250px]">
                       {entry.address || '—'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground border-r border-border/40 font-medium">
+                    <td className="px-4 py-3 text-xs text-foreground/70 border-r border-border/40 font-medium">
                       {entry.issuingAuthority || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground border-r border-border/40 whitespace-nowrap">
@@ -377,7 +377,7 @@ export default function TerroristListTab() {
                     <td className="px-8 py-3 text-xs text-destructive/80 font-bold border-r border-border/40 leading-relaxed">
                       {entry.reasons || '—'}
                     </td>
-                    <td className="px-6 py-3 text-xs text-muted-foreground italic leading-relaxed">
+                    <td className="px-6 py-3 text-xs text-foreground/70 italic leading-relaxed">
                       {entry.otherInfo || '—'}
                     </td>
                   </motion.tr>
@@ -391,11 +391,11 @@ export default function TerroristListTab() {
         {entries?.length === 0 && (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <Search className="w-8 h-8 text-muted-foreground opacity-20" />
+              <Search className="w-8 h-8 text-foreground/20 opacity-20" />
             </div>
             <div className="space-y-1">
               <h3 className="font-bold text-lg">{t('no_results_title')}</h3>
-              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+              <p className="text-sm text-foreground/70 max-w-xs mx-auto">
                 {t('no_results_desc')}
               </p>
             </div>
@@ -437,14 +437,14 @@ export default function TerroristListTab() {
                     </div>
                     <div>
                       <h3 id="import-watchlist-title" className="text-xl font-bold">{t('import_modal.title')}</h3>
-                      <p className="text-xs text-muted-foreground font-medium">{t('import_modal.desc')}</p>
+                      <p className="text-xs text-foreground/70 font-medium">{t('import_modal.desc')}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => !importLoading && setIsImportModalOpen(false)}
                     disabled={importLoading}
                     aria-label={tCommon('cancel')}
-                    className="p-2 rounded-xl hover:bg-muted text-muted-foreground transition-all disabled:opacity-50 flex-shrink-0"
+                    className="p-2 rounded-xl hover:bg-muted text-foreground/60 transition-all disabled:opacity-50 flex-shrink-0"
                   >
                     <X className="w-4 h-4" aria-hidden="true" />
                   </button>
@@ -460,7 +460,7 @@ export default function TerroristListTab() {
                       className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
                     />
                     <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
-                      {importLoading ? <Clock className="w-6 h-6 text-primary animate-spin" /> : <Download className="w-6 h-6 text-muted-foreground" />}
+                      {importLoading ? <Clock className="w-6 h-6 text-primary animate-spin" /> : <Download className="w-6 h-6 text-foreground/60" />}
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-bold">
@@ -468,7 +468,7 @@ export default function TerroristListTab() {
                           ? `${t('import_modal.uploading')} (${importProgress.current}/${importProgress.total})`
                           : t('import_modal.drop_file')}
                       </p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mt-1">.xlsx, .xls, .csv ONLY</p>
+                      <p className="text-[10px] text-foreground/60 uppercase font-black tracking-widest mt-1">.xlsx, .xls, .csv ONLY</p>
                     </div>
                   </div>
 

@@ -87,7 +87,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
-          <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">
+          <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">
             {t("ai_probability")}
           </h3>
 
@@ -136,7 +136,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
 
         {/* Signals panel */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest ml-1 mb-2 flex items-center gap-2">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest ml-1 mb-2 flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
             {t("pixel_signals")}
           </h3>
@@ -152,13 +152,13 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                   <motion.div
                     key={cat}
                     whileHover={{ y: -2 }}
-                    className={`p-5 rounded-2xl border bg-white dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${anyDetected ? "border-rose-500/20" : "border-zinc-200 dark:border-zinc-800"}`}
+                    className={`p-5 rounded-2xl border bg-card dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${anyDetected ? "border-rose-500/20" : "border-zinc-200 dark:border-zinc-800"}`}
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <div className={`p-1.5 rounded-lg bg-${meta.color}-500/10 border border-${meta.color}-500/20`}>
                         <Icon className={`w-3.5 h-3.5 text-${meta.color}-500`} />
                       </div>
-                      <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                      <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
                         {t(meta.labelKey)}
                       </span>
                     </div>
@@ -189,10 +189,10 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                 <motion.div
                   key={signal.id}
                   whileHover={{ y: -2 }}
-                  className="p-5 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm shadow-zinc-200/50 dark:shadow-none"
+                  className="p-5 bg-card dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm shadow-zinc-200/50 dark:shadow-none"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-900">
+                    <div className="p-2 rounded-xl bg-muted dark:bg-zinc-900">
                       <SignalIcon risk={signal.risk} />
                     </div>
                     <span className={`text-[10px] font-black font-mono px-2 py-0.5 rounded-full ${signal.risk === "none" ? "bg-emerald-500/10 text-emerald-600" : signal.risk === "concern" ? "bg-amber-500/10 text-amber-600" : "bg-rose-500/10 text-rose-600"}`}>
@@ -238,7 +238,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Biometric Results */}
                 <div className="space-y-3">
-                  <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                     <Fingerprint className="w-3 h-3" />
                     {t("anatomy_consistency")}
                   </span>
@@ -261,7 +261,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
 
                 {/* OCR / Text Layer */}
                 <div className="space-y-3">
-                  <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                     <FileText className="w-3 h-3" />
                     {tCommon("ocr_detect")}
                   </span>
@@ -313,8 +313,8 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             { labelKey: "stat_sat_var", value: rich.stats.saturationVariance.toFixed(3), unit: "" },
             { labelKey: "stat_megapix", value: rich.stats.megapixels.toFixed(2), unit: "MP" },
           ].map(({ labelKey, value, unit }) => (
-            <div key={labelKey} className="p-4 bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
-              <span className="block text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">{t(labelKey)}</span>
+            <div key={labelKey} className="p-4 bg-card dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
+              <span className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{t(labelKey)}</span>
               <span className="block font-mono text-lg font-bold text-zinc-900 dark:text-zinc-100">{value}{unit}</span>
             </div>
           ))}
@@ -324,7 +324,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
       {/* ── Forensic Visualization ───────────────────────────────────────── */}
       <div className="p-10 bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden group">
         <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
             <Eye className="w-4 h-4" />
             {t("forensic_view")}
           </h3>
@@ -334,7 +334,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
           </span>
         </div>
 
-        <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+        <div className="relative aspect-video rounded-2xl overflow-hidden bg-card dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
           {/* Scanning line */}
           <motion.div
             initial={{ top: "-100%" }}
@@ -378,7 +378,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
           </div>
         </div>
 
-        <p className="mt-8 text-xs text-zinc-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+        <p className="mt-8 text-xs text-muted-foreground leading-relaxed italic text-center max-w-2xl mx-auto">
           {tCommon("footer_disclaimer")}
         </p>
       </div>

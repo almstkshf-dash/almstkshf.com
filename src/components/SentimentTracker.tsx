@@ -108,7 +108,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
             {!hasData && (
                 <div className="p-6 bg-muted/20 border border-border rounded-2xl text-center">
                     <Zap className="w-5 h-5 text-status-warning-fg/50 mx-auto mb-2" />
-                    <p className="text-muted-foreground text-xs">{t('no_data_message')}</p>
+                    <p className="text-foreground/70 text-xs">{t('no_data_message')}</p>
                 </div>
             )}
 
@@ -126,7 +126,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                 <div className="flex justify-between items-start mb-4">
                                     <div>
                                         <h4 className="text-foreground font-bold text-sm tracking-tight">{data.source}</h4>
-                                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-medium">
+                                        <p className="text-[9px] text-foreground/70 uppercase tracking-widest font-medium">
                                             {t('source_analysis')} · {data.count} {t('articles')}
                                         </p>
                                     </div>
@@ -151,7 +151,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                             "text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 transition-colors",
                                             data.trend > 0 ? "bg-status-success-bg text-status-success-fg" :
                                                 data.trend < 0 ? "bg-status-error-bg text-status-error-fg" :
-                                                    "bg-muted text-muted-foreground"
+                                                    "bg-muted text-foreground/70"
                                         )}>
                                             {data.trend > 0 ? "+" : ""}{data.trend}% {t('shift')}
                                         </span>
@@ -171,7 +171,7 @@ export default function SentimentTracker({ articles = [] }: SentimentTrackerProp
                                         />
                                     </div>
 
-                                    <div className="text-[10px] text-muted-foreground">
+                                    <div className="text-[10px] text-foreground/70">
                                         {t('reach')}: {data.reach.toLocaleString()}
                                     </div>
                                 </div>

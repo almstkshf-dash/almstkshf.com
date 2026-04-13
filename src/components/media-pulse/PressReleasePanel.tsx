@@ -92,7 +92,7 @@ export default function PressReleasePanel() {
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-foreground">{t('title')}</h3>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="text-[11px] text-foreground/70">
                             {t('subtitle', { count: PR_WIRES.length })}
                         </p>
                     </div>
@@ -112,7 +112,7 @@ export default function PressReleasePanel() {
                 {/* Row 1: keyword + limit */}
                 <div className="flex gap-3">
                     <div className="flex-1 relative">
-                        <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
                         <label htmlFor="pr-keyword-input" className="sr-only">{t('keyword_placeholder')}</label>
                         <input
                             id="pr-keyword-input"
@@ -121,12 +121,12 @@ export default function PressReleasePanel() {
                             value={keyword}
                             onChange={e => setKeyword(e.target.value)}
                             placeholder={t('keyword_placeholder')}
-                            className="w-full pl-9 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50"
+                            className="w-full pl-9 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-foreground/40"
                             disabled={loading}
                         />
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                        <label htmlFor="pr-limit-per-feed" className="text-xs text-muted-foreground whitespace-nowrap">{t('max_per_feed')}</label>
+                        <label htmlFor="pr-limit-per-feed" className="text-xs text-foreground/60 whitespace-nowrap">{t('max_per_feed')}</label>
                         <input
                             id="pr-limit-per-feed"
                             name="limitPerFeed"
@@ -144,7 +144,7 @@ export default function PressReleasePanel() {
                 {/* Row 2: date range + sync button */}
                 <div className="flex gap-3 items-center">
                     <div className="flex items-center gap-2 flex-1">
-                        <label htmlFor="pr-date-from" className="text-xs text-muted-foreground whitespace-nowrap">{t('date_from')}</label>
+                        <label htmlFor="pr-date-from" className="text-xs text-foreground/60 whitespace-nowrap">{t('date_from')}</label>
                         <input
                             id="pr-date-from"
                             name="dateFrom"
@@ -154,7 +154,7 @@ export default function PressReleasePanel() {
                             className="flex-1 px-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                             disabled={loading}
                         />
-                        <label htmlFor="pr-date-to" className="text-xs text-muted-foreground whitespace-nowrap">{t('date_to')}</label>
+                        <label htmlFor="pr-date-to" className="text-xs text-foreground/60 whitespace-nowrap">{t('date_to')}</label>
                         <input
                             id="pr-date-to"
                             name="dateTo"
@@ -168,7 +168,7 @@ export default function PressReleasePanel() {
                         {(dateFrom || dateTo) && (
                             <button
                                 onClick={() => { setDateFrom(''); setDateTo(''); }}
-                                className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
+                                className="text-xs text-foreground/80 hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
                                 title={t('clear')}
                             >
                                 ✕
@@ -198,7 +198,7 @@ export default function PressReleasePanel() {
                     {PR_WIRES.map(w => (
                         <span
                             key={w.name}
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-muted border border-border text-muted-foreground"
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-muted border border-border text-foreground/70"
                         >
                             <span>{w.flag}</span>
                             {w.name}
@@ -263,7 +263,7 @@ export default function PressReleasePanel() {
                 )}
 
                 {/* Cron hint */}
-                <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 border-t border-border/50 pt-4">
+                <p className="text-[11px] text-foreground/60 flex items-center gap-1.5 border-t border-border/50 pt-4">
                     <Clock className="w-3 h-3 flex-shrink-0" />
                     {t('cron_hint')}
                 </p>

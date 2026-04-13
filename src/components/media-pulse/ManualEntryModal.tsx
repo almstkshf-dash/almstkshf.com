@@ -183,7 +183,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         size="icon"
                         onClick={onClose}
                         disabled={isLoading}
-                        className="text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-foreground/80 hover:text-foreground transition-colors"
                         aria-label={t('cancel')}
                     >
                         <X className="h-6 w-6" aria-hidden="true" />
@@ -193,7 +193,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="article_title" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('article_title')}</label>
+                            <label htmlFor="article_title" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('article_title')}</label>
                             <input
                                 id="article_title"
                                 name="article_title"
@@ -207,7 +207,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                         <div>
-                            <label htmlFor="source_name" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('source_name')}</label>
+                            <label htmlFor="source_name" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('source_name')}</label>
                             <input
                                 id="source_name"
                                 name="source_name"
@@ -224,7 +224,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="pub_date" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('date')}</label>
+                            <label htmlFor="pub_date" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('date')}</label>
                             <input
                                 id="pub_date"
                                 name="pub_date"
@@ -236,7 +236,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                         <div>
-                            <label htmlFor="article_url" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('url_optional')}</label>
+                            <label htmlFor="article_url" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('url_optional')}</label>
                             <div className="flex gap-2">
                                 <input
                                     id="article_url"
@@ -268,7 +268,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label htmlFor="source_type" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('type')}</label>
+                            <label htmlFor="source_type" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('type')}</label>
                             <select
                                 id="source_type"
                                 name="source_type"
@@ -284,7 +284,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="sentiment" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('sentiment')}</label>
+                            <label htmlFor="sentiment" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('sentiment')}</label>
                             <select
                                 id="sentiment"
                                 name="sentiment"
@@ -298,7 +298,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="reach" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('reach')}</label>
+                            <label htmlFor="reach" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('reach')}</label>
                             <input
                                 id="reach"
                                 name="reach"
@@ -318,7 +318,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                         <div>
-                            <label htmlFor="source_country" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('country')}</label>
+                            <label htmlFor="source_country" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('country')}</label>
                             <input
                                 id="source_country"
                                 name="source_country"
@@ -335,7 +335,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <label htmlFor="likes" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('likes')}</label>
+                            <label htmlFor="likes" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('likes')}</label>
                             <input
                                 id="likes"
                                 name="likes"
@@ -347,7 +347,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                         <div>
-                            <label htmlFor="retweets" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('retweets')}</label>
+                            <label htmlFor="retweets" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('retweets')}</label>
                             <input
                                 id="retweets"
                                 name="retweets"
@@ -359,7 +359,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                         <div>
-                            <label htmlFor="replies" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('replies')}</label>
+                            <label htmlFor="replies" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('replies')}</label>
                             <input
                                 id="replies"
                                 name="replies"
@@ -373,7 +373,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                     </div>
 
                     <div>
-                        <label htmlFor="content" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('content')}</label>
+                        <label htmlFor="content" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('content')}</label>
                         <textarea
                             id="content"
                             name="content"
@@ -388,7 +388,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                     </div>
 
                     <div>
-                        <label htmlFor="evidence_image" className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 transition-colors">{t('evidence_image')}</label>
+                        <label htmlFor="evidence_image" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('evidence_image')}</label>
                         <div className="flex items-center gap-4 p-4 border-2 border-dashed border-border rounded-xl bg-muted/50 transition-colors">
                             <input
                                 id="evidence_image"
@@ -396,7 +396,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageUpload}
-                                className="block w-full text-sm text-muted-foreground transition-colors
+                                className="block w-full text-sm text-foreground/60 transition-colors
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-xs file:font-bold file:uppercase file:tracking-wider
@@ -415,7 +415,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                         <Button
                             variant="ghost"
                             onClick={onClose}
-                            className="px-6 py-3 rounded-xl text-muted-foreground hover:text-foreground font-medium transition-colors h-auto shadow-none"
+                            className="px-6 py-3 rounded-xl text-foreground/80 hover:text-foreground font-medium transition-colors h-auto shadow-none"
                         >
                             {t('cancel')}
                         </Button>

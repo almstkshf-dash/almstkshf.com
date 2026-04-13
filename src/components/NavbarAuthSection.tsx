@@ -32,7 +32,7 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
             <div className="hidden lg:flex items-center gap-2">
                 <SignedOut>
                     <SignInButton mode="modal">
-                        <button className="px-4 py-2 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors">
+                        <button className="px-4 py-2 text-sm font-medium text-foreground/85 hover:text-foreground transition-colors">
                             {loginLabel}
                         </button>
                     </SignInButton>

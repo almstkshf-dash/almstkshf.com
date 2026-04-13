@@ -244,13 +244,13 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                     </div>
                                 )}
                                 <div className="px-3 py-1 bg-primary/15 border border-primary/20 rounded-full text-[10px] font-bold text-primary dark:text-blue-300 transition-colors uppercase tracking-widest">{t('real_time')}</div>
-                                <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center transition-colors">{t('global')}</div>
+                                <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-foreground/80 uppercase tracking-widest text-center transition-colors">{t('global')}</div>
                             </div>
                         </div>
 
                         {uniqueKeywords.length > 0 && (
                             <div className="flex flex-wrap items-center gap-2 mb-6">
-                                <span className={clsx("text-[10px] font-bold text-muted-foreground uppercase tracking-widest")}>
+                                <span className={clsx("text-[10px] font-bold text-foreground/80 uppercase tracking-widest")}>
                                     {t('keywords') || 'Keywords'}:
                                 </span>
                                 {uniqueKeywords.map((kw: string) => (
@@ -272,7 +272,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                             </div>
                             <h3 className="text-2xl font-bold text-foreground transition-colors">{t('reputation_safeguard')}</h3>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed transition-colors">
+                        <p className="text-sm text-foreground/80 leading-relaxed transition-colors">
                             {t('reputation_desc')}
                         </p>
                         <div className="flex gap-3">
@@ -299,7 +299,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {/* Identified Risk Factors */}
                         {analytics?.riskFactors && analytics.riskFactors.length > 0 && (
                             <div className="space-y-2 pt-4 border-t border-border mt-2">
-                                <h5 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3">{t('top_risk_indicators') || "Active Risk Indicators"}</h5>
+                                <h5 className="text-[9px] font-black uppercase tracking-widest text-foreground/80 mb-3">{t('top_risk_indicators') || "Active Risk Indicators"}</h5>
                                 <div className="flex flex-col gap-2">
                                     {analytics.riskFactors.map(factor => (
                                         <div key={factor} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-destructive/5 border border-destructive/10 group transition-all hover:bg-destructive/10">
@@ -347,7 +347,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {/* Emotions breakdown table/list */}
                         {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
                             <div className="pt-6 border-t border-border mt-2 space-y-4">
-                                <h5 className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                <h5 className="text-[10px] font-bold text-foreground/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
                                     <TrendingUp className="w-3 h-3 text-primary" />
                                     {t('top_emotions')}
                                 </h5>
@@ -425,12 +425,12 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                                     "inline-flex items-center justify-center min-w-[2.5rem] h-5 px-1.5 rounded text-[9px] font-black uppercase tracking-tight border transition-colors",
                                                     index === 0
                                                         ? "bg-primary text-primary-foreground border-primary/30 shadow-sm shadow-primary/20"
-                                                        : "bg-muted text-muted-foreground border-border"
+                                                        : "bg-muted text-foreground/70 border-border"
                                                 )}>
                                                     {code}
                                                 </span>
                                             </span>
-                                            <span className="text-[10px] text-muted-foreground tabular-nums">
+                                            <span className="text-[10px] text-foreground/80 tabular-nums">
                                                 <span className={clsx("font-black", index === 0 ? "text-primary" : "text-foreground")}>
                                                     {pct}%
                                                 </span>
@@ -502,7 +502,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {toneDistribution.map((item) => (
                             <div key={item.label} className="space-y-3 group/item">
                                 <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.15em]">
-                                    <span className="text-muted-foreground flex items-center gap-2 group-hover/item:text-foreground transition-colors">
+                                    <span className="text-foreground/80 flex items-center gap-2 group-hover/item:text-foreground transition-colors">
                                         <item.icon className="w-3.5 h-3.5" />
                                         {item.label}
                                     </span>
@@ -545,12 +545,12 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 {unreadNotifs.slice(0, 3).map((notif) => (
                                     <div key={notif._id} className="p-2.5 bg-background/60 backdrop-blur-sm rounded-xl border border-border/50 text-[10px] shadow-sm">
                                         <div className="font-bold text-foreground mb-0.5 line-clamp-1">{notif.title}</div>
-                                        <div className="text-muted-foreground line-clamp-2 leading-relaxed">{notif.message}</div>
+                                        <div className="text-foreground/70 line-clamp-2 leading-relaxed">{notif.message}</div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-muted-foreground text-[10px] leading-relaxed transition-colors mt-2">
+                            <p className="text-foreground/70 text-[10px] leading-relaxed transition-colors mt-2">
                                 {t('alerts_desc')}
                             </p>
                         )}
@@ -574,7 +574,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         </div>
                         <div className="space-y-1">
                             <h4 className="text-2xl font-black text-foreground tracking-tight">{t('volume_heatmap_title')}</h4>
-                            <p className="text-sm text-muted-foreground font-medium uppercase tracking-widest">{t('volume_heatmap_desc')}</p>
+                            <p className="text-sm text-foreground/70 font-medium uppercase tracking-widest">{t('volume_heatmap_desc')}</p>
                         </div>
                     </div>
                 </div>

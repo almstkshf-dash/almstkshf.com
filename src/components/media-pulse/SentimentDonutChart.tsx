@@ -92,7 +92,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
             {/* NSS Index Overlay */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center pb-2">
                 <div className="text-2xl font-bold">{nssIndex}%</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                <div className="text-[10px] text-foreground/70 uppercase tracking-wider">
                     {t("nss_index")}
                 </div>
             </div>

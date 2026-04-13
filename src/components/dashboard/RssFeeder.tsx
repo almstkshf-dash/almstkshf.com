@@ -99,7 +99,7 @@ export default function RssFeeder({
               {activeName || t('title')}
             </h3>
             {lastSynced && (
-              <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <p className="text-[10px] text-foreground/70 flex items-center gap-1">
                 <Clock size={10} />
                 {t('last_updated')}: {format.relativeTime(lastSynced, { now: new Date() })}
               </p>
@@ -110,7 +110,7 @@ export default function RssFeeder({
         <button
           onClick={() => fetchFeed()}
           disabled={isLoading}
-          className="p-2 hover:bg-muted rounded-full transition-colors disabled:opacity-50 text-muted-foreground hover:text-foreground"
+          className="p-2 hover:bg-muted rounded-full transition-colors disabled:opacity-50 text-foreground/60 hover:text-foreground"
           title="Refresh Feed"
         >
           <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
@@ -129,7 +129,7 @@ export default function RssFeeder({
               }}
               className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${activeUrl === cat.url
                 ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                : 'bg-muted/30 text-muted-foreground border-border/50 hover:border-border hover:bg-muted/50'
+                : 'bg-muted/30 text-foreground/70 border-border/50 hover:border-border hover:bg-muted/50'
                 }`}
             >
               {cat.name}
@@ -147,7 +147,7 @@ export default function RssFeeder({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground"
+              className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-foreground/60"
             >
               <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
               <p className="text-sm font-medium">{t('loading')}</p>
@@ -179,7 +179,7 @@ export default function RssFeeder({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center gap-3 text-muted-foreground"
+              className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center gap-3 text-foreground/60"
             >
               <Database size={32} strokeWidth={1.5} className="opacity-50" />
               <p className="text-sm">{t('no_items')}</p>
@@ -209,10 +209,10 @@ export default function RssFeeder({
                       >
                         {item.title}
                       </a>
-                      <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground flex-shrink-0 mt-1" />
+                      <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-foreground/60 flex-shrink-0 mt-1" />
                     </div>
 
-                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                    <div className="flex items-center gap-3 text-[11px] text-foreground/70 font-bold uppercase tracking-wider">
                       <span className="flex items-center gap-1 px-1.5 py-0.5 bg-muted/50 rounded-md">
                         {item.source}
                       </span>
@@ -229,7 +229,7 @@ export default function RssFeeder({
 
                     {/* Note: Sanitize and safely strip all HTML tags using DOMPurify */}
                     {item.description && (
-                      <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-foreground/70 line-clamp-2 leading-relaxed">
                         {typeof window !== 'undefined'
                           ? DOMPurify.sanitize(item.description, { ALLOWED_TAGS: [] }).slice(0, 150)
                           : item.description.replace(/<[^>]*>/g, '').slice(0, 150)}...
@@ -254,7 +254,7 @@ export default function RssFeeder({
 
               {/* Footer CTA */}
               <div className="p-3 bg-muted/20 flex justify-center">
-                <button className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5 uppercase tracking-widest">
+                <button className="text-[11px] font-bold text-foreground/70 hover:text-primary transition-colors flex items-center gap-1.5 uppercase tracking-widest">
                   <BarChart3 size={12} />
                   {t('analyze')}
                 </button>

@@ -83,7 +83,7 @@ export default function CrisisManagementClient() {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-muted-foreground text-xl leading-relaxed max-w-3xl mx-auto"
+                            className="text-foreground/80 text-xl leading-relaxed max-w-3xl mx-auto"
                         >
                             {t("description")}
                         </motion.p>
@@ -110,7 +110,7 @@ export default function CrisisManagementClient() {
                                 <h3 className="text-2xl font-bold text-foreground mb-6 group-hover:text-primary transition-colors">
                                     {t(`features.${feature.key}.title`)}
                                 </h3>
-                                <p className="text-muted-foreground leading-relaxed font-light">
+                                <p className="text-foreground/80 leading-relaxed font-light">
                                     {t(`features.${feature.key}.desc`)}
                                 </p>
                             </motion.div>
@@ -130,7 +130,7 @@ export default function CrisisManagementClient() {
                             <h2 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
                                 {t("features.multimedia_osint.title")}
                             </h2>
-                            <p className="text-muted-foreground text-lg leading-relaxed">
+                            <p className="text-foreground/80 text-lg leading-relaxed">
                                 {t("features.multimedia_osint.desc")}
                             </p>
                         </div>
@@ -151,7 +151,7 @@ export default function CrisisManagementClient() {
                                         </div>
                                         <div>
                                             <h4 className="text-foreground font-bold mb-2 uppercase tracking-wider text-sm">{item.title}</h4>
-                                            <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+                                            <p className="text-foreground/70 text-sm leading-relaxed">{item.desc}</p>
                                         </div>
                                     </motion.div>
                                 );
@@ -173,7 +173,7 @@ export default function CrisisManagementClient() {
                         >
                             {t("advanced_infrastructure.title")}
                         </motion.h2>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                        <p className="text-foreground/80 text-lg max-w-2xl mx-auto">
                             {t("advanced_infrastructure.subtitle")}
                         </p>
                     </div>
@@ -197,10 +197,10 @@ export default function CrisisManagementClient() {
                                         <item.icon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-xl font-bold text-foreground mb-4">{t(`advanced_infrastructure.items.${item.key}.title`)}</h3>
-                                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
+                                    <p className="text-foreground/70 text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
                                     <div className="pt-4 border-t border-border flex items-center gap-3">
                                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
                                     </div>
                                 </motion.div>
                             ))}
@@ -221,7 +221,7 @@ export default function CrisisManagementClient() {
 
                                 {/* Mock Data Chart / Visual */}
                                 <div className="w-full bg-background/50 rounded-2xl p-6 border border-border space-y-4 shadow-inner">
-                                    <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase">
+                                    <div className="flex items-center justify-between text-[10px] font-bold text-foreground/70 uppercase">
                                         <span>{t('visual_data.flow')}</span>
                                         <span className="text-primary">98.4% {t('visual_data.efficiency')}</span>
                                     </div>
@@ -239,18 +239,18 @@ export default function CrisisManagementClient() {
                                     <div className="grid grid-cols-2 gap-4 pt-2">
                                         <div className="text-start">
                                             <div className="text-lg font-bold text-foreground">12.4M</div>
-                                            <div className="text-[8px] text-muted-foreground uppercase tracking-wider">{t('visual_data.entries')}</div>
+                                            <div className="text-[8px] text-foreground/70 uppercase tracking-wider">{t('visual_data.entries')}</div>
                                         </div>
                                         <div className="text-end">
                                             <div className="text-lg font-bold text-foreground">~45ms</div>
-                                            <div className="text-[8px] text-muted-foreground uppercase tracking-wider">{t('visual_data.latency')}</div>
+                                            <div className="text-[8px] text-foreground/70 uppercase tracking-wider">{t('visual_data.latency')}</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-4">
                                     {['social', 'tv_radio', 'forums'].map((tag) => (
-                                        <div key={tag} className="px-3 py-2 rounded-lg bg-card border border-border text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                                        <div key={tag} className="px-3 py-2 rounded-lg bg-card border border-border text-[10px] font-bold text-foreground/70 uppercase tracking-tighter">
                                             {t(`visual_data.tags.${tag}`)}
                                         </div>
                                     ))}
@@ -277,10 +277,10 @@ export default function CrisisManagementClient() {
                                         <item.icon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-xl font-bold text-foreground mb-4">{t(`advanced_infrastructure.items.${item.key}.title`)}</h3>
-                                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
+                                    <p className="text-foreground/70 text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
                                     <div className="pt-4 border-t border-border flex items-center gap-3">
                                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
                                     </div>
                                 </motion.div>
                             ))}
@@ -296,7 +296,7 @@ export default function CrisisManagementClient() {
                         <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-4">
                             {t("dashboard_section.title")}
                         </h2>
-                        <p className="text-muted-foreground text-lg">{t("dashboard_section.subtitle")}</p>
+                        <p className="text-foreground/80 text-lg">{t("dashboard_section.subtitle")}</p>
                     </div>
                     <MediaMonitoringDashboard defaultFilter="TV" />
                 </Container>

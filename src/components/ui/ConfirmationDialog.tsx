@@ -89,7 +89,7 @@ export default function ConfirmationDialog({
                                     onClick={onClose}
                                     disabled={isLoading}
                                     aria-label={t('cancel')}
-                                    className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground transition-all disabled:opacity-50"
+                                    className="p-2 rounded-xl border border-border hover:bg-muted text-foreground/60 transition-all disabled:opacity-50"
                                 >
                                     <X className="w-4 h-4" aria-hidden="true" />
                                 </button>
@@ -97,7 +97,7 @@ export default function ConfirmationDialog({
 
                             <div className="space-y-2">
                                 <h3 id="dialog-title" className="text-xl font-bold tracking-tight text-foreground">{title}</h3>
-                                <p id="dialog-description" className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+                                <p id="dialog-description" className="text-sm text-foreground/70 leading-relaxed">{description}</p>
                             </div>
 
                             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">

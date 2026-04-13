@@ -101,7 +101,7 @@ function StatPill({
         : 'bg-zinc-50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800'
         }`}
     >
-      <span className="block text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1">
+      <span className="block text-[9px] font-black uppercase tracking-widest text-foreground/60 mb-1">
         {label}
       </span>
       <span
@@ -149,7 +149,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
-          <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">
+          <h3 className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-4">
             {t('video_probability')}
           </h3>
 
@@ -185,8 +185,8 @@ export default function VideoResults({ result }: VideoResultsProps) {
               },
             ].map(({ icon: Icon, label, value, key }) => (
               <div key={key} className="flex items-center gap-2">
-                <Icon className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                <span className="text-[10px] text-zinc-500 truncate">
+                <Icon className="w-3.5 h-3.5 text-foreground/60 shrink-0" />
+                <span className="text-[10px] text-foreground/60 truncate">
                   {label}: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{value}</span>
                 </span>
               </div>
@@ -196,7 +196,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
         {/* Aggregate metrics (2 cols) */}
         <div className="md:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ml-1">
             <BarChart3 className="w-4 h-4" />
             {t('temporal_metrics')}
           </h3>
@@ -243,7 +243,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               <motion.div
                 key={key}
                 whileHover={{ y: -2 }}
-                className={`p-5 rounded-2xl border bg-white dark:bg-zinc-950 shadow-sm shadow-zinc-200/50 dark:shadow-none ${warn
+                className={`p-5 rounded-2xl border bg-card dark:bg-muted/50 shadow-sm shadow-zinc-200/50 dark:shadow-none ${warn
                   ? 'border-rose-500/20'
                   : 'border-zinc-200 dark:border-zinc-800'
                   }`}
@@ -256,10 +256,10 @@ export default function VideoResults({ result }: VideoResultsProps) {
                       }`}
                   >
                     <Icon
-                      className={`w-3.5 h-3.5 ${warn ? 'text-rose-500' : 'text-zinc-500'}`}
+                      className={`w-3.5 h-3.5 ${warn ? 'text-rose-500' : 'text-foreground/60'}`}
                     />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-foreground/60">
                     {label}
                   </span>
                 </div>
@@ -270,7 +270,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                   {value}
                   <span className="text-sm">{unit}</span>
                 </p>
-                <p className="text-[10px] text-zinc-400 mt-1 leading-snug">{desc}</p>
+                <p className="text-[10px] text-foreground/60 mt-1 leading-snug">{desc}</p>
               </motion.div>
             ))}
           </div>
@@ -281,11 +281,11 @@ export default function VideoResults({ result }: VideoResultsProps) {
       {hasRichFrames && (
         <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2">
               <Activity className="w-4 h-4" />
               {t('temporal_flicker')}
             </h3>
-            <span className="text-[10px] font-mono text-zinc-500 bg-zinc-200/50 dark:bg-zinc-800 px-2 py-0.5 rounded italic">
+            <span className="text-[10px] font-mono text-foreground/60 bg-zinc-200/50 dark:bg-zinc-800 px-2 py-0.5 rounded italic">
               {result.temporalFlicker?.toFixed(4) ?? '—'} {t('variance_coeff')}
             </span>
           </div>
@@ -315,13 +315,13 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
           {/* X-axis timestamps */}
           <div className="flex justify-between px-2">
-            <span className="text-[9px] font-mono text-zinc-400">0s</span>
-            <span className="text-[9px] font-mono text-zinc-400">
+            <span className="text-[9px] font-mono text-foreground/60">0s</span>
+            <span className="text-[9px] font-mono text-foreground/60">
               {result.duration?.toFixed(1) ?? '?'}s
             </span>
           </div>
 
-          <p className="text-xs text-zinc-500 leading-relaxed mt-4 max-w-sm ml-auto text-right italic">
+          <p className="text-xs text-foreground/60 leading-relaxed mt-4 max-w-sm ml-auto text-right italic">
             {t('flicker_info')}
           </p>
         </div>
@@ -331,7 +331,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
       {!hasRichFrames && result.frameReports.length > 0 && (
         <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2">
               <Activity className="w-4 h-4" />
               {t('temporal_flicker')}
             </h3>
@@ -357,7 +357,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
       {/* ── Row 3 : Frame thumbnail scrubber ────────────────────────────── */}
       <div className="space-y-4">
-        <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2 ml-1">
+        <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ml-1">
           <History className="w-4 h-4" />
           {t('frame_timeline')}
         </h3>
@@ -441,20 +441,20 @@ export default function VideoResults({ result }: VideoResultsProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="p-8 bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none"
+          className="p-8 bg-card dark:bg-muted/50 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none"
         >
           <div className="flex items-center gap-4 mb-8">
-            <div className="h-10 w-10 rounded-full bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900">
+            <div className="h-10 w-10 rounded-full bg-muted dark:bg-zinc-100 flex items-center justify-center text-foreground dark:text-zinc-900">
               <Layers className="w-5 h-5" />
             </div>
             <div>
               <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">
                 {t('analysis_report')}{' '}
-                <span className="text-zinc-400 opacity-50 ml-2">
+                <span className="text-foreground/60 opacity-50 ml-2">
                   #{String(selectedFrame + 1).padStart(2, '0')}
                 </span>
               </h4>
-              <p className="text-xs text-zinc-500 font-medium">
+              <p className="text-xs text-foreground/60 font-medium">
                 {t('report_desc')}
               </p>
             </div>
@@ -518,7 +518,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {/* Signal chips */}
               {currentFrame && (
                 <div className="space-y-3">
-                  <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">
+                  <span className="text-[10px] font-black text-foreground/60 uppercase tracking-widest block">
                     {t('detected_signals')}
                   </span>
                   <div className="flex flex-wrap gap-2">
@@ -546,7 +546,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {!currentFrame &&
                 result.frameReports[selectedFrame]?.report.pixelLogicSignals && (
                   <div>
-                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block mb-3">
+                    <span className="text-[10px] font-black text-foreground/60 uppercase tracking-widest block mb-3">
                       {t('signal_methodology')}
                     </span>
                     <div className="grid grid-cols-2 gap-3">
@@ -557,7 +557,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                           key={sig.id}
                           className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-900 flex flex-col justify-center items-center text-center"
                         >
-                          <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-1">
+                          <span className="text-[9px] font-black text-foreground/60 uppercase tracking-widest mb-1">
                             {sig.label}
                           </span>
                           <span
@@ -579,7 +579,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {/* Pixel stats strip */}
               {currentStats && (
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">
+                  <span className="text-[10px] font-black text-foreground/60 uppercase tracking-widest block">
                     {t('frame_pixel_stats')}
                   </span>
                   <div className="grid grid-cols-2 gap-2">
@@ -659,14 +659,14 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 <h4 className="text-sm font-black uppercase tracking-[0.2em] text-blue-500/80">
                   {tCommon("biometric_scouts")}
                 </h4>
-                <p className="text-xs text-muted-foreground font-medium">
+                <p className="text-xs text-foreground/60 font-medium">
                   {t('deep_analysis_desc')}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 px-4 py-1.5 bg-white/50 dark:bg-black/50 rounded-full border border-border/50">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-tight text-muted-foreground italic">
+              <span className="text-[10px] font-black uppercase tracking-tight text-foreground/60 italic">
                 {tCommon("zero_api_notice")}
               </span>
             </div>
@@ -675,7 +675,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Biometric Results */}
             <div className="space-y-4">
-              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+              <span className="text-[10px] font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2">
                 <Fingerprint className="w-4 h-4" />
                 {t('anatomical_consistency')}
               </span>
@@ -698,13 +698,13 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
             {/* OCR / Text Layer */}
             <div className="space-y-4">
-              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+              <span className="text-[10px] font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 {tCommon("ocr_detect")}
               </span>
               <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">{t('pixel_pattern_ocr')}</span>
+                  <span className="text-[10px] font-bold text-foreground/60 uppercase">{t('pixel_pattern_ocr')}</span>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded ${result.deepMl.ocr.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
                     {result.deepMl.ocr.isGarbled ? t('status_suspicious') : t('status_clean')}
                   </span>
@@ -734,7 +734,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
 
       {/* ── Footer disclaimer ──────────────────────────────────────────────── */}
-      <p className="text-xs text-zinc-400 leading-relaxed italic text-center max-w-2xl mx-auto">
+      <p className="text-xs text-foreground/60 leading-relaxed italic text-center max-w-2xl mx-auto">
         {tCommon('footer_disclaimer')}
       </p>
 

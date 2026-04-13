@@ -59,7 +59,7 @@ export class ReportGenerator {
      * Specialized Press Release Report (Reach & AVE Focus)
      */
     static async exportPressReleaseReport(articles: ReportArticle[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
-        const title = translations.reports?.pr_title || 'Press Release Coverage Report';
+        const title = translations.Reports?.pr_title || 'Press Release Coverage Report';
         if (format === 'excel') {
             return this.generateExcel(articles, translations, title);
         }
@@ -70,7 +70,7 @@ export class ReportGenerator {
      * Deep Web Risk Assessment Report
      */
     static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[] | Record<string, unknown>, translations: any, format: 'pdf' | 'excel' = 'pdf') {
-        const title = translations.reports?.deep_title || 'Deep Web Risk Assessment';
+        const title = translations.Reports?.deep_title || 'Deep Web Risk Assessment';
         const threatList: ReportArticle[] = Array.isArray(threats) ? threats : [];
         if (format === 'excel') {
             return this.generateExcel(threatList, translations, title);
@@ -193,21 +193,21 @@ export class ReportGenerator {
         this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
         let y = 30;
-        this.drawHeading(doc, translations.reports?.summary || 'Metrics Summary', 14, y, fontLoaded);
+        this.drawHeading(doc, translations.Reports?.summary || 'Metrics Summary', 14, y, fontLoaded);
         y += 12;
 
         const totalReach = articles.reduce((sum, a) => sum + (a.reach || 0), 0);
         const totalAVE = articles.reduce((sum, a) => sum + (a.ave || 0), 0);
 
         this.drawMetricBoxes(doc, [
-            { label: translations.reports?.total_reach || 'TOTAL REACH', value: totalReach.toLocaleString(), color: BRAND_DARK },
-            { label: translations.reports?.total_ave || 'AD VALUE (AVE)', value: `$${totalAVE.toLocaleString()}`, color: BRAND_AMBER },
-            { label: translations.reports?.article_count || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] }
+            { label: translations.Reports?.total_reach || 'TOTAL REACH', value: totalReach.toLocaleString(), color: BRAND_DARK },
+            { label: translations.Reports?.total_ave || 'AD VALUE (AVE)', value: `$${totalAVE.toLocaleString()}`, color: BRAND_AMBER },
+            { label: translations.Reports?.article_count || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] }
         ], y, pageWidth, fontLoaded);
         y += 40;
 
         // Article Table
-        this.drawHeading(doc, translations.reports?.coverage_details || 'Coverage Details', 14, y, fontLoaded);
+        this.drawHeading(doc, translations.Reports?.coverage_details || 'Coverage Details', 14, y, fontLoaded);
 
         const tableData = articles.map(a => [
             a.publishedDate || '',
@@ -219,11 +219,11 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
-                translations.reports?.col_date || 'Date',
-                translations.reports?.col_title || 'Title',
-                translations.reports?.col_source || 'Source',
-                translations.reports?.col_reach || 'Reach',
-                translations.reports?.col_ave || 'AVE'
+                translations.Reports?.col_date || 'Date',
+                translations.Reports?.col_title || 'Title',
+                translations.Reports?.col_source || 'Source',
+                translations.Reports?.col_reach || 'Reach',
+                translations.Reports?.col_ave || 'AVE'
             ]],
             body: tableData,
             startY: y + 8,
@@ -245,7 +245,7 @@ export class ReportGenerator {
         this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
         let y = 30;
-        this.drawHeading(doc, translations.reports?.ingestion_logs || 'Ingestion Activity (Last 10 Runs)', 14, y, fontLoaded);
+        this.drawHeading(doc, translations.Reports?.ingestion_logs || 'Ingestion Activity (Last 10 Runs)', 14, y, fontLoaded);
 
         const logsTable = runs.slice(0, 10).map(r => [
             new Date(r._creationTime).toLocaleString(),
@@ -256,10 +256,10 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
-                translations.reports?.col_time || 'Timestamp',
-                translations.reports?.col_source || 'Source',
-                translations.reports?.col_status || 'Status',
-                translations.reports?.col_count || 'Articles'
+                translations.Reports?.col_time || 'Timestamp',
+                translations.Reports?.col_source || 'Source',
+                translations.Reports?.col_status || 'Status',
+                translations.Reports?.col_count || 'Articles'
             ]],
             body: logsTable,
             startY: y + 8,
@@ -270,7 +270,7 @@ export class ReportGenerator {
 
         // Identified Threats Section
         y = (doc as any).lastAutoTable.finalY + 15;
-        this.drawHeading(doc, translations.reports?.identified_threats || 'High-Risk identified Threats', 14, y, fontLoaded);
+        this.drawHeading(doc, translations.Reports?.identified_threats || 'High-Risk identified Threats', 14, y, fontLoaded);
 
         const threatsTable = threats.map(t => [
             t.publishedDate || '',
@@ -281,10 +281,10 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
-                translations.reports?.col_date || 'Date',
-                translations.reports?.col_title || 'Headline / Snippet',
-                translations.reports?.col_sentiment || 'Sentiment',
-                translations.reports?.col_source || 'Platform'
+                translations.Reports?.col_date || 'Date',
+                translations.Reports?.col_title || 'Headline / Snippet',
+                translations.Reports?.col_sentiment || 'Sentiment',
+                translations.Reports?.col_source || 'Platform'
             ]],
             body: threatsTable,
             startY: y + 8,
@@ -316,10 +316,10 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
-                translations.reports?.col_time || 'Timestamp',
-                translations.reports?.investigation_target || 'Target',
-                translations.reports?.investigation_type || 'Type',
-                translations.reports?.data_points || 'Attributes'
+                translations.Reports?.col_time || 'Timestamp',
+                translations.Reports?.investigation_target || 'Target',
+                translations.Reports?.investigation_type || 'Type',
+                translations.Reports?.data_points || 'Attributes'
             ]],
             body: tableData,
             startY: y + 8,
@@ -341,7 +341,7 @@ export class ReportGenerator {
         this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
         let y = 30;
-        this.drawHeading(doc, translations.reports?.investigation_target || 'Investigation Target', 14, y, fontLoaded);
+        this.drawHeading(doc, translations.Reports?.investigation_target || 'Investigation Target', 14, y, fontLoaded);
         y += 10;
 
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
@@ -351,7 +351,7 @@ export class ReportGenerator {
         y += 8;
         doc.setFontSize(9);
         doc.setTextColor(100);
-        doc.text(`${translations.reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`, 20, y);
+        doc.text(`${translations.Reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`, 20, y);
         y += 15;
 
         // Parse Results JSON into structured tables
@@ -363,9 +363,9 @@ export class ReportGenerator {
                 .slice(0, 25);
 
             if (details.length > 0) {
-                this.drawHeading(doc, translations.reports?.technical_details || 'Technical Attributes', 14, y, fontLoaded);
+                this.drawHeading(doc, translations.Reports?.technical_details || 'Technical Attributes', 14, y, fontLoaded);
                 await this.addAutoTable(doc, {
-                    head: [[translations.reports?.attribute || 'Attribute', translations.reports?.value || 'Value']],
+                    head: [[translations.Reports?.attribute || 'Attribute', translations.Reports?.value || 'Value']],
                     body: details.map(([k, v]) => [k, String(v)]),
                     startY: y + 8,
                     fontLoaded,
@@ -379,9 +379,9 @@ export class ReportGenerator {
             const entities = (result as any).entities || (result as any).associations || [];
             if (Array.isArray(entities) && entities.length > 0) {
                 if (y > 220) { doc.addPage(); y = 30; this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded); }
-                this.drawHeading(doc, translations.reports?.entity_map || 'Identified Entities & Associations', 14, y, fontLoaded);
+                this.drawHeading(doc, translations.Reports?.entity_map || 'Identified Entities & Associations', 14, y, fontLoaded);
                 await this.addAutoTable(doc, {
-                    head: [[translations.reports?.entity_name || 'Entity Name', translations.reports?.entity_type || 'Type', translations.reports?.relevance || 'Relevance']],
+                    head: [[translations.Reports?.entity_name || 'Entity Name', translations.Reports?.entity_type || 'Type', translations.Reports?.relevance || 'Relevance']],
                     body: entities.map((e: any) => [
                         this.fixArabic(e.name || e.value || String(e)),
                         e.type || 'Unknown',
@@ -638,8 +638,8 @@ export class ReportGenerator {
 
         doc.setFontSize(10);
         doc.setTextColor(100);
-        doc.text(this.fixArabic(`${translations.reports?.generated_at || 'Generated'}: ${new Date().toLocaleDateString()}`), pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
-        doc.text(this.fixArabic(`${translations.reports?.data_points || 'Total Data Points'}: ${count}`), pageWidth / 2, pageHeight / 2 + 22, { align: 'center' });
+        doc.text(this.fixArabic(`${translations.Reports?.generated_at || 'Generated'}: ${new Date().toLocaleDateString()}`), pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
+        doc.text(this.fixArabic(`${translations.Reports?.data_points || 'Total Data Points'}: ${count}`), pageWidth / 2, pageHeight / 2 + 22, { align: 'center' });
 
         doc.setFillColor(...BRAND_DARK);
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
@@ -661,7 +661,12 @@ export class ReportGenerator {
             },
             alternateRowStyles: { fillColor: ACCENT_BG },
             didParseCell: (data) => {
-                if (data.section === 'body' && typeof data.cell.raw === 'string' && /[\u0600-\u06FF]/.test(data.cell.raw)) {
+                const text = String(data.cell.raw || '');
+                if (data.section === 'body' && /[\u0600-\u06FF]/.test(text)) {
+                    data.cell.styles.halign = 'right';
+                }
+                // Also align headers for Arabic
+                if (data.section === 'head' && /[\u0600-\u06FF]/.test(text)) {
                     data.cell.styles.halign = 'right';
                 }
             }
@@ -679,7 +684,7 @@ export class ReportGenerator {
             doc.setFontSize(7);
             doc.setTextColor(150);
             doc.text(this.fixArabic(`${translations.brand_name || 'ALMSTKSHF'} | ${title}`), 14, pageHeight - 10);
-            const pageStr = translations.reports?.page || 'Page';
+            const pageStr = translations.Reports?.page || 'Page';
             doc.text(this.fixArabic(`${pageStr} ${i} / ${pages}`), pageWidth - 14, pageHeight - 10, { align: 'right' });
         }
 
@@ -734,13 +739,19 @@ export class ReportGenerator {
     private static async generateExcel(articles: ReportArticle[], translations: any, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
+        
+        // Detect if we should use RTL for the sheet
+        const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '');
+        if (isArabicMode) {
+            sheet.views = [{ rightToLeft: true }];
+        }
 
         sheet.columns = [
-            { header: translations.reports?.col_date || 'Date', key: 'date', width: 15 },
-            { header: translations.reports?.col_title || 'Title', key: 'title', width: 50 },
-            { header: translations.reports?.col_source || 'Source', key: 'source', width: 20 },
-            { header: translations.reports?.col_reach || 'Reach', key: 'reach', width: 15 },
-            { header: translations.reports?.col_ave || 'AVE ($)', key: 'ave', width: 15 },
+            { header: translations.Reports?.col_date || 'Date', key: 'date', width: 15 },
+            { header: translations.Reports?.col_title || 'Title', key: 'title', width: 50 },
+            { header: translations.Reports?.col_source || 'Source', key: 'source', width: 20 },
+            { header: translations.Reports?.col_reach || 'Reach', key: 'reach', width: 15 },
+            { header: translations.Reports?.col_ave || 'AVE ($)', key: 'ave', width: 15 },
         ];
 
         const headerRow = sheet.getRow(1);
@@ -765,10 +776,10 @@ export class ReportGenerator {
         const sheet = workbook.addWorksheet('OSINT History');
 
         sheet.columns = [
-            { header: translations.reports?.col_time || 'Timestamp', key: 'time', width: 25 },
-            { header: translations.reports?.investigation_target || 'Target', key: 'target', width: 30 },
-            { header: translations.reports?.investigation_type || 'Type', key: 'type', width: 15 },
-            { header: translations.reports?.data_points || 'Attributes', key: 'attrs', width: 15 },
+            { header: translations.Reports?.col_time || 'Timestamp', key: 'time', width: 25 },
+            { header: translations.Reports?.investigation_target || 'Target', key: 'target', width: 30 },
+            { header: translations.Reports?.investigation_type || 'Type', key: 'type', width: 15 },
+            { header: translations.Reports?.data_points || 'Attributes', key: 'attrs', width: 15 },
         ];
 
         const headerRow = sheet.getRow(1);

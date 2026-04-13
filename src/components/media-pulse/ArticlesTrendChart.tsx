@@ -42,14 +42,14 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
                             dataKey="date" 
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
                             interval="preserveStartEnd"
                             minTickGap={20}
                         />
                         <YAxis 
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
                         />
                         <Tooltip
                             contentStyle={{

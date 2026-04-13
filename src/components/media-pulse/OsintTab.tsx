@@ -70,7 +70,7 @@ const StatusBadge = ({ label, value, type = 'default' }: { label: string; value:
     warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
     error: 'bg-destructive/10 text-destructive border-destructive/20',
     info: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-    default: 'bg-muted/50 text-foreground/70 dark:text-slate-400 border-border'
+    default: 'bg-muted/50 text-foreground/85 dark:text-slate-400 border-border'
   };
 
   let activeColor = colors[type];
@@ -91,7 +91,7 @@ const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any
   <div className="space-y-3">
     <div className="flex items-center gap-2 px-1">
       <Icon className="w-3.5 h-3.5 text-primary/70" />
-      <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/70 dark:text-slate-400">{title}</h4>
+      <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/80 dark:text-slate-400">{title}</h4>
     </div>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
       {children}
@@ -234,7 +234,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 px-1">
                 <Cloud className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/70 tracking-widest">Global News Feed</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/80 tracking-widest">Global News Feed</h4>
               </div>
             </div>
 
@@ -250,7 +250,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
                   >
                     <h5 className="text-xs font-bold text-foreground line-clamp-2">{art.title}</h5>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-[9px] text-muted-foreground uppercase font-black">{art.source}</span>
+                      <span className="text-[9px] text-foreground/80 uppercase font-black">{art.source}</span>
                       <span className="text-[9px] text-primary font-bold line-clamp-1">{art.date}</span>
                     </div>
                   </a>
@@ -316,7 +316,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
                     className="block p-4 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
                   >
                     <h5 className="text-sm font-bold text-foreground">{get(data, 'wiki.title')}</h5>
-                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{get(data, 'wiki.summary')}</p>
+                    <p className="text-xs text-foreground/70 mt-2 leading-relaxed">{get(data, 'wiki.summary')}</p>
                   </a>
             </DataSection>
           </div>
@@ -380,7 +380,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
               const pre = document.getElementById('raw-json-view');
               if (pre) pre.classList.toggle('hidden');
             }}
-            className="text-[9px] font-black text-muted-foreground hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
+            className="text-[9px] font-black text-foreground/80 hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
           >
             <Info className="w-3 h-3" />
             Toggle Developer Raw Data
@@ -609,12 +609,12 @@ export default function OsintTab() {
                   'flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all',
                   activeType === lt.type
                     ? 'bg-primary/5 border-primary text-primary shadow-sm'
-                    : 'border-border/60 bg-muted/20 hover:border-primary/30 text-muted-foreground'
+                    : 'border-border/60 bg-muted/20 hover:border-primary/30 text-foreground/60'
                 )}
               >
                 <div className={clsx(
                   'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                  activeType === lt.type ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                  activeType === lt.type ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground/60'
                 )}>
                   {lt.icon}
                 </div>
@@ -627,7 +627,7 @@ export default function OsintTab() {
           <div className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
                 <label htmlFor="lookup-input" className="sr-only">{currentType.placeholder}</label>
                 <input
                   id="lookup-input"
@@ -657,7 +657,7 @@ export default function OsintTab() {
             </div>
             <div className="flex items-center gap-2 px-1">
               <div className={clsx("w-1.5 h-1.5 rounded-full", isAdmin ? "bg-primary/40" : "bg-amber-500")} />
-              <p className={clsx("text-[11px] font-medium", isAdmin ? "text-muted-foreground" : "text-amber-600 font-bold")}>
+              <p className={clsx("text-[11px] font-medium", isAdmin ? "text-foreground/60" : "text-amber-600 font-bold")}>
                 {!isAdmin ? t('admin_only') : currentType.hint}
               </p>
             </div>
@@ -686,7 +686,7 @@ export default function OsintTab() {
                     </div>
                     <div>
                     <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
-                      <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">Analysis Completed Successfully</p>
+                      <p className="text-[10px] font-medium text-foreground/80 uppercase tracking-widest">Analysis Completed Successfully</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -776,7 +776,7 @@ export default function OsintTab() {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-foreground">{item.query}</span>
-                        <span className="text-[10px] font-black text-muted-foreground uppercase opacity-60 tracking-tighter" suppressHydrationWarning>
+                        <span className="text-[10px] font-black text-foreground/70 uppercase opacity-80 tracking-tighter" suppressHydrationWarning>
                           {new Date(item.createdAt).toLocaleDateString()} • {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -784,17 +784,17 @@ export default function OsintTab() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id as Id<"osint_results"> }); }}
-                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-destructive transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setHistoryItemToSave(item); }}
-                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-500 transition-all"
+                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-emerald-500/10 text-foreground/60 hover:text-emerald-500 transition-all"
                       >
                         <FolderPlus className="w-3.5 h-3.5" />
                       </button>
-                      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-foreground/60 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         {expandedHistory === item._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </div>
                     </div>
@@ -831,7 +831,7 @@ export default function OsintTab() {
             <ExternalLink className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">{t('suggested_tools')}</h3>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-foreground/70 leading-relaxed">
             {t('subtitle')}
           </p>
 
@@ -846,7 +846,7 @@ export default function OsintTab() {
               >
                 <div className="min-w-0 flex-1">
                   <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{tool.name}</h4>
-                  <p className="text-[10px] text-muted-foreground truncate">{tool.description}</p>
+                  <p className="text-[10px] text-foreground/70 truncate">{tool.description}</p>
                 </div>
                 <div className="w-7 h-7 rounded-lg bg-background border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all ml-3">
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -922,7 +922,7 @@ export default function OsintTab() {
                 <div className="space-y-1.5">
                   <label htmlFor="dir-search" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.search')}</label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" />
                     <input id="dir-search" name="search" className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
                   </div>
                 </div>
@@ -934,9 +934,9 @@ export default function OsintTab() {
                   <a key={r.id} href={r.url} target="_blank" rel="noreferrer" className="flex flex-col group p-4 bg-muted/20 border border-border rounded-2xl hover:border-primary/40 hover:bg-card hover:shadow-xl transition-all h-full">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">{r.name}</h4>
-                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary" />
+                      <ExternalLink className="w-3.5 h-3.5 text-foreground/60 group-hover:text-primary" />
                     </div>
-                    <p className="text-[11px] text-muted-foreground line-clamp-2 mb-4 flex-1 font-medium">{r.description}</p>
+                    <p className="text-[11px] text-foreground/70 line-clamp-2 mb-4 flex-1 font-medium">{r.description}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {r.categories.slice(0, 2).map(c => (
                         <span key={c} className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/10">{c}</span>
@@ -949,7 +949,7 @@ export default function OsintTab() {
 
               {/* Pagination bar */}
               <div className="flex items-center justify-between pt-6 border-t border-border mt-auto sticky bottom-0 bg-card py-4">
-                <span className="text-[11px] font-bold text-muted-foreground">{tOsint('pagination.showing', { count: paged.length, total: filtered.length })}</span>
+                <span className="text-[11px] font-bold text-foreground/70">{tOsint('pagination.showing', { count: paged.length, total: filtered.length })}</span>
                 <div className="flex items-center gap-1.5">
                   <Button variant="ghost" size="sm" disabled={page === 0} onClick={() => setPage(p => Math.max(0, p - 1))} className="h-8 px-3 text-xs">{tOsint('pagination.prev')}</Button>
                   <div className="flex items-center gap-1 px-3 h-8 bg-muted rounded-lg text-[10px] font-bold">{tOsint('pagination.page', { page: page + 1, total: pageCount })}</div>

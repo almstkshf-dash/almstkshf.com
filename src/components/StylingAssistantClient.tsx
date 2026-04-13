@@ -84,7 +84,7 @@ export default function StylingAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto"
+                            className="text-xl md:text-2xl text-foreground/80 leading-relaxed max-w-3xl mx-auto"
                         >
                             {t("intro")}
                         </motion.p>
@@ -123,7 +123,7 @@ export default function StylingAssistantClient() {
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
                                     <Sparkles className="w-6 h-6 text-white" aria-hidden="true" />
                                 </div>
-                                <p className="text-lg text-muted-foreground leading-relaxed">
+                                <p className="text-lg text-foreground/80 leading-relaxed">
                                     {t("desc1")}
                                 </p>
                             </motion.div>
@@ -138,7 +138,7 @@ export default function StylingAssistantClient() {
                                 <div className="w-12 h-12 rounded-2xl bg-muted border border-border flex items-center justify-center">
                                     <ArrowRight className="w-6 h-6 text-purple-400" aria-hidden="true" />
                                 </div>
-                                <p className="text-lg text-muted-foreground leading-relaxed">
+                                <p className="text-lg text-foreground/80 leading-relaxed">
                                     {t("desc2")}
                                 </p>
                             </motion.div>
@@ -168,7 +168,7 @@ export default function StylingAssistantClient() {
                             <div className="relative z-10 space-y-8">
                                 <div>
                                     <h3 className="text-3xl font-bold text-foreground mb-2">{t("form.title")}</h3>
-                                    <p className="text-muted-foreground">{t("cta_button")}</p>
+                                    <p className="text-foreground/80">{t("cta_button")}</p>
                                 </div>
 
                                 {status === "success" ? (
@@ -181,14 +181,14 @@ export default function StylingAssistantClient() {
                                             <CheckCircle2 className="w-10 h-10 text-emerald-400" />
                                         </div>
                                         <h4 className="text-2xl font-bold text-foreground">{t("form.success")}</h4>
-                                        <p className="text-muted-foreground">We&apos;ll let you know as soon as we launch.</p>
+                                        <p className="text-foreground/80">We&apos;ll let you know as soon as we launch.</p>
                                     </motion.div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-name" className="text-sm font-medium text-muted-foreground ml-1">{t("form.name")}</label>
+                                            <label htmlFor="styling-name" className="text-sm font-medium text-foreground/70 ml-1">{t("form.name")}</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
                                                 <input
                                                     id="styling-name"
                                                     name="name"
@@ -198,15 +198,15 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setName(e.target.value)}
                                                     placeholder={t("form.placeholder_name")}
                                                     autoComplete="name"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-email" className="text-sm font-medium text-muted-foreground ml-1">{t("form.email")}</label>
+                                            <label htmlFor="styling-email" className="text-sm font-medium text-foreground/70 ml-1">{t("form.email")}</label>
                                             <div className="relative group">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
                                                 <input
                                                     id="styling-email"
                                                     name="email"
@@ -216,7 +216,7 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder={t("form.placeholder_email")}
                                                     autoComplete="email"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
                                                 />
                                             </div>
                                         </div>

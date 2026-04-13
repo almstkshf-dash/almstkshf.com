@@ -107,7 +107,7 @@ function NavbarContent() {
                                                     "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                                                     isActive || activeDropdown === item.label
                                                         ? "text-primary bg-primary/5"
-                                                        : "text-foreground/70 hover:text-foreground hover:bg-muted"
+                                                        : "text-foreground/85 hover:text-foreground hover:bg-muted"
                                                 )}
                                                 aria-expanded={activeDropdown === item.label}
                                                 aria-haspopup="true"
@@ -133,7 +133,7 @@ function NavbarContent() {
                                             "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                                             isActive
                                                 ? "text-primary bg-primary/5"
-                                                : "text-foreground/70 hover:text-foreground hover:bg-muted"
+                                                : "text-foreground/85 hover:text-foreground hover:bg-muted"
                                         )}
                                         onMouseEnter={() => setActiveDropdown(null)}
                                         onFocus={() => setActiveDropdown(null)}
@@ -160,7 +160,7 @@ function NavbarContent() {
                                 aria-label={`${t('search')} - Press ⌘K to search`}
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
-                                <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/70">
+                                <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/85">
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">⌘</kbd>
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">K</kbd>
                                 </span>
@@ -253,14 +253,14 @@ function NavbarContent() {
                                                 onClick={() => setActiveDropdown(null)}
                                             >
                                                 <div className="flex items-start gap-3">
-                                                    <div className="mt-0.5 p-2 bg-muted rounded-lg group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors text-foreground/60 border border-border group-hover/item:border-primary/20">
+                                                    <div className="mt-0.5 p-2 bg-muted rounded-lg group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors text-foreground/80 border border-border group-hover/item:border-primary/20">
                                                         {child.icon && <child.icon className={ICON_LG} aria-hidden="true" />}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <div className="text-sm font-semibold text-foreground group-hover/item:text-primary transition-colors">
                                                             {t(child.label)}
                                                         </div>
-                                                        <div className="text-xs text-foreground/70 mt-1 line-clamp-2 leading-relaxed">
+                                                        <div className="text-xs text-foreground/85 mt-1 line-clamp-2 leading-relaxed">
                                                             {t(`${child.label}_desc` as any)}
                                                         </div>
                                                     </div>
@@ -317,7 +317,7 @@ function NavbarContent() {
                                         <div key={item.label}>
                                             {item.children ? (
                                                 <div className="space-y-1">
-                                                    <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider px-3 py-2">
+                                                    <div className="text-xs font-semibold text-foreground/85 uppercase tracking-wider px-3 py-2">
                                                         {t(item.label)}
                                                     </div>
                                                     <div className="space-y-0.5 ps-3 border-s-2 border-border ms-3">
@@ -325,7 +325,7 @@ function NavbarContent() {
                                                             <HoverPrefetchLink
                                                                 key={child.label}
                                                                 href={child.href as any}
-                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
+                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-foreground/85 hover:text-foreground hover:bg-muted transition-colors"
                                                                 onClick={() => setMobileMenuOpen(false)}
                                                             >
                                                                 <div className="p-1.5 bg-muted rounded-md border border-border text-foreground/50" aria-hidden="true">
@@ -339,7 +339,7 @@ function NavbarContent() {
                                             ) : (
                                                 <HoverPrefetchLink
                                                     href={item.href as any}
-                                                    className="flex items-center gap-3 px-3 py-3 text-base font-medium text-foreground/70 hover:text-foreground hover:bg-muted rounded-lg transition-all"
+                                                    className="flex items-center gap-3 px-3 py-3 text-base font-medium text-foreground/85 hover:text-foreground hover:bg-muted rounded-lg transition-all"
                                                     onClick={() => setMobileMenuOpen(false)}
                                                 >
                                                     {item.icon && <item.icon className={ICON_LG} aria-hidden="true" />}
@@ -364,7 +364,7 @@ function NavbarContent() {
 
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
-                                        className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/70 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
+                                        className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/85 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
                                         aria-label={isRTL ? "English - Switch to English" : "العربية - Switch to Arabic"}
                                     >
                                         <Globe className={ICON_LG} aria-hidden="true" />

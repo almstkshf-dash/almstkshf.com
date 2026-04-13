@@ -111,22 +111,22 @@ export function CommandMenu() {
                             name="search"
                             placeholder={t('search_placeholder') || "Search for pages, tools, or settings..."}
                             autoComplete="off"
-                            className="flex h-10 w-full rounded-md bg-transparent py-3 text-base outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-10 w-full rounded-md bg-transparent py-3 text-base outline-none placeholder:text-foreground/50 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <div className="hidden sm:flex items-center gap-1 ms-auto">
-                            <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted text-[10px] font-medium text-muted-foreground">ESC</kbd>
+                            <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted text-[10px] font-bold text-foreground/70">ESC</kbd>
                         </div>
                     </div>
 
                     <Command.List className="max-h-[70vh] overflow-y-auto overflow-x-hidden p-2 scrollbar-thin">
-                        <Command.Empty className="py-12 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                        <Command.Empty className="py-12 flex flex-col items-center justify-center gap-3 text-foreground/60">
                             <SearchSlash className="h-10 w-10 opacity-20" />
                             <p className="text-sm">{t('no_results') || "No matches found for your search."}</p>
                         </Command.Empty>
 
                         <Command.Group
                             heading={tNav('dashboard') || "Personal"}
-                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 px-3 pt-2"
+                            className="text-[10px] font-bold text-foreground/70 uppercase tracking-widest mb-2 px-3 pt-2"
                         >
                             <Command.Item
                                 value="dashboard"
@@ -143,7 +143,7 @@ export function CommandMenu() {
 
                         <Command.Group
                             heading={tNav('media_monitoring') || "Media & Intelligence"}
-                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
+                            className="text-[10px] font-bold text-foreground/70 uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
                         >
                             {NAVIGATION_ITEMS.map((item) => {
                                 if (item.children) {
@@ -159,7 +159,7 @@ export function CommandMenu() {
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="font-medium">{tNav(child.label)}</span>
-                                                <span className="text-[10px] text-muted-foreground line-clamp-1">{tNav(item.label)}</span>
+                                                <span className="text-[10px] text-foreground/70 font-medium line-clamp-1">{tNav(item.label)}</span>
                                             </div>
                                             <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
                                         </Command.Item>
@@ -187,7 +187,7 @@ export function CommandMenu() {
 
                         <Command.Group
                             heading={tNav('settings') || "System & Settings"}
-                            className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
+                            className="text-[10px] font-bold text-foreground/70 uppercase tracking-widest mb-2 mt-4 px-3 pt-2"
                         >
                             <Command.Item
                                 value="settings"

@@ -78,7 +78,7 @@ export default function ContactForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
+                    <label htmlFor="name" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
                         {t("name")}
                     </label>
                     <input
@@ -90,11 +90,11 @@ export default function ContactForm() {
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder={t("placeholders.name")}
                         autoComplete="name"
-                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-primary transition-colors"
+                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
+                    <label htmlFor="email" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
                         {t("email")}
                     </label>
                     <input
@@ -106,13 +106,13 @@ export default function ContactForm() {
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder={t("placeholders.email")}
                         autoComplete="email"
-                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-primary transition-colors"
+                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <label htmlFor="subject" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
+                <label htmlFor="subject" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
                     {t("subject")}
                 </label>
                 <input
@@ -124,12 +124,12 @@ export default function ContactForm() {
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder={t("placeholders.subject")}
                     autoComplete="on"
-                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
                 />
             </div>
 
             <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-bold text-muted-foreground uppercase tracking-widest px-1">
+                <label htmlFor="message" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
                     {t("message")}
                 </label>
                 <textarea
@@ -141,7 +141,7 @@ export default function ContactForm() {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder={t("placeholders.message")}
                     autoComplete="on"
-                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-muted-foreground/75 focus:outline-none focus:border-primary transition-colors resize-none"
+                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors resize-none"
                 />
             </div>
 

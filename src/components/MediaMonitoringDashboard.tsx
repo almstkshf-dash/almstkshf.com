@@ -160,7 +160,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                 ) : reports.length === 0 ? (
                     <div className="col-span-full py-12 text-center bg-muted/30 border border-border border-dashed rounded-3xl transition-colors duration-300">
                         <FileText className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                        <p className="text-muted-foreground font-medium">{tMedia('no_reports')}</p>
+                        <p className="text-foreground/70 font-medium">{tMedia('no_reports')}</p>
                         <Link
                             href="/media-monitoring/central-media-repository" className="text-primary text-sm hover:underline mt-2 inline-block transition-colors"
                         >
@@ -184,7 +184,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                 </span>
                             </div>
                             <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName || report.title}</h3>
-                            <div className="text-xs text-muted-foreground mb-4 flex gap-2 transition-colors">
+                            <div className="text-xs text-foreground/70 mb-4 flex gap-2 transition-colors">
                                 <span>{report.source || report.sourceType}</span>
                                 <span>•</span>
                                 <span>{new Date(report.timestamp || report.publishedDate || report.createdAt).toLocaleDateString()}</span>

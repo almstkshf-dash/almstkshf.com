@@ -27,7 +27,7 @@ export function Header() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="text-muted-foreground text-xl max-w-2xl font-light leading-relaxed transition-colors"
+                    className="text-foreground/70 text-xl max-w-2xl font-light leading-relaxed transition-colors"
                 >
                     {tWhy("sentiment.desc")}
                 </motion.p>
@@ -47,7 +47,7 @@ export function Header() {
                     ))}
                 </div>
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors">System Status</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/70 transition-colors">System Status</p>
                     <p className="text-emerald-500 dark:text-emerald-400 font-bold text-sm flex items-center gap-2 transition-colors">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
                         Active Safeguard
