@@ -57,6 +57,10 @@ export default function ConfirmationDialog({
                             stiffness: 400,
                             mass: 0.8
                         }}
+                        role="alertdialog"
+                        aria-modal="true"
+                        aria-labelledby="dialog-title"
+                        aria-describedby="dialog-description"
                         className="relative w-full max-w-md bg-card border border-border rounded-3xl shadow-2xl shadow-primary/5 overflow-hidden"
                     >
                         <div className="p-6 md:p-8 space-y-6">
@@ -80,8 +84,8 @@ export default function ConfirmationDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-xl font-bold tracking-tight text-foreground">{title}</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+                                <h3 id="dialog-title" className="text-xl font-bold tracking-tight text-foreground">{title}</h3>
+                                <p id="dialog-description" className="text-sm text-muted-foreground leading-relaxed">{description}</p>
                             </div>
 
                             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">

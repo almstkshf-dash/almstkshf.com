@@ -70,9 +70,14 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative">
+            <div 
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
+                className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative"
+            >
                 <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">
-                    <h3 className="text-lg font-bold text-foreground">Save to Collection</h3>
+                    <h3 id="modal-title" className="text-lg font-bold text-foreground">Save to Collection</h3>
                     <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground">
                         <X className="w-5 h-5" />
                     </button>

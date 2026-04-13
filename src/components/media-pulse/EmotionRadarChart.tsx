@@ -38,9 +38,9 @@ export default function EmotionRadarChart({ data }: EmotionRadarChartProps) {
     );
 
     return (
-        <div className="w-full h-[300px]">
+        <div className="w-full h-[300px]" style={{ minHeight: '300px' }}>
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={300} debounce={1}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={300} debounce={50}>
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={translatedData}>
                     <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
                     <PolarAngleAxis 
