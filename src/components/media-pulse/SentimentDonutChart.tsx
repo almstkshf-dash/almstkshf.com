@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 interface SentimentDonutChartProps {
@@ -18,7 +18,7 @@ function getCSSVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutChartProps) {
+const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }: SentimentDonutChartProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const [mounted, setMounted] = useState(false);
     const [colors, setColors] = useState({
@@ -47,11 +47,11 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
         });
     }, []);
 
-    const chartData = [
+    const chartData = useMemo(() => [
         { name: t("ToneLabels.positive"), value: data.positive, color: colors.success },
         { name: t("ToneLabels.neutral"), value: data.neutral, color: colors.warning },
         { name: t("ToneLabels.negative"), value: data.negative, color: colors.error },
-    ];
+    ], [data.positive, data.neutral, data.negative, colors, t]);
 
     if (!mounted) return <div className="w-full h-[300px]" />;
 
@@ -98,4 +98,6 @@ export default function SentimentDonutChart({ data, nssIndex }: SentimentDonutCh
             </div>
         </div>
     );
-}
+});
+
+export default SentimentDonutChart;

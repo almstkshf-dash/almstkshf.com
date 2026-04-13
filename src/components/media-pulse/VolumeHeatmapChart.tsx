@@ -1,5 +1,7 @@
+"use client";
+
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import clsx from "clsx";
 
 interface VolumeHeatmapChartProps {
@@ -12,10 +14,10 @@ interface VolumeHeatmapChartProps {
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-export default function VolumeHeatmapChart({ data }: VolumeHeatmapChartProps) {
+const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeatmapChartProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     
-    const DAYS = [
+    const DAYS = useMemo(() => [
         t("days.Sun", { defaultValue: "Sun" }),
         t("days.Mon", { defaultValue: "Mon" }),
         t("days.Tue", { defaultValue: "Tue" }),
@@ -23,7 +25,7 @@ export default function VolumeHeatmapChart({ data }: VolumeHeatmapChartProps) {
         t("days.Thu", { defaultValue: "Thu" }),
         t("days.Fri", { defaultValue: "Fri" }),
         t("days.Sat", { defaultValue: "Sat" }),
-    ];
+    ], [t]);
 
     // Find absolute maximum to calculate relative intensity
     const maxVal = useMemo(() => Math.max(...data.map(d => d.value), 1), [data]);
@@ -170,4 +172,6 @@ export default function VolumeHeatmapChart({ data }: VolumeHeatmapChartProps) {
             </div>
         </div>
     );
-}
+});
+
+export default VolumeHeatmapChart;

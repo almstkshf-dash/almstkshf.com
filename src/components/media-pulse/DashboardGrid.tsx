@@ -34,6 +34,57 @@ interface DashboardGridProps {
     topRightSlot?: React.ReactNode;
 }
 
+const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
+    const updateKeyword = useMutation(api.monitoring.updateKeyword);
+    const [editingKeyword, setEditingKeyword] = useState<string | null>(null);
+    const [editValue, setEditValue] = useState("");
+
+    const handleEditKeyword = (oldKw: string) => {
+        setEditingKeyword(oldKw);
+        setEditValue(oldKw);
+    };
+
+    const saveKeyword = async (oldKw: string) => {
+        if (editValue && editValue.trim() !== oldKw) {
+            try {
+                await updateKeyword({ oldKeyword: oldKw, newKeyword: editValue.trim() });
+            } catch (err) {
+                console.error("Failed to update keyword", err);
+            }
+        }
+        setEditingKeyword(null);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, kw: string) => {
+        if (e.key === 'Enter') saveKeyword(kw);
+        if (e.key === 'Escape') setEditingKeyword(null);
+    };
+
+    return (
+        <div className="inline-flex items-center bg-primary/15 text-primary dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
+            {editingKeyword === kw ? (
+                <input
+                    type="text"
+                    value={editValue}
+                    onChange={e => setEditValue(e.target.value)}
+                    onBlur={() => saveKeyword(kw)}
+                    onKeyDown={e => handleKeyDown(e, kw)}
+                    autoFocus
+                    className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
+                />
+            ) : (
+                <span
+                    onDoubleClick={() => handleEditKeyword(kw)}
+                    className="cursor-pointer hover:underline"
+                    title="Double click to edit keyword across all matching articles"
+                >
+                    {kw}
+                </span>
+            )}
+        </div>
+    );
+});
+
 export const DashboardGrid = memo(function DashboardGrid({ articles = [], analytics, topLeftSlot, topRightSlot }: DashboardGridProps) {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const tDashboard = useTranslations("Dashboard");
@@ -78,31 +129,6 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         return [...new Set(articles.map(a => a.keyword).filter(Boolean))];
     }, [articles]);
 
-    const updateKeyword = useMutation(api.monitoring.updateKeyword);
-    const [editingKeyword, setEditingKeyword] = useState<string | null>(null);
-    const [editValue, setEditValue] = useState("");
-
-    const handleEditKeyword = (oldKw: string) => {
-        setEditingKeyword(oldKw);
-        setEditValue(oldKw);
-    };
-
-    const saveKeyword = async (oldKw: string) => {
-        if (editValue && editValue.trim() !== oldKw) {
-            try {
-                await updateKeyword({ oldKeyword: oldKw, newKeyword: editValue.trim() });
-            } catch (err) {
-                console.error("Failed to update keyword", err);
-            }
-        }
-        setEditingKeyword(null);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, kw: string) => {
-        if (e.key === 'Enter') saveKeyword(kw);
-        if (e.key === 'Escape') setEditingKeyword(null);
-    };
-
     const heatmapData = useMemo(() => {
         if (!articles || articles.length === 0) {
             // Dummy data to show the chart when there are no articles
@@ -141,6 +167,42 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         }
         return data;
     }, [articles]);
+    const trendData = useMemo(() => {
+        if (!articles || articles.length === 0) {
+            return [
+                { date: 'Mon', count: 4 },
+                { date: 'Tue', count: 3 },
+                { date: 'Wed', count: 7 },
+                { date: 'Thu', count: 5 },
+                { date: 'Fri', count: 8 },
+            ];
+        }
+        return Object.entries(
+            articles.reduce((acc: any, a) => {
+                const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                acc[date] = (acc[date] || 0) + 1;
+                return acc;
+            }, {})
+        ).map(([date, count]) => ({ date, count: count as number }));
+    }, [articles]);
+
+    const geoEntries = useMemo(() => {
+        if (!analytics?.geography) return [];
+        return Object.entries(analytics.geography)
+            .sort(([, a], [, b]) => (b as number) - (a as number))
+            .slice(0, 5);
+    }, [analytics?.geography]);
+
+    const geoMaxCount = useMemo(() => {
+        if (geoEntries.length === 0) return 1;
+        return (geoEntries[0][1] as number) || 1;
+    }, [geoEntries]);
+
+    const toneDistribution = useMemo(() => [
+        { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-status-success", icon: ShieldCheck, glow: "shadow-[0_0_15px_rgba(var(--status-success-rgb),0.5)]" },
+        { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-status-warning", icon: Activity, glow: "shadow-[0_0_15px_rgba(var(--status-warning-rgb),0.5)]" },
+        { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-status-error", icon: AlertCircle, glow: "shadow-[0_0_15px_rgba(var(--status-error-rgb),0.5)]" },
+    ], [sentimentPcts, t]);
 
     return (
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
@@ -192,27 +254,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                     {t('keywords') || 'Keywords'}:
                                 </span>
                                 {uniqueKeywords.map((kw: string) => (
-                                    <div key={kw} className="inline-flex items-center bg-primary/15 text-primary dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
-                                        {editingKeyword === kw ? (
-                                            <input
-                                                type="text"
-                                                value={editValue}
-                                                onChange={e => setEditValue(e.target.value)}
-                                                onBlur={() => saveKeyword(kw)}
-                                                onKeyDown={e => handleKeyDown(e, kw)}
-                                                autoFocus
-                                                className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
-                                            />
-                                        ) : (
-                                            <span
-                                                onDoubleClick={() => handleEditKeyword(kw)}
-                                                className="cursor-pointer hover:underline"
-                                                title="Double click to edit keyword across all matching articles"
-                                            >
-                                                {kw}
-                                            </span>
-                                        )}
-                                    </div>
+                                    <KeywordBadge key={kw} kw={kw} />
                                 ))}
                             </div>
                         )}
@@ -349,98 +391,75 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                             </div>
                         </div>
                         <div className="h-[160px] w-full">
-                            <ArticlesTrendChart
-                                data={articles.length > 0 ? (
-                                    // Simple transformation for trend if not provided by analytics
-                                    Object.entries(
-                                        articles.reduce((acc: any, a) => {
-                                            const date = new Date(a.publishedAt || (a._creationTime)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                                            acc[date] = (acc[date] || 0) + 1;
-                                            return acc;
-                                        }, {})
-                                    ).map(([date, count]) => ({ date, count: count as number }))
-                                ) : [
-                                    { date: 'Mon', count: 4 },
-                                    { date: 'Tue', count: 3 },
-                                    { date: 'Wed', count: 7 },
-                                    { date: 'Thu', count: 5 },
-                                    { date: 'Fri', count: 8 },
-                                ]}
-                            />
+                            <ArticlesTrendChart data={trendData} />
                         </div>
                     </motion.div>
                 </div>
 
                 {/* Geographic Reach — proper card with ranked bars */}
-                {analytics?.geography && Object.keys(analytics.geography).length > 0 && (() => {
-                    const geoEntries = Object.entries(analytics.geography)
-                        .sort(([, a], [, b]) => (b as number) - (a as number))
-                        .slice(0, 5);
-                    const maxCount = (geoEntries[0]?.[1] as number) || 1;
-                    return (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.4 }}
-                            className="glass-card p-8 rounded-[2.5rem] space-y-7 shadow-xl"
-                        >
-                            <div className="flex items-center justify-between">
-                                <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase flex items-center gap-3">
-                                    <Globe className="w-4 h-4 text-primary" />
-                                    {tDashboard('geography')}
-                                </h4>
-                                <span className="text-[10px] font-black text-primary dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
-                                    TOP {geoEntries.length}
-                                </span>
-                            </div>
-                            <div className="space-y-3.5">
-                                {geoEntries.map(([code, count], index) => {
-                                    const pct = Math.round(((count as number) / maxCount) * 100);
-                                    return (
-                                        <div key={code} className="space-y-1.5">
-                                            <div className="flex items-center justify-between">
-                                                <span className="flex items-center gap-2">
-                                                    <span className={clsx(
-                                                        "inline-flex items-center justify-center min-w-[2.5rem] h-5 px-1.5 rounded text-[9px] font-black uppercase tracking-tight border transition-colors",
-                                                        index === 0
-                                                            ? "bg-primary text-primary-foreground border-primary/30 shadow-sm shadow-primary/20"
-                                                            : "bg-muted text-muted-foreground border-border"
-                                                    )}>
-                                                        {code}
-                                                    </span>
+                {geoEntries.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.4 }}
+                        className="glass-card p-8 rounded-[2.5rem] space-y-7 shadow-xl"
+                    >
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase flex items-center gap-3">
+                                <Globe className="w-4 h-4 text-primary" />
+                                {tDashboard('geography')}
+                            </h4>
+                            <span className="text-[10px] font-black text-primary dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
+                                TOP {geoEntries.length}
+                            </span>
+                        </div>
+                        <div className="space-y-3.5">
+                            {geoEntries.map(([code, count], index) => {
+                                const pct = Math.round(((count as number) / geoMaxCount) * 100);
+                                return (
+                                    <div key={code} className="space-y-1.5">
+                                        <div className="flex items-center justify-between">
+                                            <span className="flex items-center gap-2">
+                                                <span className={clsx(
+                                                    "inline-flex items-center justify-center min-w-[2.5rem] h-5 px-1.5 rounded text-[9px] font-black uppercase tracking-tight border transition-colors",
+                                                    index === 0
+                                                        ? "bg-primary text-primary-foreground border-primary/30 shadow-sm shadow-primary/20"
+                                                        : "bg-muted text-muted-foreground border-border"
+                                                )}>
+                                                    {code}
                                                 </span>
-                                                <span className="text-[10px] text-muted-foreground tabular-nums">
-                                                    <span className={clsx("font-black", index === 0 ? "text-primary" : "text-foreground")}>
-                                                        {pct}%
-                                                    </span>
-                                                    {" · "}
-                                                    {count as number} {tDashboard('articles_count')}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground tabular-nums">
+                                                <span className={clsx("font-black", index === 0 ? "text-primary" : "text-foreground")}>
+                                                    {pct}%
                                                 </span>
-                                            </div>
-                                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden transition-colors">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    whileInView={{ width: `${pct}%` }}
-                                                    viewport={{ once: true }}
-                                                    transition={{ duration: 0.9, ease: "easeOut", delay: index * 0.07 }}
-                                                    className={clsx(
-                                                        "h-full rounded-full",
-                                                        index === 0
-                                                            ? "bg-primary shadow-sm"
-                                                            : index === 1
-                                                                ? "bg-primary/60"
-                                                                : "bg-primary/30"
-                                                    )}
-                                                />
-                                            </div>
+                                                {" · "}
+                                                {count as number} {tDashboard('articles_count')}
+                                            </span>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </motion.div>
-                    );
-                })()}
+                                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden transition-colors">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                whileInView={{ width: `${pct}%` }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 0.9, ease: "easeOut", delay: index * 0.07 }}
+                                                className={clsx(
+                                                    "h-full rounded-full",
+                                                    index === 0
+                                                        ? "bg-primary shadow-sm"
+                                                        : index === 1
+                                                            ? "bg-primary/60"
+                                                            : "bg-primary/30"
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
 
             </div>
 
@@ -480,11 +499,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         </div>
                     </div>
                     <div className="space-y-7 flex-1 flex flex-col justify-center">
-                        {[
-                            { label: t('ToneLabels.positive'), value: sentimentPcts.Positive, color: "bg-status-success", icon: ShieldCheck, glow: "shadow-[0_0_15px_rgba(var(--status-success-rgb),0.5)]" },
-                            { label: t('ToneLabels.neutral'), value: sentimentPcts.Neutral, color: "bg-status-warning", icon: Activity, glow: "shadow-[0_0_15px_rgba(var(--status-warning-rgb),0.5)]" },
-                            { label: t('ToneLabels.negative'), value: sentimentPcts.Negative, color: "bg-status-error", icon: AlertCircle, glow: "shadow-[0_0_15px_rgba(var(--status-error-rgb),0.5)]" },
-                        ].map((item) => (
+                        {toneDistribution.map((item) => (
                             <div key={item.label} className="space-y-3 group/item">
                                 <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.15em]">
                                     <span className="text-muted-foreground flex items-center gap-2 group-hover/item:text-foreground transition-colors">

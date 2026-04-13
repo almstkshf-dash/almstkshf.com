@@ -4,16 +4,15 @@ import { useQuery, useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
     Loader2, RefreshCw, ScanSearch, Globe, Languages,
-    Hash, CheckCircle2, XCircle, Clock, FileText, FileSpreadsheet
+    Hash, CheckCircle2, XCircle, Clock, FileText, FileSpreadsheet, FolderPlus
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useTranslations, useMessages } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { ReportGenerator } from '@/lib/report-generator';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
-import { FolderPlus } from 'lucide-react';
 
-export default function DeepStatusPanel() {
+const DeepStatusPanel = memo(function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
     const { isAuthenticated } = useConvexAuth();
     const runs = useQuery(
@@ -296,4 +295,6 @@ export default function DeepStatusPanel() {
             )}
         </section>
     );
-}
+});
+
+export default DeepStatusPanel;
