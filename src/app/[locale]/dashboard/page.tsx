@@ -263,7 +263,7 @@ export default function DashboardPage() {
         };
 
         setIsExporting(true);
-        
+
         // Yield thread so React can paint the "Exporting..." loading state
         // before executing the heavy, synchronous export logic.
         setTimeout(async () => {
@@ -271,8 +271,8 @@ export default function DashboardPage() {
                 try {
                     exportToExcel(filteredArticles, exportTranslations, exportTranslations.report_title);
                     showToast('success', t('export_success'));
-                } catch { 
-                    showToast('error', t('export_failed')); 
+                } catch {
+                    showToast('error', t('export_failed'));
                 } finally {
                     setIsExporting(false);
                 }
@@ -387,7 +387,7 @@ export default function DashboardPage() {
                                     <button
                                         onClick={() => handleExport('pdf')}
                                         disabled={isExporting || filteredArticles.length === 0}
-                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                     >
                                         {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
                                         PDF
@@ -395,7 +395,7 @@ export default function DashboardPage() {
                                     <button
                                         onClick={() => handleExport('excel')}
                                         disabled={isExporting || filteredArticles.length === 0}
-                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                     >
                                         {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
                                         EXCEL
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                                                 "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
                                                 selectedType === type.id
                                                     ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
-                                                    : 'bg-background/80 border-border/50 text-foreground/70 dark:text-slate-400 hover:bg-background hover:text-foreground hover:border-border'
+                                                    : 'bg-background hover:bg-muted border-border/50 text-foreground/80 dark:text-slate-200 hover:text-foreground hover:border-border'
                                             )}
                                         >
                                             {type.label}

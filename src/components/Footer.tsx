@@ -26,7 +26,7 @@ export default function Footer() {
                                 {tCommon('app_name')}
                             </span>
                         </Link>
-                        <p className="text-foreground/70 dark:text-slate-300 text-sm leading-relaxed max-w-xs">
+                        <p className="text-foreground/80 dark:text-slate-200 text-sm leading-relaxed max-w-xs">
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
@@ -60,7 +60,7 @@ export default function Footer() {
                                 <li key={item.label}>
                                     <Link
                                         href={item.href as any}
-                                        className="text-foreground/70 dark:text-slate-300 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                        className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                     >
                                         <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                         {tNav(item.label)}
@@ -70,7 +70,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/case-studies/lexcora"
-                                    className="text-foreground/70 dark:text-slate-300 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('lexcora')}
@@ -79,7 +79,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/contact"
-                                    className="text-foreground/70 dark:text-slate-300 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('contact')}
@@ -88,7 +88,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/case-studies/lexcora#faq"
-                                    className="text-foreground/70 dark:text-slate-300 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('faq')}
@@ -104,15 +104,15 @@ export default function Footer() {
                             {tCommon('try_ai')}
                         </h3>
                         <ul className="space-y-4">
-                            <li className="flex items-start gap-3 text-foreground/70 dark:text-slate-300 text-sm hover:text-foreground transition-colors group cursor-pointer">
+                            <li className="flex items-start gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group cursor-pointer">
                                 <MapPin className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>{t('address_dubai')}<br />{t('address_abu_dhabi')}</span>
                             </li>
-                            <li className="flex items-center gap-3 text-foreground/70 dark:text-slate-300 text-sm hover:text-foreground transition-colors group">
+                            <li className="flex items-center gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group">
                                 <Phone className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>+971 58 59 52 035</span>
                             </li>
-                            <li className="flex items-center gap-3 text-foreground/70 dark:text-slate-300 text-sm hover:text-foreground transition-colors group">
+                            <li className="flex items-center gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group">
                                 <Mail className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>k.account@almstkshf.com</span>
                             </li>

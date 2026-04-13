@@ -248,7 +248,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 }}
                                 nssIndex={nss}
                             />
-                            <div className="mt-2 text-[10px] font-bold text-destructive dark:text-red-400 flex items-center justify-center gap-1">
+                            <div className="mt-2 text-[10px] font-bold text-destructive dark:text-red-500 flex items-center justify-center gap-1">
                                 <ShieldAlert className="w-3 h-3" />
                                 {t('risk')}: {riskScore}%
                             </div>

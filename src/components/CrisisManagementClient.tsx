@@ -200,7 +200,7 @@ export default function CrisisManagementClient() {
                                     <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
                                     <div className="pt-4 border-t border-border flex items-center gap-3">
                                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
                                     </div>
                                 </motion.div>
                             ))}
@@ -280,7 +280,7 @@ export default function CrisisManagementClient() {
                                     <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
                                     <div className="pt-4 border-t border-border flex items-center gap-3">
                                         <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
                                     </div>
                                 </motion.div>
                             ))}

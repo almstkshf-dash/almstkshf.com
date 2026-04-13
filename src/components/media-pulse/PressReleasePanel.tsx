@@ -263,7 +263,7 @@ export default function PressReleasePanel() {
                 )}
 
                 {/* Cron hint */}
-                <p className="text-[11px] text-muted-foreground/60 flex items-center gap-1.5 border-t border-border/50 pt-4">
+                <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 border-t border-border/50 pt-4">
                     <Clock className="w-3 h-3 flex-shrink-0" />
                     {t('cron_hint')}
                 </p>

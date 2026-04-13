@@ -331,7 +331,7 @@ export default function TerroristListTab() {
                     <td className="px-4 py-3 text-center sticky left-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60">
                       <div className={clsx(
                         "inline-flex p-1.5 rounded-lg border",
-                        entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-600" :
+                        entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400" :
                           entry.type === 'entity' ? "bg-amber-500/10 border-amber-500/20 text-amber-600" :
                             "bg-purple-500/10 border-purple-500/20 text-purple-600"
                       )}>

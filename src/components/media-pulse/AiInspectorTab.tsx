@@ -391,7 +391,7 @@ export default function AiInspectorTab() {
           <ShieldCheck className="w-6 h-6 text-emerald-500/50" />
           <div className="h-px bg-border flex-1 max-w-[100px]" />
         </div>
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/60">{t("verification_protocol") || "Verified ALMSTKSHF Local Forensic Protocol v1.4"}</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">{t("verification_protocol") || "Verified ALMSTKSHF Local Forensic Protocol v1.4"}</p>
         <p className="text-sm font-medium text-muted-foreground/70 max-w-2xl mx-auto leading-relaxed">{t("footer_disclaimer")}</p>
       </footer>
     </div>

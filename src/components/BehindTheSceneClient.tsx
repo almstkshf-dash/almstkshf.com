@@ -127,12 +127,12 @@ export default function BehindTheSceneClient() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
                                         <GraduationCap className="w-5 h-5 text-muted-foreground" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t("expertise")}</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("expertise")}</p>
                                         <p className="text-sm text-foreground/80">{t("strategy")}</p>
                                     </div>
                                     <div className="p-6 rounded-3xl bg-muted/50 border border-border space-y-2">
                                         <Award className="w-5 h-5 text-muted-foreground" />
-                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{t("focus")}</p>
+                                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("focus")}</p>
                                         <p className="text-sm text-foreground/80">{t("innovation")}</p>
                                     </div>
                                 </div>
@@ -205,7 +205,7 @@ function WhoWeAreSection() {
                         </p>
                         <div className="flex flex-wrap gap-4">
                             {["speech_to_text", "deep_learning", "fingerprinting", "secure_architecture"].map((tag) => (
-                                <span key={tag} className="px-4 py-2 rounded-xl bg-muted border border-border text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                                <span key={tag} className="px-4 py-2 rounded-xl bg-muted border border-border text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                                     {t(`tech_driven.tags.${tag}`)}
                                 </span>
                             ))}

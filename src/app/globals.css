@@ -124,7 +124,7 @@
   --input: #E2E8F0;
   --ring: #2563EB;
   --radius: 0.75rem;
-  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.95);
   --glass-border: rgba(226, 232, 240, 0.5);
 
   /* Design System Status Tokens */
@@ -171,7 +171,7 @@
   --border: #1E293B;
   --input: #1E293B;
   --ring: #1D4ED8;
-  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-bg: rgba(15, 23, 42, 0.95);
   --glass-border: rgba(30, 41, 59, 0.5);
 
   /* Dark mode status refinements */
@@ -346,13 +346,13 @@ svg.lucide-moon {
 
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--glass-border);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .dark .glass-card {
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
 }
 
 .premium-border {

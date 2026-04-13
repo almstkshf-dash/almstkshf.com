@@ -761,7 +761,7 @@ export default function OsintTab() {
                     <div className="flex items-center gap-4">
                       <div className={clsx(
                         'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border',
-                        item.type === 'email' && 'bg-blue-500/10 border-blue-500/20 text-blue-600',
+                        item.type === 'email' && 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400',
                         item.type === 'domain' && 'bg-purple-500/10 border-purple-500/20 text-purple-600',
                         item.type === 'ip' && 'bg-orange-500/10 border-orange-500/20 text-orange-600',
                         item.type === 'username' && 'bg-green-500/10 border-green-500/20 text-green-600',

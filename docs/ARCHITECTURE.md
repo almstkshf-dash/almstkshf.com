@@ -277,7 +277,8 @@ User sets keyword + countries + languages
   → NewsGenerator component
   → POST /api/monitor
   → Calls monitoringAction (Convex Node.js Action)
-  → Fetches from: NewsData.io, NewsAPI.org, GNews.io, RSS feeds, World News API
+  → Fetches from: NewsData.io, NewsAPI.org, GNews.io, World News API
+  → Fetches from RSS Feeds: MENA press wire sources (WAM, SPA, KUNA) via custom localized parsers
   → For each article: dedup check → sentiment analysis (Gemini) → store in media_monitoring_articles
   → Dashboard re-renders via Convex real-time subscription
 ```

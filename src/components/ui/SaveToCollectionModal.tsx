@@ -121,9 +121,9 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                 <div className="space-y-4 animate-in slide-in-from-right-4">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-foreground">Collection Name</label>
-                                        <input 
+                                        <input
                                             autoFocus
-                                            type="text" 
+                                            type="text"
                                             value={newCollectionName}
                                             onChange={(e) => setNewCollectionName(e.target.value)}
                                             placeholder="e.g. Investigation Q3"
@@ -134,9 +134,9 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                         <Button variant="outline" className="flex-1" onClick={() => setIsCreating(false)}>
                                             {tCommon('cancel')}
                                         </Button>
-                                        <Button 
-                                            variant="primary" 
-                                            className="flex-1" 
+                                        <Button
+                                            variant="primary"
+                                            className="flex-1"
                                             onClick={handleCreateAndSave}
                                             disabled={!newCollectionName.trim() || loading}
                                             leftIcon={loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -147,7 +147,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    <button 
+                                    <button
                                         onClick={() => setIsCreating(true)}
                                         className="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
                                     >
@@ -170,7 +170,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                         <div className="space-y-2 pt-2">
                                             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground px-1 mb-2">Existing Collections</p>
                                             {collections.map(col => (
-                                                <button 
+                                                <button
                                                     key={col._id}
                                                     onClick={() => handleSave(col._id)}
                                                     disabled={loading}

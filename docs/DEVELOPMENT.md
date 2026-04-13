@@ -340,7 +340,31 @@ To prevent the application from hallucinating negative sentiment on standard bus
 
 ---
 
-## 14. Common Errors & Fixes
+## 14. Accessibility & WAI-ARIA
+
+Strict accessibility limits are in place across the application to ensure WCAG 2 AA compliance:
+- **Dialogs / Modals:** All `Dialog` implementations (like Radix UI) MUST include a `<DialogTitle>` to be accessible for screen readers. If the title should not be visibly displayed, it must still be rendered but wrapped in a `<VisuallyHidden>` component.
+- **Color Contrast:** All `status-*` (e.g. `status-success`, `status-warning`) text and background pairings must achieve a compliant contrast ratio. Do not hardcode opaque foregrounds over overly bright backgrounds; utilize alpha fallbacks and opacity combinations that pass AA compliance tests.
+
+---
+
+## 15. Performance Optimizations
+
+- **Input Latency:** Any component relying on high-frequency textual inputs (such as the `NewsGenerator`) or toggle states (`ThemeToggle`) should be optimized using `React.memo` for static sub-components to prevent the whole tree from re-rendering on every keystroke.
+- **CSS Transitions:** Avoid applying heavy `all` transitions on interactive wrappers. Target exact properties (`transition-colors`, `transition-opacity`) to avoid layout thrashing and Cumulative Layout Shift (CLS), such as in the site Footer and navigation items.
+
+---
+
+## 16. Export Generation (PDF & Excel)
+
+When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
+- All generated PDF exports MUST properly enforce UTF-8 text encoding and rely on centralized Arabic font loading.
+- Use the application's Arabic shaping/RTL reordering utility on dynamic text variables prior to rendering text onto the PDF canvas.
+- Failing to do so will result in text rendering as isolated letters from left-to-right or rendering as mojibake.
+
+---
+
+## 17. Common Errors & Fixes
 
 | Error | Cause | Fix |
 |---|---|---|

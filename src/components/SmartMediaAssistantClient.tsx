@@ -188,7 +188,7 @@ export default function SmartMediaAssistantClient() {
                                                                     <div className="flex flex-wrap gap-2 mb-2">
                                                                         <span className={clsx(
                                                                             "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                                                                            analysis.risk === "High" ? "bg-red-500/10 text-red-600 dark:text-red-400" :
+                                                                            analysis.risk === "High" ? "bg-red-500/10 text-red-600 dark:text-red-500" :
                                                                                 analysis.risk === "Medium" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
                                                                                     "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                                                         )}>
