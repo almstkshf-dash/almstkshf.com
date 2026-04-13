@@ -89,7 +89,7 @@ function NavbarContent() {
                         </div>
 
                         {/* ─── Desktop Navigation ─── */}
-                        <nav className="hidden lg:flex items-center gap-1 mx-auto">
+                        <nav className="hidden lg:flex flex-1 justify-center items-center gap-4 mx-4">
                             {NAVIGATION_ITEMS.filter(item => item.href !== "/").map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;

@@ -84,7 +84,6 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
         <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
-            aria-hidden="true"
         >
             {/* Dialog panel — where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
             <div
@@ -92,7 +91,6 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                 aria-modal="true"
                 aria-labelledby="save-collection-title"
                 className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative"
-                aria-hidden="false"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">

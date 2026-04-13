@@ -86,9 +86,16 @@ export function CommandMenu() {
             onClick={() => setOpen(false)}
         >
             <div
-                className="w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden border border-border bg-popover animate-in slide-in-from-top-4 duration-300"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="command-search-title"
+                className="w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden border border-border bg-popover animate-in slide-in-from-top-4 duration-300 relative"
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* WAI-ARIA Screen Reader Title */}
+                <h2 id="command-search-title" className="sr-only">
+                    {t('search_placeholder') || "Command Menu"}
+                </h2>
                 <Command
                     className="flex h-full w-full flex-col overflow-hidden rounded-2xl"
                     label="Command Menu"
