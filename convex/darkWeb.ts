@@ -8,33 +8,33 @@ import { api } from "./_generated/api";
 // ─── Hybrid Heuristic Engine (Zero-Cost Fallback) ─────────────────────
 function performHeuristicAnalysis(title: string, snippet: string) {
     const text = (title + " " + snippet).toLowerCase();
-    
+
     // Risk Categories with Multilingual Support (EN/AR)
     const ruleBook = [
-        { 
-            risk: "critical", 
+        {
+            risk: "critical",
             keywords: [
                 "database dump", "private key", "passport", "credit card", "root access", "ssn", "national id",
                 "قاعدة بيانات", "مفتاح خاص", "جواز سفر", "بطاقة ائتمان", "اختراق كامل",
                 "حشيش", "ماريجوانا", "كريستال", "كوك", "اكستر سي", "ترامادول", "لاريكا", "سي بي دي",
-                "hashish", "weed", "cocauine", "extra c", "teramadol", "larica", "massage in dubai", "happy ending", 
+                "hashish", "weed", "cocauine", "extra c", "teramadol", "larica", "massage in dubai", "happy ending",
                 "cristal mith", "escort girls", "harm", "harmfull", "CBD OIL"
-            ] 
+            ]
         },
-        { 
-            risk: "high", 
+        {
+            risk: "high",
             keywords: [
                 "leak", "exploit", "zeroday", "vulnerability", "malware", "ransomware", "backdoor", "hack",
                 "تسريب", "ثغرة", "برمجيات خبيثة", "فدية", "باب خلفي", "اختراق",
                 "نصب", "خراب", "زفت", "فضيحة", "ورطة", "تعيس", "فاشل"
-            ] 
+            ]
         },
-        { 
-            risk: "medium", 
+        {
+            risk: "medium",
             keywords: [
                 "marketplace", "onion", "forum", "account", "login", "credentials", "tor",
                 "سوق", "منتدى", "حساب", "دخول", "بيانات اعتماد"
-            ] 
+            ]
         }
     ];
 
@@ -45,7 +45,7 @@ function performHeuristicAnalysis(title: string, snippet: string) {
     for (const rule of ruleBook) {
         if (rule.keywords.some(k => text.includes(k))) {
             risk = rule.risk as typeof risk;
-            break; 
+            break;
         }
     }
 
@@ -113,29 +113,70 @@ export const searchAhmia = action({
         const q = encodeURIComponent(args.query);
         const url = `https://ahmia.fi/search/?q=${q}&output=json`;
 
+        let results;
         try {
-            const resp = await fetch(url, { headers: { "User-Agent": "Almstkshf-Bot/1.0" } });
-            if (!resp.ok) throw new Error("Ahmia API request failed");
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // Shorter 8s timeout for direct attempt
 
-            const results = await resp.json();
-            const topResults = results.slice(0, 20);
+            const resp = await fetch(url, {
+                headers: { "User-Agent": "Almstkshf-Bot/1.0" },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!resp.ok) throw new Error(`Ahmia API request failed with status ${resp.status}`);
+            results = await resp.json();
+
+        } catch (error) {
+            console.warn("Direct Ahmia fetch failed, attempting ZenRows fallback...", error);
+            const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
+
+            if (!zenrowsKey) {
+                console.error("No ZenRows key for fallback search.");
+                throw new ConvexError("Dark Web search failed (Source unreachable). Please configure ZenRows for priority access.");
+            }
+
+            const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(url)}&js_render=true&premium_proxy=true`;
+            try {
+                const zResp = await fetch(zUrl);
+                if (!zResp.ok) throw new Error(`ZenRows request failed status ${zResp.status}`);
+
+                const zText = await zResp.text();
+                // Find JSON in the response (in case it's wrapped or returned as string)
+                const jsonMatch = zText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+                results = JSON.parse(jsonMatch ? jsonMatch[0] : zText);
+            } catch (zError) {
+                console.error("ZenRows Ahmia fallback failed:", zError);
+                throw new ConvexError("Advanced Dark Web search remains unreachable (Ahmia/ZenRows failure).");
+            }
+        }
+
+        try {
+            // Ahmia sometimes returns an object with results in a property, or just an array
+            const topResultsArray = Array.isArray(results) ? results : (results.results || []);
+            const topResults = topResultsArray.slice(0, 20);
 
             // Resolve Gemini Key 
             const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
-            const savedResults = [];
-            for (const item of topResults) {
-                const title = item.title || "No Title";
-                const snippet = item.description || "No Snippet";
-                
-                // Use Hybrid Engine: AI if key exists, Heuristics otherwise/fallback
-                let analysis;
-                if (geminiKey) {
-                    analysis = await analyzeRiskWithGemini(title, snippet, geminiKey);
-                } else {
-                    analysis = performHeuristicAnalysis(title, snippet);
-                }
+            // Process results in parallel to avoid sequential fetch delays (Convex Action timeout)
+            const processedResults = await Promise.all(
+                topResults.map(async (item: any) => {
+                    const title = item.title || "No Title";
+                    const snippet = (item.description || item.snippet || "No Snippet").substring(0, 1000);
 
+                    let analysis;
+                    if (geminiKey) {
+                        analysis = await analyzeRiskWithGemini(title, snippet, geminiKey);
+                    } else {
+                        analysis = performHeuristicAnalysis(title, snippet);
+                    }
+                    return { item, analysis, title, snippet };
+                })
+            );
+
+            const savedResults = [];
+            for (const { item, analysis, title, snippet } of processedResults) {
                 // Insert into DB
                 await ctx.runMutation(api.darkWebDb.insert, {
                     query: args.query,
@@ -174,7 +215,7 @@ export const fetchDiffbot = action({
         if (!identity) throw new ConvexError("Not authenticated");
 
         const diffbotKey = await resolveApiKey(ctx, "DIFFBOT_API_KEY", "diffbot");
-        
+
         if (!diffbotKey) {
             console.warn("Diffbot Key missing, attempting ZenRows fallback...");
             const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
@@ -213,7 +254,7 @@ export const fetchDiffbot = action({
             console.error("Diffbot action error", err);
             // If it's a ConvexError from ZenRows, propagate it
             if (err instanceof ConvexError) throw err;
-            
+
             // Try ZenRows fallback on generic fetch failure
             const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
             if (zenrowsKey) {
