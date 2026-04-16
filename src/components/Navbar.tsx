@@ -62,11 +62,12 @@ function NavbarContent() {
 
     return (
         <>
-            <header
-                className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur-md transition-all duration-300"
+            <div
+                className="contents"
                 onMouseLeave={() => setActiveDropdown(null)}
             >
                 <Container>
+
                     <div className="flex h-16 items-center justify-between gap-4">
 
                         {/* ─── Logo ─── */}
@@ -273,7 +274,8 @@ function NavbarContent() {
                         )}
                     </AnimatePresence>
                 </Container>
-            </header>
+            </div>
+
 
             {/* ─── Mobile Menu Overlay ─── */}
             <AnimatePresence>
@@ -382,8 +384,10 @@ function NavbarContent() {
 
 export default function Navbar() {
     return (
-        <Suspense fallback={<div className="h-16 w-full border-b border-border bg-background backdrop-blur-md" />}>
-            <NavbarContent />
-        </Suspense>
+        <header className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur-md transition-all duration-300 min-h-[64px]">
+            <Suspense fallback={<div className="h-16 w-full" />}>
+                <NavbarContent />
+            </Suspense>
+        </header>
     );
 }

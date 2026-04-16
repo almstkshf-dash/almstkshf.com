@@ -292,270 +292,263 @@ export default function DashboardPage() {
     };
 
     return (
-        <main className="min-h-screen bg-background/50 text-foreground relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse [animation-delay:2s]" />
-            </div>
+        <div className="max-w-[1536px] mx-auto p-4 md:p-8 lg:p-10 space-y-10 relative z-10">
 
-            <div className="max-w-[1536px] mx-auto p-4 md:p-8 lg:p-10 space-y-10 relative z-10">
-                {/* Header Section */}
-                <header className="glass-card p-6 md:p-8 rounded-[2rem] flex flex-col xl:flex-row xl:items-center justify-between gap-6 shadow-2xl relative overflow-hidden group border-primary/10">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            {/* Header Section */}
+            <header className="glass-card p-6 md:p-8 rounded-[2rem] flex flex-col xl:flex-row xl:items-center justify-between gap-6 shadow-2xl relative overflow-hidden group border-primary/10">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
-                    <div className="relative z-10 space-y-2">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
-                                <Activity className="w-6 h-6 text-primary animate-pulse" />
-                            </div>
-                            <div>
-                                <h1 className="text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">
-                                    {t('title')}
-                                </h1>
-                                <p className="text-muted-foreground text-sm font-medium flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                                    {t('subtitle')}
-                                </p>
-                            </div>
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
+                            <Activity className="w-6 h-6 text-primary animate-pulse" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">
+                                {t('title')}
+                            </h1>
+                            <p className="text-muted-foreground text-sm font-medium flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                                {t('subtitle')}
+                            </p>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-wrap items-center gap-3 relative z-10">
-                        {/* View Switcher */}
-                        <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50 shadow-inner overflow-hidden">
-                            {[
-                                { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
-                                { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
-                                { id: 'darkweb', label: t('filters.view_darkweb') || 'Dark Web', icon: GlobeLock, color: 'purple', restricted: !isAdmin },
-                                { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
-                                { id: 'inspect', label: t('filters.view_inspect') || 'AI Inspector', icon: InspectIcon, color: 'primary' },
-                                { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
-                            ].map((view) => (
-                                <button
-                                    key={view.id}
-                                    onClick={() => {
-                                        if (view.restricted) return;
-                                        startTransition(() => changeView(view.id as any));
-                                    }}
-                                    disabled={view.restricted || isPending}
-                                    className={clsx(
-                                        "relative flex items-center gap-2 h-10 px-5 text-xs font-black uppercase tracking-widest transition-all rounded-xl",
-                                        activeView === view.id
-                                            ? `bg-primary shadow-lg shadow-primary/20 text-primary-foreground`
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                                        view.restricted && "opacity-50 cursor-not-allowed grayscale"
-                                    )}
-                                >
-                                    {view.restricted ? <Lock className="w-3.5 h-3.5" /> : <view.icon className="w-3.5 h-3.5" />}
-                                    {view.label}
-                                    <AnimatePresence>
-                                        {activeView === view.id && (
-                                            <motion.div
-                                                layoutId="active-view"
-                                                className="absolute inset-0 bg-primary rounded-xl -z-10"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                    </AnimatePresence>
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="flex items-center gap-2 ml-auto xl:ml-0">
-                            {/* Actions Group */}
-                            <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50">
-                                <HoverPrefetchLink href="/dashboard/settings">
-                                    <button
-                                        className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-primary transition-all"
-                                        title={t('settings')}
-                                    >
-                                        <Settings className="w-5 h-5" />
-                                    </button>
-                                </HoverPrefetchLink>
-
-                                <button
-                                    onClick={() => setManualModalOpen(true)}
-                                    className="h-10 px-4 flex items-center gap-2 rounded-xl hover:bg-muted text-foreground text-xs font-black uppercase tracking-widest transition-all"
-                                >
-                                    <Plus className="w-4 h-4 text-primary" />
-                                    {t('manual_entry')}
-                                </button>
-                            </div>
-
-                            {/* Export Group - Only for Article-based views */}
-                            {(activeView === 'standard' || activeView === 'deep') && (
-                                <div className="flex items-center p-1 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
-                                    <button
-                                        onClick={() => handleExport('pdf')}
-                                        disabled={isExporting || filteredArticles.length === 0}
-                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                                    >
-                                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
-                                        PDF
-                                    </button>
-                                    <button
-                                        onClick={() => handleExport('excel')}
-                                        disabled={isExporting || filteredArticles.length === 0}
-                                        className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                                    >
-                                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-                                        EXCEL
-                                    </button>
-                                </div>
-                            )}
-
-                            {totalArticles > 0 && (
-                                <button
-                                    onClick={() => setIsClearDialogOpen(true)}
-                                    className="h-[52px] px-6 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/20 text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 group"
-                                >
-                                    <Trash2 className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                                    {t('clear_all')}
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </header>
-
-
-                {activeView === 'standard' && (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
-                        {/* Discovery & Analytics Section */}
-                        <DashboardGrid
-                            articles={filteredArticles}
-                            analytics={analytics}
-                            topLeftSlot={topLeftSlotMemo}
-                            topRightSlot={topRightSlotMemo}
-                        />
-
-                        {/* Coverage Section */}
-                        <section className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
-
-                            <div className="p-8 border-b border-border/50 bg-muted/20 backdrop-blur-sm space-y-6">
-                                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                                    <div className="space-y-1">
-                                        <h2 className="text-2xl font-black text-foreground flex items-center gap-3 uppercase tracking-tighter italic">
-                                            <div className="p-2 bg-primary/10 rounded-xl">
-                                                <Filter className="w-5 h-5 text-blue-800 dark:text-blue-300" />
-                                            </div>
-                                            {t('coverage_log')}
-                                        </h2>
-                                        <p className="text-sm text-foreground/70 dark:text-slate-400 font-medium flex items-center gap-2">
-                                            <span className="text-blue-800 dark:text-blue-300 font-black">{totalArticles}</span>
-                                            {t('total_articles_detected') || 'total articles detected in current scope'}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                                        <div className="relative group">
-                                            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                            <select
-                                                id="dashboard-country-select"
-                                                aria-label={t('filters.country') || "Select Country"}
-                                                value={selectedCountry}
-                                                onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
-                                                className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"
-                                            >
-                                                <option value="All">{t('filters.all_countries')}</option>
-                                                {ALL_COUNTRIES.map((c) => (
-                                                    <option key={c.code} value={c.code}>
-                                                        {isAr ? c.ar : c.en}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                                                <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                                            </div>
-                                        </div>
-
-                                        <div className="relative w-full sm:w-80 group">
-                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary/10 rounded-lg text-primary opacity-60 group-hover:opacity-100 transition-opacity">
-                                                <Search className="w-3.5 h-3.5" />
-                                            </div>
-                                            <input
-                                                type="text"
-                                                placeholder={t('search_placeholder')}
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-foreground/50 text-foreground"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {sourceTypes.map((type) => (
-                                        <button
-                                            key={type.id}
-                                            onClick={() => startTransition(() => setSelectedType(type.id))}
-                                            className={clsx(
-                                                "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
-                                                selectedType === type.id
-                                                    ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
-                                                    : 'bg-background hover:bg-muted border-border/50 text-foreground/80 dark:text-slate-200 hover:text-foreground hover:border-border'
-                                            )}
-                                        >
-                                            {type.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="bg-background/30 backdrop-blur-md">
-                                {filteredArticles.length > 0 ? (
-                                    <div className="animate-in fade-in duration-1000">
-                                        <ArticleTable articles={filteredArticles} limit={50} />
-                                        {result?.nextSkip !== null && (
-                                            <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
-                                                <button
-                                                    onClick={() => setSkip(result.nextSkip || 0)}
-                                                    className="inline-flex items-center h-14 px-10 bg-primary shadow-xl shadow-primary/30 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-primary-foreground hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary/20"
-                                                >
-                                                    {t('filters.load_more')}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="py-32 text-center relative overflow-hidden">
-                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.03)_0%,transparent_70%)]" />
-                                        <div className="relative z-10 max-w-sm mx-auto space-y-6">
-                                            <div className="w-24 h-24 rounded-[2rem] bg-muted/50 border border-border/50 mx-auto flex items-center justify-center shadow-xl group hover:scale-110 transition-transform duration-500">
-                                                <Search className="w-10 h-10 text-muted-foreground opacity-30 group-hover:opacity-60 group-hover:rotate-12 transition-all" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <h3 className="text-xl font-bold text-foreground">{t('no_results')}</h3>
-                                                <p className="text-sm text-muted-foreground/70 font-medium leading-relaxed">{t('no_results_hint')}</p>
-                                            </div>
-                                            <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedType('All'); }} className="font-black uppercase tracking-widest text-[10px]">
-                                                {t('reset_filters') || 'Reset All Filters'}
-                                            </Button>
-                                        </div>
-                                    </div>
+                <div className="flex flex-wrap items-center gap-3 relative z-10">
+                    {/* View Switcher */}
+                    <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50 shadow-inner overflow-hidden">
+                        {[
+                            { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
+                            { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
+                            { id: 'darkweb', label: t('filters.view_darkweb') || 'Dark Web', icon: GlobeLock, color: 'purple', restricted: !isAdmin },
+                            { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
+                            { id: 'inspect', label: t('filters.view_inspect') || 'AI Inspector', icon: InspectIcon, color: 'primary' },
+                            { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
+                        ].map((view) => (
+                            <button
+                                key={view.id}
+                                onClick={() => {
+                                    if (view.restricted) return;
+                                    startTransition(() => changeView(view.id as any));
+                                }}
+                                disabled={view.restricted || isPending}
+                                className={clsx(
+                                    "relative flex items-center gap-2 h-10 px-5 text-xs font-black uppercase tracking-widest transition-all rounded-xl",
+                                    activeView === view.id
+                                        ? `bg-primary shadow-lg shadow-primary/20 text-primary-foreground`
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                                    view.restricted && "opacity-50 cursor-not-allowed grayscale"
                                 )}
-                            </div>
-                        </section>
+                            >
+                                {view.restricted ? <Lock className="w-3.5 h-3.5" /> : <view.icon className="w-3.5 h-3.5" />}
+                                {view.label}
+                                <AnimatePresence>
+                                    {activeView === view.id && (
+                                        <motion.div
+                                            layoutId="active-view"
+                                            className="absolute inset-0 bg-primary rounded-xl -z-10"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                </AnimatePresence>
+                            </button>
+                        ))}
                     </div>
-                )}
 
-                {activeView === 'deep' && (
-                    <>
-                        <NewsGenerator defaultSourceType="Online News" />
-                        <DashboardGrid articles={filteredArticles} analytics={analytics} />
-                        <DeepStatusPanel />
-                    </>
-                )}
+                    <div className="flex items-center gap-2 ml-auto xl:ml-0">
+                        {/* Actions Group */}
+                        <div className="flex items-center p-1 bg-muted/30 backdrop-blur-md rounded-2xl border border-border/50">
+                            <HoverPrefetchLink href="/dashboard/settings">
+                                <button
+                                    className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-primary transition-all"
+                                    title={t('settings')}
+                                >
+                                    <Settings className="w-5 h-5" />
+                                </button>
+                            </HoverPrefetchLink>
 
-                {activeView === 'darkweb' && <DarkWebTab />}
+                            <button
+                                onClick={() => setManualModalOpen(true)}
+                                className="h-10 px-4 flex items-center gap-2 rounded-xl hover:bg-muted text-foreground text-xs font-black uppercase tracking-widest transition-all"
+                            >
+                                <Plus className="w-4 h-4 text-primary" />
+                                {t('manual_entry')}
+                            </button>
+                        </div>
 
-                {activeView === 'osint' && <OsintTab />}
+                        {/* Export Group - Only for Article-based views */}
+                        {(activeView === 'standard' || activeView === 'deep') && (
+                            <div className="flex items-center p-1 bg-primary/10 backdrop-blur-md rounded-2xl border border-primary/20">
+                                <button
+                                    onClick={() => handleExport('pdf')}
+                                    disabled={isExporting || filteredArticles.length === 0}
+                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                >
+                                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+                                    PDF
+                                </button>
+                                <button
+                                    onClick={() => handleExport('excel')}
+                                    disabled={isExporting || filteredArticles.length === 0}
+                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                >
+                                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+                                    EXCEL
+                                </button>
+                            </div>
+                        )}
 
-                {activeView === 'terrorist_list' && <TerroristListTab />}
+                        {totalArticles > 0 && (
+                            <button
+                                onClick={() => setIsClearDialogOpen(true)}
+                                className="h-[52px] px-6 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/20 text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 group"
+                            >
+                                <Trash2 className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                                {t('clear_all')}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </header>
 
-                {activeView === 'inspect' && <AiInspectorTab />}
-            </div>
+
+            {activeView === 'standard' && (
+                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+                    {/* Discovery & Analytics Section */}
+                    <DashboardGrid
+                        articles={filteredArticles}
+                        analytics={analytics}
+                        topLeftSlot={topLeftSlotMemo}
+                        topRightSlot={topRightSlotMemo}
+                    />
+
+                    {/* Coverage Section */}
+                    <section className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
+
+                        <div className="p-8 border-b border-border/50 bg-muted/20 backdrop-blur-sm space-y-6">
+                            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                                <div className="space-y-1">
+                                    <h2 className="text-2xl font-black text-foreground flex items-center gap-3 uppercase tracking-tighter italic">
+                                        <div className="p-2 bg-primary/10 rounded-xl">
+                                            <Filter className="w-5 h-5 text-blue-800 dark:text-blue-300" />
+                                        </div>
+                                        {t('coverage_log')}
+                                    </h2>
+                                    <p className="text-sm text-foreground/70 dark:text-slate-400 font-medium flex items-center gap-2">
+                                        <span className="text-blue-800 dark:text-blue-300 font-black">{totalArticles}</span>
+                                        {t('total_articles_detected') || 'total articles detected in current scope'}
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                                    <div className="relative group">
+                                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                        <select
+                                            id="dashboard-country-select"
+                                            aria-label={t('filters.country') || "Select Country"}
+                                            value={selectedCountry}
+                                            onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
+                                            className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"
+                                        >
+                                            <option value="All">{t('filters.all_countries')}</option>
+                                            {ALL_COUNTRIES.map((c) => (
+                                                <option key={c.code} value={c.code}>
+                                                    {isAr ? c.ar : c.en}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                                            <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                                        </div>
+                                    </div>
+
+                                    <div className="relative w-full sm:w-80 group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary/10 rounded-lg text-primary opacity-60 group-hover:opacity-100 transition-opacity">
+                                            <Search className="w-3.5 h-3.5" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder={t('search_placeholder')}
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-foreground/50 text-foreground"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                {sourceTypes.map((type) => (
+                                    <button
+                                        key={type.id}
+                                        onClick={() => startTransition(() => setSelectedType(type.id))}
+                                        className={clsx(
+                                            "inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border",
+                                            selectedType === type.id
+                                                ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
+                                                : 'bg-background hover:bg-muted border-border/50 text-foreground/80 dark:text-slate-200 hover:text-foreground hover:border-border'
+                                        )}
+                                    >
+                                        {type.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-background/30 backdrop-blur-md">
+                            {filteredArticles.length > 0 ? (
+                                <div className="animate-in fade-in duration-1000">
+                                    <ArticleTable articles={filteredArticles} limit={50} />
+                                    {result?.nextSkip !== null && (
+                                        <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
+                                            <button
+                                                onClick={() => setSkip(result.nextSkip || 0)}
+                                                className="inline-flex items-center h-14 px-10 bg-primary shadow-xl shadow-primary/30 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-primary-foreground hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary/20"
+                                            >
+                                                {t('filters.load_more')}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="py-32 text-center relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary-rgb),0.03)_0%,transparent_70%)]" />
+                                    <div className="relative z-10 max-w-sm mx-auto space-y-6">
+                                        <div className="w-24 h-24 rounded-[2rem] bg-muted/50 border border-border/50 mx-auto flex items-center justify-center shadow-xl group hover:scale-110 transition-transform duration-500">
+                                            <Search className="w-10 h-10 text-muted-foreground opacity-30 group-hover:opacity-60 group-hover:rotate-12 transition-all" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xl font-bold text-foreground">{t('no_results')}</h3>
+                                            <p className="text-sm text-muted-foreground/70 font-medium leading-relaxed">{t('no_results_hint')}</p>
+                                        </div>
+                                        <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedType('All'); }} className="font-black uppercase tracking-widest text-[10px]">
+                                            {t('reset_filters') || 'Reset All Filters'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                </div>
+            )}
+
+            {activeView === 'deep' && (
+                <>
+                    <NewsGenerator defaultSourceType="Online News" />
+                    <DashboardGrid articles={filteredArticles} analytics={analytics} />
+                    <DeepStatusPanel />
+                </>
+            )}
+
+            {activeView === 'darkweb' && <DarkWebTab />}
+
+            {activeView === 'osint' && <OsintTab />}
+
+            {activeView === 'terrorist_list' && <TerroristListTab />}
+
+            {activeView === 'inspect' && <AiInspectorTab />}
 
             {/* Global Overlays */}
             <ConfirmationDialog
@@ -568,41 +561,44 @@ export default function DashboardPage() {
                 isLoading={isClearing}
             />
 
-            {toast && (
-                <div role="status" className={clsx(
-                    "fixed bottom-8 right-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5 duration-500 border flex items-center gap-4 transition-all",
-                    toast.type === 'success'
-                        ? "bg-status-success-bg/90 text-status-success-fg border-status-success-fg/20"
-                        : "bg-status-error-bg/90 text-status-error-fg border-status-error-fg/20"
-                )}>
-                    <div className={clsx(
-                        "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg",
-                        toast.type === 'success' ? "bg-status-success-fg/20" : "bg-status-error-fg/20"
+            {toast && (() => {
+                const tst = toast;
+                return (
+                    <div role="status" className={clsx(
+                        "fixed bottom-8 right-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5 duration-500 border flex items-center gap-4 transition-all",
+                        tst.type === 'success'
+                            ? "bg-status-success-bg/90 text-status-success-fg border-status-success-fg/20"
+                            : "bg-status-error-bg/90 text-status-error-fg border-status-error-fg/20"
                     )}>
-                        {toast.type === 'success' ? <ShieldCheck className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
-                    </div>
-                    <div>
-                        <div className="font-bold text-sm tracking-tight leading-none mb-1">
-                            {toast.type === 'success' ? t('success') : t('error')}
+                        <div className={clsx(
+                            "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg",
+                            tst.type === 'success' ? "bg-status-success-fg/20" : "bg-status-error-fg/20"
+                        )}>
+                            {tst.type === 'success' ? <ShieldCheck className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
                         </div>
-                        <div className="text-xs font-semibold opacity-90 leading-tight pr-4">
-                            {toast.message}
+                        <div>
+                            <div className="font-bold text-sm tracking-tight leading-none mb-1">
+                                {tst.type === 'success' ? t('success') : t('error')}
+                            </div>
+                            <div className="text-xs font-semibold opacity-90 leading-tight pr-4">
+                                {tst.message}
+                            </div>
                         </div>
+                        <button
+                            onClick={() => setToast(null)}
+                            className="p-2 hover:bg-white/10 rounded-full transition-colors opacity-60 hover:opacity-100"
+                        >
+                            <Plus className="w-4 h-4 rotate-45" />
+                        </button>
+                        <div className="absolute inset-x-2 bottom-2 h-0.5 bg-current opacity-20 rounded-full" />
                     </div>
-                    <button
-                        onClick={() => setToast(null)}
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors opacity-60 hover:opacity-100"
-                    >
-                        <Plus className="w-4 h-4 rotate-45" />
-                    </button>
-                    <div className="absolute inset-x-2 bottom-2 h-0.5 bg-current opacity-20 rounded-full" />
-                </div>
-            )}
+                );
+            })()}
 
             <ManualEntryModal
                 isOpen={isManualModalOpen}
                 onClose={() => setManualModalOpen(false)}
             />
-        </main>
+        </div>
     );
 }

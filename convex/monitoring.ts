@@ -18,16 +18,13 @@ export const getArticles = query({
         let q = ctx.db.query("media_monitoring_articles");
 
         if (args.sourceType && args.sourceType !== "All") {
-            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("sourceType"), args.sourceType));
         }
 
         if (args.sourceCountry && args.sourceCountry !== "All") {
-            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("sourceCountry"), args.sourceCountry));
         }
         if (args.depth && args.depth !== "All") {
-            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("depth"), args.depth));
         }
 
