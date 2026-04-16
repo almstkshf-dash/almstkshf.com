@@ -123,10 +123,10 @@
       "neutral": "Neutral",
       "negative": "Negative"
     },
-    "save_failed": "Failed to save article. Please try again.",
+    "save_failed": "The article couldn't be saved to the central repository. Please check your network connection and click 'Save Entry' again.",
     "fetch_article": "Fetch & Auto-Analyze",
     "extracting": "Extracting...",
-    "extract_failed": "Failed to extract content. Please check the URL or fill manually.",
+    "extract_failed": "We couldn't extract the content automatically from the provided link. Ensure the URL is public and correct, or paste the content manually into the text field.",
     "not_authenticated": "Not authenticated. Please sign in first."
   },
   "Notifications": {
@@ -143,7 +143,7 @@
     "delete": "Delete",
     "save": "Save",
     "loading": "Loading...",
-    "error": "Error",
+    "error": "System Error",
     "success": "Success",
     "app_name": "ALMSTKSHF",
     "slogan": "We Develop To Lead",
@@ -341,7 +341,7 @@
         "placeholder_email": "Enter your email",
         "submit": "Join Waitlist",
         "submitting": "Processing...",
-        "error": "We encountered an error joining the waitlist. Please try again."
+        "error": "Your waitlist registration failed to submit. Please ensure your email address is correct and try again."
       }
     }
   },
@@ -363,7 +363,7 @@
     "message": "Message",
     "send": "Send Message",
     "success": "Thank you! Your message has been sent.",
-    "error": "We couldn't send your message. Please verify your details and try again.",
+    "error": "Your message could not be sent to our support team. Please ensure all required fields are filled out correctly and try submitting again.",
     "send_another": "Send another message",
     "placeholders": {
       "name": "John Doe",
@@ -459,7 +459,7 @@
     },
     "analysis_complete": "Analysis complete!",
     "analysis_empty": "Received an empty response from our analysis engine.",
-    "analysis_error": "An unexpected error occurred during analysis.",
+    "analysis_error": "The AI analysis engine failed to process the request. The text might be too long or unsupported. Please shorten the input and try again.",
     "risk_label": "Risk",
     "sentiment_label": "Sentiment",
     "awaiting_instruction": "Awaiting instruction...",
@@ -1109,7 +1109,7 @@
     "ave_multiplier": "AVE Multiplier",
     "save": "Save Changes",
     "saved_success": "Settings saved successfully",
-    "save_failed": "Failed to save settings. Please try again.",
+    "save_failed": "Your configuration changes could not be saved to the database. Please check your required fields and try clicking 'Save Changes' again.",
     "iso_hint": "Comma separated ISO codes (e.g. AE, SA)",
     "api_keys_title": "API Keys & Access",
     "api_keys_subtitle": "Manage your AI and search provider credentials. We prioritize your keys for all processing tasks.",
@@ -1174,13 +1174,13 @@
     "confirm_clear_all": "Clear Database",
     "confirm_clear_all_desc": "Are you sure you want to PERMANENTLY delete ALL log entries? This action cannot be undone.",
     "cleared_success": "Successfully cleared {count} articles",
-    "clear_failed": "Failed to clear articles. Please check your permissions or try again later.",
+    "clear_failed": "System clear action failed. Please verify your authentication state and ensure you have permissions to erase data.",
     "coverage_log": "Coverage Log",
     "search_placeholder": "Search articles, keywords, or sources...",
     "no_results": "No articles match your criteria.",
     "no_results_hint": "Try adjusting your filters or refining your search query.",
     "export_success": "Report exported successfully.",
-    "export_failed": "Failed to export report. Please try again.",
+    "export_failed": "Report generation failed. Please ensure the dataset is fully loaded and you have sufficient memory available before exporting.",
     "export_empty": "No articles available for export.",
     "filters": {
       "all_countries": "All Countries",
@@ -1237,7 +1237,7 @@
       "negative": "Negative"
     },
     "success": "Success",
-    "error": "Error",
+    "error": "Dashboard Data Error",
     "media_pulse_analytics_title": "Media Pulse Analytics",
     "total_articles_detected": "total articles detected in current scope",
     "reset_filters": "Reset All Filters",
@@ -1261,9 +1261,9 @@
     "clear": "Clear",
     "analyzing": "Analyzing...",
     "generate_report": "Generate Report",
-    "fetch_failed": "Failed to retrieve monitoring data. Please check your connection and try again.",
+    "fetch_failed": "The intelligence engine could not retrieve the monitoring data from the selected sources. Please verify your API keys in Settings and search again.",
     "result_success": "Successfully fetched {count} articles across {feeds} feed(s). {skipped} skipped.",
-    "error_title": "Something went wrong",
+    "error_title": "Monitoring Search Failed",
     "error_keyword_required": "Please enter a keyword or phrase to monitor.",
     "error_country_required": "Select at least one target country.",
     "error_language_required": "Select at least one content language.",
@@ -1332,15 +1332,15 @@
     "clear": "Clear",
     "sync_now": "Sync Now",
     "syncing": "Syncing...",
-    "fetch_failed": "Failed to sync PR wires.",
+    "fetch_failed": "Failed to synchronize PR wire feeds. Please verify the upstream PR sources are responding and your network connection is active.",
     "not_authenticated": "Not authenticated. Please sign in first.",
-    "failed": "Failed",
+    "failed": "Sync Failed",
     "cron_hint": "Auto-sync runs every 6 hours."
   },
   "Error": {
-    "title": "Something went wrong!",
-    "description": "We apologize for the inconvenience. An unexpected error has occurred.",
-    "retry": "Try again"
+    "title": "System Alert: Page Loading Failed",
+    "description": "We were unable to load the required dashboard components due to a connectivity or authorization issue. Please refresh the page. If the issue persists, contact technical support.",
+    "retry": "Refresh Page"
   },
   "NotFound": {
     "title": "Page not found",
