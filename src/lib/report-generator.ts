@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
-import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
+// import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
 
 // ════════════════════════════════════════════════════════════════════════
 // TYPES & INTERFACES
@@ -76,6 +76,18 @@ export class ReportGenerator {
             return this.generateExcel(threatList, translations, title);
         }
         return this.generateDeepWebPDF(runs, threatList, translations, title);
+    }
+
+    /**
+     * Dark Web Results Report
+     */
+    static async exportDarkWebReport(results: any[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+        const title = translations.DarkWeb?.tab_label || 'Dark Web Search Results';
+        if (format === 'excel') {
+            await this.generateDarkWebExcel(results, translations, title);
+        } else {
+            await this.generateDarkWebPDF(results, translations, title);
+        }
     }
 
     /**
@@ -181,6 +193,45 @@ export class ReportGenerator {
     // ════════════════════════════════════════════════════════════════════════
     // FEATURE-SPECIFIC PDF GENERATORS
     // ════════════════════════════════════════════════════════════════════════
+
+    private static async generateDarkWebPDF(results: any[], translations: any, title: string) {
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+
+        // Cover Page
+        this.addCoverPage(doc, title, results.length, translations, logoBase64, fontLoaded);
+
+        doc.addPage();
+        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+        let y = 30;
+        this.drawHeading(doc, translations.DarkWeb?.tab_label || 'Dark Web Search Results', 14, y, fontLoaded);
+        y += 10;
+
+        const tableData = results.map(r => [
+            r.publishedDate ? new Date(r.publishedDate).toLocaleDateString() : '',
+            this.fixArabic(r.title || ''),
+            r.source_type || '',
+            r.risk_level || 'Neutral',
+            this.fixArabic(r.summary || '')
+        ]);
+
+        await this.addAutoTable(doc, {
+            head: [[
+                translations.Reports?.col_date || 'Date',
+                translations.Reports?.col_title || 'Title',
+                translations.Reports?.col_source || 'Source',
+                translations.DarkWeb?.col_risk || 'Risk Assessment',
+                translations.Reports?.col_summary || 'AI Summary'
+            ]],
+            body: tableData,
+            startY: y + 8,
+            fontLoaded,
+            logoBase64,
+            translations
+        });
+
+        this.finalizePDF(doc, title, translations, fontLoaded);
+    }
 
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
@@ -736,10 +787,49 @@ export class ReportGenerator {
     // EXCEL EXPORT (Unified)
     // ════════════════════════════════════════════════════════════════════════
 
+    private static async generateDarkWebExcel(results: any[], translations: any, title: string) {
+        const ExcelJS = (await import('exceljs')).default;
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Dark Web Results');
+
+        const isArabicMode = /[\u0600-\u06FF]/.test(translations.DarkWeb?.tab_label || '');
+        if (isArabicMode) {
+            sheet.views = [{ rightToLeft: true }];
+        }
+
+        sheet.columns = [
+            { header: translations.Reports?.col_date || 'Date', key: 'date', width: 15 },
+            { header: translations.Reports?.col_title || 'Title', key: 'title', width: 40 },
+            { header: translations.Reports?.col_source || 'Source', key: 'source', width: 15 },
+            { header: translations.Reports?.col_url || 'URL', key: 'url', width: 30 },
+            { header: translations.DarkWeb?.col_risk || 'Risk Assessment', key: 'risk_level', width: 15 },
+            { header: translations.Reports?.col_summary || 'AI Summary', key: 'summary', width: 50 },
+            { header: translations.Reports?.col_tags || 'Signal Tags', key: 'tags', width: 20 }
+        ];
+
+        const headerRow = sheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
+
+        results.forEach(r => {
+            sheet.addRow({
+                date: r.publishedDate ? new Date(r.publishedDate).toLocaleDateString() : '',
+                title: r.title,
+                source: r.source_type,
+                url: r.url,
+                risk_level: r.risk_level,
+                summary: r.summary,
+                tags: Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || '')
+            });
+        });
+
+        await this.downloadWorkbook(workbook, title);
+    }
+
     private static async generateExcel(articles: ReportArticle[], translations: any, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
-        
+
         // Detect if we should use RTL for the sheet
         const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '');
         if (isArabicMode) {

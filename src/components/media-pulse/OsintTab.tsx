@@ -6,7 +6,7 @@ import {
   ExternalLink, Filter, Shield, Search, Mail, Globe,
   Wifi, User, Phone, CheckCircle2, XCircle,
   ChevronDown, ChevronUp, Clock, Trash2,
-  FileText, FileSpreadsheet, Cloud
+  FileText, FileSpreadsheet, Cloud, Sparkles, Wand2
 } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -437,6 +437,8 @@ export default function OsintTab() {
     (searchParams.get('osint_tab') as LookupType) || 'watchlist'
   );
 
+  const tOpt = useTranslations('SearchOptimizer');
+
   // Sync state with URL
   useEffect(() => {
     const tab = searchParams.get('osint_tab') as LookupType;
@@ -453,6 +455,8 @@ export default function OsintTab() {
   };
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [optimizationInfo, setOptimizationInfo] = useState<{ original: string; explanation: string } | null>(null);
+  const [isOptimizing, setIsOptimizing] = useState(false);
   const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
   const messages = useMessages();
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
@@ -485,6 +489,7 @@ export default function OsintTab() {
   const lookupWikipedia = useAction(api.osint.lookupWikipedia);
   const lookupGleif = useAction(api.osint.lookupGleif);
   const lookupWatchlist = useAction(api.osint.lookupWatchlist);
+  const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
   // ── DB operations (default runtime — osintDb.ts) ──
   const deleteResult = useMutation(api.osintDb.deleteOsintResult);
   const history = useQuery(
@@ -520,6 +525,29 @@ export default function OsintTab() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const paged = filtered.slice(page * pageSize, page * pageSize + pageSize);
 
+  const handleOptimize = async () => {
+    if (!query.trim()) return;
+    setIsOptimizing(true);
+    try {
+      const res = await optimizeSearch({
+        keyword: query.trim(),
+        context: activeType === 'news' ? 'news' : 'osint',
+        targetLanguages: ['en', 'ar']
+      });
+      if (res && res.optimized) {
+        setOptimizationInfo({
+          original: query,
+          explanation: res.explanation
+        });
+        setQuery(res.optimized);
+      }
+    } catch (e) {
+      console.error("OSINT optimization failed:", e);
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
   // ── Run lookup ──
   const handleLookup = async () => {
     if (!isAuthenticated) { setError(tDashboard('not_authenticated')); return; }
@@ -529,6 +557,7 @@ export default function OsintTab() {
     setLoading(true);
     setError('');
     setResult(null);
+    setOptimizationInfo(null);
 
     try {
       let res: { success: boolean; data?: Record<string, unknown>; error?: string } | undefined;
@@ -634,12 +663,25 @@ export default function OsintTab() {
                   name="lookup"
                   type="text"
                   value={query}
-                  onChange={e => setQuery(e.target.value)}
+                  onChange={e => {
+                    setQuery(e.target.value);
+                    if (optimizationInfo) setOptimizationInfo(null);
+                  }}
                   onKeyDown={e => e.key === 'Enter' && handleLookup()}
                   placeholder={currentType.placeholder}
-                  className="w-full pl-11 pr-4 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  className="w-full pl-11 pr-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                   disabled={loading}
                 />
+                <button
+                  type="button"
+                  onClick={handleOptimize}
+                  disabled={isOptimizing || !query.trim() || loading}
+                  title={tOpt('button_tooltip')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
+                >
+                  <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} />
+                  <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" />
+                </button>
               </div>
               <Button
                 variant={isAdmin ? "primary" : "secondary"}
@@ -655,13 +697,33 @@ export default function OsintTab() {
                 {loading ? tCommon('analyze_tone') : tCommon('generate_report')}
               </Button>
             </div>
-            <div className="flex items-center gap-2 px-1">
-              <div className={clsx("w-1.5 h-1.5 rounded-full", isAdmin ? "bg-primary/40" : "bg-amber-500")} />
               <p className={clsx("text-[11px] font-medium", isAdmin ? "text-foreground/60" : "text-amber-600 font-bold")}>
                 {!isAdmin ? t('admin_only') : currentType.hint}
               </p>
             </div>
-          </div>
+
+            {optimizationInfo && (
+              <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
+                    {tOpt('explanation_title')}
+                  </p>
+                  <p className="text-[11px] text-foreground/80 leading-relaxed italic">
+                    {optimizationInfo.explanation}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setQuery(optimizationInfo.original);
+                    setOptimizationInfo(null);
+                  }}
+                  className="text-[10px] font-bold text-primary hover:underline flex-shrink-0"
+                >
+                  {tOpt('original')}
+                </button>
+              </div>
+            )}
 
           {/* Result Area */}
           <AnimatePresence mode="wait">

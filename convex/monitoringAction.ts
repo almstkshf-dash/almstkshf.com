@@ -58,7 +58,7 @@ async function resolveUrl(originalUrl: string) {
 // GEMINI AI HELPER — With robust model fallback chain
 // ═══════════════════════════════════════════════════════════════════
 async function callGeminiForAnalysis(
-    apiKey: string,
+    apiKey: string | null,
     title: string,
     snippet: string,
     keyword: string,
@@ -177,17 +177,41 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
         }
     }
 
-    console.error("❌ All Gemini models failed. Using fallback values.");
+    console.error("❌ All Gemini models failed or key is missing. Using heuristic values.");
+    
+    // ── HEURISTIC FALLBACK LOGIC ─────────────────────────────────────
+    const lowerText = (title + " " + snippet).toLowerCase();
+    let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
+    let risk: "Low" | "Medium" | "High" = "Medium";
+    
+    // EN/AR Positive keywords
+    if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|نجاح|ارباح|فوز|ازدهار|نمو|تطور|شراكة|اطلاق|ابتكار)/i)) {
+        sentiment = "Positive";
+        risk = "Low";
+    } 
+    // EN/AR Negative keywords (Colloquial + Formal + Harmful)
+    else if (lowerText.match(/(نصب|خراب|زفت|فضيحة|ورطة|تعيس|فاشل|حشيش|ماريجوانا|كريستال|كوك|ترامادول|لاريكا|سي بي دي|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|خسارة|تراجع|فشل|فضيحة|اختراق|دعوى|انتهاك|احتيال|ازمة|تحذير|خطر)/i)) {
+        sentiment = "Negative";
+        risk = "High";
+    }
+
+    const reach_estimate = lowerText.includes("twitter.com") || lowerText.includes("reddit.com") ? 15000 : 50000;
+
     return {
-        sentiment: "Neutral",
-        summary: title,
-        sourceType: "Online News",
-        reach_estimate: 50000,
-        tone: "Analytical",
-        risk: "Medium",
+        sentiment,
+        summary: snippet.substring(0, 200).trim() + "...",
+        sourceType: lowerText.includes("twitter.com") || lowerText.includes("x.com") ? "Social Media" : "Online News",
+        reach_estimate,
+        tone: sentiment === "Positive" ? "Optimistic" : (sentiment === "Negative" ? "Concerning" : "Informative"),
+        risk,
         hashtags: [],
         emotions: {
-            joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0
+            joy: sentiment === "Positive" ? 60 : 0,
+            sadness: sentiment === "Negative" ? 40 : 0,
+            anger: sentiment === "Negative" ? 30 : 0,
+            fear: sentiment === "Negative" ? 50 : 0,
+            surprise: 20,
+            trust: sentiment === "Positive" ? 70 : 30
         }
     };
 }
@@ -199,7 +223,7 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
 const RELEVANCY_THRESHOLD = 85;
 
 async function callGeminiRelevancyScore(
-    apiKey: string,
+    apiKey: string | null,
     title: string,
     snippet: string,
     keyword: string
@@ -217,6 +241,8 @@ Score how relevant this article is to the monitoring keyword on a scale of 0 to 
 
 Return valid JSON ONLY:
 {"relevancy_score": <number 0-100>, "reason": "<one sentence>"}` ;
+
+    if (!apiKey) return 100; // Fail-open (pass) if no key
 
     // Use the fastest available model for this quick gate
     const models = ["gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
@@ -281,9 +307,7 @@ export const fetchNews = action({
             const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             if (!apiKey) {
-                const ident = await ctx.auth.getUserIdentity();
-                const sourceInfo = ident ? (ident.subject ? "Source: User Settings or System Config" : "Source: System Config") : "Source: Env Context (No Identity)";
-                throw new Error(`Gemini API key is missing or invalid. [${sourceInfo}]. Please ensure you have configured your GEMINI_API_KEY in App Settings or Environment Variables.`);
+                console.warn("⚠️ Gemini API key is missing. Falling back to Heuristic Engine for analysis.");
             }
 
             const newsdataKey = await resolveApiKey(ctx, "NEWSDATA_API_KEY", "newsdata");
@@ -793,14 +817,14 @@ async function processArticle(
     country: string,
     lang: string,
     keyword: string,
-    geminiKey: string,
+    geminiKey: string | null,
     stList: string[],
     dateFrom: Date | null,
     dateTo: Date | null,
     shouldResolve: boolean,
     forceSourceType?: string
 ) {
-    if (!item.link || !item.title) return false;
+    if (typeof item.link !== "string" || typeof item.title !== "string") return false;
 
     try {
         // ── GATE 1: Boolean Pre-Filter ─────────────────────────────────────

@@ -91,6 +91,8 @@ export default defineSchema({
             qstash: v.optional(v.string()),
             gleif: v.optional(v.string()), // Usually public, but adding for future-proofing
             opensanctions: v.optional(v.string()), // For Watchlist checks
+            diffbot: v.optional(v.string()),
+            zenrows: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -160,6 +162,25 @@ export default defineSchema({
         .index("by_created_at", ["createdAt"])
         .index("by_user_id", ["userId"]),
 
+    // Dark Web Scan Results
+    darkweb_results: defineTable({
+        query: v.string(),
+        source_type: v.union(v.literal("ahmia"), v.literal("diffbot"), v.literal("zenrows")),
+        url: v.string(),
+        title: v.string(),
+        snippet: v.string(),
+        risk_level: v.union(v.literal("low"), v.literal("medium"), v.literal("high"), v.literal("critical")),
+        country_origin: v.optional(v.string()),
+        discovered_at: v.number(),
+        user_id: v.string(),
+        summary: v.optional(v.string()),
+        tags: v.optional(v.array(v.string())),
+    })
+        .index("by_user_id", ["user_id"])
+        .index("by_discovered_at", ["discovered_at"])
+        .index("by_risk_level", ["risk_level"])
+        .index("by_user_id_and_risk_level", ["user_id", "risk_level"]),
+
     payments: defineTable({
         stripeSessionId: v.string(),
         userId: v.optional(v.string()),
@@ -208,6 +229,8 @@ export default defineSchema({
             qstash: v.optional(v.string()),
             gleif: v.optional(v.string()),
             opensanctions: v.optional(v.string()),
+            diffbot: v.optional(v.string()),
+            zenrows: v.optional(v.string()),
         })),
         isSubscribed: v.optional(v.boolean()),
         isTrialActive: v.optional(v.boolean()),

@@ -1,15 +1,13 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalQuery } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { requireAdmin } from "./utils/auth";
 
 export const getSettings = query({
     args: {},
     handler: async (ctx) => {
-        // Require authentication — this document contains sensitive API secrets.
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            return null; // Return null for unauthenticated callers instead of throwing,
-                         // so UI can safely call this without crashing.
+            return null;
         }
 
         const settings = await ctx.db
@@ -17,9 +15,38 @@ export const getSettings = query({
             .filter((q) => q.eq(q.field("type"), "global"))
             .first();
 
-        return settings;
+        if (!settings) return null;
+
+        // Check if user is admin to return sensitive keys
+        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
+        const isAdmin = adminIds.includes(identity.subject);
+
+        if (isAdmin) {
+            return settings;
+        }
+
+        // Return redacted version for non-admins (only public info)
+        return {
+            _id: settings._id,
+            _creationTime: settings._creationTime,
+            type: settings.type,
+            logoUrl: settings.logoUrl,
+            defaults: settings.defaults,
+            apiKeys: undefined as any, // Tell TS this property exists but is undefined
+        };
     },
 });
+
+export const getSystemSettings = internalQuery({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db
+            .query("app_settings")
+            .filter((q) => q.eq(q.field("type"), "global"))
+            .first();
+    },
+});
+
 
 export const updateSettings = mutation({
     args: {
@@ -45,6 +72,8 @@ export const updateSettings = mutation({
             whoisjson: v.optional(v.string()),
             abuseipdb: v.optional(v.string()),
             numverify: v.optional(v.string()),
+            diffbot: v.optional(v.string()),
+            zenrows: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),

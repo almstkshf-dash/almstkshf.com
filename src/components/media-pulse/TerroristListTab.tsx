@@ -12,7 +12,7 @@ import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { ReportGenerator } from '@/lib/report-generator';
 
 
@@ -95,17 +95,32 @@ export default function TerroristListTab() {
       const reader = new FileReader();
       reader.onload = async (evt) => {
         try {
-          const data = evt.target?.result;
-          const wb = XLSX.read(data, { type: 'array' });
+          const buffer = evt.target?.result as ArrayBuffer;
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(buffer);
 
           let allData: any[] = [];
 
           // Process all sheets
-          wb.SheetNames.forEach(sheetName => {
-            const worksheet = wb.Sheets[sheetName];
-            const data = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          workbook.eachSheet(sheet => {
+            const sheetRows: any[] = [];
+            const headerRow = sheet.getRow(1);
+            // row.values returns [empty, col1, col2, ...]
+            const headers = (headerRow.values as any[]).map(v => v ? String(v).trim() : '');
 
-            const mapped = data.map((row: any) => {
+            sheet.eachRow((row, rowNumber) => {
+              if (rowNumber === 1) return; // skip header row
+              const rowData: any = {};
+              row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                const header = headers[colNumber];
+                if (header) {
+                  rowData[header] = cell.text || cell.value || "";
+                }
+              });
+              sheetRows.push(rowData);
+            });
+
+            const mapped = sheetRows.map((row: any) => {
               // Robust helper to find values by checking common variations of keys
               const getVal = (valKeys: string[]) => {
                 const rowKeys = Object.keys(row);

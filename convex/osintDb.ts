@@ -38,7 +38,7 @@ export const getOsintResults = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new ConvexError("Not authenticated");
+        if (!identity) return [];
         return await ctx.db.query("osint_results")
             .withIndex("by_created_at")
             .order("desc")

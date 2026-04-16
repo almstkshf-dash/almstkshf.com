@@ -164,7 +164,17 @@
     "search_placeholder": "Search...",
     "clear_search": "Clear Search",
     "no_results": "No results found",
-    "save_to_collection": "Save to Collection"
+    "save_to_collection": "Save to Collection",
+    "search": "Search",
+    "date": "Date",
+    "actions": "Actions"
+  },
+  "SearchOptimizer": {
+    "button_tooltip": "Optimize Search with AI",
+    "optimizing": "Optimizing...",
+    "explanation_title": "AI Optimization applied:",
+    "original": "Original",
+    "optimized": "Optimized"
   },
   "Footer": {
     "about": "About ALMSTKSHF",
@@ -1090,6 +1100,8 @@
     "bing_key": "Bing News API Key",
     "mediastack_key": "Mediastack API Key",
     "serper_key": "Serper.dev API Key",
+    "diffbot_key": "Diffbot API Key",
+    "zenrows_key": "ZenRows API Key",
     "phyllo_client_id": "Phyllo Client ID",
     "phyllo_client_secret": "Phyllo Client Secret",
     "defaults": "Default Metrics",
@@ -1185,6 +1197,7 @@
       "view_deep": "Deep Status",
       "view_osint": "OSINT Engine",
       "view_inspect": "AI Inspector",
+      "view_darkweb": "Dark Web",
       "view_terrorist_list": "Watchlist",
       "export_pdf": "Export PDF",
       "export_excel": "Export Excel"
@@ -1615,9 +1628,23 @@
     "col_time": "Timestamp",
     "col_count": "Articles",
     "col_sentiment": "Sentiment",
+    "col_url": "URL",
+    "col_summary": "AI Summary",
+    "col_tags": "Signal Tags",
     "export_pdf": "Export PDF",
     "export_excel": "Export Excel",
     "export_dossier": "Export Dossier"
+  },
+  "DarkWeb": {
+    "tab_label": "Dark Web Intelligence",
+    "search_placeholder": "Enter onion link or keyword...",
+    "risk_level": "Risk Level",
+    "col_risk": "Risk Assessment",
+    "export_report": "Export Dark Web Report",
+    "empty_state": "No dark web threats detected for this query.",
+    "ai_summary": "AI Intelligence Summary",
+    "detected_tags": "Detected Technical Tags",
+    "view_on_tor": "View on Tor Browser"
   },
   "RssFeeder": {
     "title": "Intelligence Stream",
@@ -1972,5 +1999,24 @@
       "col_anomaly": "Anomaly Type",
       "col_severity": "Severity"
     }
+  },
+  "DarkWeb": {
+    "tab_label": "Dark Web Investigation",
+    "tab_description": "Deep & Dark Web Intel",
+    "search_placeholder": "Search onion sites or analyze deep links...",
+    "source_ahmia": "Ahmia Search",
+    "source_diffbot": "Analytic Extract",
+    "source_zenrows": "Stealth Proxy",
+    "col_title": "Headline / Snippet",
+    "col_url": "Onion URL",
+    "col_source": "Method",
+    "col_risk": "Risk Assessment",
+    "risk_critical": "Critical",
+    "risk_high": "High",
+    "risk_medium": "Medium",
+    "risk_low": "Low",
+    "no_results": "No investigative results found",
+    "no_results_desc": "Select a source and enter a keyword or URL to begin investigating.",
+    "col_depth": "Depth"
   }
 }

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X, Globe } from "lucide-react";
+import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X, Globe, Sparkles, Wand2 } from "lucide-react";
 import Button from "../ui/Button";
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -366,8 +366,13 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     // Guard: ensure Clerk token is propagated to Convex before firing the action
     const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
     const fetchNews = useAction(api.monitoringAction.fetchNews);
+    const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
+
+    const tOpt = useTranslations('SearchOptimizer');
 
     const [keyword, setKeyword] = useState('');
+    const [optimizationInfo, setOptimizationInfo] = useState<{ original: string; explanation: string } | null>(null);
+    const [isOptimizing, setIsOptimizing] = useState(false);
     const [selectedCountries, setSelectedCountries] = useState<string[]>(['AE']);
     const [selectedLanguages, setSelectedLanguages] = useState<string[]>(isAr ? ['ar', 'en'] : ['en', 'ar']);
     const [dateFrom, setDateFrom] = useState('');
@@ -477,6 +482,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
     const clearForm = useCallback(() => {
         setKeyword('');
+        setOptimizationInfo(null);
         setSelectedCountries(['AE']);
         setSelectedLanguages(isAr ? ['ar', 'en'] : ['en', 'ar']);
         setDateFrom('');
@@ -485,6 +491,29 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         setErrorMsg('');
         setErrors({});
     }, [isAr]);
+
+    const handleOptimize = async () => {
+        if (!keyword.trim()) return;
+        setIsOptimizing(true);
+        try {
+            const res = await optimizeSearch({
+                keyword: keyword.trim(),
+                context: 'news',
+                targetLanguages: selectedLanguages
+            });
+            if (res && res.optimized) {
+                setOptimizationInfo({
+                    original: keyword,
+                    explanation: res.explanation
+                });
+                setKeyword(res.optimized);
+            }
+        } catch (e) {
+            console.error("Optimization failed:", e);
+        } finally {
+            setIsOptimizing(false);
+        }
+    };
 
     return (
         <section className="relative z-20 bg-card border border-border rounded-2xl overflow-visible backdrop-blur-sm shadow-sm transition-all">
@@ -531,12 +560,46 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                 if (errors.keyword) {
                                     setErrors(prev => ({ ...prev, keyword: undefined }));
                                 }
+                                if (optimizationInfo) setOptimizationInfo(null);
                             }}
                             autoComplete="on"
-                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-4 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none placeholder:text-foreground/40 border transition-colors ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
+                            className={`w-full bg-muted/50 rounded-xl pl-11 pr-12 py-3.5 text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 outline-none placeholder:text-foreground/40 border transition-colors ${errors.keyword ? 'border-destructive/60 ring-2 ring-destructive/20' : 'border-border'
                                 }`}
                         />
+                        <button
+                            type="button"
+                            onClick={handleOptimize}
+                            disabled={isOptimizing || !keyword.trim()}
+                            title={tOpt('button_tooltip')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
+                        >
+                            <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} />
+                            <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" />
+                        </button>
                     </div>
+
+                    {optimizationInfo && (
+                        <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                            <Sparkles className="w-4 h-4 text-primary mt-0.5" />
+                            <div className="flex-1">
+                                <p className="text-[11px] font-bold text-primary uppercase tracking-tight">
+                                    {tOpt('explanation_title')}
+                                </p>
+                                <p className="text-xs text-foreground/80 leading-relaxed italic">
+                                    {optimizationInfo.explanation}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setKeyword(optimizationInfo.original);
+                                    setOptimizationInfo(null);
+                                }}
+                                className="text-[10px] font-bold text-primary hover:underline"
+                            >
+                                {tOpt('original')}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

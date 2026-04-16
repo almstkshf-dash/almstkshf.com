@@ -82,7 +82,17 @@
     "search_placeholder": "ابحث...",
     "clear_search": "مسح البحث",
     "no_results": "لا توجد نتائج",
-    "save_to_collection": "حفظ في المجموعة"
+    "save_to_collection": "حفظ في المجموعة",
+    "search": "بحث",
+    "date": "التاريخ",
+    "actions": "الإجراءات"
+  },
+  "SearchOptimizer": {
+    "button_tooltip": "تحسين البحث بالذكاء الاصطناعي",
+    "optimizing": "جاري التحسين...",
+    "explanation_title": "تم تطبيق تحسين الذكاء الاصطناعي:",
+    "original": "الأصلي",
+    "optimized": "المحسن"
   },
   "ArticleTable": {
     "no_articles": "لم يتم العثور على مقالات. ابدأ المراقبة أو أضف يدوياً.",
@@ -1132,6 +1142,8 @@
     "bing_key": "مفتاح Bing News API",
     "mediastack_key": "مفتاح Mediastack API",
     "serper_key": "مفتاح Serper.dev API",
+    "diffbot_key": "مفتاح Diffbot API",
+    "zenrows_key": "مفتاح ZenRows API",
     "phyllo_client_id": "معرف العميل (Phyllo Client ID)",
     "phyllo_client_secret": "سر العميل (Phyllo Client Secret)",
     "defaults": "المقاييس الافتراضية",
@@ -1229,6 +1241,7 @@
       "view_deep": "الحالة العميقة",
       "view_osint": "محرك الاستخبارات",
       "view_inspect": "فاحص الذكاء الاصطناعي",
+      "view_darkweb": "الويب المظلم",
       "view_terrorist_list": "قائمة المراقبة",
       "export_pdf": "تصدير PDF",
       "export_excel": "تصدير Excel"
@@ -1619,9 +1632,23 @@
     "col_time": "الطابع الزمني",
     "col_count": "المقالات",
     "col_sentiment": "الانطباع",
+    "col_url": "الرابط",
+    "col_summary": "ملخص الذكاء الاصطناعي",
+    "col_tags": "علامات الإشارة",
     "export_pdf": "تصدير PDF",
     "export_excel": "تصدير Excel",
     "export_dossier": "تصدير الملف"
+  },
+  "DarkWeb": {
+    "tab_label": "التحقيق في الويب المظلم",
+    "search_placeholder": "أدخل رابط onion أو كلمة رئيسية...",
+    "risk_level": "مستوى الخطر",
+    "col_risk": "تقييم المخاطر",
+    "export_report": "تصدير تقرير الويب المظلم",
+    "empty_state": "لم يتم اكتشاف تهديدات في الويب المظلم لهذا الاستعلام.",
+    "ai_summary": "ملخص استخبارات الذكاء الاصطناعي",
+    "detected_tags": "العلامات الفنية المكتشفة",
+    "view_on_tor": "عرض على متصفح Tor"
   },
   "RssFeeder": {
     "title": "تدفق الاستخبارات",
@@ -1976,5 +2003,24 @@
       "col_anomaly": "نوع الشذوذ",
       "col_severity": "الحدة"
     }
+  },
+  "DarkWeb": {
+    "tab_label": "تحقيقات الشبكة المظلمة",
+    "tab_description": "استخبارات الويب العميق والمظلم",
+    "search_placeholder": "ابحث في مواقع البصل أو حلل الروابط العميقة...",
+    "source_ahmia": "بحث أهميا",
+    "source_diffbot": "استخراج تحليلي",
+    "source_zenrows": "وكيل متخفي",
+    "col_title": "العنوان / المقتطف",
+    "col_url": "رابط البصل",
+    "col_source": "الطريقة",
+    "col_risk": "تقييم المخاطر",
+    "risk_critical": "حرج",
+    "risk_high": "مرتفع",
+    "risk_medium": "متوسط",
+    "risk_low": "منخفض",
+    "no_results": "لم يتم العثور على نتائج تحقيق",
+    "no_results_desc": "حدد مصدراً وأدخل كلمة بحث أو رابطاً لبدء التحقيق.",
+    "col_depth": "العمق"
   }
 }

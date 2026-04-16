@@ -17,9 +17,6 @@ function hasAdminRole(identity: any): boolean {
         .toString()
         .toLowerCase();
 
-    // Hotfix bypass for specific account that got locked out
-    if (identity?.subject === "user_3ANaCRFF2kzzvODEhQWGEqHoLJb") return true;
-
     if (["admin", "owner", "superadmin"].includes(role)) return true;
     if (getAdminIds().includes(identity?.subject)) return true;
     return false;
@@ -36,11 +33,8 @@ export async function requireUser(auth: Auth) {
 export async function requireAdmin(auth: Auth) {
     const identity = await requireUser(auth);
 
-    // Allow Convex dashboard test identity in development only
-    if (
-        process.env.NODE_ENV !== "production" &&
-        identity.subject === "fake_id"
-    ) {
+    // In development only, we check for 'fake_id' (impersonation)
+    if (process.env.NODE_ENV !== "production" && identity.subject === "fake_id") {
         return identity;
     }
 
@@ -63,4 +57,14 @@ export async function requireAdmin(auth: Auth) {
     }
     return identity;
 }
+export async function isAdmin(auth: Auth): Promise<boolean> {
+    const identity = await auth.getUserIdentity();
+    if (!identity) return false;
+    
+    // Developer bypass during local testing
+    if (process.env.NODE_ENV !== "production" && identity.subject === "fake_id") {
+        return true;
+    }
 
+    return hasAdminRole(identity);
+}

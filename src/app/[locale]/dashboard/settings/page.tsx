@@ -46,6 +46,8 @@ export default function SettingsPage() {
     const [stripePublishableKey, setStripePublishableKey] = useState('');
     const [stripeSecretKey, setStripeSecretKey] = useState('');
     const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
+    const [diffbotKey, setDiffbotKey] = useState('');
+    const [zenrowsKey, setZenrowsKey] = useState('');
     const [targetCountries, setTargetCountries] = useState('AE,SA');
     const [aveMultiplier, setAveMultiplier] = useState(0.005);
     const searchParams = useSearchParams();
@@ -75,22 +77,25 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (settings) {
+            const apiKeys = (settings as any).apiKeys;
             setLogoUrl(settings.logoUrl || '');
-            setGeminiKey(settings.apiKeys?.gemini || '');
-            setInstagramKey(settings.apiKeys?.instagram || '');
-            setTwitterKey(settings.apiKeys?.twitter || '');
-            setTwitterBearer(settings.apiKeys?.twitterBearer || '');
-            setTwitterConsumerKey(settings.apiKeys?.twitterConsumerKey || '');
-            setTwitterConsumerSecret(settings.apiKeys?.twitterConsumerSecret || '');
-            setNewsdataKey(settings.apiKeys?.newsdata || '');
-            setNewsapiKey(settings.apiKeys?.newsapi || '');
-            setGnewsKey(settings.apiKeys?.gnews || '');
-            setWorldnewsKey(settings.apiKeys?.worldnews || '');
-            setChatbaseId(settings.apiKeys?.chatbaseId || '');
-            setChatbaseHost(settings.apiKeys?.chatbaseHost || '');
-            setStripePublishableKey(settings.apiKeys?.stripePublishableKey || '');
-            setStripeSecretKey(settings.apiKeys?.stripeSecretKey || '');
-            setStripeWebhookSecret(settings.apiKeys?.stripeWebhookSecret || '');
+            setGeminiKey(apiKeys?.gemini || '');
+            setInstagramKey(apiKeys?.instagram || '');
+            setTwitterKey(apiKeys?.twitter || '');
+            setTwitterBearer(apiKeys?.twitterBearer || '');
+            setTwitterConsumerKey(apiKeys?.twitterConsumerKey || '');
+            setTwitterConsumerSecret(apiKeys?.twitterConsumerSecret || '');
+            setNewsdataKey(apiKeys?.newsdata || '');
+            setNewsapiKey(apiKeys?.newsapi || '');
+            setGnewsKey(apiKeys?.gnews || '');
+            setWorldnewsKey(apiKeys?.worldnews || '');
+            setChatbaseId(apiKeys?.chatbaseId || '');
+            setChatbaseHost(apiKeys?.chatbaseHost || '');
+            setStripePublishableKey(apiKeys?.stripePublishableKey || '');
+            setStripeSecretKey(apiKeys?.stripeSecretKey || '');
+            setStripeWebhookSecret(apiKeys?.stripeWebhookSecret || '');
+            setDiffbotKey(apiKeys?.diffbot || '');
+            setZenrowsKey(apiKeys?.zenrows || '');
             setTargetCountries(settings.defaults?.targetCountries?.join(',') || 'AE,SA');
             setAveMultiplier(settings.defaults?.aveMultiplier || 0.005);
         }
@@ -138,6 +143,8 @@ export default function SettingsPage() {
                     stripePublishableKey: stripePublishableKey,
                     stripeSecretKey: stripeSecretKey,
                     stripeWebhookSecret: stripeWebhookSecret,
+                    diffbot: diffbotKey,
+                    zenrows: zenrowsKey,
                 },
                 defaults: {
                     targetCountries: targetCountries.split(',').map(c => c.trim().toUpperCase()),
@@ -370,6 +377,8 @@ export default function SettingsPage() {
                                         { id: 'newsapi', label: t('newsapi_key'), value: newsapiKey, set: setNewsapiKey },
                                         { id: 'gnews', label: t('gnews_key'), value: gnewsKey, set: setGnewsKey },
                                         { id: 'worldnews', label: t('worldnews_key'), value: worldnewsKey, set: setWorldnewsKey },
+                                        { id: 'diffbot', label: t('diffbot_key'), value: diffbotKey, set: setDiffbotKey },
+                                        { id: 'zenrows', label: t('zenrows_key'), value: zenrowsKey, set: setZenrowsKey },
                                     ].map((field) => (
                                         <div key={field.id} className="space-y-2">
                                             <label htmlFor={field.id} className="text-sm font-bold text-foreground/80">{field.label}</label>

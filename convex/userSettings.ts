@@ -7,12 +7,24 @@ import { v, ConvexError } from "convex/values";
 export const get = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return null;
+
+        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
+        const isAdmin = adminIds.includes(identity.subject);
+
+        // Authorization: Only allow user to see their own settings OR an admin to see any.
+        if (identity.subject !== args.userId && !isAdmin) {
+            throw new ConvexError("Not authorized to view these settings.");
+        }
+
         return await ctx.db
             .query("userSettings")
             .withIndex("by_userId", (q) => q.eq("userId", args.userId))
             .unique();
     },
 });
+
 
 /**
  * Initializes user settings with a 7-day trial.

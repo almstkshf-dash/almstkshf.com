@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useTransition, Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
-import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2, Activity, BarChart3 } from 'lucide-react';
+import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2, Activity, BarChart3, GlobeLock } from 'lucide-react';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import { DashboardGrid } from '@/components/media-pulse/DashboardGrid';
 import ArticleTable from '@/components/media-pulse/ArticleTable';
@@ -26,6 +26,7 @@ import RssFeeder from '@/components/dashboard/RssFeeder';
 import { AAWSAT_SOURCES } from '@/config/rss-sources';
 import { Shield, Fingerprint as InspectIcon } from 'lucide-react';
 import AiInspectorTab from '@/components/media-pulse/AiInspectorTab';
+import DarkWebTab from '@/components/media-pulse/DarkWebTab';
 
 type ArticleItem = {
     _id: string;
@@ -53,19 +54,19 @@ export default function DashboardPage() {
     const [selectedCountry, setSelectedCountry] = useState('All');
 
     // Initialize activeView from URL search parameters, defaulting to 'standard'
-    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect'>(
+    const [activeView, setActiveView] = useState<'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb'>(
         (searchParams.get('view') as any) || 'standard'
     );
 
     // Sync state with URL search parameters
     useEffect(() => {
         const view = searchParams.get('view') as any;
-        if (view && ['standard', 'deep', 'osint', 'terrorist_list', 'inspect'].includes(view)) {
+        if (view && ['standard', 'deep', 'osint', 'terrorist_list', 'inspect', 'darkweb'].includes(view)) {
             setActiveView(view);
         }
     }, [searchParams]);
 
-    const changeView = (newView: 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect') => {
+    const changeView = (newView: 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb') => {
         setActiveView(newView);
         const params = new URLSearchParams(searchParams.toString());
         params.set('view', newView);
@@ -326,6 +327,7 @@ export default function DashboardPage() {
                             {[
                                 { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
                                 { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
+                                { id: 'darkweb', label: t('filters.view_darkweb') || 'Dark Web', icon: GlobeLock, color: 'purple', restricted: !isAdmin },
                                 { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
                                 { id: 'inspect', label: t('filters.view_inspect') || 'AI Inspector', icon: InspectIcon, color: 'primary' },
                                 { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
@@ -543,6 +545,8 @@ export default function DashboardPage() {
                         <DeepStatusPanel />
                     </>
                 )}
+
+                {activeView === 'darkweb' && <DarkWebTab />}
 
                 {activeView === 'osint' && <OsintTab />}
 
