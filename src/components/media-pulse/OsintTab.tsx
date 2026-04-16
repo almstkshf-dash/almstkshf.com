@@ -263,22 +263,22 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'corporate' && (
           <div className="space-y-6">
             <DataSection title="Corporate Entities" icon={Database}>
-                {get(data, 'companies')?.map((c: any, i: number) => (
-                  <a
-                    key={i}
-                    href={c.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
-                  >
-                    <h5 className="text-xs font-bold text-foreground">{c.name}</h5>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      <StatusBadge label="Jurisdiction" value={c.jurisdiction || 'N/A'} type="default" />
-                      <StatusBadge label="Status" value={c.status || 'N/A'} type="info" />
-                      <StatusBadge label="Company Number" value={c.number || 'N/A'} type="default" />
-                    </div>
-                  </a>
-                ))}
+              {get(data, 'companies')?.map((c: any, i: number) => (
+                <a
+                  key={i}
+                  href={c.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+                >
+                  <h5 className="text-xs font-bold text-foreground">{c.name}</h5>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <StatusBadge label="Jurisdiction" value={c.jurisdiction || 'N/A'} type="default" />
+                    <StatusBadge label="Status" value={c.status || 'N/A'} type="info" />
+                    <StatusBadge label="Company Number" value={c.number || 'N/A'} type="default" />
+                  </div>
+                </a>
+              ))}
             </DataSection>
           </div>
         )}
@@ -286,22 +286,22 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'location' && (
           <div className="space-y-6">
             <DataSection title="Geographic Targets" icon={Globe}>
-                {get(data, 'locations')?.map((loc: any, i: number) => (
-                  <a
-                    key={i}
-                    href={loc.osmUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
-                  >
-                    <h5 className="text-xs font-bold text-foreground">{loc.displayName}</h5>
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                       <StatusBadge label="Type" value={loc.type || 'N/A'} type="info" />
-                       <StatusBadge label="City" value={loc.city || 'N/A'} type="default" />
-                       <StatusBadge label="Country" value={loc.country || 'N/A'} type="default" />
-                    </div>
-                  </a>
-                ))}
+              {get(data, 'locations')?.map((loc: any, i: number) => (
+                <a
+                  key={i}
+                  href={loc.osmUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block p-3 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+                >
+                  <h5 className="text-xs font-bold text-foreground">{loc.displayName}</h5>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <StatusBadge label="Type" value={loc.type || 'N/A'} type="info" />
+                    <StatusBadge label="City" value={loc.city || 'N/A'} type="default" />
+                    <StatusBadge label="Country" value={loc.country || 'N/A'} type="default" />
+                  </div>
+                </a>
+              ))}
             </DataSection>
           </div>
         )}
@@ -309,15 +309,15 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'wikipedia' && get(data, 'wiki') && (
           <div className="space-y-6">
             <DataSection title="General Information" icon={Info}>
-                  <a
-                    href={get(data, 'wiki.url')}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block p-4 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
-                  >
-                    <h5 className="text-sm font-bold text-foreground">{get(data, 'wiki.title')}</h5>
-                    <p className="text-xs text-foreground/70 mt-2 leading-relaxed">{get(data, 'wiki.summary')}</p>
-                  </a>
+              <a
+                href={get(data, 'wiki.url')}
+                target="_blank"
+                rel="noreferrer"
+                className="block p-4 rounded-xl border border-border bg-card/50 hover:bg-muted/50 transition-colors col-span-1 sm:col-span-2"
+              >
+                <h5 className="text-sm font-bold text-foreground">{get(data, 'wiki.title')}</h5>
+                <p className="text-xs text-foreground/70 mt-2 leading-relaxed">{get(data, 'wiki.summary')}</p>
+              </a>
             </DataSection>
           </div>
         )}
@@ -325,19 +325,19 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'gleif' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.lei_registration')} icon={Database}>
-                {get(data, 'records')?.map((r: any, i: number) => (
-                  <div
-                    key={i}
-                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2"
-                  >
-                    <h5 className="text-xs font-bold text-foreground">{r.legalName}</h5>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                       <StatusBadge label={t('result_view.headers.lei')} value={r.lei || 'N/A'} type="default" />
-                       <StatusBadge label={t('result_view.headers.status')} value={r.status || 'N/A'} type="info" />
-                       <StatusBadge label={t('result_view.headers.jurisdiction')} value={r.jurisdiction || 'N/A'} type="default" />
-                    </div>
+              {get(data, 'records')?.map((r: any, i: number) => (
+                <div
+                  key={i}
+                  className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2"
+                >
+                  <h5 className="text-xs font-bold text-foreground">{r.legalName}</h5>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <StatusBadge label={t('result_view.headers.lei')} value={r.lei || 'N/A'} type="default" />
+                    <StatusBadge label={t('result_view.headers.status')} value={r.status || 'N/A'} type="info" />
+                    <StatusBadge label={t('result_view.headers.jurisdiction')} value={r.jurisdiction || 'N/A'} type="default" />
                   </div>
-                ))}
+                </div>
+              ))}
             </DataSection>
           </div>
         )}
@@ -345,30 +345,30 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'watchlist' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
-                {get(data, 'matches')?.map((m: any, i: number) => (
-                  <div
-                    key={i}
-                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
-                  >
-                    <div className="flex items-center justify-between">
-                      <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
-                      <span className="text-[10px] font-black text-destructive uppercase tracking-widest">
-                        {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                       <StatusBadge label={t('result_view.headers.schema')} value={m.schema || 'N/A'} type="info" />
-                       <StatusBadge label={t('result_view.headers.datasets')} value={m.datasets?.join(', ') || 'N/A'} type="default" />
-                       <StatusBadge label={t('result_view.headers.topics')} value={m.topics?.join(', ') || 'None'} type="default" />
-                    </div>
+              {get(data, 'matches')?.map((m: any, i: number) => (
+                <div
+                  key={i}
+                  className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
+                >
+                  <div className="flex items-center justify-between">
+                    <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
+                    <span className="text-[10px] font-black text-destructive uppercase tracking-widest">
+                      {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
+                    </span>
                   </div>
-                ))}
-                {!get(data, 'matches')?.length && (
-                   <div className="col-span-1 sm:col-span-2 p-4 text-center border border-emerald-500/20 bg-emerald-500/5 rounded-xl">
-                      <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-50" />
-                      <p className="text-xs font-bold text-emerald-600">{t('result_view.fields.no_matches')}</p>
-                   </div>
-                )}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <StatusBadge label={t('result_view.headers.schema')} value={m.schema || 'N/A'} type="info" />
+                    <StatusBadge label={t('result_view.headers.datasets')} value={m.datasets?.join(', ') || 'N/A'} type="default" />
+                    <StatusBadge label={t('result_view.headers.topics')} value={m.topics?.join(', ') || 'None'} type="default" />
+                  </div>
+                </div>
+              ))}
+              {!get(data, 'matches')?.length && (
+                <div className="col-span-1 sm:col-span-2 p-4 text-center border border-emerald-500/20 bg-emerald-500/5 rounded-xl">
+                  <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-50" />
+                  <p className="text-xs font-bold text-emerald-600">{t('result_view.fields.no_matches')}</p>
+                </div>
+              )}
             </DataSection>
           </div>
         )}
@@ -697,33 +697,33 @@ export default function OsintTab() {
                 {loading ? tCommon('analyze_tone') : tCommon('generate_report')}
               </Button>
             </div>
-              <p className={clsx("text-[11px] font-medium", isAdmin ? "text-foreground/60" : "text-amber-600 font-bold")}>
-                {!isAdmin ? t('admin_only') : currentType.hint}
-              </p>
-            </div>
+            <p className={clsx("text-[11px] font-medium", isAdmin ? "text-foreground/60" : "text-amber-600 font-bold")}>
+              {!isAdmin ? t('admin_only') : currentType.hint}
+            </p>
+          </div>
 
-            {optimizationInfo && (
-              <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
-                <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
-                    {tOpt('explanation_title')}
-                  </p>
-                  <p className="text-[11px] text-foreground/80 leading-relaxed italic">
-                    {optimizationInfo.explanation}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setQuery(optimizationInfo.original);
-                    setOptimizationInfo(null);
-                  }}
-                  className="text-[10px] font-bold text-primary hover:underline flex-shrink-0"
-                >
-                  {tOpt('original')}
-                </button>
+          {optimizationInfo && (
+            <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+              <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
+                  {tOpt('explanation_title')}
+                </p>
+                <p className="text-[11px] text-foreground/80 leading-relaxed italic">
+                  {optimizationInfo.explanation}
+                </p>
               </div>
-            )}
+              <button
+                onClick={() => {
+                  setQuery(optimizationInfo.original);
+                  setOptimizationInfo(null);
+                }}
+                className="text-[10px] font-bold text-primary hover:underline flex-shrink-0"
+              >
+                {tOpt('original')}
+              </button>
+            </div>
+          )}
 
           {/* Result Area */}
           <AnimatePresence mode="wait">
@@ -747,14 +747,14 @@ export default function OsintTab() {
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div>
-                    <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
+                      <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
                       <p className="text-[10px] font-medium text-foreground/80 uppercase tracking-widest">Analysis Completed Successfully</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => setIsCollectionModalOpen(true)}>
-                        <FolderPlus className="w-3 h-3" />
-                        Save to Collection
+                      <FolderPlus className="w-3 h-3" />
+                      Save to Collection
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
                       <Database className="w-3 h-3" />
@@ -763,15 +763,15 @@ export default function OsintTab() {
                   </div>
                 </div>
 
-                <SaveToCollectionModal 
-                    isOpen={isCollectionModalOpen} 
-                    onClose={() => setIsCollectionModalOpen(false)}
-                    item={{
-                        id: Math.random().toString(36).substring(7),
-                        type: "osint",
-                        title: `OSINT: ${activeType} lookup for ${query}`,
-                        data: result
-                    }}
+                <SaveToCollectionModal
+                  isOpen={isCollectionModalOpen}
+                  onClose={() => setIsCollectionModalOpen(false)}
+                  item={{
+                    id: Math.random().toString(36).substring(7),
+                    type: "osint",
+                    title: `OSINT: ${activeType} lookup for ${query}`,
+                    data: result
+                  }}
                 />
 
                 <StructuredResultView type={activeType} data={result} t={t} />
@@ -870,16 +870,16 @@ export default function OsintTab() {
               ))}
             </div>
             {historyItemToSave && (
-               <SaveToCollectionModal 
-                    isOpen={!!historyItemToSave} 
-                    onClose={() => setHistoryItemToSave(null)}
-                    item={{
-                        id: historyItemToSave._id,
-                        type: "osint",
-                        title: `OSINT: ${historyItemToSave.type} lookup for ${historyItemToSave.query}`,
-                        data: historyItemToSave.result
-                    }}
-                />
+              <SaveToCollectionModal
+                isOpen={!!historyItemToSave}
+                onClose={() => setHistoryItemToSave(null)}
+                item={{
+                  id: historyItemToSave._id,
+                  type: "osint",
+                  title: `OSINT: ${historyItemToSave.type} lookup for ${historyItemToSave.query}`,
+                  data: historyItemToSave.result
+                }}
+              />
             )}
           </div>
         )}
@@ -949,7 +949,7 @@ export default function OsintTab() {
               <div className="flex items-center gap-3">
                 <Filter className="w-5 h-5 text-primary" />
                 <h3 id="osint-directory-title" className="font-bold">{tOsint('title')}</h3>
-                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-primary/20">
+                <span className="text-[10px] bg-primary/10 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-primary/20">
                   {resources.length} {tOsint('filters.search')}
                 </span>
               </div>
@@ -961,21 +961,21 @@ export default function OsintTab() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1.5">
                   <label htmlFor="dir-category" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.category')}</label>
-                  <select id="dir-category" name="category" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={category} onChange={e => { setCategory(e.target.value); setPage(0); }}>
+                  <select id="dir-category" name="category" aria-label={tOsint('filters.category')} className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={category} onChange={e => { setCategory(e.target.value); setPage(0); }}>
                     <option value="all">Global (All)</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="dir-label" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.label')}</label>
-                  <select id="dir-label" name="label" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={labelFilter} onChange={e => { setLabelFilter(e.target.value); setPage(0); }}>
+                  <select id="dir-label" name="label" aria-label={tOsint('filters.label')} className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={labelFilter} onChange={e => { setLabelFilter(e.target.value); setPage(0); }}>
                     <option value="all">Any Access</option>
                     {LABELS.map(l => <option key={l.code} value={l.code}>{l.text}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="dir-lang" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.language')}</label>
-                  <select id="dir-lang" name="language" className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={language} onChange={e => { setLanguage(e.target.value); setPage(0); }}>
+                  <select id="dir-lang" name="language" aria-label={tOsint('filters.language')} className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2.5 text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" value={language} onChange={e => { setLanguage(e.target.value); setPage(0); }}>
                     <option value="all">Multi-language</option>
                     <option value="en">English Only</option>
                     <option value="ar">Arabic Oriented</option>
@@ -1001,7 +1001,7 @@ export default function OsintTab() {
                     <p className="text-[11px] text-foreground/70 line-clamp-2 mb-4 flex-1 font-medium">{r.description}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {r.categories.slice(0, 2).map(c => (
-                        <span key={c} className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/10">{c}</span>
+                        <span key={c} className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-primary/10 text-blue-800 dark:text-blue-300 border border-primary/10">{c}</span>
                       ))}
                       {r.freeTier && <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/10">Free</span>}
                     </div>

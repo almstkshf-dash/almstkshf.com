@@ -294,7 +294,7 @@ export default function AiInspectorTab() {
               <div className="flex items-center justify-between glass-card px-8 py-4 rounded-3xl border border-border/50">
                 <h2 className="text-xl font-black flex items-center gap-4 text-foreground tracking-tight">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <Search className="w-5 h-5 text-primary" />
+                    <Search className="w-5 h-5 text-blue-800 dark:text-blue-300" />
                   </div>
                   {t("results_summary")}
                 </h2>
@@ -368,7 +368,7 @@ export default function AiInspectorTab() {
                     </div>
                     <div className="flex flex-col justify-center space-y-6 lg:pl-10">
                       <div className="space-y-3">
-                        <div className="inline-block px-4 py-1 bg-primary/10 rounded-full border border-primary/20 text-[10px] font-black text-primary tracking-widest uppercase">
+                        <div className="inline-block px-4 py-1 bg-primary/10 rounded-full border border-primary/20 text-[10px] font-black text-blue-800 dark:text-blue-300 tracking-widest uppercase">
                           {t("forensic_extraction")}
                         </div>
                         <h3 className="text-4xl font-black tracking-tighter text-foreground">{t("video.analysis_report")}</h3>

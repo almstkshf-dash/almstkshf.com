@@ -37,7 +37,7 @@ export function AnalyticsStrategy() {
     return (
         <section className="space-y-20 border-t border-border pt-32 transition-colors">
             <div className="max-w-4xl space-y-6">
-                <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
+                <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-blue-800 dark:text-blue-300 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
                     {t('strategy_badge')}
                 </div>
                 <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">

@@ -17,7 +17,7 @@ export function Header() {
                     className="flex items-center gap-3"
                 >
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 transition-colors">
-                        <Activity className="w-7 h-7 text-primary" />
+                        <Activity className="w-7 h-7 text-blue-800 dark:text-blue-300" />
                     </div>
                     <h1 className="text-5xl lg:text-7xl font-bold text-foreground tracking-tighter transition-colors">
                         {t("media_pulse")}

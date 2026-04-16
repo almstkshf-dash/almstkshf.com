@@ -61,7 +61,7 @@ const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
     };
 
     return (
-        <div className="inline-flex items-center bg-primary/15 text-primary dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
+        <div className="inline-flex items-center bg-primary/15 text-blue-800 dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
             {editingKeyword === kw ? (
                 <input
                     type="text"
@@ -243,7 +243,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                         </Button>
                                     </div>
                                 )}
-                                <div className="px-3 py-1 bg-primary/15 border border-primary/20 rounded-full text-[10px] font-bold text-primary dark:text-blue-300 transition-colors uppercase tracking-widest">{t('real_time')}</div>
+                                <div className="px-3 py-1 bg-primary/15 border border-primary/20 rounded-full text-[10px] font-bold text-blue-800 dark:text-blue-300 transition-colors uppercase tracking-widest">{t('real_time')}</div>
                                 <div className="px-3 py-1 bg-muted border border-border rounded-full text-[10px] font-bold text-foreground/80 uppercase tracking-widest text-center transition-colors">{t('global')}</div>
                             </div>
                         </div>
@@ -410,7 +410,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 <Globe className="w-4 h-4 text-primary" />
                                 {tDashboard('geography')}
                             </h4>
-                            <span className="text-[10px] font-black text-primary dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
+                            <span className="text-[10px] font-black text-blue-800 dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
                                 TOP {geoEntries.length}
                             </span>
                         </div>

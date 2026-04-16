@@ -272,6 +272,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             <select
                                 id="source_type"
                                 name="source_type"
+                                aria-label={t('type')}
                                 value={formData.sourceType}
                                 onChange={e => setFormData({ ...formData, sourceType: e.target.value })}
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"
@@ -288,6 +289,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             <select
                                 id="sentiment"
                                 name="sentiment"
+                                aria-label={t('sentiment')}
                                 value={formData.sentiment}
                                 onChange={e => setFormData({ ...formData, sentiment: e.target.value })}
                                 className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"

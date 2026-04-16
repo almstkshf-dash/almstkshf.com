@@ -57,6 +57,7 @@ export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>(
         (searchParams.get('tab') as any) || 'general'
     );
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Sync state with URL search parameters
     useEffect(() => {
@@ -73,7 +74,7 @@ export default function SettingsPage() {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (settings) {
@@ -101,18 +102,43 @@ export default function SettingsPage() {
         }
     }, [settings]);
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        
+        if (!targetCountries.trim()) {
+            newErrors.targetCountries = t('error_required');
+        } else {
+            const countryCodes = targetCountries.split(',').map(c => c.trim());
+            const isValid = countryCodes.every(c => /^[A-Z]{2}$/i.test(c));
+            if (!isValid) {
+                newErrors.targetCountries = t('error_invalid_countries');
+            }
+        }
+
+        if (isNaN(Number(aveMultiplier)) || Number(aveMultiplier) <= 0) {
+            newErrors.aveMultiplier = t('error_required');
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             // Guard against Convex's 1MB document limit — base64 adds ~33% overhead.
             // Combined with all API keys in the same document, 700KB is a safe ceiling.
             if (file.size > 700 * 1024) {
-                setMessage({
-                    type: 'error',
-                    text: `Logo file is too large (${Math.round(file.size / 1024)}KB). Please use an image under 700KB.`
+                setErrors({
+                    logo: `Logo file is too large (${Math.round(file.size / 1024)}KB). Please use an image under 700KB.`
                 });
                 return;
             }
+            setErrors(prev => {
+                const n = { ...prev };
+                delete n.logo;
+                return n;
+            });
             const reader = new FileReader();
             reader.onloadend = () => {
                 setLogoUrl(reader.result as string);
@@ -122,6 +148,11 @@ export default function SettingsPage() {
     };
 
     const handleSave = async () => {
+        if (!validate()) {
+            setMessage({ type: 'error', text: t('save_failed') });
+            return;
+        }
+
         setIsLoading(true);
         setMessage(null);
         try {
@@ -209,12 +240,12 @@ export default function SettingsPage() {
                 </Button>
             </div>
 
-            {message && (
+            {message?.type === 'success' && (
                 <div className={clsx(
                     "p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300",
-                    message.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400' : 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/30 dark:text-rose-400'
+                    "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400"
                 )}>
-                    <div className={clsx("w-2 h-2 rounded-full", message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500')} />
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
                     {message.text}
                 </div>
             )}
@@ -250,7 +281,10 @@ export default function SettingsPage() {
                                     {t('logo_upload')}
                                 </h2>
                                 <div className="flex flex-col sm:flex-row items-center gap-8">
-                                    <div className="relative w-40 h-40 border-2 border-dashed border-border rounded-3xl flex items-center justify-center bg-muted/30 overflow-hidden group">
+                                    <div className={clsx(
+                                        "relative w-40 h-40 border-2 border-dashed rounded-3xl flex items-center justify-center bg-muted/30 overflow-hidden group transition-colors",
+                                        errors.logo ? "border-rose-500 shadow-[0_0_0_1px_rgba(244,63,94,0.1)]" : "border-border"
+                                    )}>
                                         {logoUrl ? (
                                             <Image src={logoUrl} alt={t('logo_alt')} fill className="object-contain p-4 transition-transform group-hover:scale-105" />
                                         ) : (
@@ -272,6 +306,7 @@ export default function SettingsPage() {
                                     <div className="flex-1 space-y-2">
                                         <p className="font-medium text-foreground">{t('logo_desc')}</p>
                                         <p className="text-sm text-muted-foreground">{t('logo_size_hint')}</p>
+                                        {errors.logo && <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-left-2">{errors.logo}</p>}
                                     </div>
                                 </div>
                             </section>
@@ -289,10 +324,19 @@ export default function SettingsPage() {
                                             name="target-countries"
                                             value={targetCountries}
                                             onChange={(e) => setTargetCountries(e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
+                                            className={clsx(
+                                                "w-full px-4 py-3 rounded-xl border bg-muted/20 focus:ring-2 outline-none text-foreground transition-all",
+                                                errors.targetCountries ? "border-rose-500 focus:ring-rose-200" : "border-border focus:ring-primary"
+                                            )}
                                             placeholder={t('placeholder_countries')}
                                         />
-                                        <p className="text-xs text-muted-foreground">{t('iso_hint')}</p>
+                                        <div className="min-h-[1.25rem]">
+                                        {errors.targetCountries ? (
+                                            <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-top-1">{errors.targetCountries}</p>
+                                        ) : (
+                                            <p className="text-xs text-muted-foreground">{t('iso_hint')}</p>
+                                        )}
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <label htmlFor="ave-multiplier" className="text-sm font-bold text-foreground/80">{t('ave_multiplier')}</label>
@@ -303,9 +347,18 @@ export default function SettingsPage() {
                                             step="0.001"
                                             value={aveMultiplier}
                                             onChange={(e) => setAveMultiplier(parseFloat(e.target.value))}
-                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground"
+                                            className={clsx(
+                                                "w-full px-4 py-3 rounded-xl border bg-muted/20 focus:ring-2 outline-none text-foreground transition-all",
+                                                errors.aveMultiplier ? "border-rose-500 focus:ring-rose-200" : "border-border focus:ring-primary"
+                                            )}
                                         />
-                                        <p className="text-sm text-muted-foreground">{t('default_value')}: 0.005</p>
+                                        <div className="min-h-[1.25rem]">
+                                        {errors.aveMultiplier ? (
+                                            <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-top-1">{errors.aveMultiplier}</p>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">{t('default_value')}: 0.005</p>
+                                        )}
+                                        </div>
                                     </div>
                                 </div>
 

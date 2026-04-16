@@ -37,7 +37,7 @@ const nextConfig = {
 
     // Top-level turbopack config (Next.js 15.5+)
     turbopack: {
-        root: '.',
+        root: process.cwd(),
         resolveAlias: {
             // Stub @mediapipe/face_mesh so Turbopack never tries to statically
             // resolve the broken FaceMesh export. mlHelper.ts uses dynamic

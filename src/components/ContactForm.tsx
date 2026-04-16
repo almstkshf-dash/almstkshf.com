@@ -11,20 +11,39 @@ import clsx from "clsx";
 
 export default function ContactForm() {
     const t = useTranslations("Contact");
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         subject: "",
-        message: ""
+        message: "",
     });
 
     const submitContact = useMutation(api.contact.submit);
     const sendContactEmail = useAction(api.contact.sendContactEmail);
 
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.name.trim()) newErrors.name = t("error_required");
+        if (!formData.email.trim()) {
+            newErrors.email = t("error_required");
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = t("error_email");
+        }
+        if (!formData.subject.trim()) newErrors.subject = t("error_required");
+        if (!formData.message.trim()) newErrors.message = t("error_required");
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!validate()) return;
+
         setStatus("loading");
+        setErrors({});
 
         try {
             // First, save to database
@@ -41,6 +60,7 @@ export default function ContactForm() {
 
                 setStatus("success");
                 setFormData({ name: "", email: "", subject: "", message: "" });
+                setErrors({});
             } else {
                 console.error("Contact submission failed:", res.error);
                 setStatus("error");
@@ -85,13 +105,16 @@ export default function ContactForm() {
                         id="name"
                         name="name"
                         type="text"
-                        required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder={t("placeholders.name")}
                         autoComplete="name"
-                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                        className={clsx(
+                            "w-full bg-muted border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none transition-all",
+                            errors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
+                        )}
                     />
+                    {errors.name && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.name}</p>}
                 </div>
                 <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
@@ -101,13 +124,16 @@ export default function ContactForm() {
                         id="email"
                         name="email"
                         type="email"
-                        required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder={t("placeholders.email")}
                         autoComplete="email"
-                        className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                        className={clsx(
+                            "w-full bg-muted border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none transition-all",
+                            errors.email ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
+                        )}
                     />
+                    {errors.email && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.email}</p>}
                 </div>
             </div>
 
@@ -119,13 +145,16 @@ export default function ContactForm() {
                     id="subject"
                     name="subject"
                     type="text"
-                    required
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder={t("placeholders.subject")}
                     autoComplete="on"
-                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                    className={clsx(
+                        "w-full bg-muted border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none transition-all",
+                        errors.subject ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
+                    )}
                 />
+                {errors.subject && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.subject}</p>}
             </div>
 
             <div className="space-y-2">
@@ -136,17 +165,20 @@ export default function ContactForm() {
                     id="message"
                     name="message"
                     rows={6}
-                    required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder={t("placeholders.message")}
                     autoComplete="on"
-                    className="w-full bg-muted border border-border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors resize-none"
+                    className={clsx(
+                        "w-full bg-muted border rounded-2xl py-4 px-6 text-foreground placeholder:text-foreground/50 focus:outline-none transition-all resize-none",
+                        errors.message ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
+                    )}
                 />
+                {errors.message && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.message}</p>}
             </div>
 
             {status === "error" && (
-                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-500 text-sm">
+                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-500 text-sm animate-in zoom-in-95 duration-200">
                     <AlertCircle className="w-5 h-5" />
                     {t("error")}
                 </div>
@@ -156,7 +188,7 @@ export default function ContactForm() {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full h-14 text-base"
+                className="w-full h-14 text-base font-extrabold uppercase tracking-widest"
                 isLoading={status === "loading"}
                 rightIcon={<Send className="w-4 h-4" />}
             >

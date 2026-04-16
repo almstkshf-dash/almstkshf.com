@@ -86,7 +86,7 @@ const ArticleRow = memo(({
                         href={article.resolvedUrl || article.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
+                        className="font-semibold text-foreground hover:text-blue-800 transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
                         dir="auto"
                     >
                         <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
@@ -354,7 +354,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
             {selectedIds.size > 0 && (
                 <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border-y border-primary/20 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-primary dark:text-blue-300">
+                        <span className="text-sm font-bold text-blue-800 dark:text-blue-300">
                             {t('items_selected', { count: selectedIds.size })}
                         </span>
                     </div>

@@ -72,7 +72,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                                     let bgClass = "bg-muted/40";
                                     let shadowClass = "";
                                     let ringClass = "";
-                                    let textClass = "text-primary";
+                                    let textClass = "text-blue-800 dark:text-blue-300";
 
                                     if (val > 0) {
                                         if (intensity > 0.8) {

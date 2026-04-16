@@ -438,12 +438,12 @@ export default function DashboardPage() {
                                     <div className="space-y-1">
                                         <h2 className="text-2xl font-black text-foreground flex items-center gap-3 uppercase tracking-tighter italic">
                                             <div className="p-2 bg-primary/10 rounded-xl">
-                                                <Filter className="w-5 h-5 text-primary" />
+                                                <Filter className="w-5 h-5 text-blue-800 dark:text-blue-300" />
                                             </div>
                                             {t('coverage_log')}
                                         </h2>
                                         <p className="text-sm text-foreground/70 dark:text-slate-400 font-medium flex items-center gap-2">
-                                            <span className="text-primary font-black">{totalArticles}</span>
+                                            <span className="text-blue-800 dark:text-blue-300 font-black">{totalArticles}</span>
                                             {t('total_articles_detected') || 'total articles detected in current scope'}
                                         </p>
                                     </div>
@@ -452,6 +452,8 @@ export default function DashboardPage() {
                                         <div className="relative group">
                                             <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
                                             <select
+                                                id="dashboard-country-select"
+                                                aria-label={t('filters.country') || "Select Country"}
                                                 value={selectedCountry}
                                                 onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
                                                 className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"

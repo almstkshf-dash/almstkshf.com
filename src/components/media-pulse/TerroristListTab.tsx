@@ -448,7 +448,7 @@ export default function TerroristListTab() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-                      <Upload className="w-6 h-6 text-primary" aria-hidden="true" />
+                      <Upload className="w-6 h-6 text-blue-800 dark:text-blue-300" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 id="import-watchlist-title" className="text-xl font-bold">{t('import_modal.title')}</h3>

@@ -307,6 +307,8 @@ export default function DarkWebTab() {
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-foreground/50 flex-shrink-0" />
               <select
+                id="darkweb-country-select"
+                aria-label={t('country_filter')}
                 value={selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
                 className="bg-muted/40 border border-border rounded-xl px-3 py-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-foreground"

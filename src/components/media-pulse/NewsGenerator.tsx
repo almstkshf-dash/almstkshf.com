@@ -245,7 +245,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         selected.map((selected_id) => (
                             <span
                                 key={selected_id}
-                                className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                                className="inline-flex items-center gap-1 bg-primary/10 text-blue-800 dark:text-blue-300 border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
                                 {finalRenderTag(selected_id)}
                                 <span
@@ -311,7 +311,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                         className={clsx(
                                             "w-full flex justify-start gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors",
                                             selected.includes(item.id)
-                                                ? 'bg-primary/10 text-primary font-semibold'
+                                                ? 'bg-primary/10 text-blue-800 dark:text-blue-300 font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
                                         )}
                                     >
@@ -521,7 +521,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center transition-colors">
-                        <Search className="w-4.5 h-4.5 text-primary" />
+                        <Search className="w-4.5 h-4.5 text-blue-800 dark:text-blue-300" />
                     </div>
                     <div>
                         <h2 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h2>
@@ -571,7 +571,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                             onClick={handleOptimize}
                             disabled={isOptimizing || !keyword.trim()}
                             title={tOpt('button_tooltip')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-blue-800 dark:text-blue-300 hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
                         >
                             <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} />
                             <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" />
