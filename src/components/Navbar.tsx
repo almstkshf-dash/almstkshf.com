@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, memo } from "react";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -26,7 +26,7 @@ const MobileAuthFooter = dynamic(
     { ssr: false }
 );
 
-function NavbarContent() {
+const NavbarContent = memo(function NavbarContent() {
     const t = useTranslations("Navigation");
     const tCommon = useTranslations("Common");
     const locale = useLocale();
@@ -380,9 +380,9 @@ function NavbarContent() {
             </AnimatePresence >
         </>
     );
-}
+});
 
-export default function Navbar() {
+export default memo(function Navbar() {
     return (
         <header className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur-md transition-all duration-300 min-h-[64px]">
             <Suspense fallback={<div className="h-16 w-full" />}>

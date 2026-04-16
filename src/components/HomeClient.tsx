@@ -1,4 +1,5 @@
 "use client";
+import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import Container from '@/components/ui/Container';
@@ -21,7 +22,7 @@ const FreeInsightTool = dynamic(() => import('@/components/FreeInsightTool'), { 
  * waiting for this JS bundle. All framer-motion animations here only affect
  * content that is scrolled into view *after* the LCP event has already fired.
  */
-export default function HomeClient() {
+export default memo(function HomeClient() {
     const t = useTranslations();
 
     const features = [
@@ -248,4 +249,4 @@ export default function HomeClient() {
             </section>
         </>
     );
-}
+});

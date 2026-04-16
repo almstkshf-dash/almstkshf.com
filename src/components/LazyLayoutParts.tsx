@@ -13,6 +13,7 @@
  *  - Toaster (sonner)     ~20 KB parsed JS — only needed when a toast fires
  *  - ChatbaseWidget       external script   — lazyOnload anyway
  */
+import { memo } from "react";
 import dynamic from "next/dynamic";
 
 const CommandMenu = dynamic(
@@ -35,7 +36,7 @@ const ChatbaseWidget = dynamic(
     { ssr: false }
 );
 
-export default function LazyLayoutParts() {
+export default memo(function LazyLayoutParts() {
     return (
         <>
             <CommandMenu />
@@ -44,4 +45,4 @@ export default function LazyLayoutParts() {
             <ChatbaseWidget />
         </>
     );
-}
+});
