@@ -1480,7 +1480,9 @@
         "technical_records": "Technical Records",
         "carrier_details": "Carrier Details",
         "lei_registration": "LEI Registration Records",
-        "sanctions_matches": "Sanctions & PEP Matches"
+        "sanctions_matches": "Sanctions & PEP Matches",
+        "social_presence": "Social Platform Presence",
+        "email_breakdown": "Email Technical Breakdown"
       },
       "fields": {
         "username": "Username",
@@ -1507,7 +1509,13 @@
         "location": "Location",
         "no_matches": "No matching watchlist records found for this query.",
         "match_percent": "{count}% Match",
-        "match_count": "Direct Matches"
+        "match_count": "Direct Matches",
+        "platforms_checked": "Platforms Checked",
+        "platforms_found": "Accounts Found",
+        "digital_exposure": "Digital Exposure Score",
+        "platform_found": "Account Found",
+        "platform_clear": "Not Registered",
+        "platform_unknown": "Unknown / Blocked"
       },
       "toggle_raw": "Toggle Developer Raw Data"
     },

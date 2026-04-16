@@ -1480,7 +1480,9 @@
         "technical_records": "السجلات التقنية",
         "carrier_details": "تفاصيل المشغل",
         "lei_registration": "سجلات تسجيل LEI",
-        "sanctions_matches": "تطابقات العقوبات وقوائم المراقبة"
+        "sanctions_matches": "تطابقات العقوبات وقوائم المراقبة",
+        "social_presence": "الحضور على المنصات الاجتماعية",
+        "email_breakdown": "التفاصيل التقنية للبريد الإلكتروني"
       },
       "fields": {
         "username": "اسم المستخدم",
@@ -1507,7 +1509,13 @@
         "location": "الموقع",
         "no_matches": "لم يتم العثور على سجلات مطابقة في قوائم المراقبة لهذا البحث.",
         "match_percent": "تطابق بنسبة {count}%",
-        "match_count": "التطابقات المباشرة"
+        "match_count": "التطابقات المباشرة",
+        "platforms_checked": "المنصات المفحوصة",
+        "platforms_found": "الحسابات المكتشفة",
+        "digital_exposure": "درجة الانكشاف الرقمي",
+        "platform_found": "تم العثور على حساب",
+        "platform_clear": "غير مسجل",
+        "platform_unknown": "غير محدد / محجوب"
       },
       "toggle_raw": "تبديل بيانات المطور الخام"
     },

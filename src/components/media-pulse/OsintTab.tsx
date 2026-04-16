@@ -99,6 +99,120 @@ const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any
   </div>
 );
 
+// ─── Social Platform Presence Grid (Holehe-style results display) ─────────
+const PLATFORM_ICONS: Record<string, string> = {
+  'Twitter/X': '𝕏', 'Spotify': '🎵', 'Duolingo': '🦉', 'WordPress': '📝',
+  'ProtonMail': '🔒', 'Foursquare': '📍', 'Flickr': '📷', 'Airbnb': '🏠',
+  'Snapchat': '👻', 'Pinterest': '📌', 'Zoom': '📹', 'Instagram': '📸',
+  'GitHub': '🐙', 'Adobe': '🎨', 'Last.fm': '🎧', 'Disqus': '💬',
+  'MyAnimeList': '🎌', 'Quora': '❓',
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  social: 'from-blue-500/10 to-cyan-500/10 border-blue-500/20',
+  professional: 'from-purple-500/10 to-violet-500/10 border-purple-500/20',
+  entertainment: 'from-pink-500/10 to-rose-500/10 border-pink-500/20',
+  productivity: 'from-emerald-500/10 to-teal-500/10 border-emerald-500/20',
+  ecommerce: 'from-amber-500/10 to-orange-500/10 border-amber-500/20',
+};
+
+type SocialPresenceData = {
+  platforms: Array<{ platform: string; found: boolean | null; url: string; category: string }>;
+  foundOn: string[];
+  notFoundOn: string[];
+  unknownOn: string[];
+  totalChecked: number;
+  totalFound: number;
+};
+
+const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
+  if (!data?.platforms?.length) return null;
+  const { platforms, totalFound, totalChecked } = data;
+  const exposure = Math.round((totalFound / Math.max(totalChecked, 1)) * 100);
+
+  return (
+    <div className="space-y-5">
+      {/* Summary Bar */}
+      <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+        <div>
+          <p className="text-sm font-semibold text-foreground">🔍 Social Platform Presence</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Holehe-style account enumeration · {totalChecked} platforms checked</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-emerald-400">{totalFound}</p>
+            <p className="text-xs text-muted-foreground">Found</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-rose-400">{totalChecked - totalFound - data.unknownOn.length}</p>
+            <p className="text-xs text-muted-foreground">Clear</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-amber-400">{data.unknownOn.length}</p>
+            <p className="text-xs text-muted-foreground">Unknown</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Exposure Progress Bar */}
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs">
+          <span className="text-muted-foreground">Digital Exposure Score</span>
+          <span className={`font-semibold ${
+            exposure >= 70 ? 'text-rose-400' : exposure >= 40 ? 'text-amber-400' : 'text-emerald-400'
+          }`}>{exposure}%</span>
+        </div>
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ${
+              exposure >= 70 ? 'bg-gradient-to-r from-rose-500 to-red-600'
+              : exposure >= 40 ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+              : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+            }`}
+            style={{ width: `${exposure}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Platform Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+        {platforms.map((p) => (
+          <a
+            key={p.platform}
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${
+              CATEGORY_COLORS[p.category] || 'from-muted/20 to-muted/10 border-border'
+            } hover:scale-105 transition-all duration-200 cursor-pointer`}
+          >
+            {/* Status indicator dot */}
+            <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
+              p.found === true ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+              : p.found === false ? 'bg-rose-400'
+              : 'bg-amber-400'
+            }`} />
+            {/* Icon */}
+            <span className="text-2xl" aria-hidden="true">
+              {PLATFORM_ICONS[p.platform] || '🌐'}
+            </span>
+            {/* Name */}
+            <span className="text-xs font-medium text-center text-foreground leading-tight">{p.platform}</span>
+            {/* Status label */}
+            <span className={`text-[10px] font-semibold uppercase tracking-wide ${
+              p.found === true ? 'text-emerald-400'
+              : p.found === false ? 'text-rose-400'
+              : 'text-amber-400'
+            }`}>
+              {p.found === true ? 'Found' : p.found === false ? 'Clear' : 'Unknown'}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: any }) => {
   if (!data) return null;
 
@@ -111,9 +225,13 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {type === 'email' && (
           <>
-            <StatusBadge label="Deliverable" value={get(data, 'deliverability') || get(data, 'format_valid') || 'Unknown'} />
+            <StatusBadge
+              label="Platforms Found"
+              value={`${data.socialPresence?.totalFound ?? '—'} / ${data.socialPresence?.totalChecked ?? 18}`}
+              type={data.socialPresence?.totalFound > 0 ? 'warning' : 'success'}
+            />
             <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
-            <StatusBadge label="Risk Score" value={get(data, 'reputation') || 'Low'} type={get(data, 'reputation') === 'High' ? 'error' : 'success'} />
+            <StatusBadge label="MX Valid" value={get(data, 'mx_records') ? 'Yes' : 'N/A'} type="info" />
           </>
         )}
         {type === 'ip' && (
@@ -180,12 +298,30 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
       {/* Detailed Sections */}
       <div className="bg-muted/10 border border-border rounded-2xl p-5 space-y-6">
         {type === 'email' && (
-          <DataSection title="Identity Details" icon={User}>
-            <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
-            <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
-            <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
-            <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
-          </DataSection>
+          <>
+            {/* Social Platform Presence Grid */}
+            {data.socialPresence && (
+              <SocialPresenceGrid data={data.socialPresence} />
+            )}
+            {data.socialPresenceNote && (
+              <div className="text-xs text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-lg p-3">
+                ⚠️ {data.socialPresenceNote}
+              </div>
+            )}
+            {/* Email Technical Breakdown */}
+            <DataSection title="Email Technical Breakdown" icon={User}>
+              <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
+              <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
+              <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
+              <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
+              {get(data, 'mx_records') && (
+                <StatusBadge label="MX Records" value={Array.isArray(get(data, 'mx_records')) ? get(data, 'mx_records').join(', ') : get(data, 'mx_records')} type="info" />
+              )}
+              {get(data, 'gravatar') && (
+                <StatusBadge label="Gravatar Profile" value={get(data, 'gravatar.displayName') || 'Found'} type="success" />
+              )}
+            </DataSection>
+          </>
         )}
 
         {type === 'ip' && (

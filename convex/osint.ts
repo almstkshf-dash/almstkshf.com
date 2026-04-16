@@ -25,35 +25,28 @@ export const lookupEmail = action({
 
             const results: Record<string, any> = { email };
 
-            // 1. HaveIBeenPwned — free public API (no key required for single email check)
+            // 1. Social Platform Presence — Holehe-style (pure TypeScript, no Python / no spawn)
+            // Convex runs in sandboxed cloud Node.js; child_process.spawn() is unavailable.
+            // We replicate Holehe's approach: parallel fetch() to 18 platform API/registration
+            // endpoints with per-platform timeouts and full graceful degradation.
             try {
-                const hibpRes = await fetch(
-                    `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}?truncateResponse=false`,
-                    {
-                        headers: {
-                            "User-Agent": "ALMSTKSHF-OSINT/1.0",
-                            "hibp-api-key": await resolveApiKey(ctx, "HIBP_API_KEY", "hibp") || "",
-                        },
-                    }
-                );
-                if (hibpRes.status === 404) {
-                    results.breaches = [];
-                    results.breachCount = 0;
-                } else if (hibpRes.ok) {
-                    const breaches = await hibpRes.json();
-                    results.breaches = breaches.map((b: any) => ({
-                        name: b.Name,
-                        domain: b.Domain,
-                        breachDate: b.BreachDate,
-                        dataClasses: b.DataClasses,
-                        isVerified: b.IsVerified,
-                    }));
-                    results.breachCount = breaches.length;
-                } else {
-                    results.breachNote = `HIBP API: ${hibpRes.status}`;
-                }
+                const platformResults = await checkPlatformPresence(email);
+                results.socialPresence = {
+                    platforms: platformResults,
+                    foundOn: platformResults
+                        .filter((p: PlatformResult) => p.found === true)
+                        .map((p: PlatformResult) => p.platform),
+                    notFoundOn: platformResults
+                        .filter((p: PlatformResult) => p.found === false)
+                        .map((p: PlatformResult) => p.platform),
+                    unknownOn: platformResults
+                        .filter((p: PlatformResult) => p.found === null)
+                        .map((p: PlatformResult) => p.platform),
+                    totalChecked: platformResults.length,
+                    totalFound: platformResults.filter((p: PlatformResult) => p.found === true).length,
+                };
             } catch (err) {
-                results.breachNote = `HIBP unavailable: ${err instanceof Error ? err.message : String(err)}`;
+                results.socialPresenceNote = `Platform check unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             // 2. Gravatar profile (email hash lookup)
@@ -926,6 +919,305 @@ export const lookupWatchlist = action({
         }
     }
 });
+
+// ─── Holehe-style Platform Presence ─────────────────────────────────────
+// TypeScript port of Holehe's approach: parallel registration endpoint checks.
+// Why not `spawn('holehe', ...)`: Convex cloud Node.js is sandboxed — no access
+// to Python interpreter or local file system. Pure fetch() achieves the same result.
+
+type PlatformResult = {
+    platform: string;
+    found: boolean | null;      // true=registered, false=not registered, null=unknown/blocked
+    url: string;
+    category: 'social' | 'professional' | 'entertainment' | 'productivity' | 'ecommerce';
+};
+
+async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
+    const T = 5500; // per-platform timeout ms
+    const enc = encodeURIComponent(email);
+    const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120';
+
+    const checks: Array<() => Promise<PlatformResult>> = [
+
+        // 1. Twitter/X — email_available endpoint (no auth needed, returns {taken:bool})
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://api.twitter.com/i/users/email_available.json?email=${enc}`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Twitter/X', found: d.taken === true, url: 'https://x.com', category: 'social' };
+                }
+            } catch { /* timeout */ }
+            return { platform: 'Twitter/X', found: null, url: 'https://x.com', category: 'social' };
+        },
+
+        // 2. Spotify — signup validation (status 20 = email exists, status 1 = available)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://spclient.wg.spotify.com/signup/public/v1/account?validate=1&email=${enc}&displayName=&platform=Android-ARM`,
+                    { headers: { 'User-Agent': ua, 'App-Platform': 'Android' }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Spotify', found: d.status === 20, url: 'https://spotify.com', category: 'entertainment' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Spotify', found: null, url: 'https://spotify.com', category: 'entertainment' };
+        },
+
+        // 3. Duolingo — user lookup by email field
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://www.duolingo.com/2017-06-30/users?fields=id&email=${enc}`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Duolingo', found: Array.isArray(d?.users) && d.users.length > 0, url: 'https://duolingo.com', category: 'productivity' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Duolingo', found: null, url: 'https://duolingo.com', category: 'productivity' };
+        },
+
+        // 4. WordPress.com — email availability REST endpoint (404=not registered, 200=exists)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://public-api.wordpress.com/rest/v1/users/email-check/${enc}`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                return { platform: 'WordPress', found: r.status !== 404 && r.ok, url: 'https://wordpress.com', category: 'productivity' };
+            } catch { /* noop */ }
+            return { platform: 'WordPress', found: null, url: 'https://wordpress.com', category: 'productivity' };
+        },
+
+        // 5. ProtonMail — username availability (Code 2500 or HTTP 409 = username taken)
+        async () => {
+            try {
+                const username = email.split('@')[0];
+                const r = await fetch(
+                    `https://account.proton.me/api/core/v4/users/available?Name=${encodeURIComponent(username)}&ParseDomain=0`,
+                    { headers: { 'x-pm-apiversion': '4', 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok || r.status === 409) {
+                    const d = await r.json().catch(() => ({}));
+                    return { platform: 'ProtonMail', found: (d as any)?.Code === 2500 || r.status === 409, url: 'https://proton.me', category: 'productivity' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'ProtonMail', found: null, url: 'https://proton.me', category: 'productivity' };
+        },
+
+        // 6. Foursquare — login data check (accountExists field)
+        async () => {
+            try {
+                const r = await fetch('https://foursquare.com/api/userAuthentication/loginData', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'User-Agent': ua },
+                    body: JSON.stringify({ emailAddress: email }),
+                    signal: AbortSignal.timeout(T),
+                });
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Foursquare', found: !!(d as any)?.accountExists, url: 'https://foursquare.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Foursquare', found: null, url: 'https://foursquare.com', category: 'social' };
+        },
+
+        // 7. Flickr — people.findByEmail (public method, no API key returns stat ok/fail)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://api.flickr.com/services/rest/?method=flickr.people.findByEmail&find_email=${enc}&format=json&nojsoncallback=1`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Flickr', found: (d as any)?.stat === 'ok', url: 'https://flickr.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Flickr', found: null, url: 'https://flickr.com', category: 'social' };
+        },
+
+        // 8. Airbnb — Primary email lookup (returns userExists bool)
+        async () => {
+            try {
+                const r = await fetch('https://www.airbnb.com/api/v3/PrimaryEmailLookup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'User-Agent': ua, 'X-Airbnb-API-Key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20' },
+                    body: JSON.stringify({ email }),
+                    signal: AbortSignal.timeout(T),
+                });
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Airbnb', found: !!(d as any)?.data?.primaryEmailLookup?.userExists, url: 'https://airbnb.com', category: 'ecommerce' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Airbnb', found: null, url: 'https://airbnb.com', category: 'ecommerce' };
+        },
+
+        // 9. Snapchat — find_user endpoint
+        async () => {
+            try {
+                const r = await fetch('https://auth.snapchat.com/snap_auth/api/user/find_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'User-Agent': ua },
+                    body: JSON.stringify({ email }),
+                    signal: AbortSignal.timeout(T),
+                });
+                const d = await r.json().catch(() => null);
+                return { platform: 'Snapchat', found: r.ok && !(d as any)?.error, url: 'https://snapchat.com', category: 'social' };
+            } catch { /* noop */ }
+            return { platform: 'Snapchat', found: null, url: 'https://snapchat.com', category: 'social' };
+        },
+
+        // 10. Pinterest — RegisterEmailCheck resource (data:false means email IS taken)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://www.pinterest.com/resource/RegisterEmailCheckResource/get/?source_url=%2F&data=%7B%22options%22%3A%7B%22email%22%3A%22${enc}%22%7D%7D`,
+                    { headers: { 'X-Pinterest-AppState': 'active', 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Pinterest', found: (d as any)?.resource_response?.data === false, url: 'https://pinterest.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Pinterest', found: null, url: 'https://pinterest.com', category: 'social' };
+        },
+
+        // 11. Zoom — user lookup by email (200=exists, 404=not found)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://api.zoom.us/v2/users/${enc}`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                return { platform: 'Zoom', found: r.status === 200, url: 'https://zoom.us', category: 'productivity' };
+            } catch { /* noop */ }
+            return { platform: 'Zoom', found: null, url: 'https://zoom.us', category: 'productivity' };
+        },
+
+        // 12. Instagram — web_create_ajax (checks email errors for 'already' / 'taken' patterns)
+        async () => {
+            try {
+                const r = await fetch('https://www.instagram.com/api/v1/web/accounts/web_create_ajax/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': 'missing', 'X-Instagram-AJAX': '1', 'User-Agent': ua },
+                    body: `email=${enc}&username=randtest9182&password=Test12345!&first_name=Test`,
+                    signal: AbortSignal.timeout(T),
+                });
+                if (r.ok) {
+                    const d = await r.json();
+                    const emailErrors: string[] = (d as any)?.errors?.email || [];
+                    return { platform: 'Instagram', found: emailErrors.some(e => /already|taken|exists/i.test(e)), url: 'https://instagram.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Instagram', found: null, url: 'https://instagram.com', category: 'social' };
+        },
+
+        // 13. GitHub — password_resets POST (302/200=email known, 422=not found)
+        async () => {
+            try {
+                const r = await fetch('https://github.com/password_resets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': ua, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                    body: `email=${enc}&authenticity_token=placeholder`,
+                    redirect: 'manual',
+                    signal: AbortSignal.timeout(T),
+                });
+                return { platform: 'GitHub', found: r.status === 200 || r.status === 302, url: 'https://github.com', category: 'professional' };
+            } catch { /* noop */ }
+            return { platform: 'GitHub', found: null, url: 'https://github.com', category: 'professional' };
+        },
+
+        // 14. Adobe — user existence API (200=exists, 404=not found)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://auth.services.adobe.com/api/v1/user_existance/${enc}`,
+                    { headers: { 'User-Agent': ua, 'Accept': 'application/json' }, signal: AbortSignal.timeout(T) }
+                );
+                return { platform: 'Adobe', found: r.ok, url: 'https://adobe.com', category: 'professional' };
+            } catch { /* noop */ }
+            return { platform: 'Adobe', found: null, url: 'https://adobe.com', category: 'professional' };
+        },
+
+        // 15. Last.fm — account create POST (302=processed/found, other=not known)
+        async () => {
+            try {
+                const r = await fetch('https://www.last.fm/api/account/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': ua },
+                    body: `email=${enc}`,
+                    redirect: 'manual',
+                    signal: AbortSignal.timeout(T),
+                });
+                return { platform: 'Last.fm', found: r.status === 302 || r.ok, url: 'https://last.fm', category: 'entertainment' };
+            } catch { /* noop */ }
+            return { platform: 'Last.fm', found: null, url: 'https://last.fm', category: 'entertainment' };
+        },
+
+        // 16. Disqus — checkUsername (code≠0 = username taken)
+        async () => {
+            try {
+                const r = await fetch(
+                    `https://disqus.com/api/3.0/users/checkUsername.json?username=${encodeURIComponent(email.split('@')[0])}`,
+                    { headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(T) }
+                );
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Disqus', found: (d as any)?.code !== 0, url: 'https://disqus.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Disqus', found: null, url: 'https://disqus.com', category: 'social' };
+        },
+
+        // 17. MyAnimeList — check_exist.php (returns '1' if email exists)
+        async () => {
+            try {
+                const r = await fetch('https://myanimelist.net/api/check_exist.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': ua },
+                    body: `email=${enc}`,
+                    signal: AbortSignal.timeout(T),
+                });
+                if (r.ok) {
+                    const text = await r.text();
+                    return { platform: 'MyAnimeList', found: text.trim() === '1', url: 'https://myanimelist.net', category: 'entertainment' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'MyAnimeList', found: null, url: 'https://myanimelist.net', category: 'entertainment' };
+        },
+
+        // 18. Quora — GraphQL email check
+        async () => {
+            try {
+                const r = await fetch('https://www.quora.com/_/graphql?q=EmailCheckQuery', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'User-Agent': ua },
+                    body: JSON.stringify({ query: 'query EmailCheckQuery($email:String){emailExists(email:$email)}', variables: { email } }),
+                    signal: AbortSignal.timeout(T),
+                });
+                if (r.ok) {
+                    const d = await r.json();
+                    return { platform: 'Quora', found: (d as any)?.data?.emailExists === true, url: 'https://quora.com', category: 'social' };
+                }
+            } catch { /* noop */ }
+            return { platform: 'Quora', found: null, url: 'https://quora.com', category: 'social' };
+        },
+    ];
+
+    const settled = await Promise.allSettled(checks.map(fn => fn()));
+    return settled
+        .map(r => r.status === 'fulfilled' ? r.value : null)
+        .filter((r): r is PlatformResult => r !== null);
+}
 
 // ─── Internal helper: email → MD5 (for Gravatar) ─────────────────────
 async function emailToMd5(email: string): Promise<string> {
