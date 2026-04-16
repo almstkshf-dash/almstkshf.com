@@ -390,4 +390,4 @@ export default memo(function Navbar() {
             </Suspense>
         </header>
     );
-}
+});
