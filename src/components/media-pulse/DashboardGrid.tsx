@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
-import { useMemo, memo, useState } from "react";
+import { useMemo, memo, useState, useCallback } from "react";
 import SentimentDonutChart from "./SentimentDonutChart";
 import EmotionRadarChart from "./EmotionRadarChart";
 import ArticlesTrendChart from "./ArticlesTrendChart";
@@ -101,18 +101,18 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         };
     }, [articles, analytics]);
 
-    const sentimentPcts = analytics?.sentimentDistribution ?? {
+    const sentimentPcts = useMemo(() => analytics?.sentimentDistribution ?? {
         Positive: 0,
         Neutral: 0,
         Negative: 0
-    };
+    }, [analytics?.sentimentDistribution]);
 
     const riskScore = analytics?.riskScore ?? 0;
     const nss = analytics?.nss ?? 0;
 
     const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
 
-    const handleExport = async (format: 'pdf' | 'excel') => {
+    const handleExport = useCallback(async (format: 'pdf' | 'excel') => {
         setIsExporting(format);
         try {
             await ReportGenerator.exportPressReleaseReport(articles, messages, format);
@@ -121,7 +121,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
         } finally {
             setIsExporting(null);
         }
-    };
+    }, [articles, messages]);
 
     const isPressRelease = articles.some(a => a.sourceType === 'Press Release');
 

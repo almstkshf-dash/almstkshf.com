@@ -39,12 +39,12 @@ function performHeuristicAnalysis(title: string, snippet: string) {
     ];
 
     let risk: "low" | "medium" | "high" | "critical" = "low";
-    let tags: string[] = [];
+    const tags: string[] = [];
 
     // 1. Identify Risk Level
     for (const rule of ruleBook) {
         if (rule.keywords.some(k => text.includes(k))) {
-            risk = rule.risk as any;
+            risk = rule.risk as typeof risk;
             break; 
         }
     }

@@ -18,16 +18,16 @@ export const getArticles = query({
         let q = ctx.db.query("media_monitoring_articles");
 
         if (args.sourceType && args.sourceType !== "All") {
-            // @ts-ignore
+            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("sourceType"), args.sourceType));
         }
 
         if (args.sourceCountry && args.sourceCountry !== "All") {
-            // @ts-ignore
+            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("sourceCountry"), args.sourceCountry));
         }
         if (args.depth && args.depth !== "All") {
-            // @ts-ignore
+            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("depth"), args.depth));
         }
 
@@ -38,7 +38,7 @@ export const getArticles = query({
             return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
         };
 
-        all.sort((a: any, b: any) => {
+        all.sort((a, b) => {
             const da = parseDate(a.publishedDate);
             const db = parseDate(b.publishedDate);
             if (db !== da) return db - da;
@@ -101,9 +101,7 @@ export const saveArticle = mutation({
     handler: async (ctx, args) => {
         // Ensure sourceType matches schema validator
         const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
-        const sourceType = validSourceTypes.includes(args.sourceType)
-            ? args.sourceType
-            : "Online News";
+
 
         // Check for duplicates before inserting
         const existing = await ctx.db
@@ -340,7 +338,7 @@ export const getEmotionAggregates = query({
                             if (emotions[k] !== undefined) emotions[k] += (v as number);
                         });
                     }
-                } catch (e) { /* skip unparseable tone */ }
+                } catch (err) { /* skip unparseable tone */ }
             }
         });
 

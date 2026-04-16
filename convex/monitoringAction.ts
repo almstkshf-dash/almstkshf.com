@@ -4,7 +4,7 @@ import { v } from "convex/values";
 import { api } from "./_generated/api";
 import Parser from 'rss-parser';
 import * as cheerio from 'cheerio';
-// @ts-ignore
+// @ts-expect-error
 import NewsAPI from 'newsapi';
 import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
@@ -458,7 +458,7 @@ export const fetchNews = action({
                         for (const lang of languageList) {
                             const response = await naClient.v2.everything({
                                 q: cleanQuery,
-                                language: lang as any,
+                                language: lang as "en" | "ar",
                                 from: naDateFrom,
                                 to: naDateTo,
                                 sortBy: 'publishedAt',
@@ -1100,9 +1100,9 @@ export const fetchPressReleaseSources = action({
                             const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
 
                             let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
-                            let summary = snippet.slice(0, 300);
-                            let reach = 75000;
-                            let emotions: any = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
+                            const summary = snippet.slice(0, 300);
+                            const reach = 75000;
+                            const emotions = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
 
                             // ── Cost-Cutting Sentiment Analysis ────────────────────────────────
                             // Simplified regex-based sentiment detection instead of AI API
@@ -1135,14 +1135,15 @@ export const fetchPressReleaseSources = action({
 
                             savedCount++;
                             totalSaved++;
-                        } catch (_) {
+                        } catch (err) {
                             totalErrors++;
                         }
                     }
 
                     feedResults.push({ feed: feed.name, saved: savedCount, total: items.length });
-                } catch (feedErr: any) {
-                    feedResults.push({ feed: feed.name, error: feedErr?.message || "fetch failed" });
+                } catch (feedErr: unknown) {
+                    const message = feedErr instanceof Error ? feedErr.message : "fetch failed";
+                    feedResults.push({ feed: feed.name, error: message });
                     totalErrors++;
                 }
             })

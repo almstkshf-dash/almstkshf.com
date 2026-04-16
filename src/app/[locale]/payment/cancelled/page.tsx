@@ -24,7 +24,7 @@ export default function PaymentCancelledPage() {
 
                         <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 mb-8">
                             <p className="text-slate-400">
-                                If you experienced any issues during checkout, please don't hesitate to contact our support team.
+                                If you experienced any issues during checkout, please don&apos;t hesitate to contact our support team.
                             </p>
                         </div>
 

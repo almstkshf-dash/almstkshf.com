@@ -15,7 +15,7 @@ export const getMediaReports = query({
         let q = ctx.db.query("media_monitoring_articles");
 
         if (args.source && args.source !== "All") {
-            // @ts-ignore
+            // @ts-expect-error
             q = q.filter((q) => q.eq(q.field("sourceType"), args.source));
         }
 

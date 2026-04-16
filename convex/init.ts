@@ -1,4 +1,4 @@
-import { internalMutation, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
 
 export const seed = mutation({
     handler: async (ctx) => {

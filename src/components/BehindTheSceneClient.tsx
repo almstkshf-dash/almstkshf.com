@@ -149,11 +149,11 @@ export default function BehindTheSceneClient() {
                     className="mt-40 p-12 md:p-24 rounded-[4rem] bg-primary/10 border border-blue-500/10 text-center space-y-12"
                 >
                     <div className="relative inline-block">
-                        <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-primary">"</span>
+                        <span className="text-8xl font-serif absolute -top-12 -left-12 opacity-10 text-primary">&quot;</span>
                         <h2 className="text-3xl md:text-5xl font-light italic text-foreground max-w-4xl mx-auto leading-tight">
                             {t("quote")}
                         </h2>
-                        <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-primary">"</span>
+                        <span className="text-8xl font-serif absolute -bottom-24 -right-12 opacity-10 text-primary">&quot;</span>
                     </div>
                 </motion.section>
 

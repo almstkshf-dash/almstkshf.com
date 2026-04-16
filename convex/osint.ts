@@ -52,8 +52,8 @@ export const lookupEmail = action({
                 } else {
                     results.breachNote = `HIBP API: ${hibpRes.status}`;
                 }
-            } catch (e: any) {
-                results.breachNote = `HIBP unavailable: ${e?.message}`;
+            } catch (err) {
+                results.breachNote = `HIBP unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             // 2. Gravatar profile (email hash lookup)
@@ -112,9 +112,9 @@ export const lookupEmail = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupEmail failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupEmail failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -156,8 +156,8 @@ export const lookupDomain = action({
                         status: w.status,
                     };
                 }
-            } catch (e: any) {
-                results.whoisNote = `WHOIS unavailable: ${e?.message}`;
+            } catch (err) {
+                results.whoisNote = `WHOIS unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             // 2. DNS Records (A, MX, TXT, NS via Google DNS-over-HTTPS)
@@ -176,8 +176,8 @@ export const lookupDomain = action({
                     })
                 );
                 results.dns = dnsResults;
-            } catch (e: any) {
-                results.dnsNote = `DNS lookup failed: ${e?.message}`;
+            } catch (err) {
+                results.dnsNote = `DNS lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             // 3. SSL Certificate info via crt.sh
@@ -260,9 +260,9 @@ export const lookupDomain = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupDomain failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupDomain failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -298,8 +298,8 @@ export const lookupIp = action({
                         isp: geo.org,
                     };
                 }
-            } catch (e: any) {
-                results.geoNote = `Geo lookup failed: ${e?.message}`;
+            } catch (err) {
+                results.geoNote = `Geo lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             // 2. Abuse IPDB — check if IP is known malicious (free tier)
@@ -358,9 +358,9 @@ export const lookupIp = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupIp failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupIp failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -474,9 +474,9 @@ export const lookupUsername = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupUsername failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupUsername failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -525,8 +525,8 @@ export const lookupPhone = action({
                         note: "Configure NUMVERIFY_API_KEY for full validation",
                     };
                 }
-            } catch (e: any) {
-                results.validationNote = `Phone lookup failed: ${e?.message}`;
+            } catch (err) {
+                results.validationNote = `Phone lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
@@ -547,9 +547,9 @@ export const lookupPhone = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupPhone failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupPhone failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -604,8 +604,8 @@ export const lookupNews = action({
                 } else {
                     return { success: false, error: `News fetch failed: ${res.status}` };
                 }
-            } catch (e: any) {
-                console.warn("News fetch failed:", e);
+            } catch (err) {
+                console.warn("News fetch failed:", err);
                 return { success: false, error: "Failed to connect to the news provider." };
             }
 
@@ -627,9 +627,9 @@ export const lookupNews = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupNews failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupNews failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     },
 });
@@ -660,12 +660,12 @@ export const lookupCorporate = action({
                 } else {
                     results.error = `OpenCorporates API error: ${res.status}`;
                 }
-            } catch (e: any) {
-                results.error = `OpenCorporates unavailable: ${e.message}`;
+            } catch (err) {
+                results.error = `OpenCorporates unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
-                type: "corporate" as any,
+                type: "corporate",
                 query: query,
                 result: results,
             });
@@ -681,9 +681,9 @@ export const lookupCorporate = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupCorporate failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupCorporate failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     }
 });
@@ -715,12 +715,12 @@ export const lookupLocation = action({
                 } else {
                     results.error = `Nominatim API error: ${res.status}`;
                 }
-            } catch (e: any) {
-                results.error = `Nominatim unavailable: ${e.message}`;
+            } catch (err) {
+                results.error = `Nominatim unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
-                type: "location" as any,
+                type: "location",
                 query: query,
                 result: results,
             });
@@ -736,9 +736,9 @@ export const lookupLocation = action({
             }
 
             return { success: true, data: results, recordId };
-        } catch (e: any) {
-            console.error("lookupLocation failed:", e);
-            return { success: false, error: e instanceof Error ? e.message : String(e) };
+        } catch (err) {
+            console.error("lookupLocation failed:", err);
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
         }
     }
 });
@@ -778,12 +778,12 @@ export const lookupWikipedia = action({
                         }
                     }
                 }
-            } catch (e: any) {
-                results.error = `Wikipedia unavailable: ${e.message}`;
+            } catch (err) {
+                results.error = `Wikipedia unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
             const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
-                type: "wikipedia" as any,
+                type: "wikipedia",
                 query: query,
                 result: results,
             });

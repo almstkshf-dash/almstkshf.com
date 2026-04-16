@@ -4,7 +4,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon } from "lucide-react";
 import Button from "./ui/Button";
@@ -24,13 +24,7 @@ interface DashboardProps {
     defaultFilter?: DashboardFilter;
 }
 
-interface DashboardArticle {
-    _id: string;
-    title: string;
-    sentiment: "Positive" | "Neutral" | "Negative";
-    sourceType: string;
-    publishedDate: string;
-}
+
 
 interface FilterOption {
     label: string;
@@ -95,6 +89,17 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         { label: "Press Release", value: "Press Release", icon: FileText, href: "/media-monitoring/press" },
     ], []);
 
+    // Memoize the chart data mapping to avoid inline array creation on every render
+    const chartData = useMemo(() => {
+        if (!reports || (Array.isArray(reports) && reports.length === 0)) return null;
+        return (reports as any[])?.map((a: any) => ({
+            reportName: a.title || a.reportName,
+            source: a.sourceType || a.source,
+            timestamp: a.publishedDate || a.createdAt || a.timestamp,
+            sentiment: a.sentiment
+        }));
+    }, [reports]);
+
     if (!mounted) {
         return (
             <div className="space-y-8 animate-pulse">
@@ -112,17 +117,6 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
             </div>
         );
     }
-
-    // Memoize the chart data mapping to avoid inline array creation on every render
-    const chartData = useMemo(() => {
-        if (!reports || reports.length === 0) return null;
-        return reports.map((a: any) => ({
-            reportName: a.title || a.reportName,
-            source: a.sourceType || a.source,
-            timestamp: a.publishedDate || a.createdAt || a.timestamp,
-            sentiment: a.sentiment
-        }));
-    }, [reports]);
 
     return (
         <div className="space-y-8">

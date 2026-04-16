@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import DOMPurify from 'dompurify';
@@ -46,7 +46,7 @@ export default function RssFeeder({
   const [error, setError] = useState<string | null>(null);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
 
-  const fetchFeed = async (silent = false) => {
+  const fetchFeed = useCallback(async (silent = false) => {
     if (!silent) setIsLoading(true);
     setError(null);
 
@@ -65,26 +65,27 @@ export default function RssFeeder({
       } else {
         throw new Error(data.error || 'Invalid feed format');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[RssFeeder] Fetch error:', err);
       // Explicitly check for browser-level network drops/blocks
-      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      const message = err instanceof Error ? err.message : String(err);
+      if (err instanceof TypeError && message === 'Failed to fetch') {
         setError('Network blocked. Please disable AdBlocker or check your connection.');
       } else {
-        setError(err.message || t('error_fetching'));
+        setError(message || t('error_fetching'));
       }
       if (!silent) toast.error(t('error_fetching'));
     } finally {
       if (!silent) setIsLoading(false);
     }
-  };
+  }, [activeUrl, maxItems, t]);
 
   useEffect(() => {
     fetchFeed();
     // Auto-refresh every 15 minutes to match the proxy cache
     const interval = setInterval(() => fetchFeed(true), 15 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [activeUrl]);
+  }, [fetchFeed]);
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
