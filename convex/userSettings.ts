@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 
@@ -58,7 +66,7 @@ export const init = mutation({
 
 /**
  * Updates the user's personal Gemini API key (BYOK).
- * userId is derived server-side from the authenticated session — never trusted from the client.
+ * userId is derived server-side from the authenticated session â€” never trusted from the client.
  */
 export const updateGeminiKey = mutation({
     args: { geminiApiKey: v.string() },
@@ -144,7 +152,7 @@ export const updateApiKeys = mutation({
 
 /**
  * Sets the subscription status for a user.
- * ADMIN-ONLY — typically called by the Stripe webhook handler.
+ * ADMIN-ONLY â€” typically called by the Stripe webhook handler.
  */
 export const setSubscriptionStatus = mutation({
     args: { userId: v.string(), isSubscribed: v.boolean() },

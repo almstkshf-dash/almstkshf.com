@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 export async function sendResendEmail(options: {
     to: string | string[];
     subject: string;
@@ -34,7 +42,7 @@ export async function sendResendEmail(options: {
             try {
                 const errorData = JSON.parse(responseData);
                 if (errorData.name === "validation_error" && errorData.message.includes("testing emails")) {
-                    console.error("❌ RESEND ERROR: You are in testing mode. You can ONLY send emails to the email address associated with your Resend account.");
+                    console.error("âŒ RESEND ERROR: You are in testing mode. You can ONLY send emails to the email address associated with your Resend account.");
                 }
             } catch { /* ignore parse error */ }
 

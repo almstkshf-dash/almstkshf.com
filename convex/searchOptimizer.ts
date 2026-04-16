@@ -1,51 +1,59 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use node";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { resolveApiKey } from "./utils/keys";
 
 /**
- * ═══════════════════════════════════════════════════════════════════
+ * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * SEARCH OPTIMIZER ENGINE
  * Uses Gemini (BYOK or System) to expand, refine, and translate
  * search queries for maximum monitoring coverage.
  *
  * Fallback: Context-Aware Heuristic Engine (zero-cost, zero-AI)
- * ═══════════════════════════════════════════════════════════════════
+ * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  */
 
-// ─── Stop Words (EN + AR) ─────────────────────────────────────────
+// â”€â”€â”€ Stop Words (EN + AR) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STOP_WORDS = new Set([
   "the", "a", "an", "in", "on", "at", "to", "for", "of", "and", "or",
   "is", "was", "are", "with", "by", "from", "as", "into", "about",
-  "في", "من", "إلى", "على", "عن", "مع", "هو", "هي", "هم", "و",
+  "ÙÙŠ", "Ù…Ù†", "Ø¥Ù„Ù‰", "Ø¹Ù„Ù‰", "Ø¹Ù†", "Ù…Ø¹", "Ù‡Ùˆ", "Ù‡ÙŠ", "Ù‡Ù…", "Ùˆ",
 ]);
 
-// ─── GCC / UAE / KSA Entity Bilingual Map ────────────────────────
+// â”€â”€â”€ GCC / UAE / KSA Entity Bilingual Map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ENTITY_MAP: Record<string, string> = {
-  ADNOC: 'ADNOC OR "Abu Dhabi National Oil Company" OR "أدنوك"',
-  NEOM: 'NEOM OR "نيوم"',
-  ARAMCO: 'Aramco OR "Saudi Aramco" OR "أرامكو"',
-  ETIHAD: 'Etihad OR "Etihad Airways" OR "الاتحاد للطيران"',
-  EMIRATES: 'Emirates OR "طيران الإمارات"',
-  ADIB: 'ADIB OR "Abu Dhabi Islamic Bank" OR "مصرف أبوظبي الإسلامي"',
-  ENOC: 'ENOC OR "Emirates National Oil Company" OR "شركة الإمارات الوطنية للنفط"',
-  ETISALAT: 'Etisalat OR "e&" OR "اتصالات"',
-  DEWA: 'DEWA OR "Dubai Electricity and Water Authority" OR "هيئة كهرباء ومياه دبي"',
-  "MUBADALA": 'Mubadala OR "mubadala investment" OR "مبادلة"',
-  "ADQ": 'ADQ OR "Abu Dhabi Developmental Holding" OR "أبوظبي للتنمية"',
-  "STC": 'STC OR "Saudi Telecom Company" OR "الاتصالات السعودية"',
-  "SABIC": 'SABIC OR "Saudi Basic Industries" OR "سابك"',
-  "TALABAT": 'Talabat OR "طلبات"',
-  "CAREEM": 'Careem OR "كريم"',
+  ADNOC: 'ADNOC OR "Abu Dhabi National Oil Company" OR "Ø£Ø¯Ù†ÙˆÙƒ"',
+  NEOM: 'NEOM OR "Ù†ÙŠÙˆÙ…"',
+  ARAMCO: 'Aramco OR "Saudi Aramco" OR "Ø£Ø±Ø§Ù…ÙƒÙˆ"',
+  ETIHAD: 'Etihad OR "Etihad Airways" OR "Ø§Ù„Ø§ØªØ­Ø§Ø¯ Ù„Ù„Ø·ÙŠØ±Ø§Ù†"',
+  EMIRATES: 'Emirates OR "Ø·ÙŠØ±Ø§Ù† Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª"',
+  ADIB: 'ADIB OR "Abu Dhabi Islamic Bank" OR "Ù…ØµØ±Ù Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠ"',
+  ENOC: 'ENOC OR "Emirates National Oil Company" OR "Ø´Ø±ÙƒØ© Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø§Ù„ÙˆØ·Ù†ÙŠØ© Ù„Ù„Ù†ÙØ·"',
+  ETISALAT: 'Etisalat OR "e&" OR "Ø§ØªØµØ§Ù„Ø§Øª"',
+  DEWA: 'DEWA OR "Dubai Electricity and Water Authority" OR "Ù‡ÙŠØ¦Ø© ÙƒÙ‡Ø±Ø¨Ø§Ø¡ ÙˆÙ…ÙŠØ§Ù‡ Ø¯Ø¨ÙŠ"',
+  "MUBADALA": 'Mubadala OR "mubadala investment" OR "Ù…Ø¨Ø§Ø¯Ù„Ø©"',
+  "ADQ": 'ADQ OR "Abu Dhabi Developmental Holding" OR "Ø£Ø¨ÙˆØ¸Ø¨ÙŠ Ù„Ù„ØªÙ†Ù…ÙŠØ©"',
+  "STC": 'STC OR "Saudi Telecom Company" OR "Ø§Ù„Ø§ØªØµØ§Ù„Ø§Øª Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©"',
+  "SABIC": 'SABIC OR "Saudi Basic Industries" OR "Ø³Ø§Ø¨Ùƒ"',
+  "TALABAT": 'Talabat OR "Ø·Ù„Ø¨Ø§Øª"',
+  "CAREEM": 'Careem OR "ÙƒØ±ÙŠÙ…"',
 };
 
-// ─── Context-Specific Threat Modifier Profiles ────────────────────
+// â”€â”€â”€ Context-Specific Threat Modifier Profiles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CONTEXT_PROFILES = {
   darkweb: {
     modifiers: [
       "leak", "breach", "dump", "database", "credentials",
       "exploit", "onion", "darknet", "hacked", "stolen",
-      "تسريب", "اختراق", "قاعدة بيانات", "بيانات مسربة",
+      "ØªØ³Ø±ÙŠØ¨", "Ø§Ø®ØªØ±Ø§Ù‚", "Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª", "Ø¨ÙŠØ§Ù†Ø§Øª Ù…Ø³Ø±Ø¨Ø©",
     ],
     booleanClause: '(leak OR breach OR dump OR "darknet" OR exploit OR credentials OR "data dump" OR onion)',
     explanation: "Added Dark Web threat-intelligence modifiers: breach, dump, exploit, onion, darknet.",
@@ -53,22 +61,22 @@ const CONTEXT_PROFILES = {
   osint: {
     modifiers: [
       "exposure", "dox", "pastebin", "github", "recon",
-      "الكشف", "التعرض", "مصادر مفتوحة",
+      "Ø§Ù„ÙƒØ´Ù", "Ø§Ù„ØªØ¹Ø±Ø¶", "Ù…ØµØ§Ø¯Ø± Ù…ÙØªÙˆØ­Ø©",
     ],
-    booleanClause: '(pastebin OR github OR exposure OR dox OR recon OR "open source intelligence" OR منتدى)',
+    booleanClause: '(pastebin OR github OR exposure OR dox OR recon OR "open source intelligence" OR Ù…Ù†ØªØ¯Ù‰)',
     explanation: "Added OSINT surface-web modifiers for exposure and recon tracking.",
   },
   news: {
     modifiers: [
       "report", "announcement", "press release", "statement", "coverage",
-      "بيان", "تقرير", "مؤتمر صحفي", "تصريح",
+      "Ø¨ÙŠØ§Ù†", "ØªÙ‚Ø±ÙŠØ±", "Ù…Ø¤ØªÙ…Ø± ØµØ­ÙÙŠ", "ØªØµØ±ÙŠØ­",
     ],
-    booleanClause: '(report OR announcement OR "press release" OR statement OR coverage OR تقرير OR بيان)',
+    booleanClause: '(report OR announcement OR "press release" OR statement OR coverage OR ØªÙ‚Ø±ÙŠØ± OR Ø¨ÙŠØ§Ù†)',
     explanation: "Added news-specific synonyms for media coverage tracking.",
   },
 } as const;
 
-// ─── Robust JSON Parser (handles Gemini markdown wrappers) ─────────
+// â”€â”€â”€ Robust JSON Parser (handles Gemini markdown wrappers) â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function safeParseJson(raw: string): Record<string, unknown> | null {
   try {
     // Strip potential ```json ... ``` or ``` ... ``` markdown blocks
@@ -82,7 +90,7 @@ function safeParseJson(raw: string): Record<string, unknown> | null {
   }
 }
 
-// ─── Context-Aware Heuristic Optimizer (THE MISSING ALGORITHM) ────
+// â”€â”€â”€ Context-Aware Heuristic Optimizer (THE MISSING ALGORITHM) â”€â”€â”€â”€
 /**
  * Zero-cost fallback optimizer that implements context-aware Boolean
  * query construction when Gemini is unavailable.
@@ -97,7 +105,7 @@ function heuristicOptimize(
   let optimized = keyword.trim();
   let explanation = "Applied keyword preservation (no AI key configured).";
 
-  // 1. ── Stop Word Removal ──────────────────────────────────────────
+  // 1. â”€â”€ Stop Word Removal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const words = optimized.split(/\s+/);
   const meaningful = words.filter(w => !STOP_WORDS.has(w.toLowerCase()));
   if (meaningful.length > 0 && meaningful.length < words.length) {
@@ -105,20 +113,20 @@ function heuristicOptimize(
     explanation = "Removed stop words for cleaner signal.";
   }
 
-  // 2. ── Acronym Exact-Match Wrapping ──────────────────────────────
+  // 2. â”€â”€ Acronym Exact-Match Wrapping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!optimized.includes(" ") && optimized.length > 2 && optimized === optimized.toUpperCase()) {
     optimized = `"${optimized}"`;
     explanation = "Wrapped acronym in quotes for exact match.";
   }
 
-  // 3. ── GCC Entity Bilingual Expansion ────────────────────────────
+  // 3. â”€â”€ GCC Entity Bilingual Expansion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const upperKey = optimized.replace(/"/g, "").toUpperCase().trim();
   if (ENTITY_MAP[upperKey]) {
     optimized = ENTITY_MAP[upperKey];
     explanation = "Expanded to bilingual (EN/AR) form using known GCC entity mapping.";
   }
 
-  // 4. ── Context-Aware Threat/Domain Modifier Injection ─────────────
+  // 4. â”€â”€ Context-Aware Threat/Domain Modifier Injection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // This is the core missing algorithm: inject context-specific Boolean clauses
   // to amplify signal in the right intelligence domain.
   const profile = CONTEXT_PROFILES[context];
@@ -133,20 +141,20 @@ function heuristicOptimize(
     }
   }
 
-  // 5. ── Multilingual Hint (Arabic transliteration for UAE/KSA market) ─
+  // 5. â”€â”€ Multilingual Hint (Arabic transliteration for UAE/KSA market) â”€
   if (langs.includes("ar") && !optimized.includes("OR") && optimized.length < 100) {
     // Only append Arabic hint if no Arabic characters already present
     const hasArabic = /[\u0600-\u06FF]/.test(optimized);
     if (!hasArabic && context !== "darkweb") {
       // For news/osint, add a broad Arabic OR clause only if query is simple
-      explanation += " (Arabic search arm recommended — add AR translation manually for best results)";
+      explanation += " (Arabic search arm recommended â€” add AR translation manually for best results)";
     }
   }
 
   return { original, optimized, explanation, method: "heuristic" };
 }
 
-// ─── Main Exported Action ─────────────────────────────────────────
+// â”€â”€â”€ Main Exported Action â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const optimizeQuery = action({
   args: {
     keyword: v.string(),
@@ -158,7 +166,7 @@ export const optimizeQuery = action({
     const langList = args.targetLanguages || ["en", "ar"];
 
     if (!apiKey) {
-      console.warn("⚠️ No Gemini API key for SearchOptimizer. Using heuristic fallback.");
+      console.warn("âš ï¸ No Gemini API key for SearchOptimizer. Using heuristic fallback.");
       return heuristicOptimize(args.keyword, langList, args.context);
     }
 
@@ -171,7 +179,7 @@ Target Languages: ${langList.join(", ")}
 
 Rules:
 1. Clean the query from noise, stop words, or irrelevant symbols.
-2. If the user provides a name, expand it with common variations (e.g., "ADNOC" -> "ADNOC" OR "Abu Dhabi National Oil Company" OR "أدنوك").
+2. If the user provides a name, expand it with common variations (e.g., "ADNOC" -> "ADNOC" OR "Abu Dhabi National Oil Company" OR "Ø£Ø¯Ù†ÙˆÙƒ").
 3. Translate the keyword into all target languages provided.
 4. If the context is DARKWEB or OSINT: Add relevant threat-intelligence modifiers (e.g., "leak", "breach", "dump", "database", "credentials", "exploit").
 5. If the context is NEWS: Add industry-specific synonyms and press coverage terms.
@@ -213,7 +221,7 @@ Return valid JSON ONLY with these exact fields:
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!rawText) continue;
 
-        // Robust parsing — strips markdown code fences Gemini sometimes emits
+        // Robust parsing â€” strips markdown code fences Gemini sometimes emits
         const parsed = safeParseJson(rawText);
         if (!parsed || typeof parsed.optimizedQuery !== "string") {
           console.warn(`SearchOptimizer: ${model} returned unparseable JSON, trying next...`);
@@ -232,7 +240,7 @@ Return valid JSON ONLY with these exact fields:
       }
     }
 
-    // All AI models failed — fall back to heuristic
+    // All AI models failed â€” fall back to heuristic
     console.warn("SearchOptimizer: All Gemini models exhausted. Using heuristic engine.");
     return heuristicOptimize(args.keyword, langList, args.context);
   },

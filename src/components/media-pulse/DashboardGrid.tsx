@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText, Clock } from "lucide-react";
@@ -396,7 +404,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     </motion.div>
                 </div>
 
-                {/* Geographic Reach — proper card with ranked bars */}
+                {/* Geographic Reach â€” proper card with ranked bars */}
                 {geoEntries.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -434,7 +442,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                                 <span className={clsx("font-black", index === 0 ? "text-primary" : "text-foreground")}>
                                                     {pct}%
                                                 </span>
-                                                {" · "}
+                                                {" Â· "}
                                                 {count as number} {tDashboard('articles_count')}
                                             </span>
                                         </div>

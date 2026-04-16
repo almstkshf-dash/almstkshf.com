@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
@@ -37,7 +45,7 @@ export const analyzeMedia = action({
         const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         if (!apiKey) {
-            console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
+            console.error("âŒ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
             return {
                 success: false,
                 error: "The AI service is not configured. Please add your Gemini API key in Settings or contact support. (Error: CFG_MISSING)"
@@ -71,7 +79,7 @@ Return valid JSON ONLY:
         try {
             // Helper function to call Gemini API
             const callGemini = async (model: string) => {
-                console.log(`🧠 Attempting analysis with model: ${model}`);
+                console.log(`ðŸ§  Attempting analysis with model: ${model}`);
                 const response = await fetch(
                     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
                     {
@@ -91,7 +99,7 @@ Return valid JSON ONLY:
 
             // Diagnostics: Identify Key Source (Masked)
             const keyMasked = apiKey.length > 8 ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : "****";
-            console.log(`🧠 AI Analysis Request: [Key: ${keyMasked}] [UserID: ${(identity?.subject || "ANONYMOUS").substring(0, 8)}]`);
+            console.log(`ðŸ§  AI Analysis Request: [Key: ${keyMasked}] [UserID: ${(identity?.subject || "ANONYMOUS").substring(0, 8)}]`);
 
             // Try models in sequence (Sync with monitoringAction.ts)
             const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
@@ -105,13 +113,13 @@ Return valid JSON ONLY:
 
                     const errText = await response.text();
                     lastError = `Model ${model} failed (${response.status}): ${errText}`;
-                    console.warn(`⚠️ ${lastError}`);
+                    console.warn(`âš ï¸ ${lastError}`);
 
                     // Only skip to next model if it's 404 (not found), 429 (rate limit), or 400 (bad request/invalid per model)
                     // We no longer break on 400 as different models might have different key restrictions
                 } catch (e: any) {
                     lastError = `Fetch failed for ${model}: ${e.message}`;
-                    console.warn(`⚠️ ${lastError}`);
+                    console.warn(`âš ï¸ ${lastError}`);
                 }
             }
 

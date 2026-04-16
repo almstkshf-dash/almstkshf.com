@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use node";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
@@ -12,9 +20,9 @@ import { parseBooleanKeyword, matchesBooleanFilter, buildApiQuery } from "./util
 import { checkAndSetSeen } from "./utils/dedup";
 import { sendResendEmail } from "./utils/email";
 
-// ═══════════════════════════════════════════════════════════════════
-// THE SPIDER — Inlined link resolver for Convex Node Runtime
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// THE SPIDER â€” Inlined link resolver for Convex Node Runtime
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function resolveUrl(originalUrl: string) {
     try {
         const controller = new AbortController();
@@ -49,14 +57,14 @@ async function resolveUrl(originalUrl: string) {
 
         return { finalUrl, imageUrl, source: siteName };
     } catch (error) {
-        console.warn(`⚠️ Spider failed to resolve: ${originalUrl}`, error);
+        console.warn(`âš ï¸ Spider failed to resolve: ${originalUrl}`, error);
         return null;
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// GEMINI AI HELPER — With robust model fallback chain
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// GEMINI AI HELPER â€” With robust model fallback chain
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function callGeminiForAnalysis(
     apiKey: string | null,
     title: string,
@@ -117,7 +125,7 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
 
     for (const model of models) {
         try {
-            console.log(`🧠 Trying Gemini model: ${model}`);
+            console.log(`ðŸ§  Trying Gemini model: ${model}`);
             const response = await fetch(
                 `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
                 {
@@ -177,20 +185,20 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
         }
     }
 
-    console.error("❌ All Gemini models failed or key is missing. Using heuristic values.");
+    console.error("âŒ All Gemini models failed or key is missing. Using heuristic values.");
     
-    // ── HEURISTIC FALLBACK LOGIC ─────────────────────────────────────
+    // â”€â”€ HEURISTIC FALLBACK LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const lowerText = (title + " " + snippet).toLowerCase();
     let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
     let risk: "Low" | "Medium" | "High" = "Medium";
     
     // EN/AR Positive keywords
-    if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|نجاح|ارباح|فوز|ازدهار|نمو|تطور|شراكة|اطلاق|ابتكار)/i)) {
+    if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|Ù†Ø¬Ø§Ø­|Ø§Ø±Ø¨Ø§Ø­|ÙÙˆØ²|Ø§Ø²Ø¯Ù‡Ø§Ø±|Ù†Ù…Ùˆ|ØªØ·ÙˆØ±|Ø´Ø±Ø§ÙƒØ©|Ø§Ø·Ù„Ø§Ù‚|Ø§Ø¨ØªÙƒØ§Ø±)/i)) {
         sentiment = "Positive";
         risk = "Low";
     } 
     // EN/AR Negative keywords (Colloquial + Formal + Harmful)
-    else if (lowerText.match(/(نصب|خراب|زفت|فضيحة|ورطة|تعيس|فاشل|حشيش|ماريجوانا|كريستال|كوك|ترامادول|لاريكا|سي بي دي|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|خسارة|تراجع|فشل|فضيحة|اختراق|دعوى|انتهاك|احتيال|ازمة|تحذير|خطر)/i)) {
+    else if (lowerText.match(/(Ù†ØµØ¨|Ø®Ø±Ø§Ø¨|Ø²ÙØª|ÙØ¶ÙŠØ­Ø©|ÙˆØ±Ø·Ø©|ØªØ¹ÙŠØ³|ÙØ§Ø´Ù„|Ø­Ø´ÙŠØ´|Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§|ÙƒØ±ÙŠØ³ØªØ§Ù„|ÙƒÙˆÙƒ|ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„|Ù„Ø§Ø±ÙŠÙƒØ§|Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|Ø®Ø³Ø§Ø±Ø©|ØªØ±Ø§Ø¬Ø¹|ÙØ´Ù„|ÙØ¶ÙŠØ­Ø©|Ø§Ø®ØªØ±Ø§Ù‚|Ø¯Ø¹ÙˆÙ‰|Ø§Ù†ØªÙ‡Ø§Ùƒ|Ø§Ø­ØªÙŠØ§Ù„|Ø§Ø²Ù…Ø©|ØªØ­Ø°ÙŠØ±|Ø®Ø·Ø±)/i)) {
         sentiment = "Negative";
         risk = "High";
     }
@@ -216,10 +224,10 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
     };
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// GEMINI RELEVANCY GATE — Returns 0-100 relevancy score
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// GEMINI RELEVANCY GATE â€” Returns 0-100 relevancy score
 // Articles scoring below RELEVANCY_THRESHOLD are discarded before DB write.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const RELEVANCY_THRESHOLD = 85;
 
 async function callGeminiRelevancyScore(
@@ -276,7 +284,7 @@ Return valid JSON ONLY:
 
             const parsed = JSON.parse(text.trim());
             const score = typeof parsed.relevancy_score === "number" ? parsed.relevancy_score : 100;
-            console.log(`🎯 Relevancy [${score}/100] — ${parsed.reason || ""} — "${title.substring(0, 50)}"`);
+            console.log(`ðŸŽ¯ Relevancy [${score}/100] â€” ${parsed.reason || ""} â€” "${title.substring(0, 50)}"`);
             return score;
         } catch (e) {
             console.warn(`Relevancy model ${model} failed:`, e);
@@ -287,10 +295,10 @@ Return valid JSON ONLY:
     return 100; // Fail-open if all models fail
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// THE BRAIN — Main fetchNews Action
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// THE BRAIN â€” Main fetchNews Action
 // Supports: multi-country, multi-language, date-range, full-phrase
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export const fetchNews = action({
     args: {
         keyword: v.string(),
@@ -307,7 +315,7 @@ export const fetchNews = action({
             const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             if (!apiKey) {
-                console.warn("⚠️ Gemini API key is missing. Falling back to Heuristic Engine for analysis.");
+                console.warn("âš ï¸ Gemini API key is missing. Falling back to Heuristic Engine for analysis.");
             }
 
             const newsdataKey = await resolveApiKey(ctx, "NEWSDATA_API_KEY", "newsdata");
@@ -340,7 +348,7 @@ export const fetchNews = action({
             const countryList = args.countries.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
             const languageList = args.languages.split(',').map(l => l.trim().toLowerCase()).filter(Boolean);
 
-            // Parse date range if provided (DD/MM/YYYY → Date object)
+            // Parse date range if provided (DD/MM/YYYY â†’ Date object)
             let dateFromObj: Date | null = null;
             let dateToObj: Date | null = null;
             if (args.dateFrom) {
@@ -353,7 +361,7 @@ export const fetchNews = action({
                 dateToObj.setHours(23, 59, 59, 999); // End of day
             }
 
-            // Full-phrase search — wrap in quotes for exact match on Google News
+            // Full-phrase search â€” wrap in quotes for exact match on Google News
             // We use buildApiQuery to get a "clean" version for the API, 
             // but for RSS we might want to keep the enriched logic.
             const cleanQuery = buildApiQuery(args.keyword);
@@ -391,8 +399,8 @@ export const fetchNews = action({
             let totalSuccess = 0;
             const totalSkipped = 0;
 
-            // ── Parallel Provider Fetching ───────────────────────────────────
-            console.log(`🚀 Starting parallel fetch for keyword: ${args.keyword}`);
+            // â”€â”€ Parallel Provider Fetching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            console.log(`ðŸš€ Starting parallel fetch for keyword: ${args.keyword}`);
 
             const fetchPromises = [];
 
@@ -409,7 +417,7 @@ export const fetchNews = action({
                         }
                         return { name: `RSS-${combo.country}`, success: localSuccess };
                     } catch (e) {
-                        console.error(`❌ RSS fail: ${combo.url}`, e);
+                        console.error(`âŒ RSS fail: ${combo.url}`, e);
                         return { name: `RSS-${combo.country}`, error: true };
                     }
                 })());
@@ -440,7 +448,7 @@ export const fetchNews = action({
                         }
                         return { name: 'NewsData.io', error: true };
                     } catch (e) {
-                        console.error(`❌ NewsData.io fail`, e);
+                        console.error(`âŒ NewsData.io fail`, e);
                         return { name: 'NewsData.io', error: true };
                     }
                 })());
@@ -480,7 +488,7 @@ export const fetchNews = action({
                         }
                         return { name: 'NewsAPI.org', success: localSuccess };
                     } catch (e) {
-                        console.error(`❌ NewsAPI.org fail`, e);
+                        console.error(`âŒ NewsAPI.org fail`, e);
                         return { name: 'NewsAPI.org', error: true };
                     }
                 })());
@@ -524,7 +532,7 @@ export const fetchNews = action({
                         }
                         return { name: 'GNews.io', success: localSuccess };
                     } catch (e) {
-                        console.error(`❌ GNews.io fail`, e);
+                        console.error(`âŒ GNews.io fail`, e);
                         return { name: 'GNews.io', error: true };
                     }
                 })());
@@ -564,7 +572,7 @@ export const fetchNews = action({
                         }
                         return { name: 'WorldNews API', error: true };
                     } catch (e) {
-                        console.error(`❌ WorldNews API fail`, e);
+                        console.error(`âŒ WorldNews API fail`, e);
                         return { name: 'WorldNews API', error: true };
                     }
                 })());
@@ -601,7 +609,7 @@ export const fetchNews = action({
                         }
                         return { name: 'Twitter (X)', error: true };
                     } catch (e) {
-                        console.error(`❌ Twitter fail`, e);
+                        console.error(`âŒ Twitter fail`, e);
                         return { name: 'Twitter (X)', error: true };
                     }
                 })());
@@ -635,7 +643,7 @@ export const fetchNews = action({
                         }
                         return { name: 'Bing News', error: true };
                     } catch (e) {
-                        console.error(`❌ Bing News fail`, e);
+                        console.error(`âŒ Bing News fail`, e);
                         return { name: 'Bing News', error: true };
                     }
                 })());
@@ -666,7 +674,7 @@ export const fetchNews = action({
                         }
                         return { name: 'Mediastack', error: true };
                     } catch (e) {
-                        console.error(`❌ Mediastack fail`, e);
+                        console.error(`âŒ Mediastack fail`, e);
                         return { name: 'Mediastack', error: true };
                     }
                 })());
@@ -710,7 +718,7 @@ export const fetchNews = action({
                         }
                         return { name: 'Serper.dev', error: true };
                     } catch (e) {
-                        console.error(`❌ Serper.dev fail`, e);
+                        console.error(`âŒ Serper.dev fail`, e);
                         return { name: 'Serper.dev', error: true };
                     }
                 })());
@@ -745,7 +753,7 @@ export const fetchNews = action({
                     }
                     return { name: 'GLEIF', success: 0 };
                 } catch (e) {
-                    console.error(`❌ GLEIF fail`, e);
+                    console.error(`âŒ GLEIF fail`, e);
                     return { name: 'GLEIF', error: true };
                 }
             })());
@@ -755,18 +763,18 @@ export const fetchNews = action({
                 if ('success' in r) totalSuccess += r.success || 0;
             });
 
-            console.log(`📊 Parallel Fetch Complete: ${totalSuccess} saved articles.`);
+            console.log(`ðŸ“Š Parallel Fetch Complete: ${totalSuccess} saved articles.`);
             return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: results.length };
         } catch (globalError: any) {
-            console.error("🏁 CRITICAL: Global fetchNews failure", globalError);
+            console.error("ðŸ CRITICAL: Global fetchNews failure", globalError);
             return { success: false, error: "Unable to process news monitoring." };
         }
     },
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// THE EXTRACTOR — Direct URL to Article Extraction
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// THE EXTRACTOR â€” Direct URL to Article Extraction
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export const extractArticle = action({
     args: {
         url: v.string(),
@@ -782,7 +790,7 @@ export const extractArticle = action({
             const result = await extractWithWorldNews(args.url, worldnewsKey, args.analyze || false);
             return { success: !!result, data: result };
         } catch (error) {
-            console.error("❌ Extract error:", error);
+            console.error("âŒ Extract error:", error);
             return { success: false, error: "Failed to extract article content." };
         }
     }
@@ -797,7 +805,7 @@ async function extractWithWorldNews(url: string, apiKey: string, analyze: boolea
         if (!res.ok) return null;
         return await res.json();
     } catch (e) {
-        console.error("❌ WorldNews Extract fail", e);
+        console.error("âŒ WorldNews Extract fail", e);
         return null;
     }
 }
@@ -827,24 +835,24 @@ async function processArticle(
     if (typeof item.link !== "string" || typeof item.title !== "string") return false;
 
     try {
-        // ── GATE 1: Boolean Pre-Filter ─────────────────────────────────────
+        // â”€â”€ GATE 1: Boolean Pre-Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Evaluates mandatory (+), excluded (-), and phrase terms BEFORE any
-        // API call. Zero cost — pure string matching.
+        // API call. Zero cost â€” pure string matching.
         const boolExpr = parseBooleanKeyword(keyword);
         const snippet = item.contentSnippet || item.content || item.title;
         if (!matchesBooleanFilter(boolExpr, item.title, snippet)) {
-            console.log(`⚡ Boolean reject: "${item.title.substring(0, 60)}..."`);
+            console.log(`âš¡ Boolean reject: "${item.title.substring(0, 60)}..."`);
             return false;
         }
 
-        // ── GATE 2: Date Filter ────────────────────────────────────────────
+        // â”€â”€ GATE 2: Date Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const pubDate = item.pubDate ? new Date(item.pubDate) : null;
         if (pubDate) {
             if (dateFrom && pubDate < dateFrom) return false;
             if (dateTo && pubDate > dateTo) return false;
         }
 
-        // ── GATE 3: Redis Deduplication (24-hour hash cache) ──────────────
+        // â”€â”€ GATE 3: Redis Deduplication (24-hour hash cache) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Prevents the same article from multiple providers (NewsData, GNews,
         // RSS) being stored twice. Uses SHA-256(url+title) with 24h TTL.
         const isDuplicate = await checkAndSetSeen(item.link, item.title);
@@ -852,7 +860,7 @@ async function processArticle(
             return false; // Log already printed inside checkAndSetSeen
         }
 
-        // ── GATE 4: Gemini Relevancy Score (≥70 required) ─────────────────
+        // â”€â”€ GATE 4: Gemini Relevancy Score (â‰¥70 required) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Lightweight Gemini call to score how relevant the article is to the
         // keyword. Articles scoring below 70/100 are discarded before the
         // full analysis + DB write.
@@ -863,17 +871,17 @@ async function processArticle(
             keyword
         );
         if (relevancyScore < RELEVANCY_THRESHOLD) {
-            console.log(`⚠️ Low relevancy (${relevancyScore}/100) — discarded: "${item.title.substring(0, 60)}"`);
+            console.log(`âš ï¸ Low relevancy (${relevancyScore}/100) â€” discarded: "${item.title.substring(0, 60)}"`);
             return false;
         }
 
-        // ── RESOLVE: Spider — Resolve URL if needed (RSS redirects) ───────
+        // â”€â”€ RESOLVE: Spider â€” Resolve URL if needed (RSS redirects) â”€â”€â”€â”€â”€â”€â”€
         let resolvedUrl = item.link;
         let imageUrl = item.imageUrl;
         let sourceName = item.source || item.creator;
 
         if (shouldResolve) {
-            console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
+            console.log(`ðŸ•·ï¸ Resolving: ${item.title.substring(0, 50)}...`);
             const resolved = await resolveUrl(item.link);
             if (resolved) {
                 resolvedUrl = resolved.finalUrl;
@@ -882,7 +890,7 @@ async function processArticle(
             }
         }
 
-        // ── ANALYSE: Full Gemini Sentiment Analysis ────────────────────────
+        // â”€â”€ ANALYSE: Full Gemini Sentiment Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const aiData = await callGeminiForAnalysis(
             geminiKey,
             item.title,
@@ -982,13 +990,13 @@ async function processArticle(
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PRESS RELEASE WIRE INGESTION
 // Directly pulls from major global and Arab PR wire RSS feeds.
-// Bypasses news aggregator APIs — content is first-party from wire services.
-// ═══════════════════════════════════════════════════════════════════════════════
+// Bypasses news aggregator APIs â€” content is first-party from wire services.
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// PR wire RSS sources — mix of global and MENA-focused feeds
+// PR wire RSS sources â€” mix of global and MENA-focused feeds
 const PR_WIRE_FEEDS: Array<{
     name: string;
     url: string;
@@ -1037,9 +1045,9 @@ export const fetchPressReleaseSources = action({
         // Support Boolean logic in Press Release filtering
         const booleanExpr = parseBooleanKeyword(fetchedKeyword);
         const keyword = fetchedKeyword || "Press Release";
-        const itemLimit = args.limit ?? 30;   // per-feed cap — user controlled
+        const itemLimit = args.limit ?? 30;   // per-feed cap â€” user controlled
 
-        // Date range (optional) — ISO strings from the UI date picker
+        // Date range (optional) â€” ISO strings from the UI date picker
         const dateFromObj = args.dateFrom ? new Date(args.dateFrom) : null;
         const dateToObj = args.dateTo ? new Date(args.dateTo + "T23:59:59Z") : null;
         const parser = new Parser({ timeout: 10000 });
@@ -1058,7 +1066,7 @@ export const fetchPressReleaseSources = action({
                     // Each feed pulls up to itemLimit candidates, then we filter by keyword
                     const candidates = feedData.items.slice(0, itemLimit);
 
-                    // ── Keyword filter (Boolean logic) ────────────────────────────────
+                    // â”€â”€ Keyword filter (Boolean logic) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     const afterKeyword = fetchedKeyword
                         ? candidates.filter((item) => {
                             const title = item.title ?? "";
@@ -1067,7 +1075,7 @@ export const fetchPressReleaseSources = action({
                         })
                         : candidates;
 
-                    // ── Date range filter ────────────────────────────────────────────
+                    // â”€â”€ Date range filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     const items = (dateFromObj || dateToObj)
                         ? afterKeyword.filter((item) => {
                             if (!item.pubDate) return true;
@@ -1083,11 +1091,11 @@ export const fetchPressReleaseSources = action({
                         if (!item.link || !item.title) continue;
 
                         try {
-                            // ── GATE 1: Redis Deduplication ──────────────────────────────────
+                            // â”€â”€ GATE 1: Redis Deduplication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                             // Prevent identical PRs from overlapping feeds or multiple runs
                             const isSeen = await checkAndSetSeen(item.link, item.title);
                             if (isSeen) {
-                                console.log(`🗑️ PR Dedup skip: ${item.title.substring(0, 50)}...`);
+                                console.log(`ðŸ—‘ï¸ PR Dedup skip: ${item.title.substring(0, 50)}...`);
                                 continue;
                             }
 
@@ -1104,7 +1112,7 @@ export const fetchPressReleaseSources = action({
                             const reach = 75000;
                             const emotions = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
 
-                            // ── Cost-Cutting Sentiment Analysis ────────────────────────────────
+                            // â”€â”€ Cost-Cutting Sentiment Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                             // Simplified regex-based sentiment detection instead of AI API
                             const lowerSnippet = snippet.toLowerCase();
                             if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {

@@ -1,7 +1,15 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 /**
- * Image Forensics Result Component — expanded view
+ * Image Forensics Result Component â€” expanded view
  *
  * Surfaces all 10 pixel-logic signals (grouped by category), the verification
  * checklist, raw pixel stats, and the forensic scan overlay.
@@ -18,16 +26,16 @@ import {
   AlertTriangle, FileText
 } from "lucide-react";
 
-// ─── Props accept either report shape ────────────────────────────────────────
+// â”€â”€â”€ Props accept either report shape â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ImageResultsProps {
   report: ImageAnalysisReport;
   originalImage: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Category labels are resolved at render time via t() — keys stored here
+// Category labels are resolved at render time via t() â€” keys stored here
 const CATEGORY_KEYS: Record<
   ImageSignal["category"],
   { labelKey: string; icon: React.ElementType; color: string }
@@ -57,7 +65,7 @@ function SignalIcon({ risk }: { risk: string }) {
   return <Scan className="w-4 h-4 text-zinc-500" />;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function ImageResults({ report, originalImage }: ImageResultsProps) {
   const t = useTranslations("AiInspector.image");
@@ -79,7 +87,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
 
-      {/* ── Top row: Score + (if rich) verdict ─────────────────────────── */}
+      {/* â”€â”€ Top row: Score + (if rich) verdict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Score card */}
@@ -142,7 +150,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
           </h3>
 
           {rich ? (
-            /* ── Rich grouped signals ──────────────────────────────────── */
+            /* â”€â”€ Rich grouped signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             <div className="space-y-4">
               {byCategory.map(({ cat, signals }) => {
                 const meta = CATEGORY_KEYS[cat];
@@ -183,7 +191,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               })}
             </div>
           ) : (
-            /* ── Legacy flat signal list ───────────────────────────────── */
+            /* â”€â”€ Legacy flat signal list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {report.pixelLogicSignals.map((signal) => (
                 <motion.div
@@ -206,7 +214,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             </div>
           )}
 
-          {/* ── Native AI Forensic Scouts (Deep ML) ─────────────────────── */}
+          {/* â”€â”€ Native AI Forensic Scouts (Deep ML) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           {rich?.deepMl && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -301,7 +309,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
 
       </div>
 
-      {/* ── Pixel Stats Bar (only when rich data available) ─────────────── */}
+      {/* â”€â”€ Pixel Stats Bar (only when rich data available) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {rich && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {[
@@ -321,7 +329,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
         </div>
       )}
 
-      {/* ── Forensic Visualization ───────────────────────────────────────── */}
+      {/* â”€â”€ Forensic Visualization â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="p-10 bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden group">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">

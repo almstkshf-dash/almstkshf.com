@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { action, mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
@@ -46,7 +54,7 @@ export const fetchDeepSources = action({
         limit: v.optional(v.number()),
     },
     handler: async (ctx, args): Promise<{ success: boolean; count?: number; error?: string }> => {
-        // When called from the scheduler (cron), there is no user identity — that's safe by design.
+        // When called from the scheduler (cron), there is no user identity â€” that's safe by design.
         // When called directly by a user, we still require admin privileges.
         const identity = await ctx.auth.getUserIdentity();
         if (identity) {

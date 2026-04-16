@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
@@ -272,12 +280,12 @@ export const getAnalyticsOverview = query({
             weightedSentimentSum += sentimentValue * weight;
         });
 
-        // NSS = (Σ Weighted Sentiment) / Total Mentions * 100
+        // NSS = (Î£ Weighted Sentiment) / Total Mentions * 100
         const nss = Math.round((weightedSentimentSum / articles.length) * 100);
 
         // Risk Score Composition
         const negativeDensity = counts.Negative / articles.length;
-        // Mocking Velocity for now — normally would compare with past 24h
+        // Mocking Velocity for now â€” normally would compare with past 24h
         const velocity = 0.05;
         const influencerNegativeWeight = 0.1; // Placeholder
         const topicSensitivity = 0.2; // Placeholder

@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
@@ -186,7 +194,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                             <h3 className="font-medium text-foreground mb-1 transition-colors">{report.reportName || report.title}</h3>
                             <div className="text-xs text-foreground/70 mb-4 flex gap-2 transition-colors">
                                 <span>{report.source || report.sourceType}</span>
-                                <span>•</span>
+                                <span>â€¢</span>
                                 <span>{new Date(report.timestamp || report.publishedDate || report.createdAt).toLocaleDateString()}</span>
                             </div>
                             <div className="flex gap-2">

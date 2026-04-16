@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -11,17 +19,17 @@ import Button from '@/components/ui/Button';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 
-// ─── PR wire sources metadata (mirrored from backend for display) ────
+// â”€â”€â”€ PR wire sources metadata (mirrored from backend for display) â”€â”€â”€â”€
 const PR_WIRES = [
-    { name: 'PR Newswire', region: 'Global', flag: '🌍' },
-    { name: 'Business Wire', region: 'Global', flag: '🌍' },
-    { name: 'GlobeNewswire MENA', region: 'MENA', flag: '🌐' },
-    { name: 'Zawya PR', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (UAE EN)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (UAE AR)', region: 'AE', flag: '🇦🇪' },
-    { name: 'SPA (Saudi)', region: 'SA', flag: '🇸🇦' },
-    { name: 'MENA FN', region: 'MENA', flag: '🌐' },
-    { name: 'Gulf News PR', region: 'AE', flag: '🇦🇪' },
+    { name: 'PR Newswire', region: 'Global', flag: 'ðŸŒ' },
+    { name: 'Business Wire', region: 'Global', flag: 'ðŸŒ' },
+    { name: 'GlobeNewswire MENA', region: 'MENA', flag: 'ðŸŒ' },
+    { name: 'Zawya PR', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
+    { name: 'WAM (UAE EN)', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
+    { name: 'WAM (UAE AR)', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
+    { name: 'SPA (Saudi)', region: 'SA', flag: 'ðŸ‡¸ðŸ‡¦' },
+    { name: 'MENA FN', region: 'MENA', flag: 'ðŸŒ' },
+    { name: 'Gulf News PR', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
 ];
 
 type FeedResult = {
@@ -171,7 +179,7 @@ export default function PressReleasePanel() {
                                 className="text-xs text-foreground/80 hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
                                 title={t('clear')}
                             >
-                                ✕
+                                âœ•
                             </button>
                         )}
                     </div>
@@ -232,7 +240,7 @@ export default function PressReleasePanel() {
 
                         {syncResult.totalSaved === 0 && keyword.trim() && (
                             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
-                                <span className="text-lg">🔍</span>
+                                <span className="text-lg">ðŸ”</span>
                                 <span>No articles matched <strong>&quot;{keyword}&quot;</strong> across all 9 feeds. Try a shorter or broader keyword.</span>
                             </div>
                         )}

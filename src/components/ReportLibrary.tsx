@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { useQuery } from "convex/react";
@@ -85,7 +93,7 @@ export default function ReportLibrary() {
                                             <Calendar className="w-3 h-3" aria-hidden="true" />
                                             {new Date(collection.updatedAt).toLocaleDateString()}
                                         </span>
-                                        <span>•</span>
+                                        <span>â€¢</span>
                                         <span className="text-foreground/70">{collection.items?.length || 0} Items</span>
                                     </div>
                                 </div>

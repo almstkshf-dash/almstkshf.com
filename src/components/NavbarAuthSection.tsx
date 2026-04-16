@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 import { memo } from "react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -28,7 +36,7 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
 }: NavbarAuthSectionProps) {
     return (
         <>
-            {/* ─── Desktop auth ─── */}
+            {/* â”€â”€â”€ Desktop auth â”€â”€â”€ */}
             <div className="hidden lg:flex items-center gap-2">
                 <SignedOut>
                     <SignInButton mode="modal">
@@ -72,7 +80,7 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
                 </SignedIn>
             </div>
 
-            {/* ─── Mobile auth ─── */}
+            {/* â”€â”€â”€ Mobile auth â”€â”€â”€ */}
             <div className="lg:hidden flex items-center gap-2">
                 <SignedIn>
                     <HoverPrefetchLink
@@ -99,9 +107,9 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
 
 export default NavbarAuthSection;
 
-/* ─────────────────────────────────────────────────────────────
-   Mobile menu footer auth — used by the mobile drawer
-───────────────────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   Mobile menu footer auth â€” used by the mobile drawer
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 interface MobileAuthFooterProps {
     getStartedLabel: string;
     dashboardLabel: string;

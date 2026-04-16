@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import { useQuery, useAction, useConvexAuth } from 'convex/react';
@@ -95,7 +103,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
 
     return (
         <section className="space-y-6">
-            {/* ── Configuration Card ── */}
+            {/* â”€â”€ Configuration Card â”€â”€ */}
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-5">
                 <div className="flex items-center gap-2 mb-1">
                     <ScanSearch className="w-5 h-5 text-indigo-500" />

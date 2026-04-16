@@ -1,8 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import ExcelJS from 'exceljs';
 import { fixArabicForPDF, isArabic } from './arabic-utils';
 import type { jsPDF } from 'jspdf';
 
-// ─── Domain types ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Domain types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface Article {
     title: string;
@@ -38,19 +46,19 @@ interface ExportTranslations {
     reach?: string;
     ave?: string;
     hashtags?: string;
-    // PDF — brand
+    // PDF â€” brand
     brand_name?: string;
     brand_tagline?: string;
     footer_url?: string;
     generated_at?: string;
     page_count?: string;
     report_title?: string;
-    // PDF — cover
+    // PDF â€” cover
     total_articles?: string;
     keyword_label?: string;
     region_label?: string;
     langs_label?: string;
-    // PDF — summary
+    // PDF â€” summary
     summary_title?: string;
     total_reach?: string;
     ad_value?: string;
@@ -62,7 +70,7 @@ interface ExportTranslations {
     rec_high_neg?: string;
     rec_mod_neg?: string;
     rec_healthy?: string;
-    // PDF — table
+    // PDF â€” table
     coverage_log?: string;
     [key: string]: string | undefined;
 }
@@ -77,9 +85,9 @@ interface AutoTableCellData {
     };
 }
 
-// ════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // EXCEL EXPORT
-// ════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export async function exportToExcel(
     articles: Article[],
     translations: ExportTranslations,
@@ -137,9 +145,9 @@ export async function exportToExcel(
     link.click();
 }
 
-// ════════════════════════════════════════════════════════════════════════
-// PDF EXPORT — Professional branded report
-// ════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// PDF EXPORT â€” Professional branded report
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 // Brand colors
 const BRAND_DARK = [31, 78, 120] as const;     // #1F4E78
@@ -307,9 +315,9 @@ export async function exportToPDF(
         doc.text(processedText, x, y, options);
     };
 
-    // ═══════════════════════════════════════════════════════
-    // PAGE 1 — COVER PAGE
-    // ═══════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // PAGE 1 â€” COVER PAGE
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     doc.setFillColor(...BRAND_DARK);
     doc.rect(0, 0, pageWidth, 70, 'F');
 
@@ -356,11 +364,11 @@ export async function exportToPDF(
     doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
     doc.setFontSize(8);
     doc.setTextColor(200, 200, 200);
-    addText(`${translations.footer_url || 'www.almstkshf.com'}  |  ${translations.brand_name || 'المستكشف'}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+    addText(`${translations.footer_url || 'www.almstkshf.com'}  |  ${translations.brand_name || 'Ø§Ù„Ù…Ø³ØªÙƒØ´Ù'}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
-    // ═══════════════════════════════════════════════════════
-    // PAGE 2 — EXECUTIVE SUMMARY
-    // ═══════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // PAGE 2 â€” EXECUTIVE SUMMARY
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     doc.addPage();
     addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
@@ -446,9 +454,9 @@ export async function exportToPDF(
     const recX = recAlign === 'right' ? pageWidth - 20 : 20;
     doc.text(splitRec, recX, y + 10, { align: recAlign });
 
-    // ═══════════════════════════════════════════════════════
-    // PAGE 3+ — ARTICLES TABLE
-    // ═══════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // PAGE 3+ â€” ARTICLES TABLE
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     doc.addPage();
     addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
 
@@ -520,9 +528,9 @@ export async function exportToPDF(
         },
     });
 
-    // ═══════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     // ADD PAGE NUMBERS
-    // ═══════════════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);

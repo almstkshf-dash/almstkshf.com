@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
@@ -16,7 +24,7 @@ async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
             convex.setAuth(token);
         }
     } catch {
-        // Auth token unavailable — proceed as anonymous (read-only queries may still work)
+        // Auth token unavailable â€” proceed as anonymous (read-only queries may still work)
     }
     return convex;
 }

@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
@@ -51,7 +59,7 @@ export async function POST(request: NextRequest) {
         switch (event.type) {
             case 'checkout.session.completed': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                console.log('✅ Payment successful:', session.id);
+                console.log('âœ… Payment successful:', session.id);
 
                 // Initialize Convex Client
                 const { ConvexHttpClient } = await import('convex/browser');
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
 
             case 'checkout.session.async_payment_succeeded': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                console.log('✅ Async payment successful:', session.id);
+                console.log('âœ… Async payment successful:', session.id);
 
                 // Initialize Convex Client
                 const { ConvexHttpClient } = await import('convex/browser');
@@ -97,7 +105,7 @@ export async function POST(request: NextRequest) {
 
             case 'checkout.session.async_payment_failed': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                console.log('❌ Async payment failed:', session.id);
+                console.log('âŒ Async payment failed:', session.id);
 
                 // Initialize Convex Client
                 const { ConvexHttpClient } = await import('convex/browser');
@@ -131,20 +139,20 @@ export async function POST(request: NextRequest) {
 
             case 'payment_intent.succeeded': {
                 const paymentIntent = event.data.object as Stripe.PaymentIntent;
-                console.log('✅ PaymentIntent successful:', paymentIntent.id);
+                console.log('âœ… PaymentIntent successful:', paymentIntent.id);
                 break;
             }
 
             case 'payment_intent.payment_failed': {
                 const paymentIntent = event.data.object as Stripe.PaymentIntent;
-                console.log('❌ PaymentIntent failed:', paymentIntent.id);
+                console.log('âŒ PaymentIntent failed:', paymentIntent.id);
                 break;
             }
 
             case 'customer.subscription.created':
             case 'customer.subscription.updated': {
                 const subscription = event.data.object as Stripe.Subscription;
-                console.log('📝 Subscription updated:', subscription.id);
+                console.log('ðŸ“ Subscription updated:', subscription.id);
 
                 const { ConvexHttpClient } = await import('convex/browser');
                 const { api } = await import('../../../../../convex/_generated/api');
@@ -152,7 +160,7 @@ export async function POST(request: NextRequest) {
 
                 const userId = subscription.metadata?.userId;
                 if (!userId) {
-                    console.error('❌ No userId found in subscription metadata:', subscription.id);
+                    console.error('âŒ No userId found in subscription metadata:', subscription.id);
                     break;
                 }
 
@@ -171,7 +179,7 @@ export async function POST(request: NextRequest) {
 
             case 'customer.subscription.deleted': {
                 const subscription = event.data.object as Stripe.Subscription;
-                console.log('🗑️ Subscription cancelled:', subscription.id);
+                console.log('ðŸ—‘ï¸ Subscription cancelled:', subscription.id);
 
                 const { ConvexHttpClient } = await import('convex/browser');
                 const { api } = await import('../../../../../convex/_generated/api');
@@ -195,13 +203,13 @@ export async function POST(request: NextRequest) {
 
             case 'invoice.paid': {
                 const invoice = event.data.object as Stripe.Invoice;
-                console.log('✅ Invoice paid:', invoice.id);
+                console.log('âœ… Invoice paid:', invoice.id);
                 break;
             }
 
             case 'invoice.payment_failed': {
                 const invoice = event.data.object as Stripe.Invoice;
-                console.log('❌ Invoice payment failed:', invoice.id);
+                console.log('âŒ Invoice payment failed:', invoice.id);
 
                 try {
                     const { ConvexHttpClient } = await import('convex/browser');

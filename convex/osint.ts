@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use node";
 import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
@@ -5,12 +13,12 @@ import { api } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
 
-// ═══════════════════════════════════════════════════════════════════
-// OSINT ENGINE — Active Open-Source Intelligence Lookups
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// OSINT ENGINE â€” Active Open-Source Intelligence Lookups
 // All external API calls use public, free-tier APIs where available.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// ─── Email Intelligence ─────────────────────────────────────────────
+// â”€â”€â”€ Email Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupEmail = action({
     args: {
         email: v.string(),
@@ -25,7 +33,7 @@ export const lookupEmail = action({
 
             const results: Record<string, any> = { email };
 
-            // 1. Social Platform Presence — Holehe-style (pure TypeScript, no Python / no spawn)
+            // 1. Social Platform Presence â€” Holehe-style (pure TypeScript, no Python / no spawn)
             // Convex runs in sandboxed cloud Node.js; child_process.spawn() is unavailable.
             // We replicate Holehe's approach: parallel fetch() to 18 platform API/registration
             // endpoints with per-platform timeouts and full graceful degradation.
@@ -112,7 +120,7 @@ export const lookupEmail = action({
     },
 });
 
-// ─── Domain Intelligence ─────────────────────────────────────────────
+// â”€â”€â”€ Domain Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupDomain = action({
     args: {
         domain: v.string(),
@@ -218,7 +226,7 @@ export const lookupDomain = action({
                 }
             } catch (_) { /* IP lookup failed */ }
 
-            // 5. Wayback Machine — first/last snapshot
+            // 5. Wayback Machine â€” first/last snapshot
             try {
                 const waybackRes = await fetch(
                     `https://archive.org/wayback/available?url=${domain}`
@@ -260,7 +268,7 @@ export const lookupDomain = action({
     },
 });
 
-// ─── IP Intelligence ──────────────────────────────────────────────────
+// â”€â”€â”€ IP Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupIp = action({
     args: {
         ip: v.string(),
@@ -273,7 +281,7 @@ export const lookupIp = action({
 
             const results: Record<string, any> = { ip };
 
-            // 1. ipapi.co — free tier (1000 requests/day, no key needed)
+            // 1. ipapi.co â€” free tier (1000 requests/day, no key needed)
             try {
                 const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
                 if (geoRes.ok) {
@@ -295,7 +303,7 @@ export const lookupIp = action({
                 results.geoNote = `Geo lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            // 2. Abuse IPDB — check if IP is known malicious (free tier)
+            // 2. Abuse IPDB â€” check if IP is known malicious (free tier)
             try {
                 const abuseKey = await resolveApiKey(ctx, "ABUSEIPDB_API_KEY", "abuseipdb");
                 if (abuseKey) {
@@ -358,7 +366,7 @@ export const lookupIp = action({
     },
 });
 
-// ─── Username Intelligence ─────────────────────────────────────────────
+// â”€â”€â”€ Username Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupUsername = action({
     args: {
         username: v.string(),
@@ -373,7 +381,7 @@ export const lookupUsername = action({
             }
 
             // Check username existence on major platforms
-            // Uses HEAD requests where possible — no API key needed
+            // Uses HEAD requests where possible â€” no API key needed
             const platforms = [
                 { name: "GitHub", url: `https://github.com/${username}`, api: `https://api.github.com/users/${username}` },
                 { name: "Twitter/X", url: `https://twitter.com/${username}`, api: null },
@@ -474,7 +482,7 @@ export const lookupUsername = action({
     },
 });
 
-// ─── Phone Number Intelligence ────────────────────────────────────────
+// â”€â”€â”€ Phone Number Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupPhone = action({
     args: {
         phone: v.string(),
@@ -490,7 +498,7 @@ export const lookupPhone = action({
 
             const results: Record<string, any> = { phone };
 
-            // numverify — free tier (100 requests/month)
+            // numverify â€” free tier (100 requests/month)
             try {
                 const numKey = await resolveApiKey(ctx, "NUMVERIFY_API_KEY", "numverify");
                 if (numKey) {
@@ -547,10 +555,10 @@ export const lookupPhone = action({
     },
 });
 
-// ─── Persistence: moved to convex/osintDb.ts (mutations/queries can't live in Node.js runtime)
+// â”€â”€â”€ Persistence: moved to convex/osintDb.ts (mutations/queries can't live in Node.js runtime)
 // Import path for frontend: api.osintDb.*
 
-// ─── News Intelligence (Replaces GDELT) ──────────────────────────────────
+// â”€â”€â”€ News Intelligence (Replaces GDELT) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupNews = action({
     args: {
         query: v.string(),
@@ -627,7 +635,7 @@ export const lookupNews = action({
     },
 });
 
-// ─── Corporate Intelligence ───────────────────────────────────────────
+// â”€â”€â”€ Corporate Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupCorporate = action({
     args: { companyName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -681,7 +689,7 @@ export const lookupCorporate = action({
     }
 });
 
-// ─── Location Intelligence ────────────────────────────────────────────
+// â”€â”€â”€ Location Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupLocation = action({
     args: { locationName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -736,7 +744,7 @@ export const lookupLocation = action({
     }
 });
 
-// ─── Wikipedia Intelligence ───────────────────────────────────────────
+// â”€â”€â”€ Wikipedia Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupWikipedia = action({
     args: { query: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -799,7 +807,7 @@ export const lookupWikipedia = action({
     }
 });
 
-// ─── GLEIF Intelligence ──────────────────────────────────────────────
+// â”€â”€â”€ GLEIF Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupGleif = action({
     args: { companyName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -853,7 +861,7 @@ export const lookupGleif = action({
     }
 });
 
-// ─── Watchlist Intelligence (UN/OFAC) ─────────────────────────────────
+// â”€â”€â”€ Watchlist Intelligence (UN/OFAC) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const lookupWatchlist = action({
     args: { query: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -920,9 +928,9 @@ export const lookupWatchlist = action({
     }
 });
 
-// ─── Holehe-style Platform Presence ─────────────────────────────────────
+// â”€â”€â”€ Holehe-style Platform Presence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // TypeScript port of Holehe's approach: parallel registration endpoint checks.
-// Why not `spawn('holehe', ...)`: Convex cloud Node.js is sandboxed — no access
+// Why not `spawn('holehe', ...)`: Convex cloud Node.js is sandboxed â€” no access
 // to Python interpreter or local file system. Pure fetch() achieves the same result.
 
 type PlatformResult = {
@@ -939,7 +947,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
 
     const checks: Array<() => Promise<PlatformResult>> = [
 
-        // 1. Twitter/X — email_available endpoint (no auth needed, returns {taken:bool})
+        // 1. Twitter/X â€” email_available endpoint (no auth needed, returns {taken:bool})
         async () => {
             try {
                 const r = await fetch(
@@ -954,7 +962,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Twitter/X', found: null, url: 'https://x.com', category: 'social' };
         },
 
-        // 2. Spotify — signup validation (status 20 = email exists, status 1 = available)
+        // 2. Spotify â€” signup validation (status 20 = email exists, status 1 = available)
         async () => {
             try {
                 const r = await fetch(
@@ -969,7 +977,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Spotify', found: null, url: 'https://spotify.com', category: 'entertainment' };
         },
 
-        // 3. Duolingo — user lookup by email field
+        // 3. Duolingo â€” user lookup by email field
         async () => {
             try {
                 const r = await fetch(
@@ -984,7 +992,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Duolingo', found: null, url: 'https://duolingo.com', category: 'productivity' };
         },
 
-        // 4. WordPress.com — email availability REST endpoint (404=not registered, 200=exists)
+        // 4. WordPress.com â€” email availability REST endpoint (404=not registered, 200=exists)
         async () => {
             try {
                 const r = await fetch(
@@ -996,7 +1004,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'WordPress', found: null, url: 'https://wordpress.com', category: 'productivity' };
         },
 
-        // 5. ProtonMail — username availability (Code 2500 or HTTP 409 = username taken)
+        // 5. ProtonMail â€” username availability (Code 2500 or HTTP 409 = username taken)
         async () => {
             try {
                 const username = email.split('@')[0];
@@ -1012,7 +1020,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'ProtonMail', found: null, url: 'https://proton.me', category: 'productivity' };
         },
 
-        // 6. Foursquare — login data check (accountExists field)
+        // 6. Foursquare â€” login data check (accountExists field)
         async () => {
             try {
                 const r = await fetch('https://foursquare.com/api/userAuthentication/loginData', {
@@ -1029,7 +1037,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Foursquare', found: null, url: 'https://foursquare.com', category: 'social' };
         },
 
-        // 7. Flickr — people.findByEmail (public method, no API key returns stat ok/fail)
+        // 7. Flickr â€” people.findByEmail (public method, no API key returns stat ok/fail)
         async () => {
             try {
                 const r = await fetch(
@@ -1044,7 +1052,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Flickr', found: null, url: 'https://flickr.com', category: 'social' };
         },
 
-        // 8. Airbnb — Primary email lookup (returns userExists bool)
+        // 8. Airbnb â€” Primary email lookup (returns userExists bool)
         async () => {
             try {
                 const r = await fetch('https://www.airbnb.com/api/v3/PrimaryEmailLookup', {
@@ -1061,7 +1069,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Airbnb', found: null, url: 'https://airbnb.com', category: 'ecommerce' };
         },
 
-        // 9. Snapchat — find_user endpoint
+        // 9. Snapchat â€” find_user endpoint
         async () => {
             try {
                 const r = await fetch('https://auth.snapchat.com/snap_auth/api/user/find_user', {
@@ -1076,7 +1084,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Snapchat', found: null, url: 'https://snapchat.com', category: 'social' };
         },
 
-        // 10. Pinterest — RegisterEmailCheck resource (data:false means email IS taken)
+        // 10. Pinterest â€” RegisterEmailCheck resource (data:false means email IS taken)
         async () => {
             try {
                 const r = await fetch(
@@ -1091,7 +1099,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Pinterest', found: null, url: 'https://pinterest.com', category: 'social' };
         },
 
-        // 11. Zoom — user lookup by email (200=exists, 404=not found)
+        // 11. Zoom â€” user lookup by email (200=exists, 404=not found)
         async () => {
             try {
                 const r = await fetch(
@@ -1103,7 +1111,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Zoom', found: null, url: 'https://zoom.us', category: 'productivity' };
         },
 
-        // 12. Instagram — web_create_ajax (checks email errors for 'already' / 'taken' patterns)
+        // 12. Instagram â€” web_create_ajax (checks email errors for 'already' / 'taken' patterns)
         async () => {
             try {
                 const r = await fetch('https://www.instagram.com/api/v1/web/accounts/web_create_ajax/', {
@@ -1121,7 +1129,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Instagram', found: null, url: 'https://instagram.com', category: 'social' };
         },
 
-        // 13. GitHub — password_resets POST (302/200=email known, 422=not found)
+        // 13. GitHub â€” password_resets POST (302/200=email known, 422=not found)
         async () => {
             try {
                 const r = await fetch('https://github.com/password_resets', {
@@ -1136,7 +1144,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'GitHub', found: null, url: 'https://github.com', category: 'professional' };
         },
 
-        // 14. Adobe — user existence API (200=exists, 404=not found)
+        // 14. Adobe â€” user existence API (200=exists, 404=not found)
         async () => {
             try {
                 const r = await fetch(
@@ -1148,7 +1156,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Adobe', found: null, url: 'https://adobe.com', category: 'professional' };
         },
 
-        // 15. Last.fm — account create POST (302=processed/found, other=not known)
+        // 15. Last.fm â€” account create POST (302=processed/found, other=not known)
         async () => {
             try {
                 const r = await fetch('https://www.last.fm/api/account/create', {
@@ -1163,7 +1171,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Last.fm', found: null, url: 'https://last.fm', category: 'entertainment' };
         },
 
-        // 16. Disqus — checkUsername (code≠0 = username taken)
+        // 16. Disqus â€” checkUsername (codeâ‰ 0 = username taken)
         async () => {
             try {
                 const r = await fetch(
@@ -1178,7 +1186,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'Disqus', found: null, url: 'https://disqus.com', category: 'social' };
         },
 
-        // 17. MyAnimeList — check_exist.php (returns '1' if email exists)
+        // 17. MyAnimeList â€” check_exist.php (returns '1' if email exists)
         async () => {
             try {
                 const r = await fetch('https://myanimelist.net/api/check_exist.php', {
@@ -1195,7 +1203,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
             return { platform: 'MyAnimeList', found: null, url: 'https://myanimelist.net', category: 'entertainment' };
         },
 
-        // 18. Quora — GraphQL email check
+        // 18. Quora â€” GraphQL email check
         async () => {
             try {
                 const r = await fetch('https://www.quora.com/_/graphql?q=EmailCheckQuery', {
@@ -1219,7 +1227,7 @@ async function checkPlatformPresence(email: string): Promise<PlatformResult[]> {
         .filter((r): r is PlatformResult => r !== null);
 }
 
-// ─── Internal helper: email → MD5 (for Gravatar) ─────────────────────
+// â”€â”€â”€ Internal helper: email â†’ MD5 (for Gravatar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function emailToMd5(email: string): Promise<string> {
     // This file already uses "use node" so this is safe.
     const { createHash } = await import("crypto");

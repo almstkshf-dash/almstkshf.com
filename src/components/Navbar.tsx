@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { useState, useEffect, Suspense, memo } from "react";
@@ -16,7 +24,7 @@ import Button from "@/components/ui/Button";
 import dynamic from "next/dynamic";
 import { NotificationBell } from "@/components/NotificationBell";
 
-// Lazy-load all Clerk UI — keeps the ~186 KiB Clerk bundle out of the initial page load
+// Lazy-load all Clerk UI â€” keeps the ~186 KiB Clerk bundle out of the initial page load
 const NavbarAuthSection = dynamic(
     () => import("@/components/NavbarAuthSection"),
     { ssr: false, loading: () => <div className="w-9 h-9 rounded-full bg-muted animate-pulse" aria-hidden="true" /> }
@@ -52,9 +60,9 @@ const NavbarContent = memo(function NavbarContent() {
 
     const isRTL = locale === "ar";
 
-    /* ──────────────────────────────────────────────── */
+    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     /* Shared icon size tokens                          */
-    /* ──────────────────────────────────────────────── */
+    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     const ICON_SM = "w-4 h-4";
     const ICON_MD = "w-[18px] h-[18px]";
     const ICON_LG = "w-5 h-5";
@@ -70,7 +78,7 @@ const NavbarContent = memo(function NavbarContent() {
 
                     <div className="flex h-16 items-center justify-between gap-4">
 
-                        {/* ─── Logo ─── */}
+                        {/* â”€â”€â”€ Logo â”€â”€â”€ */}
                         <div onMouseEnter={() => setActiveDropdown(null)} className="shrink-0">
                             <HoverPrefetchLink href="/" aria-label={`${tCommon('app_name')} - Go to homepage`} className="flex items-center gap-2.5 group z-50 relative">
                                 <div className="relative w-8 h-8 rounded-lg bg-primary flex items-center justify-center overflow-hidden shrink-0">
@@ -89,7 +97,7 @@ const NavbarContent = memo(function NavbarContent() {
                             </HoverPrefetchLink>
                         </div>
 
-                        {/* ─── Desktop Navigation ─── */}
+                        {/* â”€â”€â”€ Desktop Navigation â”€â”€â”€ */}
                         <nav className="hidden lg:flex flex-1 justify-center items-center gap-4 mx-4">
                             {NAVIGATION_ITEMS.filter(item => item.href !== "/").map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
@@ -148,7 +156,7 @@ const NavbarContent = memo(function NavbarContent() {
                             })}
                         </nav>
 
-                        {/* ─── Action Buttons (Desktop) ─── */}
+                        {/* â”€â”€â”€ Action Buttons (Desktop) â”€â”€â”€ */}
                         <div
                             className="hidden lg:flex items-center gap-2 shrink-0"
                             onMouseEnter={() => setActiveDropdown(null)}
@@ -158,11 +166,11 @@ const NavbarContent = memo(function NavbarContent() {
                                 variant="outline"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }))}
                                 className="px-3 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
-                                aria-label={`${t('search')} - Press ⌘K to search`}
+                                aria-label={`${t('search')} - Press âŒ˜K to search`}
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
                                 <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/85">
-                                    <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">⌘</kbd>
+                                    <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">âŒ˜</kbd>
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">K</kbd>
                                 </span>
                             </Button>
@@ -186,7 +194,7 @@ const NavbarContent = memo(function NavbarContent() {
                                 </span>
                             </Button>
 
-                            {/* Auth section — only after hydration, Clerk bundle loaded lazily */}
+                            {/* Auth section â€” only after hydration, Clerk bundle loaded lazily */}
                             {mounted && (
                                 <NavbarAuthSection
                                     loginLabel={loginLabel}
@@ -203,9 +211,9 @@ const NavbarContent = memo(function NavbarContent() {
                             )}
                         </div>
 
-                        {/* ─── Mobile Controls ─── */}
+                        {/* â”€â”€â”€ Mobile Controls â”€â”€â”€ */}
                         <div className="lg:hidden flex items-center gap-2 shrink-0">
-                            {/* Mobile dashboard/avatar — shown after hydration via lazy Clerk chunk */}
+                            {/* Mobile dashboard/avatar â€” shown after hydration via lazy Clerk chunk */}
                             {mounted && (
                                 <NavbarAuthSection
                                     loginLabel={loginLabel}
@@ -231,7 +239,7 @@ const NavbarContent = memo(function NavbarContent() {
                         </div>
                     </div>
 
-                    {/* ─── Dropdown Menu ─── */}
+                    {/* â”€â”€â”€ Dropdown Menu â”€â”€â”€ */}
                     <AnimatePresence>
                         {activeDropdown && NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children && (
                             <motion.div
@@ -277,7 +285,7 @@ const NavbarContent = memo(function NavbarContent() {
             </div>
 
 
-            {/* ─── Mobile Menu Overlay ─── */}
+            {/* â”€â”€â”€ Mobile Menu Overlay â”€â”€â”€ */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
@@ -367,10 +375,10 @@ const NavbarContent = memo(function NavbarContent() {
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/85 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
-                                        aria-label={isRTL ? "English - Switch to English" : "العربية - Switch to Arabic"}
+                                        aria-label={isRTL ? "English - Switch to English" : "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© - Switch to Arabic"}
                                     >
                                         <Globe className={ICON_LG} aria-hidden="true" />
-                                        <span>{isRTL ? "English" : "العربية"}</span>
+                                        <span>{isRTL ? "English" : "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©"}</span>
                                     </button>
                                 </div>
                             </div>

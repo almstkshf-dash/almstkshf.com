@@ -1,11 +1,19 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 interface Metrics {
     reach: number;
     ave: number;
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Known Publisher Reach Database (UAE & GCC Focus)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const PUBLISHER_REACH: Record<string, number> = {
     "Gulf News": 5000000,
     "Khaleej Times": 4500000,
@@ -31,10 +39,10 @@ const PUBLISHER_REACH: Record<string, number> = {
 
 const DEFAULT_REACH = 50000;
 
-// ═══════════════════════════════════════════════════════════════════
-// AVE FORMULA: Reach × Conversion Rate (0.02) × CPM ($5)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// AVE FORMULA: Reach Ã— Conversion Rate (0.02) Ã— CPM ($5)
 // This is the standard formula agreed upon.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const AVE_CONVERSION_RATE = 0.02;
 const AVE_CPM = 5; // $5 per thousand impressions
 
@@ -55,7 +63,7 @@ export function calculateMetrics(
     }
 
     // 2. Calculate AVE
-    // Formula: Reach × 0.02 × $5 = Reach × 0.1
+    // Formula: Reach Ã— 0.02 Ã— $5 = Reach Ã— 0.1
     const multiplier = customMultiplier || (AVE_CONVERSION_RATE * AVE_CPM);
     const ave = Math.round(reach * multiplier);
 

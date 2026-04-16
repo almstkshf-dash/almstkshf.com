@@ -1,22 +1,17 @@
-/**
- * AI Content Detection Engine — Text
- * ─────────────────────────────────────────────────────────────────
- * Pure rule-based forensic engine for detecting AI-generated text.
- * Uses linguistic pattern analysis, lexical entropy, burstiness,
- * passive-voice density, contraction absence, and statistical heuristics.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * 100% client-side. Zero API calls. Privacy-preserving.
- * Supports both English and Arabic text.
- *
- * @module textEngine
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-// ─── Interfaces ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Interfaces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /** Per-sentence breakdown result */
 export interface SentenceResult {
   text: string;
-  score: number;        // 0–100, higher = more AI-like
+  score: number;        // 0â€“100, higher = more AI-like
   label: "Human" | "Mixed" | "AI";
   signals: string[];
   startIndex: number;   // character offset in original text
@@ -41,31 +36,31 @@ export interface SignalEntry {
   count?: number;
 }
 
-/** Full analysis result — unified interface */
+/** Full analysis result â€” unified interface */
 export interface TextAnalysisResult {
-  // ── Top-level (backward-compatible) ──
-  score: number;                          // 0 (Human) → 100 (AI)
+  // â”€â”€ Top-level (backward-compatible) â”€â”€
+  score: number;                          // 0 (Human) â†’ 100 (AI)
   signals: SignalEntry[];                 // Named signal entries for UI
   highlightedRanges: HighlightedRange[];  // Character-offset ranges for highlighting
 
-  // ── Extended forensic breakdown ──
+  // â”€â”€ Extended forensic breakdown â”€â”€
   verdict: "Fully Human" | "Mostly Human" | "Mixed" | "Mostly AI" | "Fully AI";
   verdictKey: string;                    // i18n key
   sentences: SentenceResult[];           // Per-sentence scores
-  signalBreakdown: Record<string, number>; // Aggregated signal → count map
+  signalBreakdown: Record<string, number>; // Aggregated signal â†’ count map
   wordCount: number;
   avgSentenceLength: number;             // words
-  burstinessScore: number;               // 0–100; low = AI-like
+  burstinessScore: number;               // 0â€“100; low = AI-like
   contractionRatio: number;             // as % (e.g. 1.5 = 1.5%)
-  listDensity: number;                  // 0–100 (% of sentences with list structure)
-  passiveVoiceRatio: number;            // 0–100 (% of sentences with passive voice)
-  vocabularyRichness: number;           // Type-Token Ratio × 100
+  listDensity: number;                  // 0â€“100 (% of sentences with list structure)
+  passiveVoiceRatio: number;            // 0â€“100 (% of sentences with passive voice)
+  vocabularyRichness: number;           // Type-Token Ratio Ã— 100
   isArabicDominant: boolean;
 }
 
-// ─── Signal dictionaries ───────────────────────────────────────────────────
+// â”€â”€â”€ Signal dictionaries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/** AI opener phrases — how LLMs always start responses */
+/** AI opener phrases â€” how LLMs always start responses */
 const AI_OPENERS: RegExp[] = [
   /^certainly[,!]?/i,
   /^absolutely[,!]?/i,
@@ -126,15 +121,15 @@ const AI_OPENERS: RegExp[] = [
   /^to get started/i,
   /^to begin with/i,
   // Arabic openers
-  /^بالتأكيد[،!]?/,
-  /^بكل سرور[،!]?/,
-  /^شكراً (لك|على|لسؤالك)/,
-  /^يسعدني/,
-  /^بناءً على/,
-  /^في عالم (اليوم|الحديث)/,
+  /^Ø¨Ø§Ù„ØªØ£ÙƒÙŠØ¯[ØŒ!]?/,
+  /^Ø¨ÙƒÙ„ Ø³Ø±ÙˆØ±[ØŒ!]?/,
+  /^Ø´ÙƒØ±Ø§Ù‹ (Ù„Ùƒ|Ø¹Ù„Ù‰|Ù„Ø³Ø¤Ø§Ù„Ùƒ)/,
+  /^ÙŠØ³Ø¹Ø¯Ù†ÙŠ/,
+  /^Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰/,
+  /^ÙÙŠ Ø¹Ø§Ù„Ù… (Ø§Ù„ÙŠÙˆÙ…|Ø§Ù„Ø­Ø¯ÙŠØ«)/,
 ];
 
-/** AI transition words — used to chain ideas artificially */
+/** AI transition words â€” used to chain ideas artificially */
 const AI_TRANSITIONS: RegExp[] = [
   /\bfurthermore\b/i,
   /\bmoreover\b/i,
@@ -204,15 +199,15 @@ const AI_TRANSITIONS: RegExp[] = [
   /\bto put it frankly\b/i,
   /\bas mentioned earlier\b/i,
   // Arabic transitions
-  /\bعلاوة على ذلك\b/,
-  /\bبالإضافة إلى ذلك\b/,
-  /\bفي الختام\b/,
-  /\bوخلاصة القول\b/,
-  /\bومن الجدير بالذكر\b/,
-  /\bفضلاً عن ذلك\b/,
+  /\bØ¹Ù„Ø§ÙˆØ© Ø¹Ù„Ù‰ Ø°Ù„Ùƒ\b/,
+  /\bØ¨Ø§Ù„Ø¥Ø¶Ø§ÙØ© Ø¥Ù„Ù‰ Ø°Ù„Ùƒ\b/,
+  /\bÙÙŠ Ø§Ù„Ø®ØªØ§Ù…\b/,
+  /\bÙˆØ®Ù„Ø§ØµØ© Ø§Ù„Ù‚ÙˆÙ„\b/,
+  /\bÙˆÙ…Ù† Ø§Ù„Ø¬Ø¯ÙŠØ± Ø¨Ø§Ù„Ø°ÙƒØ±\b/,
+  /\bÙØ¶Ù„Ø§Ù‹ Ø¹Ù† Ø°Ù„Ùƒ\b/,
 ];
 
-/** AI hedges, buzzwords, corporate-speak — assistant-voice vocabulary */
+/** AI hedges, buzzwords, corporate-speak â€” assistant-voice vocabulary */
 const AI_HEDGES: RegExp[] = [
   /\bit('s| is) important to\b/i,
   /\bit('s| is) crucial to\b/i,
@@ -299,13 +294,13 @@ const AI_HEDGES: RegExp[] = [
   /\bfostering a sense of\b/i,
   /\bshaping the future\b/i,
   // Arabic hedges
-  /\bمن الأهمية بمكان\b/,
-  /\bتجدر الإشارة\b/,
-  /\bمن المهم أن\b/,
-  /\bينبغي التنويه\b/,
+  /\bÙ…Ù† Ø§Ù„Ø£Ù‡Ù…ÙŠØ© Ø¨Ù…ÙƒØ§Ù†\b/,
+  /\bØªØ¬Ø¯Ø± Ø§Ù„Ø¥Ø´Ø§Ø±Ø©\b/,
+  /\bÙ…Ù† Ø§Ù„Ù…Ù‡Ù… Ø£Ù†\b/,
+  /\bÙŠÙ†Ø¨ØºÙŠ Ø§Ù„ØªÙ†ÙˆÙŠÙ‡\b/,
 ];
 
-/** AI closers — how LLMs always wrap up a response */
+/** AI closers â€” how LLMs always wrap up a response */
 const AI_CLOSERS: RegExp[] = [
   /\bi hope (this|that) (helps|clarifies|answers)/i,
   /\bfeel free to (ask|reach out|contact)/i,
@@ -322,13 +317,13 @@ const AI_CLOSERS: RegExp[] = [
   /\byour (feedback|thoughts|questions) are welcome/i,
   /\bwe hope this (article|guide|post|overview) (has been|was)/i,
   // Arabic closers
-  /\bلا تتردد في\b/,
-  /\bإن كان لديك أي استفسار\b/,
-  /\bنأمل أن يكون هذا مفيداً\b/,
-  /\bنحن هنا للمساعدة\b/,
+  /\bÙ„Ø§ ØªØªØ±Ø¯Ø¯ ÙÙŠ\b/,
+  /\bØ¥Ù† ÙƒØ§Ù† Ù„Ø¯ÙŠÙƒ Ø£ÙŠ Ø§Ø³ØªÙØ³Ø§Ø±\b/,
+  /\bÙ†Ø£Ù…Ù„ Ø£Ù† ÙŠÙƒÙˆÙ† Ù‡Ø°Ø§ Ù…ÙÙŠØ¯Ø§Ù‹\b/,
+  /\bÙ†Ø­Ù† Ù‡Ù†Ø§ Ù„Ù„Ù…Ø³Ø§Ø¹Ø¯Ø©\b/,
 ];
 
-/** Over-explanation markers — AI explains things nobody asked for */
+/** Over-explanation markers â€” AI explains things nobody asked for */
 const AI_OVER_EXPLAIN: RegExp[] = [
   /\bto put it (simply|another way|differently)\b/i,
   /\bin layman'?s terms\b/i,
@@ -375,7 +370,7 @@ const AI_OVER_EXPLAIN: RegExp[] = [
   /\bto better understand\b/i,
 ];
 
-/** Contraction patterns — AI avoids these in formal mode */
+/** Contraction patterns â€” AI avoids these in formal mode */
 const CONTRACTIONS: RegExp[] = [
   /\b(don't|doesn't|didn't|won't|wouldn't|can't|couldn't|shouldn't|isn't|aren't|wasn't|weren't)\b/i,
   /\b(I'm|I've|I'll|I'd|you're|you've|you'll|you'd|he's|she's|it's|we're|we've|they're|they've)\b/i,
@@ -384,7 +379,7 @@ const CONTRACTIONS: RegExp[] = [
   /\b(y'all|y'all've|ain't|gonna|wanna|gotta)\b/i,
 ];
 
-/** Human signals — casual language AI almost never uses */
+/** Human signals â€” casual language AI almost never uses */
 const HUMAN_SIGNALS: RegExp[] = [
   /\b(lol|lmao|omg|wtf|tbh|imo|imho|ngl|idk|rn|afaik|fwiw|smh|brb|gtg|irl|btw|fyi)\b/i,
   /\b(gonna|wanna|gotta|kinda|sorta|dunno|lemme|gimme|ain't|y'all)\b/i,
@@ -394,7 +389,7 @@ const HUMAN_SIGNALS: RegExp[] = [
   /[?]{2,}/,        // confused/frustrated
   /\b(honestly|literally|basically|actually like|i mean,?|you know,?)\b/i,
   /\b(damn|hell|crap|shit|fuck|bloody|freaking|frickin|freakin)\b/i,
-  /—\s*\w/,         // em dash mid-thought
+  /â€”\s*\w/,         // em dash mid-thought
   /\banyway[,s]?\b/i,
   /\bso yeah\b/i,
   /\bright\?\s/i,   // checking in mid-text
@@ -404,15 +399,15 @@ const HUMAN_SIGNALS: RegExp[] = [
   /\bmaybe (it'?s|that'?s|i should)\b/i,
   /\bnot (gonna|going to) lie\b/i,
   // Arabic informal
-  /\bمش عارف\b/,
-  /\bوالله\b/,
-  /\bاللي فات مات\b/,
-  /\bيعني\b/,
+  /\bÙ…Ø´ Ø¹Ø§Ø±Ù\b/,
+  /\bÙˆØ§Ù„Ù„Ù‡\b/,
+  /\bØ§Ù„Ù„ÙŠ ÙØ§Øª Ù…Ø§Øª\b/,
+  /\bÙŠØ¹Ù†ÙŠ\b/,
 ];
 
-/** List-heavy writing patterns — AI loves structured lists even in prose */
+/** List-heavy writing patterns â€” AI loves structured lists even in prose */
 const LIST_MARKERS: RegExp[] = [
-  /^\s*[-•*]\s+/m,
+  /^\s*[-â€¢*]\s+/m,
   /^\s*\d+[.)]\s+/m,
   /\b(first|second|third|fourth|fifth),?\s+(you|we|it|the)\b/i,
   /\b(one|two|three|four|five) (key|main|important|crucial|major) (point|reason|factor|aspect|element|way)\b/i,
@@ -421,12 +416,12 @@ const LIST_MARKERS: RegExp[] = [
   /\bthirdly[,:]?\s/i,
   /\ba\)\s|b\)\s|c\)\s/i,
   // Arabic list markers
-  /^\s*أولاً[،:]/m,
-  /^\s*ثانياً[،:]/m,
-  /^\s*ثالثاً[،:]/m,
+  /^\s*Ø£ÙˆÙ„Ø§Ù‹[ØŒ:]/m,
+  /^\s*Ø«Ø§Ù†ÙŠØ§Ù‹[ØŒ:]/m,
+  /^\s*Ø«Ø§Ù„Ø«Ø§Ù‹[ØŒ:]/m,
 ];
 
-/** Passive voice patterns — AI overuses passive constructions */
+/** Passive voice patterns â€” AI overuses passive constructions */
 const PASSIVE_VOICE: RegExp[] = [
   /\b(is|are|was|were|be|been|being)\s+([\w]+ed|[\w]+en)\b/i,
   /\bhas been ([\w]+ed|[\w]+en)\b/i,
@@ -439,7 +434,7 @@ const PASSIVE_VOICE: RegExp[] = [
   // False-positive filter: common non-passive "is known", "is needed"
 ];
 
-/** AI structural patterns — formulaic paragraph openers */
+/** AI structural patterns â€” formulaic paragraph openers */
 const AI_STRUCTURAL: RegExp[] = [
   /^(When it comes to|In terms of|With regard to|Regarding|As for)\b/i,
   /^(One of the (most|key|main|primary|important))\b/i,
@@ -453,7 +448,7 @@ const AI_STRUCTURAL: RegExp[] = [
   /\b(in (recent|today's|modern) (years|times|era|world))\b/i,
 ];
 
-// ─── Utility: detect if text is predominantly Arabic ──────────────────────
+// â”€â”€â”€ Utility: detect if text is predominantly Arabic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function detectArabicDominance(text: string): boolean {
   const arabicChars = (text.match(/[\u0600-\u06FF]/g) || []).length;
@@ -461,12 +456,12 @@ function detectArabicDominance(text: string): boolean {
   return totalChars > 0 && arabicChars / totalChars > 0.4;
 }
 
-// ─── Sentence splitter (English + Arabic aware) ───────────────────────────
+// â”€â”€â”€ Sentence splitter (English + Arabic aware) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function splitSentences(text: string): Array<{ text: string; startIndex: number }> {
   const results: Array<{ text: string; startIndex: number }> = [];
-  // Split on sentence-ending punctuation including Arabic periods (؟ !)
-  const sentenceRe = /[^.!?؟\n]+[.!?؟\n]*/g;
+  // Split on sentence-ending punctuation including Arabic periods (ØŸ !)
+  const sentenceRe = /[^.!?ØŸ\n]+[.!?ØŸ\n]*/g;
   let match: RegExpExecArray | null;
   while ((match = sentenceRe.exec(text)) !== null) {
     const trimmed = match[0].trim();
@@ -477,7 +472,7 @@ function splitSentences(text: string): Array<{ text: string; startIndex: number 
   return results;
 }
 
-// ─── Burstiness: human writing has high variance in sentence lengths ───────
+// â”€â”€â”€ Burstiness: human writing has high variance in sentence lengths â”€â”€â”€â”€â”€â”€â”€
 
 function calcBurstiness(lengths: number[]): number {
   if (lengths.length < 2) return 50; // neutral
@@ -487,7 +482,7 @@ function calcBurstiness(lengths: number[]): number {
   return Math.min(100, Math.round((std / Math.max(mean, 1)) * 100));
 }
 
-// ─── Contraction ratio ────────────────────────────────────────────────────
+// â”€â”€â”€ Contraction ratio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function calcContractionRatio(text: string, wordCount: number): number {
   let hits = 0;
@@ -498,7 +493,7 @@ function calcContractionRatio(text: string, wordCount: number): number {
   return wordCount > 0 ? hits / wordCount : 0;
 }
 
-// ─── List density ────────────────────────────────────────────────────────
+// â”€â”€â”€ List density â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function calcListDensity(sentences: string[]): number {
   let listSentences = 0;
@@ -510,7 +505,7 @@ function calcListDensity(sentences: string[]): number {
   return sentences.length > 0 ? Math.round((listSentences / sentences.length) * 100) : 0;
 }
 
-// ─── Passive voice density ────────────────────────────────────────────────
+// â”€â”€â”€ Passive voice density â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function calcPassiveVoiceRatio(sentences: string[]): number {
   let passiveSentences = 0;
@@ -522,7 +517,7 @@ function calcPassiveVoiceRatio(sentences: string[]): number {
   return sentences.length > 0 ? Math.round((passiveSentences / sentences.length) * 100) : 0;
 }
 
-// ─── Vocabulary richness (TTR) ────────────────────────────────────────────
+// â”€â”€â”€ Vocabulary richness (TTR) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function calcVocabularyRichness(text: string): number {
   const words = text.toLowerCase().match(/\b\w+\b/g) || [];
@@ -531,7 +526,7 @@ function calcVocabularyRichness(text: string): number {
   return Math.round((unique.size / words.length) * 100);
 }
 
-// ─── Per-sentence scorer ──────────────────────────────────────────────────
+// â”€â”€â”€ Per-sentence scorer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function scoreSentence(
   sentence: string,
@@ -544,7 +539,7 @@ function scoreSentence(
   const signals: string[] = [];
   const words = sentence.split(/\s+/).length;
 
-  // 1. AI openers — first sentence weighted higher
+  // 1. AI openers â€” first sentence weighted higher
   for (const pattern of AI_OPENERS) {
     if (pattern.test(sentence)) {
       score += index === 0 ? 38 : 24;
@@ -553,24 +548,24 @@ function scoreSentence(
     }
   }
 
-  // 2. AI transitions — cumulative
+  // 2. AI transitions â€” cumulative
   let transitionHits = 0;
   for (const pattern of AI_TRANSITIONS) {
     if (pattern.test(sentence)) transitionHits++;
   }
   if (transitionHits > 0) {
     score += transitionHits * 16;
-    signals.push(`AI transition word (×${transitionHits})`);
+    signals.push(`AI transition word (Ã—${transitionHits})`);
   }
 
-  // 3. AI hedges / buzzwords — cumulative
+  // 3. AI hedges / buzzwords â€” cumulative
   let hedgeHits = 0;
   for (const pattern of AI_HEDGES) {
     if (pattern.test(sentence)) hedgeHits++;
   }
   if (hedgeHits > 0) {
     score += hedgeHits * 12;
-    signals.push(`AI buzzword/hedge (×${hedgeHits})`);
+    signals.push(`AI buzzword/hedge (Ã—${hedgeHits})`);
   }
 
   // 4. Over-explanation patterns
@@ -583,7 +578,7 @@ function scoreSentence(
     signals.push("AI over-explanation pattern");
   }
 
-  // 5. AI closers — last 2 sentences only
+  // 5. AI closers â€” last 2 sentences only
   if (index >= total - 2) {
     for (const pattern of AI_CLOSERS) {
       if (pattern.test(sentence)) {
@@ -601,7 +596,7 @@ function scoreSentence(
   }
   if (structHits > 0) {
     score += structHits * 10;
-    signals.push(`Formulaic sentence structure (×${structHits})`);
+    signals.push(`Formulaic sentence structure (Ã—${structHits})`);
   }
 
   // 7. List-marker in sentence
@@ -634,24 +629,24 @@ function scoreSentence(
     }
   }
 
-  // 10. Human signals — reduce score
+  // 10. Human signals â€” reduce score
   let humanHits = 0;
   for (const pattern of HUMAN_SIGNALS) {
     if (pattern.test(sentence)) humanHits++;
   }
   if (humanHits > 0) {
     score -= humanHits * 22;
-    signals.push(`Human signal detected (×${humanHits})`);
+    signals.push(`Human signal detected (Ã—${humanHits})`);
   }
 
-  // 11. AI sweet-spot sentence length (15–28 words, ends with period)
-  if (words >= 15 && words <= 28 && /[.؟]$/.test(sentence)) {
+  // 11. AI sweet-spot sentence length (15â€“28 words, ends with period)
+  if (words >= 15 && words <= 28 && /[.ØŸ]$/.test(sentence)) {
     score += 7;
     signals.push("Uniform sentence length (AI sweet spot)");
   }
 
   // 12. Very long sentence with no natural pause
-  if (words > 35 && !/[,\-–—();،]/.test(sentence)) {
+  if (words > 35 && !/[,\-â€“â€”();ØŒ]/.test(sentence)) {
     score += 10;
     signals.push("Run-on without natural pause");
   }
@@ -675,7 +670,7 @@ function scoreSentence(
   };
 }
 
-// ─── Highlight builder ────────────────────────────────────────────────────
+// â”€â”€â”€ Highlight builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildHighlightedRanges(text: string): HighlightedRange[] {
   const ranges: HighlightedRange[] = [];
@@ -712,7 +707,7 @@ function buildHighlightedRanges(text: string): HighlightedRange[] {
   return deduped;
 }
 
-// ─── Named signal entries builder ─────────────────────────────────────────
+// â”€â”€â”€ Named signal entries builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildSignalEntries(
   signalBreakdown: Record<string, number>
@@ -793,7 +788,7 @@ function buildSignalEntries(
     "Uniform sentence length (AI sweet spot)": { 
       id: "uniform_length", 
       label: "Uniform Cadence", 
-      description: "Consistent 15–28 word sentences without length variation.", 
+      description: "Consistent 15â€“28 word sentences without length variation.", 
       labelKey: "signal_uniform_length_label",
       descKey: "signal_uniform_length_desc",
       severity: "medium" 
@@ -801,7 +796,7 @@ function buildSignalEntries(
     "Run-on without natural pause": { 
       id: "run_on", 
       label: "Run-On Sentence", 
-      description: "Long sentence with no commas or dashes — unnatural for human writers.", 
+      description: "Long sentence with no commas or dashes â€” unnatural for human writers.", 
       labelKey: "signal_run_on_label",
       descKey: "signal_run_on_desc",
       severity: "low" 
@@ -827,13 +822,13 @@ function buildSignalEntries(
   const entries: SignalEntry[] = [];
   for (const [key, count] of Object.entries(signalBreakdown)) {
     // Fuzzy match on key prefix
-    const metaKey = Object.keys(META).find(k => key.startsWith(k.split(" (×")[0]));
+    const metaKey = Object.keys(META).find(k => key.startsWith(k.split(" (Ã—")[0]));
     if (metaKey) {
       const meta = META[metaKey];
       entries.push({
         ...meta,
         count,
-        label: count > 1 ? `${meta.label} (×${count})` : meta.label,
+        label: count > 1 ? `${meta.label} (Ã—${count})` : meta.label,
       });
     } else if (key !== "No strong signals") {
       // Fallback for unknown signals
@@ -853,7 +848,7 @@ function buildSignalEntries(
   return entries;
 }
 
-// ─── Main analyzer ────────────────────────────────────────────────────────
+// â”€â”€â”€ Main analyzer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function analyzeText(text: string): TextAnalysisResult {
 
@@ -919,8 +914,8 @@ export function analyzeText(text: string): TextAnalysisResult {
   const breakdown: Record<string, number> = {};
   scoredSentences.forEach(r => {
     r.signals.forEach(sig => {
-      // Normalize: strip "(×N)" suffix for aggregation
-      const key = sig.replace(/\s*\(×\d+\)$/, '');
+      // Normalize: strip "(Ã—N)" suffix for aggregation
+      const key = sig.replace(/\s*\(Ã—\d+\)$/, '');
       breakdown[key] = (breakdown[key] || 0) + 1;
     });
   });

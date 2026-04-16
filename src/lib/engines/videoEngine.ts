@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { ForensicAnomaly } from './mlHelper';
 import { ImageAnalysisReport, analyzeImageCanvas, analyzeImageCanvasDeep } from './imageEngine';
 
@@ -58,12 +66,12 @@ export interface VideoAnalysisResult {
   }>;
 }
 
-// ─── Legacy alias (old consumers continue to work unchanged) ──────────────────
+// â”€â”€â”€ Legacy alias (old consumers continue to work unchanged) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-/** @deprecated Use VideoAnalysisResult — this alias exists for backward compat. */
+/** @deprecated Use VideoAnalysisResult â€” this alias exists for backward compat. */
 export type VideoAnalysisResultLegacy = VideoAnalysisResult;
 
-// ─── Frame extractor ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Frame extractor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function extractFrame(
   video: HTMLVideoElement,
@@ -87,7 +95,7 @@ function getThumbnail(canvas: HTMLCanvasElement): string {
   return canvas.toDataURL('image/jpeg', 0.42);
 }
 
-// ─── Frame pixel stats ────────────────────────────────────────────────────────
+// â”€â”€â”€ Frame pixel stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function analyzeFrameData(data: ImageData): FramePixelStats {
   const px = data.data;
@@ -106,7 +114,7 @@ function analyzeFrameData(data: ImageData): FramePixelStats {
   }
   const avgBrightness = sumBright / total;
 
-  // Noise — std-dev of luminance
+  // Noise â€” std-dev of luminance
   const grayVariance =
     grays.reduce((a, b) => a + Math.pow(b - avgBrightness, 2), 0) / total;
   const noiseLevel = Math.sqrt(grayVariance);
@@ -168,7 +176,7 @@ function analyzeFrameData(data: ImageData): FramePixelStats {
   const upperThirdMean = upCount > 0 ? upSum / upCount : 0;
   const lowerThirdMean = lowCount > 0 ? lowSum / lowCount : 0;
 
-  // Background zone variance — 4 corner sharpness samples
+  // Background zone variance â€” 4 corner sharpness samples
   const cz = Math.floor(Math.min(w, h) * 0.15);
   const corners = [
     zoneEdge(0, 0, cz, cz),
@@ -181,7 +189,7 @@ function analyzeFrameData(data: ImageData): FramePixelStats {
     corners.reduce((a, b) => a + Math.pow(b - cornerMean, 2), 0) / 4,
   );
 
-  // Local color block count — quantise to 8×8 blocks, count distinct dominant hues
+  // Local color block count â€” quantise to 8Ã—8 blocks, count distinct dominant hues
   const blockW = Math.floor(w / 8),
     blockH = Math.floor(h / 8);
   const blockHues = new Set<number>();
@@ -213,7 +221,7 @@ function analyzeFrameData(data: ImageData): FramePixelStats {
   };
 }
 
-// ─── Per-frame scorer ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Per-frame scorer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function scoreFrame(
   stats: FramePixelStats,
@@ -223,7 +231,7 @@ function scoreFrame(
   let score = 0;
   const signals: VideoFrameSignal[] = [];
 
-  // ── Static per-frame signals ──────────────────────────────────────────────
+  // â”€â”€ Static per-frame signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const s_smooth = stats.noiseLevel < 14;
   if (s_smooth) score += 25;
@@ -235,13 +243,13 @@ function scoreFrame(
 
   const s_low_complexity = stats.localColorBlocks < 18;
   if (s_low_complexity) score += 15;
-  signals.push({ id: 'v_low_complexity', name: 'Low color complexity — AI background', nameKey: 'signal_v_low_complexity_name', detected: s_low_complexity });
+  signals.push({ id: 'v_low_complexity', name: 'Low color complexity â€” AI background', nameKey: 'signal_v_low_complexity_name', detected: s_low_complexity });
 
   const s_hair_blur = stats.centerSharpness > 0 && stats.borderSharpness < stats.centerSharpness * 0.45;
   if (s_hair_blur) score += 20;
   signals.push({ id: 'v_hair_blur', name: 'Unnatural subject isolation / hair edge blur', nameKey: 'signal_v_hair_blur_name', detected: s_hair_blur });
 
-  // ── Temporal signals (require previous frame) ─────────────────────────────
+  // â”€â”€ Temporal signals (require previous frame) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (prevStats) {
     const s_flicker = Math.abs(stats.avgBrightness - prevStats.avgBrightness) > 28;
@@ -270,18 +278,18 @@ function scoreFrame(
     if (s_bg_color_variance) score += 15;
     signals.push({ id: 'v_bg_color_variance', name: 'Background color style inconsistency', nameKey: 'signal_v_bg_color_variance_name', detected: s_bg_color_variance });
 
-    // ── Blink proxy: eye zone frozen over 3 consecutive frames ────────────
+    // â”€â”€ Blink proxy: eye zone frozen over 3 consecutive frames â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (prev2Stats) {
       const upperDelta1 = Math.abs(stats.upperThirdMean - prevStats.upperThirdMean);
       const upperDelta2 = Math.abs(prevStats.upperThirdMean - prev2Stats.upperThirdMean);
       const s_blink_freeze = upperDelta1 < 1.5 && upperDelta2 < 1.5;
       if (s_blink_freeze) score += 15;
-      signals.push({ id: 'v_blink_freeze', name: 'Eye zone frozen — no blink rhythm', nameKey: 'signal_v_blink_freeze_name', detected: s_blink_freeze });
+      signals.push({ id: 'v_blink_freeze', name: 'Eye zone frozen â€” no blink rhythm', nameKey: 'signal_v_blink_freeze_name', detected: s_blink_freeze });
     }
 
     const s_edge_jitter = Math.abs(stats.edgeSharpness - prevStats.edgeSharpness) > 15;
     if (s_edge_jitter) score += 20;
-    signals.push({ id: 'v_edge_jitter', name: 'Temporal edge jitter — flickering detail', nameKey: 'signal_v_edge_jitter_name', detected: s_edge_jitter });
+    signals.push({ id: 'v_edge_jitter', name: 'Temporal edge jitter â€” flickering detail', nameKey: 'signal_v_edge_jitter_name', detected: s_edge_jitter });
 
     const s_static_bg = stats.bgZoneVariance < 2 && prevStats.bgZoneVariance < 2;
     if (s_static_bg) score += 10;
@@ -294,7 +302,7 @@ function scoreFrame(
   };
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /** Map a [0-100] score to a localized frame label + its i18n key. */
 function buildFrameLabel(score: number): { label: string; labelKey: string } {
@@ -307,7 +315,7 @@ function buildFrameLabel(score: number): { label: string; labelKey: string } {
  * Compute a set of sample timestamps using adaptive scene-change detection.
  *
  * Strategy:
- *  1. Start with a baseline of evenly-spaced timestamps (one per ≈2 s, capped at `baseMax`).
+ *  1. Start with a baseline of evenly-spaced timestamps (one per â‰ˆ2 s, capped at `baseMax`).
  *  2. Pre-scan every second to measure frame-to-frame brightness delta.
  *  3. Insert an extra keyframe around each detected scene cut (delta > `cutThreshold`).
  *  4. De-duplicate and sort, capping the final list at `hardMax`.
@@ -328,7 +336,7 @@ async function computeAdaptiveTimestamps(
   );
 
   // --- Scene-cut scan (1-FPS lightweight pass) ---
-  const scanStep = Math.max(1, Math.floor(duration / 60)); // ≤60 probes
+  const scanStep = Math.max(1, Math.floor(duration / 60)); // â‰¤60 probes
   const scanTimes: number[] = [];
   for (let t = scanStep; t < duration - 0.5; t += scanStep) {
     scanTimes.push(parseFloat(t.toFixed(2)));
@@ -427,12 +435,12 @@ export async function analyzeVideoFile(
     video.onloadedmetadata = async () => {
       try {
         const duration = video.duration;
-        // 480×270 gives richer spatial signal without excessive memory pressure
+        // 480Ã—270 gives richer spatial signal without excessive memory pressure
         const canvas = document.createElement('canvas');
         canvas.width = 480;
         canvas.height = 270;
 
-        // ── Adaptive sampling: uniform baseline + scene-cut keyframes ──
+        // â”€â”€ Adaptive sampling: uniform baseline + scene-cut keyframes â”€â”€
         onProgress?.(2);
         const timestamps = await computeAdaptiveTimestamps(video, canvas, duration);
 
@@ -451,12 +459,12 @@ export async function analyzeVideoFile(
           const imageData = await extractFrame(video, t, canvas);
           if (!imageData) continue;
 
-          // ── Fast pixel heuristics ──
+          // â”€â”€ Fast pixel heuristics â”€â”€
           const stats = analyzeFrameData(imageData);
           const { score: ruleScore, signals: ruleSignals } = scoreFrame(stats, prevStats, prev2Stats);
           const thumb = getThumbnail(canvas);
 
-          // ── Deep ML (once, at midpoint) ──
+          // â”€â”€ Deep ML (once, at midpoint) â”€â”€
           let deepReport: ImageAnalysisReport | null = null;
           if (i === deepMlIdx) {
             deepReport = await analyzeImageCanvasDeep(canvas);

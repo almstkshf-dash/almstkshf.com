@@ -1,26 +1,16 @@
-/**
- * ═══════════════════════════════════════════════════════════════════
- * BOOLEAN FILTER ENGINE
- * Pure utility — no external dependencies, no Convex imports.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * Supports:
- *   +word       → mandatory term (article MUST contain it)
- *   -word       → excluded term (article MUST NOT contain it)
- *   "phrase"    → exact phrase match (mandatory)
- *   word        → soft term (ignored in strict gate — used for scoring)
- *   A OR B      → either A or B must be present
- *
- * Usage:
- *   parseBooleanKeyword('ADNOC -gas +"press release"')
- *   matchesBooleanFilter(expression, "article title", "article snippet")
- * ═══════════════════════════════════════════════════════════════════
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
 export interface BooleanExpression {
-  mandatory: string[];     // +word or "phrase" — ALL must match
-  excluded: string[];      // -word — NONE must match
-  soft: string[];          // plain words — no hard constraint
-  orGroups: string[][];    // [["A", "B"], ["C", "D"]] → (A or B) AND (C or D)
+  mandatory: string[];     // +word or "phrase" â€” ALL must match
+  excluded: string[];      // -word â€” NONE must match
+  soft: string[];          // plain words â€” no hard constraint
+  orGroups: string[][];    // [["A", "B"], ["C", "D"]] â†’ (A or B) AND (C or D)
   rawKeyword: string;      // the original keyword to use as API query term
 }
 

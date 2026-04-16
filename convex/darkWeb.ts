@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use node";
 
 import { action } from "./_generated/server";
@@ -5,7 +13,7 @@ import { v, ConvexError } from "convex/values";
 import { resolveApiKey } from "./utils/keys";
 import { api } from "./_generated/api";
 
-// ─── Hybrid Heuristic Engine (Zero-Cost Fallback) ─────────────────────
+// â”€â”€â”€ Hybrid Heuristic Engine (Zero-Cost Fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function performHeuristicAnalysis(title: string, snippet: string) {
     const text = (title + " " + snippet).toLowerCase();
 
@@ -15,8 +23,8 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "critical",
             keywords: [
                 "database dump", "private key", "passport", "credit card", "root access", "ssn", "national id",
-                "قاعدة بيانات", "مفتاح خاص", "جواز سفر", "بطاقة ائتمان", "اختراق كامل",
-                "حشيش", "ماريجوانا", "كريستال", "كوك", "اكستر سي", "ترامادول", "لاريكا", "سي بي دي",
+                "Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª", "Ù…ÙØªØ§Ø­ Ø®Ø§Øµ", "Ø¬ÙˆØ§Ø² Ø³ÙØ±", "Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù†", "Ø§Ø®ØªØ±Ø§Ù‚ ÙƒØ§Ù…Ù„",
+                "Ø­Ø´ÙŠØ´", "Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§", "ÙƒØ±ÙŠØ³ØªØ§Ù„", "ÙƒÙˆÙƒ", "Ø§ÙƒØ³ØªØ± Ø³ÙŠ", "ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„", "Ù„Ø§Ø±ÙŠÙƒØ§", "Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ",
                 "hashish", "weed", "cocauine", "extra c", "teramadol", "larica", "massage in dubai", "happy ending",
                 "cristal mith", "escort girls", "harm", "harmfull", "CBD OIL"
             ]
@@ -25,15 +33,15 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "high",
             keywords: [
                 "leak", "exploit", "zeroday", "vulnerability", "malware", "ransomware", "backdoor", "hack",
-                "تسريب", "ثغرة", "برمجيات خبيثة", "فدية", "باب خلفي", "اختراق",
-                "نصب", "خراب", "زفت", "فضيحة", "ورطة", "تعيس", "فاشل"
+                "ØªØ³Ø±ÙŠØ¨", "Ø«ØºØ±Ø©", "Ø¨Ø±Ù…Ø¬ÙŠØ§Øª Ø®Ø¨ÙŠØ«Ø©", "ÙØ¯ÙŠØ©", "Ø¨Ø§Ø¨ Ø®Ù„ÙÙŠ", "Ø§Ø®ØªØ±Ø§Ù‚",
+                "Ù†ØµØ¨", "Ø®Ø±Ø§Ø¨", "Ø²ÙØª", "ÙØ¶ÙŠØ­Ø©", "ÙˆØ±Ø·Ø©", "ØªØ¹ÙŠØ³", "ÙØ§Ø´Ù„"
             ]
         },
         {
             risk: "medium",
             keywords: [
                 "marketplace", "onion", "forum", "account", "login", "credentials", "tor",
-                "سوق", "منتدى", "حساب", "دخول", "بيانات اعتماد"
+                "Ø³ÙˆÙ‚", "Ù…Ù†ØªØ¯Ù‰", "Ø­Ø³Ø§Ø¨", "Ø¯Ø®ÙˆÙ„", "Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ø¹ØªÙ…Ø§Ø¯"
             ]
         }
     ];
@@ -62,7 +70,7 @@ function performHeuristicAnalysis(title: string, snippet: string) {
     return { risk, summary, tags };
 }
 
-// ─── Gemini Risk Scoring Helper ───────────────────────────────────────
+// â”€â”€â”€ Gemini Risk Scoring Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function analyzeRiskWithGemini(title: string, text: string, geminiKey: string) {
     try {
         const prompt = `
@@ -103,7 +111,7 @@ Content Snippet: ${text}
     }
 }
 
-// ─── Search Ahmia (Onion Links) ───────────────────────────────────────
+// â”€â”€â”€ Search Ahmia (Onion Links) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const searchAhmia = action({
     args: { query: v.string() },
     handler: async (ctx, args) => {
@@ -199,7 +207,7 @@ export const searchAhmia = action({
     },
 });
 
-// ─── Fetch Diffbot (Structured Scraping) ──────────────────────────────
+// â”€â”€â”€ Fetch Diffbot (Structured Scraping) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const fetchDiffbot = action({
     args: { url: v.string() },
     handler: async (ctx, args): Promise<{
@@ -265,7 +273,7 @@ export const fetchDiffbot = action({
     },
 });
 
-// ─── Stealth Fetch ZenRows (Anti-Bot Bypass) ──────────────────────────
+// â”€â”€â”€ Stealth Fetch ZenRows (Anti-Bot Bypass) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const stealthFetch = action({
     args: { url: v.string(), country: v.optional(v.string()) },
     handler: async (ctx, args): Promise<{ title: string, text: string }> => {

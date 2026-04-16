@@ -1,6 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { createWorker } from 'tesseract.js';
 
-// Lazily-typed references — populated by loadModels() at runtime only.
+// Lazily-typed references â€” populated by loadModels() at runtime only.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let faceModel: any | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

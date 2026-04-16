@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 import { memo } from 'react';
 import { useTranslations } from 'next-intl';
@@ -8,14 +16,14 @@ import clsx from 'clsx';
 import dynamic from 'next/dynamic';
 
 /*
- * TBT FIX — FreeInsightTool imports convex/react + the generated Convex API.
+ * TBT FIX â€” FreeInsightTool imports convex/react + the generated Convex API.
  * Lazy-loading it defers that parse cost until after the hero + clients sections
  * have already rendered and the main thread is no longer in the critical path.
  */
 const FreeInsightTool = dynamic(() => import('@/components/FreeInsightTool'), { ssr: false });
 
 /**
- * HomeClient — Client Component containing ONLY below-the-fold, animated sections.
+ * HomeClient â€” Client Component containing ONLY below-the-fold, animated sections.
  *
  * LCP fix: The hero section (h1 LCP element) was extracted into `HeroSection.tsx`
  * (a Server Component) so the browser renders it instantly in static HTML without
@@ -51,7 +59,7 @@ export default memo(function HomeClient() {
 
     return (
         <>
-            {/* Clients Carousel Section — below fold, skipped during initial paint */}
+            {/* Clients Carousel Section â€” below fold, skipped during initial paint */}
             <section
                 className="py-20 bg-background border-y border-border overflow-hidden"
                 style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
@@ -92,14 +100,14 @@ export default memo(function HomeClient() {
                 </div>
             </section>
 
-            {/* Trust & Compliance Row — images are below the fold, no priority needed */}
+            {/* Trust & Compliance Row â€” images are below the fold, no priority needed */}
             <section
                 className="py-12 bg-muted/30 border-b border-border"
                 style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}
             >
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
-                        {/* Use <img> for decorative trust badges — they are below fold, lazy by default */}
+                        {/* Use <img> for decorative trust badges â€” they are below fold, lazy by default */}
                         <div className="relative w-32 h-12">
                             <img
                                 src="/tdra.webp"

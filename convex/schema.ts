@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -251,7 +259,7 @@ export default defineSchema({
 
     local_terrorist_list: defineTable({
         type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),
-        category: v.string(), // e.g., "شخص إرهابي", "تنظيم إرهابي"
+        category: v.string(), // e.g., "Ø´Ø®Øµ Ø¥Ø±Ù‡Ø§Ø¨ÙŠ", "ØªÙ†Ø¸ÙŠÙ… Ø¥Ø±Ù‡Ø§Ø¨ÙŠ"
         nameArabic: v.string(),
         nameLatin: v.string(),
         nationality: v.optional(v.string()),

@@ -1,15 +1,23 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 /**
- * Video Forensics Result Component — v2
+ * Video Forensics Result Component â€” v2
  *
  * Surfaces the full VideoAnalysisResult from the expanded videoEngine:
- *  • Overall AI-probability score + verdict
- *  • 4 aggregate forensic metrics (temporal inconsistency, flicker %, hair-edge %, bg inconsistency)
- *  • Score-bar timeline (one bar per frame, coloured by label)
- *  • Clickable frame scrubber with thumbnail + signal chips
- *  • Selected-frame pixel-stat strip
- *  • Legacy fallback if only old `combinedScore` data is present
+ *  â€¢ Overall AI-probability score + verdict
+ *  â€¢ 4 aggregate forensic metrics (temporal inconsistency, flicker %, hair-edge %, bg inconsistency)
+ *  â€¢ Score-bar timeline (one bar per frame, coloured by label)
+ *  â€¢ Clickable frame scrubber with thumbnail + signal chips
+ *  â€¢ Selected-frame pixel-stat strip
+ *  â€¢ Legacy fallback if only old `combinedScore` data is present
  */
 
 import {
@@ -41,13 +49,13 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface VideoResultsProps {
   result: VideoAnalysisResult;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function riskMeta(score: number) {
   if (score >= 60)
@@ -115,7 +123,7 @@ function StatPill({
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function VideoResults({ result }: VideoResultsProps) {
   const t = useTranslations('AiInspector.video');
@@ -139,7 +147,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
 
-      {/* ── Row 1 : Score + 4 aggregate metrics ─────────────────────────── */}
+      {/* â”€â”€ Row 1 : Score + 4 aggregate metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* Score card */}
@@ -206,8 +214,8 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {
                 icon: Activity,
                 label: t('temporal_inconsistency'),
-                value: result.temporalInconsistency ?? '—',
-                unit: ' σ',
+                value: result.temporalInconsistency ?? 'â€”',
+                unit: ' Ïƒ',
                 desc: t('temporal_inconsistency_desc'),
                 warn: (result.temporalInconsistency ?? 0) > 20,
                 key: 'ti',
@@ -224,7 +232,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {
                 icon: Wind,
                 label: t('hair_edge_flicker'),
-                value: result.hairEdgeFlicker ?? '—',
+                value: result.hairEdgeFlicker ?? 'â€”',
                 unit: '%',
                 desc: t('hair_edge_flicker_desc'),
                 warn: (result.hairEdgeFlicker ?? 0) > 25,
@@ -233,7 +241,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {
                 icon: Scan,
                 label: t('background_inconsistency'),
-                value: result.backgroundInconsistency ?? '—',
+                value: result.backgroundInconsistency ?? 'â€”',
                 unit: '',
                 desc: t('background_inconsistency_desc'),
                 warn: (result.backgroundInconsistency ?? 0) > 8,
@@ -277,7 +285,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
         </div>
       </div>
 
-      {/* ── Row 2 : Score-bar timeline ───────────────────────────────────── */}
+      {/* â”€â”€ Row 2 : Score-bar timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {hasRichFrames && (
         <div className="p-8 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-6">
@@ -286,7 +294,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               {t('temporal_flicker')}
             </h3>
             <span className="text-[10px] font-mono text-foreground/60 bg-zinc-200/50 dark:bg-zinc-800 px-2 py-0.5 rounded italic">
-              {result.temporalFlicker?.toFixed(4) ?? '—'} {t('variance_coeff')}
+              {result.temporalFlicker?.toFixed(4) ?? 'â€”'} {t('variance_coeff')}
             </span>
           </div>
 
@@ -297,7 +305,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               return (
                 <motion.button
                   key={idx}
-                  title={`${(frame.timestamp ?? 0).toFixed(2)}s — ${frame.label} (${frame.score}%)`}
+                  title={`${(frame.timestamp ?? 0).toFixed(2)}s â€” ${frame.label} (${frame.score}%)`}
                   onClick={() => setSelectedFrame(idx)}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{
@@ -355,7 +363,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
         </div>
       )}
 
-      {/* ── Row 3 : Frame thumbnail scrubber ────────────────────────────── */}
+      {/* â”€â”€ Row 3 : Frame thumbnail scrubber â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="space-y-4">
         <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ml-1">
           <History className="w-4 h-4" />
@@ -434,7 +442,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
         </div>
       </div>
 
-      {/* ── Row 4 : Selected frame detail panel ─────────────────────────── */}
+      {/* â”€â”€ Row 4 : Selected frame detail panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <AnimatePresence mode="wait">
         <motion.div
           key={selectedFrame}
@@ -643,7 +651,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* ── Native AI Forensic Scouts (Deep ML) ─────────────────────── */}
+      {/* â”€â”€ Native AI Forensic Scouts (Deep ML) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {result.deepMl && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -733,7 +741,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
       )}
 
 
-      {/* ── Footer disclaimer ──────────────────────────────────────────────── */}
+      {/* â”€â”€ Footer disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <p className="text-xs text-foreground/60 leading-relaxed italic text-center max-w-2xl mx-auto">
         {tCommon('footer_disclaimer')}
       </p>

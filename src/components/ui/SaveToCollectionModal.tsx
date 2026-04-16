@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -80,12 +88,12 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     };
 
     return (
-        /* Overlay — no ARIA role, purely visual */
+        /* Overlay â€” no ARIA role, purely visual */
         <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
         >
-            {/* Dialog panel — where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
+            {/* Dialog panel â€” where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
             <div
                 role="dialog"
                 aria-modal="true"

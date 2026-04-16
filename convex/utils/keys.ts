@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 
@@ -25,7 +33,7 @@ export async function resolveApiKey(
         let userSettings: any = null;
 
         if ("db" in ctx) {
-            // Context has direct DB access (Mutation or Query) — bypasses authorization checks in public queries
+            // Context has direct DB access (Mutation or Query) â€” bypasses authorization checks in public queries
             const dbRef = (ctx as QueryCtx | MutationCtx).db;
             appSettings = await dbRef
                 .query("app_settings")
@@ -39,7 +47,7 @@ export async function resolveApiKey(
                     .unique();
             }
         } else {
-            // Action context — must use runQuery
+            // Action context â€” must use runQuery
             // Using internal query to bypass redaction for server-side key resolution
             appSettings = await ctx.runQuery(internal.settings.getSystemSettings, {});
             if (identity) {

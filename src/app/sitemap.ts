@@ -1,8 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { MetadataRoute } from 'next'
 
 const BASE_URL = 'https://almstkshf.com'
 
-// Public routes only — private/authenticated routes must never appear in the sitemap
+// Public routes only â€” private/authenticated routes must never appear in the sitemap
 const routes = [
     '',
     '/case-studies/lexcora',

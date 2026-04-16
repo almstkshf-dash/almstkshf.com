@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
@@ -151,7 +159,7 @@ export default function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-foreground/85 uppercase tracking-widest font-medium">
-                    <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
+                    <p>Â© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>
                         <a href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</a>

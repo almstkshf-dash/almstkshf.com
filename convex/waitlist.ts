@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { mutation } from "./_generated/server";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
@@ -14,7 +22,7 @@ export const joinWaitlist = mutation({
         const email = args.email.trim().toLowerCase();
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email)) {
-            console.error(`❌ Validation failed for email: "${email}"`);
+            console.error(`âŒ Validation failed for email: "${email}"`);
             throw new Error("Invalid email address format. Please check and try again.");
         }
 
@@ -73,7 +81,7 @@ export const sendWaitlistEmails = action({
                     html: `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                             <h2 style="color: #1e293b; border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">
-                                You're on the Waitlist! 🎉
+                                You're on the Waitlist! ðŸŽ‰
                             </h2>
                             <p style="font-size: 16px; color: #334155; line-height: 1.6;">
                                 Hi ${args.name || "there"},

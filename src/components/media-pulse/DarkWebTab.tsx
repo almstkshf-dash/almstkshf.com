@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -26,7 +34,7 @@ import Button from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
 
-// ─── Constants ─────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SOURCES = [
   { id: 'ahmia', icon: GlobeLock, labelKey: 'source_ahmia' },
   { id: 'diffbot', icon: SearchCode, labelKey: 'source_diffbot' },
@@ -50,7 +58,7 @@ const GEO_COUNTRIES = [
   { code: 'ir', label: 'Iran' },
 ];
 
-// ─── Skeleton Row ───────────────────────────────────────────────────
+// â”€â”€â”€ Skeleton Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SkeletonRow() {
   return (
     <tr className="border-b border-border/40">
@@ -80,26 +88,26 @@ function SkeletonRow() {
   );
 }
 
-// ─── Main Component ─────────────────────────────────────────────────
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function DarkWebTab() {
   const t = useTranslations('DarkWeb');
   const tCommon = useTranslations('Common');
   const tOpt = useTranslations('SearchOptimizer');
 
-  // ── Search state ──────────────────────────────────────────────────
+  // â”€â”€ Search state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [searchQuery, setSearchQuery] = useState('');
   const [source, setSource] = useState<SourceId>('ahmia');
   const [selectedCountry, setSelectedCountry] = useState(''); // For ZenRows geo-targeting
   const [isLoading, setIsLoading] = useState(false);
 
-  // ── Optimization state ────────────────────────────────────────────
+  // â”€â”€ Optimization state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationInfo, setOptimizationInfo] = useState<{
     original: string;
     explanation: string;
   } | null>(null);
 
-  // ── Inline result state for Diffbot / ZenRows (replaces alert()) ──
+  // â”€â”€ Inline result state for Diffbot / ZenRows (replaces alert()) â”€â”€
   const [fetchResult, setFetchResult] = useState<{
     title: string;
     text?: string;
@@ -107,7 +115,7 @@ export default function DarkWebTab() {
   } | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  // ── Convex hooks ──────────────────────────────────────────────────
+  // â”€â”€ Convex hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const { isAuthenticated } = useConvexAuth();
   const searchAhmia = useAction(api.darkWeb.searchAhmia);
   const fetchDiffbot = useAction(api.darkWeb.fetchDiffbot);
@@ -119,7 +127,7 @@ export default function DarkWebTab() {
     isAuthenticated ? { limit: 50 } : 'skip'
   ) || [];
 
-  // ── Risk badge ────────────────────────────────────────────────────
+  // â”€â”€ Risk badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRiskBadgeStyles = (risk: string) => {
     switch (risk) {
       case 'critical': return 'bg-red-500/10 text-red-600 border-red-500/20';
@@ -130,7 +138,7 @@ export default function DarkWebTab() {
     }
   };
 
-  // ── Handlers ──────────────────────────────────────────────────────
+  // â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleSearch = async () => {
     if (!searchQuery.trim() || isLoading) return;
     setIsLoading(true);
@@ -139,20 +147,20 @@ export default function DarkWebTab() {
 
     try {
       if (source === 'ahmia') {
-        // Ahmia stores results directly to DB via Convex action — results stream in via useQuery
+        // Ahmia stores results directly to DB via Convex action â€” results stream in via useQuery
         await searchAhmia({ query: searchQuery });
         setSearchQuery('');
         setOptimizationInfo(null);
 
       } else if (source === 'diffbot') {
-        // Diffbot returns structured content for a given URL — show inline
+        // Diffbot returns structured content for a given URL â€” show inline
         const res = await fetchDiffbot({ url: searchQuery });
         if (res) {
           setFetchResult({ title: res.title, text: res.text?.slice(0, 400), source: 'diffbot' });
         }
 
       } else if (source === 'zenrows') {
-        // ZenRows stealth scrape — supports geo-targeting via selectedCountry
+        // ZenRows stealth scrape â€” supports geo-targeting via selectedCountry
         const res = await stealthFetch({
           url: searchQuery,
           country: selectedCountry || undefined,
@@ -212,10 +220,10 @@ export default function DarkWebTab() {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────
+  // â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <div className="space-y-6">
-      {/* ── Search Card ──────────────────────────────────────────── */}
+      {/* â”€â”€ Search Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-5">
 
         {/* Header */}
@@ -242,7 +250,7 @@ export default function DarkWebTab() {
           )}
         </div>
 
-        {/* ── Source Toggles (Ahmia / Diffbot / ZenRows) ───────── */}
+        {/* â”€â”€ Source Toggles (Ahmia / Diffbot / ZenRows) â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="flex gap-2 text-nowrap overflow-x-auto pb-1 scrollbar-none">
           {SOURCES.map((s) => {
             const Icon = s.icon;
@@ -265,7 +273,7 @@ export default function DarkWebTab() {
           })}
         </div>
 
-        {/* ── Search Input Row ──────────────────────────────────── */}
+        {/* â”€â”€ Search Input Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         {/* FIX: added `relative` so the absolute optimizationInfo banner anchors correctly */}
         <div className="relative flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
@@ -328,7 +336,7 @@ export default function DarkWebTab() {
             {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : tCommon('search')}
           </Button>
 
-          {/* FIX: Optimization info banner — now anchors to `relative` parent above */}
+          {/* FIX: Optimization info banner â€” now anchors to `relative` parent above */}
           <AnimatePresence>
             {optimizationInfo && (
               <motion.div
@@ -357,7 +365,7 @@ export default function DarkWebTab() {
           </AnimatePresence>
         </div>
 
-        {/* ── Inline result for Diffbot / ZenRows ─────────────── */}
+        {/* â”€â”€ Inline result for Diffbot / ZenRows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <AnimatePresence>
           {searchError && (
             <motion.div
@@ -384,7 +392,7 @@ export default function DarkWebTab() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-purple-600" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-600">
-                  {fetchResult.source === 'diffbot' ? 'Diffbot' : 'ZenRows'} — Extracted Content
+                  {fetchResult.source === 'diffbot' ? 'Diffbot' : 'ZenRows'} â€” Extracted Content
                 </span>
               </div>
               <p className="text-sm font-bold text-foreground">{fetchResult.title}</p>
@@ -398,7 +406,7 @@ export default function DarkWebTab() {
         </AnimatePresence>
       </div>
 
-      {/* ── Results Table ────────────────────────────────────────── */}
+      {/* â”€â”€ Results Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[1000px]">

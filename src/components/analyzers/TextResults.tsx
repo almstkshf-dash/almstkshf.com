@@ -1,15 +1,23 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 /**
- * Text Forensics Result Component — v2
+ * Text Forensics Result Component â€” v2
  *
  * Surfaces the full TextAnalysisResult from textEngine.ts:
- *  • Overall AI-probability score + verdict badge
- *  • 6 aggregate linguistic metrics (burstiness, TTR, passive voice, etc.)
- *  • Named signal chips (severity-coloured, grouped)
- *  • Per-sentence breakdown list (click to highlight)
- *  • Colour-coded forensic text view (opener / transition / hedge / closer / human)
- *  • Footer disclaimer
+ *  â€¢ Overall AI-probability score + verdict badge
+ *  â€¢ 6 aggregate linguistic metrics (burstiness, TTR, passive voice, etc.)
+ *  â€¢ Named signal chips (severity-coloured, grouped)
+ *  â€¢ Per-sentence breakdown list (click to highlight)
+ *  â€¢ Colour-coded forensic text view (opener / transition / hedge / closer / human)
+ *  â€¢ Footer disclaimer
  */
 
 import { TextAnalysisResult, SentenceResult, HighlightedRange } from '@/lib/engines/textEngine';
@@ -34,14 +42,14 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Props â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface TextResultsProps {
   result: TextAnalysisResult;
   rawText: string;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function scoreMeta(score: number) {
   if (score >= 70)
@@ -75,7 +83,7 @@ const HIGHLIGHT_STYLE: Record<HighlightedRange['type'], string> = {
   marker: 'bg-zinc-400/15 border-b border-zinc-400/40 text-zinc-700 dark:text-zinc-300',
 };
 
-// ─── Highlighted text renderer ────────────────────────────────────────────────
+// â”€â”€â”€ Highlighted text renderer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function HighlightedText({
   rawText,
@@ -136,7 +144,7 @@ function HighlightedText({
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function TextResults({ result, rawText }: TextResultsProps) {
   const t = useTranslations('AiInspector.text');
@@ -150,7 +158,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
 
-      {/* ── Row 1 : Score + 6 aggregate metrics ──────────────────────────── */}
+      {/* â”€â”€ Row 1 : Score + 6 aggregate metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Score card */}
@@ -276,7 +284,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         </div>
       </div>
 
-      {/* ── Row 2 : Named signals ─────────────────────────────────────────── */}
+      {/* â”€â”€ Row 2 : Named signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {result.signals.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
@@ -307,7 +315,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         </div>
       )}
 
-      {/* No signals — clean pass */}
+      {/* No signals â€” clean pass */}
       {result.signals.length === 0 && (
         <div className="flex flex-col items-center justify-center p-10 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-500 gap-3">
           <ShieldCheck className="w-12 h-12" />
@@ -315,7 +323,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         </div>
       )}
 
-      {/* ── Row 3 : Sentence timeline ─────────────────────────────────────── */}
+      {/* â”€â”€ Row 3 : Sentence timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {result.sentences.length > 0 && (
         <div className="space-y-6">
           <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
@@ -330,7 +338,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
               return (
                 <motion.button
                   key={idx}
-                  title={`Sentence ${idx + 1} — ${s.label} (${s.score}%)\n${s.text.slice(0, 80)}…`}
+                  title={`Sentence ${idx + 1} â€” ${s.label} (${s.score}%)\n${s.text.slice(0, 80)}â€¦`}
                   onClick={() => setSelectedSentence(selectedSentence === idx ? null : idx)}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: `${Math.max(6, s.score)}%`, opacity: 1 }}
@@ -412,7 +420,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         </div>
       )}
 
-      {/* ── Row 4 : Forensic highlight view ──────────────────────────────── */}
+      {/* â”€â”€ Row 4 : Forensic highlight view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="p-10 bg-card dark:bg-muted/50 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative">
         <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
           <Search className="w-32 h-32" />
@@ -463,7 +471,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
         </div>
       </div>
 
-      {/* ── Footer disclaimer ──────────────────────────────────────────────── */}
+      {/* â”€â”€ Footer disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <p className="text-xs text-muted-foreground leading-relaxed italic text-center max-w-2xl mx-auto">
         {tCommon('footer_disclaimer')}
       </p>

@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import React, { useRef, useMemo } from "react";
@@ -51,7 +59,7 @@ function GoldWave({ y, speed, depth }: { y: number; speed: number; depth: number
 function Scene() {
     return (
         <>
-            {/* طبقات عمق مختلفة */}
+            {/* Ø·Ø¨Ù‚Ø§Øª Ø¹Ù…Ù‚ Ù…Ø®ØªÙ„ÙØ© */}
             <GoldWave y={2} speed={0.6} depth={-6} />
             <GoldWave y={0.5} speed={0.4} depth={-5} />
             <GoldWave y={-1} speed={0.3} depth={-4} />

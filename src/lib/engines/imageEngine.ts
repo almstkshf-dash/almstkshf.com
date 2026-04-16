@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { analyzeOCR, detectBiometricAnomalies, detectWatermarks, ForensicAnomaly } from './mlHelper';
 
 export interface ImageSignal {
@@ -48,7 +56,7 @@ export interface ImageAnalysisResult {
   };
 }
 
-// ─── Legacy interface (kept for backward compat) ──────────────────────────────
+// â”€â”€â”€ Legacy interface (kept for backward compat) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ImageAnalysisReport {
   overallRisk: "low" | "medium" | "high";
@@ -65,7 +73,7 @@ export interface ImageAnalysisReport {
   richResult?: ImageAnalysisResult;
 }
 
-// ─── Main entry (new API) ─────────────────────────────────────────────────────
+// â”€â”€â”€ Main entry (new API) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult> {
   return new Promise((resolve, reject) => {
@@ -85,10 +93,10 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
-        // ── Standard pixel heuristics ──
+        // â”€â”€ Standard pixel heuristics â”€â”€
         const stats = computePixelStats(imageData, canvas.width, canvas.height, img.width, img.height, file);
         
-        // ── Deep ML Analysis (Async) ──
+        // â”€â”€ Deep ML Analysis (Async) â”€â”€
         (async () => {
           try {
             const ocrResult = await analyzeOCR(canvas);
@@ -124,7 +132,7 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
   });
 }
 
-// ─── Legacy entry points (backward compat) ────────────────────────────────────
+// â”€â”€â”€ Legacy entry points (backward compat) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const analyzeImage = async (img: HTMLImageElement): Promise<ImageAnalysisReport> => {
   const canvas = document.createElement("canvas");
@@ -202,7 +210,7 @@ export const analyzeImageCanvas = (canvas: HTMLCanvasElement): ImageAnalysisRepo
   return finalizeReport(richResult, stats);
 };
 
-// ─── Pixel computation ────────────────────────────────────────────────────────
+// â”€â”€â”€ Pixel computation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function computePixelStats(
   data: ImageData,
@@ -345,7 +353,7 @@ function stdDev(arr: number[]): number {
   return Math.sqrt(arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length);
 }
 
-// ─── Signal builder ────────────────────────────────────────────────────────
+// â”€â”€â”€ Signal builder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function buildImageResult(
   stats: PixelStats, 
@@ -373,7 +381,7 @@ function buildImageResult(
       detected: stats.saturationVariance < 0.10,
       weight: 20,
       category: "texture",
-      description: "Human photos have chaotic, uneven colour across regions — AI flattens it.",
+      description: "Human photos have chaotic, uneven colour across regions â€” AI flattens it.",
       labelKey: "signal_low_sat_name",
       descKey: "signal_low_sat_desc",
     },
@@ -443,7 +451,7 @@ function buildImageResult(
       detected: [1, 2, 4, 8, 16].some(mp => Math.abs(stats.megapixels - mp) < 0.02),
       weight: 15,
       category: "artifact",
-      description: "AI generators output exact round megapixel counts — cameras don't.",
+      description: "AI generators output exact round megapixel counts â€” cameras don't.",
       labelKey: "signal_round_mp_name",
       descKey: "signal_round_mp_desc",
     },

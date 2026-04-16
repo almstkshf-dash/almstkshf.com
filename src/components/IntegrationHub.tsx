@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -86,7 +94,7 @@ export default function IntegrationHub() {
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60 mb-2">API Key</p>
                                     <div className="flex items-center gap-3 font-mono text-sm">
                                         <span className="text-foreground/60 truncate max-w-[200px] md:max-w-none">
-                                            {showKey[item.id] ? item.apiKey : "••••••••••••••••••••••••••••"}
+                                            {showKey[item.id] ? item.apiKey : "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"}
                                         </span>
                                         <Button
                                             variant="ghost"

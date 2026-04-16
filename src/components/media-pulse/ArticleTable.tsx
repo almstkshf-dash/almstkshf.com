@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import { useTranslations } from 'next-intl';
@@ -116,7 +124,7 @@ const ArticleRow = memo(({
                 </div>
             </td>
             <td className="p-4 text-sm text-foreground/80">
-                {article.source || article.sourceCountry || '—'}
+                {article.source || article.sourceCountry || 'â€”'}
             </td>
             <td className="p-4 text-center">
                 <div className="flex flex-col gap-1.5 items-center">
@@ -193,7 +201,7 @@ const ArticleRow = memo(({
                 </div>
             </td>
             <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors" suppressHydrationWarning>
-                {article.reach?.toLocaleString() || '—'}
+                {article.reach?.toLocaleString() || 'â€”'}
             </td>
             <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors">
                 {article.likes !== undefined ? (
@@ -201,7 +209,7 @@ const ArticleRow = memo(({
                         <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
                         <Heart className="w-3 h-3 text-status-error-fg/70" />
                     </div>
-                ) : '—'}
+                ) : 'â€”'}
             </td>
             <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
                 {article.retweets !== undefined ? (
@@ -209,7 +217,7 @@ const ArticleRow = memo(({
                         <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
                         <Share2 className="w-3 h-3 text-status-success-fg/70" />
                     </div>
-                ) : '—'}
+                ) : 'â€”'}
             </td>
             <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
                 {article.replies !== undefined ? (
@@ -217,7 +225,7 @@ const ArticleRow = memo(({
                         <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
                         <MessageCircle className="w-3 h-3 text-status-info-fg/70" />
                     </div>
-                ) : '—'}
+                ) : 'â€”'}
             </td>
             <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors" suppressHydrationWarning>
                 ${article.ave?.toLocaleString() || '0'}

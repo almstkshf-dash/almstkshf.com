@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 import clsx from 'clsx';
 import * as React from 'react';
@@ -8,158 +16,158 @@ import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X,
 import Button from "../ui/Button";
 import { useLocale, useTranslations } from 'next-intl';
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FULL WORLD COUNTRIES LIST
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export const ALL_COUNTRIES = [
-    { code: 'AE', flag: '🇦🇪', en: 'United Arab Emirates', ar: 'الإمارات العربية المتحدة' },
-    { code: 'SA', flag: '🇸🇦', en: 'Saudi Arabia', ar: 'المملكة العربية السعودية' },
-    { code: 'EG', flag: '🇪🇬', en: 'Egypt', ar: 'مصر' },
-    { code: 'KW', flag: '🇰🇼', en: 'Kuwait', ar: 'الكويت' },
-    { code: 'QA', flag: '🇶🇦', en: 'Qatar', ar: 'قطر' },
-    { code: 'BH', flag: '🇧🇭', en: 'Bahrain', ar: 'البحرين' },
-    { code: 'OM', flag: '🇴🇲', en: 'Oman', ar: 'عُمان' },
-    { code: 'JO', flag: '🇯🇴', en: 'Jordan', ar: 'الأردن' },
-    { code: 'LB', flag: '🇱🇧', en: 'Lebanon', ar: 'لبنان' },
-    { code: 'IQ', flag: '🇮🇶', en: 'Iraq', ar: 'العراق' },
-    { code: 'SY', flag: '🇸🇾', en: 'Syria', ar: 'سوريا' },
-    { code: 'PS', flag: '🇵🇸', en: 'Palestine', ar: 'فلسطين' },
-    { code: 'YE', flag: '🇾🇪', en: 'Yemen', ar: 'اليمن' },
-    { code: 'LY', flag: '🇱🇾', en: 'Libya', ar: 'ليبيا' },
-    { code: 'TN', flag: '🇹🇳', en: 'Tunisia', ar: 'تونس' },
-    { code: 'DZ', flag: '🇩🇿', en: 'Algeria', ar: 'الجزائر' },
-    { code: 'MA', flag: '🇲🇦', en: 'Morocco', ar: 'المغرب' },
-    { code: 'SD', flag: '🇸🇩', en: 'Sudan', ar: 'السودان' },
-    { code: 'SO', flag: '🇸🇴', en: 'Somalia', ar: 'الصومال' },
-    { code: 'DJ', flag: '🇩🇯', en: 'Djibouti', ar: 'جيبوتي' },
-    { code: 'MR', flag: '🇲🇷', en: 'Mauritania', ar: 'موريتانيا' },
-    { code: 'KM', flag: '🇰🇲', en: 'Comoros', ar: 'جزر القمر' },
-    { code: 'US', flag: '🇺🇸', en: 'United States', ar: 'الولايات المتحدة' },
-    { code: 'GB', flag: '🇬🇧', en: 'United Kingdom', ar: 'المملكة المتحدة' },
-    { code: 'CA', flag: '🇨🇦', en: 'Canada', ar: 'كندا' },
-    { code: 'AU', flag: '🇦🇺', en: 'Australia', ar: 'أستراليا' },
-    { code: 'FR', flag: '🇫🇷', en: 'France', ar: 'فرنسا' },
-    { code: 'DE', flag: '🇩🇪', en: 'Germany', ar: 'ألمانيا' },
-    { code: 'IT', flag: '🇮🇹', en: 'Italy', ar: 'إيطاليا' },
-    { code: 'ES', flag: '🇪🇸', en: 'Spain', ar: 'إسبانيا' },
-    { code: 'NL', flag: '🇳🇱', en: 'Netherlands', ar: 'هولندا' },
-    { code: 'BE', flag: '🇧🇪', en: 'Belgium', ar: 'بلجيكا' },
-    { code: 'CH', flag: '🇨🇭', en: 'Switzerland', ar: 'سويسرا' },
-    { code: 'AT', flag: '🇦🇹', en: 'Austria', ar: 'النمسا' },
-    { code: 'SE', flag: '🇸🇪', en: 'Sweden', ar: 'السويد' },
-    { code: 'NO', flag: '🇳🇴', en: 'Norway', ar: 'النرويج' },
-    { code: 'DK', flag: '🇩🇰', en: 'Denmark', ar: 'الدنمارك' },
-    { code: 'FI', flag: '🇫🇮', en: 'Finland', ar: 'فنلندا' },
-    { code: 'PL', flag: '🇵🇱', en: 'Poland', ar: 'بولندا' },
-    { code: 'PT', flag: '🇵🇹', en: 'Portugal', ar: 'البرتغال' },
-    { code: 'GR', flag: '🇬🇷', en: 'Greece', ar: 'اليونان' },
-    { code: 'IE', flag: '🇮🇪', en: 'Ireland', ar: 'أيرلندا' },
-    { code: 'CZ', flag: '🇨🇿', en: 'Czech Republic', ar: 'التشيك' },
-    { code: 'RO', flag: '🇷🇴', en: 'Romania', ar: 'رومانيا' },
-    { code: 'HU', flag: '🇭🇺', en: 'Hungary', ar: 'المجر' },
-    { code: 'RU', flag: '🇷🇺', en: 'Russia', ar: 'روسيا' },
-    { code: 'TR', flag: '🇹🇷', en: 'Turkey', ar: 'تركيا' },
-    { code: 'CN', flag: '🇨🇳', en: 'China', ar: 'الصين' },
-    { code: 'JP', flag: '🇯🇵', en: 'Japan', ar: 'اليابان' },
-    { code: 'KR', flag: '🇰🇷', en: 'South Korea', ar: 'كوريا الجنوبية' },
-    { code: 'IN', flag: '🇮🇳', en: 'India', ar: 'الهند' },
-    { code: 'PK', flag: '🇵🇰', en: 'Pakistan', ar: 'باكستان' },
-    { code: 'BD', flag: '🇧🇩', en: 'Bangladesh', ar: 'بنغلاديش' },
-    { code: 'ID', flag: '🇮🇩', en: 'Indonesia', ar: 'إندونيسيا' },
-    { code: 'MY', flag: '🇲🇾', en: 'Malaysia', ar: 'ماليزيا' },
-    { code: 'SG', flag: '🇸🇬', en: 'Singapore', ar: 'سنغافورة' },
-    { code: 'TH', flag: '🇹🇭', en: 'Thailand', ar: 'تايلاند' },
-    { code: 'PH', flag: '🇵🇭', en: 'Philippines', ar: 'الفلبين' },
-    { code: 'VN', flag: '🇻🇳', en: 'Vietnam', ar: 'فيتنام' },
-    { code: 'BR', flag: '🇧🇷', en: 'Brazil', ar: 'البرازيل' },
-    { code: 'MX', flag: '🇲🇽', en: 'Mexico', ar: 'المكسيك' },
-    { code: 'AR', flag: '🇦🇷', en: 'Argentina', ar: 'الأرجنتين' },
-    { code: 'CO', flag: '🇨🇴', en: 'Colombia', ar: 'كولومبيا' },
-    { code: 'CL', flag: '🇨🇱', en: 'Chile', ar: 'تشيلي' },
-    { code: 'ZA', flag: '🇿🇦', en: 'South Africa', ar: 'جنوب أفريقيا' },
-    { code: 'NG', flag: '🇳🇬', en: 'Nigeria', ar: 'نيجيريا' },
-    { code: 'KE', flag: '🇰🇪', en: 'Kenya', ar: 'كينيا' },
-    { code: 'GH', flag: '🇬🇭', en: 'Ghana', ar: 'غانا' },
-    { code: 'ET', flag: '🇪🇹', en: 'Ethiopia', ar: 'إثيوبيا' },
-    { code: 'TZ', flag: '🇹🇿', en: 'Tanzania', ar: 'تنزانيا' },
-    { code: 'IL', flag: '🇮🇱', en: 'Israel', ar: 'إسرائيل' },
-    { code: 'IR', flag: '🇮🇷', en: 'Iran', ar: 'إيران' },
-    { code: 'AF', flag: '🇦🇫', en: 'Afghanistan', ar: 'أفغانستان' },
-    { code: 'NZ', flag: '🇳🇿', en: 'New Zealand', ar: 'نيوزيلندا' },
-    { code: 'UA', flag: '🇺🇦', en: 'Ukraine', ar: 'أوكرانيا' },
-    { code: 'HR', flag: '🇭🇷', en: 'Croatia', ar: 'كرواتيا' },
-    { code: 'RS', flag: '🇷🇸', en: 'Serbia', ar: 'صربيا' },
-    { code: 'BG', flag: '🇧🇬', en: 'Bulgaria', ar: 'بلغاريا' },
-    { code: 'SK', flag: '🇸🇰', en: 'Slovakia', ar: 'سلوفاكيا' },
-    { code: 'LT', flag: '🇱🇹', en: 'Lithuania', ar: 'ليتوانيا' },
-    { code: 'LV', flag: '🇱🇻', en: 'Latvia', ar: 'لاتفيا' },
-    { code: 'EE', flag: '🇪🇪', en: 'Estonia', ar: 'إستونيا' },
-    { code: 'CY', flag: '🇨🇾', en: 'Cyprus', ar: 'قبرص' },
-    { code: 'MT', flag: '🇲🇹', en: 'Malta', ar: 'مالطا' },
-    { code: 'LU', flag: '🇱🇺', en: 'Luxembourg', ar: 'لوكسمبورغ' },
-    { code: 'IS', flag: '🇮🇸', en: 'Iceland', ar: 'آيسلندا' },
-    { code: 'PE', flag: '🇵🇪', en: 'Peru', ar: 'بيرو' },
-    { code: 'VE', flag: '🇻🇪', en: 'Venezuela', ar: 'فنزويلا' },
-    { code: 'EC', flag: '🇪🇨', en: 'Ecuador', ar: 'الإكوادور' },
-    { code: 'UY', flag: '🇺🇾', en: 'Uruguay', ar: 'أوروغواي' },
-    { code: 'PY', flag: '🇵🇾', en: 'Paraguay', ar: 'باراغواي' },
-    { code: 'BO', flag: '🇧🇴', en: 'Bolivia', ar: 'بوليفيا' },
-    { code: 'CR', flag: '🇨🇷', en: 'Costa Rica', ar: 'كوستاريكا' },
-    { code: 'PA', flag: '🇵🇦', en: 'Panama', ar: 'بنما' },
-    { code: 'CU', flag: '🇨🇺', en: 'Cuba', ar: 'كوبا' },
-    { code: 'DO', flag: '🇩🇴', en: 'Dominican Republic', ar: 'جمهورية الدومينيكان' },
-    { code: 'GT', flag: '🇬🇹', en: 'Guatemala', ar: 'غواتيمالا' },
-    { code: 'HN', flag: '🇭🇳', en: 'Honduras', ar: 'هندوراس' },
-    { code: 'JM', flag: '🇯🇲', en: 'Jamaica', ar: 'جامايكا' },
-    { code: 'TT', flag: '🇹🇹', en: 'Trinidad and Tobago', ar: 'ترينيداد وتوباغو' },
-    { code: 'HT', flag: '🇭🇹', en: 'Haiti', ar: 'هايتي' },
-    { code: 'SV', flag: '🇸🇻', en: 'El Salvador', ar: 'السلفادور' },
-    { code: 'NI', flag: '🇳🇮', en: 'Nicaragua', ar: 'نيكاراغوا' },
-    { code: 'LK', flag: '🇱🇰', en: 'Sri Lanka', ar: 'سريلانكا' },
-    { code: 'MM', flag: '🇲🇲', en: 'Myanmar', ar: 'ميانمار' },
-    { code: 'KH', flag: '🇰🇭', en: 'Cambodia', ar: 'كمبوديا' },
-    { code: 'NP', flag: '🇳🇵', en: 'Nepal', ar: 'نيبال' },
-    { code: 'UZ', flag: '🇺🇿', en: 'Uzbekistan', ar: 'أوزبكستان' },
-    { code: 'KZ', flag: '🇰🇿', en: 'Kazakhstan', ar: 'كازاخستان' },
-    { code: 'GE', flag: '🇬🇪', en: 'Georgia', ar: 'جورجيا' },
-    { code: 'AZ', flag: '🇦🇿', en: 'Azerbaijan', ar: 'أذربيجان' },
-    { code: 'AM', flag: '🇦🇲', en: 'Armenia', ar: 'أرمينيا' },
-    { code: 'UG', flag: '🇺🇬', en: 'Uganda', ar: 'أوغندا' },
-    { code: 'CM', flag: '🇨🇲', en: 'Cameroon', ar: 'الكاميرون' },
-    { code: 'SN', flag: '🇸🇳', en: 'Senegal', ar: 'السنغال' },
-    { code: 'CI', flag: '🇨🇮', en: 'Ivory Coast', ar: 'ساحل العاج' },
-    { code: 'MG', flag: '🇲🇬', en: 'Madagascar', ar: 'مدغشقر' },
-    { code: 'MZ', flag: '🇲🇿', en: 'Mozambique', ar: 'موزمبيق' },
-    { code: 'AO', flag: '🇦🇴', en: 'Angola', ar: 'أنغولا' },
-    { code: 'TW', flag: '🇹🇼', en: 'Taiwan', ar: 'تايوان' },
-    { code: 'HK', flag: '🇭🇰', en: 'Hong Kong', ar: 'هونغ كونغ' },
-    { code: 'MO', flag: '🇲🇴', en: 'Macau', ar: 'ماكاو' },
-    { code: 'BN', flag: '🇧🇳', en: 'Brunei', ar: 'بروناي' },
+    { code: 'AE', flag: 'ðŸ‡¦ðŸ‡ª', en: 'United Arab Emirates', ar: 'Ø§Ù„Ø¥Ù…Ø§Ø±Ø§Øª Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ù…ØªØ­Ø¯Ø©' },
+    { code: 'SA', flag: 'ðŸ‡¸ðŸ‡¦', en: 'Saudi Arabia', ar: 'Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©' },
+    { code: 'EG', flag: 'ðŸ‡ªðŸ‡¬', en: 'Egypt', ar: 'Ù…ØµØ±' },
+    { code: 'KW', flag: 'ðŸ‡°ðŸ‡¼', en: 'Kuwait', ar: 'Ø§Ù„ÙƒÙˆÙŠØª' },
+    { code: 'QA', flag: 'ðŸ‡¶ðŸ‡¦', en: 'Qatar', ar: 'Ù‚Ø·Ø±' },
+    { code: 'BH', flag: 'ðŸ‡§ðŸ‡­', en: 'Bahrain', ar: 'Ø§Ù„Ø¨Ø­Ø±ÙŠÙ†' },
+    { code: 'OM', flag: 'ðŸ‡´ðŸ‡²', en: 'Oman', ar: 'Ø¹ÙÙ…Ø§Ù†' },
+    { code: 'JO', flag: 'ðŸ‡¯ðŸ‡´', en: 'Jordan', ar: 'Ø§Ù„Ø£Ø±Ø¯Ù†' },
+    { code: 'LB', flag: 'ðŸ‡±ðŸ‡§', en: 'Lebanon', ar: 'Ù„Ø¨Ù†Ø§Ù†' },
+    { code: 'IQ', flag: 'ðŸ‡®ðŸ‡¶', en: 'Iraq', ar: 'Ø§Ù„Ø¹Ø±Ø§Ù‚' },
+    { code: 'SY', flag: 'ðŸ‡¸ðŸ‡¾', en: 'Syria', ar: 'Ø³ÙˆØ±ÙŠØ§' },
+    { code: 'PS', flag: 'ðŸ‡µðŸ‡¸', en: 'Palestine', ar: 'ÙÙ„Ø³Ø·ÙŠÙ†' },
+    { code: 'YE', flag: 'ðŸ‡¾ðŸ‡ª', en: 'Yemen', ar: 'Ø§Ù„ÙŠÙ…Ù†' },
+    { code: 'LY', flag: 'ðŸ‡±ðŸ‡¾', en: 'Libya', ar: 'Ù„ÙŠØ¨ÙŠØ§' },
+    { code: 'TN', flag: 'ðŸ‡¹ðŸ‡³', en: 'Tunisia', ar: 'ØªÙˆÙ†Ø³' },
+    { code: 'DZ', flag: 'ðŸ‡©ðŸ‡¿', en: 'Algeria', ar: 'Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±' },
+    { code: 'MA', flag: 'ðŸ‡²ðŸ‡¦', en: 'Morocco', ar: 'Ø§Ù„Ù…ØºØ±Ø¨' },
+    { code: 'SD', flag: 'ðŸ‡¸ðŸ‡©', en: 'Sudan', ar: 'Ø§Ù„Ø³ÙˆØ¯Ø§Ù†' },
+    { code: 'SO', flag: 'ðŸ‡¸ðŸ‡´', en: 'Somalia', ar: 'Ø§Ù„ØµÙˆÙ…Ø§Ù„' },
+    { code: 'DJ', flag: 'ðŸ‡©ðŸ‡¯', en: 'Djibouti', ar: 'Ø¬ÙŠØ¨ÙˆØªÙŠ' },
+    { code: 'MR', flag: 'ðŸ‡²ðŸ‡·', en: 'Mauritania', ar: 'Ù…ÙˆØ±ÙŠØªØ§Ù†ÙŠØ§' },
+    { code: 'KM', flag: 'ðŸ‡°ðŸ‡²', en: 'Comoros', ar: 'Ø¬Ø²Ø± Ø§Ù„Ù‚Ù…Ø±' },
+    { code: 'US', flag: 'ðŸ‡ºðŸ‡¸', en: 'United States', ar: 'Ø§Ù„ÙˆÙ„Ø§ÙŠØ§Øª Ø§Ù„Ù…ØªØ­Ø¯Ø©' },
+    { code: 'GB', flag: 'ðŸ‡¬ðŸ‡§', en: 'United Kingdom', ar: 'Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ù…ØªØ­Ø¯Ø©' },
+    { code: 'CA', flag: 'ðŸ‡¨ðŸ‡¦', en: 'Canada', ar: 'ÙƒÙ†Ø¯Ø§' },
+    { code: 'AU', flag: 'ðŸ‡¦ðŸ‡º', en: 'Australia', ar: 'Ø£Ø³ØªØ±Ø§Ù„ÙŠØ§' },
+    { code: 'FR', flag: 'ðŸ‡«ðŸ‡·', en: 'France', ar: 'ÙØ±Ù†Ø³Ø§' },
+    { code: 'DE', flag: 'ðŸ‡©ðŸ‡ª', en: 'Germany', ar: 'Ø£Ù„Ù…Ø§Ù†ÙŠØ§' },
+    { code: 'IT', flag: 'ðŸ‡®ðŸ‡¹', en: 'Italy', ar: 'Ø¥ÙŠØ·Ø§Ù„ÙŠØ§' },
+    { code: 'ES', flag: 'ðŸ‡ªðŸ‡¸', en: 'Spain', ar: 'Ø¥Ø³Ø¨Ø§Ù†ÙŠØ§' },
+    { code: 'NL', flag: 'ðŸ‡³ðŸ‡±', en: 'Netherlands', ar: 'Ù‡ÙˆÙ„Ù†Ø¯Ø§' },
+    { code: 'BE', flag: 'ðŸ‡§ðŸ‡ª', en: 'Belgium', ar: 'Ø¨Ù„Ø¬ÙŠÙƒØ§' },
+    { code: 'CH', flag: 'ðŸ‡¨ðŸ‡­', en: 'Switzerland', ar: 'Ø³ÙˆÙŠØ³Ø±Ø§' },
+    { code: 'AT', flag: 'ðŸ‡¦ðŸ‡¹', en: 'Austria', ar: 'Ø§Ù„Ù†Ù…Ø³Ø§' },
+    { code: 'SE', flag: 'ðŸ‡¸ðŸ‡ª', en: 'Sweden', ar: 'Ø§Ù„Ø³ÙˆÙŠØ¯' },
+    { code: 'NO', flag: 'ðŸ‡³ðŸ‡´', en: 'Norway', ar: 'Ø§Ù„Ù†Ø±ÙˆÙŠØ¬' },
+    { code: 'DK', flag: 'ðŸ‡©ðŸ‡°', en: 'Denmark', ar: 'Ø§Ù„Ø¯Ù†Ù…Ø§Ø±Ùƒ' },
+    { code: 'FI', flag: 'ðŸ‡«ðŸ‡®', en: 'Finland', ar: 'ÙÙ†Ù„Ù†Ø¯Ø§' },
+    { code: 'PL', flag: 'ðŸ‡µðŸ‡±', en: 'Poland', ar: 'Ø¨ÙˆÙ„Ù†Ø¯Ø§' },
+    { code: 'PT', flag: 'ðŸ‡µðŸ‡¹', en: 'Portugal', ar: 'Ø§Ù„Ø¨Ø±ØªØºØ§Ù„' },
+    { code: 'GR', flag: 'ðŸ‡¬ðŸ‡·', en: 'Greece', ar: 'Ø§Ù„ÙŠÙˆÙ†Ø§Ù†' },
+    { code: 'IE', flag: 'ðŸ‡®ðŸ‡ª', en: 'Ireland', ar: 'Ø£ÙŠØ±Ù„Ù†Ø¯Ø§' },
+    { code: 'CZ', flag: 'ðŸ‡¨ðŸ‡¿', en: 'Czech Republic', ar: 'Ø§Ù„ØªØ´ÙŠÙƒ' },
+    { code: 'RO', flag: 'ðŸ‡·ðŸ‡´', en: 'Romania', ar: 'Ø±ÙˆÙ…Ø§Ù†ÙŠØ§' },
+    { code: 'HU', flag: 'ðŸ‡­ðŸ‡º', en: 'Hungary', ar: 'Ø§Ù„Ù…Ø¬Ø±' },
+    { code: 'RU', flag: 'ðŸ‡·ðŸ‡º', en: 'Russia', ar: 'Ø±ÙˆØ³ÙŠØ§' },
+    { code: 'TR', flag: 'ðŸ‡¹ðŸ‡·', en: 'Turkey', ar: 'ØªØ±ÙƒÙŠØ§' },
+    { code: 'CN', flag: 'ðŸ‡¨ðŸ‡³', en: 'China', ar: 'Ø§Ù„ØµÙŠÙ†' },
+    { code: 'JP', flag: 'ðŸ‡¯ðŸ‡µ', en: 'Japan', ar: 'Ø§Ù„ÙŠØ§Ø¨Ø§Ù†' },
+    { code: 'KR', flag: 'ðŸ‡°ðŸ‡·', en: 'South Korea', ar: 'ÙƒÙˆØ±ÙŠØ§ Ø§Ù„Ø¬Ù†ÙˆØ¨ÙŠØ©' },
+    { code: 'IN', flag: 'ðŸ‡®ðŸ‡³', en: 'India', ar: 'Ø§Ù„Ù‡Ù†Ø¯' },
+    { code: 'PK', flag: 'ðŸ‡µðŸ‡°', en: 'Pakistan', ar: 'Ø¨Ø§ÙƒØ³ØªØ§Ù†' },
+    { code: 'BD', flag: 'ðŸ‡§ðŸ‡©', en: 'Bangladesh', ar: 'Ø¨Ù†ØºÙ„Ø§Ø¯ÙŠØ´' },
+    { code: 'ID', flag: 'ðŸ‡®ðŸ‡©', en: 'Indonesia', ar: 'Ø¥Ù†Ø¯ÙˆÙ†ÙŠØ³ÙŠØ§' },
+    { code: 'MY', flag: 'ðŸ‡²ðŸ‡¾', en: 'Malaysia', ar: 'Ù…Ø§Ù„ÙŠØ²ÙŠØ§' },
+    { code: 'SG', flag: 'ðŸ‡¸ðŸ‡¬', en: 'Singapore', ar: 'Ø³Ù†ØºØ§ÙÙˆØ±Ø©' },
+    { code: 'TH', flag: 'ðŸ‡¹ðŸ‡­', en: 'Thailand', ar: 'ØªØ§ÙŠÙ„Ø§Ù†Ø¯' },
+    { code: 'PH', flag: 'ðŸ‡µðŸ‡­', en: 'Philippines', ar: 'Ø§Ù„ÙÙ„Ø¨ÙŠÙ†' },
+    { code: 'VN', flag: 'ðŸ‡»ðŸ‡³', en: 'Vietnam', ar: 'ÙÙŠØªÙ†Ø§Ù…' },
+    { code: 'BR', flag: 'ðŸ‡§ðŸ‡·', en: 'Brazil', ar: 'Ø§Ù„Ø¨Ø±Ø§Ø²ÙŠÙ„' },
+    { code: 'MX', flag: 'ðŸ‡²ðŸ‡½', en: 'Mexico', ar: 'Ø§Ù„Ù…ÙƒØ³ÙŠÙƒ' },
+    { code: 'AR', flag: 'ðŸ‡¦ðŸ‡·', en: 'Argentina', ar: 'Ø§Ù„Ø£Ø±Ø¬Ù†ØªÙŠÙ†' },
+    { code: 'CO', flag: 'ðŸ‡¨ðŸ‡´', en: 'Colombia', ar: 'ÙƒÙˆÙ„ÙˆÙ…Ø¨ÙŠØ§' },
+    { code: 'CL', flag: 'ðŸ‡¨ðŸ‡±', en: 'Chile', ar: 'ØªØ´ÙŠÙ„ÙŠ' },
+    { code: 'ZA', flag: 'ðŸ‡¿ðŸ‡¦', en: 'South Africa', ar: 'Ø¬Ù†ÙˆØ¨ Ø£ÙØ±ÙŠÙ‚ÙŠØ§' },
+    { code: 'NG', flag: 'ðŸ‡³ðŸ‡¬', en: 'Nigeria', ar: 'Ù†ÙŠØ¬ÙŠØ±ÙŠØ§' },
+    { code: 'KE', flag: 'ðŸ‡°ðŸ‡ª', en: 'Kenya', ar: 'ÙƒÙŠÙ†ÙŠØ§' },
+    { code: 'GH', flag: 'ðŸ‡¬ðŸ‡­', en: 'Ghana', ar: 'ØºØ§Ù†Ø§' },
+    { code: 'ET', flag: 'ðŸ‡ªðŸ‡¹', en: 'Ethiopia', ar: 'Ø¥Ø«ÙŠÙˆØ¨ÙŠØ§' },
+    { code: 'TZ', flag: 'ðŸ‡¹ðŸ‡¿', en: 'Tanzania', ar: 'ØªÙ†Ø²Ø§Ù†ÙŠØ§' },
+    { code: 'IL', flag: 'ðŸ‡®ðŸ‡±', en: 'Israel', ar: 'Ø¥Ø³Ø±Ø§Ø¦ÙŠÙ„' },
+    { code: 'IR', flag: 'ðŸ‡®ðŸ‡·', en: 'Iran', ar: 'Ø¥ÙŠØ±Ø§Ù†' },
+    { code: 'AF', flag: 'ðŸ‡¦ðŸ‡«', en: 'Afghanistan', ar: 'Ø£ÙØºØ§Ù†Ø³ØªØ§Ù†' },
+    { code: 'NZ', flag: 'ðŸ‡³ðŸ‡¿', en: 'New Zealand', ar: 'Ù†ÙŠÙˆØ²ÙŠÙ„Ù†Ø¯Ø§' },
+    { code: 'UA', flag: 'ðŸ‡ºðŸ‡¦', en: 'Ukraine', ar: 'Ø£ÙˆÙƒØ±Ø§Ù†ÙŠØ§' },
+    { code: 'HR', flag: 'ðŸ‡­ðŸ‡·', en: 'Croatia', ar: 'ÙƒØ±ÙˆØ§ØªÙŠØ§' },
+    { code: 'RS', flag: 'ðŸ‡·ðŸ‡¸', en: 'Serbia', ar: 'ØµØ±Ø¨ÙŠØ§' },
+    { code: 'BG', flag: 'ðŸ‡§ðŸ‡¬', en: 'Bulgaria', ar: 'Ø¨Ù„ØºØ§Ø±ÙŠØ§' },
+    { code: 'SK', flag: 'ðŸ‡¸ðŸ‡°', en: 'Slovakia', ar: 'Ø³Ù„ÙˆÙØ§ÙƒÙŠØ§' },
+    { code: 'LT', flag: 'ðŸ‡±ðŸ‡¹', en: 'Lithuania', ar: 'Ù„ÙŠØªÙˆØ§Ù†ÙŠØ§' },
+    { code: 'LV', flag: 'ðŸ‡±ðŸ‡»', en: 'Latvia', ar: 'Ù„Ø§ØªÙÙŠØ§' },
+    { code: 'EE', flag: 'ðŸ‡ªðŸ‡ª', en: 'Estonia', ar: 'Ø¥Ø³ØªÙˆÙ†ÙŠØ§' },
+    { code: 'CY', flag: 'ðŸ‡¨ðŸ‡¾', en: 'Cyprus', ar: 'Ù‚Ø¨Ø±Øµ' },
+    { code: 'MT', flag: 'ðŸ‡²ðŸ‡¹', en: 'Malta', ar: 'Ù…Ø§Ù„Ø·Ø§' },
+    { code: 'LU', flag: 'ðŸ‡±ðŸ‡º', en: 'Luxembourg', ar: 'Ù„ÙˆÙƒØ³Ù…Ø¨ÙˆØ±Øº' },
+    { code: 'IS', flag: 'ðŸ‡®ðŸ‡¸', en: 'Iceland', ar: 'Ø¢ÙŠØ³Ù„Ù†Ø¯Ø§' },
+    { code: 'PE', flag: 'ðŸ‡µðŸ‡ª', en: 'Peru', ar: 'Ø¨ÙŠØ±Ùˆ' },
+    { code: 'VE', flag: 'ðŸ‡»ðŸ‡ª', en: 'Venezuela', ar: 'ÙÙ†Ø²ÙˆÙŠÙ„Ø§' },
+    { code: 'EC', flag: 'ðŸ‡ªðŸ‡¨', en: 'Ecuador', ar: 'Ø§Ù„Ø¥ÙƒÙˆØ§Ø¯ÙˆØ±' },
+    { code: 'UY', flag: 'ðŸ‡ºðŸ‡¾', en: 'Uruguay', ar: 'Ø£ÙˆØ±ÙˆØºÙˆØ§ÙŠ' },
+    { code: 'PY', flag: 'ðŸ‡µðŸ‡¾', en: 'Paraguay', ar: 'Ø¨Ø§Ø±Ø§ØºÙˆØ§ÙŠ' },
+    { code: 'BO', flag: 'ðŸ‡§ðŸ‡´', en: 'Bolivia', ar: 'Ø¨ÙˆÙ„ÙŠÙÙŠØ§' },
+    { code: 'CR', flag: 'ðŸ‡¨ðŸ‡·', en: 'Costa Rica', ar: 'ÙƒÙˆØ³ØªØ§Ø±ÙŠÙƒØ§' },
+    { code: 'PA', flag: 'ðŸ‡µðŸ‡¦', en: 'Panama', ar: 'Ø¨Ù†Ù…Ø§' },
+    { code: 'CU', flag: 'ðŸ‡¨ðŸ‡º', en: 'Cuba', ar: 'ÙƒÙˆØ¨Ø§' },
+    { code: 'DO', flag: 'ðŸ‡©ðŸ‡´', en: 'Dominican Republic', ar: 'Ø¬Ù…Ù‡ÙˆØ±ÙŠØ© Ø§Ù„Ø¯ÙˆÙ…ÙŠÙ†ÙŠÙƒØ§Ù†' },
+    { code: 'GT', flag: 'ðŸ‡¬ðŸ‡¹', en: 'Guatemala', ar: 'ØºÙˆØ§ØªÙŠÙ…Ø§Ù„Ø§' },
+    { code: 'HN', flag: 'ðŸ‡­ðŸ‡³', en: 'Honduras', ar: 'Ù‡Ù†Ø¯ÙˆØ±Ø§Ø³' },
+    { code: 'JM', flag: 'ðŸ‡¯ðŸ‡²', en: 'Jamaica', ar: 'Ø¬Ø§Ù…Ø§ÙŠÙƒØ§' },
+    { code: 'TT', flag: 'ðŸ‡¹ðŸ‡¹', en: 'Trinidad and Tobago', ar: 'ØªØ±ÙŠÙ†ÙŠØ¯Ø§Ø¯ ÙˆØªÙˆØ¨Ø§ØºÙˆ' },
+    { code: 'HT', flag: 'ðŸ‡­ðŸ‡¹', en: 'Haiti', ar: 'Ù‡Ø§ÙŠØªÙŠ' },
+    { code: 'SV', flag: 'ðŸ‡¸ðŸ‡»', en: 'El Salvador', ar: 'Ø§Ù„Ø³Ù„ÙØ§Ø¯ÙˆØ±' },
+    { code: 'NI', flag: 'ðŸ‡³ðŸ‡®', en: 'Nicaragua', ar: 'Ù†ÙŠÙƒØ§Ø±Ø§ØºÙˆØ§' },
+    { code: 'LK', flag: 'ðŸ‡±ðŸ‡°', en: 'Sri Lanka', ar: 'Ø³Ø±ÙŠÙ„Ø§Ù†ÙƒØ§' },
+    { code: 'MM', flag: 'ðŸ‡²ðŸ‡²', en: 'Myanmar', ar: 'Ù…ÙŠØ§Ù†Ù…Ø§Ø±' },
+    { code: 'KH', flag: 'ðŸ‡°ðŸ‡­', en: 'Cambodia', ar: 'ÙƒÙ…Ø¨ÙˆØ¯ÙŠØ§' },
+    { code: 'NP', flag: 'ðŸ‡³ðŸ‡µ', en: 'Nepal', ar: 'Ù†ÙŠØ¨Ø§Ù„' },
+    { code: 'UZ', flag: 'ðŸ‡ºðŸ‡¿', en: 'Uzbekistan', ar: 'Ø£ÙˆØ²Ø¨ÙƒØ³ØªØ§Ù†' },
+    { code: 'KZ', flag: 'ðŸ‡°ðŸ‡¿', en: 'Kazakhstan', ar: 'ÙƒØ§Ø²Ø§Ø®Ø³ØªØ§Ù†' },
+    { code: 'GE', flag: 'ðŸ‡¬ðŸ‡ª', en: 'Georgia', ar: 'Ø¬ÙˆØ±Ø¬ÙŠØ§' },
+    { code: 'AZ', flag: 'ðŸ‡¦ðŸ‡¿', en: 'Azerbaijan', ar: 'Ø£Ø°Ø±Ø¨ÙŠØ¬Ø§Ù†' },
+    { code: 'AM', flag: 'ðŸ‡¦ðŸ‡²', en: 'Armenia', ar: 'Ø£Ø±Ù…ÙŠÙ†ÙŠØ§' },
+    { code: 'UG', flag: 'ðŸ‡ºðŸ‡¬', en: 'Uganda', ar: 'Ø£ÙˆØºÙ†Ø¯Ø§' },
+    { code: 'CM', flag: 'ðŸ‡¨ðŸ‡²', en: 'Cameroon', ar: 'Ø§Ù„ÙƒØ§Ù…ÙŠØ±ÙˆÙ†' },
+    { code: 'SN', flag: 'ðŸ‡¸ðŸ‡³', en: 'Senegal', ar: 'Ø§Ù„Ø³Ù†ØºØ§Ù„' },
+    { code: 'CI', flag: 'ðŸ‡¨ðŸ‡®', en: 'Ivory Coast', ar: 'Ø³Ø§Ø­Ù„ Ø§Ù„Ø¹Ø§Ø¬' },
+    { code: 'MG', flag: 'ðŸ‡²ðŸ‡¬', en: 'Madagascar', ar: 'Ù…Ø¯ØºØ´Ù‚Ø±' },
+    { code: 'MZ', flag: 'ðŸ‡²ðŸ‡¿', en: 'Mozambique', ar: 'Ù…ÙˆØ²Ù…Ø¨ÙŠÙ‚' },
+    { code: 'AO', flag: 'ðŸ‡¦ðŸ‡´', en: 'Angola', ar: 'Ø£Ù†ØºÙˆÙ„Ø§' },
+    { code: 'TW', flag: 'ðŸ‡¹ðŸ‡¼', en: 'Taiwan', ar: 'ØªØ§ÙŠÙˆØ§Ù†' },
+    { code: 'HK', flag: 'ðŸ‡­ðŸ‡°', en: 'Hong Kong', ar: 'Ù‡ÙˆÙ†Øº ÙƒÙˆÙ†Øº' },
+    { code: 'MO', flag: 'ðŸ‡²ðŸ‡´', en: 'Macau', ar: 'Ù…Ø§ÙƒØ§Ùˆ' },
+    { code: 'BN', flag: 'ðŸ‡§ðŸ‡³', en: 'Brunei', ar: 'Ø¨Ø±ÙˆÙ†Ø§ÙŠ' },
 ];
 
 const LANGUAGES = [
-    { code: 'en', en: 'English', ar: 'الإنجليزية' },
-    { code: 'ar', en: 'Arabic', ar: 'العربية' },
-    { code: 'fr', en: 'French', ar: 'الفرنسية' },
-    { code: 'de', en: 'German', ar: 'الألمانية' },
-    { code: 'es', en: 'Spanish', ar: 'الإسبانية' },
-    { code: 'pt', en: 'Portuguese', ar: 'البرتغالية' },
-    { code: 'ru', en: 'Russian', ar: 'الروسية' },
-    { code: 'zh', en: 'Chinese', ar: 'الصينية' },
-    { code: 'ja', en: 'Japanese', ar: 'اليابانية' },
-    { code: 'ko', en: 'Korean', ar: 'الكورية' },
-    { code: 'hi', en: 'Hindi', ar: 'الهندية' },
-    { code: 'tr', en: 'Turkish', ar: 'التركية' },
-    { code: 'id', en: 'Indonesian', ar: 'الإندونيسية' },
-    { code: 'ur', en: 'Urdu', ar: 'الأردية' },
+    { code: 'en', en: 'English', ar: 'Ø§Ù„Ø¥Ù†Ø¬Ù„ÙŠØ²ÙŠØ©' },
+    { code: 'ar', en: 'Arabic', ar: 'Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©' },
+    { code: 'fr', en: 'French', ar: 'Ø§Ù„ÙØ±Ù†Ø³ÙŠØ©' },
+    { code: 'de', en: 'German', ar: 'Ø§Ù„Ø£Ù„Ù…Ø§Ù†ÙŠØ©' },
+    { code: 'es', en: 'Spanish', ar: 'Ø§Ù„Ø¥Ø³Ø¨Ø§Ù†ÙŠØ©' },
+    { code: 'pt', en: 'Portuguese', ar: 'Ø§Ù„Ø¨Ø±ØªØºØ§Ù„ÙŠØ©' },
+    { code: 'ru', en: 'Russian', ar: 'Ø§Ù„Ø±ÙˆØ³ÙŠØ©' },
+    { code: 'zh', en: 'Chinese', ar: 'Ø§Ù„ØµÙŠÙ†ÙŠØ©' },
+    { code: 'ja', en: 'Japanese', ar: 'Ø§Ù„ÙŠØ§Ø¨Ø§Ù†ÙŠØ©' },
+    { code: 'ko', en: 'Korean', ar: 'Ø§Ù„ÙƒÙˆØ±ÙŠØ©' },
+    { code: 'hi', en: 'Hindi', ar: 'Ø§Ù„Ù‡Ù†Ø¯ÙŠØ©' },
+    { code: 'tr', en: 'Turkish', ar: 'Ø§Ù„ØªØ±ÙƒÙŠØ©' },
+    { code: 'id', en: 'Indonesian', ar: 'Ø§Ù„Ø¥Ù†Ø¯ÙˆÙ†ÙŠØ³ÙŠØ©' },
+    { code: 'ur', en: 'Urdu', ar: 'Ø§Ù„Ø£Ø±Ø¯ÙŠØ©' },
 ];
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SEARCHABLE MULTI-SELECT DROPDOWN COMPONENT
-// ═══════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MEMOIZED MULTI-SELECT DROPDOWN COMPONENT
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     items,
     selected,
@@ -355,9 +363,9 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     );
 });
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN NEWS GENERATOR
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 export default function NewsGenerator({ defaultSourceType }: { defaultSourceType?: string }) {
     const locale = useLocale();
     const t = useTranslations('NewsGenerator');
@@ -385,11 +393,11 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const sourceTypes = useMemo(() => [
-        { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
-        { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release بيان صحفي' },
-        { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog مدونة' },
-        { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
-        { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
+        { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News Ø£Ø®Ø¨Ø§Ø± Ø¹Ø¨Ø± Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª' },
+        { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release Ø¨ÙŠØ§Ù† ØµØ­ÙÙŠ' },
+        { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog Ù…Ø¯ÙˆÙ†Ø©' },
+        { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„ØªÙˆØ§ØµÙ„ Ø§Ù„Ø§Ø¬ØªÙ…Ø§Ø¹ÙŠ' },
+        { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print ØµØ­Ø§ÙØ© Ù…Ø·Ø¨ÙˆØ¹Ø©' },
     ], [t]);
     const [result, setResult] = useState<{ count: number; skipped: number; feeds: number } | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
@@ -407,7 +415,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // Convert HTML date (YYYY-MM-DD) → DD/MM/YYYY for backend
+    // Convert HTML date (YYYY-MM-DD) â†’ DD/MM/YYYY for backend
     const formatDateForBackend = useCallback((htmlDate: string): string => {
         if (!htmlDate) return '';
         const [y, m, d] = htmlDate.split('-');
@@ -451,7 +459,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         if (!validate()) return;
         // Safety: never invoke an authenticated action when Convex hasn't received the token yet
         if (!isAuthenticated) {
-            setErrorMsg(t('not_authenticated') || (isAr ? 'يجب تسجيل الدخول أولاً' : 'You must be signed in to run this action.'));
+            setErrorMsg(t('not_authenticated') || (isAr ? 'ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ø§Ù‹' : 'You must be signed in to run this action.'));
             return;
         }
         setLoading(true);

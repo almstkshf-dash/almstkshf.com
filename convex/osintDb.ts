@@ -1,8 +1,16 @@
-// No "use node" — mutations and queries run on the default Convex runtime.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
+// No "use node" â€” mutations and queries run on the default Convex runtime.
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 
-// ─── Save a new OSINT lookup result ──────────────────────────────────
+// â”€â”€â”€ Save a new OSINT lookup result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const saveOsintResult = mutation({
     args: {
         type: v.union(
@@ -33,7 +41,7 @@ export const saveOsintResult = mutation({
     },
 });
 
-// ─── Fetch recent OSINT results for the current user ─────────────────
+// â”€â”€â”€ Fetch recent OSINT results for the current user â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const getOsintResults = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
@@ -46,7 +54,7 @@ export const getOsintResults = query({
     },
 });
 
-// ─── Delete a single OSINT result ────────────────────────────────────
+// â”€â”€â”€ Delete a single OSINT result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const deleteOsintResult = mutation({
     args: { id: v.id("osint_results") },
     handler: async (ctx, args) => {

@@ -1,8 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { NextResponse } from 'next/server';
 import { parseFeed } from '@/lib/rss-engine';
 import { FeedResponse } from '@/types/rss';
 
-// Pin to Node.js runtime — rss-parser requires xml2js which is not Edge-compatible
+// Pin to Node.js runtime â€” rss-parser requires xml2js which is not Edge-compatible
 export const runtime = 'nodejs';
 
 /**
@@ -50,7 +58,7 @@ export async function GET(request: Request) {
     }, { status: 400 });
   }
 
-  // Security check: SSRF guard — rejects private IPs, loopback, and non-HTTPS URLs
+  // Security check: SSRF guard â€” rejects private IPs, loopback, and non-HTTPS URLs
   if (!isSafePublicUrl(feedUrl)) {
     return NextResponse.json<FeedResponse>({
       success: false,

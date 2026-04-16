@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import resources from '../../../data/osintResources.json';
@@ -21,7 +29,7 @@ import { ReportGenerator } from '@/lib/report-generator';
 import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
 import { AlertCircle, ArrowRight, ShieldCheck, Database, Server, Smartphone, Info, FolderPlus } from 'lucide-react';
 
-// ─── Static directory data ─────────────────────────────────────────────
+// â”€â”€â”€ Static directory data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CATEGORIES = [
   'social', 'people', 'dating', 'phone', 'public records',
   'geolocation', 'maps', 'business', 'search', 'directory',
@@ -47,7 +55,7 @@ type Resource = {
   notes?: string | null;
 };
 
-// ─── Lookup type definition ─────────────────────────────────────────────
+// â”€â”€â”€ Lookup type definition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist';
 
 interface HistoryItem {
@@ -60,7 +68,7 @@ interface HistoryItem {
   createdAt: number;
 }
 
-// ─── Result Components ──────────────────────────────────────────────────
+// â”€â”€â”€ Result Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const StatusBadge = ({ label, value, type = 'default' }: { label: string; value: string | boolean; type?: 'default' | 'success' | 'warning' | 'error' | 'info' }) => {
   const isTrue = value === true || value === 'true' || value === 'yes';
   const isFalse = value === false || value === 'false' || value === 'no';
@@ -99,13 +107,13 @@ const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any
   </div>
 );
 
-// ─── Social Platform Presence Grid (Holehe-style results display) ─────────
+// â”€â”€â”€ Social Platform Presence Grid (Holehe-style results display) â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PLATFORM_ICONS: Record<string, string> = {
-  'Twitter/X': '𝕏', 'Spotify': '🎵', 'Duolingo': '🦉', 'WordPress': '📝',
-  'ProtonMail': '🔒', 'Foursquare': '📍', 'Flickr': '📷', 'Airbnb': '🏠',
-  'Snapchat': '👻', 'Pinterest': '📌', 'Zoom': '📹', 'Instagram': '📸',
-  'GitHub': '🐙', 'Adobe': '🎨', 'Last.fm': '🎧', 'Disqus': '💬',
-  'MyAnimeList': '🎌', 'Quora': '❓',
+  'Twitter/X': 'ð•', 'Spotify': 'ðŸŽµ', 'Duolingo': 'ðŸ¦‰', 'WordPress': 'ðŸ“',
+  'ProtonMail': 'ðŸ”’', 'Foursquare': 'ðŸ“', 'Flickr': 'ðŸ“·', 'Airbnb': 'ðŸ ',
+  'Snapchat': 'ðŸ‘»', 'Pinterest': 'ðŸ“Œ', 'Zoom': 'ðŸ“¹', 'Instagram': 'ðŸ“¸',
+  'GitHub': 'ðŸ™', 'Adobe': 'ðŸŽ¨', 'Last.fm': 'ðŸŽ§', 'Disqus': 'ðŸ’¬',
+  'MyAnimeList': 'ðŸŽŒ', 'Quora': 'â“',
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -135,8 +143,8 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
       {/* Summary Bar */}
       <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
         <div>
-          <p className="text-sm font-semibold text-foreground">🔍 Social Platform Presence</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Holehe-style account enumeration · {totalChecked} platforms checked</p>
+          <p className="text-sm font-semibold text-foreground">ðŸ” Social Platform Presence</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Holehe-style account enumeration Â· {totalChecked} platforms checked</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-center">
@@ -194,7 +202,7 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
             }`} />
             {/* Icon */}
             <span className="text-2xl" aria-hidden="true">
-              {PLATFORM_ICONS[p.platform] || '🌐'}
+              {PLATFORM_ICONS[p.platform] || 'ðŸŒ'}
             </span>
             {/* Name */}
             <span className="text-xs font-medium text-center text-foreground leading-tight">{p.platform}</span>
@@ -227,7 +235,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
           <>
             <StatusBadge
               label="Platforms Found"
-              value={`${data.socialPresence?.totalFound ?? '—'} / ${data.socialPresence?.totalChecked ?? 18}`}
+              value={`${data.socialPresence?.totalFound ?? 'â€”'} / ${data.socialPresence?.totalChecked ?? 18}`}
               type={data.socialPresence?.totalFound > 0 ? 'warning' : 'success'}
             />
             <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
@@ -305,7 +313,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
             )}
             {data.socialPresenceNote && (
               <div className="text-xs text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-lg p-3">
-                ⚠️ {data.socialPresenceNote}
+                âš ï¸ {data.socialPresenceNote}
               </div>
             )}
             {/* Email Technical Breakdown */}
@@ -530,7 +538,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
   );
 };
 
-// ─── Main component ─────────────────────────────────────────────────────
+// â”€â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function OsintTab() {
   const { isAuthenticated } = useConvexAuth();
   const t = useTranslations('OsintTab');
@@ -559,7 +567,7 @@ export default function OsintTab() {
       { type: 'watchlist', label: t('panels.watchlist.title'), icon: <Shield className="w-4 h-4" />, placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
     ];
 
-  // ── Hydration guard ──
+  // â”€â”€ Hydration guard â”€â”€
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -567,7 +575,7 @@ export default function OsintTab() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // ── Active lookup state ──
+  // â”€â”€ Active lookup state â”€â”€
   // Use a state synchronized with URL for persistence
   const [activeType, setActiveType] = useState<LookupType>(
     (searchParams.get('osint_tab') as LookupType) || 'watchlist'
@@ -613,7 +621,7 @@ export default function OsintTab() {
     }
   };
 
-  // ── Convex actions (Node.js runtime — osint.ts) ──
+  // â”€â”€ Convex actions (Node.js runtime â€” osint.ts) â”€â”€
   const lookupEmail = useAction(api.osint.lookupEmail);
   const lookupDomain = useAction(api.osint.lookupDomain);
   const lookupIp = useAction(api.osint.lookupIp);
@@ -626,14 +634,14 @@ export default function OsintTab() {
   const lookupGleif = useAction(api.osint.lookupGleif);
   const lookupWatchlist = useAction(api.osint.lookupWatchlist);
   const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
-  // ── DB operations (default runtime — osintDb.ts) ──
+  // â”€â”€ DB operations (default runtime â€” osintDb.ts) â”€â”€
   const deleteResult = useMutation(api.osintDb.deleteOsintResult);
   const history = useQuery(
     api.osintDb.getOsintResults,
     isAuthenticated ? { limit: 20 } : 'skip'
   ) as HistoryItem[] | undefined;
 
-  // ── Resource directory state ──
+  // â”€â”€ Resource directory state â”€â”€
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>('all');
   const [labelFilter, setLabelFilter] = useState<string>('all');
@@ -684,7 +692,7 @@ export default function OsintTab() {
     }
   };
 
-  // ── Run lookup ──
+  // â”€â”€ Run lookup â”€â”€
   const handleLookup = async () => {
     if (!isAuthenticated) { setError(tDashboard('not_authenticated')); return; }
     if (!isAdmin) { setError(t('admin_only')); return; }
@@ -726,7 +734,7 @@ export default function OsintTab() {
     }
   };
 
-  // ── Resource filtering for the active panel ──
+  // â”€â”€ Resource filtering for the active panel â”€â”€
   const suggestedTools = useMemo(() => {
     let cat: string[] = [];
     switch (activeType) {
@@ -750,7 +758,7 @@ export default function OsintTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      {/* ══ LEFT COLUMN: INVESTIGATION ENGINE ═══════════════════════ */}
+      {/* â•â• LEFT COLUMN: INVESTIGATION ENGINE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <div className="lg:col-span-8 space-y-6">
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex items-center justify-between">
@@ -975,7 +983,7 @@ export default function OsintTab() {
                       <div className="flex flex-col">
                         <span className="font-bold text-foreground">{item.query}</span>
                         <span className="text-[10px] font-black text-foreground/70 uppercase opacity-80 tracking-tighter" suppressHydrationWarning>
-                          {new Date(item.createdAt).toLocaleDateString()} • {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(item.createdAt).toLocaleDateString()} â€¢ {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     </div>
@@ -1021,7 +1029,7 @@ export default function OsintTab() {
         )}
       </div>
 
-      {/* ══ RIGHT COLUMN: EXTERNAL TOOLS ═══════════════════════════ */}
+      {/* â•â• RIGHT COLUMN: EXTERNAL TOOLS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <div className="lg:col-span-4 space-y-6">
         {/* Suggested External Tools */}
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
@@ -1072,7 +1080,7 @@ export default function OsintTab() {
         </div>
       </div>
 
-      {/* ══ FULL DIRECTORY MODAL (reusing directory UI) ════════════ */}
+      {/* â•â• FULL DIRECTORY MODAL (reusing directory UI) â•â•â•â•â•â•â•â•â•â•â•â• */}
       {dirOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"

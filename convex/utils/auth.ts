@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { Auth } from "convex/server";
 import { ConvexError } from "convex/values";
 
@@ -51,7 +59,7 @@ export async function requireAdmin(auth: Auth) {
             `Not authorized. ` +
             `subject="${identity.subject}" ` +
             `detectedRole="${detectedRole ?? "NONE"}" ` +
-            `(role must be "admin", "owner", or "superadmin" — ` +
+            `(role must be "admin", "owner", or "superadmin" â€” ` +
             `set this in your Clerk JWT template under publicMetadata.role)`
         );
     }

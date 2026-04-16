@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import Parser from 'rss-parser';
 import { FeedItem } from '@/types/rss';
 
@@ -33,7 +41,7 @@ const parser: any = new Parser({
   },
   // Disable the built-in fetch so we can use our own (with UA header + timeout)
   requestOptions: {
-    // rss-parser passes these to Node's http.request — but we bypass parseURL entirely
+    // rss-parser passes these to Node's http.request â€” but we bypass parseURL entirely
     rejectUnauthorized: false,
   },
 });
@@ -56,7 +64,7 @@ export async function parseFeed(
   url: string,
   sourceName: string = 'RSS Feed'
 ): Promise<FeedItem[]> {
-  // ── 1. FETCH raw XML with spoofed headers + timeout ──────────────────────
+  // â”€â”€ 1. FETCH raw XML with spoofed headers + timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -76,7 +84,7 @@ export async function parseFeed(
       // Next.js data cache: cache the raw XML itself for 900s (15 min)
       // stale-while-revalidate lets a background re-fetch happen without
       // blocking in-flight requests.
-      // @ts-ignore — Next.js extends the standard fetch API
+      // @ts-ignore â€” Next.js extends the standard fetch API
       next: { revalidate: 900 },
     });
 
@@ -98,7 +106,7 @@ export async function parseFeed(
     clearTimeout(timeoutId);
   }
 
-  // ── 2. PARSE the raw XML string ───────────────────────────────────────────
+  // â”€â”€ 2. PARSE the raw XML string â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let feed: any;
   try {
     feed = await parser.parseString(rawXml);
@@ -107,7 +115,7 @@ export async function parseFeed(
     throw new Error(`Failed to parse RSS XML from ${url}: ${err.message}`);
   }
 
-  // ── 3. NORMALISE into FeedItem[] ──────────────────────────────────────────
+  // â”€â”€ 3. NORMALISE into FeedItem[] â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const resolvedSource = sourceName || feed.title || new URL(url).hostname;
 
   return (feed.items ?? []).map((item: any): FeedItem => {

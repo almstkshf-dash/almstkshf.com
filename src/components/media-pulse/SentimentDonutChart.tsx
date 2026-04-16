@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use client";
 
 import { useTranslations } from "next-intl";
@@ -33,7 +41,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
     useEffect(() => {
         setMounted(true);
         // Status tokens are stored as bare HSL components (e.g. "158 64% 52%")
-        // so we must wrap them with hsl(). Popover/border are hex — use directly.
+        // so we must wrap them with hsl(). Popover/border are hex â€” use directly.
         const successHSL = getCSSVar("--status-success");
         const warningHSL = getCSSVar("--status-warning");
         const errorHSL = getCSSVar("--status-error");

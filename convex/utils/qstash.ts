@@ -1,21 +1,29 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 "use node";
 import { Client } from "@upstash/qstash";
 import { ActionCtx } from "../_generated/server";
 import { resolveApiKey } from "./keys";
 
 /**
- * ═══════════════════════════════════════════════════════════════════
+ * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * QSTASH UTILITY
  * 
  * Provides a configured QStash client for Convex Actions.
  * Uses resolveApiKey to support User-level, System-level and Env keys.
- * ═══════════════════════════════════════════════════════════════════
+ * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  */
 
 export async function getQStashClient(ctx: ActionCtx) {
   const token = await resolveApiKey(ctx, "UPSTASH_QSTASH_TOKEN", "qstash");
   if (!token) {
-    console.warn("⚠️ QStash: API Token not configured.");
+    console.warn("âš ï¸ QStash: API Token not configured.");
     return null;
   }
   return new Client({ token });
@@ -43,10 +51,10 @@ export async function publishToQStash(
       delay: options.delay,
       headers: options.headers,
     });
-    console.log(`🚀 QStash: Published to ${options.url} (MsgID: ${res.messageId})`);
+    console.log(`ðŸš€ QStash: Published to ${options.url} (MsgID: ${res.messageId})`);
     return res;
   } catch (error) {
-    console.error("❌ QStash: Publish failed:", error);
+    console.error("âŒ QStash: Publish failed:", error);
     throw error;
   }
 }

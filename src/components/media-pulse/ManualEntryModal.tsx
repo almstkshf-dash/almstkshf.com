@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -164,9 +172,9 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
     };
 
     return (
-        /* Overlay — no ARIA role, purely visual */
+        /* Overlay â€” no ARIA role, purely visual */
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            {/* Dialog panel — role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
+            {/* Dialog panel â€” role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
             <div
                 role="dialog"
                 aria-modal="true"
