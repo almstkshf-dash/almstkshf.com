@@ -864,7 +864,10 @@
       "More": "More",
       "volume_heatmap_title": "News Cycle Heatmap",
       "volume_heatmap_desc": "Days of the week vs. Hour of the day (UAE Time)",
+      "heatmap_cell_label": "{count} articles on {day} at {time}",
       "at": "at",
+      "am": "AM",
+      "pm": "PM",
       "days": {
         "Sun": "Sun",
         "Mon": "Mon",
@@ -1250,10 +1253,25 @@
       "neutral": "Neutral",
       "negative": "Negative"
     },
+    "SentimentTracker": {
+      "title": "Live Pulse: Public Sentiment",
+      "live": "Live Updates",
+      "awaiting_data": "Awaiting Data",
+      "no_data_message": "Run a monitoring report to see live sentiment analysis.",
+      "source_analysis": "Source Analysis",
+      "articles": "articles",
+      "shift": "Shift",
+      "reach": "Reach",
+      "ai_recommendation": "AI Recommendation",
+      "ai_rec_high_negative": "High negative sentiment detected across sources. Recommend activating crisis management protocols and preparing official statements immediately.",
+      "ai_rec_moderate_negative": "Moderate negative coverage detected in local news. Consider proactive outreach and monitoring the trend closely before it intensifies.",
+      "ai_rec_positive_trend": "Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.",
+      "ai_rec_default": "Coverage sentiment is balanced. Continue current media strategy and monitor for shifts."
+    },
     "success": "Success",
     "error": "Dashboard Data Error",
     "media_pulse_analytics_title": "Media Pulse Analytics",
-    "total_articles_detected": "{count} total articles detected in current scope",
+    "total_articles_detected": "total articles detected in current scope",
     "reset_filters": "Reset All Filters",
     "investigation_engine": "Investigation Engine"
   },
@@ -2085,5 +2103,63 @@
     "all": "All",
     "first": "First",
     "opinion": "Opinion"
+  },
+  "MediaPulseDetail": {
+    "dashboard_grid": {
+      "live_stream": "Live Stream",
+      "real_time": "Real-Time",
+      "global": "Global",
+      "keywords": "Keywords",
+      "edit_keyword_hint": "Edit keyword",
+      "reputation_safeguard": "Reputation Safeguard",
+      "reputation_desc": "AI-powered risk scoring across all monitored sources.",
+      "total_ave": "Total AVE",
+      "articles_count": "articles",
+      "risk": "Risk",
+      "top_risk_indicators": "Top Risk Indicators",
+      "emotional_pulse": "Emotional Pulse",
+      "top_emotions": "Top Emotions",
+      "articles_trend": "Articles Trend",
+      "scope": "Monitoring Scope",
+      "scope_desc": "Our engine scans thousands of global sources every hour to surface insights that matter to your brand.",
+      "tone_distribution": "Tone Distribution",
+      "new": "New",
+      "automated_alerts": "Automated Alerts",
+      "alerts_desc": "No alerts triggered in the current monitoring window.",
+      "volume_heatmap_title": "Volume Heatmap",
+      "volume_heatmap_desc": "Article volume by day and hour",
+      "nss_index": "NSS Index",
+      "sentiment_distribution_label": "Sentiment distribution: {positive}% positive, {neutral}% neutral, {negative}% negative",
+      "ToneLabels": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      },
+      "risk_factors": {
+        "high_negative_volume": "High Negative Volume",
+        "crisis_keywords": "Crisis Keywords",
+        "rapid_spread": "Rapid Spread",
+        "low_source_diversity": "Low Source Diversity",
+        "sentiment_drop": "Sentiment Drop"
+      },
+      "days": {
+        "Sun": "Sun",
+        "Mon": "Mon",
+        "Tue": "Tue",
+        "Wed": "Wed",
+        "Thu": "Thu",
+        "Fri": "Fri",
+        "Sat": "Sat"
+      },
+      "am": "AM",
+      "pm": "PM",
+      "at": "at",
+      "heatmap_cell_label": "Day {day}, Hour {hour}: {count} articles",
+      "Less": "Less",
+      "More": "More"
+    },
+    "sentiment_donut": {
+      "title": "Sentiment Breakdown"
+    }
   }
 }

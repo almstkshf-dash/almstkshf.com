@@ -47,11 +47,13 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
         return map;
     }, [data]);
 
-    // Helper to format hour beautifully
+    // Helper to format hour beautifully with localization
     const formatHour = (hour: number) => {
-        if (hour === 0) return "12 AM";
-        if (hour === 12) return "12 PM";
-        return hour > 12 ? `${hour - 12} PM` : `${hour} AM`;
+        const am = t("am");
+        const pm = t("pm");
+        if (hour === 0) return `12 ${am}`;
+        if (hour === 12) return `12 ${pm}`;
+        return hour > 12 ? `${hour - 12} ${pm}` : `${hour} ${am}`;
     };
 
     return (
@@ -123,8 +125,7 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                                             aria-label={t("heatmap_cell_label", {
                                                 day: DAYS[dayIndex],
                                                 time: formatHour(hour),
-                                                count: val,
-                                                defaultValue: `${val} articles on ${DAYS[dayIndex]} at ${formatHour(hour)}`
+                                                count: val
                                             })}
                                         >
                                             <div

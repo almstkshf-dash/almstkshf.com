@@ -446,7 +446,7 @@ export default function DashboardPage() {
                                     </h2>
                                     <p className="text-sm text-foreground/70 dark:text-slate-400 font-medium flex items-center gap-2">
                                         <span className="text-blue-800 dark:text-blue-300 font-black">{totalArticles}</span>
-                                        {t('total_articles_detected') || 'total articles detected in current scope'}
+                                        {t('total_articles_detected')}
                                     </p>
                                 </div>
 
