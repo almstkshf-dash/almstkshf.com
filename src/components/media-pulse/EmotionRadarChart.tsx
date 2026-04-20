@@ -18,6 +18,8 @@ import {
     ResponsiveContainer,
 } from "recharts";
 
+import { ChartSkeleton } from "@/components/ui/Skeleton";
+
 interface EmotionRadarChartProps {
     data: {
         subject: string;
@@ -39,11 +41,7 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
         subject: t(item.subject.toLowerCase()) || item.subject,
     })), [data, t]);
 
-    if (!mounted) return (
-        <div className="w-full h-[300px] flex items-center justify-center">
-            <div className="w-32 h-32 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-        </div>
-    );
+    if (!mounted) return <ChartSkeleton height="300px" />;
 
     return (
         <div className="w-full h-[300px]" style={{ minHeight: '300px' }}>

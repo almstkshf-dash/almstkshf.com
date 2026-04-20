@@ -1277,7 +1277,10 @@
     "media_pulse_analytics_title": "Media Pulse Analytics",
     "total_articles_detected": "total articles detected in current scope",
     "reset_filters": "Reset All Filters",
-    "investigation_engine": "Investigation Engine"
+    "investigation_engine": "Investigation Engine",
+    "export_pdf": "Export PDF",
+    "export_excel": "Export Excel",
+    "save_to_collection": "Save to Collection"
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1704,7 +1707,11 @@
     "error_fetching": "Connection to the intelligence stream failed.",
     "placeholder_url": "Enter RSS link (e.g., https://...)",
     "analyze": "Analyze Stream",
-    "refresh": "Refresh Feed"
+    "refresh": "Refresh Feed",
+    "syncing": "Syncing...",
+    "sync_now": "Sync Now",
+    "failed_fetch": "Intelligence bridge failed. Please check network connectivity.",
+    "retry": "Try Again"
   },
   "TerroristList": {
     "title": "Local Terrorist List",
@@ -2108,16 +2115,5 @@
     "all": "All",
     "first": "First",
     "opinion": "Opinion"
-  },
-  "RssFeeder": {
-    "title": "Live Intelligence Feed",
-    "syncing": "Syncing...",
-    "sync_now": "Sync Now",
-    "last_updated": "Last updated: {time}",
-    "loading": "Connecting to intelligence sources...",
-    "no_items": "No items found in this feed.",
-    "read_more": "Read Analysis",
-    "analyze": "Analyze Trends",
-    "failed_fetch": "Intelligence bridge failed. Please check network connectivity."
   }
 }

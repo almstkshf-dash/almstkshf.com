@@ -258,7 +258,7 @@ ${html.substring(0, 20000)}
                     url: item.url || "#",
                     title,
                     snippet,
-                    risk_level: analysis.risk as \"low\" | \"medium\" | \"high\" | \"critical\",
+                    risk_level: analysis.risk as "low" | "medium" | "high" | "critical",
                     summary: analysis.summary,
                     tags: analysis.tags,
                 });

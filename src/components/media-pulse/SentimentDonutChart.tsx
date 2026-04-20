@@ -12,6 +12,8 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState, useMemo, memo } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
+import { ChartSkeleton } from "@/components/ui/Skeleton";
+
 interface SentimentDonutChartProps {
     data: {
         positive: number;
@@ -41,7 +43,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
     useEffect(() => {
         setMounted(true);
         // Status tokens are stored as bare HSL components (e.g. "158 64% 52%")
-        // so we must wrap them with hsl(). Popover/border are hex â€” use directly.
+        // so we must wrap them with hsl(). Popover/border are hex — use directly.
         const successHSL = getCSSVar("--status-success");
         const warningHSL = getCSSVar("--status-warning");
         const errorHSL = getCSSVar("--status-error");
@@ -61,7 +63,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
         { name: t("ToneLabels.negative"), value: data.negative, color: colors.error },
     ], [data.positive, data.neutral, data.negative, colors, t]);
 
-    if (!mounted) return <div className="w-full h-[300px]" />;
+    if (!mounted) return <ChartSkeleton height="300px" />;
 
     return (
         <div className="relative w-full h-[300px]" style={{ minHeight: '300px' }}>

@@ -300,4 +300,11 @@ export default defineSchema({
         createdAt: v.number(),
         updatedAt: v.number(),
     }).index("by_userId", ["userId"]),
+
+    user_reports: defineTable({
+        userId: v.string(),
+        type: v.union(v.literal("pdf"), v.literal("csv"), v.literal("excel")),
+        articleCount: v.number(),
+        timestamp: v.number(),
+    }).index("by_userId", ["userId"]),
 });

@@ -349,7 +349,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
         }
     }, [updateSentiment]);
 
-    if (!mounted || articles === undefined) {
+    if (articles === undefined) {
         return (
             <div className="p-8 space-y-4 animate-pulse">
                 <div className="h-10 bg-muted/20 rounded-xl w-full" />

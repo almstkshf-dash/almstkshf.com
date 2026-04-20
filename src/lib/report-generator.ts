@@ -45,12 +45,60 @@ export interface OsintResult {
     timestamp?: number;
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// CONSTANTS & THEME
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+export class ReportGenerator {
+    private articles: ReportArticle[];
+    private translations: any;
 
-const BRAND_DARK = [15, 23, 42] as const;
-const BRAND_AMBER = [245, 158, 11] as const;
+    constructor(articles: ReportArticle[], translations: any) {
+        this.articles = articles;
+        this.translations = translations;
+    }
+
+    /**
+     * Generate PDF as a Blob
+     */
+    public async generatePDF(): Promise<Blob> {
+        const title = this.translations.Reports?.pr_title || 'Media Monitoring Report';
+        const result = await ReportGenerator.generatePressReleasePDF(this.articles, this.translations, title, true);
+        return (result as any).doc.output('blob');
+    }
+
+    /**
+     * Generate Excel as a Blob
+     */
+    public async generateExcel(): Promise<Blob> {
+        const title = this.translations.Reports?.pr_title || 'Media Monitoring Report';
+        return await ReportGenerator.generateExcel(this.articles, this.translations, title, true) as Blob;
+    }
+
+    /**
+     * Generate CSV as a Blob
+     */
+    public generateCSV(): Blob {
+        const headers = [
+            this.translations.Reports?.col_date || 'Date',
+            this.translations.Reports?.col_title || 'Title',
+            this.translations.Reports?.col_source || 'Source',
+            this.translations.Reports?.col_reach || 'Reach',
+            this.translations.Reports?.col_ave || 'AVE ($)'
+        ];
+
+        const rows = this.articles.map(a => [
+            a.publishedDate || '',
+            `"${(a.title || '').replace(/"/g, '""')}"`,
+            a.source || '',
+            (a.reach || 0).toString(),
+            (a.ave || 0).toString()
+        ]);
+
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    }
+
+    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+    // PUBLIC STATIC METHODS
+    // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+
 const ACCENT_BG = [241, 245, 249] as const;
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -240,7 +288,7 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string) {
+    private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string, returnOnly = false) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Cover Page
@@ -833,7 +881,7 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateExcel(articles: ReportArticle[], translations: any, title: string) {
+    private static async generateExcel(articles: ReportArticle[], translations: any, title: string, returnOnly = false) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
 

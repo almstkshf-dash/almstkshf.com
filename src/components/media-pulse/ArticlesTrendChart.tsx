@@ -19,6 +19,8 @@ import {
     CartesianGrid,
 } from "recharts";
 
+import { ChartSkeleton } from "@/components/ui/Skeleton";
+
 interface ArticlesTrendChartProps {
     data: {
         date: string;
@@ -33,7 +35,7 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
         setMounted(true);
     }, []);
 
-    if (!mounted) return <div className="w-full h-full" />;
+    if (!mounted) return <ChartSkeleton height="160px" />;
 
     return (
         <div className="w-full h-full min-h-[160px]">

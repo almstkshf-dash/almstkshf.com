@@ -10,7 +10,7 @@
 
 import Container from "@/components/ui/Container";
 import { Header } from "./media-pulse/Header";
-import { DashboardGrid } from "./media-pulse/DashboardGrid";
+import DashboardGrid from "./media-pulse/DashboardGrid";
 import { DetailedContent } from "./media-pulse/DetailedContent";
 import { AnalyticsStrategy } from "./media-pulse/AnalyticsStrategy";
 

@@ -57,3 +57,17 @@ export function SkeletonReportRow() {
         </div>
     );
 }
+
+/**
+ * Specialized skeleton for charts to maintain consistent layout during lazy loading
+ */
+export function ChartSkeleton({ height = "300px" }: { height?: string }) {
+    return (
+        <div 
+            style={{ height }} 
+            className="w-full bg-muted/10 rounded-2xl animate-pulse flex items-center justify-center border border-border/50"
+        >
+            <div className="w-12 h-12 bg-primary/5 rounded-full" />
+        </div>
+    );
+}

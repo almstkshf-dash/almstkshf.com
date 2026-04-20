@@ -29,6 +29,7 @@ import type * as queries from "../queries.js";
 import type * as searchOptimizer from "../searchOptimizer.js";
 import type * as settings from "../settings.js";
 import type * as terroristList from "../terroristList.js";
+import type * as userActions from "../userActions.js";
 import type * as userSettings from "../userSettings.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_booleanFilter from "../utils/booleanFilter.js";
@@ -67,6 +68,7 @@ declare const fullApi: ApiFromModules<{
   searchOptimizer: typeof searchOptimizer;
   settings: typeof settings;
   terroristList: typeof terroristList;
+  userActions: typeof userActions;
   userSettings: typeof userSettings;
   "utils/auth": typeof utils_auth;
   "utils/booleanFilter": typeof utils_booleanFilter;

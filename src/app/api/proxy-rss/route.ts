@@ -58,6 +58,8 @@ export async function GET(request: Request) {
     }, { status: 400 });
   }
 
+  console.log(`[API Proxy] Request for: ${feedUrl}`);
+
   // Security check: SSRF guard â€” rejects private IPs, loopback, and non-HTTPS URLs
   if (!isSafePublicUrl(feedUrl)) {
     return NextResponse.json<FeedResponse>({

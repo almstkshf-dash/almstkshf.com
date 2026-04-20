@@ -71,11 +71,30 @@ export default function RssFeeder({
     if (!silent) setIsLoading(true);
     setError(null);
 
+    // Use AbortController to handle stale requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const response = await fetch(`/api/proxy-rss?url=${encodeURIComponent(activeUrl)}`);
+      const response = await fetch(`/api/proxy-rss?url=${encodeURIComponent(activeUrl)}&t=${Date.now()}`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch feed data');
+        // Try to get error from JSON if possible
+        let errorMsg = 'Failed to fetch feed data';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch {
+          // Fallback to status text
+          errorMsg = `${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -88,15 +107,21 @@ export default function RssFeeder({
       }
     } catch (err: unknown) {
       console.error('[RssFeeder] Fetch error:', err);
-      // Explicitly check for browser-level network drops/blocks
+      
       const message = err instanceof Error ? err.message : String(err);
-      if (err instanceof TypeError && message === 'Failed to fetch') {
-        setError('Network blocked. Please disable AdBlocker or check your connection.');
+      
+      // Explicitly handle network-level failures vs API errors
+      if (err instanceof TypeError && (message === 'Failed to fetch' || message.includes('network'))) {
+        setError(t('failed_fetch'));
+      } else if (err instanceof Error && err.name === 'AbortError') {
+        setError(t('error_fetching') + ' (Timeout)');
       } else {
         setError(message || t('error_fetching'));
       }
+      
       if (!silent) toast.error(t('error_fetching'));
     } finally {
+      clearTimeout(timeoutId);
       if (!silent) setIsLoading(false);
     }
   }, [activeUrl, maxItems, t]);
@@ -190,9 +215,10 @@ export default function RssFeeder({
                 <p className="text-sm font-semibold text-foreground">{error}</p>
                 <button
                   onClick={() => fetchFeed()}
-                  className="text-xs text-primary hover:underline font-medium"
+                  className="text-xs text-primary hover:underline font-medium flex items-center gap-1 mx-auto"
                 >
-                  Try again
+                  <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+                  {t('retry')}
                 </button>
               </div>
             </motion.div>
