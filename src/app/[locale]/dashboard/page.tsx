@@ -221,7 +221,7 @@ export default function DashboardPage() {
         <div className="sticky top-8 mb-8 z-20">
             <RssFeeder
                 initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
-                initialSourceName={isAr ? "الشرق الأوسط" : "Global Intelligence (BBC)"}
+                initialSourceName={isAr ? "main" : "Global Intelligence (BBC)"}
                 categories={isAr ? AAWSAT_SOURCES : []}
                 maxItems={10}
             />

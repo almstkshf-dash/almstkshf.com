@@ -18,18 +18,6 @@ export function Header() {
 
     return (
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-"use client";
-
-import { useTranslations } from "next-intl";
-import { Activity, ShieldCheck } from "lucide-react";
-import { motion } from "framer-motion";
-
-export function Header() {
-    const t = useTranslations("Navigation");
-    const tWhy = useTranslations("WhyChooseUs");
-
-    return (
-        <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-4">
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}

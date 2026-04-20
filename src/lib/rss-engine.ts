@@ -69,24 +69,49 @@ export async function parseFeed(
   const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   let rawXml: string;
+  let response: Response;
   try {
-    const response = await fetch(url, {
+    // We use redirect: 'manual' to catch broken redirects (like aawsat.com redirecting to :80 on HTTPS)
+    // and fix them before following.
+    response = await fetch(url, {
       signal: controller.signal,
+      redirect: 'manual',
       headers: {
         'User-Agent': BROWSER_UA,
-        // Prefer XML/Atom over HTML when the server does content negotiation
         Accept:
           'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
         'Accept-Language': 'ar,en;q=0.9',
-        // Mimic a real browser referer so the server doesn't reject us
         Referer: new URL(url).origin + '/',
       },
-      // Next.js data cache: cache the raw XML itself for 900s (15 min)
-      // stale-while-revalidate lets a background re-fetch happen without
-      // blocking in-flight requests.
-      // @ts-ignore â€” Next.js extends the standard fetch API
+      // @ts-ignore
       next: { revalidate: 900 },
     });
+
+    // Handle redirects manually to fix broken Location headers (common in some Arabic news servers)
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location');
+      if (location) {
+        // Fix for broken redirects: some servers redirect https://domain.com/... to https://domain.com:80/...
+        // Port 80 is for HTTP, so browsers and node-fetch fail the TLS handshake on a :80 port.
+        const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
+
+        console.log(`[RSS Engine] Following manual redirect: ${url} -> ${fixedLocation}`);
+
+        // Follow the redirect once
+        const nextResponse = await fetch(fixedLocation, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': BROWSER_UA,
+            Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+            'Accept-Language': 'ar,en;q=0.9',
+            Referer: new URL(url).origin + '/',
+          },
+          // @ts-ignore
+          next: { revalidate: 900 },
+        });
+        response = nextResponse;
+      }
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -101,6 +126,8 @@ export async function parseFeed(
         `Feed request timed out after ${FETCH_TIMEOUT_MS / 1000}s: ${url}`
       );
     }
+    // If we get a TLS/SSL error (common on Windows with broken port redirects),
+    // it will be caught here but handled by our manual redirect above now.
     throw new Error(`Network error fetching feed from ${url}: ${err.message}`);
   } finally {
     clearTimeout(timeoutId);

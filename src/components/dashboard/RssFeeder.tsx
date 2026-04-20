@@ -46,6 +46,7 @@ export default function RssFeeder({
   className = ""
 }: RssFeederProps) {
   const t = useTranslations('RssFeeder');
+  const tSources = useTranslations('RssSources');
   const format = useFormatter();
   const [activeUrl, setActiveUrl] = useState(initialFeedUrl);
   const [activeName, setActiveName] = useState(initialSourceName);
@@ -53,6 +54,18 @@ export default function RssFeeder({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
+
+  // Helper to translate source name if it's a key
+  const translateSourceName = (name: string | undefined): string => {
+    if (!name) return t('title');
+    try {
+      // Try to translate. If it fails or returns the same key, it might not be a key.
+      const translated = tSources(name);
+      return translated;
+    } catch {
+      return name;
+    }
+  };
 
   const fetchFeed = useCallback(async (silent = false) => {
     if (!silent) setIsLoading(true);
@@ -105,7 +118,7 @@ export default function RssFeeder({
           </div>
           <div>
             <h3 className="font-semibold text-foreground tracking-tight">
-              {activeName || t('title')}
+              {translateSourceName(activeName)}
             </h3>
             {lastSynced && (
               <p className="text-[10px] text-foreground/70 flex items-center gap-1">
@@ -142,7 +155,7 @@ export default function RssFeeder({
                 : 'bg-muted/30 text-foreground/70 border-border/50 hover:border-border hover:bg-muted/50'
                 }`}
             >
-              {cat.name}
+              {translateSourceName(cat.name)}
             </button>
           ))}
         </div>

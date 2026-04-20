@@ -35,7 +35,7 @@ import {
   RefreshCw,
   Search
 } from 'lucide-react';
-import Image from 'next/image';
+import NextImage from 'next/image';
 
 // Engines & Components
 import { analyzeText, TextAnalysisResult } from '@/lib/engines/textEngine';
@@ -332,7 +332,7 @@ export default function AIInspectorPage() {
             <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">{t('footer_disclaimer')}</p>
           </div>
           <div className="flex items-start justify-end">
-            <Image src="/logo.png" alt="ALMSTKSHF" width={128} height={32} className="h-8 w-auto grayscale opacity-40 dark:opacity-60" unoptimized />
+            <NextImage src="/logo.png" alt="ALMSTKSHF" width={128} height={32} className="h-8 w-auto grayscale opacity-40 dark:opacity-60" unoptimized />
           </div>
         </footer>
       </div>
