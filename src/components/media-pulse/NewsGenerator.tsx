@@ -307,7 +307,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         {filtered.length === 0 ? (
                             <div className="py-10 text-center">
                                 <Search className="w-8 h-8 text-foreground/20 mx-auto mb-2" />
-                                <p className="text-foreground/60 text-xs font-medium">{noResultsText || 'No results found'}</p>
+                                <p className="text-foreground/60 text-xs font-medium">{noResultsText}</p>
                             </div>
                         ) : (
                             <div className="p-1.5 grid grid-cols-1 gap-0.5">
@@ -343,7 +343,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     {/* Footer */}
                     <div className="p-3 border-t border-border/50 bg-muted/10 flex items-center justify-between transition-colors">
                         <span className="text-[10px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-2">
-                            {selected.length} {selectedText || 'selected'}
+                            {selected.length} {selectedText}
                         </span>
                         {selected.length > 0 && (
                             <Button
@@ -353,7 +353,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 onClick={() => onChange([])}
                                 className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
                             >
-                                {clearAllText || 'Clear All'}
+                                {clearAllText}
                             </Button>
                         )}
                     </div>
@@ -459,7 +459,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         if (!validate()) return;
         // Safety: never invoke an authenticated action when Convex hasn't received the token yet
         if (!isAuthenticated) {
-            setErrorMsg(t('not_authenticated') || (isAr ? 'ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ø§Ù‹' : 'You must be signed in to run this action.'));
+            setErrorMsg(t('not_authenticated'));
             return;
         }
         setLoading(true);
@@ -666,16 +666,16 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Source Types */}
                     <div className="space-y-2">
-                        <label id="sources-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('source_types') || 'Source Types'}</label>
+                        <label id="sources-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('source_types')}</label>
                         <MultiSelectDropdown
                             id="sources-select"
                             aria-labelledby="sources-label"
                             items={sourceTypes}
                             selected={selectedSourceTypes}
                             onChange={(v) => setSelectedSourceTypes(v)}
-                            placeholder={t('select_sources') || 'Select sources...'}
-                            searchPlaceholder={t('search_sources') || 'Search sources...'}
-                            selectedText={t('sources_selected') || 'selected'}
+                            placeholder={t('select_sources')}
+                            searchPlaceholder={t('search_sources')}
+                            selectedText={t('sources_selected')}
                             icon={<Filter className="w-4 h-4" />}
                         />
                     </div>

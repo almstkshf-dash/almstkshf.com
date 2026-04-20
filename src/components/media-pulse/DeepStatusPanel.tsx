@@ -22,6 +22,7 @@ import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 
 const DeepStatusPanel = memo(function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
+    const tDashboard = useTranslations('Dashboard');
     const { isAuthenticated } = useConvexAuth();
     const runs = useQuery(
         api.deepSources.getDeepRuns,
@@ -223,7 +224,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                                 className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
                             >
                                 <FileText className="w-3 h-3" />
-                                PDF
+                                {tDashboard('export_pdf')}
                             </Button>
                             <Button
                                 variant="ghost"
@@ -234,7 +235,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                                 className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
                             >
                                 <FileSpreadsheet className="w-3 h-3" />
-                                EXCEL
+                                {tDashboard('export_excel')}
                             </Button>
                         </div>
                     )}
@@ -264,7 +265,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                                     : 'bg-rose-500/10 text-rose-500'
                                     }`}
                             >
-                                {run.status}
+                                {run.status === 'success' ? t('status_success') : t('status_failed')}
                             </span>
                             <span className="text-foreground/70 text-xs">
                                 {run.itemCount} {t('items')}
@@ -290,8 +291,8 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
             </div>
 
             {runToSave && (
-                <SaveToCollectionModal 
-                    isOpen={!!runToSave} 
+                <SaveToCollectionModal
+                    isOpen={!!runToSave}
                     onClose={() => setRunToSave(null)}
                     item={{
                         id: runToSave._id,

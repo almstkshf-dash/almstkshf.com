@@ -44,6 +44,7 @@ interface DashboardGridProps {
 
 const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
     const updateKeyword = useMutation(api.monitoring.updateKeyword);
+    const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const [editingKeyword, setEditingKeyword] = useState<string | null>(null);
     const [editValue, setEditValue] = useState("");
 
@@ -84,7 +85,7 @@ const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
                 <span
                     onDoubleClick={() => handleEditKeyword(kw)}
                     className="cursor-pointer hover:underline"
-                    title="Double click to edit keyword across all matching articles"
+                    title={t('edit_keyword_hint')}
                 >
                     {kw}
                 </span>
@@ -259,7 +260,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {uniqueKeywords.length > 0 && (
                             <div className="flex flex-wrap items-center gap-2 mb-6">
                                 <span className={clsx("text-[10px] font-bold text-foreground/80 uppercase tracking-widest")}>
-                                    {t('keywords') || 'Keywords'}:
+                                    {t('keywords')}:
                                 </span>
                                 {uniqueKeywords.map((kw: string) => (
                                     <KeywordBadge key={kw} kw={kw} />
@@ -307,7 +308,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {/* Identified Risk Factors */}
                         {analytics?.riskFactors && analytics.riskFactors.length > 0 && (
                             <div className="space-y-2 pt-4 border-t border-border mt-2">
-                                <h5 className="text-[9px] font-black uppercase tracking-widest text-foreground/80 mb-3">{t('top_risk_indicators') || "Active Risk Indicators"}</h5>
+                                <h5 className="text-[9px] font-black uppercase tracking-widest text-foreground/80 mb-3">{t('top_risk_indicators')}</h5>
                                 <div className="flex flex-col gap-2">
                                     {analytics.riskFactors.map(factor => (
                                         <div key={factor} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-destructive/5 border border-destructive/10 group transition-all hover:bg-destructive/10">
@@ -419,7 +420,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 {tDashboard('geography')}
                             </h4>
                             <span className="text-[10px] font-black text-blue-800 dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
-                                TOP {geoEntries.length}
+                                {tDashboard('top_suffix')} {geoEntries.length}
                             </span>
                         </div>
                         <div className="space-y-3.5">
@@ -488,7 +489,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     </div>
                     <h4 className="font-black text-sm uppercase tracking-[0.2em] mb-6 opacity-80 italic transition-colors relative z-10">{t('scope')}</h4>
                     <div className="text-5xl font-black mb-4 tracking-tighter relative z-10">
-                        {(totalReach / 1000000).toFixed(1)}M+
+                        {(totalReach / 1000000).toFixed(1)}{tDashboard('million_suffix')}
                     </div>
                     <p className="text-primary-foreground/90 text-sm font-medium leading-relaxed transition-colors relative z-10">{t('scope_desc')}</p>
                 </motion.div>
@@ -541,7 +542,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         </div>
                         {unreadNotifs && unreadNotifs.length > 0 && (
                             <span className="text-[11px] bg-primary text-primary-foreground px-3 py-1 rounded-full font-black shadow-lg shadow-primary/30 animate-bounce">
-                                {unreadNotifs.length} {t('new') || 'NEW'}
+                                {unreadNotifs.length} {t('new')}
                             </span>
                         )}
                     </div>

@@ -133,7 +133,7 @@ type SocialPresenceData = {
   totalFound: number;
 };
 
-const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
+const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: any }) => {
   if (!data?.platforms?.length) return null;
   const { platforms, totalFound, totalChecked } = data;
   const exposure = Math.round((totalFound / Math.max(totalChecked, 1)) * 100);
@@ -143,21 +143,21 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
       {/* Summary Bar */}
       <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
         <div>
-          <p className="text-sm font-semibold text-foreground">ðŸ” Social Platform Presence</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Holehe-style account enumeration Â· {totalChecked} platforms checked</p>
+          <p className="text-sm font-semibold text-foreground">ðŸ” {t('result_view.sections.social_presence')}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t('result_view.fields.holehe_note')} Â· {t('result_view.fields.platforms_checked_full', { count: totalChecked })}</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-emerald-400">{totalFound}</p>
-            <p className="text-xs text-muted-foreground">Found</p>
+            <p className="text-xs text-muted-foreground">{t('result_view.headers.found')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-rose-400">{totalChecked - totalFound - data.unknownOn.length}</p>
-            <p className="text-xs text-muted-foreground">Clear</p>
+            <p className="text-xs text-muted-foreground">{t('result_view.headers.clear')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-amber-400">{data.unknownOn.length}</p>
-            <p className="text-xs text-muted-foreground">Unknown</p>
+            <p className="text-xs text-muted-foreground">{t('result_view.headers.unknown')}</p>
           </div>
         </div>
       </div>
@@ -165,18 +165,16 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
       {/* Exposure Progress Bar */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Digital Exposure Score</span>
-          <span className={`font-semibold ${
-            exposure >= 70 ? 'text-rose-400' : exposure >= 40 ? 'text-amber-400' : 'text-emerald-400'
-          }`}>{exposure}%</span>
+          <span className="text-muted-foreground">{t('result_view.fields.digital_exposure')}</span>
+          <span className={`font-semibold ${exposure >= 70 ? 'text-rose-400' : exposure >= 40 ? 'text-amber-400' : 'text-emerald-400'
+            }`}>{exposure}%</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-700 ${
-              exposure >= 70 ? 'bg-gradient-to-r from-rose-500 to-red-600'
-              : exposure >= 40 ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-              : 'bg-gradient-to-r from-emerald-500 to-teal-500'
-            }`}
+            className={`h-full rounded-full transition-all duration-700 ${exposure >= 70 ? 'bg-gradient-to-r from-rose-500 to-red-600'
+                : exposure >= 40 ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                  : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+              }`}
             style={{ width: `${exposure}%` }}
           />
         </div>
@@ -190,16 +188,14 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
             href={p.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${
-              CATEGORY_COLORS[p.category] || 'from-muted/20 to-muted/10 border-border'
-            } hover:scale-105 transition-all duration-200 cursor-pointer`}
+            className={`group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${CATEGORY_COLORS[p.category] || 'from-muted/20 to-muted/10 border-border'
+              } hover:scale-105 transition-all duration-200 cursor-pointer`}
           >
             {/* Status indicator dot */}
-            <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
-              p.found === true ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
-              : p.found === false ? 'bg-rose-400'
-              : 'bg-amber-400'
-            }`} />
+            <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${p.found === true ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+                : p.found === false ? 'bg-rose-400'
+                  : 'bg-amber-400'
+              }`} />
             {/* Icon */}
             <span className="text-2xl" aria-hidden="true">
               {PLATFORM_ICONS[p.platform] || 'ðŸŒ'}
@@ -207,12 +203,11 @@ const SocialPresenceGrid = ({ data }: { data: SocialPresenceData }) => {
             {/* Name */}
             <span className="text-xs font-medium text-center text-foreground leading-tight">{p.platform}</span>
             {/* Status label */}
-            <span className={`text-[10px] font-semibold uppercase tracking-wide ${
-              p.found === true ? 'text-emerald-400'
-              : p.found === false ? 'text-rose-400'
-              : 'text-amber-400'
-            }`}>
-              {p.found === true ? 'Found' : p.found === false ? 'Clear' : 'Unknown'}
+            <span className={`text-[10px] font-semibold uppercase tracking-wide ${p.found === true ? 'text-emerald-400'
+                : p.found === false ? 'text-rose-400'
+                  : 'text-amber-400'
+              }`}>
+              {p.found === true ? t('result_view.headers.found') : p.found === false ? t('result_view.headers.clear') : t('result_view.headers.unknown')}
             </span>
           </a>
         ))}
@@ -234,58 +229,58 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'email' && (
           <>
             <StatusBadge
-              label="Platforms Found"
+              label={t('result_view.headers.platforms_found')}
               value={`${data.socialPresence?.totalFound ?? 'â€”'} / ${data.socialPresence?.totalChecked ?? 18}`}
               type={data.socialPresence?.totalFound > 0 ? 'warning' : 'success'}
             />
-            <StatusBadge label="Disposable" value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
-            <StatusBadge label="MX Valid" value={get(data, 'mx_records') ? 'Yes' : 'N/A'} type="info" />
+            <StatusBadge label={t('result_view.headers.disposable')} value={get(data, 'is_disposable') || false} type={get(data, 'is_disposable') ? 'error' : 'success'} />
+            <StatusBadge label={t('result_view.headers.mx_valid')} value={get(data, 'mx_records') ? t('result_view.headers.valid') : 'N/A'} type="info" />
           </>
         )}
         {type === 'ip' && (
           <>
-            <StatusBadge label="Country" value={get(data, 'country_name') || get(data, 'country') || 'Unknown'} type="info" />
-            <StatusBadge label="VPN/Proxy" value={get(data, 'security.is_vpn') || get(data, 'is_proxy') || false} type={get(data, 'security.is_vpn') ? 'warning' : 'success'} />
-            <StatusBadge label="Threat Level" value={get(data, 'security.threat_level') || 'Low'} type={get(data, 'security.threat_level') === 'High' ? 'error' : 'success'} />
+            <StatusBadge label={t('result_view.headers.country')} value={get(data, 'country_name') || get(data, 'country') || t('result_view.headers.unknown')} type="info" />
+            <StatusBadge label={t('result_view.headers.vpn_proxy')} value={get(data, 'security.is_vpn') || get(data, 'is_proxy') || false} type={get(data, 'security.is_vpn') ? 'warning' : 'success'} />
+            <StatusBadge label={t('result_view.headers.threat_level')} value={get(data, 'security.threat_level') || 'Low'} type={get(data, 'security.threat_level') === 'High' ? 'error' : 'success'} />
           </>
         )}
         {type === 'domain' && (
           <>
-            <StatusBadge label="Registered" value={get(data, 'registered') || 'Yes'} />
-            <StatusBadge label="DNSSEC" value={get(data, 'dnssec') || 'Unknown'} type="info" />
-            <StatusBadge label="Status" value={get(data, 'status') || 'Active'} type="success" />
+            <StatusBadge label={t('result_view.headers.registered')} value={get(data, 'registered') || t('result_view.headers.valid')} />
+            <StatusBadge label={t('result_view.headers.dnssec')} value={get(data, 'dnssec') || t('result_view.headers.unknown')} type="info" />
+            <StatusBadge label={t('result_view.headers.status')} value={get(data, 'status') || t('result_view.headers.valid')} type="success" />
           </>
         )}
         {type === 'phone' && (
           <>
-            <StatusBadge label="Valid" value={get(data, 'valid') || false} />
-            <StatusBadge label="Line Type" value={get(data, 'line_type') || 'Mobile'} type="info" />
-            <StatusBadge label="Carrier" value={get(data, 'carrier') || 'Unknown'} type="info" />
+            <StatusBadge label={t('result_view.headers.valid')} value={get(data, 'valid') || false} />
+            <StatusBadge label={t('result_view.headers.line_type')} value={get(data, 'line_type') || 'Mobile'} type="info" />
+            <StatusBadge label={t('result_view.headers.carrier')} value={get(data, 'carrier') || t('result_view.headers.unknown')} type="info" />
           </>
         )}
         {type === 'news' && (
           <>
-            <StatusBadge label="Provider" value={get(data, 'provider') || 'Unknown'} type="info" />
+            <StatusBadge label={t('result_view.headers.provider')} value={get(data, 'provider') || t('result_view.headers.unknown')} type="info" />
             <StatusBadge label="Data Feeds" value="Global RSS" type="info" />
-            <StatusBadge label="Articles Found" value={get(data, 'totalArticles') || '0'} type="success" />
+            <StatusBadge label={t('result_view.fields.articles_found')} value={get(data, 'totalArticles') || '0'} type="success" />
           </>
         )}
         {type === 'corporate' && (
           <>
             <StatusBadge label="Provider" value="OpenCorporates" type="info" />
-            <StatusBadge label="Companies Found" value={get(data, 'companies')?.length || '0'} type={get(data, 'companies')?.length > 0 ? "success" : "warning"} />
+            <StatusBadge label={t('result_view.fields.companies_found')} value={get(data, 'companies')?.length || '0'} type={get(data, 'companies')?.length > 0 ? "success" : "warning"} />
           </>
         )}
         {type === 'location' && (
           <>
             <StatusBadge label="Provider" value="Nominatim OSM" type="info" />
-            <StatusBadge label="Locations Found" value={get(data, 'locations')?.length || '0'} type={get(data, 'locations')?.length > 0 ? "success" : "warning"} />
+            <StatusBadge label={t('result_view.fields.locations_found')} value={get(data, 'locations')?.length || '0'} type={get(data, 'locations')?.length > 0 ? "success" : "warning"} />
           </>
         )}
         {type === 'wikipedia' && (
           <>
             <StatusBadge label="Provider" value="Wikipedia" type="info" />
-            <StatusBadge label="Match Found" value={get(data, 'wiki') ? 'Yes' : 'No'} type={get(data, 'wiki') ? "success" : "warning"} />
+            <StatusBadge label={t('result_view.fields.match_found')} value={get(data, 'wiki') ? t('result_view.headers.valid') : t('result_view.headers.clear')} type={get(data, 'wiki') ? "success" : "warning"} />
           </>
         )}
         {type === 'gleif' && (
@@ -309,7 +304,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
           <>
             {/* Social Platform Presence Grid */}
             {data.socialPresence && (
-              <SocialPresenceGrid data={data.socialPresence} />
+              <SocialPresenceGrid data={data.socialPresence} t={t} />
             )}
             {data.socialPresenceNote && (
               <div className="text-xs text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-lg p-3">
@@ -317,13 +312,13 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
               </div>
             )}
             {/* Email Technical Breakdown */}
-            <DataSection title="Email Technical Breakdown" icon={User}>
-              <StatusBadge label="Username" value={get(data, 'user') || 'N/A'} />
-              <StatusBadge label="Domain" value={get(data, 'domain') || 'N/A'} />
-              <StatusBadge label="Free Provider" value={get(data, 'is_free') || false} />
-              <StatusBadge label="Catch All" value={get(data, 'catch_all') || false} />
+            <DataSection title={t('result_view.sections.email_breakdown')} icon={User}>
+              <StatusBadge label={t('result_view.fields.username')} value={get(data, 'user') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.domain')} value={get(data, 'domain') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.free_provider')} value={get(data, 'is_free') || false} />
+              <StatusBadge label={t('result_view.fields.catch_all')} value={get(data, 'catch_all') || false} />
               {get(data, 'mx_records') && (
-                <StatusBadge label="MX Records" value={Array.isArray(get(data, 'mx_records')) ? get(data, 'mx_records').join(', ') : get(data, 'mx_records')} type="info" />
+                <StatusBadge label={t('result_view.fields.mx_check')} value={Array.isArray(get(data, 'mx_records')) ? get(data, 'mx_records').join(', ') : get(data, 'mx_records')} type="info" />
               )}
               {get(data, 'gravatar') && (
                 <StatusBadge label="Gravatar Profile" value={get(data, 'gravatar.displayName') || 'Found'} type="success" />
@@ -334,42 +329,42 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
 
         {type === 'ip' && (
           <>
-            <DataSection title="Geolocation" icon={Globe}>
-              <StatusBadge label="City" value={get(data, 'city') || 'Unknown'} />
-              <StatusBadge label="Region" value={get(data, 'region') || 'Unknown'} />
-              <StatusBadge label="Postal" value={get(data, 'zip') || 'N/A'} />
-              <StatusBadge label="Timezone" value={get(data, 'time_zone.name') || 'N/A'} />
+            <DataSection title={t('result_view.sections.geolocation')} icon={Globe}>
+              <StatusBadge label={t('result_view.fields.city')} value={get(data, 'city') || 'Unknown'} />
+              <StatusBadge label={t('result_view.fields.region')} value={get(data, 'region') || 'Unknown'} />
+              <StatusBadge label={t('result_view.fields.postal')} value={get(data, 'zip') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.timezone')} value={get(data, 'time_zone.name') || 'N/A'} />
             </DataSection>
-            <DataSection title="Network Infrastructure" icon={Server}>
-              <StatusBadge label="ASN" value={get(data, 'asn') || 'N/A'} />
-              <StatusBadge label="ISP" value={get(data, 'isp') || 'N/A'} />
-              <StatusBadge label="Organization" value={get(data, 'org') || 'N/A'} />
-              <StatusBadge label="Type" value={get(data, 'type') || 'IPv4'} />
+            <DataSection title={t('result_view.sections.infrastructure')} icon={Server}>
+              <StatusBadge label={t('result_view.fields.asn')} value={get(data, 'asn') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.isp')} value={get(data, 'isp') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.organization')} value={get(data, 'org') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.type')} value={get(data, 'type') || 'IPv4'} />
             </DataSection>
           </>
         )}
 
         {type === 'domain' && (
           <>
-            <DataSection title="WHOIS Information" icon={Database}>
-              <StatusBadge label="Registrar" value={get(data, 'registrar') || 'N/A'} />
-              <StatusBadge label="Created" value={get(data, 'created_date') || 'N/A'} />
-              <StatusBadge label="Expiry" value={get(data, 'expiration_date') || 'N/A'} />
-              <StatusBadge label="Updated" value={get(data, 'updated_date') || 'N/A'} />
+            <DataSection title={t('result_view.sections.whois')} icon={Database}>
+              <StatusBadge label={t('result_view.fields.registrar')} value={get(data, 'registrar') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.created')} value={get(data, 'created_date') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.expiry')} value={get(data, 'expiration_date') || 'N/A'} />
+              <StatusBadge label={t('result_view.fields.updated')} value={get(data, 'updated_date') || 'N/A'} />
             </DataSection>
-            <DataSection title="Technical Records" icon={Wifi}>
-              <StatusBadge label="Nameservers" value={Array.isArray(get(data, 'name_servers')) ? get(data, 'name_servers').length : 0} />
-              <StatusBadge label="MX Check" value={get(data, 'mx_found') || false} />
+            <DataSection title={t('result_view.sections.technical_records')} icon={Wifi}>
+              <StatusBadge label={t('result_view.fields.nameservers')} value={Array.isArray(get(data, 'name_servers')) ? get(data, 'name_servers').length : 0} />
+              <StatusBadge label={t('result_view.fields.mx_check')} value={get(data, 'mx_found') || false} />
             </DataSection>
           </>
         )}
 
         {type === 'phone' && (
-          <DataSection title="Carrier Details" icon={Smartphone}>
-            <StatusBadge label="Local Format" value={get(data, 'local_format') || 'N/A'} />
-            <StatusBadge label="Intl Format" value={get(data, 'international_format') || 'N/A'} />
-            <StatusBadge label="Country Prefix" value={get(data, 'country_prefix') || 'N/A'} />
-            <StatusBadge label="Location" value={get(data, 'location') || 'N/A'} />
+          <DataSection title={t('result_view.sections.carrier_details')} icon={Smartphone}>
+            <StatusBadge label={t('result_view.fields.local_format')} value={get(data, 'local_format') || 'N/A'} />
+            <StatusBadge label={t('result_view.fields.international_format')} value={get(data, 'international_format') || 'N/A'} />
+            <StatusBadge label={t('result_view.fields.country_prefix')} value={get(data, 'country_prefix') || 'N/A'} />
+            <StatusBadge label={t('result_view.fields.location')} value={get(data, 'location') || 'N/A'} />
           </DataSection>
         )}
 
@@ -378,12 +373,12 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2 px-1">
                 <Cloud className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/80 tracking-widest">Global News Feed</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-foreground/80 tracking-widest">{t('result_view.fields.data_feeds')}</h4>
               </div>
             </div>
 
             {get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
-              <DataSection title="Recent News Mentions" icon={FileText}>
+              <DataSection title={t('result_view.fields.articles_found')} icon={FileText}>
                 {get(data, 'articles').slice(0, 10).map((art: any, i: number) => (
                   <a
                     key={i}
@@ -406,7 +401,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
 
         {type === 'corporate' && (
           <div className="space-y-6">
-            <DataSection title="Corporate Entities" icon={Database}>
+            <DataSection title={t('result_view.fields.companies_found')} icon={Database}>
               {get(data, 'companies')?.map((c: any, i: number) => (
                 <a
                   key={i}
@@ -429,7 +424,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
 
         {type === 'location' && (
           <div className="space-y-6">
-            <DataSection title="Geographic Targets" icon={Globe}>
+            <DataSection title={t('result_view.fields.locations_found')} icon={Globe}>
               {get(data, 'locations')?.map((loc: any, i: number) => (
                 <a
                   key={i}
@@ -452,7 +447,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
 
         {type === 'wikipedia' && get(data, 'wiki') && (
           <div className="space-y-6">
-            <DataSection title="General Information" icon={Info}>
+            <DataSection title={t('result_view.headers.provider')} icon={Info}>
               <a
                 href={get(data, 'wiki.url')}
                 target="_blank"
@@ -527,7 +522,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
             className="text-[9px] font-black text-foreground/80 hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
           >
             <Info className="w-3 h-3" />
-            Toggle Developer Raw Data
+            {t('result_view.fields.toggle_raw')}
           </button>
           <pre id="raw-json-view" className="hidden mt-3 text-[10px] text-foreground/60 whitespace-pre-wrap break-all bg-black/5 p-4 rounded-xl font-mono">
             {JSON.stringify(data, null, 2)}
@@ -892,13 +887,13 @@ export default function OsintTab() {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
-                      <p className="text-[10px] font-medium text-foreground/80 uppercase tracking-widest">Analysis Completed Successfully</p>
+                      <p className="text-[10px] font-medium text-foreground/80 uppercase tracking-widest">{t('result_view.fields.analysis_completed')}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => setIsCollectionModalOpen(true)}>
                       <FolderPlus className="w-3 h-3" />
-                      Save to Collection
+                      {t('result_view.fields.save_collection')}
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 px-3 text-[10px] font-black uppercase tracking-widest gap-2 bg-muted/50" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
                       <Database className="w-3 h-3" />

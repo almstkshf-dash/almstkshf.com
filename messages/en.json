@@ -858,6 +858,7 @@
       "articles_trend": "Articles Trend",
       "sentiment_distribution": "Sentiment Distribution",
       "top_emotions": "Top Emotions",
+      "edit_keyword_hint": "Double click to edit keyword across all matching articles",
       "keywords": "Active Keywords",
       "Less": "Less",
       "More": "More",
@@ -1174,10 +1175,14 @@
     "placeholder_countries": "AE, SA, EG"
   },
   "Dashboard": {
-    "title": "Media Intelligence Center",
+    "title": "Dashboard",
     "subtitle": "Real-time monitoring, AI analysis, and strategic insights.",
     "manual_entry": "Manual Entry",
     "settings": "Settings",
+    "top_suffix": "TOP",
+    "million_suffix": "M+",
+    "pdf_label": "PDF",
+    "excel_label": "EXCEL",
     "clear_all": "Clear All",
     "confirm_clear_all": "Clear Database",
     "confirm_clear_all_desc": "Are you sure you want to PERMANENTLY delete ALL log entries? This action cannot be undone.",
@@ -1192,6 +1197,7 @@
     "export_empty": "No articles available for export.",
     "filters": {
       "all_countries": "All Countries",
+      "all_types": "All Types",
       "all": "All",
       "online": "Online News",
       "social": "Social Media",
@@ -1199,8 +1205,8 @@
       "blog": "Blog",
       "print": "Print",
       "load_more": "Load More",
-      "country": "Country",
-      "language": "Language",
+      "country": "Target Countries",
+      "language": "Content Language",
       "view_standard": "Standard View",
       "view_deep": "Deep Status",
       "view_osint": "OSINT Engine",
@@ -1247,7 +1253,7 @@
     "success": "Success",
     "error": "Dashboard Data Error",
     "media_pulse_analytics_title": "Media Pulse Analytics",
-    "total_articles_detected": "total articles detected in current scope",
+    "total_articles_detected": "{count} total articles detected in current scope",
     "reset_filters": "Reset All Filters",
     "investigation_engine": "Investigation Engine"
   },
@@ -1312,7 +1318,9 @@
     "scanning": "Scanning deep web sources...",
     "status_scanning": "Loading recent scans...",
     "config_panel": "Scan Configuration",
-    "result_count": "fetched {count} items"
+    "result_count": "fetched {count} items",
+    "status_success": "Success",
+    "status_failed": "Failed"
   },
   "SentimentTracker": {
     "title": "Live Pulse: Public Sentiment",
@@ -1470,7 +1478,16 @@
         "datasets": "Datasets",
         "topics": "Topics",
         "score": "Score",
-        "provider": "Provider"
+        "provider": "Provider",
+        "found": "Found",
+        "clear": "Clear",
+        "unknown": "Unknown",
+        "digital_exposure": "Digital Exposure Score",
+        "exposure_score": "Digital Exposure Score",
+        "platforms_found": "Platforms Found",
+        "found_on": "Found On",
+        "not_found_on": "Not Found On",
+        "unknown_on": "Unknown On"
       },
       "sections": {
         "identity_details": "Identity Details",
@@ -1515,7 +1532,10 @@
         "digital_exposure": "Digital Exposure Score",
         "platform_found": "Account Found",
         "platform_clear": "Not Registered",
-        "platform_unknown": "Unknown / Blocked"
+        "platform_unknown": "Unknown / Blocked",
+        "analysis_completed": "Analysis Completed Successfully",
+        "save_collection": "Save to Collection",
+        "platforms_checked_full": "{count} platforms checked"
       },
       "toggle_raw": "Toggle Developer Raw Data"
     },

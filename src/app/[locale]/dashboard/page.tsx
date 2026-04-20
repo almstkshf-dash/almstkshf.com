@@ -210,7 +210,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mt-6 mb-2">
                 <h2 className="text-2xl font-black text-foreground tracking-tight uppercase flex items-center gap-3 italic">
                     <BarChart3 className="w-6 h-6 text-primary" />
-                    {t('media_pulse_analytics_title') || 'Media Pulse Analytics'}
+                    {t('media_pulse_analytics_title')}
                 </h2>
                 <div className="h-px bg-gradient-to-r from-primary/20 via-primary/5 to-transparent flex-1 mx-8" />
             </div>
@@ -329,9 +329,9 @@ export default function DashboardPage() {
                         {[
                             { id: 'standard', label: t('filters.view_standard'), icon: Globe, color: 'primary' },
                             { id: 'deep', label: t('filters.view_deep'), icon: Search, color: 'status-info' },
-                            { id: 'darkweb', label: t('filters.view_darkweb') || 'Dark Web', icon: GlobeLock, color: 'purple', restricted: !isAdmin },
+                            { id: 'darkweb', label: t('filters.view_darkweb'), icon: GlobeLock, color: 'purple', restricted: !isAdmin },
                             { id: 'osint', label: t('filters.view_osint'), icon: ShieldCheck, color: 'status-success', restricted: !isAdmin },
-                            { id: 'inspect', label: t('filters.view_inspect') || 'AI Inspector', icon: InspectIcon, color: 'primary' },
+                            { id: 'inspect', label: t('filters.view_inspect'), icon: InspectIcon, color: 'primary' },
                             { id: 'terrorist_list', label: t('filters.view_terrorist_list'), icon: Shield, color: 'destructive', restricted: !isAdmin }
                         ].map((view) => (
                             <button
@@ -394,7 +394,7 @@ export default function DashboardPage() {
                                     className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                 >
                                     {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
-                                    PDF
+                                    {t('pdf_label')}
                                 </button>
                                 <button
                                     onClick={() => handleExport('excel')}
@@ -402,7 +402,7 @@ export default function DashboardPage() {
                                     className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                 >
                                     {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-                                    EXCEL
+                                    {t('excel_label')}
                                 </button>
                             </div>
                         )}
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                                             <p className="text-sm text-muted-foreground/70 font-medium leading-relaxed">{t('no_results_hint')}</p>
                                         </div>
                                         <Button variant="ghost" onClick={() => { setSearchQuery(''); setSelectedType('All'); }} className="font-black uppercase tracking-widest text-[10px]">
-                                            {t('reset_filters') || 'Reset All Filters'}
+                                            {t('reset_filters')}
                                         </Button>
                                     </div>
                                 </div>

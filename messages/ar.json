@@ -391,7 +391,9 @@
     "scanning": "جاري مسح مصادر الويب العميق...",
     "status_scanning": "جاري تحميل عمليات المسح الأخيرة...",
     "config_panel": "إعدادات المسح",
-    "result_count": "تم جلب {count} عنصر"
+    "result_count": "تم جلب {count} عنصر",
+    "status_success": "ناجح",
+    "status_failed": "فشل"
   },
   "Contact": {
     "title": "تواصل معنا",
@@ -896,6 +898,7 @@
       "articles_trend": "اتجاه المقالات",
       "sentiment_distribution": "توزيع المشاعر",
       "top_emotions": "أبرز الانفعالات",
+      "edit_keyword_hint": "انقر مرتين لتعديل الكلمة المفتاحية عبر جميع المقالات المتطابقة",
       "keywords": "الكلمات المفتاحية النشطة",
       "Less": "أقل",
       "More": "أكثر",
@@ -1212,10 +1215,14 @@
     "placeholder_countries": "مثال: AE، SA"
   },
   "Dashboard": {
-    "title": "المركز الإعلامي الاستخباري",
+    "title": "لوحة التحكم",
     "subtitle": "المراقبة في الوقت الفعلي، تحليل الذكاء الاصطناعي، والرؤى الاستراتيجية.",
     "manual_entry": "إدخال يدوي",
     "settings": "الإعدادات",
+    "top_suffix": "الأفضل",
+    "million_suffix": "م+",
+    "pdf_label": "PDF",
+    "excel_label": "EXCEL",
     "clear_all": "مسح الكل",
     "confirm_clear_all": "مسح قاعدة البيانات",
     "confirm_clear_all_desc": "سيؤدي هذا إلى حذف جميع المقالات المراقبة بشكل نهائي من قاعدة بياناتك. لا يمكن التراجع عن هذا الإجراء.",
@@ -1232,6 +1239,7 @@
     "error": "خطأ في بيانات لوحة التحكم",
     "filters": {
       "all_countries": "جميع الدول",
+      "all_types": "جميع الأنواع",
       "all": "الكل",
       "online": "أخبار الإنترنت",
       "social": "وسائل التواصل الاجتماعي",
@@ -1239,8 +1247,8 @@
       "blog": "مدونات",
       "print": "طباعة",
       "load_more": "تحميل المزيد",
-      "country": "الدولة",
-      "language": "اللغة",
+      "country": "الدول المستهدفة",
+      "language": "لغة المحتوى",
       "view_standard": "العرض القياسي",
       "view_deep": "الحالة العميقة",
       "view_osint": "محرك الاستخبارات",
@@ -1285,7 +1293,7 @@
       "negative": "سلبي"
     },
     "media_pulse_analytics_title": "تحليلات نبض الإعلام",
-    "total_articles_detected": "إجمالي المقالات المرصودة في النطاق الحالي",
+    "total_articles_detected": "تم الكشف عن {count} مقالات في النطاق الحالي",
     "reset_filters": "إعادة تعيين جميع الفلاتر",
     "investigation_engine": "محرك التحقيق"
   },
@@ -1470,7 +1478,13 @@
         "datasets": "مجموعات البيانات",
         "topics": "المواضيع",
         "score": "النتيجة",
-        "provider": "المزود"
+        "provider": "المزود",
+        "found": "موجود",
+        "clear": "نظيف",
+        "unknown": "غير معروف",
+        "found_on": "موجود في",
+        "not_found_on": "غير موجود في",
+        "unknown_on": "غير محدد في"
       },
       "sections": {
         "identity_details": "تفاصيل الهوية",
@@ -1515,7 +1529,10 @@
         "digital_exposure": "درجة الانكشاف الرقمي",
         "platform_found": "تم العثور على حساب",
         "platform_clear": "غير مسجل",
-        "platform_unknown": "غير محدد / محجوب"
+        "platform_unknown": "غير محدد / محجوب",
+        "analysis_completed": "اكتمل التحليل بنجاح",
+        "save_collection": "حفظ في المجموعة",
+        "platforms_checked_full": "تم فحص {count} منصة"
       },
       "toggle_raw": "تبديل بيانات المطور الخام"
     },
