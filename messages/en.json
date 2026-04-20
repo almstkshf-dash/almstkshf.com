@@ -885,7 +885,31 @@
         "SENTIMENT_SHIFT_DETECTION": "Sudden Sentiment Shift"
       },
       "top_risk_indicators": "Top Risk Indicators",
-      "new": "NEW"
+      "new": "NEW",
+      "nss_desc": "Net Sentiment Score. Evaluates overall brand health based on tone.",
+      "risk_level": "Risk Level",
+      "risk_desc": "Current potential for reputational damage.",
+      "velocity": "Velocity",
+      "velocity_desc": "Rate of new articles published per hour.",
+      "total_reach": "Total Reach",
+      "reach_desc": "Estimated audience exposure across all sources.",
+      "emotional_integrity": "Emotional Integrity",
+      "article_volume_trend": "Article Volume Trend",
+      "trend_subtitle": "Daily publishing activity over the last 7 days",
+      "geographic_activity_heat": "Geographic Activity Heat",
+      "activity_heatmap_desc": "Article distribution by region and time",
+      "critical_risk_factors": "Critical Risk Factors",
+      "no_risks_detected": "No Critical Risks Detected",
+      "crisis_probability": "Crisis Probability",
+      "gemini_osint_pulse": "Gemini OSINT Pulse",
+      "live_analysis": "Live Analysis",
+      "full_ai_report": "Full AI Report",
+      "factors": {
+        "negative_sentiment_spike": "Negative Sentiment Spike",
+        "volume_surge_negative": "Volume Surge (Negative Content)",
+        "high_reach_critical": "High Reach Critical Mention",
+        "sentiment_shift_detection": "Sudden Sentiment Shift"
+      }
     },
     "sentiment_donut": {
       "title": "Sentiment Breakdown"

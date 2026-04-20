@@ -925,7 +925,31 @@
         "SENTIMENT_SHIFT_DETECTION": "رصد تحول مفاجئ في المشاعر"
       },
       "top_risk_indicators": "أبرز مؤشرات المخاطر",
-      "new": "جديد"
+      "new": "جديد",
+      "nss_desc": "يقيم صحة العلامة التجارية بناءً على النبرة العامة.",
+      "risk_level": "مستوى الخطر",
+      "risk_desc": "الاحتمال الحالي للضرر بالسمعة.",
+      "velocity": "السرعة",
+      "velocity_desc": "معدل نشر المقالات الجديدة في الساعة.",
+      "total_reach": "إجمالي الوصول",
+      "reach_desc": "التعرض التقديري للجمهور عبر جميع المصادر.",
+      "emotional_integrity": "النزاهة العاطفية",
+      "article_volume_trend": "اتجاه حجم المقالات",
+      "trend_subtitle": "نشاط النشر اليومي خلال آخر 7 أيام",
+      "geographic_activity_heat": "النشاط الجغرافي للحرارة",
+      "activity_heatmap_desc": "توزيع المقالات حسب المنطقة والوقت",
+      "critical_risk_factors": "عوامل الخطر الحرجة",
+      "no_risks_detected": "لم يتم اكتشاف مخاطر حرجة",
+      "crisis_probability": "احتمالية الأزمة",
+      "gemini_osint_pulse": "نبض Gemini OSINT",
+      "live_analysis": "تحليل مباشر",
+      "full_ai_report": "تقرير الذكاء الاصطناعي الكامل",
+      "factors": {
+        "negative_sentiment_spike": "ارتفاع مفاجئ في المشاعر السلبية",
+        "volume_surge_negative": "زيادة ملحوظة في المحتوى السلبي",
+        "high_reach_critical": "إشارة حرجة عالية الانتشار",
+        "sentiment_shift_detection": "رصد تحول مفاجئ في المشاعر"
+      }
     },
     "sentiment_donut": {
       "title": "توزيع النبرة"
