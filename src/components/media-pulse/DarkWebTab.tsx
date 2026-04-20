@@ -230,7 +230,7 @@ export default function DarkWebTab() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <GlobeLock className="w-6 h-6 text-purple-600" />
+              <GlobeLock className="w-6 h-6 text-purple-600" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-lg font-bold tracking-tight">{t('tab_label')}</h2>
@@ -241,10 +241,10 @@ export default function DarkWebTab() {
           {results.length > 0 && (
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} className="h-9 px-3 text-xs">
-                <FileDown className="w-3.5 h-3.5 mr-1.5" /> PDF
+                <FileDown className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> PDF
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleExport('excel')} className="h-9 px-3 text-xs">
-                <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" /> Excel
+                <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> Excel
               </Button>
             </div>
           )}
@@ -258,6 +258,8 @@ export default function DarkWebTab() {
             return (
               <button
                 key={s.id}
+                role="radio"
+                aria-checked={isSelected}
                 onClick={() => { setSource(s.id); setFetchResult(null); setSearchError(null); }}
                 className={clsx(
                   'flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap',
@@ -266,7 +268,7 @@ export default function DarkWebTab() {
                     : 'bg-muted/20 border-border/60 text-foreground/60 hover:border-purple-500/30'
                 )}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                 {t(s.labelKey)}
               </button>
             );
@@ -277,8 +279,10 @@ export default function DarkWebTab() {
         {/* FIX: added `relative` so the absolute optimizationInfo banner anchors correctly */}
         <div className="relative flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
+            <label htmlFor="darkweb-search-input" className="sr-only">{t('search_placeholder')}</label>
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
             <input
+              id="darkweb-search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => {
@@ -302,10 +306,11 @@ export default function DarkWebTab() {
                 onClick={handleOptimize}
                 disabled={isOptimizing || !searchQuery.trim() || isLoading}
                 title={tOpt('button_tooltip')}
+                aria-label={tOpt('button_tooltip')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
               >
-                <Wand2 className={clsx('w-4 h-4', isOptimizing && 'animate-pulse')} />
-                <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-purple-600 animate-bounce opacity-0 group-hover:opacity-100" />
+                <Wand2 className={clsx('w-4 h-4', isOptimizing && 'animate-pulse')} aria-hidden="true" />
+                <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-purple-600 animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -313,7 +318,7 @@ export default function DarkWebTab() {
           {/* Country selector for ZenRows geo-targeting (tracker T-09) */}
           {(source === 'zenrows' || source === 'diffbot') && (
             <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-foreground/50 flex-shrink-0" />
+              <Globe className="w-4 h-4 text-foreground/50 flex-shrink-0" aria-hidden="true" />
               <select
                 id="darkweb-country-select"
                 aria-label={t('country_filter')}
@@ -333,7 +338,7 @@ export default function DarkWebTab() {
             disabled={isLoading || isOptimizing || !searchQuery.trim()}
             className="h-[50px] bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20 px-8 flex-shrink-0"
           >
-            {isLoading ? <Clock className="w-4 h-4 animate-spin" /> : tCommon('search')}
+            {isLoading ? <Clock className="w-4 h-4 animate-spin" aria-hidden="true" /> : tCommon('search')}
           </Button>
 
           {/* FIX: Optimization info banner â€” now anchors to `relative` parent above */}
@@ -345,7 +350,7 @@ export default function DarkWebTab() {
                 exit={{ opacity: 0, y: -6 }}
                 className="absolute top-full left-0 right-0 z-30 mt-2 flex items-start gap-2 p-2.5 bg-purple-500/5 border border-purple-500/20 rounded-xl backdrop-blur-md shadow-lg"
               >
-                <Sparkles className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+                <Sparkles className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-purple-600 uppercase tracking-tight">
                     {tOpt('explanation_title')}
@@ -374,7 +379,7 @@ export default function DarkWebTab() {
               exit={{ opacity: 0 }}
               className="flex items-start gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-sm"
             >
-              <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div>
                 <p className="font-bold text-destructive text-xs uppercase tracking-tight">Search Error</p>
                 <p className="text-xs text-foreground/70 mt-0.5">{searchError}</p>
@@ -390,7 +395,7 @@ export default function DarkWebTab() {
               className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl space-y-2"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                <CheckCircle2 className="w-4 h-4 text-purple-600" aria-hidden="true" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-600">
                   {fetchResult.source === 'diffbot' ? 'Diffbot' : 'ZenRows'} â€” Extracted Content
                 </span>
@@ -412,19 +417,19 @@ export default function DarkWebTab() {
           <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-muted/40 border-b border-border">
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[300px]">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[300px]">
                   {t('col_title')}
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70">
                   {t('col_url')}
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center">
                   {t('col_source')}
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center">
                   {t('col_risk')}
                 </th>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-right">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-right">
                   {tCommon('actions')}
                 </th>
               </tr>
@@ -453,9 +458,9 @@ export default function DarkWebTab() {
                       <div className="flex items-start gap-3">
                         <div className="mt-1 flex-shrink-0">
                           {entry.risk_level === 'critical' ? (
-                            <ShieldAlert className="w-4 h-4 text-red-500" />
+                            <ShieldAlert className="w-4 h-4 text-red-500" aria-hidden="true" />
                           ) : (
-                            <GlobeLock className="w-4 h-4 text-purple-500" />
+                            <GlobeLock className="w-4 h-4 text-purple-500" aria-hidden="true" />
                           )}
                         </div>
                         <div>
@@ -480,7 +485,7 @@ export default function DarkWebTab() {
                         rel="noreferrer"
                         className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300 bg-purple-500/10 px-2 py-1 rounded transition-colors"
                       >
-                        <LinkIcon className="w-3 h-3 flex-shrink-0" />
+                        <LinkIcon className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
                         <span className="max-w-[200px] truncate">{entry.url}</span>
                       </a>
                     </td>
@@ -500,9 +505,10 @@ export default function DarkWebTab() {
                     <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => deleteById({ id: entry._id })}
+                        aria-label={`${tCommon('delete')} ${entry.title}`}
                         className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-destructive transition-colors group-hover:opacity-100 opacity-50"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </td>
                   </motion.tr>
@@ -516,7 +522,7 @@ export default function DarkWebTab() {
         {results.length === 0 && !isLoading && (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <GlobeLock className="w-8 h-8 text-foreground/20 opacity-20" />
+              <GlobeLock className="w-8 h-8 text-foreground/20 opacity-20" aria-hidden="true" />
             </div>
             <div className="space-y-1">
               <h3 className="font-bold text-lg">{t('no_results')}</h3>

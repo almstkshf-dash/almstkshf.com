@@ -39,7 +39,12 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
         <div className="w-full h-full min-h-[160px]">
             {mounted && (
                 <ResponsiveContainer width="100%" height="100%" minHeight={160} debounce={50}>
-                    <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <AreaChart 
+                        data={data} 
+                        margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                        role="img"
+                        aria-label="Article volume trend chart over time"
+                    >
                         <defs>
                             <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />

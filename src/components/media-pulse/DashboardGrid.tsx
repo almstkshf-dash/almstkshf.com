@@ -72,21 +72,29 @@ const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
     return (
         <div className="inline-flex items-center bg-primary/15 text-blue-800 dark:text-blue-300 border border-primary/20 px-3 py-1 rounded-full text-[11px] font-bold transition-colors">
             {editingKeyword === kw ? (
-                <input
-                    type="text"
-                    value={editValue}
-                    onChange={e => setEditValue(e.target.value)}
-                    onBlur={() => saveKeyword(kw)}
-                    onKeyDown={e => handleKeyDown(e, kw)}
-                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                    autoFocus
-                    className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
-                />
+                <>
+                    <label htmlFor={`edit-kw-${kw}`} className="sr-only">{t('edit_keyword_hint')}</label>
+                    <input
+                        id={`edit-kw-${kw}`}
+                        type="text"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        onBlur={() => saveKeyword(kw)}
+                        onKeyDown={e => handleKeyDown(e, kw)}
+                        /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                        autoFocus
+                        className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
+                    />
+                </>
             ) : (
                 <span
                     onDoubleClick={() => handleEditKeyword(kw)}
-                    className="cursor-pointer hover:underline"
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleEditKeyword(kw)}
+                    tabIndex={0}
+                    role="button"
+                    className="cursor-pointer hover:underline outline-none focus:ring-1 focus:ring-primary/40 rounded px-0.5"
                     title={t('edit_keyword_hint')}
+                    aria-label={`${kw}, ${t('edit_keyword_hint')}`}
                 >
                     {kw}
                 </span>
@@ -221,7 +229,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                 {topLeftSlot}
                 <section className="glass-card p-8 rounded-[2.5rem] relative overflow-hidden group shadow-2xl transition-all hover:bg-card/80">
                     <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity pointer-events-none group-hover:scale-110 duration-700">
-                        <Activity className="w-48 h-48" />
+                        <Activity className="w-48 h-48" aria-hidden="true" />
                     </div>
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
@@ -237,7 +245,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                             isLoading={isExporting === 'pdf'}
                                             className="h-8 text-[10px] uppercase tracking-widest font-bold gap-2 rounded-xl"
                                         >
-                                            <FileText className="w-3.5 h-3.5" />
+                                            <FileText className="w-3.5 h-3.5" aria-hidden="true" />
                                             PDF
                                         </Button>
                                         <Button
@@ -248,7 +256,8 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                             isLoading={isExporting === 'excel'}
                                             className="h-8 text-[10px] uppercase tracking-widest font-bold gap-2 rounded-xl"
                                         >
-                                            <FileSpreadsheet className="w-3.5 h-3.5" />
+                                            <FileSpreadsheet className="w-3.5 h-3.5" aria-hidden="true" />
+                                            EXCEL
                                             EXCEL
                                         </Button>
                                     </div>
@@ -278,7 +287,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     <div className="flex-1 space-y-4">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-destructive/10 border border-destructive/20 flex items-center justify-center transition-colors">
-                                <ShieldAlert className="w-6 h-6 text-destructive" />
+                                <ShieldAlert className="w-6 h-6 text-destructive" aria-hidden="true" />
                             </div>
                             <h3 className="text-2xl font-bold text-foreground transition-colors">{t('reputation_safeguard')}</h3>
                         </div>
@@ -301,7 +310,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 nssIndex={nss}
                             />
                             <div className="mt-2 text-[10px] font-bold text-destructive dark:text-red-500 flex items-center justify-center gap-1">
-                                <ShieldAlert className="w-3 h-3" />
+                                <ShieldAlert className="w-3 h-3" aria-hidden="true" />
                                 {t('risk')}: {riskScore}%
                             </div>
                         </div>
@@ -313,7 +322,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                                 <div className="flex flex-col gap-2">
                                     {analytics.riskFactors.map(factor => (
                                         <div key={factor} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-destructive/5 border border-destructive/10 group transition-all hover:bg-destructive/10">
-                                            <AlertCircle className="w-3.5 h-3.5 text-destructive animate-pulse" />
+                                            <AlertCircle className="w-3.5 h-3.5 text-destructive animate-pulse" aria-hidden="true" />
                                             <span className="text-[10px] font-bold text-destructive/90 uppercase tracking-tight">
                                                 {t(`risk_factors.${factor}`) || factor.replace(/_/g, ' ')}
                                             </span>
@@ -335,12 +344,12 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         className="glass-card p-8 rounded-[2.5rem] space-y-8 shadow-xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none rotate-12">
-                            <Zap className="w-32 h-32 text-primary" />
+                            <Zap className="w-32 h-32 text-primary" aria-hidden="true" />
                         </div>
                         <div className="flex items-center justify-between relative z-10">
                             <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('emotional_pulse')}</h4>
                             <div className="p-2 bg-amber-500/10 rounded-lg">
-                                <Zap className="w-4 h-4 text-amber-500" />
+                                <Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />
                             </div>
                         </div>
 
@@ -358,7 +367,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         {analytics?.emotions && Object.keys(analytics.emotions).length > 0 && (
                             <div className="pt-6 border-t border-border mt-2 space-y-4">
                                 <h5 className="text-[10px] font-bold text-foreground/80 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                    <TrendingUp className="w-3 h-3 text-primary" />
+                                    <TrendingUp className="w-3 h-3 text-primary" aria-hidden="true" />
                                     {t('top_emotions')}
                                 </h5>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -397,7 +406,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                         <div className="flex items-center justify-between">
                             <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('articles_trend')}</h4>
                             <div className="p-2 bg-blue-500/10 rounded-lg">
-                                <TrendingUp className="w-4 h-4 text-blue-500" />
+                                <TrendingUp className="w-4 h-4 text-blue-500" aria-hidden="true" />
                             </div>
                         </div>
                         <div className="h-[160px] w-full">
@@ -417,7 +426,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     >
                         <div className="flex items-center justify-between">
                             <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase flex items-center gap-3">
-                                <Globe className="w-4 h-4 text-primary" />
+                                <Globe className="w-4 h-4 text-primary" aria-hidden="true" />
                                 {tDashboard('geography')}
                             </h4>
                             <span className="text-[10px] font-black text-blue-800 dark:text-blue-300 transition-colors uppercase tracking-widest bg-primary/15 px-3 py-1 rounded-full border border-primary/20">
@@ -486,7 +495,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     className="p-8 bg-gradient-to-br from-primary to-primary/80 rounded-[2.5rem] text-primary-foreground shadow-xl shadow-primary/20 relative overflow-hidden group transition-all flex flex-col justify-center h-full min-h-[250px]"
                 >
                     <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform pointer-events-none duration-500">
-                        <Globe className="w-32 h-32" />
+                        <Globe className="w-32 h-32" aria-hidden="true" />
                     </div>
                     <h4 className="font-black text-sm uppercase tracking-[0.2em] mb-6 opacity-80 italic transition-colors relative z-10">{t('scope')}</h4>
                     <div className="text-5xl font-black mb-4 tracking-tighter relative z-10">
@@ -505,7 +514,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     <div className="flex items-center justify-between">
                         <h4 className="text-foreground font-black text-sm tracking-[0.2em] uppercase">{t('tone_distribution')}</h4>
                         <div className="p-2 bg-primary/10 rounded-lg">
-                            <BarChart3 className="w-4 h-4 text-primary" />
+                            <BarChart3 className="w-4 h-4 text-primary" aria-hidden="true" />
                         </div>
                     </div>
                     <div className="space-y-7 flex-1 flex flex-col justify-center">
@@ -513,7 +522,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                             <div key={item.label} className="space-y-3 group/item">
                                 <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.15em]">
                                     <span className="text-foreground/80 flex items-center gap-2 group-hover/item:text-foreground transition-colors">
-                                        <item.icon className="w-3.5 h-3.5" />
+                                        <item.icon className="w-3.5 h-3.5" aria-hidden="true" />
                                         {item.label}
                                     </span>
                                     <span className="text-foreground bg-muted/50 px-3 py-1 rounded-lg border border-border/50 transition-all group-hover/item:scale-110">{item.value}%</span>
@@ -539,7 +548,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 blur-3xl rounded-full group-hover:scale-150 transition-transform duration-700" />
                     <div className="flex items-center justify-between relative z-10">
                         <div className="p-2.5 bg-primary/20 rounded-xl">
-                            <Zap className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
+                            <Zap className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" aria-hidden="true" />
                         </div>
                         {unreadNotifs && unreadNotifs.length > 0 && (
                             <span className="text-[11px] bg-primary text-primary-foreground px-3 py-1 rounded-full font-black shadow-lg shadow-primary/30 animate-bounce">
@@ -580,7 +589,7 @@ export const DashboardGrid = memo(function DashboardGrid({ articles = [], analyt
                 <div className="flex items-center justify-between mb-10 relative z-10">
                     <div className="flex items-center gap-6">
                         <div className="p-4 bg-primary/10 rounded-[1.5rem] text-primary border border-primary/20 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                            <Clock className="w-8 h-8" />
+                            <Clock className="w-8 h-8" aria-hidden="true" />
                         </div>
                         <div className="space-y-1">
                             <h4 className="text-2xl font-black text-foreground tracking-tight">{t('volume_heatmap_title')}</h4>

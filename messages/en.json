@@ -1295,6 +1295,7 @@
     "select_sources": "Select sources...",
     "search_sources": "Search sources...",
     "clear_all": "Clear All",
+    "remove": "Remove",
     "not_authenticated": "Not authenticated. Please sign in first."
   },
   "DeepSources": {
@@ -1680,7 +1681,8 @@
     "source": "Source",
     "error_fetching": "Connection to the intelligence stream failed.",
     "placeholder_url": "Enter RSS link (e.g., https://...)",
-    "analyze": "Analyze Stream"
+    "analyze": "Analyze Stream",
+    "refresh": "Refresh Feed"
   },
   "TerroristList": {
     "title": "Local Terrorist List",

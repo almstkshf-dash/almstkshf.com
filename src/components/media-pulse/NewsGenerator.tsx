@@ -205,6 +205,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
         return <span>{item?.label || id}</span>;
     }, [items]);
 
+    const t = useTranslations('NewsGenerator');
     const finalRenderItem = renderItem || defaultRenderItem;
     const finalRenderTag = renderTag || defaultRenderTag;
     const [isOpen, setIsOpen] = useState(false);
@@ -233,11 +234,22 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
         <div ref={ref} className="relative">
             {/* Trigger Button */}
             <div
-                role="button"
-                tabIndex={0}
+                role="combobox"
+                aria-haspopup="listbox"
+                aria-expanded={isOpen}
+                aria-controls={`${id || 'dropdown'}-listbox`}
                 aria-labelledby={ariaLabelledBy}
+                tabIndex={0}
                 onClick={() => setIsOpen(!isOpen)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsOpen(!isOpen); } }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setIsOpen(!isOpen);
+                    }
+                    if (e.key === 'Escape' && isOpen) {
+                        setIsOpen(false);
+                    }
+                }}
                 className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-left transition-all border cursor-pointer ${error
                     ? 'border-destructive/60 ring-2 ring-destructive/20'
                     : isOpen
@@ -256,27 +268,25 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 className="inline-flex items-center gap-1 bg-primary/10 text-blue-800 dark:text-blue-300 border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
                                 {finalRenderTag(selected_id)}
-                                <span
-                                    role="button"
-                                    aria-label={`Remove ${items.find(i => i.id === selected_id)?.label || selected_id}`}
-                                    tabIndex={0}
+                                <button
+                                    type="button"
+                                    aria-label={`${t('remove')} ${items.find(i => i.id === selected_id)?.label || selected_id}`}
                                     onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggle(selected_id); } }}
                                     className="hover:text-primary/70 ml-0.5 cursor-pointer transition-colors"
                                 >
                                     <X className="w-3 h-3" aria-hidden="true" />
-                                </span>
+                                </button>
                             </span>
                         ))
                     )}
                 </div>
-                <ChevronDown className={`w-4 h-4 text-foreground/70 transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-foreground/70 transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </div>
 
             {/* Error Message */}
             {error && (
                 <p className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-in fade-in duration-300">
-                    <AlertTriangle className="w-3 h-3" /> {error}
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" /> {error}
                 </p>
             )}
 
@@ -287,7 +297,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     <div className="p-3 border-b border-border/50 bg-muted/20">
                         <div className="relative">
                             <label htmlFor={`${id || 'dropdown'}-search`} className="sr-only">{searchPlaceholder}</label>
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" aria-hidden="true" />
                             <input
                                 id={`${id || 'dropdown'}-search`}
                                 name={`${id || 'dropdown'}-search`}
@@ -304,10 +314,15 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     </div>
 
                     {/* Items List */}
-                    <div className="max-h-64 overflow-y-auto scrollbar-thin transition-colors">
+                    <div
+                        id={`${id || 'dropdown'}-listbox`}
+                        role="listbox"
+                        aria-multiselectable="true"
+                        className="max-h-64 overflow-y-auto scrollbar-thin transition-colors"
+                    >
                         {filtered.length === 0 ? (
-                            <div className="py-10 text-center">
-                                <Search className="w-8 h-8 text-foreground/20 mx-auto mb-2" />
+                            <div className="py-10 text-center" role="option" aria-disabled="true">
+                                <Search className="w-8 h-8 text-foreground/20 mx-auto mb-2" aria-hidden="true" />
                                 <p className="text-foreground/60 text-xs font-medium">{noResultsText}</p>
                             </div>
                         ) : (
@@ -316,9 +331,11 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                     <button
                                         key={item.id}
                                         type="button"
+                                        role="option"
+                                        aria-selected={selected.includes(item.id)}
                                         onClick={() => toggle(item.id)}
                                         className={clsx(
-                                            "w-full flex justify-start gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors",
+                                            "w-full flex justify-start items-center gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors focus:bg-muted focus:outline-none",
                                             selected.includes(item.id)
                                                 ? 'bg-primary/10 text-blue-800 dark:text-blue-300 font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
@@ -331,7 +348,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                                 : 'border-border bg-background'
                                         )}>
                                             {selected.includes(item.id) && (
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" />
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" aria-hidden="true" />
                                             )}
                                         </div>
                                         <div className="flex-1 truncate text-left">{finalRenderItem(item)}</div>
@@ -530,7 +547,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center transition-colors">
-                        <Search className="w-4.5 h-4.5 text-blue-800 dark:text-blue-300" />
+                        <Search className="w-4.5 h-4.5 text-blue-800 dark:text-blue-300" aria-hidden="true" />
                     </div>
                     <div>
                         <h2 className="text-foreground font-bold text-sm transition-colors">{t('monitor_keyword')}</h2>
@@ -555,11 +572,10 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div>
                     <label htmlFor="monitor_keyword" className="sr-only">{t('monitor_keyword')}</label>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
                         <input
                             id="monitor_keyword"
                             name="monitor_keyword"
-                            aria-label={t('monitor_keyword')}
                             type="text"
                             placeholder={t('placeholder')}
                             value={keyword}
@@ -580,16 +596,17 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                             onClick={handleOptimize}
                             disabled={isOptimizing || !keyword.trim()}
                             title={tOpt('button_tooltip')}
+                            aria-label={tOpt('button_tooltip')}
                             className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-blue-800 dark:text-blue-300 hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
                         >
-                            <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} />
-                            <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" />
+                            <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} aria-hidden="true" />
+                            <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
                         </button>
                     </div>
 
                     {optimizationInfo && (
                         <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
-                            <Sparkles className="w-4 h-4 text-primary mt-0.5" />
+                            <Sparkles className="w-4 h-4 text-primary mt-0.5" aria-hidden="true" />
                             <div className="flex-1">
                                 <p className="text-[11px] font-bold text-primary uppercase tracking-tight">
                                     {tOpt('explanation_title')}
@@ -690,7 +707,6 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                 <input
                                     id="date-from"
                                     name="date-from"
-                                    aria-label={t('date_from')}
                                     type="date"
                                     value={dateFrom}
                                     onChange={(e) => setDateFrom(e.target.value)}
@@ -703,7 +719,6 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                                 <input
                                     id="date-to"
                                     name="date-to"
-                                    aria-label={t('date_to')}
                                     type="date"
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
@@ -719,13 +734,13 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                     <div className="flex-1">
                         {errorMsg && (
                             <div className="text-destructive text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
-                                <AlertTriangle className="w-3.5 h-3.5" />
+                                <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
                                 {errorMsg}
                             </div>
                         )}
                         {result && (
                             <div className="text-emerald-500 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
-                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                                 {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
                             </div>
                         )}

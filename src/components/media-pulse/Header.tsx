@@ -18,6 +18,18 @@ export function Header() {
 
     return (
         <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Activity, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+
+export function Header() {
+    const t = useTranslations("Navigation");
+    const tWhy = useTranslations("WhyChooseUs");
+
+    return (
+        <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="space-y-4">
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -25,7 +37,7 @@ export function Header() {
                     className="flex items-center gap-3"
                 >
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 transition-colors">
-                        <Activity className="w-7 h-7 text-blue-800 dark:text-blue-300" />
+                        <Activity className="w-7 h-7 text-blue-800 dark:text-blue-300" aria-hidden="true" />
                     </div>
                     <h1 className="text-5xl lg:text-7xl font-bold text-foreground tracking-tighter transition-colors">
                         {t("media_pulse")}
@@ -50,14 +62,14 @@ export function Header() {
                 <div className="flex -space-x-3">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="w-10 h-10 rounded-full border-2 border-background bg-muted flex items-center justify-center transition-colors">
-                            <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                            <ShieldCheck className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                         </div>
                     ))}
                 </div>
                 <div>
                     <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/70 transition-colors">System Status</p>
                     <p className="text-emerald-500 dark:text-emerald-400 font-bold text-sm flex items-center gap-2 transition-colors">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" aria-hidden="true"></span>
                         Active Safeguard
                     </p>
                 </div>

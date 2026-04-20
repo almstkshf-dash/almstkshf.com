@@ -36,12 +36,12 @@ const getSourceBadgeColor = (type: string) => {
  */
 const getSourceIcon = (type: string) => {
     switch (type) {
-        case 'Press Release': return <BookOpen className="w-3 h-3" />;
-        case 'Online News': return <Newspaper className="w-3 h-3" />;
-        case 'Social Media': return <MessageSquare className="w-3 h-3" />;
-        case 'Blog': return <Globe2 className="w-3 h-3" />;
-        case 'Print': return <Printer className="w-3 h-3" />;
-        default: return <Newspaper className="w-3 h-3" />;
+        case 'Press Release': return <BookOpen className="w-3 h-3" aria-hidden="true" />;
+        case 'Online News': return <Newspaper className="w-3 h-3" aria-hidden="true" />;
+        case 'Social Media': return <MessageSquare className="w-3 h-3" aria-hidden="true" />;
+        case 'Blog': return <Globe2 className="w-3 h-3" aria-hidden="true" />;
+        case 'Print': return <Printer className="w-3 h-3" aria-hidden="true" />;
+        default: return <Newspaper className="w-3 h-3" aria-hidden="true" />;
     }
 };
 
@@ -98,7 +98,7 @@ const ArticleRow = memo(({
                         dir="auto"
                     >
                         <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" aria-hidden="true" />
                     </a>
                     <div className="flex items-center gap-2 flex-wrap" dir="auto">
                         <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${theme}`}>
@@ -111,10 +111,10 @@ const ArticleRow = memo(({
                                                 article.sourceType}
                         </span>
                         <span className="text-[10px] text-foreground/80 dark:text-slate-200 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
-                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
                             {article.sourceCountry || article.country}
                         </span>
-                        {article.imageUrl && <ImageIcon className="w-3 h-3 text-status-info-fg/70" />}
+                        {article.imageUrl && <ImageIcon className="w-3 h-3 text-status-info-fg/70" aria-hidden="true" />}
                         {article.isManual && (
                             <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
                                 {t('manual')}
@@ -135,7 +135,7 @@ const ArticleRow = memo(({
                     </span>
                     {article.relevancy_score !== undefined && (
                         <div className="flex items-center gap-1 text-[9px] font-bold text-foreground/80 dark:text-slate-200 uppercase tracking-tighter" title={t('relevancy')}>
-                            <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
+                            <div className="w-12 h-1 bg-muted rounded-full overflow-hidden" aria-hidden="true">
                                 <div
                                     className={clsx(
                                         "h-full transition-all",
@@ -145,6 +145,7 @@ const ArticleRow = memo(({
                                     style={{ width: `${article.relevancy_score}%` }}
                                 />
                             </div>
+                            <span className="sr-only">{t('relevancy')}: </span>
                             <span>{article.relevancy_score}%</span>
                         </div>
                     )}
@@ -152,31 +153,36 @@ const ArticleRow = memo(({
             </td>
             <td className="p-4">
                 <div className="relative group/sentiment">
-                    <div className={clsx(
-                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border cursor-pointer hover:ring-2 hover:ring-primary/20",
-                        article.sentiment === 'Positive'
-                            ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
-                            : article.sentiment === 'Negative'
-                                ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
-                                : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
-                    )}>
-                        {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" />}
-                        {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" />}
-                        {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" />}
+                    <button 
+                        type="button"
+                        aria-haspopup="listbox"
+                        aria-label={t('sentiment')}
+                        className={clsx(
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border cursor-pointer hover:ring-2 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary",
+                            article.sentiment === 'Positive'
+                                ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
+                                : article.sentiment === 'Negative'
+                                    ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
+                                    : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
+                        )}
+                    >
+                        {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" aria-hidden="true" />}
+                        {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" aria-hidden="true" />}
+                        {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" aria-hidden="true" />}
                         {article.sentiment === 'Positive' ? t('sentiments.positive') :
                             article.sentiment === 'Negative' ? t('sentiments.negative') :
                                 t('sentiments.neutral')}
 
                         {article.manualSentimentOverride && (
                             <span title={`Original: ${article.originalSentiment}`}>
-                                <History className="w-2.5 h-2.5 opacity-60 ml-0.5" />
+                                <History className="w-2.5 h-2.5 opacity-60 ml-0.5" aria-hidden="true" />
                             </span>
                         )}
-                        <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 transition-opacity ml-1" />
-                    </div>
+                        <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 group-focus-within/sentiment:opacity-100 transition-opacity ml-1" aria-hidden="true" />
+                    </button>
 
                     {/* Simple Sentiment Dropdown */}
-                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-in fade-in zoom-in-95 duration-200">
                         {(['Positive', 'Neutral', 'Negative'] as const).map((s) => (
                             <button
                                 key={s}
@@ -207,7 +213,7 @@ const ArticleRow = memo(({
                 {article.likes !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
-                        <Heart className="w-3 h-3 text-status-error-fg/70" />
+                        <Heart className="w-3 h-3 text-status-error-fg/70" aria-hidden="true" />
                     </div>
                 ) : 'â€”'}
             </td>
@@ -215,7 +221,7 @@ const ArticleRow = memo(({
                 {article.retweets !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
-                        <Share2 className="w-3 h-3 text-status-success-fg/70" />
+                        <Share2 className="w-3 h-3 text-status-success-fg/70" aria-hidden="true" />
                     </div>
                 ) : 'â€”'}
             </td>
@@ -223,7 +229,7 @@ const ArticleRow = memo(({
                 {article.replies !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
-                        <MessageCircle className="w-3 h-3 text-status-info-fg/70" />
+                        <MessageCircle className="w-3 h-3 text-status-info-fg/70" aria-hidden="true" />
                     </div>
                 ) : 'â€”'}
             </td>
@@ -240,7 +246,7 @@ const ArticleRow = memo(({
                     <span className={clsx(
                         "w-1 h-1 rounded-full mr-1.5 transition-all animate-pulse",
                         article.status === 'in_progress' ? "bg-status-warning-fg" : "bg-status-success-fg"
-                    )} />
+                    )} aria-hidden="true" />
                     {article.status === 'in_progress' ? t('status_in_progress') : t('status_live')}
                 </span>
             </td>
@@ -384,7 +390,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                 <table className="w-full text-left rtl:text-right border-collapse">
                     <thead>
                         <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
-                            <th className="p-4 w-10">
+                            <th scope="col" className="p-4 w-10">
                                 <input
                                     type="checkbox"
                                     checked={selectedIds.size === displayedArticles.length && displayedArticles.length > 0}
@@ -393,18 +399,20 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                     className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
                                 />
                             </th>
-                            <th className="p-4 font-bold">{t('col_date')}</th>
-                            <th className="p-4 font-bold">{t('col_title')}</th>
-                            <th className="p-4 font-bold">{t('col_source')}</th>
-                            <th className="p-4 font-bold">{t('col_depth')}</th>
-                            <th className="p-4 font-bold">{t('col_sentiment')}</th>
-                            <th className="p-4 font-bold text-right rtl:text-left">{t('col_reach')}</th>
-                            <th className="p-4 font-bold text-right rtl:text-left">{t('col_likes')}</th>
-                            <th className="p-4 font-bold text-right rtl:text-left">{t('col_retweets')}</th>
-                            <th className="p-4 font-bold text-right rtl:text-left">{t('col_replies')}</th>
-                            <th className="p-4 font-bold text-right rtl:text-left">{t('col_ave')}</th>
-                            <th className="p-4 font-bold text-center">{t('col_status')}</th>
-                            <th className="p-4 font-bold text-center w-12"></th>
+                            <th scope="col" className="p-4 font-bold">{t('col_date')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_title')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_source')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_depth')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_sentiment')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_reach')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_likes')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_retweets')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_replies')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_ave')}</th>
+                            <th scope="col" className="p-4 font-bold text-center">{t('col_status')}</th>
+                            <th scope="col" className="p-4 font-bold text-center w-12">
+                                <span className="sr-only">Actions</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border/50">

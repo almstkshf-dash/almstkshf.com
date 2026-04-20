@@ -265,6 +265,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                     disabled={!formData.url}
                                     className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0 h-auto shadow-none"
                                     title={t('fetch_article')}
+                                    aria-label={t('fetch_article')}
                                 >
                                     {!isExtracting && <Wand2 className="w-4 h-4" aria-hidden="true" />}
                                     <span className="hidden sm:inline">

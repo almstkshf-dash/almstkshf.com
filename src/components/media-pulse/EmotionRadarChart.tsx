@@ -49,7 +49,14 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
         <div className="w-full h-[300px]" style={{ minHeight: '300px' }}>
             {mounted && (
                 <ResponsiveContainer width="100%" height="100%" minHeight={300} debounce={50}>
-                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={translatedData}>
+                    <RadarChart 
+                        cx="50%" 
+                        cy="50%" 
+                        outerRadius="80%" 
+                        data={translatedData}
+                        role="img"
+                        aria-label="Emotional intensity radar chart"
+                    >
                         <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
                         <PolarAngleAxis 
                             dataKey="subject" 

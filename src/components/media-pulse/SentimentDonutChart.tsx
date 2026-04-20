@@ -79,6 +79,12 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
                             paddingAngle={5}
                             dataKey="value"
                             stroke="none"
+                            role="img"
+                            aria-label={t("sentiment_distribution_label", {
+                                positive: data.positive,
+                                neutral: data.neutral,
+                                negative: data.negative
+                            })}
                         >
                             {chartData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.color} />

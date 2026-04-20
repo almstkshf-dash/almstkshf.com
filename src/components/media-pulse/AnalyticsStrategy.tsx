@@ -72,7 +72,7 @@ export function AnalyticsStrategy() {
                             <div className="lg:col-span-5 space-y-6">
                                 <div className="flex items-center gap-4">
                                     <div className={clsx("p-3 rounded-xl bg-muted transition-colors", s.color)}>
-                                        <s.icon className="w-6 h-6" />
+                                        <s.icon className="w-6 h-6" aria-hidden="true" />
                                     </div>
                                     <h3 className="text-3xl font-bold text-foreground tracking-tight transition-colors">{t(`${s.key}.title`)}</h3>
                                 </div>

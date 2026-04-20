@@ -119,6 +119,13 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                                         <div
                                             key={`${dayIndex}-${hour}`}
                                             className="group relative flex-1 aspect-square max-h-[28px]"
+                                            role="gridcell"
+                                            aria-label={t("heatmap_cell_label", {
+                                                day: DAYS[dayIndex],
+                                                time: formatHour(hour),
+                                                count: val,
+                                                defaultValue: `${val} articles on ${DAYS[dayIndex]} at ${formatHour(hour)}`
+                                            })}
                                         >
                                             <div
                                                 className={clsx(

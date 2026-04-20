@@ -1335,6 +1335,7 @@
     "select_sources": "اختر المصادر...",
     "search_sources": "البحث في المصادر...",
     "clear_all": "مسح الكل",
+    "remove": "إزالة",
     "not_authenticated": "غير مسجل دخول. يرجى تسجيل الدخول أولاً."
   },
   "PressReleasePanel": {
@@ -1677,7 +1678,8 @@
     "source": "المصدر",
     "error_fetching": "فشل الاتصال بتدفق الاستخبارات.",
     "placeholder_url": "أدخل رابط RSS (مثلاً https://...)",
-    "analyze": "تحليل التدفق"
+    "analyze": "تحليل التدفق",
+    "refresh": "تحديث البيانات"
   },
   "TerroristList": {
     "title": "القائمة المحلية للإرهاب",

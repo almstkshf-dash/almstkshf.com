@@ -120,7 +120,8 @@ export default function RssFeeder({
           onClick={() => fetchFeed()}
           disabled={isLoading}
           className="p-2 hover:bg-muted rounded-full transition-colors disabled:opacity-50 text-foreground/60 hover:text-foreground"
-          title="Refresh Feed"
+          aria-label={t('refresh')}
+          title={t('refresh')}
         >
           <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
         </button>

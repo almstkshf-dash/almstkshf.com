@@ -188,6 +188,7 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: any }) =
             href={p.url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${p.platform}: ${p.found === true ? t('result_view.headers.found') : p.found === false ? t('result_view.headers.clear') : t('result_view.headers.unknown')}`}
             className={`group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border bg-gradient-to-br ${CATEGORY_COLORS[p.category] || 'from-muted/20 to-muted/10 border-border'
               } hover:scale-105 transition-all duration-200 cursor-pointer`}
           >
@@ -195,10 +196,10 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: any }) =
             <span className={`absolute top-2 right-2 w-2 h-2 rounded-full ${p.found === true ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
                 : p.found === false ? 'bg-rose-400'
                   : 'bg-amber-400'
-              }`} />
+              }`} aria-hidden="true" />
             {/* Icon */}
             <span className="text-2xl" aria-hidden="true">
-              {PLATFORM_ICONS[p.platform] || 'ðŸŒ'}
+              {PLATFORM_ICONS[p.platform] || '🌐'}
             </span>
             {/* Name */}
             <span className="text-xs font-medium text-center text-foreground leading-tight">{p.platform}</span>
@@ -518,10 +519,15 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
             onClick={() => {
               const pre = document.getElementById('raw-json-view');
               if (pre) pre.classList.toggle('hidden');
+              const isExpanded = pre && !pre.classList.contains('hidden');
+              const btn = document.querySelector('[aria-controls="raw-json-view"]');
+              if (btn) btn.setAttribute('aria-expanded', String(isExpanded));
             }}
+            aria-expanded="false"
+            aria-controls="raw-json-view"
             className="text-[9px] font-black text-foreground/80 hover:text-primary uppercase tracking-widest flex items-center gap-1.5 transition-colors"
           >
-            <Info className="w-3 h-3" />
+            <Info className="w-3 h-3" aria-hidden="true" />
             {t('result_view.fields.toggle_raw')}
           </button>
           <pre id="raw-json-view" className="hidden mt-3 text-[10px] text-foreground/60 whitespace-pre-wrap break-all bg-black/5 p-4 rounded-xl font-mono">
@@ -549,17 +555,17 @@ export default function OsintTab() {
     placeholder: string;
     hint: string;
   }> = [
-      { type: 'email', label: t('panels.email.title'), icon: <Mail className="w-4 h-4" />, placeholder: t('panels.email.placeholder'), hint: t('panels.email.desc') },
-      { type: 'domain', label: t('panels.domain.title'), icon: <Globe className="w-4 h-4" />, placeholder: t('panels.domain.placeholder'), hint: t('panels.domain.desc') },
-      { type: 'ip', label: t('panels.ip.title'), icon: <Wifi className="w-4 h-4" />, placeholder: t('panels.ip.placeholder'), hint: t('panels.ip.desc') },
-      { type: 'username', label: t('panels.username.title'), icon: <User className="w-4 h-4" />, placeholder: t('panels.username.placeholder'), hint: t('panels.username.desc') },
-      { type: 'phone', label: t('panels.phone.title'), icon: <Phone className="w-4 h-4" />, placeholder: t('panels.phone.placeholder'), hint: t('panels.phone.desc') },
-      { type: 'news', label: t('panels.news.title'), icon: <Cloud className="w-4 h-4" />, placeholder: t('panels.news.placeholder'), hint: t('panels.news.desc') },
-      { type: 'corporate', label: t('panels.corporate.title'), icon: <Database className="w-4 h-4" />, placeholder: t('panels.corporate.placeholder'), hint: t('panels.corporate.desc') },
-      { type: 'location', label: t('panels.location.title'), icon: <Globe className="w-4 h-4" />, placeholder: t('panels.location.placeholder'), hint: t('panels.location.desc') },
-      { type: 'wikipedia', label: t('panels.wikipedia.title'), icon: <Info className="w-4 h-4" />, placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
-      { type: 'gleif', label: t('panels.gleif.title'), icon: <Database className="w-4 h-4" />, placeholder: t('panels.gleif.placeholder'), hint: t('panels.gleif.desc') },
-      { type: 'watchlist', label: t('panels.watchlist.title'), icon: <Shield className="w-4 h-4" />, placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
+      { type: 'email', label: t('panels.email.title'), icon: <Mail className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.email.placeholder'), hint: t('panels.email.desc') },
+      { type: 'domain', label: t('panels.domain.title'), icon: <Globe className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.domain.placeholder'), hint: t('panels.domain.desc') },
+      { type: 'ip', label: t('panels.ip.title'), icon: <Wifi className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.ip.placeholder'), hint: t('panels.ip.desc') },
+      { type: 'username', label: t('panels.username.title'), icon: <User className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.username.placeholder'), hint: t('panels.username.desc') },
+      { type: 'phone', label: t('panels.phone.title'), icon: <Phone className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.phone.placeholder'), hint: t('panels.phone.desc') },
+      { type: 'news', label: t('panels.news.title'), icon: <Cloud className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.news.placeholder'), hint: t('panels.news.desc') },
+      { type: 'corporate', label: t('panels.corporate.title'), icon: <Database className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.corporate.placeholder'), hint: t('panels.corporate.desc') },
+      { type: 'location', label: t('panels.location.title'), icon: <Globe className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.location.placeholder'), hint: t('panels.location.desc') },
+      { type: 'wikipedia', label: t('panels.wikipedia.title'), icon: <Info className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
+      { type: 'gleif', label: t('panels.gleif.title'), icon: <Database className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.gleif.placeholder'), hint: t('panels.gleif.desc') },
+      { type: 'watchlist', label: t('panels.watchlist.title'), icon: <Shield className="w-4 h-4" aria-hidden="true" />, placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
     ];
 
   // â”€â”€ Hydration guard â”€â”€
@@ -762,7 +768,7 @@ export default function OsintTab() {
               <h2 className="text-base font-bold">{t('title')}</h2>
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
               <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{tCommon('status')}</span>
             </div>
           </div>
@@ -773,6 +779,7 @@ export default function OsintTab() {
               <button
                 key={lt.type}
                 onClick={() => { handleTypeChange(lt.type); setQuery(''); setResult(null); setError(''); }}
+                aria-pressed={activeType === lt.type}
                 className={clsx(
                   'flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all',
                   activeType === lt.type
@@ -795,7 +802,7 @@ export default function OsintTab() {
           <div className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
                 <label htmlFor="lookup-input" className="sr-only">{currentType.placeholder}</label>
                 <input
                   id="lookup-input"
@@ -818,8 +825,8 @@ export default function OsintTab() {
                   title={tOpt('button_tooltip')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
                 >
-                  <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} />
-                  <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" />
+                  <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} aria-hidden="true" />
+                  <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
                 </button>
               </div>
               <Button
@@ -843,7 +850,7 @@ export default function OsintTab() {
 
           {optimizationInfo && (
             <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
-              <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+              <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
                   {tOpt('explanation_title')}
@@ -883,7 +890,7 @@ export default function OsintTab() {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
@@ -924,7 +931,7 @@ export default function OsintTab() {
           <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
+                <Clock className="w-4 h-4 text-primary" aria-hidden="true" />
                 <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">{tDashboard('coverage_log')}</h3>
               </div>
               <div className="flex items-center gap-2">
@@ -986,14 +993,16 @@ export default function OsintTab() {
                       <button
                         onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id as Id<"osint_results"> }); }}
                         className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-destructive transition-all"
+                        aria-label={tCommon('delete')}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setHistoryItemToSave(item); }}
                         className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-emerald-500/10 text-foreground/60 hover:text-emerald-500 transition-all"
+                        aria-label={t('result_view.fields.save_collection')}
                       >
-                        <FolderPlus className="w-3.5 h-3.5" />
+                        <FolderPlus className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                       <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-foreground/60 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         {expandedHistory === item._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -1123,7 +1132,7 @@ export default function OsintTab() {
                 <div className="space-y-1.5">
                   <label htmlFor="dir-search" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.search')}</label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" aria-hidden="true" />
                     <input id="dir-search" name="search" className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
                   </div>
                 </div>

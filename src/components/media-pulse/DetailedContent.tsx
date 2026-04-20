@@ -47,7 +47,7 @@ export function DetailedContent() {
                         >
                             <div className="flex gap-6">
                                 <div className={clsx("p-4 rounded-2xl shrink-0 h-fit transition-colors", f.bg, f.color)}>
-                                    <f.icon className="w-8 h-8" />
+                                    <f.icon className="w-8 h-8" aria-hidden="true" />
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-xl font-bold text-foreground uppercase tracking-wider text-sm transition-colors">

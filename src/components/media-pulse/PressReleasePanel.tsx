@@ -19,17 +19,17 @@ import Button from '@/components/ui/Button';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 
-// â”€â”€â”€ PR wire sources metadata (mirrored from backend for display) â”€â”€â”€â”€
+// ─── PR wire sources metadata (mirrored from backend for display) ────
 const PR_WIRES = [
-    { name: 'PR Newswire', region: 'Global', flag: 'ðŸŒ' },
-    { name: 'Business Wire', region: 'Global', flag: 'ðŸŒ' },
-    { name: 'GlobeNewswire MENA', region: 'MENA', flag: 'ðŸŒ' },
-    { name: 'Zawya PR', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
-    { name: 'WAM (UAE EN)', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
-    { name: 'WAM (UAE AR)', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
-    { name: 'SPA (Saudi)', region: 'SA', flag: 'ðŸ‡¸ðŸ‡¦' },
-    { name: 'MENA FN', region: 'MENA', flag: 'ðŸŒ' },
-    { name: 'Gulf News PR', region: 'AE', flag: 'ðŸ‡¦ðŸ‡ª' },
+    { name: 'PR Newswire', region: 'Global', flag: '🌐' },
+    { name: 'Business Wire', region: 'Global', flag: '🌐' },
+    { name: 'GlobeNewswire MENA', region: 'MENA', flag: '🌐' },
+    { name: 'Zawya PR', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (UAE EN)', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (UAE AR)', region: 'AE', flag: '🇦🇪' },
+    { name: 'SPA (Saudi)', region: 'SA', flag: '🇸🇦' },
+    { name: 'MENA FN', region: 'MENA', flag: '🌐' },
+    { name: 'Gulf News PR', region: 'AE', flag: '🇦🇪' },
 ];
 
 type FeedResult = {
@@ -96,7 +96,7 @@ export default function PressReleasePanel() {
             <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                        <Rss className="w-4 h-4 text-blue-500" />
+                        <Rss className="w-4 h-4 text-blue-500" aria-hidden="true" />
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-foreground">{t('title')}</h3>
@@ -108,7 +108,7 @@ export default function PressReleasePanel() {
                 <div className="flex items-center gap-3">
                     {/* Live count badge */}
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                        <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                        <TrendingUp className="w-3.5 h-3.5 text-blue-500" aria-hidden="true" />
                         <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
                             {t('db_count', { count: prCount })}
                         </span>
@@ -120,7 +120,7 @@ export default function PressReleasePanel() {
                 {/* Row 1: keyword + limit */}
                 <div className="flex gap-3">
                     <div className="flex-1 relative">
-                        <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" />
+                        <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
                         <label htmlFor="pr-keyword-input" className="sr-only">{t('keyword_placeholder')}</label>
                         <input
                             id="pr-keyword-input"
@@ -178,14 +178,15 @@ export default function PressReleasePanel() {
                                 onClick={() => { setDateFrom(''); setDateTo(''); }}
                                 className="text-xs text-foreground/80 hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-muted"
                                 title={t('clear')}
+                                aria-label={t('clear')}
                             >
-                                âœ•
+                                ✖
                             </button>
                         )}
                     </div>
                     {!isAdmin && isAuthenticated && (
                         <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-2.5 py-1.5 rounded-lg">
-                            <Lock className="w-3 h-3" />
+                            <Lock className="w-3 h-3" aria-hidden="true" />
                             Admin only
                         </span>
                     )}
@@ -197,7 +198,7 @@ export default function PressReleasePanel() {
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
                         title={!isAdmin ? 'This feature requires admin privileges' : undefined}
                     >
-                        {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" />{t('sync_now')}</>}
+                        {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />{t('sync_now')}</>}
                     </Button>
                 </div>
 
@@ -217,7 +218,7 @@ export default function PressReleasePanel() {
                 {/* Status messages */}
                 {error && (
                     <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
-                        <XCircle className="w-4 h-4 flex-shrink-0" />
+                        <XCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                         <span>{error}</span>
                     </div>
                 )}
@@ -231,7 +232,7 @@ export default function PressReleasePanel() {
                                 ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                                 : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
                         )}>
-                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                             <span>{syncResult.message}</span>
                             {syncResult.totalErrors > 0 && (
                                 <span className="ml-auto text-xs opacity-70">{syncResult.totalErrors} feed(s) failed</span>
@@ -240,7 +241,7 @@ export default function PressReleasePanel() {
 
                         {syncResult.totalSaved === 0 && keyword.trim() && (
                             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
-                                <span className="text-lg">ðŸ”</span>
+                                <span className="text-lg">🔎</span>
                                 <span>No articles matched <strong>&quot;{keyword}&quot;</strong> across all 9 feeds. Try a shorter or broader keyword.</span>
                             </div>
                         )}
@@ -272,7 +273,7 @@ export default function PressReleasePanel() {
 
                 {/* Cron hint */}
                 <p className="text-[11px] text-foreground/60 flex items-center gap-1.5 border-t border-border/50 pt-4">
-                    <Clock className="w-3 h-3 flex-shrink-0" />
+                    <Clock className="w-3 h-3 flex-shrink-0" aria-hidden="true" />
                     {t('cron_hint')}
                 </p>
             </div>
