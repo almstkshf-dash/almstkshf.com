@@ -2072,7 +2072,8 @@
     "risk_low": "Low",
     "no_results": "No investigative results found",
     "no_results_desc": "Select a source and enter a keyword or URL to begin investigating.",
-    "col_depth": "Depth"
+    "col_depth": "Depth",
+    "search_failed": "Dark Web search systems are currently overloaded or unreachable. Please verify your API keys and try again."
   },
   "RssSources": {
     "main": "Main",

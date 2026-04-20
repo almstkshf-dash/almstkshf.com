@@ -23,7 +23,7 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "critical",
             keywords: [
                 "database dump", "private key", "passport", "credit card", "root access", "ssn", "national id",
-                "Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª", "Ù…ÙØªØ§Ø­ Ø®Ø§Øµ", "Ø¬ÙˆØ§Ø² Ø³ÙØ±", "Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù†", "Ø§Ø®ØªØ±Ø§Ù‚ ÙƒØ§Ù…Ù„",
+                "Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª", "Ù…Ù ØªØ§Ø­ Ø®Ø§Øµ", "Ø¬ÙˆØ§Ø² Ø³Ù Ø±", "Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù†", "Ø§Ø®ØªØ±Ø§Ù‚ ÙƒØ§Ù…Ù„",
                 "Ø­Ø´ÙŠØ´", "Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§", "ÙƒØ±ÙŠØ³ØªØ§Ù„", "ÙƒÙˆÙƒ", "Ø§ÙƒØ³ØªØ± Ø³ÙŠ", "ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„", "Ù„Ø§Ø±ÙŠÙƒØ§", "Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ",
                 "hashish", "weed", "cocauine", "extra c", "teramadol", "larica", "massage in dubai", "happy ending",
                 "cristal mith", "escort girls", "harm", "harmfull", "CBD OIL"
@@ -33,8 +33,8 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "high",
             keywords: [
                 "leak", "exploit", "zeroday", "vulnerability", "malware", "ransomware", "backdoor", "hack",
-                "ØªØ³Ø±ÙŠØ¨", "Ø«ØºØ±Ø©", "Ø¨Ø±Ù…Ø¬ÙŠØ§Øª Ø®Ø¨ÙŠØ«Ø©", "ÙØ¯ÙŠØ©", "Ø¨Ø§Ø¨ Ø®Ù„ÙÙŠ", "Ø§Ø®ØªØ±Ø§Ù‚",
-                "Ù†ØµØ¨", "Ø®Ø±Ø§Ø¨", "Ø²ÙØª", "ÙØ¶ÙŠØ­Ø©", "ÙˆØ±Ø·Ø©", "ØªØ¹ÙŠØ³", "ÙØ§Ø´Ù„"
+                "ØªØ³Ø±ÙŠØ¨", "Ø«ØºØ±Ø©", "Ø¨Ø±Ù…Ø¬ÙŠØ§Øª Ø®Ø¨ÙŠØ«Ø©", "Ù Ø¯ÙŠØ©", "Ø¨Ø§Ø¨ Ø®Ù„Ù ÙŠ", "Ø§Ø®ØªØ±Ø§Ù‚",
+                "Ù†ØµØ¨", "Ø®Ø±Ø§Ø¨", "Ø²Ù Øª", "Ù Ø¶ÙŠØ­Ø©", "ÙˆØ±Ø·Ø©", "ØªØ¹ÙŠØ³", "Ù Ø§Ø´Ù„"
             ]
         },
         {
@@ -119,52 +119,118 @@ export const searchAhmia = action({
         if (!identity) throw new ConvexError("Not authenticated");
 
         const q = encodeURIComponent(args.query);
-        const url = `https://ahmia.fi/search/?q=${q}&output=json`;
+        const jsonUrl = `https://ahmia.fi/search/?q=${q}&output=json`;
+        const htmlUrl = `https://ahmia.fi/search/?q=${q}`;
 
-        let results;
+        let results: any = null;
+        let usedHtmlFallback = false;
+
+        // --- Tier 1: Direct JSON API ---
         try {
+            console.log(`[DarkWeb] Attempting direct JSON fetch: ${jsonUrl}`);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000); // Shorter 8s timeout for direct attempt
+            const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s for direct
 
-            const resp = await fetch(url, {
-                headers: { "User-Agent": "Almstkshf-Bot/1.0" },
+            const resp = await fetch(jsonUrl, {
+                headers: { "User-Agent": "Almstkshf-Bot/1.1 (Research)" },
                 signal: controller.signal
             });
             clearTimeout(timeoutId);
 
-            if (!resp.ok) throw new Error(`Ahmia API request failed with status ${resp.status}`);
-            results = await resp.json();
-
-        } catch (error) {
-            console.warn("Direct Ahmia fetch failed, attempting ZenRows fallback...", error);
-            const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
-
-            if (!zenrowsKey) {
-                console.error("No ZenRows key for fallback search.");
-                throw new ConvexError("Dark Web search failed (Source unreachable). Please configure ZenRows for priority access.");
+            if (resp.ok) {
+                results = await resp.json();
+                console.log("[DarkWeb] Direct JSON fetch successful.");
+            } else {
+                console.warn(`[DarkWeb] Direct JSON fetch status: ${resp.status}`);
             }
+        } catch (error) {
+            console.warn("[DarkWeb] Direct JSON fetch failed, moving to ZenRows fallback.");
+        }
 
-            const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(url)}&js_render=true&premium_proxy=true`;
-            try {
-                const zResp = await fetch(zUrl);
-                if (!zResp.ok) throw new Error(`ZenRows request failed status ${zResp.status}`);
-
-                const zText = await zResp.text();
-                // Find JSON in the response (in case it's wrapped or returned as string)
-                const jsonMatch = zText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-                results = JSON.parse(jsonMatch ? jsonMatch[0] : zText);
-            } catch (zError) {
-                console.error("ZenRows Ahmia fallback failed:", zError);
-                throw new ConvexError("Advanced Dark Web search remains unreachable (Ahmia/ZenRows failure).");
+        // --- Tier 2: ZenRows JSON API ---
+        if (!results) {
+            const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
+            if (zenrowsKey) {
+                try {
+                    console.log("[DarkWeb] Attempting ZenRows JSON fetch...");
+                    const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(jsonUrl)}&js_render=true&premium_proxy=true`;
+                    const zResp = await fetch(zUrl);
+                    if (zResp.ok) {
+                        const zText = await zResp.text();
+                        const jsonMatch = zText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
+                        results = JSON.parse(jsonMatch ? jsonMatch[0] : zText);
+                        console.log("[DarkWeb] ZenRows JSON fetch successful.");
+                    } else {
+                        console.warn(`[DarkWeb] ZenRows JSON fetch status: ${zResp.status}`);
+                    }
+                } catch (zError) {
+                    console.warn("[DarkWeb] ZenRows JSON fetch failed:", zError);
+                }
             }
         }
 
-        try {
-            // Ahmia sometimes returns an object with results in a property, or just an array
-            const topResultsArray = Array.isArray(results) ? results : (results.results || []);
-            const topResults = topResultsArray.slice(0, 20);
+        // --- Tier 3: ZenRows HTML Scraping + Gemini Parsing (THE ULTIMATE FALLBACK) ---
+        if (!results) {
+            const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
+            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
-            // Resolve Gemini Key 
+            if (zenrowsKey && geminiKey) {
+                try {
+                    console.log("[DarkWeb] Attempting ZenRows HTML + Gemini fallback...");
+                    const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(htmlUrl)}&js_render=true&premium_proxy=true&wait=2000`;
+                    const zResp = await fetch(zUrl);
+                    if (zResp.ok) {
+                        const html = await zResp.text();
+                        
+                        // Use Gemini to extract results from HTML
+                        const prompt = `
+Extract all dark web search results from this Ahmia HTML page. 
+For each result, find the site title, onion URL, and a short snippet or description.
+Return exactly valid JSON: { \"results\": [{ \"title\": \"string\", \"url\": \"string\", \"snippet\": \"string\" }] }
+Limit to top 15 results.
+
+HTML Content Snippet:
+${html.substring(0, 20000)}
+`;
+                        const gResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: prompt }] }],
+                                generationConfig: { responseMimeType: "application/json" },
+                            }),
+                        });
+
+                        if (gResp.ok) {
+                            const gData = await gResp.ok ? await gResp.json() : null;
+                            const gText = gData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (gText) {
+                                results = JSON.parse(gText);
+                                usedHtmlFallback = true;
+                                console.log("[DarkWeb] ZenRows + Gemini HTML fallback successful.");
+                            }
+                        }
+                    }
+                } catch (htmlError) {
+                    console.error("[DarkWeb] HTML fallback failed:", htmlError);
+                }
+            }
+        }
+
+        if (!results) {
+            throw new ConvexError("search_failed");
+        }
+
+        try {
+            // Normalize results array
+            let rawResults = [];
+            if (usedHtmlFallback && results.results) {
+                rawResults = results.results;
+            } else {
+                rawResults = Array.isArray(results) ? results : (results.results || []);
+            }
+            
+            const topResults = rawResults.slice(0, 20);
             const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
             // Process results in parallel to avoid sequential fetch delays (Convex Action timeout)
@@ -192,7 +258,7 @@ export const searchAhmia = action({
                     url: item.url || "#",
                     title,
                     snippet,
-                    risk_level: analysis.risk as "low" | "medium" | "high" | "critical",
+                    risk_level: analysis.risk as \"low\" | \"medium\" | \"high\" | \"critical\",
                     summary: analysis.summary,
                     tags: analysis.tags,
                 });

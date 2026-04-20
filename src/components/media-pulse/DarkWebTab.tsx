@@ -171,7 +171,12 @@ export default function DarkWebTab() {
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Search failed';
-      setSearchError(msg);
+      // Attempt to translate the message if it's a known key
+      if (msg === 'search_failed') {
+        setSearchError(t('search_failed'));
+      } else {
+        setSearchError(msg);
+      }
     } finally {
       setIsLoading(false);
     }
