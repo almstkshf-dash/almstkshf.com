@@ -133,7 +133,7 @@ export default function DarkWebTab() {
       case 'critical': return 'bg-red-500/10 text-red-600 border-red-500/20';
       case 'high':     return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
       case 'medium':   return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
-      case 'low':      return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+      case 'low':      return 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border-emerald-500/20';
       default:         return 'bg-muted text-foreground/70 border-border';
     }
   };
@@ -384,9 +384,9 @@ export default function DarkWebTab() {
               exit={{ opacity: 0 }}
               className="flex items-start gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-sm"
             >
-              <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="font-bold text-destructive text-xs uppercase tracking-tight">Search Error</p>
+                <p className="font-bold text-rose-700 dark:text-rose-300 text-xs uppercase tracking-tight">Search Error</p>
                 <p className="text-xs text-foreground/70 mt-0.5">{searchError}</p>
               </div>
             </motion.div>
@@ -511,7 +511,7 @@ export default function DarkWebTab() {
                       <button
                         onClick={() => deleteById({ id: entry._id })}
                         aria-label={`${tCommon('delete')} ${entry.title}`}
-                        className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-destructive transition-colors group-hover:opacity-100 opacity-50"
+                        className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-rose-600 dark:hover:text-rose-400 transition-colors group-hover:opacity-100 opacity-50"
                       >
                         <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>

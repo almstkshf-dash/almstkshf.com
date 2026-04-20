@@ -256,7 +256,7 @@ const ArticleRow = memo(({
                     size="icon"
                     onClick={() => onDeleteClick(article._id)}
                     isLoading={isDeleting}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-destructive h-8 w-8 shadow-none"
+                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-rose-600 dark:hover:text-rose-400 h-8 w-8 shadow-none"
                     title={t('delete')}
                     aria-label={t('delete')}
                 >

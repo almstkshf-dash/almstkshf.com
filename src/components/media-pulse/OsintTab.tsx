@@ -76,7 +76,7 @@ const StatusBadge = ({ label, value, type = 'default' }: { label: string; value:
   const colors = {
     success: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
     warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
-    error: 'bg-destructive/10 text-destructive border-destructive/20',
+    error: 'bg-destructive/10 text-rose-700 dark:text-rose-300 border-destructive/20',
     info: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
     default: 'bg-muted/50 text-foreground/85 dark:text-slate-400 border-border'
   };
@@ -492,7 +492,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
                 >
                   <div className="flex items-center justify-between">
                     <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
-                    <span className="text-[10px] font-black text-destructive uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">
                       {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
                     </span>
                   </div>
@@ -506,7 +506,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
               {!get(data, 'matches')?.length && (
                 <div className="col-span-1 sm:col-span-2 p-4 text-center border border-emerald-500/20 bg-emerald-500/5 rounded-xl">
                   <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-50" />
-                  <p className="text-xs font-bold text-emerald-600">{t('result_view.fields.no_matches')}</p>
+                  <p className="text-xs font-bold text-emerald-800 dark:text-emerald-400">{t('result_view.fields.no_matches')}</p>
                 </div>
               )}
             </DataSection>
@@ -769,7 +769,7 @@ export default function OsintTab() {
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{tCommon('status')}</span>
+              <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">{tCommon('status')}</span>
             </div>
           </div>
 
@@ -878,7 +878,7 @@ export default function OsintTab() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="flex items-center gap-3 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3"
+                className="flex items-center gap-3 text-sm text-rose-700 dark:text-rose-300 bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3"
               >
                 <XCircle className="w-4 h-4 flex-shrink-0" />
                 <span className="font-semibold">{error}</span>
@@ -890,7 +890,7 @@ export default function OsintTab() {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="text-sm font-bold text-foreground capitalize tracking-tight">{activeType} {tDashboard('investigation_engine')}</h3>
@@ -992,7 +992,7 @@ export default function OsintTab() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id as Id<"osint_results"> }); }}
-                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-destructive transition-all"
+                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-rose-600 dark:hover:text-rose-400 transition-all"
                         aria-label={tCommon('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
@@ -1151,7 +1151,7 @@ export default function OsintTab() {
                       {r.categories.slice(0, 2).map(c => (
                         <span key={c} className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-primary/10 text-blue-800 dark:text-blue-300 border border-primary/10">{c}</span>
                       ))}
-                      {r.freeTier && <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/10">Free</span>}
+                      {r.freeTier && <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border border-emerald-500/10">Free</span>}
                     </div>
                   </a>
                 ))}

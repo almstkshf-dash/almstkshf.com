@@ -213,7 +213,7 @@ export default function TerroristListTab() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-destructive" aria-hidden="true" />
+              <Shield className="w-6 h-6 text-rose-600 dark:text-rose-400" aria-hidden="true" />
             </div>
             <div>
               <h2 className="text-lg font-bold tracking-tight">{t('title')}</h2>
@@ -227,7 +227,7 @@ export default function TerroristListTab() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsImportModalOpen(true)}
-                className="gap-2 font-bold text-[11px] uppercase tracking-widest border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+                className="gap-2 font-bold text-[11px] uppercase tracking-widest border-destructive/20 hover:bg-destructive/5 hover:text-rose-600 dark:hover:text-rose-400"
               >
                 <Upload className="w-3.5 h-3.5" />
                 {t('import_data')}
@@ -255,7 +255,7 @@ export default function TerroristListTab() {
             )}
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{tCommon('status')}</span>
+              <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">{tCommon('status')}</span>
             </div>
           </div>
         </div>
@@ -402,7 +402,7 @@ export default function TerroristListTab() {
                     <td className="px-4 py-3 text-xs text-muted-foreground border-r border-border/40 whitespace-nowrap">
                       {entry.expiryDate || 'â€”'}
                     </td>
-                    <td className="px-8 py-3 text-xs text-destructive/80 font-bold border-r border-border/40 leading-relaxed">
+                    <td className="px-8 py-3 text-xs text-rose-700 dark:text-rose-300 font-bold border-r border-border/40 leading-relaxed">
                       {entry.reasons || 'â€”'}
                     </td>
                     <td className="px-6 py-3 text-xs text-foreground/70 italic leading-relaxed">
@@ -502,7 +502,7 @@ export default function TerroristListTab() {
                   </div>
 
                   {importError && (
-                    <div className="flex items-center gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-xs font-bold" role="alert">
+                    <div className="flex items-center gap-3 p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-bold" role="alert">
                       <XCircle className="w-4 h-4" aria-hidden="true" />
                       {importError}
                     </div>

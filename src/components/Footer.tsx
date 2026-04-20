@@ -34,23 +34,23 @@ export default function Footer() {
                                 {tCommon('app_name')}
                             </span>
                         </Link>
-                        <p className="text-foreground/80 dark:text-slate-200 text-sm leading-relaxed max-w-xs">
+                        <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-foreground/85 hover:text-primary hover:bg-muted/80 transition-all">
+                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
                                 <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
                         <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                             <div className="relative w-20 h-8">
-                                <Image src="/tdra.webp" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/tdra.webp" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                             <div className="relative w-8 h-8">
-                                <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain dark:brightness-110" />
+                                <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                             <div className="relative w-20 h-8">
-                                <Image src="/secure.webp" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain dark:brightness-110" />
+                                <Image src="/secure.webp" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@ export default function Footer() {
                                 <li key={item.label}>
                                     <Link
                                         href={item.href as any}
-                                        className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                        className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                     >
                                         <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                         {tNav(item.label)}
@@ -78,7 +78,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/case-studies/lexcora"
-                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('lexcora')}
@@ -87,7 +87,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/contact"
-                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('contact')}
@@ -96,7 +96,7 @@ export default function Footer() {
                             <li>
                                 <Link
                                     href="/case-studies/lexcora#faq"
-                                    className="text-foreground/80 dark:text-slate-200 hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                    className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
                                     {tNav('faq')}
@@ -112,15 +112,15 @@ export default function Footer() {
                             {tCommon('try_ai')}
                         </h3>
                         <ul className="space-y-4">
-                            <li className="flex items-start gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group cursor-pointer">
+                            <li className="flex items-start gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group cursor-pointer">
                                 <MapPin className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>{t('address_dubai')}<br />{t('address_abu_dhabi')}</span>
                             </li>
-                            <li className="flex items-center gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group">
+                            <li className="flex items-center gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group">
                                 <Phone className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>+971 58 59 52 035</span>
                             </li>
-                            <li className="flex items-center gap-3 text-foreground/80 dark:text-slate-200 text-sm hover:text-foreground transition-colors group">
+                            <li className="flex items-center gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors group">
                                 <Mail className="w-5 h-5 text-primary flex-shrink-0" aria-hidden="true" />
                                 <span>k.account@almstkshf.com</span>
                             </li>
@@ -135,12 +135,12 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-4">
                             <li>
-                                <Link href="/privacy" className="text-foreground/85 hover:text-foreground transition-colors text-sm">
+                                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                                     {t('privacy')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/terms" className="text-foreground/85 hover:text-foreground transition-colors text-sm">
+                                <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                                     {t('terms')}
                                 </Link>
                             </li>
@@ -148,17 +148,17 @@ export default function Footer() {
 
                         {/* Domain Switcher Placeholder */}
                         <div className="mt-8 p-4 bg-muted/50 rounded-xl border border-border">
-                            <p className="text-xs text-foreground/70 mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
+                            <p className="text-xs text-muted-foreground mb-3 uppercase font-bold tracking-widest">{t('global_network')}</p>
                             <div className="flex flex-wrap gap-2">
                                 <span className="px-2 py-1 bg-muted text-[10px] text-foreground rounded font-medium border border-border">{t('regions.uae')}</span>
-                                <span className="px-2 py-1 bg-muted text-[10px] text-foreground/90 rounded font-medium border border-border">{t('regions.ksa')} ({t('coming_soon')})</span>
+                                <span className="px-2 py-1 bg-muted text-[10px] text-foreground rounded font-medium border border-border">{t('regions.ksa')} ({t('coming_soon')})</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-foreground/85 uppercase tracking-widest font-medium">
+                <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground uppercase tracking-widest font-medium">
                     <p>Â© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>

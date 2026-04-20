@@ -63,6 +63,7 @@
     "col_replies": "Replies",
     "col_ave": "AVE ($)",
     "col_status": "Status",
+    "sentiment": "Sentiment",
     "sentiment_override": "Sentiment Override",
     "relevancy": "Relevancy",
     "manual": "Manual",
@@ -2107,6 +2108,7 @@
     "search_failed": "Dark Web search systems are currently overloaded or unreachable. Please verify your API keys and try again."
   },
   "RssSources": {
+    "global_intel_bbc": "Global Intelligence (BBC)",
     "main": "Main",
     "news": "All News",
     "world": "Arab World",

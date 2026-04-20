@@ -217,7 +217,7 @@ export default function PressReleasePanel() {
 
                 {/* Status messages */}
                 {error && (
-                    <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2 text-sm text-rose-700 dark:text-rose-300 bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
                         <XCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                         <span>{error}</span>
                     </div>
@@ -229,7 +229,7 @@ export default function PressReleasePanel() {
                         <div className={clsx(
                             'flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl border',
                             syncResult.totalErrors === 0
-                                ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                                ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-400'
                                 : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
                         )}>
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
@@ -253,7 +253,7 @@ export default function PressReleasePanel() {
                                     className={clsx(
                                         'flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-medium',
                                         f.error
-                                            ? 'bg-destructive/5 border-destructive/20 text-destructive'
+                                            ? 'bg-destructive/5 border-destructive/20 text-rose-700 dark:text-rose-300'
                                             : 'bg-muted border-border text-foreground'
                                     )}
                                 >
@@ -261,7 +261,7 @@ export default function PressReleasePanel() {
                                     {f.error ? (
                                         <span className="ml-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
                                     ) : (
-                                        <span className="ml-2 flex-shrink-0 text-emerald-600 dark:text-emerald-400 font-bold">
+                                        <span className="ml-2 flex-shrink-0 text-emerald-800 dark:text-emerald-400 font-bold">
                                             +{f.saved ?? 0}
                                         </span>
                                     )}

@@ -631,7 +631,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Countries */}
                     <div className="space-y-2">
-                        <label id="region-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</label>
+                        <span id="region-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('region')}</span>
                         <MultiSelectDropdown
                             id="region-select"
                             aria-labelledby="region-label"
@@ -659,7 +659,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Languages */}
                     <div className="space-y-2">
-                        <label id="language-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</label>
+                        <span id="language-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('language')}</span>
                         <MultiSelectDropdown
                             id="language-select"
                             aria-labelledby="language-label"
@@ -684,7 +684,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Source Types */}
                     <div className="space-y-2">
-                        <label id="sources-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('source_types')}</label>
+                        <span id="sources-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('source_types')}</span>
                         <MultiSelectDropdown
                             id="sources-select"
                             aria-labelledby="sources-label"
@@ -700,7 +700,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     {/* Dates */}
                     <div className="space-y-2">
-                        <label id="date-range-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</label>
+                        <span id="date-range-label" className="block text-[11px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-1">{t('date_range')}</span>
                         <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="date-range-label">
                             <div className="space-y-1">
                                 <label htmlFor="date-from" className="sr-only">Date From</label>

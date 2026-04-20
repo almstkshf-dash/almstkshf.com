@@ -11,7 +11,28 @@
 import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { resolveApiKey } from "./utils/keys";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
+
+
+// --- Utilities ---
+function safeJsonParse(text: string, fallback: any = null) {
+    if (!text) return fallback;
+    try {
+        // Remove markdown code blocks if present
+        const cleanText = text.replace(/```json\n?|```/g, "").trim();
+        return JSON.parse(cleanText);
+    } catch (e) {
+        console.warn("[safeJsonParse] Failed to parse JSON, attempting regex extraction:", e);
+        try {
+            // Brute force regex for JSON-like structure
+            const match = text.match(/\{[\s\S]*\}/);
+            if (match) return JSON.parse(match[0]);
+        } catch (innerE) {
+            console.error("[safeJsonParse] Regex extraction also failed:", innerE);
+        }
+        return fallback;
+    }
+}
 
 // â”€â”€â”€ Hybrid Heuristic Engine (Zero-Cost Fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function performHeuristicAnalysis(title: string, snippet: string) {
@@ -72,6 +93,9 @@ function performHeuristicAnalysis(title: string, snippet: string) {
 
 // â”€â”€â”€ Gemini Risk Scoring Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function analyzeRiskWithGemini(title: string, text: string, geminiKey: string) {
+    const fallback = performHeuristicAnalysis(title, text);
+    if (!geminiKey) return fallback;
+
     try {
         const prompt = `
 Classify this Dark Web content risk for a media intelligence platform. Return exactly valid JSON: 
@@ -80,34 +104,43 @@ Classify this Dark Web content risk for a media intelligence platform. Return ex
 Content Title: ${title}
 Content Snippet: ${text}
 `;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout per analysis
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json" },
+                generationConfig: { 
+                    responseMimeType: "application/json",
+                    temperature: 0.1 
+                },
             }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
-            console.warn("Gemini failing, falling back to heuristics...");
-            return performHeuristicAnalysis(title, text);
+            console.warn(`[analyze] Gemini API error (${response.status}), using heuristics.`);
+            return fallback;
         }
 
         const data = await response.json();
         const outputText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!outputText) return performHeuristicAnalysis(title, text);
+        if (!outputText) return fallback;
 
-        const parsed = JSON.parse(outputText);
+        const parsed = safeJsonParse(outputText, fallback);
         const validRisks = ["low", "medium", "high", "critical"];
+        
         return {
-            risk: validRisks.includes(parsed.risk) ? parsed.risk : "medium",
-            summary: parsed.summary || "Summary generation missing",
-            tags: parsed.tags || [],
+            risk: (parsed && validRisks.includes(parsed.risk)) ? parsed.risk : fallback.risk,
+            summary: (parsed && typeof parsed.summary === "string") ? parsed.summary : fallback.summary,
+            tags: (parsed && Array.isArray(parsed.tags)) ? parsed.tags : fallback.tags,
         };
     } catch (e) {
-        console.error("Gemini parse error, using heuristics:", e);
-        return performHeuristicAnalysis(title, text);
+        console.error("[analyze] Gemini analysis crashed, using heuristics:", e);
+        return fallback;
     }
 }
 
@@ -124,12 +157,13 @@ export const searchAhmia = action({
 
         let results: any = null;
         let usedHtmlFallback = false;
+        const startTime = Date.now();
 
         // --- Tier 1: Direct JSON API ---
         try {
             console.log(`[DarkWeb] Attempting direct JSON fetch: ${jsonUrl}`);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s for direct
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s for direct
 
             const resp = await fetch(jsonUrl, {
                 headers: { "User-Agent": "Almstkshf-Bot/1.1 (Research)" },
@@ -138,8 +172,9 @@ export const searchAhmia = action({
             clearTimeout(timeoutId);
 
             if (resp.ok) {
-                results = await resp.json();
-                console.log("[DarkWeb] Direct JSON fetch successful.");
+                const text = await resp.text();
+                results = safeJsonParse(text);
+                if (results) console.log("[DarkWeb] Direct JSON fetch successful.");
             } else {
                 console.warn(`[DarkWeb] Direct JSON fetch status: ${resp.status}`);
             }
@@ -153,13 +188,17 @@ export const searchAhmia = action({
             if (zenrowsKey) {
                 try {
                     console.log("[DarkWeb] Attempting ZenRows JSON fetch...");
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); 
+
                     const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(jsonUrl)}&js_render=true&premium_proxy=true`;
-                    const zResp = await fetch(zUrl);
+                    const zResp = await fetch(zUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
                     if (zResp.ok) {
                         const zText = await zResp.text();
-                        const jsonMatch = zText.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-                        results = JSON.parse(jsonMatch ? jsonMatch[0] : zText);
-                        console.log("[DarkWeb] ZenRows JSON fetch successful.");
+                        results = safeJsonParse(zText);
+                        if (results) console.log("[DarkWeb] ZenRows JSON fetch successful.");
                     } else {
                         console.warn(`[DarkWeb] ZenRows JSON fetch status: ${zResp.status}`);
                     }
@@ -169,7 +208,7 @@ export const searchAhmia = action({
             }
         }
 
-        // --- Tier 3: ZenRows HTML Scraping + Gemini Parsing (THE ULTIMATE FALLBACK) ---
+        // --- Tier 3: ZenRows HTML Scraping + Gemini Parsing ---
         if (!results) {
             const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
             const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
@@ -177,20 +216,19 @@ export const searchAhmia = action({
             if (zenrowsKey && geminiKey) {
                 try {
                     console.log("[DarkWeb] Attempting ZenRows HTML + Gemini fallback...");
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                     const zUrl = `https://api.zenrows.com/v1/?apikey=${zenrowsKey}&url=${encodeURIComponent(htmlUrl)}&js_render=true&premium_proxy=true&wait=2000`;
-                    const zResp = await fetch(zUrl);
+                    const zResp = await fetch(zUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
                     if (zResp.ok) {
                         const html = await zResp.text();
-                        
-                        // Use Gemini to extract results from HTML
                         const prompt = `
-Extract all dark web search results from this Ahmia HTML page. 
-For each result, find the site title, onion URL, and a short snippet or description.
-Return exactly valid JSON: { \"results\": [{ \"title\": \"string\", \"url\": \"string\", \"snippet\": \"string\" }] }
-Limit to top 15 results.
-
-HTML Content Snippet:
-${html.substring(0, 20000)}
+Extract dark web search results from this HTML. Max 10.
+Return JSON: { "results": [{ "title": "string", "url": "string", "snippet": "string" }] }
+HTML: ${html.substring(0, 15000)}
 `;
                         const gResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
                             method: "POST",
@@ -202,12 +240,12 @@ ${html.substring(0, 20000)}
                         });
 
                         if (gResp.ok) {
-                            const gData = await gResp.ok ? await gResp.json() : null;
+                            const gData = await gResp.json();
                             const gText = gData?.candidates?.[0]?.content?.parts?.[0]?.text;
                             if (gText) {
-                                results = JSON.parse(gText);
-                                usedHtmlFallback = true;
-                                console.log("[DarkWeb] ZenRows + Gemini HTML fallback successful.");
+                                results = safeJsonParse(gText);
+                                usedHtmlFallback = !!results;
+                                if (usedHtmlFallback) console.log("[DarkWeb] ZenRows + Gemini HTML fallback successful.");
                             }
                         }
                     }
@@ -218,57 +256,63 @@ ${html.substring(0, 20000)}
         }
 
         if (!results) {
+            console.error("[DarkWeb] All tiers failed after", (Date.now() - startTime) / 1000, "seconds");
             throw new ConvexError("search_failed");
         }
 
         try {
             // Normalize results array
-            let rawResults = [];
-            if (usedHtmlFallback && results.results) {
+            let rawResults: any[] = [];
+            if (usedHtmlFallback && results?.results) {
                 rawResults = results.results;
-            } else {
-                rawResults = Array.isArray(results) ? results : (results.results || []);
+            } else if (Array.isArray(results)) {
+                rawResults = results;
+            } else if (results?.results) {
+                rawResults = results.results;
             }
             
-            const topResults = rawResults.slice(0, 20);
+            // Limit to 10 results to ensure we don't timeout during analysis
+            const topResults = rawResults.slice(0, 10); 
             const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
-            // Process results in parallel to avoid sequential fetch delays (Convex Action timeout)
+            console.log(`[DarkWeb] Processing ${topResults.length} results...`);
+
+            // Process results in parallel
             const processedResults = await Promise.all(
                 topResults.map(async (item: any) => {
                     const title = item.title || "No Title";
                     const snippet = (item.description || item.snippet || "No Snippet").substring(0, 1000);
-
-                    let analysis;
-                    if (geminiKey) {
-                        analysis = await analyzeRiskWithGemini(title, snippet, geminiKey);
-                    } else {
-                        analysis = performHeuristicAnalysis(title, snippet);
-                    }
-                    return { item, analysis, title, snippet };
+                    const analysis = await analyzeRiskWithGemini(title, snippet, geminiKey || "");
+                    
+                    return {
+                        query: args.query,
+                        source_type: "ahmia" as const,
+                        url: item.url || "#",
+                        title,
+                        snippet,
+                        risk_level: analysis.risk as "low" | "medium" | "high" | "critical",
+                        summary: analysis.summary,
+                        tags: analysis.tags,
+                    };
                 })
             );
 
-            const savedResults = [];
-            for (const { item, analysis, title, snippet } of processedResults) {
-                // Insert into DB
-                await ctx.runMutation(api.darkWebDb.insert, {
-                    query: args.query,
-                    source_type: "ahmia",
-                    url: item.url || "#",
-                    title,
-                    snippet,
-                    risk_level: analysis.risk as "low" | "medium" | "high" | "critical",
-                    summary: analysis.summary,
-                    tags: analysis.tags,
-                });
-                savedResults.push({ title, snippet, risk_level: analysis.risk, url: item.url });
+            // Batch insert into DB
+            if (processedResults.length > 0) {
+                await ctx.runMutation(api.darkWebDb.insertMany, { results: processedResults });
+                console.log(`[DarkWeb] Successfully saved ${processedResults.length} results.`);
             }
 
-            return savedResults;
+            return processedResults.map(r => ({
+                title: r.title,
+                snippet: r.snippet,
+                risk_level: r.risk_level,
+                url: r.url
+            }));
+
         } catch (error) {
-            console.error("Ahmia Search Error:", error);
-            throw new ConvexError("Failed to fetch from Ahmia");
+            console.error("[DarkWeb] Post-processing error:", error);
+            throw new ConvexError("Failed to process dark web results");
         }
     },
 });

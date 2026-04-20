@@ -138,7 +138,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
             label: t("total_reach"),
             value: analytics?.totalReach?.toLocaleString() || 0,
             icon: BarChart3,
-            color: "text-emerald-500",
+            color: "text-emerald-700 dark:text-emerald-400",
             bg: "bg-emerald-500/10",
             description: t("reach_desc")
         }
@@ -254,7 +254,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                     <div className="bg-card border border-border/50 rounded-3xl p-6 relative group overflow-hidden">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("sentiment_distribution")}</h3>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                                 <TrendingUp className="w-3 h-3" />
                                 +2.4%
                             </div>
@@ -264,7 +264,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                         {/* Legend */}
                         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/40">
                             <div className="text-center">
-                                <div className="text-xs font-bold text-emerald-500">{sentimentData.positive}%</div>
+                                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{sentimentData.positive}%</div>
                                 <div className="text-[10px] text-foreground/50 uppercase">{t("ToneLabels.positive")}</div>
                             </div>
                             <div className="text-center border-x border-border/40">

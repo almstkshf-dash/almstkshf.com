@@ -198,13 +198,13 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
 
                 {/* Status messages */}
                 {error && (
-                    <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2 text-sm text-rose-700 dark:text-rose-300 bg-destructive/5 border border-destructive/20 rounded-lg px-3 py-2">
                         <XCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                         {error}
                     </div>
                 )}
                 {success && (
-                    <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2 text-sm text-emerald-800 dark:text-emerald-400 bg-emerald-500/5 border border-emerald-500/20 rounded-lg px-3 py-2">
                         <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                         {success}
                     </div>
@@ -265,7 +265,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                             </span>
                             <span
                                 className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-widest ${run.status === 'success'
-                                    ? 'bg-emerald-500/10 text-emerald-600'
+                                    ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-400'
                                     : 'bg-rose-500/10 text-rose-500'
                                     }`}
                             >
@@ -275,7 +275,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                                 {run.itemCount} {t('items')}
                             </span>
                             {run.error && (
-                                <span className="text-[11px] text-destructive w-full mt-0.5">
+                                <span className="text-[11px] text-rose-700 dark:text-rose-300 w-full mt-0.5">
                                     {run.error}
                                 </span>
                             )}
@@ -283,7 +283,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="p-1.5 h-auto text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors"
+                                    className="p-1.5 h-auto text-emerald-800 dark:text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors"
                                     onClick={() => setRunToSave(run)}
                                     title={tDashboard('save_to_collection')}
                                     aria-label={tDashboard('save_to_collection')}

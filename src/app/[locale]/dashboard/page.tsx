@@ -236,7 +236,7 @@ export default function DashboardPage() {
         <div className="sticky top-8 mb-8 z-20">
             <RssFeeder
                 initialFeedUrl={isAr ? "https://aawsat.com/feed" : "https://feeds.bbci.co.uk/news/world/rss.xml"}
-                initialSourceName={isAr ? "main" : "Global Intelligence (BBC)"}
+                initialSourceName={isAr ? "main" : "global_intel_bbc"}
                 categories={isAr ? AAWSAT_SOURCES : []}
                 maxItems={10}
             />
@@ -414,7 +414,7 @@ export default function DashboardPage() {
                                 <button
                                     onClick={() => handleExport('excel')}
                                     disabled={isExporting || filteredArticles.length === 0}
-                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                                    className="h-10 px-5 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
                                 >
                                     {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
                                     {t('excel_label')}
@@ -425,7 +425,7 @@ export default function DashboardPage() {
                         {totalArticles > 0 && (
                             <button
                                 onClick={() => setIsClearDialogOpen(true)}
-                                className="h-[52px] px-6 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/20 text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 group"
+                                className="h-[52px] px-6 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-rose-600 dark:text-rose-400 border border-destructive/20 text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 group"
                             >
                                 <Trash2 className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                                 {t('clear_all')}

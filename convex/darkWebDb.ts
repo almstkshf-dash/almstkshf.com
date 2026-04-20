@@ -33,6 +33,38 @@ export const insert = mutation({
     },
 });
 
+export const insertMany = mutation({
+    args: {
+        results: v.array(v.object({
+            query: v.string(),
+            source_type: v.union(v.literal("ahmia"), v.literal("diffbot"), v.literal("zenrows")),
+            url: v.string(),
+            title: v.string(),
+            snippet: v.string(),
+            risk_level: v.union(v.literal("low"), v.literal("medium"), v.literal("high"), v.literal("critical")),
+            country_origin: v.optional(v.string()),
+            summary: v.optional(v.string()),
+            tags: v.optional(v.array(v.string())),
+        }))
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new ConvexError("Not authenticated");
+        
+        const now = Date.now();
+        const inserts = args.results.map(res => 
+            ctx.db.insert("darkweb_results", {
+                ...res,
+                user_id: identity.subject,
+                discovered_at: now,
+            })
+        );
+        
+        return await Promise.all(inserts);
+    }
+});
+
+
 // â”€â”€â”€ Fetch recent Dark Web results for the current user â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const getByUserId = query({
     args: { limit: v.optional(v.number()) },
