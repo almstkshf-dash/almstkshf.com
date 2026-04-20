@@ -857,6 +857,7 @@
       "emotional_pulse": "Emotional Pulse",
       "articles_trend": "Articles Trend",
       "sentiment_distribution": "Sentiment Distribution",
+      "sentiment_distribution_label": "Sentiment distribution: {positive}% positive, {neutral}% neutral, {negative}% negative",
       "top_emotions": "Top Emotions",
       "edit_keyword_hint": "Double click to edit keyword across all matching articles",
       "keywords": "Active Keywords",
@@ -885,6 +886,9 @@
       },
       "top_risk_indicators": "Top Risk Indicators",
       "new": "NEW"
+    },
+    "sentiment_donut": {
+      "title": "Sentiment Breakdown"
     }
   },
   "CrisisManagementDetail": {
@@ -2104,62 +2108,15 @@
     "first": "First",
     "opinion": "Opinion"
   },
-  "MediaPulseDetail": {
-    "dashboard_grid": {
-      "live_stream": "Live Stream",
-      "real_time": "Real-Time",
-      "global": "Global",
-      "keywords": "Keywords",
-      "edit_keyword_hint": "Edit keyword",
-      "reputation_safeguard": "Reputation Safeguard",
-      "reputation_desc": "AI-powered risk scoring across all monitored sources.",
-      "total_ave": "Total AVE",
-      "articles_count": "articles",
-      "risk": "Risk",
-      "top_risk_indicators": "Top Risk Indicators",
-      "emotional_pulse": "Emotional Pulse",
-      "top_emotions": "Top Emotions",
-      "articles_trend": "Articles Trend",
-      "scope": "Monitoring Scope",
-      "scope_desc": "Our engine scans thousands of global sources every hour to surface insights that matter to your brand.",
-      "tone_distribution": "Tone Distribution",
-      "new": "New",
-      "automated_alerts": "Automated Alerts",
-      "alerts_desc": "No alerts triggered in the current monitoring window.",
-      "volume_heatmap_title": "Volume Heatmap",
-      "volume_heatmap_desc": "Article volume by day and hour",
-      "nss_index": "NSS Index",
-      "sentiment_distribution_label": "Sentiment distribution: {positive}% positive, {neutral}% neutral, {negative}% negative",
-      "ToneLabels": {
-        "positive": "Positive",
-        "neutral": "Neutral",
-        "negative": "Negative"
-      },
-      "risk_factors": {
-        "high_negative_volume": "High Negative Volume",
-        "crisis_keywords": "Crisis Keywords",
-        "rapid_spread": "Rapid Spread",
-        "low_source_diversity": "Low Source Diversity",
-        "sentiment_drop": "Sentiment Drop"
-      },
-      "days": {
-        "Sun": "Sun",
-        "Mon": "Mon",
-        "Tue": "Tue",
-        "Wed": "Wed",
-        "Thu": "Thu",
-        "Fri": "Fri",
-        "Sat": "Sat"
-      },
-      "am": "AM",
-      "pm": "PM",
-      "at": "at",
-      "heatmap_cell_label": "Day {day}, Hour {hour}: {count} articles",
-      "Less": "Less",
-      "More": "More"
-    },
-    "sentiment_donut": {
-      "title": "Sentiment Breakdown"
-    }
+  "RssFeeder": {
+    "title": "Live Intelligence Feed",
+    "syncing": "Syncing...",
+    "sync_now": "Sync Now",
+    "last_updated": "Last updated: {time}",
+    "loading": "Connecting to intelligence sources...",
+    "no_items": "No items found in this feed.",
+    "read_more": "Read Analysis",
+    "analyze": "Analyze Trends",
+    "failed_fetch": "Intelligence bridge failed. Please check network connectivity."
   }
 }

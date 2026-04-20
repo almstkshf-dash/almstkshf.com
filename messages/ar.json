@@ -897,6 +897,7 @@
       "articles": "مقال",
       "articles_trend": "اتجاه المقالات",
       "sentiment_distribution": "توزيع المشاعر",
+      "sentiment_distribution_label": "توزيع النبرة: {positive}% إيجابي، {neutral}% محايد، {negative}% سلبي",
       "top_emotions": "أبرز الانفعالات",
       "edit_keyword_hint": "انقر مرتين لتعديل الكلمة المفتاحية عبر جميع المقالات المتطابقة",
       "keywords": "الكلمات المفتاحية النشطة",
@@ -925,6 +926,9 @@
       },
       "top_risk_indicators": "أبرز مؤشرات المخاطر",
       "new": "جديد"
+    },
+    "sentiment_donut": {
+      "title": "توزيع النبرة"
     }
   },
   "CrisisManagementDetail": {
@@ -2086,62 +2090,15 @@
     "first": "الأولى",
     "opinion": "الرأي"
   },
-  "MediaPulseDetail": {
-    "dashboard_grid": {
-      "live_stream": "البث المباشر",
-      "real_time": "فوري",
-      "global": "عالمي",
-      "keywords": "الكلمات المفتاحية",
-      "edit_keyword_hint": "تعديل الكلمة المفتاحية",
-      "reputation_safeguard": "درع السمعة",
-      "reputation_desc": "تقييم المخاطر بالذكاء الاصطناعي عبر جميع المصادر المراقبة.",
-      "total_ave": "إجمالي القيمة الإعلانية",
-      "articles_count": "مقالات",
-      "risk": "المخاطرة",
-      "top_risk_indicators": "أبرز مؤشرات الخطر",
-      "emotional_pulse": "النبض العاطفي",
-      "top_emotions": "أبرز المشاعر",
-      "articles_trend": "اتجاه المقالات",
-      "scope": "نطاق المراقبة",
-      "scope_desc": "يفحص محركنا آلاف المصادر العالمية كل ساعة لاستخراج الرؤى المهمة لعلامتك التجارية.",
-      "tone_distribution": "توزيع النبرة",
-      "new": "جديد",
-      "automated_alerts": "تنبيهات تلقائية",
-      "alerts_desc": "لم يتم تشغيل أي تنبيهات في نافذة المراقبة الحالية.",
-      "volume_heatmap_title": "خريطة الحجم الحرارية",
-      "volume_heatmap_desc": "حجم المقالات حسب اليوم والساعة",
-      "nss_index": "مؤشر NSS",
-      "sentiment_distribution_label": "توزيع النبرة: {positive}% إيجابي، {neutral}% محايد، {negative}% سلبي",
-      "ToneLabels": {
-        "positive": "إيجابي",
-        "neutral": "محايد",
-        "negative": "سلبي"
-      },
-      "risk_factors": {
-        "high_negative_volume": "حجم سلبي مرتفع",
-        "crisis_keywords": "كلمات مفتاحية للأزمات",
-        "rapid_spread": "انتشار سريع",
-        "low_source_diversity": "تنوع محدود في المصادر",
-        "sentiment_drop": "انخفاض النبرة"
-      },
-      "days": {
-        "Sun": "أحد",
-        "Mon": "اثن",
-        "Tue": "ثلا",
-        "Wed": "أرب",
-        "Thu": "خمي",
-        "Fri": "جمع",
-        "Sat": "سبت"
-      },
-      "am": "ص",
-      "pm": "م",
-      "at": "في",
-      "heatmap_cell_label": "اليوم {day}، الساعة {hour}: {count} مقالات",
-      "Less": "أقل",
-      "More": "أكثر"
-    },
-    "sentiment_donut": {
-      "title": "توزيع النبرة"
-    }
+  "RssFeeder": {
+    "title": "خلاصة الاستخبارات المباشرة",
+    "syncing": "جاري المزامنة...",
+    "sync_now": "زامن الآن",
+    "last_updated": "آخر تحديث: {time}",
+    "loading": "جاري الاتصال بمصادر الاستخبارات...",
+    "no_items": "لا توجد عناصر في هذه الخلاصة.",
+    "read_more": "اقرأ التحليل",
+    "analyze": "تحليل الاتجاهات",
+    "failed_fetch": "فشل جسر الاستخبارات. يرجى التحقق من اتصال الشبكة."
   }
 }
