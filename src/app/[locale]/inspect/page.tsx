@@ -35,6 +35,7 @@ import {
   RefreshCw,
   Search
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Engines & Components
 import { analyzeText, TextAnalysisResult } from '@/lib/engines/textEngine';
@@ -203,7 +204,7 @@ export default function AIInspectorPage() {
                           value={inputText}
                           onChange={(e) => setInputText(e.target.value)}
                           placeholder={t('text.placeholder')}
-                          className="w-full h-80 bg-transparent border-none focus:ring-0 text-2xl md:text-3xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-800 text-zinc-800 dark:text-zinc-200 resize-none font-sans"
+                          className="w-full h-80 bg-transparent border-none focus:ring-0 text-2xl md:text-3xl font-medium placeholder:text-zinc-500 dark:placeholder:text-zinc-500 text-zinc-800 dark:text-zinc-200 resize-none font-sans"
                         />
                       </motion.div>
                     ) : (
@@ -230,7 +231,7 @@ export default function AIInspectorPage() {
                           ) : (
                             <div className="flex flex-col items-center text-center px-6">
                               <div className="p-8 rounded-full bg-zinc-50 dark:bg-zinc-900 mb-8 group-hover/upload:scale-110 transition-transform">
-                                <Upload className="w-16 h-16 text-zinc-400 dark:text-zinc-700" />
+                                <Upload className="w-16 h-16 text-zinc-500 dark:text-zinc-500" />
                               </div>
                               <h4 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 mb-4">{t('upload.title')}</h4>
                               <p className="text-sm text-zinc-500 max-w-xs font-medium leading-relaxed">
@@ -246,7 +247,7 @@ export default function AIInspectorPage() {
 
                 <div className="p-4 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
                   <div className="flex items-center gap-6 ml-6">
-                    <div className="hidden md:flex items-center gap-2 text-zinc-400">
+                    <div className="hidden md:flex items-center gap-2 text-zinc-500">
                       <Layers className="w-4 h-4" />
                       <span className="text-[10px] font-black uppercase tracking-widest">Multi-Engine Forensic Mode</span>
                     </div>
@@ -289,7 +290,7 @@ export default function AIInspectorPage() {
                     <button onClick={resetAnalysis} className="p-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-zinc-500">
                       <RefreshCw className="w-5 h-5" />
                     </button>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-zinc-200 dark:bg-zinc-900 rounded-2xl text-xs font-black uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                    <button className="flex items-center gap-2 px-6 py-3 bg-zinc-200 dark:bg-zinc-900 rounded-2xl text-xs font-black uppercase tracking-widest text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                       <Download className="w-4 h-4" />
                       {t('export_pdf')}
                     </button>
@@ -317,21 +318,21 @@ export default function AIInspectorPage() {
         {/* Footer Forensic Info */}
         <footer className="border-t border-zinc-200 dark:border-zinc-800 pt-12 pb-24 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="space-y-2">
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
               <ShieldAlert className="w-3 h-3" />
               Zero-API Policy
             </span>
             <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">{t('browser_only')}</p>
           </div>
           <div className="space-y-2">
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
               <Info className="w-3 h-3" />
               Methodology
             </span>
             <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">{t('footer_disclaimer')}</p>
           </div>
           <div className="flex items-start justify-end">
-            <img src="/logo.png" alt="ALMSTKSHF" className="h-8 grayscale opacity-20" crossOrigin="anonymous" />
+            <Image src="/logo.png" alt="ALMSTKSHF" width={128} height={32} className="h-8 w-auto grayscale opacity-40 dark:opacity-60" unoptimized />
           </div>
         </footer>
       </div>

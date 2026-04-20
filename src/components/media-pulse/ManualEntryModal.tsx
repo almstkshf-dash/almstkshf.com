@@ -9,6 +9,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -415,7 +416,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                             {formData.imageUrl && (
                                 <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
-                                    <img src={formData.imageUrl} alt="" className="h-full w-full object-cover" aria-hidden="true" crossOrigin="anonymous" />
+                                    <Image src={formData.imageUrl} alt="" fill unoptimized className="object-cover" aria-hidden="true" />
                                 </div>
                             )}
                         </div>

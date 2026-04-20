@@ -214,6 +214,51 @@
     background-color: var(--background);
     color: var(--foreground);
     @apply antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 
+   * PERMANENT STANDARDS FOR A11Y & LAYOUT SHIFT (CLS) 
+   */
+
+  /* 1. Touch Target Minimums (24px large / sufficient space) */
+  button, 
+  a, 
+  input[type="button"], 
+  input[type="submit"], 
+  input[type="checkbox"], 
+  input[type="radio"], 
+  [role="button"], 
+  [role="menuitem"], 
+  [role="tab"],
+  [role="switch"] {
+    min-height: 24px;
+    min-width: 24px;
+    touch-action: manipulation;
+  }
+
+  /* 2. Visual Focus States (Accessibility / Color Contrast) */
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* 3. Anti Layout-Shift (CLS) Media Defaults */
+  img, 
+  video, 
+  iframe, 
+  canvas, 
+  svg {
+    max-width: 100%;
+    /* Default height/width properties prevent rendering shifts */
+    height: auto;
+  }
+
+  /* Hide broken images until loaded to prevent shift/ugliness */
+  img:-moz-loading {
+    visibility: hidden;
   }
 
   /*

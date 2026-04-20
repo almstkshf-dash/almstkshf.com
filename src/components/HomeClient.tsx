@@ -14,6 +14,7 @@ import Container from '@/components/ui/Container';
 import { LayoutDashboard, Zap, ShieldCheck, BarChart3, TrendingUp, Search } from 'lucide-react';
 import clsx from 'clsx';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 /*
  * TBT FIX â€” FreeInsightTool imports convex/react + the generated Convex API.
@@ -109,7 +110,7 @@ export default memo(function HomeClient() {
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
                         {/* Use <img> for decorative trust badges â€” they are below fold, lazy by default */}
                         <div className="relative w-32 h-12">
-                            <img
+                            <Image
                                 src="/tdra.webp"
                                 alt="TDRA Approved"
                                 width={128}
@@ -121,7 +122,7 @@ export default memo(function HomeClient() {
                             />
                         </div>
                         <div className="relative w-16 h-16">
-                            <img
+                            <Image
                                 src="/soc2.png"
                                 alt="SOC2 Compliance"
                                 width={64}
@@ -133,7 +134,7 @@ export default memo(function HomeClient() {
                             />
                         </div>
                         <div className="relative w-32 h-12">
-                            <img
+                            <Image
                                 src="/secure.webp"
                                 alt="Secure App"
                                 width={128}
@@ -145,7 +146,7 @@ export default memo(function HomeClient() {
                             />
                         </div>
                         <div className="relative w-32 h-12">
-                            <img
+                            <Image
                                 src="/saas-awards.webp"
                                 alt="SaaS Awards"
                                 width={128}

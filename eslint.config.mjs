@@ -12,7 +12,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("next/core-web-vitals", "next/typescript", "plugin:jsx-a11y/recommended"),
   {
     rules: {
       // ── TypeScript: relax to warn ──────────────────────────────────────────
@@ -35,6 +35,16 @@ const eslintConfig = [
       // ── React ──────────────────────────────────────────────────────────────
       "react/no-unescaped-entities": "warn",
       "react-hooks/exhaustive-deps": "warn",
+
+      // ── Accessibility (jsx-a11y) Permanent Checks ──────────────────────────
+      "jsx-a11y/alt-text": "warn",
+      "jsx-a11y/aria-props": "warn",
+      "jsx-a11y/aria-proptypes": "warn",
+      "jsx-a11y/aria-unsupported-elements": "warn",
+      "jsx-a11y/role-has-required-aria-props": "warn",
+      "jsx-a11y/role-supports-aria-props": "warn",
+      "jsx-a11y/no-static-element-interactions": "warn",
+      "jsx-a11y/click-events-have-key-events": "warn",
 
       // ── Next.js ────────────────────────────────────────────────────────────
       "@next/next/no-img-element": "warn",
