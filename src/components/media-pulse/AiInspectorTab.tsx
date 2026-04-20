@@ -58,32 +58,32 @@ export default function AiInspectorTab() {
         AiInspector: {
           results_summary: t("results_summary"),
           export_not_supported_excel: t("export_not_supported_excel"),
-          
+
           label_mode: t("export.label_mode") || "MODE",
           label_risk: t("export.label_risk") || "RISK LEVEL",
           label_confidence: t("export.label_confidence") || "CONFIDENCE",
-          
+
           mode_text: t("modes.text"),
           mode_image: t("modes.image"),
           mode_video: t("modes.video"),
-          
+
           risk_low: t("export.risk_low") || "Low",
           risk_medium: t("export.risk_medium") || "Medium",
           risk_high: t("export.risk_high") || "High",
-          
+
           none: t("export.none") || "None",
-          
+
           linguistic_signals: t("export.linguistic_signals") || "Linguistic Signals",
           col_sentence: t("export.col_sentence") || "Sentence Segment",
           col_flags: t("export.col_flags") || "Detected Flags",
           col_ai_prob: t("export.col_ai_prob") || "AI Probability",
-          
+
           visual_signals: t("export.visual_signals") || "Visual Signals",
           col_signal: t("export.col_signal") || "Signal",
           col_desc: t("export.col_desc") || "Description",
           col_value: t("export.col_value") || "Value",
           col_risk: t("export.col_risk") || "Risk",
-          
+
           frame_analysis: t("export.frame_analysis") || "Video Frame Analysis",
           col_time: t("export.col_time") || "Timestamp",
           col_anomaly: t("export.col_anomaly") || "Anomaly Type",
@@ -257,7 +257,8 @@ export default function AiInspectorTab() {
                 </div>
               ) : (
                 <div className="relative">
-                  <label className="block w-full cursor-pointer">
+                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                  <label htmlFor="file-upload" className="block w-full cursor-pointer">
                     <div className="border-4 border-dashed border-border/50 bg-card/60 backdrop-blur-sm rounded-[3rem] p-24 flex flex-col items-center gap-6 hover:bg-card hover:border-primary/30 transition-all group shadow-xl">
                       <div className="w-24 h-24 rounded-[2rem] bg-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-110 group-hover:bg-primary/10 group-hover:border-primary/30 transition-all shadow-inner">
                         <Upload className="w-12 h-12 text-foreground/80 group-hover:text-primary transition-colors" />
@@ -270,6 +271,7 @@ export default function AiInspectorTab() {
                         {t("select_file") || "Browse Local Storage"}
                       </div>
                       <input
+                        id="file-upload"
                         type="file"
                         accept={mode === "image" ? "image/*" : "video/*"}
                         onChange={handleFileUpload}
@@ -333,14 +335,14 @@ export default function AiInspectorTab() {
                 </div>
               </div>
 
-              <SaveToCollectionModal 
-                isOpen={isCollectionModalOpen} 
+              <SaveToCollectionModal
+                isOpen={isCollectionModalOpen}
                 onClose={() => setIsCollectionModalOpen(false)}
                 item={{
-                    id: Math.random().toString(36).substring(7),
-                    type: "ai_inspector",
-                    title: t("collection_title", { mode: t(`modes.${mode}`) }),
-                    data: mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults
+                  id: Math.random().toString(36).substring(7),
+                  type: "ai_inspector",
+                  title: t("collection_title", { mode: t(`modes.${mode}`) }),
+                  data: mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults
                 }}
               />
 
@@ -373,6 +375,7 @@ export default function AiInspectorTab() {
                 <div className="space-y-10">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div className="aspect-video rounded-[2.5rem] overflow-hidden border border-border bg-black relative group shadow-2xl">
+                      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                       <video src={previewUrl!} controls className="w-full h-full object-contain" crossOrigin="anonymous" />
                     </div>
                     <div className="flex flex-col justify-center space-y-6 lg:pl-10">

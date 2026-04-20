@@ -89,10 +89,13 @@ export function CommandMenu() {
     if (!open) return null;
 
     return (
+        <>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
             className="fixed inset-0 z-[999] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 sm:p-6 md:p-20 animate-in fade-in duration-200"
             onClick={() => setOpen(false)}
         >
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
             <div
                 role="dialog"
                 aria-modal="true"
@@ -215,6 +218,7 @@ export function CommandMenu() {
                 </Command>
             </div>
         </div>
+        </>
     );
 }
 

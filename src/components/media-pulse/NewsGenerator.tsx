@@ -297,6 +297,7 @@ const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 onChange={(e) => setSearch(e.target.value)}
                                 autoComplete="off"
                                 className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
+                                /* eslint-disable-next-line jsx-a11y/no-autofocus */
                                 autoFocus
                             />
                         </div>

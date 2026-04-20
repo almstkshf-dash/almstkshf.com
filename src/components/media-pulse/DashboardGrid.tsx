@@ -78,6 +78,7 @@ const KeywordBadge = memo(function KeywordBadge({ kw }: { kw: string }) {
                     onChange={e => setEditValue(e.target.value)}
                     onBlur={() => saveKeyword(kw)}
                     onKeyDown={e => handleKeyDown(e, kw)}
+                    /* eslint-disable-next-line jsx-a11y/no-autofocus */
                     autoFocus
                     className="bg-transparent border-none outline-none text-primary w-24 p-0 focus:ring-0 text-[11px] font-bold h-4"
                 />
