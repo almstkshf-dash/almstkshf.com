@@ -22,17 +22,15 @@ const nextConfig = {
          *
          * Estimated saving: 650 ms (per Lighthouse audit).
          */
-        optimizeCss: false,
+        optimizeCss: true,
 
         optimizePackageImports: [
             'lucide-react',
             'framer-motion',
             'recharts',
             'sonner',
-            'next-themes',
             '@vercel/analytics',
         ],
-
     },
 
     // Top-level turbopack config (Next.js 15.5+)
@@ -54,10 +52,10 @@ const nextConfig = {
     poweredByHeader: false,
 
     eslint: {
-        ignoreDuringBuilds: true,
+        ignoreDuringBuilds: false,
     },
     typescript: {
-        ignoreBuildErrors: true,
+        ignoreBuildErrors: false,
     },
 
     async headers() {

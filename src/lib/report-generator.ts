@@ -72,7 +72,7 @@ export class ReportGenerator {
     public async generatePDF(): Promise<Blob> {
         const title = this.translations.Reports?.pr_title || 'Media Monitoring Report';
         const result = await ReportGenerator.generatePressReleasePDF(this.articles, this.translations, title, true);
-        return (result as any).doc.output('blob');
+        return result.doc.output('blob');
     }
 
     /**
@@ -80,7 +80,7 @@ export class ReportGenerator {
      */
     public async generateExcel(): Promise<Blob> {
         const title = this.translations.Reports?.pr_title || 'Media Monitoring Report';
-        return await ReportGenerator.generateExcel(this.articles, this.translations, title, true) as Blob;
+        return await ReportGenerator.generateExcel(this.articles, this.translations, title, true);
     }
 
     /**
@@ -297,7 +297,7 @@ export class ReportGenerator {
     }
 
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string, returnOnly = false) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Cover Page
         this.addCoverPage(doc, title, articles.length, translations, logoBase64, fontLoaded);
@@ -346,7 +346,8 @@ export class ReportGenerator {
             translations
         });
 
-        this.finalizePDF(doc, title, translations, fontLoaded);
+        this.finalizePDF(doc, title, translations, fontLoaded, returnOnly);
+        return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
     }
 
     private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: any, title: string) {
@@ -787,7 +788,7 @@ export class ReportGenerator {
         });
     }
 
-    private static finalizePDF(doc: jsPDF, title: string, translations: any, fontLoaded: boolean) {
+    private static finalizePDF(doc: jsPDF, title: string, translations: any, fontLoaded: boolean, returnOnly = false) {
         const pages = doc.getNumberOfPages();
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
@@ -801,6 +802,8 @@ export class ReportGenerator {
             const pageStr = translations.Reports?.page || 'Page';
             doc.text(this.fixArabic(`${pageStr} ${i} / ${pages}`), pageWidth - 14, pageHeight - 10, { align: 'right' });
         }
+
+        if (returnOnly) return;
 
         const dateStr = new Date().toISOString().split('T')[0];
         doc.save(`${title.replace(/\s+/g, '_')}_${dateStr}.pdf`);
@@ -889,7 +892,8 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateExcel(articles: ReportArticle[], translations: any, title: string, returnOnly = false) {
+    private static async generateExcel(articles: ReportArticle[], translations: any, title: string, returnOnly = false): Promise<any> {
+        const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
 
@@ -921,7 +925,12 @@ export class ReportGenerator {
             });
         });
 
-        this.downloadWorkbook(workbook, title);
+        if (returnOnly) {
+            const buffer = await workbook.xlsx.writeBuffer();
+            return new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        }
+
+        await this.downloadWorkbook(workbook, title);
     }
 
     private static async generateOsintHistoryExcel(items: OsintResult[], translations: any, title: string) {

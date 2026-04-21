@@ -16,6 +16,7 @@
     "e2e:headless": "start-server-and-test dev http://localhost:3001 \"cypress run --e2e\""
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
     "@clerk/nextjs": "^6.38.0",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
@@ -38,6 +39,8 @@
     "@upstash/search": "^0.1.7",
     "@vercel/analytics": "^1.6.1",
     "@vercel/otel": "^2.1.0",
+    "@vercel/speed-insights": "^2.0.0",
+    "ai": "^6.0.168",
     "autoprefixer": "^10.4.24",
     "axios": "^1.15.0",
     "cheerio": "^1.2.0",
@@ -67,7 +70,8 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "tesseract.js": "^7.0.0",
-    "three": "^0.182.0"
+    "three": "^0.182.0",
+    "zod": "^4.3.6"
   },
   "browserslist": [
     "last 2 Chrome versions",

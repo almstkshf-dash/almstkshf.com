@@ -15,28 +15,16 @@ import { useRouter, usePathname } from '@/i18n/routing';
 import { Plus, Search, Filter, FileSpreadsheet, FileDown, Trash2, AlertTriangle, X, Globe, Settings, Lock, ShieldCheck, AlertCircle, Loader2, Activity, BarChart3, GlobeLock, Shield, Fingerprint as InspectIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
-import DashboardGrid from '@/components/media-pulse/DashboardGrid';
-import { useMutation, useQuery, useConvexAuth } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
-import NewsGenerator, { ALL_COUNTRIES } from '@/components/media-pulse/NewsGenerator';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
+import { useMutation, useQuery, useConvexAuth } from 'convex/react';
+import { api } from '../../../../convex/_generated/api';
+import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
+import { ALL_COUNTRIES } from '@/components/media-pulse/NewsGenerator';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import { AAWSAT_SOURCES } from '@/config/rss-sources';
-
-// Lazy-load heavy components to reduce initial JS payload
-const DarkWebTab = dynamic(() => import('@/components/media-pulse/DarkWebTab'), { ssr: false });
-const OsintTab = dynamic(() => import('@/components/media-pulse/OsintTab'), { ssr: false });
-const TerroristListTab = dynamic(() => import('@/components/media-pulse/TerroristListTab'), { ssr: false });
-const AiInspectorTab = dynamic(() => import('@/components/media-pulse/AiInspectorTab'), { ssr: false });
-const DeepStatusPanel = dynamic(() => import('@/components/media-pulse/DeepStatusPanel'), { ssr: false });
-const ArticleTable = dynamic(() => import('@/components/media-pulse/ArticleTable'), { ssr: false });
-const PressReleasePanel = dynamic(() => import('@/components/media-pulse/PressReleasePanel'), { ssr: false });
-const ManualEntryModal = dynamic(() => import('@/components/media-pulse/ManualEntryModal'), { ssr: false });
-const RssFeeder = dynamic(() => import('@/components/dashboard/RssFeeder'), { ssr: false });
 
 function TabSkeleton() {
     return (
@@ -49,6 +37,24 @@ function TabSkeleton() {
         </div>
     );
 }
+
+// Lazy-load heavy components to reduce initial JS payload
+const DashboardGrid = dynamic(() => import('@/components/media-pulse/DashboardGrid'), {
+    ssr: false,
+    loading: () => <TabSkeleton />
+});
+const NewsGenerator = dynamic(() => import('@/components/media-pulse/NewsGenerator'), {
+    ssr: false
+});
+const DarkWebTab = dynamic(() => import('@/components/media-pulse/DarkWebTab'), { ssr: false });
+const OsintTab = dynamic(() => import('@/components/media-pulse/OsintTab'), { ssr: false });
+const TerroristListTab = dynamic(() => import('@/components/media-pulse/TerroristListTab'), { ssr: false });
+const AiInspectorTab = dynamic(() => import('@/components/media-pulse/AiInspectorTab'), { ssr: false });
+const DeepStatusPanel = dynamic(() => import('@/components/media-pulse/DeepStatusPanel'), { ssr: false });
+const ArticleTable = dynamic(() => import('@/components/media-pulse/ArticleTable'), { ssr: false });
+const PressReleasePanel = dynamic(() => import('@/components/media-pulse/PressReleasePanel'), { ssr: false });
+const ManualEntryModal = dynamic(() => import('@/components/media-pulse/ManualEntryModal'), { ssr: false });
+const RssFeeder = dynamic(() => import('@/components/dashboard/RssFeeder'), { ssr: false });
 
 
 type ArticleItem = {
