@@ -1345,7 +1345,23 @@
     "investigation_engine": "محرك التحقيق",
     "export_pdf": "تصدير PDF",
     "export_excel": "تصدير Excel",
-    "save_to_collection": "حفظ في المجموعة"
+    "save_to_collection": "حفظ في المجموعة",
+    "sidebar": {
+      "standard": "قياسي",
+      "deep": "رصد متعمق",
+      "darkweb": "الويب المظلم",
+      "osint": "محرك المعلومات",
+      "inspect": "المفتش الذكي",
+      "terrorist_list": "قائمة المراقبة",
+      "settings": "الإعدادات"
+    },
+    "section": {
+      "discovery": "محرك الاكتشاف",
+      "press": "مراقبة الصحافة",
+      "analytics": "تحليلات النبض الإعلامي",
+      "coverage": "سجل التغطية",
+      "live_feed": "البث المباشر"
+    }
   },
   "NewsGenerator": {
     "monitor_keyword": "مراقبة الكلمات المفتاحية",
@@ -1519,6 +1535,7 @@
         "threat_level": "مستوى التهديد",
         "registered": "مسجل",
         "dnssec": "DNSSEC",
+        "mx_valid": "سجلات MX صالحة",
         "status": "الحالة",
         "valid": "صالح",
         "line_type": "نوع الخط",
@@ -1533,6 +1550,9 @@
         "found": "موجود",
         "clear": "نظيف",
         "unknown": "غير معروف",
+        "digital_exposure": "درجة الانكشاف الرقمي",
+        "exposure_score": "درجة الانكشاف الرقمي",
+        "platforms_found": "المنصات المكتشفة",
         "found_on": "موجود في",
         "not_found_on": "غير موجود في",
         "unknown_on": "غير محدد في"
@@ -1583,9 +1603,15 @@
         "platform_unknown": "غير محدد / محجوب",
         "analysis_completed": "اكتمل التحليل بنجاح",
         "save_collection": "حفظ في المجموعة",
-        "platforms_checked_full": "تم فحص {count} منصة"
-      },
-      "toggle_raw": "تبديل بيانات المطور الخام"
+        "platforms_checked_full": "تم فحص {count} منصة",
+        "holehe_note": "تحليل البصمة الاجتماعية عبر Holehe.",
+        "articles_found": "المقالات التي تم العثور عليها",
+        "companies_found": "الشركات التي تم العثور عليها",
+        "locations_found": "المواقع التي تم العثور عليها",
+        "match_found": "تم العثور على تطابق",
+        "data_feeds": "خلاصات البيانات",
+        "toggle_raw": "تبديل بيانات المطور الخام"
+      }
     },
     "admin_only": "عمليات البحث المتقدمة في OSINT مقتصرة على حسابات المسؤولين. يرجى الاتصال بالمسؤول للوصول.",
     "export_history": "تصدير سجل التحقيق",

@@ -106,13 +106,19 @@ export default function RssFeeder({
         throw new Error(data.error || 'Invalid feed format');
       }
     } catch (err: unknown) {
-      console.error('[RssFeeder] Fetch error:', err);
+      // Log full error details for debugging in developmental environments
+      console.error('[RssFeeder] Fetch error technical details:', {
+        url: activeUrl,
+        error: err,
+        timestamp: new Date().toISOString()
+      });
       
       const message = err instanceof Error ? err.message : String(err);
       
       // Explicitly handle network-level failures vs API errors
       if (err instanceof TypeError && (message === 'Failed to fetch' || message.includes('network'))) {
-        setError(t('failed_fetch'));
+        setError(t('failed_fetch') + ' - Network or CORS issue');
+        console.warn('[RssFeeder] This usually happens if the request is blocked by an ad-blocker or a firewall.');
       } else if (err instanceof Error && err.name === 'AbortError') {
         setError(t('error_fetching') + ' (Timeout)');
       } else {

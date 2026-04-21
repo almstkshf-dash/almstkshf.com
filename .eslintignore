@@ -1,0 +1,7 @@
+.next/
+convex/_generated/
+scratch/
+next-env.d.ts
+public/
+dist/
+node_modules/

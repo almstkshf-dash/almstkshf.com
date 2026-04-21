@@ -1305,7 +1305,23 @@
     "investigation_engine": "Investigation Engine",
     "export_pdf": "Export PDF",
     "export_excel": "Export Excel",
-    "save_to_collection": "Save to Collection"
+    "save_to_collection": "Save to Collection",
+    "sidebar": {
+      "standard": "Standard",
+      "deep": "Deep Status",
+      "darkweb": "Dark Web",
+      "osint": "OSINT Engine",
+      "inspect": "AI Inspector",
+      "terrorist_list": "Watchlist",
+      "settings": "Settings"
+    },
+    "section": {
+      "discovery": "Discovery Engine",
+      "press": "Press Monitor",
+      "analytics": "Media Pulse Analytics",
+      "coverage": "Coverage Log",
+      "live_feed": "Live Feed"
+    }
   },
   "NewsGenerator": {
     "monitor_keyword": "Monitor Keyword",
@@ -1519,6 +1535,7 @@
         "threat_level": "Threat Level",
         "registered": "Registered",
         "dnssec": "DNSSEC",
+        "mx_valid": "MX Records Valid",
         "status": "Status",
         "valid": "Valid",
         "line_type": "Line Type",
@@ -1586,9 +1603,15 @@
         "platform_unknown": "Unknown / Blocked",
         "analysis_completed": "Analysis Completed Successfully",
         "save_collection": "Save to Collection",
-        "platforms_checked_full": "{count} platforms checked"
-      },
-      "toggle_raw": "Toggle Developer Raw Data"
+        "platforms_checked_full": "{count} platforms checked",
+        "holehe_note": "Social footprint analysis via Holehe.",
+        "articles_found": "Articles Found",
+        "companies_found": "Companies Found",
+        "locations_found": "Locations Found",
+        "match_found": "Match Found",
+        "data_feeds": "Data Feeds",
+        "toggle_raw": "Toggle Developer Raw Data"
+      }
     },
     "admin_only": "Advanced OSINT searches are restricted to admin accounts. Please contact administrator for access.",
     "export_history": "Export Investigation History",

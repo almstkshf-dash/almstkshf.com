@@ -73,19 +73,20 @@ export async function parseFeed(
   try {
     // We use redirect: 'manual' to catch broken redirects (like aawsat.com redirecting to :80 on HTTPS)
     // and fix them before following.
-    response = await fetch(url, {
+    const fetchOptions: RequestInit = {
       signal: controller.signal,
       redirect: 'manual',
       headers: {
         'User-Agent': BROWSER_UA,
-        Accept:
-          'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+        Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
         'Accept-Language': 'ar,en;q=0.9',
         Referer: new URL(url).origin + '/',
       },
       // @ts-ignore
       next: { revalidate: 900 },
-    });
+    };
+
+    response = await fetch(url, fetchOptions);
 
     // Handle redirects manually to fix broken Location headers (common in some Arabic news servers)
     if (response.status >= 300 && response.status < 400) {
@@ -99,36 +100,39 @@ export async function parseFeed(
 
         // Follow the redirect once
         const nextResponse = await fetch(fixedLocation, {
-          signal: controller.signal,
-          headers: {
-            'User-Agent': BROWSER_UA,
-            Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
-            'Accept-Language': 'ar,en;q=0.9',
-            Referer: new URL(url).origin + '/',
-          },
-          // @ts-ignore
-          next: { revalidate: 900 },
+          ...fetchOptions,
+          redirect: 'follow', // Follow subsequent redirects automatically
         });
         response = nextResponse;
       }
     }
 
     if (!response.ok) {
-      throw new Error(
-        `Remote server responded with HTTP ${response.status} ${response.statusText} for ${url}`
-      );
+      const errorText = `Remote server responded with HTTP ${response.status} ${response.statusText} for ${url}`;
+      console.warn(`[RSS Engine] ${errorText}`);
+      throw new Error(errorText);
     }
 
     rawXml = await response.text();
+    
+    // Safety check for empty responses which can happen with some proxies
+    if (!rawXml || rawXml.trim().length === 0) {
+      throw new Error(`The remote server for ${url} returned an empty response.`);
+    }
   } catch (err: any) {
     if (err.name === 'AbortError') {
-      throw new Error(
-        `Feed request timed out after ${FETCH_TIMEOUT_MS / 1000}s: ${url}`
-      );
+      throw new Error(`Feed request timed out after ${FETCH_TIMEOUT_MS / 1000}s: ${url}`);
     }
-    // If we get a TLS/SSL error (common on Windows with broken port redirects),
-    // it will be caught here but handled by our manual redirect above now.
-    throw new Error(`Network error fetching feed from ${url}: ${err.message}`);
+    
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error(`[RSS Engine] Fetch failed for ${url}:`, errorMessage);
+    
+    // Check for specific network errors that common RSS feeds might trigger
+    if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('ENOTFOUND')) {
+      throw new Error(`The feed server at ${url} is currently unreachable.`);
+    }
+    
+    throw new Error(`Network error fetching feed from ${url}: ${errorMessage}`);
   } finally {
     clearTimeout(timeoutId);
   }

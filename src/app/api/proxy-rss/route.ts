@@ -92,9 +92,17 @@ export async function GET(request: Request) {
 
   } catch (error) {
     console.error(`[API Feed] Caught error:`, error);
+    const message = error instanceof Error ? error.message : 'Internal Server Error fetching RSS feed.';
+    
+    // Choose appropriate status code
+    let status = 500;
+    if (message.includes('timeout') || message.includes('timed out')) status = 504;
+    else if (message.includes('unreachable') || message.includes('ECONN')) status = 502;
+    else if (message.includes('Empty response')) status = 502;
+
     return NextResponse.json<FeedResponse>({
       success: false,
-      error: error instanceof Error ? error.message : 'Internal Server Error fetching RSS feed.'
-    }, { status: 500 });
+      error: message
+    }, { status });
   }
 }
