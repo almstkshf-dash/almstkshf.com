@@ -82,7 +82,7 @@ export async function parseFeed(
         'Accept-Language': 'ar,en;q=0.9',
         Referer: new URL(url).origin + '/',
       },
-      // @ts-ignore
+      // @ts-expect-error Next.js extends RequestInit but it might not be typed globally
       next: { revalidate: 900 },
     };
 

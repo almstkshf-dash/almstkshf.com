@@ -11,6 +11,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
 import { X, Plus, FolderPlus, Loader2, Check } from "lucide-react";
 import Button from "./Button";
 import { useTranslations } from "next-intl";
@@ -54,7 +55,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     const handleSave = async (collectionId: string) => {
         setLoading(true);
         try {
-            await addToCollection({ collectionId: collectionId as any, item });
+            await addToCollection({ collectionId: collectionId as Id<"collections">, item });
             setSuccess(true);
             setTimeout(() => {
                 setSuccess(false);
@@ -95,7 +96,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
             onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
         >
             {/* Dialog panel â€” where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */}
             <div
                 role="dialog"
                 aria-modal="true"

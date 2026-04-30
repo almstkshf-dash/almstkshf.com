@@ -8,7 +8,7 @@
 
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConvexClientProvider } from "@/app/ConvexClientProvider";
@@ -27,11 +27,6 @@ interface RootProvidersProps {
  * client component, we align global attributes and synchronization logic.
  */
 export function RootProviders({ children, locale, messages }: RootProvidersProps) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     return (<ClerkProvider telemetry={false}><NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC"><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
     );

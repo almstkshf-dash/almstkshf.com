@@ -25,7 +25,7 @@ import { useLocale } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
-import { ALL_COUNTRIES } from '@/components/media-pulse/NewsGenerator';
+import { ALL_COUNTRIES } from '@/lib/countries';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import { AAWSAT_SOURCES } from '@/config/rss-sources';

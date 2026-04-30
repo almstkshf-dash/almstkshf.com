@@ -94,7 +94,7 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
         // â”€â”€ Standard pixel heuristics â”€â”€
-        const stats = computePixelStats(imageData, canvas.width, canvas.height, img.width, img.height, file);
+        const stats = computePixelStats(imageData, canvas.width, canvas.height, img.width, img.height);
         
         // â”€â”€ Deep ML Analysis (Async) â”€â”€
         (async () => {
@@ -111,7 +111,7 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
 
             URL.revokeObjectURL(url);
             resolve(result);
-          } catch (e) {
+          } catch {
             // Fallback to basic results if ML fails
             const result = buildImageResult(stats, file);
             URL.revokeObjectURL(url);
@@ -151,7 +151,7 @@ export const analyzeImageCanvasDeep = async (canvas: HTMLCanvasElement): Promise
   const { width, height } = canvas;
   const imageData = ctx.getImageData(0, 0, width, height);
 
-  const stats = computePixelStats(imageData, width, height, width, height, new File([], "canvas.png"));
+  const stats = computePixelStats(imageData, width, height, width, height);
   
   const ocrResult = await analyzeOCR(canvas);
   const biometricResult = await detectBiometricAnomalies(canvas);
@@ -163,12 +163,12 @@ export const analyzeImageCanvasDeep = async (canvas: HTMLCanvasElement): Promise
     watermarks: watermarkResult
   });
 
-  return finalizeReport(richResult, stats);
+  return finalizeReport(richResult);
 };
 
 // Helper to consolidate scoring logic
-export function finalizeReport(richResult: ImageAnalysisResult, stats: PixelStats): ImageAnalysisReport {
-  let riskScore = richResult.overallScore;
+export function finalizeReport(richResult: ImageAnalysisResult): ImageAnalysisReport {
+  const riskScore = richResult.overallScore;
   const signals: ImageAnalysisReport["pixelLogicSignals"] = [];
 
   for (const sig of richResult.signals) {
@@ -204,10 +204,10 @@ export const analyzeImageCanvas = (canvas: HTMLCanvasElement): ImageAnalysisRepo
 
   // Now compute full rich stats for the legacy report too
   const dummyFile = new File([], "canvas.png", { type: "image/png" });
-  const stats = computePixelStats(imageData, width, height, width, height, dummyFile);
+  const stats = computePixelStats(imageData, width, height, width, height);
   const richResult = buildImageResult(stats, dummyFile);
 
-  return finalizeReport(richResult, stats);
+  return finalizeReport(richResult);
 };
 
 // â”€â”€â”€ Pixel computation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -217,8 +217,7 @@ function computePixelStats(
   w: number,
   h: number,
   origW: number,
-  origH: number,
-  file: File
+  origH: number
 ): PixelStats {
   const px = data.data;
   const total = w * h;
