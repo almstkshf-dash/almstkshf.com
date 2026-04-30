@@ -26,6 +26,9 @@ import TextResults from "@/components/analyzers/TextResults";
 import ImageResults from "@/components/analyzers/ImageResults";
 import VideoResults from "@/components/analyzers/VideoResults";
 
+// Types
+import { AiInspectorData, ReportTranslations } from "@/types/reports";
+
 // Engines
 import { analyzeText, TextAnalysisResult } from "@/lib/engines/textEngine";
 import { analyzeImageFile, ImageAnalysisReport } from "@/lib/engines/imageEngine";
@@ -54,43 +57,81 @@ export default function AiInspectorTab() {
       const activeData = mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults;
       if (!activeData) return;
 
-      await ReportGenerator.exportAiInspectorReport(mode, activeData, {
+      // Map to AiInspectorData interface
+      const reportData: AiInspectorData = {
+        overallRisk: mode === 'text' ? (textResults?.score ?? 0 >= 70 ? 'high' : textResults?.score ?? 0 >= 30 ? 'medium' : 'low') : 
+                    mode === 'image' ? (imageResults?.overallRisk ?? 'low') : 
+                    (videoResults?.overallRisk ?? 'low'),
+        confidenceScore: activeData.score ?? activeData.confidenceScore ?? 0,
+        sentenceBreakdown: textResults?.sentences?.map(s => ({
+          text: s.text,
+          flags: s.signals,
+          aiProbability: s.score / 100
+        })),
+        pixelLogicSignals: imageResults?.pixelLogicSignals?.map(s => ({
+          id: s.id,
+          label: s.label,
+          description: s.description,
+          detectedValue: String(s.detectedValue),
+          risk: s.risk
+        })),
+        deepMl: (imageResults?.richResult?.deepMl || videoResults?.deepMl) ? {
+          biometrics: {
+            faceAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics.faceAnomalies,
+            handAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics.handAnomalies,
+          },
+          ocr: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.ocr,
+          watermarks: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.watermarks,
+        } : undefined,
+        frameAnomalies: videoResults?.frames?.map(f => ({
+          timestamp: String(f.timestamp),
+          type: f.label,
+          severity: f.score / 100,
+          description: f.signals.map(s => s.name).join(', ')
+        }))
+      };
+
+      const reportTranslations: ReportTranslations = {
         AiInspector: {
           results_summary: t("results_summary"),
           export_not_supported_excel: t("export_not_supported_excel"),
-
           label_mode: t("export.label_mode") || "MODE",
           label_risk: t("export.label_risk") || "RISK LEVEL",
           label_confidence: t("export.label_confidence") || "CONFIDENCE",
-
           mode_text: t("modes.text"),
           mode_image: t("modes.image"),
           mode_video: t("modes.video"),
-
           risk_low: t("export.risk_low") || "Low",
           risk_medium: t("export.risk_medium") || "Medium",
           risk_high: t("export.risk_high") || "High",
-
           none: t("export.none") || "None",
-
           linguistic_signals: t("export.linguistic_signals") || "Linguistic Signals",
           col_sentence: t("export.col_sentence") || "Sentence Segment",
           col_flags: t("export.col_flags") || "Detected Flags",
           col_ai_prob: t("export.col_ai_prob") || "AI Probability",
-
           visual_signals: t("export.visual_signals") || "Visual Signals",
           col_signal: t("export.col_signal") || "Signal",
           col_desc: t("export.col_desc") || "Description",
           col_value: t("export.col_value") || "Value",
           col_risk: t("export.col_risk") || "Risk",
-
           frame_analysis: t("export.frame_analysis") || "Video Frame Analysis",
           col_time: t("export.col_time") || "Timestamp",
           col_anomaly: t("export.col_anomaly") || "Anomaly Type",
-          col_severity: t("export.col_severity") || "Severity"
+          col_severity: t("export.col_severity") || "Severity",
+          anatomy_consistency: t("export.anatomy_consistency") || "Anatomy Consistency",
+          anomaly_detected: t("export.anomaly_detected") || "Anomaly Detected",
+          anomaly_low_risk: t("export.anomaly_low_risk") || "No Anomalies",
+          ocr_detect: t("export.ocr_detect") || "OCR Text Layer",
+          detected_ai_signature: t("export.detected_ai_signature") || "AI Watermark",
+          biometric_scouts: t("export.biometric_scouts") || "Biometric & Deep ML Signals",
+          col_feature: t("export.col_feature") || "Feature",
+          col_detail: t("export.col_detail") || "Detail",
+          col_status: t("export.col_status") || "Status",
         },
         brand_name: "ALMSTKSHF"
-      }, format);
+      };
+
+      await ReportGenerator.exportAiInspectorReport(mode, reportData, reportTranslations, format);
     } catch (err) {
       console.error(err);
     } finally {

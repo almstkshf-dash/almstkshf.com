@@ -38,7 +38,7 @@ export function NotificationBell() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleDismiss = async (id: any) => {
+    const handleDismiss = async (id: string) => {
         await markAsRead({ id });
     };
 

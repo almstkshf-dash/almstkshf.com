@@ -5,7 +5,7 @@ import { useState } from 'react';
 import RssFeeder from '@/components/dashboard/RssFeeder';
 
 export default function TestFetch() {
-    const [result, setResult] = useState<any>(null);
+    const [result, setResult] = useState<unknown>(null);
     const [error, setError] = useState<string | null>(null);
 
     const runTest = async (url: string) => {
@@ -19,7 +19,7 @@ export default function TestFetch() {
             } else {
                 setError(data.error || 'Unknown error');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             setError(err.message);
         }
     };

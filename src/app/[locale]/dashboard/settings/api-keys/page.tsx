@@ -54,7 +54,7 @@ export default function ApiKeysPage() {
         setIsSaving(true);
         setMessage(null);
         try {
-            await updateApiKeys({ keys: (specificKeys || keys) as any });
+            await updateApiKeys({ keys: (specificKeys || keys) as Record<string, string> });
             setMessage({ type: 'success', text: t('saved_success') });
         } catch (error) {
             console.error('Failed to save API keys:', error);

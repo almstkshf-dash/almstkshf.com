@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
                     stripePriceId: subscription.items.data[0].price.id,
                     stripeCustomerId: subscription.customer as string,
                     status: subscription.status,
-                    currentPeriodEnd: ((subscription as any).current_period_end ?? 0) * 1000,
+                    currentPeriodEnd: ((subscription as unknown as { current_period_end?: number }).current_period_end ?? 0) * 1000,
                     cancelAtPeriodEnd: subscription.cancel_at_period_end,
                     plan: plan,
                 });
@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
                 // Trigger email notification via Convex Action
                 try {
                     if (subscription.status === 'active' || subscription.status === 'trialing') {
-                        await convex.action((api as any).emails.sendSubscriptionEmail, {
-                            to: (subscription as any).customer_email || (subscription as any).email || "",
+                        await convex.action((api as unknown as { emails: { sendSubscriptionEmail: string } }).emails.sendSubscriptionEmail as never, {
+                            to: (subscription as unknown as { customer_email?: string, email?: string }).customer_email || (subscription as unknown as { email?: string }).email || "",
                             subject: subscription.status === 'trialing' ? "Welcome to your 15-day Free Trial!" : "Your Almstkshf Subscription is Active!",
                             userName: subscription.metadata?.userName || "Subscriber",
                             planName: subscription.metadata?.planName || "Selected Plan",
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
                         stripePriceId: subscription.items.data[0].price.id,
                         stripeCustomerId: subscription.customer as string,
                         status: 'canceled',
-                        currentPeriodEnd: ((subscription as any).current_period_end ?? 0) * 1000,
+                        currentPeriodEnd: ((subscription as unknown as { current_period_end?: number }).current_period_end ?? 0) * 1000,
                         cancelAtPeriodEnd: true,
                     });
                 }
@@ -160,9 +160,9 @@ export async function POST(request: NextRequest) {
 
                 let userId = invoice.metadata?.userId;
 
-                if (!userId && (invoice as any).subscription) {
+                if (!userId && (invoice as unknown as { subscription?: string }).subscription) {
                     try {
-                        const sub = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
+                        const sub = await stripe.subscriptions.retrieve((invoice as unknown as { subscription: string }).subscription);
                         userId = sub.metadata.userId;
                     } catch (e) {
                         console.error("Failed to fetch subscription for invoice fail", e);

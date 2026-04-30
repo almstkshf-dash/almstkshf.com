@@ -27,7 +27,7 @@ import {
 export type NavigationItem = {
   label: string;
   href?: string;
-  icon?: any;
+  icon?: React.ElementType;
   children?: NavigationItem[];
   description?: string;
 };

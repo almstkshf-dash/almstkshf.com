@@ -30,7 +30,7 @@ const FETCH_TIMEOUT_MS = 15_000;
  * Configured with customFields so we capture media, full content, and encoded HTML.
  * Typed as `any` because rss-parser's generics don't expose all custom fields.
  */
-const parser: any = new Parser({
+const parser = new Parser({
   customFields: {
     item: [
       ['media:content', 'media'],
@@ -119,7 +119,7 @@ export async function parseFeed(
     if (!rawXml || rawXml.trim().length === 0) {
       throw new Error(`The remote server for ${url} returned an empty response.`);
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err.name === 'AbortError') {
       throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
     }
@@ -138,18 +138,19 @@ export async function parseFeed(
   }
 
   // â”€â”€ 2. PARSE the raw XML string â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  let feed: any;
+  let feed;
   try {
     feed = await parser.parseString(rawXml);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(`[RSS Engine] XML parse error for ${url}:`, err);
-    throw new Error(`Failed to parse RSS XML from ${url}: ${err.message}`);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    throw new Error(`Failed to parse RSS XML from ${url}: ${errorMessage}`);
   }
 
   // â”€â”€ 3. NORMALISE into FeedItem[] â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const resolvedSource = sourceName || feed.title || new URL(url).hostname;
 
-  return (feed.items ?? []).map((item: any): FeedItem => {
+  return (feed.items ?? []).map((item): FeedItem => {
     const description = item.description || item.contentSnippet || '';
     const content = item.contentEncoded || item.content || description;
 

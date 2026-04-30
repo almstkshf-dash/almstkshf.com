@@ -41,9 +41,10 @@ import Button from "@/components/ui/Button";
 import { useMessages } from "next-intl";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { MonitoringArticle } from "@/types/reports";
 
 interface DashboardGridProps {
-    articles?: any[];
+    articles?: MonitoringArticle[];
     analytics?: {
         nss: number;
         riskScore: number;

@@ -68,10 +68,10 @@ export async function GET(request: NextRequest) {
         }
 
         return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error generating chatbase token:', error);
         return NextResponse.json(
-            { error: 'Failed to generate token', details: error.message },
+            { error: 'Failed to generate token', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

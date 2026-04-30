@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
             velocity: data.velocity,
             status: data.riskScore > 70 ? "High Risk" : data.riskScore > 40 ? "Elevated" : "Stable"
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

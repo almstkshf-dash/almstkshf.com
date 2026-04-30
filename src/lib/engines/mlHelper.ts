@@ -9,10 +9,8 @@
 import { createWorker } from 'tesseract.js';
 
 // Lazily-typed references â€” populated by loadModels() at runtime only.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let faceModel: any | null = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let handModel: any | null = null;
+let faceModel: unknown | null = null;
+let handModel: unknown | null = null;
 
 /**
  * Loads the face and hand models if not already loaded.
@@ -54,7 +52,7 @@ export async function analyzeOCR(canvas: HTMLCanvasElement): Promise<{
   confidence: number;
 }> {
   const worker = await createWorker('eng');
-  const { data } = await (worker.recognize(canvas) as any);
+  const { data } = await (worker.recognize(canvas) as unknown as { data: { text: string; confidence: number; words: { text?: string; confidence?: number }[] } });
   const { text, confidence, words } = data;
   await worker.terminate();
 
@@ -62,7 +60,7 @@ export async function analyzeOCR(canvas: HTMLCanvasElement): Promise<{
   // 1. Words with rare character transitions
   // 2. High ratio of symbols to letters
   // 3. Very low OCR confidence on structured areas
-  const garbledWords = (words as any[]).filter((w: any) => {
+  const garbledWords = (words as { text?: string }[]).filter((w: { text?: string }) => {
     const hasManyConsonants = /[^aeiou]{5,}/i.test(w.text);
     const hasSymbols = /[^a-z0-9]/i.test(w.text);
     return w.confidence < 50 || (hasManyConsonants && hasSymbols);
@@ -97,8 +95,8 @@ export async function detectBiometricAnomalies(canvas: HTMLCanvasElement): Promi
   for (const face of faces) {
     const keypoints = face.keypoints;
     if (keypoints.length > 0) {
-      const leftEye = keypoints.find((k: any) => k.name === 'leftEye');
-      const rightEye = keypoints.find((k: any) => k.name === 'rightEye');
+      const leftEye = keypoints.find((k: { name?: string; x?: number; y?: number; z?: number }) => k.name === 'leftEye');
+      const rightEye = keypoints.find((k: { name?: string; x?: number; y?: number; z?: number }) => k.name === 'rightEye');
       if (leftEye && rightEye) {
         const yDiff = Math.abs(leftEye.y - rightEye.y);
         if (yDiff > 12) {

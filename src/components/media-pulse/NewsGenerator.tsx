@@ -15,6 +15,7 @@ import { api } from '../../../convex/_generated/api';
 import { Search, AlertTriangle, CheckCircle2, Languages, Filter, ChevronDown, X, Globe, Sparkles, Wand2 } from "lucide-react";
 import Button from "../ui/Button";
 import { useLocale, useTranslations } from 'next-intl';
+import { FetchNewsResponse, OptimizeQueryResponse } from '@/types/api';
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // FULL WORLD COUNTRIES LIST
@@ -408,7 +409,6 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     );
 
     const [loading, setLoading] = useState(false);
-    const [showDatePicker, setShowDatePicker] = useState(false);
 
         const sourceTypes = useMemo(() => [
         { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
@@ -417,21 +417,11 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
         { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
     ], [t]);
-    const [result, setResult] = useState<{ count: number; skipped: number; feeds: number } | null>(null);
+    const [result, setResult] = useState<FetchNewsResponse | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
 
     // Validation errors
     const [errors, setErrors] = useState<{ keyword?: string; countries?: string; languages?: string }>({});
-
-    const dateRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (dateRef.current && !dateRef.current.contains(e.target as Node)) setShowDatePicker(false);
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, []);
 
     // Convert HTML date (YYYY-MM-DD) → DD/MM/YYYY for backend
     const formatDateForBackend = useCallback((htmlDate: string): string => {
@@ -440,11 +430,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         return `${d}/${m}/${y}`;
     }, []);
 
-    const formatDateDisplay = useCallback((htmlDate: string): string => {
-        if (!htmlDate) return '';
-        const d = new Date(htmlDate);
-        return d.toLocaleDateString(locale === 'ar' ? 'ar-AE' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }, [locale]);
+
 
     // Country helpers
     const countryItems = React.useMemo(() => ALL_COUNTRIES.map((c) => ({
@@ -461,8 +447,6 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         label: isAr ? l.ar : l.en,
         searchStr: `${l.en} ${l.ar} ${l.code}`,
     })), [isAr]);
-
-    const getLangByCode = useCallback((code: string) => LANGUAGES.find((l) => l.code === code), []);
 
     const validate = useCallback((): boolean => {
         const newErrors: typeof errors = {};
@@ -491,20 +475,20 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 sourceTypes: selectedSourceTypes.join(','),
                 dateFrom: dateFrom ? formatDateForBackend(dateFrom) : undefined,
                 dateTo: dateTo ? formatDateForBackend(dateTo) : undefined,
-            }) as any;
+            }) as FetchNewsResponse;
 
             if (res.success) {
                 setResult(res);
             } else {
                 setErrorMsg(res.error || t('fetch_failed'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("News fetch internal error:", error);
             setErrorMsg(t('fetch_failed'));
         } finally {
             setLoading(false);
         }
-    }, [validate, isAuthenticated, keyword, selectedCountries, selectedLanguages, selectedSourceTypes, dateFrom, dateTo, fetchNews, t, isAr, formatDateForBackend]);
+    }, [validate, isAuthenticated, keyword, selectedCountries, selectedLanguages, selectedSourceTypes, dateFrom, dateTo, fetchNews, t, formatDateForBackend]);
 
     const clearForm = useCallback(() => {
         setKeyword('');
@@ -526,7 +510,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 keyword: keyword.trim(),
                 context: 'news',
                 targetLanguages: selectedLanguages
-            });
+            }) as OptimizeQueryResponse;
             if (res && res.optimized) {
                 setOptimizationInfo({
                     original: keyword,
@@ -741,7 +725,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                         {result && (
                             <div className="text-emerald-500 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
                                 <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                                {t('result_success', { count: result.count, skipped: result.skipped, feeds: result.feeds })}
+                                {t('result_success', { count: result.count ?? 0, skipped: result.skipped ?? 0, feeds: result.feeds ?? 0 })}
                             </div>
                         )}
                     </div>

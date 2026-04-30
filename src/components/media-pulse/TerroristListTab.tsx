@@ -23,6 +23,9 @@ import { api } from '../../../convex/_generated/api';
 import ExcelJS from 'exceljs';
 import { ReportGenerator } from '@/lib/report-generator';
 
+// Types
+import { TerroristListItem, ReportTranslations } from '@/types/reports';
+
 
 // ─── Constants ─────────────────────────────────────────────────────────
 const ENTRY_TYPES = ['all', 'individual', 'entity', 'organization'] as const;
@@ -57,7 +60,7 @@ export default function TerroristListTab() {
   const entries = useQuery(api.terroristList.search, {
     searchTerm: searchQuery,
     type: filterType === 'all' ? undefined : filterType
-  });
+  }) as TerroristListItem[] | undefined;
 
   const wipeAll = useMutation(api.terroristList.wipeAll);
   const addItems = useMutation(api.terroristList.addItems);
@@ -67,7 +70,7 @@ export default function TerroristListTab() {
     if (!entries || entries.length === 0) return;
     try {
       // Create a simplified translations object for ReportGenerator
-      const exportTranslations = {
+      const exportTranslations: ReportTranslations = {
         TerroristList: {
           title: t('title'),
           fields: {
@@ -107,28 +110,28 @@ export default function TerroristListTab() {
           const workbook = new ExcelJS.Workbook();
           await workbook.xlsx.load(buffer);
 
-          let allData: any[] = [];
+          let allData: Partial<TerroristListItem>[] = [];
 
           // Process all sheets
           workbook.eachSheet(sheet => {
-            const sheetRows: any[] = [];
+            const sheetRows: Record<string, string>[] = [];
             const headerRow = sheet.getRow(1);
             // row.values returns [empty, col1, col2, ...]
-            const headers = (headerRow.values as any[]).map(v => v ? String(v).trim() : '');
+            const headers = (headerRow.values as (string | number | boolean | null)[]).map(v => v ? String(v).trim() : '');
 
             sheet.eachRow((row, rowNumber) => {
               if (rowNumber === 1) return; // skip header row
-              const rowData: any = {};
+              const rowData: Record<string, string> = {};
               row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 const header = headers[colNumber];
                 if (header) {
-                  rowData[header] = cell.text || cell.value || "";
+                  rowData[header] = cell.text || String(cell.value || "");
                 }
               });
               sheetRows.push(rowData);
             });
 
-            const mapped = sheetRows.map((row: any) => {
+            const mapped = sheetRows.map((row) => {
               // Robust helper to find values by checking common variations of keys
               const getVal = (valKeys: string[]) => {
                 const rowKeys = Object.keys(row);
@@ -193,14 +196,15 @@ export default function TerroristListTab() {
 
           setIsImportModalOpen(false);
           alert(`Successfully imported ${allData.length} records.`);
-        } catch (err: any) {
-          setImportError(err.message || "Failed to parse file");
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Failed to parse file";
+          setImportError(msg);
         } finally {
           setImportLoading(false);
         }
       };
       reader.readAsArrayBuffer(file);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setImportError("File read error");
       setImportLoading(false);
     }

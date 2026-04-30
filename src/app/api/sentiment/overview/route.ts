@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
                 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
             }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("API Overview Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

@@ -23,7 +23,7 @@ interface SaveToCollectionModalProps {
         type: "media_monitoring" | "osint" | "ai_inspector" | "watchlist" | "deep_web" | "custom";
         title: string;
         sourceId?: string;
-        data: any;
+        data: Record<string, unknown>;
     };
 }
 

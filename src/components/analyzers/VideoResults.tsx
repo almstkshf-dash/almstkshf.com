@@ -560,7 +560,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     <div className="grid grid-cols-2 gap-3">
                       {result.frameReports[
                         selectedFrame
-                      ].report.pixelLogicSignals.map((sig: any) => (
+                      ].report.pixelLogicSignals.map((sig: { id?: string; label?: string; risk?: string; detectedValue?: string }) => (
                         <div
                           key={sig.id}
                           className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-900 flex flex-col justify-center items-center text-center"
@@ -689,7 +689,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
               </span>
               <div className="flex flex-wrap gap-2">
                 {result.deepMl.biometrics.faceAnomalies.length > 0 || result.deepMl.biometrics.handAnomalies.length > 0 ? (
-                  ([...result.deepMl.biometrics.faceAnomalies, ...result.deepMl.biometrics.handAnomalies] as ForensicAnomaly[]).map((anomaly: any, idx) => (
+                  ([...result.deepMl.biometrics.faceAnomalies, ...result.deepMl.biometrics.handAnomalies] as ForensicAnomaly[]).map((anomaly: ForensicAnomaly, idx) => (
                     <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-[11px] font-black text-rose-500 dark:text-rose-400 shadow-sm">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       {t.has(`anomaly_${anomaly.id}_name`) ? t(`anomaly_${anomaly.id}_name`) : anomaly.name}
@@ -731,7 +731,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 <Layers className="w-4 h-4 text-amber-600" />
                 <span className="text-xs font-bold text-amber-700 dark:text-amber-500">
                   {t('detected_ai_signature')}: <span className="font-black italic">
-                    {(result.deepMl.watermarks as ForensicAnomaly[]).map((w: any) => t.has(`watermark_${w.id}_name`) ? t(`watermark_${w.id}_name`) : w.name).join(', ')}
+                    {(result.deepMl.watermarks as ForensicAnomaly[]).map((w: ForensicAnomaly) => t.has(`watermark_${w.id}_name`) ? t(`watermark_${w.id}_name`) : w.name).join(', ')}
                   </span>
                 </span>
               </div>

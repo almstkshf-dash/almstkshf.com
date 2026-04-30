@@ -32,7 +32,7 @@ export default function ReportLibrary() {
         return () => clearTimeout(timer);
     }, [inputValue]);
 
-    const filteredCollections = collectionsResult?.filter((c: any) =>
+    const filteredCollections = collectionsResult?.filter((c: { _id: string; name: string; items?: unknown[]; [key: string]: unknown }) =>
         c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
         c.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
@@ -75,7 +75,7 @@ export default function ReportLibrary() {
                         <p className="text-foreground/80 font-medium">{t('no_results')}</p>
                     </div>
                 ) : (
-                    filteredCollections?.map((collection: any) => (
+                    filteredCollections?.map((collection: { _id: string; name: string; items?: unknown[]; [key: string]: unknown }) => (
                         <div
                             key={collection._id}
                             className="bg-card/40 border border-border hover:border-border/80 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:bg-card/60 group"

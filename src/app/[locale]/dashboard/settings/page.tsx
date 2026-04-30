@@ -8,35 +8,28 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { Save, Upload, Loader2, CreditCard, Link2, Settings, Key, Share2, MessageSquare, Shield, Zap, BarChart3, Globe } from 'lucide-react';
+import { Save, Upload, Loader2, CreditCard, Settings, Key, Share2, MessageSquare, Shield, Zap, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 import { Link } from '@/i18n/routing';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { ALL_COUNTRIES, MultiSelectDropdown } from '@/components/media-pulse/NewsGenerator';
 
-interface Payment {
-    _id: string;
-    createdAt: number;
-    productName: string;
-    amount: number;
-    currency: string;
-    status: string;
-}
+
 
 export default function SettingsPage() {
     const t = useTranslations('Settings');
     const { userId } = useAuth();
     const settings = useQuery(api.settings.getSettings);
     const updateSettings = useMutation(api.settings.updateSettings);
-    const payments = useQuery(api.payments.getUserPayments, { userId: userId || '' });
+
 
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');
@@ -72,13 +65,13 @@ export default function SettingsPage() {
     const pathname = usePathname();
 
     const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>(
-        (searchParams.get('tab') as any) || 'general'
+        (searchParams.get('tab') as 'general' | 'ai' | 'social' | 'integrations') || 'general'
     );
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Sync state with URL search parameters
     useEffect(() => {
-        const tab = searchParams.get('tab') as any;
+        const tab = searchParams.get('tab') as 'general' | 'ai' | 'social' | 'integrations' | null;
         if (tab && ['general', 'ai', 'social', 'integrations'].includes(tab)) {
             setActiveTab(tab);
         }
@@ -95,7 +88,7 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (settings) {
-            const apiKeys = (settings as any).apiKeys;
+            const apiKeys = (settings as Record<string, unknown>).apiKeys as Record<string, string> | undefined;
             setLogoUrl(settings.logoUrl || '');
             setGeminiKey(apiKeys?.gemini || '');
             setInstagramKey(apiKeys?.instagram || '');
@@ -192,9 +185,9 @@ export default function SettingsPage() {
                 },
             });
             setMessage({ type: 'success', text: t('saved_success') });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to save settings:', error);
-            const msg = error?.message || '';
+            const msg = error instanceof Error ? error.message : '';
             const isAuthError = msg.toLowerCase().includes('not authorized') || msg.toLowerCase().includes('admin');
             setMessage({
                 type: 'error',
@@ -267,7 +260,7 @@ export default function SettingsPage() {
                         <Button
                             key={tab.id}
                             variant={activeTab === tab.id ? "primary" : "ghost"}
-                            onClick={() => handleTabChange(tab.id as any)}
+                            onClick={() => handleTabChange(tab.id as 'general' | 'ai' | 'social' | 'integrations')}
                             className={clsx(
                                 "flex items-center justify-start gap-3 px-4 py-3.5 rounded-xl font-medium transition-all whitespace-nowrap shadow-none",
                                 activeTab === tab.id

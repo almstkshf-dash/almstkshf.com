@@ -115,22 +115,22 @@ export async function POST(req: NextRequest) {
 
         // Fix Language: Check for Arabic characters
         const isArabic = /[\u0600-\u06FF]/.test(title + content);
-        // @ts-ignore
+        // @ts-expect-error - Language detection overrides standard schema in runtime
         articleData.language = isArabic ? "AR" : "EN";
 
         // Fix Date format to DD/MM/YYYY
         if (!manualData?.date) {
             const d = new Date();
-            // @ts-ignore
+            // @ts-expect-error - Custom date formatting override
             articleData.publishedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
         }
 
-        // @ts-ignore
+        // @ts-expect-error - Using raw document payload before runtime validation
         await convex.mutation(api.monitoring.saveArticle, articleData);
 
         return NextResponse.json({ success: true, data: articleData });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Monitor API Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -156,9 +156,9 @@ export async function GET(req: NextRequest) {
             limit,
             skip,
             sourceType
-        }) as any;
+        }) as { items?: unknown[]; total?: number; nextSkip?: number | null };
         return NextResponse.json({ success: true, count: result?.items?.length || 0, total: result?.total || 0, nextSkip: result?.nextSkip ?? null, data: result?.items || [] });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
     }
 }

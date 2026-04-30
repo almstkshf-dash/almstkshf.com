@@ -8,7 +8,14 @@
 
 import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
+import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem } from '@/types/reports';
 // import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
+
+interface AutoTablejsPDF extends jsPDF {
+    lastAutoTable: {
+        finalY: number;
+    };
+}
 
 // -------------------------------------------------------------------------------------------------
 // TYPES & INTERFACES
@@ -24,7 +31,7 @@ export interface ReportArticle {
     reach?: number;
     ave?: number;
     content?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface DeepWebRun {
@@ -40,7 +47,7 @@ export interface OsintResult {
     _id?: string;
     query: string;
     type: string;
-    result: any;
+    result: Record<string, unknown> | unknown[];
     createdAt?: number;
     timestamp?: number;
 }
@@ -59,9 +66,9 @@ const ACCENT_BG = [241, 245, 249] as const;
 
 export class ReportGenerator {
     private articles: ReportArticle[];
-    private translations: any;
+    private translations: ReportTranslations;
 
-    constructor(articles: ReportArticle[], translations: any) {
+    constructor(articles: ReportArticle[], translations: ReportTranslations) {
         this.articles = articles;
         this.translations = translations;
     }
@@ -121,7 +128,7 @@ export class ReportGenerator {
     /**
      * Specialized Press Release Report (Reach & AVE Focus)
      */
-    static async exportPressReleaseReport(articles: ReportArticle[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    static async exportPressReleaseReport(articles: ReportArticle[], translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.Reports?.pr_title || 'Press Release Coverage Report';
         if (format === 'excel') {
             return this.generateExcel(articles, translations, title);
@@ -132,7 +139,7 @@ export class ReportGenerator {
     /**
      * Deep Web Risk Assessment Report
      */
-    static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[] | Record<string, unknown>, translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    static async exportDeepWebReport(runs: DeepWebRun[], threats: ReportArticle[] | Record<string, unknown>, translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.Reports?.deep_title || 'Deep Web Risk Assessment';
         const threatList: ReportArticle[] = Array.isArray(threats) ? threats : [];
         if (format === 'excel') {
@@ -144,7 +151,7 @@ export class ReportGenerator {
     /**
      * Dark Web Results Report
      */
-    static async exportDarkWebReport(results: any[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    static async exportDarkWebReport(results: DarkWebResult[], translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.DarkWeb?.tab_label || 'Dark Web Search Results';
         if (format === 'excel') {
             await this.generateDarkWebExcel(results, translations, title);
@@ -156,7 +163,7 @@ export class ReportGenerator {
     /**
      * OSINT Technical Dossier (Single or History)
      */
-    public static async exportOsintReport(items: any[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    public static async exportOsintReport(items: OsintResult[], translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.Reports?.osint_title || 'OSINT Technical Dossier';
         if (format === 'excel') {
             await this.generateOsintHistoryExcel(items, translations, title);
@@ -165,7 +172,7 @@ export class ReportGenerator {
         }
     }
 
-    public static async exportTerroristListReport(items: any[], translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    public static async exportTerroristListReport(items: TerroristListItem[], translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.TerroristList?.title || 'Watchlist Clearance Report';
         if (format === 'excel') {
             await this.generateWatchlistExcel(items, translations, title);
@@ -174,7 +181,7 @@ export class ReportGenerator {
         }
     }
 
-    private static async generateWatchlistPDF(items: any[], translations: any, title: string) {
+    private static async generateWatchlistPDF(items: TerroristListItem[], translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
         this.addCoverPage(doc, title, items.length, translations, logoBase64, fontLoaded);
 
@@ -210,7 +217,7 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generateWatchlistExcel(items: any[], translations: any, title: string) {
+    private static async generateWatchlistExcel(items: TerroristListItem[], translations: ReportTranslations, title: string) {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Watchlist');
@@ -245,7 +252,7 @@ export class ReportGenerator {
     /**
      * AI Forensic Inspector Report
      */
-    static async exportAiInspectorReport(mode: 'text' | 'image' | 'video', data: any, translations: any, format: 'pdf' | 'excel' = 'pdf') {
+    static async exportAiInspectorReport(mode: 'text' | 'image' | 'video', data: AiInspectorData, translations: ReportTranslations, format: 'pdf' | 'excel' = 'pdf') {
         const title = translations.AiInspector?.results_summary || 'AI Forensic Analysis Report';
         if (format === 'excel') {
             return this.generateAiInspectorExcel(mode, data, translations, title);
@@ -253,11 +260,7 @@ export class ReportGenerator {
         return this.generateAiInspectorPDF(mode, data, translations, title);
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-    // FEATURE-SPECIFIC PDF GENERATORS
-    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-
-    private static async generateDarkWebPDF(results: any[], translations: any, title: string) {
+    private static async generateDarkWebPDF(results: DarkWebResult[], translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Cover Page
@@ -296,7 +299,7 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generatePressReleasePDF(articles: ReportArticle[], translations: any, title: string, returnOnly = false) {
+    private static async generatePressReleasePDF(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false) {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Cover Page
@@ -350,7 +353,7 @@ export class ReportGenerator {
         return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
     }
 
-    private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: any, title: string) {
+    private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         this.addCoverPage(doc, title, threats.length, translations, logoBase64, fontLoaded);
@@ -384,34 +387,23 @@ export class ReportGenerator {
         });
 
         // Identified Threats Section
-        y = (doc as any).lastAutoTable.finalY + 15;
+        y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
         this.drawHeading(doc, translations.Reports?.identified_threats || 'High-Risk identified Threats', 14, y, fontLoaded);
 
-        const threatsTable = threats.map(t => [
-            t.publishedDate || '',
-            this.fixArabic(t.title),
-            t.sentiment || 'Neutral',
-            this.fixArabic(t.source || '')
-        ]);
-
         await this.addAutoTable(doc, {
-            head: [[
-                translations.Reports?.col_date || 'Date',
-                translations.Reports?.col_title || 'Headline / Snippet',
-                translations.Reports?.col_sentiment || 'Sentiment',
-                translations.Reports?.col_source || 'Platform'
-            ]],
-            body: threatsTable,
+            head: [[translations.Reports?.col_date || 'Date', translations.Reports?.col_title || 'Title', translations.Reports?.col_source || 'Source']],
+            body: threats.map(a => [a.publishedDate || '', a.title, a.source || '']),
             startY: y + 8,
             fontLoaded,
             logoBase64,
             translations
         });
+        y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
 
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generateOsintHistoryPDF(items: OsintResult[], translations: any, title: string) {
+    private static async generateOsintHistoryPDF(items: OsintResult[], translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         this.addCoverPage(doc, title, items.length, translations, logoBase64, fontLoaded);
@@ -426,7 +418,7 @@ export class ReportGenerator {
             new Date(item.createdAt || item.timestamp || Date.now()).toLocaleString(),
             item.query,
             item.type.toUpperCase(),
-            typeof item.result === 'object' ? Object.keys(item.result).length.toString() : '1'
+            typeof item.result === 'object' ? Object.keys(item.result as Record<string, unknown>).length.toString() : '1'
         ]);
 
         await this.addAutoTable(doc, {
@@ -446,7 +438,7 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generateOsintPDF(data: OsintResult, translations: any, title: string) {
+    private static async generateOsintPDF(data: OsintResult, translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
         // Custom Dossier Cover
@@ -487,36 +479,39 @@ export class ReportGenerator {
                     logoBase64,
                     translations
                 });
-                y = (doc as any).lastAutoTable.finalY + 15;
+                y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
             }
 
             // Entity Map
-            const entities = (result as any).entities || (result as any).associations || [];
-            if (Array.isArray(entities) && entities.length > 0) {
-                if (y > 220) { doc.addPage(); y = 30; this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded); }
-                this.drawHeading(doc, translations.Reports?.entity_map || 'Identified Entities & Associations', 14, y, fontLoaded);
-                await this.addAutoTable(doc, {
-                    head: [[translations.Reports?.entity_name || 'Entity Name', translations.Reports?.entity_type || 'Type', translations.Reports?.relevance || 'Relevance']],
-                    body: entities.map((e: any) => [
-                        this.fixArabic(e.name || e.value || String(e)),
-                        e.type || 'Unknown',
-                        e.score || e.relevance || 'High'
-                    ]),
-                    startY: y + 8,
-                    fontLoaded,
-                    logoBase64,
-                    translations
-                });
-            }
+            const resultObj = result as Record<string, unknown>;
+            const entities = (resultObj.entities || resultObj.associations || []) as Array<{ name?: string; type?: string; relevance?: string | number }>;
+
+            await this.addAutoTable(doc, {
+                head: [[
+                    translations.Reports?.entity_name || 'Entity',
+                    translations.Reports?.entity_type || 'Type',
+                    translations.Reports?.relevance || 'Relevance'
+                ]],
+                body: entities.map((e) => [
+                    e.name || 'Unknown',
+                    e.type || 'N/A',
+                    typeof e.relevance === 'number' ? `${(e.relevance * 100).toFixed(0)}%` : (e.relevance || 'N/A')
+                ]),
+                startY: y + 8,
+                fontLoaded,
+                logoBase64,
+                translations
+            });
+            y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
         }
 
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generateAiInspectorPDF(mode: string, data: any, translations: any, title: string) {
+    private static async generateAiInspectorPDF(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
 
-        const modeTrans = translations.AiInspector?.[`mode_${mode}`] || mode.toUpperCase();
+        const modeTrans = translations.AiInspector?.[`mode_${mode}` as keyof typeof translations.AiInspector] || mode.toUpperCase();
         this.addCoverPage(doc, `${title} - ${modeTrans}`, typeof data === 'object' ? Object.keys(data).length : 1, translations, logoBase64, fontLoaded);
 
         doc.addPage();
@@ -529,24 +524,17 @@ export class ReportGenerator {
         doc.setFontSize(10);
         doc.setTextColor(...BRAND_DARK);
 
-        let riskLevel = 'Low';
-        let confidence = 0;
+        const riskLevel = data.overallRisk;
+        const confidence = data.confidenceScore;
 
-        if (mode === 'text' && data) {
-            riskLevel = data.overallRisk;
-            confidence = data.confidenceScore;
-        } else if (mode === 'image' && data) {
-            riskLevel = data.overallRisk;
-            confidence = data.confidenceScore;
-        } else if (mode === 'video' && data) {
-            riskLevel = data.overallRisk;
-            confidence = data.confidenceScore;
-        }
-
-        const colorMap: any = { low: [16, 185, 129], medium: [245, 158, 11], high: [239, 68, 68] };
+        const colorMap: Record<string, [number, number, number]> = {
+            low: [16, 185, 129],
+            medium: [245, 158, 11],
+            high: [239, 68, 68]
+        };
         const rColor = colorMap[riskLevel?.toLowerCase()] || BRAND_DARK;
 
-        const localizedRiskLevel = translations.AiInspector?.[`risk_${riskLevel?.toLowerCase()}`] || riskLevel?.toUpperCase() || 'UNKNOWN';
+        const localizedRiskLevel = translations.AiInspector?.[`risk_${riskLevel?.toLowerCase()}` as keyof typeof translations.AiInspector] || riskLevel?.toUpperCase() || 'UNKNOWN';
 
         this.drawMetricBoxes(doc, [
             { label: translations.AiInspector?.label_mode || 'MODE', value: modeTrans, color: BRAND_DARK },
@@ -558,11 +546,6 @@ export class ReportGenerator {
 
         if (mode === 'text' && data) {
             this.drawHeading(doc, translations.AiInspector?.linguistic_signals || 'Linguistic Signals', 14, y, fontLoaded);
-            const tableData = data.sentenceBreakdown?.map((s: any) => [
-                this.fixArabic(s.text.slice(0, 80) + (s.text.length > 80 ? '...' : '')),
-                this.fixArabic(s.flags.join(', ') || translations.AiInspector?.none || 'None'),
-                `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
-            ]) || [];
 
             await this.addAutoTable(doc, {
                 head: [[
@@ -570,19 +553,24 @@ export class ReportGenerator {
                     translations.AiInspector?.col_flags || 'Detected Flags',
                     translations.AiInspector?.col_ai_prob || 'AI Probability'
                 ]],
-                body: tableData,
+                body: data.sentenceBreakdown?.map(s => [
+                    s.text,
+                    s.flags.join(', ') || translations.AiInspector?.none || 'None',
+                    `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
+                ]) || [],
                 startY: y + 8,
                 fontLoaded,
                 logoBase64,
                 translations
             });
+            y = (doc as AutoTablejsPDF).lastAutoTable?.finalY || y + 50;
         } else if (mode === 'image' && data) {
             this.drawHeading(doc, translations.AiInspector?.visual_signals || 'Visual Signals', 14, y, fontLoaded);
-            const tableData = data.pixelLogicSignals?.map((s: any) => [
+            const tableData = data.pixelLogicSignals?.map((s: { label?: string; description?: string; detectedValue?: string; risk?: string }) => [
                 this.fixArabic(s.label),
                 this.fixArabic(s.description),
                 this.fixArabic(s.detectedValue),
-                this.fixArabic(translations.AiInspector?.[`risk_${s.risk?.toLowerCase()}`] || s.risk?.toUpperCase() || s.risk)
+                this.fixArabic(translations.AiInspector?.[`risk_${s.risk?.toLowerCase()}` as keyof typeof translations.AiInspector] || s.risk?.toUpperCase() || s.risk)
             ]) || [];
 
             await this.addAutoTable(doc, {
@@ -596,11 +584,16 @@ export class ReportGenerator {
                 startY: y + 8,
                 fontLoaded,
                 logoBase64,
-                translations
+                translations,
+                didDrawPage: (data) => {
+                    if (data.pageNumber > 1) {
+                        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+                    }
+                }
             });
 
             if (data.deepMl) {
-                y = (doc as any).lastAutoTable?.finalY || y + 50;
+                y = (doc as AutoTablejsPDF).lastAutoTable?.finalY || y + 50;
                 if (y > 220) { doc.addPage(); y = 30; this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded); }
                 else { y += 15; }
 
@@ -612,7 +605,7 @@ export class ReportGenerator {
                 const handAnomalies = data.deepMl.biometrics?.handAnomalies || [];
                 const allAnomalies = [...faceAnomalies, ...handAnomalies];
                 if (allAnomalies.length > 0) {
-                    allAnomalies.forEach((a: any) => {
+                    allAnomalies.forEach((a: { name?: string; id?: string }) => {
                         mlData.push([
                             this.fixArabic(translations.AiInspector?.anatomy_consistency || 'Anatomy Consistency'),
                             this.fixArabic(a.name || a.id),
@@ -641,7 +634,7 @@ export class ReportGenerator {
 
                 // Watermarks
                 if (data.deepMl.watermarks && data.deepMl.watermarks.length > 0) {
-                    data.deepMl.watermarks.forEach((w: any) => {
+                    data.deepMl.watermarks.forEach((w: { name?: string; id?: string }) => {
                         mlData.push([
                             this.fixArabic(translations.AiInspector?.detected_ai_signature || 'AI Watermark'),
                             this.fixArabic(w.name || w.id),
@@ -667,7 +660,7 @@ export class ReportGenerator {
             }
         } else if (mode === 'video' && data) {
             this.drawHeading(doc, translations.AiInspector?.frame_analysis || 'Video Frame Analysis', 14, y, fontLoaded);
-            const tableData = data.frameAnomalies?.map((f: any) => [
+            const tableData = data.frameAnomalies?.map((f: { timestamp?: string | number; type?: string; severity?: number; description?: string }) => [
                 f.timestamp,
                 this.fixArabic(f.type),
                 `${((f.severity ?? 0) * 100).toFixed(1)}%`,
@@ -727,7 +720,7 @@ export class ReportGenerator {
         return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
     }
 
-    private static addCoverPage(doc: jsPDF, title: string, count: number, translations: any, logoBase64: string | null, fontLoaded: boolean) {
+    private static addCoverPage(doc: jsPDF, title: string, count: number, translations: ReportTranslations, logoBase64: string | null, fontLoaded: boolean) {
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
 
@@ -760,7 +753,7 @@ export class ReportGenerator {
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
     }
 
-    private static async addAutoTable(doc: jsPDF, options: any) {
+    private static async addAutoTable(doc: jsPDF, options: { head: string[][]; body: (string | number | undefined)[][]; startY: number; fontLoaded: boolean; logoBase64: string | null; translations: ReportTranslations }) {
         const autoTable = (await import('jspdf-autotable')).default;
         return autoTable(doc, {
             ...options,
@@ -788,7 +781,7 @@ export class ReportGenerator {
         });
     }
 
-    private static finalizePDF(doc: jsPDF, title: string, translations: any, fontLoaded: boolean, returnOnly = false) {
+    private static finalizePDF(doc: jsPDF, title: string, translations: ReportTranslations, fontLoaded: boolean, returnOnly = false) {
         const pages = doc.getNumberOfPages();
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
@@ -837,7 +830,7 @@ export class ReportGenerator {
         });
     }
 
-    private static addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number, translations: any, fontLoaded: boolean) {
+    private static addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number, translations: ReportTranslations, fontLoaded: boolean) {
         doc.setFillColor(...BRAND_DARK);
         doc.rect(0, 0, pageWidth, 15, 'F');
         if (logoBase64) {
@@ -853,7 +846,7 @@ export class ReportGenerator {
     // EXCEL EXPORT (Unified)
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
-    private static async generateDarkWebExcel(results: any[], translations: any, title: string) {
+    private static async generateDarkWebExcel(results: DarkWebResult[], translations: ReportTranslations, title: string) {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Dark Web Results');
@@ -892,7 +885,7 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateExcel(articles: ReportArticle[], translations: any, title: string, returnOnly = false): Promise<any> {
+    private static async generateExcel(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false): Promise<Blob | { doc: jsPDF }> {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
@@ -933,7 +926,7 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateOsintHistoryExcel(items: OsintResult[], translations: any, title: string) {
+    private static async generateOsintHistoryExcel(items: OsintResult[], translations: ReportTranslations, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('OSINT History');
 
@@ -960,7 +953,7 @@ export class ReportGenerator {
         this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateAiInspectorExcel(mode: string, data: any, translations: any, title: string) {
+    private static async generateAiInspectorExcel(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Forensic Report');
 
@@ -983,7 +976,7 @@ export class ReportGenerator {
             ]);
             subHeader.font = { bold: true };
 
-            data.sentenceBreakdown?.forEach((s: any) => {
+            data.sentenceBreakdown?.forEach((s) => {
                 sheet.addRow([
                     s.text,
                     s.flags.join(', ') || translations.AiInspector?.none || 'None',
@@ -1000,7 +993,7 @@ export class ReportGenerator {
             ]);
             subHeader.font = { bold: true };
 
-            data.pixelLogicSignals?.forEach((s: any) => {
+            data.pixelLogicSignals?.forEach((s) => {
                 sheet.addRow([
                     s.label,
                     s.description,
@@ -1025,7 +1018,7 @@ export class ReportGenerator {
                 const allAnomalies = [...faceAnomalies, ...handAnomalies];
 
                 if (allAnomalies.length > 0) {
-                    allAnomalies.forEach((a: any) => {
+                    allAnomalies.forEach((a) => {
                         sheet.addRow([
                             translations.AiInspector?.anatomy_consistency || 'Anatomy Consistency',
                             a.name || a.id,
@@ -1052,7 +1045,7 @@ export class ReportGenerator {
                 }
 
                 if (data.deepMl.watermarks && data.deepMl.watermarks.length > 0) {
-                    data.deepMl.watermarks.forEach((w: any) => {
+                    data.deepMl.watermarks.forEach((w) => {
                         sheet.addRow([
                             translations.AiInspector?.detected_ai_signature || 'AI Watermark',
                             w.name || w.id,
@@ -1072,7 +1065,7 @@ export class ReportGenerator {
             ]);
             subHeader.font = { bold: true };
 
-            data.frameAnomalies?.forEach((f: any) => {
+            data.frameAnomalies?.forEach((f) => {
                 sheet.addRow([
                     f.timestamp,
                     f.type,
@@ -1089,6 +1082,81 @@ export class ReportGenerator {
         if (mode === 'video') sheet.getColumn(4).width = 40;
 
         this.downloadWorkbook(workbook, `${title}_${modeTrans}`);
+    }
+
+    static async exportOsintReport(history: OsintHistoryItem[], messages: Record<string, unknown>, format: 'pdf' | 'excel') {
+        const translations = messages as ReportTranslations;
+        const title = translations.Reports?.osint_title || 'OSINT Investigation History';
+
+        if (format === 'pdf') {
+            const doc = new jsPDF() as AutoTablejsPDF;
+            const logo = await this.loadLogo();
+
+            if (logo) {
+                doc.addImage(logo, 'PNG', 10, 10, 30, 30);
+            }
+
+            doc.setFont('Amiri', 'bold');
+            doc.setFontSize(22);
+            doc.text(this.fixArabic(title), 105, 25, { align: 'center' });
+
+            doc.setFontSize(10);
+            const generatedAtText = translations.Reports?.generated_at || 'Generated at';
+            doc.text(`${this.fixArabic(generatedAtText)}: ${new Date().toLocaleString()}`, 105, 35, { align: 'center' });
+
+            const tableData = history.map((item) => [
+                new Date(item.createdAt).toLocaleString(),
+                item.type,
+                item.query,
+                'Success'
+            ]);
+
+            doc.autoTable({
+                startY: 50,
+                head: [[
+                    this.fixArabic(translations.Reports?.col_date || 'Date'),
+                    this.fixArabic(translations.Reports?.investigation_type || 'Type'),
+                    this.fixArabic(translations.Reports?.investigation_target || 'Target'),
+                    this.fixArabic(translations.Reports?.col_status || 'Status')
+                ]],
+                body: tableData,
+                styles: { font: 'Amiri', halign: 'right' },
+                headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+            });
+
+            doc.save(`OSINT_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+        } else {
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet('OSINT History');
+
+            sheet.addRow([title]).font = { bold: true, size: 16 };
+            sheet.addRow([`${translations.Reports?.generated_at || 'Generated at'}: ${new Date().toLocaleString()}`]);
+            sheet.addRow([]);
+
+            const headerRow = sheet.addRow([
+                translations.Reports?.col_date || 'Date',
+                translations.Reports?.investigation_type || 'Type',
+                translations.Reports?.investigation_target || 'Target',
+                translations.Reports?.col_status || 'Status'
+            ]);
+            headerRow.font = { bold: true };
+
+            history.forEach((item) => {
+                sheet.addRow([
+                    new Date(item.createdAt).toLocaleString(),
+                    item.type,
+                    item.query,
+                    'Success'
+                ]);
+            });
+
+            sheet.getColumn(1).width = 25;
+            sheet.getColumn(2).width = 15;
+            sheet.getColumn(3).width = 40;
+            sheet.getColumn(4).width = 15;
+
+            this.downloadWorkbook(workbook, 'OSINT_History');
+        }
     }
 
     private static async downloadWorkbook(workbook: ExcelJS.Workbook, title: string) {

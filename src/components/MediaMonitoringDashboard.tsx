@@ -100,7 +100,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     // Memoize the chart data mapping to avoid inline array creation on every render
     const chartData = useMemo(() => {
         if (!reports || (Array.isArray(reports) && reports.length === 0)) return null;
-        return (reports as any[])?.map((a: any) => ({
+        return (reports as { id: string; url?: string; urlToImage?: string }[])?.map((a) => ({
             reportName: a.title || a.reportName,
             source: a.sourceType || a.source,
             timestamp: a.publishedDate || a.createdAt || a.timestamp,
@@ -156,7 +156,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                             <SkeletonCard key={i} />
                         ))
                     ) : (
-                        crisisPlans.map((plan: any, i: number) => (
+                        crisisPlans.map((plan: { id: string; title: string; riskLevel: string; actions: string[] }, i: number) => (
                             <CrisisPlanCard key={i} {...plan} />
                         ))
                     )}

@@ -86,7 +86,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
             } else {
                 setError(res?.error || t('fetch_failed'));
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             setError(e?.message || t('fetch_failed'));
         } finally {
             setLoading(false);
@@ -255,7 +255,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                     <p className="text-sm text-foreground/70 py-2">{t('no_runs')}</p>
                 )}
                 <div className="space-y-2">
-                    {runs?.map((run: any) => (
+                    {runs?.map((run: { _id: string; _creationTime: number; status: string; source?: string; articlesCount?: number; executionTimeMs?: number }) => (
                         <div
                             key={run._id}
                             className="flex flex-wrap items-center justify-between bg-muted/40 border border-border rounded-lg px-3 py-2 text-sm gap-2"

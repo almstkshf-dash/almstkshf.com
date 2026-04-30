@@ -79,7 +79,7 @@ export default function DashboardPage() {
     const t = useTranslations('Dashboard');
     const locale = useLocale();
     const isAr = locale === 'ar';
-    const [isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
 
     const searchParams = useSearchParams();
     const router = useRouter();

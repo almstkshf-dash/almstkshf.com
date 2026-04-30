@@ -29,6 +29,9 @@ import { ReportGenerator } from '@/lib/report-generator';
 import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
 import { AlertCircle, ArrowRight, ShieldCheck, Database, Server, Smartphone, Info, FolderPlus } from 'lucide-react';
 
+// Types
+import { OsintLookupType, OsintHistoryItem } from '@/types/reports';
+
 // â”€â”€â”€ Static directory data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CATEGORIES = [
   'social', 'people', 'dating', 'phone', 'public records',
@@ -56,16 +59,10 @@ type Resource = {
 };
 
 // â”€â”€â”€ Lookup type definition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-type LookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist';
+type LookupType = OsintLookupType;
 
-interface HistoryItem {
+interface HistoryItem extends Omit<OsintHistoryItem, '_id'> {
   _id: Id<"osint_results">;
-  _creationTime: number;
-  type: LookupType;
-  query: string;
-  result: any;
-  userId: string;
-  createdAt: number;
 }
 
 // â”€â”€â”€ Result Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -95,7 +92,7 @@ const StatusBadge = ({ label, value, type = 'default' }: { label: string; value:
   );
 };
 
-const DataSection = ({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) => (
+const DataSection = ({ title, icon: Icon, children }: { title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; children: React.ReactNode }) => (
   <div className="space-y-3">
     <div className="flex items-center gap-2 px-1">
       <Icon className="w-3.5 h-3.5 text-primary/70" />
@@ -133,7 +130,7 @@ type SocialPresenceData = {
   totalFound: number;
 };
 
-const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: any }) => {
+const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: (key: string, values?: Record<string, string | number>) => string }) => {
   if (!data?.platforms?.length) return null;
   const { platforms, totalFound, totalChecked } = data;
   const exposure = Math.round((totalFound / Math.max(totalChecked, 1)) * 100);
@@ -217,11 +214,11 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: any }) =
   );
 };
 
-const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: any }) => {
+const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Record<string, unknown>; t: (key: string, values?: Record<string, string | number>) => string }) => {
   if (!data) return null;
 
   // Helper to get nested values safely
-  const get = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  const get = (obj: Record<string, unknown>, path: string): unknown => path.split('.').reduce<unknown>((acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined), obj);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -380,7 +377,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
 
             {get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
               <DataSection title={t('result_view.fields.articles_found')} icon={FileText}>
-                {get(data, 'articles').slice(0, 10).map((art: any, i: number) => (
+                {(get(data, 'articles') as Array<Record<string, unknown>>).slice(0, 10).map((art, i: number) => (
                   <a
                     key={i}
                     href={art.link}
@@ -403,7 +400,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'corporate' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.fields.companies_found')} icon={Database}>
-              {get(data, 'companies')?.map((c: any, i: number) => (
+              {(get(data, 'companies') as Array<Record<string, unknown>> | undefined)?.map((c, i: number) => (
                 <a
                   key={i}
                   href={c.url}
@@ -426,7 +423,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'location' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.fields.locations_found')} icon={Globe}>
-              {get(data, 'locations')?.map((loc: any, i: number) => (
+              {(get(data, 'locations') as Array<Record<string, unknown>> | undefined)?.map((loc, i: number) => (
                 <a
                   key={i}
                   href={loc.osmUrl}
@@ -465,7 +462,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'gleif' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.lei_registration')} icon={Database}>
-              {get(data, 'records')?.map((r: any, i: number) => (
+              {(get(data, 'records') as Array<Record<string, unknown>> | undefined)?.map((r, i: number) => (
                 <div
                   key={i}
                   className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2"
@@ -485,7 +482,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
         {type === 'watchlist' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
-              {get(data, 'matches')?.map((m: any, i: number) => (
+              {(get(data, 'matches') as Array<Record<string, unknown>> | undefined)?.map((m, i: number) => (
                 <div
                   key={i}
                   className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
@@ -721,7 +718,7 @@ export default function OsintTab() {
       }
 
       if (res?.success) {
-        setResult(res.data ?? null);
+        setResult((res.data as Record<string, unknown>) ?? null);
         setError('');
       } else {
         setError(res?.error || tCommon('no_results'));

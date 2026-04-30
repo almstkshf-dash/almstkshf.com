@@ -100,6 +100,6 @@ export default function ChatbaseWidget() {
 // Extend Window interface for TypeScript
 declare global {
     interface Window {
-        chatbase: any;
+        chatbase: unknown;
     }
 }

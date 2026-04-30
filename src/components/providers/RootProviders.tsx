@@ -18,7 +18,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 interface RootProvidersProps {
     children: ReactNode;
     locale: string;
-    messages: any;
+    messages: Record<string, unknown>;
 }
 
 /**

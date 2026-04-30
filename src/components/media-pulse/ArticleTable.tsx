@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
+import { MonitoringArticle } from '@/types/reports';
 
 /**
  * Pure helper for source type styling
@@ -58,14 +59,14 @@ const ArticleRow = memo(({
     onUpdateSentiment,
     t
 }: {
-    article: any,
+    article: MonitoringArticle,
     isSelected: boolean,
     isDeleting: boolean,
     isUpdating: boolean,
     onToggleSelect: (id: string) => void,
     onDeleteClick: (id: string) => void,
     onUpdateSentiment: (id: string, s: string) => void,
-    t: any
+    t: ReturnType<typeof import('next-intl').useTranslations>
 }) => {
     const theme = getSourceBadgeColor(article.sourceType);
 
@@ -269,7 +270,7 @@ const ArticleRow = memo(({
 
 ArticleRow.displayName = 'ArticleRow';
 
-const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { articles: any[], limit?: number }) {
+const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { articles: MonitoringArticle[], limit?: number }) {
     const t = useTranslations('ArticleTable');
     const deleteArticle = useMutation(api.monitoring.deleteArticle);
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
@@ -416,7 +417,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border/50">
-                        {displayedArticles.map((article: any) => (
+                        {displayedArticles.map((article) => (
                             <ArticleRow
                                 key={article._id}
                                 article={article}

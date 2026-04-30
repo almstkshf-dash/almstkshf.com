@@ -64,7 +64,7 @@ export default function FreeInsightTool() {
             } else {
                 setError(res.error || "Analysis failed. Please try again.");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("FreeInsightTool internal error:", err);
             setError("A system error occurred. Please try again later.");
         } finally {

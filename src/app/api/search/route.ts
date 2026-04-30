@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         const result = await performSearch(index, query);
 
         return NextResponse.json({ success: true, data: result });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("API Search Error:", error);
         return NextResponse.json(
             { error: "Search failed", details: error.message },

@@ -34,6 +34,9 @@ import Button from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
 
+// Types
+import { DarkWebResult, ReportTranslations } from '@/types/reports';
+
 // â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SOURCES = [
   { id: 'ahmia', icon: GlobeLock, labelKey: 'source_ahmia' },
@@ -122,10 +125,10 @@ export default function DarkWebTab() {
   const stealthFetch = useAction(api.darkWeb.stealthFetch);
   const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
   const deleteById = useMutation(api.darkWebDb.deleteById);
-  const results = useQuery(
+  const results = (useQuery(
     api.darkWebDb.getByUserId,
     isAuthenticated ? { limit: 50 } : 'skip'
-  ) || [];
+  ) || []) as DarkWebResult[];
 
   // â”€â”€ Risk badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRiskBadgeStyles = (risk: string) => {
@@ -205,7 +208,7 @@ export default function DarkWebTab() {
   const handleExport = async (format: 'pdf' | 'excel') => {
     if (!results || results.length === 0) return;
     try {
-      const exportTranslations = {
+      const exportTranslations: ReportTranslations = {
         DarkWeb: { 
           tab_label: t('tab_label'),
           col_risk: t('col_risk') 

@@ -21,7 +21,7 @@ interface Article {
     reach: number;
     ave: number;
     content?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 interface SentimentTrackerProps {

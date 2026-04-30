@@ -44,7 +44,7 @@ export const exportToPdf = (articles: ArticleData[], namespace: string = 'Press'
     'Title'
   ];
 
-  const tableRows: any[] = [];
+  const tableRows: unknown[] = [];
 
   articles.forEach(article => {
     const rowData = [
