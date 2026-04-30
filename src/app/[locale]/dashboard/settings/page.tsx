@@ -20,7 +20,8 @@ import Button from '@/components/ui/Button';
 import { Link } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
-import { ALL_COUNTRIES, MultiSelectDropdown } from '@/components/media-pulse/NewsGenerator';
+import { ALL_COUNTRIES } from '@/lib/countries';
+import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 
 
 
