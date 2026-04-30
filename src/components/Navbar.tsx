@@ -84,7 +84,7 @@ const NavbarContent = memo(function NavbarContent() {
                                 <div className="relative w-8 h-8 rounded-lg bg-primary flex items-center justify-center overflow-hidden shrink-0">
                                     <Image
                                         src="/logo.png"
-                                        alt=""
+                                        alt={tCommon('logo_alt')}
                                         fill
                                         sizes="32px"
                                         className="object-contain"
@@ -98,7 +98,7 @@ const NavbarContent = memo(function NavbarContent() {
                         </div>
 
                         {/* â”€â”€â”€ Desktop Navigation â”€â”€â”€ */}
-                        <nav className="hidden lg:flex flex-1 justify-center items-center gap-4 mx-4">
+                        <nav className="hidden lg:flex flex-1 justify-start items-center gap-2 ms-6">
                             {NAVIGATION_ITEMS.filter(item => item.href !== "/").map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;
@@ -113,7 +113,7 @@ const NavbarContent = memo(function NavbarContent() {
                                         >
                                             <button
                                                 className={clsx(
-                                                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                                                    "flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                                                     isActive || activeDropdown === item.label
                                                         ? "text-primary bg-primary/5"
                                                         : "text-foreground/85 hover:text-foreground hover:bg-muted"
@@ -139,7 +139,7 @@ const NavbarContent = memo(function NavbarContent() {
                                         key={item.label}
                                         href={item.href as any}
                                         className={clsx(
-                                            "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                                            "flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                                             isActive
                                                 ? "text-primary bg-primary/5"
                                                 : "text-foreground/85 hover:text-foreground hover:bg-muted"
@@ -165,7 +165,7 @@ const NavbarContent = memo(function NavbarContent() {
                             <Button
                                 variant="outline"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }))}
-                                className="px-3 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
+                                className="px-2 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
                                 aria-label={`${t('search')} - Press âŒ˜K to search`}
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
@@ -187,7 +187,7 @@ const NavbarContent = memo(function NavbarContent() {
                                 size="icon"
                                 onClick={toggleLocale}
                                 className="bg-muted hover:bg-muted/80 rounded-full h-10 w-10 relative flex items-center justify-center overflow-hidden border border-border group shadow-none"
-                                aria-label={isRTL ? "EN - Switch to English" : "AR - Switch to Arabic"}
+                                aria-label={isRTL ? tCommon('switch_to_english') : tCommon('switch_to_arabic')}
                             >
                                 <span className="font-bold text-xs group-hover:scale-110 transition-transform">
                                     {isRTL ? "EN" : "AR"}
@@ -232,7 +232,7 @@ const NavbarContent = memo(function NavbarContent() {
                             <button
                                 className={clsx(ACTION_BTN, "text-foreground")}
                                 onClick={() => setMobileMenuOpen(true)}
-                                aria-label="Open menu"
+                                aria-label={tCommon('open_menu')}
                             >
                                 <Menu className={ICON_LG} aria-hidden="true" />
                             </button>
@@ -302,7 +302,7 @@ const NavbarContent = memo(function NavbarContent() {
                                         <div className="relative w-9 h-9 overflow-hidden rounded-lg border border-border bg-background flex items-center justify-center">
                                             <Image
                                                 src="/logo.png"
-                                                alt=""
+                                                alt={tCommon('logo_alt')}
                                                 width={28}
                                                 height={28}
                                                 className="object-contain dark:brightness-0 dark:invert"

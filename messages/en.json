@@ -25,7 +25,6 @@
     "press": "Press",
     "get_started": "Get Started",
     "contact": "Contact Us",
-    "behind_the_scene": "Behind the Scenes",
     "pricing": "Pricing",
     "smart_assistant_input_placeholder": "Generate a press response...",
     "whatsapp": "WHATSAPP",
@@ -168,7 +167,16 @@
     "save_to_collection": "Save to Collection",
     "search": "Search",
     "date": "Date",
-    "actions": "Actions"
+    "actions": "Actions",
+    "open_menu": "Open navigation menu",
+    "close_menu": "Close navigation menu",
+    "switch_to_arabic": "Switch to Arabic language",
+    "switch_to_english": "Switch to English language",
+    "tdra_alt": "TDRA UAE Certification - Telecommunications and Digital Government Regulatory Authority",
+    "soc2_alt": "SOC2 Type II Compliance - Enterprise Data Security Standard",
+    "secure_alt": "Military-Grade Encryption & Secure Application Badge",
+    "saas_awards_alt": "Global SaaS Awards - Winner for Innovative Enterprise AI",
+    "logo_alt": "ALMSTKSHF Official Logo - Advanced Media & Legal Solutions"
   },
   "SearchOptimizer": {
     "button_tooltip": "Optimize Search with AI",
@@ -391,28 +399,6 @@
       "title": "Sentiment & Reputation",
       "desc": "With our proprietary sentiment analysis algorithms, you can safeguard your brand’s reputation, detecting and neutralizing fake news before it spreads."
     }
-  },
-  "Team": {
-    "title": "Behind the Scene",
-    "subtitle": "Meet the visionaries leading the Almstkshf intelligence ecosystem.",
-    "members": {
-      "tamer": {
-        "name": "Tamer Younes",
-        "role": "CEO",
-        "desc": "Tamer Gad is a seasoned PR and marketing consultant with over 20 years of experience in the GCC. He holds a Bachelor’s in Media, a Master’s in Social Marketing, a Diploma in Operations Management, and a Certificate in Prompt Engineering for Artificial Intelligence. Licensed by twofour54, he advises on AI-powered media monitoring, sentiment analysis, and strategic communication for public and private entities in the UAE."
-      },
-      "rami": {
-        "name": "Eng. Rami Kamel",
-        "role": "COO",
-        "desc": "Eng. Rami Kamel is a cybersecurity engineer and co-founder of the AlMstkshf media intelligence platform. With a strong background in secure systems design and AI integration, he leads the technical architecture behind real-time sentiment analysis and multi-source media monitoring. Rami is known for his ability to merge data security with smart decision-support tools, enabling government and enterprise clients across the UAE to act on media insights with confidence."
-      }
-    },
-    "badge": "Leadership Team",
-    "expertise": "Expertise",
-    "focus": "Focus",
-    "strategy": "Strategy & Leadership",
-    "innovation": "Continuous Innovation",
-    "quote": "At Almstkshf, we are not just analysts; we are architects of clarity in an era of information overload."
   },
   "WhoWeAre": {
     "title": "Who We Are & What We Do",

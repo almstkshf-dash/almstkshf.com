@@ -24,8 +24,6 @@ const isPublicRoute = createRouteMatcher([
     "/privacy(.*)",
     "/:locale(en|ar)/terms(.*)",
     "/terms(.*)",
-    "/:locale(en|ar)/behind-the-scene(.*)",
-    "/behind-the-scene(.*)",
     "/:locale(en|ar)/case-studies(.*)",
     "/case-studies(.*)",
     "/:locale(en|ar)/lexcora(.*)",
@@ -73,7 +71,3 @@ export const config = {
         '/(api|trpc)(.*)',
     ],
 };
-
-
-
-

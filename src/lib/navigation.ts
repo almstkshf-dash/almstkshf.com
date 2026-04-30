@@ -13,16 +13,13 @@ import {
   Microscope,
   Settings,
   BarChart3,
-  Mic2,
   Newspaper,
   FileText,
   Activity,
   ShieldAlert,
   Home,
-  Users,
   CreditCard,
   Tv,
-  Radio,
   Database,
   Search,
 } from "lucide-react";
@@ -117,13 +114,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
         icon: ShieldAlert,
         description: "Strategic crisis response planning"
       },
-
     ]
-  },
-  {
-    label: "behind_the_scene",
-    href: "/behind-the-scene",
-    icon: Users,
   },
   {
     label: "pricing",

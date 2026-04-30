@@ -10,7 +10,7 @@ import { MetadataRoute } from 'next'
 
 const BASE_URL = 'https://almstkshf.com'
 
-// Public routes only â€” private/authenticated routes must never appear in the sitemap
+// Public routes only — private/authenticated routes must never appear in the sitemap
 const routes = [
     '',
     '/case-studies/lexcora',
@@ -24,7 +24,6 @@ const routes = [
     '/media-monitoring/media-pulse',
     '/media-monitoring/crisis-management',
     '/contact',
-    '/behind-the-scene',
     '/pricing',
     '/privacy',
     '/terms',

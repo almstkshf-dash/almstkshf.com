@@ -29,7 +29,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Column 1: About */}
                     <div className="space-y-6">
-                        <Link href="/" className="flex items-center gap-3">
+                        <Link href="/" aria-label={tCommon('logo_alt')} className="flex items-center gap-3">
                             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                 {tCommon('app_name')}
                             </span>
@@ -38,19 +38,19 @@ export default function Footer() {
                             {t('description')}
                         </p>
                         <div className="flex gap-4">
-                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
+                            <Link href="https://www.linkedin.com/company/almstkshf/" target="_blank" rel="me" aria-label="LinkedIn" className="p-2 bg-muted rounded-lg text-muted-foreground hover:text-primary hover:bg-muted/80 transition-all">
                                 <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
                         <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
                             <div className="relative w-20 h-8">
-                                <Image src="/tdra.webp" alt="TDRA Certification" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
+                                <Image src="/tdra.webp" alt={tCommon('tdra_alt')} fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                             <div className="relative w-8 h-8">
-                                <Image src="/soc2.png" alt="SOC2 Compliance" fill sizes="(max-width: 768px) 32px, 32px" className="object-contain invert dark:invert-0 dark:brightness-110" />
+                                <Image src="/soc2.png" alt={tCommon('soc2_alt')} fill sizes="(max-width: 768px) 32px, 32px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                             <div className="relative w-20 h-8">
-                                <Image src="/secure.webp" alt="Secure Application" fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
+                                <Image src="/secure.webp" alt={tCommon('secure_alt')} fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
                         </div>
                     </div>
@@ -159,7 +159,7 @@ export default function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground uppercase tracking-widest font-medium">
-                    <p>Â© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
+                    <p>© {new Date().getFullYear()} {tCommon('app_name')}. {t('rights')}.</p>
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>
                         <a href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</a>

@@ -33,6 +33,7 @@ const FreeInsightTool = dynamic(() => import('@/components/FreeInsightTool'), { 
  */
 export default memo(function HomeClient() {
     const t = useTranslations();
+    const tCommon = useTranslations("Common");
 
     const features = [
         {
@@ -112,7 +113,7 @@ export default memo(function HomeClient() {
                         <div className="relative w-32 h-12">
                             <Image
                                 src="/tdra.webp"
-                                alt="TDRA Approved"
+                                alt={tCommon('tdra_alt')}
                                 width={128}
                                 height={48}
                                 loading="lazy"
@@ -124,7 +125,7 @@ export default memo(function HomeClient() {
                         <div className="relative w-16 h-16">
                             <Image
                                 src="/soc2.png"
-                                alt="SOC2 Compliance"
+                                alt={tCommon('soc2_alt')}
                                 width={64}
                                 height={64}
                                 loading="lazy"
@@ -136,7 +137,7 @@ export default memo(function HomeClient() {
                         <div className="relative w-32 h-12">
                             <Image
                                 src="/secure.webp"
-                                alt="Secure App"
+                                alt={tCommon('secure_alt')}
                                 width={128}
                                 height={48}
                                 loading="lazy"
@@ -148,7 +149,7 @@ export default memo(function HomeClient() {
                         <div className="relative w-32 h-12">
                             <Image
                                 src="/saas-awards.webp"
-                                alt="SaaS Awards"
+                                alt={tCommon('saas_awards_alt')}
                                 width={128}
                                 height={48}
                                 loading="lazy"
