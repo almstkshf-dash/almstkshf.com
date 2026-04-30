@@ -30,7 +30,7 @@ export default function Footer() {
                     {/* Column 1: About */}
                     <div className="space-y-6">
                         <Link href="/" aria-label={tCommon('logo_alt')} className="flex items-center gap-3">
-                            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent app-name">
                                 {tCommon('app_name')}
                             </span>
                         </Link>
@@ -42,7 +42,7 @@ export default function Footer() {
                                 <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
-                        <div className="pt-4 flex flex-wrap gap-4 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+                        <div className="pt-4 flex flex-wrap gap-4">
                             <div className="relative w-20 h-8">
                                 <Image src="/tdra.webp" alt={tCommon('tdra_alt')} fill sizes="(max-width: 768px) 80px, 80px" className="object-contain invert dark:invert-0 dark:brightness-110" />
                             </div>
@@ -57,7 +57,7 @@ export default function Footer() {
 
                     {/* Column 2: Quick Links */}
                     <div>
-                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2 section-title">
                             <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {t('links')}
                         </h3>
@@ -107,7 +107,7 @@ export default function Footer() {
 
                     {/* Column 3: Contact Info */}
                     <div>
-                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2 section-title">
                             <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {tCommon('try_ai')}
                         </h3>
@@ -129,7 +129,7 @@ export default function Footer() {
 
                     {/* Column 4: Newsletter/Legal */}
                     <div>
-                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                        <h3 className="text-foreground font-semibold mb-6 uppercase tracking-wider text-sm flex items-center gap-2 section-title">
                             <span className="w-8 h-px bg-primary" aria-hidden="true"></span>
                             {t('legal')}
                         </h3>
@@ -163,13 +163,6 @@ export default function Footer() {
                     <div className="flex gap-6">
                         <Link href="/contact" className="hover:text-foreground transition-colors">{t('support')}</Link>
                         <a href="/sitemap.xml" className="hover:text-foreground transition-colors">{t('sitemap')}</a>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hover:text-foreground h-auto p-0 font-medium uppercase tracking-widest text-[11px] shadow-none hover:bg-transparent"
-                        >
-                            {t('status')}
-                        </Button>
                     </div>
                 </div>
             </Container>

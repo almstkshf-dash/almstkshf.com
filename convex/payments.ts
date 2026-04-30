@@ -48,6 +48,7 @@ export const getUserPayments = query({
             .collect();
     },
 });
+
 export const syncSubscription = mutation({
     args: {
         userId: v.string(),
@@ -57,12 +58,15 @@ export const syncSubscription = mutation({
         status: v.string(),
         currentPeriodEnd: v.number(),
         cancelAtPeriodEnd: v.boolean(),
+        plan: v.optional(v.union(v.literal("standard"), v.literal("professional"), v.literal("enterprise"))),
     },
     handler: async (ctx, args) => {
         const existing = await ctx.db
             .query("subscriptions")
             .withIndex("by_subscription_id", (q) => q.eq("stripeSubscriptionId", args.stripeSubscriptionId))
             .first();
+
+        const isActive = args.status === 'active' || args.status === 'trialing';
 
         if (existing) {
             await ctx.db.patch(existing._id, {
@@ -74,7 +78,39 @@ export const syncSubscription = mutation({
             });
         } else {
             await ctx.db.insert("subscriptions", {
-                ...args,
+                userId: args.userId,
+                stripeSubscriptionId: args.stripeSubscriptionId,
+                stripePriceId: args.stripePriceId,
+                stripeCustomerId: args.stripeCustomerId,
+                status: args.status,
+                currentPeriodEnd: args.currentPeriodEnd,
+                cancelAtPeriodEnd: args.cancelAtPeriodEnd,
+                updatedAt: Date.now(),
+            });
+
+            // New subscription: create notification
+            await ctx.db.insert("notifications", {
+                userId: args.userId,
+                title: "Subscription Activated",
+                message: `Your ${args.status === 'trialing' ? 'trial' : 'subscription'} is now active. Welcome to the platform!`,
+                type: "billing",
+                isRead: false,
+                createdAt: Date.now(),
+            });
+        }
+
+        // Update userSettings
+        const settings = await ctx.db
+            .query("userSettings")
+            .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+            .unique();
+
+        if (settings) {
+            await ctx.db.patch(settings._id, {
+                isSubscribed: isActive,
+                plan: args.plan,
+                isTrialActive: args.status === 'trialing',
+                trialEndsAt: args.status === 'trialing' ? args.currentPeriodEnd : undefined,
                 updatedAt: Date.now(),
             });
         }
@@ -88,5 +124,51 @@ export const getSubscription = query({
             .query("subscriptions")
             .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
             .first();
+    },
+});
+
+export const checkSubscriptions = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const now = Date.now();
+        const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+        
+        // Find active subscriptions ending in the next 3 days
+        const expiringSoon = await ctx.db
+            .query("subscriptions")
+            .filter((q) => 
+                q.and(
+                    q.eq(q.field("status"), "active"),
+                    q.lt(q.field("currentPeriodEnd"), now + threeDaysMs),
+                    q.gt(q.field("currentPeriodEnd"), now)
+                )
+            )
+            .collect();
+
+        for (const sub of expiringSoon) {
+            // Check if we already notified them recently (to avoid spam)
+            const recentNotif = await ctx.db
+                .query("notifications")
+                .withIndex("by_userId", (q) => q.eq("userId", sub.userId))
+                .filter((q) => 
+                    q.and(
+                        q.eq(q.field("type"), "billing"),
+                        q.eq(q.field("title"), "Subscription Expiring Soon"),
+                        q.gt(q.field("createdAt"), now - (24 * 60 * 60 * 1000)) // within last 24h
+                    )
+                )
+                .first();
+
+            if (!recentNotif) {
+                await ctx.db.insert("notifications", {
+                    userId: sub.userId,
+                    title: "Subscription Expiring Soon",
+                    message: "Your subscription will expire in less than 3 days. Renew now to keep your access to OSINT and AI Inspector.",
+                    type: "billing",
+                    isRead: false,
+                    createdAt: now,
+                });
+            }
+        }
     },
 });

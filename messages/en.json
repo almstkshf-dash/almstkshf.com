@@ -1416,9 +1416,7 @@
     "description": "Sorry, we couldn’t find the page you’re looking for.",
     "home_button": "Go back home"
   },
-  "Pricing": {
-    "title": "Plans & Pricing"
-  },
+
   "Osint": {
     "title": "Open Source Intelligence (OSINT)",
     "subtitle": "Curated resources, free or registration-only. Please respect terms of use.",
@@ -1733,19 +1731,20 @@
   },
   "RssFeeder": {
     "title": "Intelligence Stream",
-    "loading": "Syncing feed...",
-    "no_items": "No recent updates found for this stream.",
-    "last_updated": "Last updated",
-    "read_more": "Read Full Intelligence",
+    "loading": "Analyzing latest intelligence...",
+    "items_count": "{count} items",
+    "no_items": "No recent reports in this channel",
+    "last_updated": "Last synced",
+    "read_more": "Extract Full Intel",
     "source": "Source",
-    "error_fetching": "Connection to the intelligence stream failed.",
+    "error_fetching": "Sync error",
     "placeholder_url": "Enter RSS link (e.g., https://...)",
-    "analyze": "Analyze Stream",
-    "refresh": "Refresh Feed",
+    "analyze": "Deep Pulse Analysis",
+    "refresh": "Force Refresh",
     "syncing": "Syncing...",
     "sync_now": "Sync Now",
-    "failed_fetch": "Intelligence bridge failed. Please check network connectivity.",
-    "retry": "Try Again"
+    "failed_fetch": "Intelligence retrieval interrupted",
+    "retry": "Try again"
   },
   "TerroristList": {
     "title": "Local Terrorist List",
@@ -2114,8 +2113,23 @@
     "no_results": "No investigative results found",
     "no_results_desc": "Select a source and enter a keyword or URL to begin investigating.",
     "col_depth": "Depth",
-    "search_failed": "Dark Web search systems are currently overloaded or unreachable. Please verify your API keys and try again."
+    "search_failed": "Dark Web search systems are currently overloaded or unreachable. Please verify your API keys and try again.",
+    "country_filter": "Select Target Country",
+    "url_placeholder": "Enter a URL to extract / scrape...",
+    "extracted_content": "Extracted Content",
+    "geo_auto": "Auto (Default)",
+    "geo_us": "United States",
+    "geo_gb": "United Kingdom",
+    "geo_ae": "UAE",
+    "geo_sa": "Saudi Arabia",
+    "geo_tr": "Turkey",
+    "geo_de": "Germany",
+    "geo_fr": "France",
+    "geo_nl": "Netherlands",
+    "geo_ru": "Russia",
+    "geo_ir": "Iran"
   },
+
   "RssSources": {
     "global_intel_bbc": "Global Intelligence (BBC)",
     "main": "Main",
@@ -2149,6 +2163,79 @@
     "investigation": "Investigation",
     "all": "All",
     "first": "First",
-    "opinion": "Opinion"
+    "opinion": "Opinion",
+    "live_status": "Live",
+    "live_desc": "Real-time monitoring",
+    "asharq_al_awsat": "Asharq Al-Awsat",
+    "bbc": "BBC"
+  },
+  "Pricing": {
+    "title": "Pricing Plans",
+    "description": "Choose the right media intelligence package for your organization.",
+    "discount_info": "Save 15% with annual billing",
+    "billing_monthly": "Monthly",
+    "billing_annual": "Annual",
+    "save_badge": "Save 15%",
+    "free_trial_title": "Wait! Don't Miss Out",
+    "free_trial_desc": "Try Almstkshf for 15 days for free. Experience the full power of our media intelligence platform before you commit.",
+    "free_trial_cta": "Start My 15-Day Free Trial",
+    "free_trial_note": "Requires credit card registration. Cancel anytime.",
+    "recommended": "Most Popular",
+    "contact_sales": "Contact Sales",
+    "subscribe_now": "Subscribe Now",
+    "currency": "AED",
+    "per_month": "/mo",
+    "specialized_solutions": "Specialized Solutions",
+    "enterprise_prompt": "Looking for custom integration or larger scale monitoring?",
+    "enterprise_link_text": "Contact our Enterprise Team",
+    "plans": {
+      "standard": {
+        "name": "Standard",
+        "description": "Essential media monitoring for individuals and small teams.",
+        "features": [
+          "OSINT Engine (Standard)",
+          "Media Pulse Watchlist",
+          "Daily Email Reports",
+          "10 Saved Keywords",
+          "Standard Support"
+        ]
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "Advanced tools for growing businesses and PR agencies.",
+        "features": [
+          "AI Inspector (Advanced Analysis)",
+          "Press Release Monitoring",
+          "OSINT Engine (Pro)",
+          "Real-time WhatsApp Alerts",
+          "50 Saved Keywords"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "The complete intelligence suite for elite organizations.",
+        "features": [
+          "Dark Web Monitoring",
+          "Full AI Media Assistant",
+          "Unlimited OSINT Investigations",
+          "Custom Crisis Management",
+          "24/7 Dedicated Support"
+        ]
+      }
+    },
+    "specialized": {
+      "kyc": {
+        "name": "KYC Compliance",
+        "description": "Automated identity verification."
+      },
+      "go-aml": {
+        "name": "GO-AML Integration",
+        "description": "Anti-money laundering compliance."
+      },
+      "dark-web": {
+        "name": "Dark Web Scrape",
+        "description": "Deep web monitoring and threat intelligence."
+      }
+    }
   }
 }

@@ -24,7 +24,7 @@ import ExcelJS from 'exceljs';
 import { ReportGenerator } from '@/lib/report-generator';
 
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Constants ─────────────────────────────────────────────────────────
 const ENTRY_TYPES = ['all', 'individual', 'entity', 'organization'] as const;
 type EntryType = (typeof ENTRY_TYPES)[number];
 
@@ -34,7 +34,7 @@ export default function TerroristListTab() {
   const tCommon = useTranslations('Common');
   const isAdmin = useQuery(api.authQueries.checkIsAdmin);
 
-  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── State ────────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<EntryType>('all');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -53,7 +53,7 @@ export default function TerroristListTab() {
     return () => document.removeEventListener('keydown', handleImportModalKeyDown);
   }, [isImportModalOpen, handleImportModalKeyDown]);
 
-  // â”€â”€â”€ Convex Operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Convex Operations ────────────────────────────────────────────────
   const entries = useQuery(api.terroristList.search, {
     searchTerm: searchQuery,
     type: filterType === 'all' ? undefined : filterType
@@ -90,7 +90,7 @@ export default function TerroristListTab() {
     }
   };
 
-  // â”€â”€â”€ Handlers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Handlers ─────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !isAdmin) return;
@@ -144,27 +144,27 @@ export default function TerroristListTab() {
                 return "";
               };
 
-              const nameAr = getVal(['Ø§Ù„Ø§Ø³Ù… ÙƒØ§Ù…Ù„', 'Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„', 'Ø§Ø³Ù… Ø§Ù„ÙØ±Ø¯', 'Ø§Ø³Ù… Ø§Ù„Ø´Ø®Øµ', 'Ø§Ø³Ù… Ø§Ù„ÙƒÙŠØ§Ù†', 'Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„ÙƒØ§Ù…Ù„', 'Ø§Ù„Ø§Ø³Ù…', 'Name Arabic', 'Name (Arabic)', 'Full Name Arabic', 'Ar Name']);
-              const nameEn = getVal(['Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ù„Ø§ØªÙŠÙ†ÙŠØ©', 'Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ù„ØºØ© Ø§Ù„Ø§Ù†Ø¬Ù„ÙŠØ²ÙŠØ©', 'Ø§Ù„Ø§Ø³Ù… Ø¨Ø§Ù„Ø§Ù†Ø¬Ù„ÙŠØ²ÙŠØ©', 'English Name', 'Name (English)', 'Latin Name', 'Full Name', 'Name Latin', 'Name (Latin)', 'Name English', 'En Name']);
-              const typeRaw = getVal(['Ø§Ù„Ù†ÙˆØ¹', 'ÙØ¦Ø© Ø§Ù„Ù…Ø¯Ø±Ø¬', 'Type', 'Category', 'Classification']).toLowerCase();
+              const nameAr = getVal(['الاسم بالكامل', 'الاسم بالعربية', 'اسم الفرد', 'اسم الشخص', 'اسم المنشأة', 'الاسم الكامل', 'الاسم', 'Name Arabic', 'Name (Arabic)', 'Full Name Arabic', 'Ar Name']);
+              const nameEn = getVal(['الاسم بالإنجليزية', 'الاسم باللاتينية', 'English Name', 'Name (English)', 'Latin Name', 'Full Name', 'Name Latin', 'Name (Latin)', 'Name English', 'En Name']);
+              const typeRaw = getVal(['النوع', 'فئة المدرج', 'Type', 'Category', 'Classification']).toLowerCase();
 
               return {
                 nameArabic: nameAr,
                 nameLatin: nameEn,
-                type: typeRaw.includes('ÙØ±Ø¯') || typeRaw.includes('individual') || typeRaw.includes('person') ? 'individual' :
-                  typeRaw.includes('ÙƒÙŠØ§Ù†') || typeRaw.includes('entity') || typeRaw.includes('company') ? 'entity' :
-                    typeRaw.includes('Ù…Ù†Ø¸Ù…Ø©') || typeRaw.includes('org') || typeRaw.includes('organization') ? 'organization' : 'individual',
-                nationality: getVal(['Ø§Ù„Ø¬Ù†Ø³ÙŠØ©', 'Ø§Ù„Ø¯ÙˆÙ„Ø©', 'Ø§Ù„ÙˆØ·Ù†', 'Nationality', 'Citizen', 'Country', 'State']),
-                category: getVal(['Ø§Ù„ÙØ¦Ø©', 'Ø§Ù„Ù…Ø¯Ø±Ø¬', 'Ø§Ù„Ø­Ø§Ù„Ø©', 'Category', 'Status', 'Description', 'List Name']) || 'Designated',
-                documentNumber: getVal(['Ø±Ù‚Ù… Ø§Ù„ÙˆØ«ÙŠÙ‚Ø©', 'Ø±Ù‚Ù… Ø§Ù„Ø¬ÙˆØ§Ø²', 'Ø±Ù‚Ù… Ø§Ù„Ù‡ÙˆÙŠØ©', 'Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ù…Ø¯Ù†ÙŠ', 'Document Number', 'ID', 'Passport', 'Identifiier', 'Doc #']),
-                reasons: getVal(['Ø§Ù„Ø£Ø³Ø¨Ø§Ø¨', 'Ø³Ø¨Ø¨ Ø§Ù„Ø¥Ø¯Ø±Ø§Ø¬', 'Ø§Ù„Ø£Ø³Ø³ Ø§Ù„Ù‚Ø§Ù†ÙˆÙ†ÙŠØ©', 'Ø§Ù„ØªÙØ§ØµÙŠÙ„', 'Reasons', 'Comments', 'Legal Grounds', 'Basis', 'Summary', 'Ø£Ø³Ø¨Ø§Ø¨ Ø§Ù„Ø¥Ø¯Ø±Ø§Ø¬']),
-                dob: getVal(['ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯', 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯/Ø§Ù„ØªØ£Ø³ÙŠØ³', 'Ø³Ù†Ø© Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯', 'DOB', 'Date of Birth', 'Birth Date']),
-                pob: getVal(['Ù…ÙƒØ§Ù† Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯', 'Ø¨Ù„Ø¯ Ø§Ù„Ù…Ù†Ø´Ø£', 'POB', 'Place of Birth', 'Address of Birth']),
-                address: getVal(['Ø§Ù„Ø¹Ù†ÙˆØ§Ù†', 'Ø§Ù„Ù…ÙƒØ§Ù†', 'Ù…Ù‚Ø± Ø§Ù„Ø¥Ù‚Ø§Ù…Ø©', 'Address', 'Location', 'Residence']),
-                issuingAuthority: getVal(['Ø¬Ù‡Ø© Ø§Ù„Ø¥ØµØ¯Ø§Ø±', 'Ø§Ù„Ù…ØµØ¯Ø±', 'Ø§Ù„Ø¬Ù‡Ø© Ø§Ù„Ù…Ø®ØªØµØ©', 'Issuing Authority', 'Issuer', 'Authority']),
-                issueDate: getVal(['ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥ØµØ¯Ø§Ø±', 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ù‚Ø±Ø§Ø±', 'Issue Date', 'Decision Date']),
-                expiryDate: getVal(['ØªØ§Ø±ÙŠØ® Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡', 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ù†ÙØ§Ø° Ø­ØªÙ‰', 'Expiry Date', 'Expiration', 'Valid To']),
-                otherInfo: getVal(['Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø£Ø®Ø±Ù‰', 'Ù…Ù„Ø§Ø­Ø¸Ø§Øª', 'Ø§Ù„ÙƒÙ†ÙŠØ©', 'Ø¨ÙŠØ§Ù†Ø§Øª Ø¥Ø¶Ø§ÙÙŠØ©', 'Other Info', 'Notes', 'Remarks', 'Ø§Ù„ÙƒÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø±ÙÙˆØ¹Ø©', 'Metadata', 'Nickname', 'Alias']),
+                type: typeRaw.includes('فرد') || typeRaw.includes('individual') || typeRaw.includes('person') ? 'individual' :
+                  typeRaw.includes('منشأة') || typeRaw.includes('كيان') || typeRaw.includes('entity') || typeRaw.includes('company') ? 'entity' :
+                    typeRaw.includes('منظمة') || typeRaw.includes('org') || typeRaw.includes('organization') ? 'organization' : 'individual',
+                nationality: getVal(['الجنسية', 'الدولة', 'المواطنة', 'Nationality', 'Citizen', 'Country', 'State']),
+                category: getVal(['الفئة', 'المدرج', 'الحالة', 'Category', 'Status', 'Description', 'List Name']) || 'Designated',
+                documentNumber: getVal(['رقم الوثيقة', 'رقم الجواز', 'رقم الهوية', 'الرقم المدني', 'Document Number', 'ID', 'Passport', 'Identifiier', 'Doc #']),
+                reasons: getVal(['الأسباب', 'سبب الإدراج', 'الأسس القانونية', 'التفاصيل', 'Reasons', 'Comments', 'Legal Grounds', 'Basis', 'Summary', 'أسباب الإدراج']),
+                dob: getVal(['تاريخ الميلاد', 'تاريخ الميلاد/التأسيس', 'سنة الميلاد', 'DOB', 'Date of Birth', 'Birth Date']),
+                pob: getVal(['مكان الميلاد', 'بلد المنشأ', 'POB', 'Place of Birth', 'Address of Birth']),
+                address: getVal(['العنوان', 'المكان', 'مقر الإقامة', 'Address', 'Location', 'Residence']),
+                issuingAuthority: getVal(['جهة الإصدار', 'المصدر', 'الجهة المختصة', 'Issuing Authority', 'Issuer', 'Authority']),
+                issueDate: getVal(['تاريخ الإصدار', 'تاريخ القرار', 'Issue Date', 'Decision Date']),
+                expiryDate: getVal(['تاريخ الانتهاء', 'تاريخ النفاذ حتى', 'Expiry Date', 'Expiration', 'Valid To']),
+                otherInfo: getVal(['معلومات أخرى', 'ملاحظات', 'الكنية', 'بيانات إضافية', 'Other Info', 'Notes', 'Remarks', 'البيانات المرفوعة', 'Metadata', 'Nickname', 'Alias']),
               };
             });
 
@@ -208,7 +208,7 @@ export default function TerroristListTab() {
 
   return (
     <div className="space-y-6">
-      {/* â”€â”€â”€ Header & Controls â”€â”€â”€ */}
+      {/* ─── Header & Controls ─── */}
       <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -260,7 +260,7 @@ export default function TerroristListTab() {
           </div>
         </div>
 
-        {/* â”€â”€â”€ Search & Filters â”€â”€â”€ */}
+        {/* ─── Search & Filters ─── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
@@ -295,7 +295,7 @@ export default function TerroristListTab() {
         </div>
       </div>
 
-      {/* â”€â”€â”€ Results Table â”€â”€â”€ */}
+      {/* ─── Results Table ─── */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[1400px]">
@@ -371,13 +371,13 @@ export default function TerroristListTab() {
                       {entry.nameArabic}
                     </td>
                     <td className="px-6 py-3 text-xs font-semibold text-foreground/70 italic border-r border-border/40">
-                      {entry.nameLatin || 'â€”'}
+                      {entry.nameLatin || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs font-bold border-r border-border/40">
-                      {entry.nationality || 'â€”'}
+                      {entry.nationality || '—'}
                     </td>
                     <td className="px-4 py-3 text-[11px] font-mono font-bold text-foreground border-r border-border/40">
-                      {entry.documentNumber || 'â€”'}
+                      {entry.documentNumber || '—'}
                     </td>
                     <td className="px-4 py-3 border-r border-border/40">
                       <span className="px-2 py-1 rounded-md bg-destructive/10 text-red-700 dark:text-red-400 text-[10px] font-black uppercase tracking-tight border border-destructive/20 whitespace-nowrap">
@@ -385,28 +385,28 @@ export default function TerroristListTab() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-foreground/70 whitespace-nowrap border-r border-border/40">
-                      {entry.dob || 'â€”'}
+                      {entry.dob || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-foreground/70 whitespace-nowrap border-r border-border/40">
-                      {entry.pob || 'â€”'}
+                      {entry.pob || '—'}
                     </td>
                     <td className="px-6 py-3 text-xs text-foreground/70 border-r border-border/40 leading-relaxed min-w-[250px]">
-                      {entry.address || 'â€”'}
+                      {entry.address || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-foreground/70 border-r border-border/40 font-medium">
-                      {entry.issuingAuthority || 'â€”'}
+                      {entry.issuingAuthority || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground border-r border-border/40 whitespace-nowrap">
-                      {entry.issueDate || 'â€”'}
+                      {entry.issueDate || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground border-r border-border/40 whitespace-nowrap">
-                      {entry.expiryDate || 'â€”'}
+                      {entry.expiryDate || '—'}
                     </td>
                     <td className="px-8 py-3 text-xs text-rose-700 dark:text-rose-300 font-bold border-r border-border/40 leading-relaxed">
-                      {entry.reasons || 'â€”'}
+                      {entry.reasons || '—'}
                     </td>
                     <td className="px-6 py-3 text-xs text-foreground/70 italic leading-relaxed">
-                      {entry.otherInfo || 'â€”'}
+                      {entry.otherInfo || '—'}
                     </td>
                   </motion.tr>
                 ))}
@@ -415,7 +415,7 @@ export default function TerroristListTab() {
           </table>
         </div>
 
-        {/* â”€â”€ Empty State â”€â”€ */}
+        {/* ── Empty State ── */}
         {entries?.length === 0 && (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
@@ -434,11 +434,11 @@ export default function TerroristListTab() {
         )}
       </div>
 
-      {/* â”€â”€â”€ Import Modal â”€â”€â”€ */}
+      {/* ─── Import Modal ─── */}
       <AnimatePresence>
         {isImportModalOpen && (
           <>
-            {/* Overlay â€” no ARIA role, purely visual */}
+            {/* Overlay — no ARIA role, purely visual */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -448,7 +448,7 @@ export default function TerroristListTab() {
                 className="absolute inset-0 bg-background/80 backdrop-blur-sm"
                 aria-hidden="true"
               />
-              {/* Dialog panel â€” role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
+              {/* Dialog panel — role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
               <motion.div
                 role="dialog"
                 aria-modal="true"

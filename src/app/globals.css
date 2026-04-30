@@ -3,10 +3,14 @@
 /**
  * DESIGN TOKENS — Conserving root variables in this global CSS file 
  * ensures they are part of the server-rendered HTML via <link> tags.
+ * 
+ * TO CHANGE THE GLOBAL FONT:
+ * 1. Update the Cairo import in `src/app/[locale]/layout.tsx`
+ * 2. Update the --font-sans variable below.
  */
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-arabic: var(--font-ibm-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -441,9 +445,64 @@
 
 /* ─── Component-level helpers ───────────────────────────────────────────── */
 
-/* RTL font override */
+/* RTL font and typography overrides — ABSOLUTE Cairo Enforcement */
+[dir="rtl"],
+[dir="rtl"] body,
+[dir="rtl"] * {
+  --font-sans: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
+  font-family: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
+}
+
 [dir="rtl"] {
-  font-family: var(--font-ibm-plex-arabic), var(--font-sans);
+  font-weight: 400;
+}
+
+/* Reset and Enforce typography properties for all Arabic elements */
+[dir="rtl"] *,
+[dir="rtl"] *::before,
+[dir="rtl"] *::after {
+  font-family: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* 1. Base weights for content & interactive elements (Cairo Regular - 400) */
+/* This covers body content, labels, and interactive elements per user request */
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] a,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea,
+[dir="rtl"] label,
+[dir="rtl"] div,
+[dir="rtl"] .font-normal,
+[dir="rtl"] .font-medium,
+[dir="rtl"] .font-semibold,
+[dir="rtl"] .font-bold {
+  font-weight: 400 !important;
+}
+
+/* 2. Headline and UI Header weights (Cairo SemiBold - 600) */
+/* We only allow SemiBold for actual headers or elements with explicitly heavy weight classes */
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] .font-extrabold,
+[dir="rtl"] .font-black {
+  font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* 3. Special Case: Force Bold on specifically heavy UI elements that act as headers */
+[dir="rtl"] .app-name,
+[dir="rtl"] .nav-header,
+[dir="rtl"] .section-title {
+  font-weight: 600 !important;
 }
 
 /* Theme-toggle icon — GPU layer so it doesn't repaint surrounding text */

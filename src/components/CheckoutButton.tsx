@@ -12,22 +12,27 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 import { getStripe } from '@/lib/stripe-client';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 import Button from '@/components/ui/Button';
 
 interface CheckoutButtonProps {
     productId: string;
+    billingCycle?: 'monthly' | 'annual';
+    isTrial?: boolean;
     className?: string;
     children?: React.ReactNode;
 }
 
 export default function CheckoutButton({
     productId,
+    billingCycle = 'monthly',
+    isTrial = false,
     className = '',
     children = 'Checkout',
 }: CheckoutButtonProps) {
     const [loading, setLoading] = useState(false);
     const { userId } = useAuth();
+    const { user } = useUser();
 
     const handleCheckout = async () => {
         setLoading(true);
@@ -42,6 +47,9 @@ export default function CheckoutButton({
                 body: JSON.stringify({
                     productId,
                     userId,
+                    billingCycle,
+                    isTrial,
+                    userName: user?.fullName || user?.username || 'Subscriber',
                 }),
             });
 

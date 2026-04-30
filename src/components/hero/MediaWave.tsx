@@ -59,7 +59,7 @@ function GoldWave({ y, speed, depth }: { y: number; speed: number; depth: number
 function Scene() {
     return (
         <>
-            {/* Ø·Ø¨Ù‚Ø§Øª Ø¹Ù…Ù‚ Ù…Ø®ØªÙ„ÙØ© */}
+            {/* طبقات عمق مختلفة */}
             <GoldWave y={2} speed={0.6} depth={-6} />
             <GoldWave y={0.5} speed={0.4} depth={-5} />
             <GoldWave y={-1} speed={0.3} depth={-4} />

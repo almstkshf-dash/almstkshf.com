@@ -45,17 +45,17 @@ type SourceId = typeof SOURCES[number]['id'];
 
 // Countries for ZenRows geo-targeting (tracker T-09)
 const GEO_COUNTRIES = [
-  { code: '', label: 'Auto (Default)' },
-  { code: 'us', label: 'United States' },
-  { code: 'gb', label: 'United Kingdom' },
-  { code: 'ae', label: 'UAE' },
-  { code: 'sa', label: 'Saudi Arabia' },
-  { code: 'tr', label: 'Turkey' },
-  { code: 'de', label: 'Germany' },
-  { code: 'fr', label: 'France' },
-  { code: 'nl', label: 'Netherlands' },
-  { code: 'ru', label: 'Russia' },
-  { code: 'ir', label: 'Iran' },
+  { code: '', labelKey: 'geo_auto' },
+  { code: 'us', labelKey: 'geo_us' },
+  { code: 'gb', labelKey: 'geo_gb' },
+  { code: 'ae', labelKey: 'geo_ae' },
+  { code: 'sa', labelKey: 'geo_sa' },
+  { code: 'tr', labelKey: 'geo_tr' },
+  { code: 'de', labelKey: 'geo_de' },
+  { code: 'fr', labelKey: 'geo_fr' },
+  { code: 'nl', labelKey: 'geo_nl' },
+  { code: 'ru', labelKey: 'geo_ru' },
+  { code: 'ir', labelKey: 'geo_ir' },
 ];
 
 // â”€â”€â”€ Skeleton Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -298,7 +298,7 @@ export default function DarkWebTab() {
               placeholder={
                 source === 'ahmia'
                   ? t('search_placeholder')
-                  : 'Enter a URL to extract / scrape...'
+                  : t('url_placeholder')
               }
               className="w-full pl-11 pr-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium"
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -332,7 +332,7 @@ export default function DarkWebTab() {
                 className="bg-muted/40 border border-border rounded-xl px-3 py-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-foreground"
               >
                 {GEO_COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>{c.label}</option>
+                  <option key={c.code} value={c.code}>{t(c.labelKey)}</option>
                 ))}
               </select>
             </div>
@@ -402,7 +402,7 @@ export default function DarkWebTab() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-purple-600" aria-hidden="true" />
                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-600">
-                  {fetchResult.source === 'diffbot' ? 'Diffbot' : 'ZenRows'} â€” Extracted Content
+                  {fetchResult.source === 'diffbot' ? 'Diffbot' : 'ZenRows'} — {t('extracted_content')}
                 </span>
               </div>
               <p className="text-sm font-bold text-foreground">{fetchResult.title}</p>

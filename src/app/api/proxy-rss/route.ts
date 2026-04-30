@@ -58,7 +58,8 @@ export async function GET(request: Request) {
     }, { status: 400 });
   }
 
-  console.log(`[API Proxy] Request for: ${feedUrl}`);
+  console.log(`[API Proxy] [${new Date().toISOString()}] Received request for URL: ${feedUrl}`);
+  console.log(`[API Proxy] [${new Date().toISOString()}] Origin: ${request.headers.get('origin') || 'direct'}`);
 
   // Security check: SSRF guard â€” rejects private IPs, loopback, and non-HTTPS URLs
   if (!isSafePublicUrl(feedUrl)) {
@@ -69,7 +70,9 @@ export async function GET(request: Request) {
   }
 
   try {
+    console.log(`[API Proxy] [${new Date().toISOString()}] Calling parseFeed for: ${feedUrl}`);
     const data = await parseFeed(feedUrl, sourceName);
+    console.log(`[API Proxy] [${new Date().toISOString()}] parseFeed successful, items found: ${data?.length || 0}`);
 
     // Check if we actually got items
     if (!data || data.length === 0) {
@@ -91,8 +94,10 @@ export async function GET(request: Request) {
     });
 
   } catch (error) {
-    console.error(`[API Feed] Caught error:`, error);
+    console.error(`[API Feed] [${new Date().toISOString()}] Caught error while fetching ${feedUrl}:`, error);
     const message = error instanceof Error ? error.message : 'Internal Server Error fetching RSS feed.';
+    const stack = error instanceof Error ? error.stack : 'No stack trace';
+    console.error(`[API Feed] Error details: ${message}\nStack: ${stack}`);
     
     // Choose appropriate status code
     let status = 500;

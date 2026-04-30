@@ -24,7 +24,7 @@ import Button from "@/components/ui/Button";
 import dynamic from "next/dynamic";
 import { NotificationBell } from "@/components/NotificationBell";
 
-// Lazy-load all Clerk UI â€” keeps the ~186 KiB Clerk bundle out of the initial page load
+// Lazy-load all Clerk UI — keeps the ~186 KiB Clerk bundle out of the initial page load
 const NavbarAuthSection = dynamic(
     () => import("@/components/NavbarAuthSection"),
     { ssr: false, loading: () => <div className="w-9 h-9 rounded-full bg-muted animate-pulse" aria-hidden="true" /> }
@@ -60,9 +60,9 @@ const NavbarContent = memo(function NavbarContent() {
 
     const isRTL = locale === "ar";
 
-    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ———————————————————————————————————————————————— */
     /* Shared icon size tokens                          */
-    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ———————————————————————————————————————————————— */
     const ICON_SM = "w-4 h-4";
     const ICON_MD = "w-[18px] h-[18px]";
     const ICON_LG = "w-5 h-5";
@@ -74,13 +74,13 @@ const NavbarContent = memo(function NavbarContent() {
                 className="contents"
                 onMouseLeave={() => setActiveDropdown(null)}
             >
-                <Container>
+                <Container className="max-w-none px-4 md:px-6">
 
-                    <div className="flex h-16 items-center justify-between gap-4">
+                    <div className="flex h-16 items-center justify-between gap-2">
 
-                        {/* â”€â”€â”€ Logo â”€â”€â”€ */}
+                        {/* ——— Logo ——— */}
                         <div onMouseEnter={() => setActiveDropdown(null)} className="shrink-0">
-                            <HoverPrefetchLink href="/" aria-label={`${tCommon('app_name')} - Go to homepage`} className="flex items-center gap-2.5 group z-50 relative">
+                            <HoverPrefetchLink href="/" aria-label={`${tCommon('app_name')} - Go to homepage`} className="flex items-center gap-2 group z-50 relative">
                                 <div className="relative w-8 h-8 rounded-lg bg-primary flex items-center justify-center overflow-hidden shrink-0">
                                     <Image
                                         src="/logo.png"
@@ -91,14 +91,14 @@ const NavbarContent = memo(function NavbarContent() {
                                         priority
                                     />
                                 </div>
-                                <span className="hidden sm:block font-bold text-lg tracking-tight text-foreground">
+                                <span className="hidden xl:block font-bold text-lg tracking-tight text-foreground app-name">
                                     {tCommon('app_name')}
                                 </span>
                             </HoverPrefetchLink>
                         </div>
 
-                        {/* â”€â”€â”€ Desktop Navigation â”€â”€â”€ */}
-                        <nav className="hidden lg:flex flex-1 justify-start items-center gap-2 ms-6">
+                        {/* ——— Desktop Navigation ——— */}
+                        <nav className="hidden lg:flex flex-1 justify-start items-center gap-1 ms-2">
                             {NAVIGATION_ITEMS.filter(item => item.href !== "/").map((item) => {
                                 const isActive = pathname.includes(item.href || item.label);
                                 const hasChildren = !!item.children;
@@ -124,7 +124,7 @@ const NavbarContent = memo(function NavbarContent() {
                                                 {item.icon && (
                                                     <item.icon className={clsx(ICON_MD, "shrink-0")} aria-hidden="true" />
                                                 )}
-                                                <span>{t(item.label)}</span>
+                                                <span className="nav-header">{t(item.label)}</span>
                                                 <ChevronDown className={clsx(
                                                     ICON_SM, "shrink-0 transition-transform duration-200",
                                                     activeDropdown === item.label && "rotate-180"
@@ -150,13 +150,13 @@ const NavbarContent = memo(function NavbarContent() {
                                         {item.icon && (
                                             <item.icon className={clsx(ICON_MD, "shrink-0")} aria-hidden="true" />
                                         )}
-                                        {t(item.label)}
+                                        <span className="nav-header">{t(item.label)}</span>
                                     </HoverPrefetchLink>
                                 );
                             })}
                         </nav>
 
-                        {/* â”€â”€â”€ Action Buttons (Desktop) â”€â”€â”€ */}
+                        {/* ——— Action Buttons (Desktop) ——— */}
                         <div
                             className="hidden lg:flex items-center gap-2 shrink-0"
                             onMouseEnter={() => setActiveDropdown(null)}
@@ -166,11 +166,11 @@ const NavbarContent = memo(function NavbarContent() {
                                 variant="outline"
                                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }))}
                                 className="px-2 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
-                                aria-label={`${t('search')} - Press âŒ˜K to search`}
+                                aria-label={`${t('search')} - Press ⌘K to search`}
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
                                 <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/85">
-                                    <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">âŒ˜</kbd>
+                                    <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">⌘</kbd>
                                     <kbd className="px-1 py-0.5 rounded border border-border bg-muted text-[10px] leading-none">K</kbd>
                                 </span>
                             </Button>
@@ -194,7 +194,7 @@ const NavbarContent = memo(function NavbarContent() {
                                 </span>
                             </Button>
 
-                            {/* Auth section â€” only after hydration, Clerk bundle loaded lazily */}
+                            {/* Auth section — only after hydration, Clerk bundle loaded lazily */}
                             {mounted && (
                                 <NavbarAuthSection
                                     loginLabel={loginLabel}
@@ -211,9 +211,9 @@ const NavbarContent = memo(function NavbarContent() {
                             )}
                         </div>
 
-                        {/* â”€â”€â”€ Mobile Controls â”€â”€â”€ */}
+                        {/* ——— Mobile Controls ——— */}
                         <div className="lg:hidden flex items-center gap-2 shrink-0">
-                            {/* Mobile dashboard/avatar â€” shown after hydration via lazy Clerk chunk */}
+                            {/* Mobile dashboard/avatar — shown after hydration via lazy Clerk chunk */}
                             {mounted && (
                                 <NavbarAuthSection
                                     loginLabel={loginLabel}
@@ -239,7 +239,7 @@ const NavbarContent = memo(function NavbarContent() {
                         </div>
                     </div>
 
-                    {/* â”€â”€â”€ Dropdown Menu â”€â”€â”€ */}
+                    {/* ——— Dropdown Menu ——— */}
                     <AnimatePresence>
                         {activeDropdown && NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children && (
                             <motion.div
@@ -253,30 +253,32 @@ const NavbarContent = memo(function NavbarContent() {
                                     className="py-8"
                                     onMouseEnter={() => setActiveDropdown(activeDropdown)}
                                 >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children?.map((child) => (
-                                            <HoverPrefetchLink
-                                                key={child.label}
-                                                href={child.href as any}
-                                                className="block p-4 rounded-xl hover:bg-muted transition-all group/item border border-transparent hover:border-border"
-                                                onClick={() => setActiveDropdown(null)}
-                                            >
-                                                <div className="flex items-start gap-3">
-                                                    <div className="mt-0.5 p-2 bg-muted rounded-lg group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors text-foreground/80 border border-border group-hover/item:border-primary/20">
-                                                        {child.icon && <child.icon className={ICON_LG} aria-hidden="true" />}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <div className="text-sm font-semibold text-foreground group-hover/item:text-primary transition-colors">
-                                                            {t(child.label)}
+                                    <Container>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {NAVIGATION_ITEMS.find(i => i.label === activeDropdown)?.children?.map((child) => (
+                                                <HoverPrefetchLink
+                                                    key={child.label}
+                                                    href={child.href as any}
+                                                    className="block p-4 rounded-xl hover:bg-muted transition-all group/item border border-transparent hover:border-border"
+                                                    onClick={() => setActiveDropdown(null)}
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="mt-0.5 p-2 bg-muted rounded-lg group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors text-foreground/80 border border-border group-hover/item:border-primary/20">
+                                                            {child.icon && <child.icon className={ICON_LG} aria-hidden="true" />}
                                                         </div>
-                                                        <div className="text-xs text-foreground/85 mt-1 line-clamp-2 leading-relaxed">
-                                                            {t(`${child.label}_desc` as any)}
+                                                        <div className="min-w-0">
+                                                            <div className="text-sm font-semibold text-foreground group-hover/item:text-primary transition-colors">
+                                                                {t(child.label)}
+                                                            </div>
+                                                            <div className="text-xs text-foreground/85 mt-1 line-clamp-2 leading-relaxed">
+                                                                {t(`${child.label}_desc` as any)}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </HoverPrefetchLink>
-                                        ))}
-                                    </div>
+                                                </HoverPrefetchLink>
+                                            ))}
+                                        </div>
+                                    </Container>
                                 </div>
                             </motion.div>
                         )}
@@ -285,7 +287,7 @@ const NavbarContent = memo(function NavbarContent() {
             </div>
 
 
-            {/* â”€â”€â”€ Mobile Menu Overlay â”€â”€â”€ */}
+            {/* ——— Mobile Menu Overlay ——— */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
@@ -327,7 +329,7 @@ const NavbarContent = memo(function NavbarContent() {
                                         <div key={item.label}>
                                             {item.children ? (
                                                 <div className="space-y-1">
-                                                    <div className="text-xs font-semibold text-foreground/85 uppercase tracking-wider px-3 py-2">
+                                                    <div className="text-xs font-semibold text-foreground/85 uppercase tracking-wider px-3 py-2 nav-header">
                                                         {t(item.label)}
                                                     </div>
                                                     <div className="space-y-0.5 ps-3 border-s-2 border-border ms-3">
@@ -353,14 +355,14 @@ const NavbarContent = memo(function NavbarContent() {
                                                     onClick={() => setMobileMenuOpen(false)}
                                                 >
                                                     {item.icon && <item.icon className={ICON_LG} aria-hidden="true" />}
-                                                    {t(item.label)}
+                                                    <span className="nav-header">{t(item.label)}</span>
                                                 </HoverPrefetchLink>
                                             )}
                                         </div>
                                     ))}
                                 </div>
 
-                                {/* Mobile Footer Actions */}
+                                {/* Mobile Footer Actions ——— */}
                                 <div className="mt-6 pt-6 border-t border-border flex flex-col gap-3">
                                     {mounted && (
                                         <MobileAuthFooter
@@ -375,10 +377,10 @@ const NavbarContent = memo(function NavbarContent() {
                                     <button
                                         onClick={() => { toggleLocale(); setMobileMenuOpen(false); }}
                                         className="flex items-center justify-center gap-2 py-3 text-sm font-medium text-foreground/85 hover:text-foreground bg-muted rounded-lg border border-border transition-colors"
-                                        aria-label={isRTL ? "English - Switch to English" : "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© - Switch to Arabic"}
+                                        aria-label={isRTL ? "English - Switch to English" : "العربية - Switch to Arabic"}
                                     >
                                         <Globe className={ICON_LG} aria-hidden="true" />
-                                        <span>{isRTL ? "English" : "Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©"}</span>
+                                        <span>{isRTL ? "English" : "العربية"}</span>
                                     </button>
                                 </div>
                             </div>

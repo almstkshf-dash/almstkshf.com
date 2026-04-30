@@ -121,7 +121,7 @@ export async function parseFeed(
     }
   } catch (err: any) {
     if (err.name === 'AbortError') {
-      throw new Error(`Feed request timed out after ${FETCH_TIMEOUT_MS / 1000}s: ${url}`);
+      throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
     }
     
     const errorMessage = err instanceof Error ? err.message : String(err);

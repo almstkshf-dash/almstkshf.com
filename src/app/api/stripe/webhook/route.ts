@@ -8,7 +8,7 @@
 
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { stripe } from '../../../../lib/stripe';
 import Stripe from 'stripe';
 
 // Stripe webhook secret (required in production)
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         switch (event.type) {
             case 'checkout.session.completed': {
                 const session = event.data.object as Stripe.Checkout.Session;
-                console.log('âœ… Payment successful:', session.id);
+                console.log('✅ Payment successful:', session.id);
 
                 // Initialize Convex Client
                 const { ConvexHttpClient } = await import('convex/browser');
@@ -80,79 +80,10 @@ export async function POST(request: NextRequest) {
                 break;
             }
 
-            case 'checkout.session.async_payment_succeeded': {
-                const session = event.data.object as Stripe.Checkout.Session;
-                console.log('âœ… Async payment successful:', session.id);
-
-                // Initialize Convex Client
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-                // Update the payment status to 'paid'
-                await convex.mutation(api.payments.recordPayment, {
-                    stripeSessionId: session.id,
-                    userId: session.client_reference_id || session.metadata?.userId,
-                    amount: (session.amount_total || 0) / 100,
-                    currency: session.currency || 'usd',
-                    status: 'paid',
-                    productName: session.metadata?.productName || 'Default Product',
-                    customerEmail: session.customer_details?.email || undefined,
-                });
-
-                break;
-            }
-
-            case 'checkout.session.async_payment_failed': {
-                const session = event.data.object as Stripe.Checkout.Session;
-                console.log('âŒ Async payment failed:', session.id);
-
-                // Initialize Convex Client
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-                const userId = session.client_reference_id || session.metadata?.userId;
-
-                // Update the payment status to 'failed'
-                await convex.mutation(api.payments.recordPayment, {
-                    stripeSessionId: session.id,
-                    userId: userId,
-                    amount: (session.amount_total || 0) / 100,
-                    currency: session.currency || 'usd',
-                    status: 'failed',
-                    productName: session.metadata?.productName || 'Default Product',
-                    customerEmail: session.customer_details?.email || undefined,
-                });
-
-                if (userId) {
-                    await convex.mutation(api.monitoring.createNotification, {
-                        userId: userId as string,
-                        title: "Payment Failed",
-                        message: `Your payment for ${session.metadata?.productName || 'your subscription'} could not be processed.`,
-                        type: "billing"
-                    });
-                }
-
-                break;
-            }
-
-            case 'payment_intent.succeeded': {
-                const paymentIntent = event.data.object as Stripe.PaymentIntent;
-                console.log('âœ… PaymentIntent successful:', paymentIntent.id);
-                break;
-            }
-
-            case 'payment_intent.payment_failed': {
-                const paymentIntent = event.data.object as Stripe.PaymentIntent;
-                console.log('âŒ PaymentIntent failed:', paymentIntent.id);
-                break;
-            }
-
             case 'customer.subscription.created':
             case 'customer.subscription.updated': {
                 const subscription = event.data.object as Stripe.Subscription;
-                console.log('ðŸ“ Subscription updated:', subscription.id);
+                console.log('📋 Subscription updated:', subscription.id);
 
                 const { ConvexHttpClient } = await import('convex/browser');
                 const { api } = await import('../../../../../convex/_generated/api');
@@ -160,9 +91,11 @@ export async function POST(request: NextRequest) {
 
                 const userId = subscription.metadata?.userId;
                 if (!userId) {
-                    console.error('âŒ No userId found in subscription metadata:', subscription.id);
+                    console.error('❌ No userId found in subscription metadata:', subscription.id);
                     break;
                 }
+
+                const plan = subscription.metadata?.planId as "standard" | "professional" | "enterprise" | undefined;
 
                 await convex.mutation(api.payments.syncSubscription, {
                     userId,
@@ -170,16 +103,32 @@ export async function POST(request: NextRequest) {
                     stripePriceId: subscription.items.data[0].price.id,
                     stripeCustomerId: subscription.customer as string,
                     status: subscription.status,
-                    currentPeriodEnd: (subscription.items.data[0]?.current_period_end ?? 0) * 1000, // Stripe uses seconds
+                    currentPeriodEnd: ((subscription as any).current_period_end ?? 0) * 1000,
                     cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                    plan: plan,
                 });
+
+                // Trigger email notification via Convex Action
+                try {
+                    if (subscription.status === 'active' || subscription.status === 'trialing') {
+                        await convex.action((api as any).emails.sendSubscriptionEmail, {
+                            to: (subscription as any).customer_email || (subscription as any).email || "",
+                            subject: subscription.status === 'trialing' ? "Welcome to your 15-day Free Trial!" : "Your Almstkshf Subscription is Active!",
+                            userName: subscription.metadata?.userName || "Subscriber",
+                            planName: subscription.metadata?.planName || "Selected Plan",
+                            type: "activation",
+                        });
+                    }
+                } catch (emailErr) {
+                    console.error("Failed to send subscription email:", emailErr);
+                }
 
                 break;
             }
 
             case 'customer.subscription.deleted': {
                 const subscription = event.data.object as Stripe.Subscription;
-                console.log('ðŸ—‘ï¸ Subscription cancelled:', subscription.id);
+                console.log('🗑️ Subscription cancelled:', subscription.id);
 
                 const { ConvexHttpClient } = await import('convex/browser');
                 const { api } = await import('../../../../../convex/_generated/api');
@@ -193,7 +142,7 @@ export async function POST(request: NextRequest) {
                         stripePriceId: subscription.items.data[0].price.id,
                         stripeCustomerId: subscription.customer as string,
                         status: 'canceled',
-                        currentPeriodEnd: (subscription.items.data[0]?.current_period_end ?? 0) * 1000,
+                        currentPeriodEnd: ((subscription as any).current_period_end ?? 0) * 1000,
                         cancelAtPeriodEnd: true,
                     });
                 }
@@ -201,39 +150,32 @@ export async function POST(request: NextRequest) {
                 break;
             }
 
-            case 'invoice.paid': {
-                const invoice = event.data.object as Stripe.Invoice;
-                console.log('âœ… Invoice paid:', invoice.id);
-                break;
-            }
-
             case 'invoice.payment_failed': {
                 const invoice = event.data.object as Stripe.Invoice;
-                console.log('âŒ Invoice payment failed:', invoice.id);
+                console.log('❌ Invoice payment failed:', invoice.id);
 
-                try {
-                    const { ConvexHttpClient } = await import('convex/browser');
-                    const { api } = await import('../../../../../convex/_generated/api');
-                    const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+                const { ConvexHttpClient } = await import('convex/browser');
+                const { api } = await import('../../../../../convex/_generated/api');
+                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-                    // Customer ID can sometimes be mapped back to user or we can pull userId from subscription metadata
-                    // Not guaranteed to have the userId, but we can try from customer_email or metadata
-                    const customerEmail = invoice.customer_email;
+                let userId = invoice.metadata?.userId;
 
-                    // Note: Ideally we look up the user by customerEmail or subscription ID in Convex.
-                    // For now, we will just use the invoice metadata:
-                    const userId = invoice.metadata?.userId;
-
-                    if (userId) {
-                        await convex.mutation(api.monitoring.createNotification, {
-                            userId: userId as string,
-                            title: "Invoice Payment Failed",
-                            message: `Payment failed for invoice ${invoice.number || invoice.id}. Please update your billing methods.`,
-                            type: "billing"
-                        });
+                if (!userId && (invoice as any).subscription) {
+                    try {
+                        const sub = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
+                        userId = sub.metadata.userId;
+                    } catch (e) {
+                        console.error("Failed to fetch subscription for invoice fail", e);
                     }
-                } catch (e) {
-                    console.error("Failed to push notification for invoice fail", e);
+                }
+
+                if (userId) {
+                    await convex.mutation(api.monitoring.createNotification, {
+                        userId: userId as string,
+                        title: "Payment Failed",
+                        message: `Payment failed for your subscription. Please update your billing info to avoid service interruption.`,
+                        type: "billing"
+                    });
                 }
 
                 break;

@@ -12,16 +12,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import DOMPurify from 'dompurify';
-import {
-  Rss,
-  ExternalLink,
-  RefreshCw,
-  Clock,
-  AlertCircle,
-  ChevronRight,
-  Database,
-  BarChart3
-} from 'lucide-react';
+import { Rss, ExternalLink, Calendar, Clock, ChevronRight, Share2, Bookmark, BookmarkCheck, LayoutGrid, List as ListIcon, RefreshCw, BarChart3, AlertCircle, Database } from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
@@ -76,13 +69,30 @@ export default function RssFeeder({
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const response = await fetch(`/api/proxy-rss?url=${encodeURIComponent(activeUrl)}&t=${Date.now()}`, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache'
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const proxyUrl = `${origin}/api/proxy-rss?url=${encodeURIComponent(activeUrl)}&t=${Date.now()}`;
+      console.log(`[RssFeeder] [${new Date().toISOString()}] Attempting fetch to: ${proxyUrl} (Origin: ${origin})`);
+      
+      const performFetch = async (retries = 2): Promise<Response> => {
+        try {
+          return await fetch(proxyUrl, {
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+          });
+        } catch (err) {
+          if (retries > 0 && err instanceof TypeError) {
+            console.warn(`[RssFeeder] Fetch failed, retrying in 1.5s... (${retries} left)`);
+            await new Promise(r => setTimeout(r, 1500));
+            return performFetch(retries - 1);
+          }
+          throw err;
         }
-      });
+      };
+
+      const response = await performFetch();
 
       if (!response.ok) {
         // Try to get error from JSON if possible
@@ -117,10 +127,12 @@ export default function RssFeeder({
       
       // Explicitly handle network-level failures vs API errors
       if (err instanceof TypeError && (message === 'Failed to fetch' || message.includes('network'))) {
-        setError(t('failed_fetch') + ' - Network or CORS issue');
-        console.warn('[RssFeeder] This usually happens if the request is blocked by an ad-blocker or a firewall.');
+        setError(t('failed_fetch') + ' - Network or CORS issue. See console for details.');
+        console.error('[RssFeeder] CRITICAL: Network failure detected. Possible causes:\n1. Ad-blocker or Firewall blocking the request.\n2. The server is not reachable at the current origin.\n3. SSL/TLS handshake failure.');
+        console.error('[RssFeeder] Full Error Object:', err);
       } else if (err instanceof Error && err.name === 'AbortError') {
-        setError(t('error_fetching') + ' (Timeout)');
+        setError(t('error_fetching') + ' (Request Timed Out)');
+        console.warn('[RssFeeder] Request was aborted due to timeout.');
       } else {
         setError(message || t('error_fetching'));
       }
@@ -133,10 +145,18 @@ export default function RssFeeder({
   }, [activeUrl, maxItems, t]);
 
   useEffect(() => {
-    fetchFeed();
-    // Auto-refresh every 15 minutes to match the proxy cache
+    // Add a small delay to avoid race conditions during initial mount/hydration
+    const initialTimer = setTimeout(() => {
+      fetchFeed();
+    }, 1200);
+
+    // Auto-refresh every 15 minutes
     const interval = setInterval(() => fetchFeed(true), 15 * 60 * 1000);
-    return () => clearInterval(interval);
+    
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, [fetchFeed]);
 
   return (
@@ -173,7 +193,7 @@ export default function RssFeeder({
 
       {/* Categories Selection */}
       {categories.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide px-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-3 -mb-1 scrollbar-hide px-1 select-none">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -181,10 +201,13 @@ export default function RssFeeder({
                 setActiveUrl(cat.url);
                 setActiveName(cat.name);
               }}
-              className={`whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all border ${activeUrl === cat.url
-                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                : 'bg-muted/30 text-foreground/70 border-border/50 hover:border-border hover:bg-muted/50'
-                }`}
+              className={clsx(
+                "whitespace-nowrap px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all border",
+                "rtl:tracking-normal ltr:tracking-tight",
+                activeUrl === cat.url
+                  ? 'bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20'
+                  : 'bg-muted/30 text-foreground/70 border-border/50 hover:border-border hover:bg-muted/50'
+              )}
             >
               {translateSourceName(cat.name)}
             </button>

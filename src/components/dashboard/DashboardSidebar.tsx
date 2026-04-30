@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { useQuery, useConvexAuth } from 'convex/react';
@@ -61,7 +61,9 @@ const NAV_ITEMS: NavItem[] = [
  * While admin status is loading, those slots show a skeleton.
  */
 export default function DashboardSidebar() {
-    const t = useTranslations('Dashboard');
+    const t = useTranslations();
+    const locale = useLocale();
+    const isAr = locale === 'ar';
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -103,12 +105,13 @@ export default function DashboardSidebar() {
                 onClick={() => changeView(item.id)}
                 disabled={isPending}
                 aria-current={isActive ? 'page' : undefined}
-                title={layout === 'icon' ? t(item.labelKey as any) : undefined}
+                title={layout === 'icon' ? t(`Dashboard.${item.labelKey}` as any) : undefined}
                 className={clsx(
                     'relative flex items-center gap-3 rounded-2xl transition-all duration-200 group',
                     layout === 'expanded'
-                        ? 'w-full h-11 px-4 text-xs font-black uppercase tracking-widest'
+                        ? 'w-full h-11 px-4 text-xs font-black tracking-widest uppercase'
                         : 'w-10 h-10 justify-center',
+                    layout === 'expanded' && isAr && '!tracking-normal !uppercase-none',
                     isActive
                         ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
@@ -127,7 +130,7 @@ export default function DashboardSidebar() {
 
                 <Icon className={clsx('shrink-0', layout === 'expanded' ? 'w-4 h-4' : 'w-5 h-5')} />
                 {layout === 'expanded' && (
-                    <span className="truncate">{t(item.labelKey as any)}</span>
+                    <span className="truncate">{t(`Dashboard.${item.labelKey}` as any)}</span>
                 )}
             </button>
         );
@@ -137,7 +140,7 @@ export default function DashboardSidebar() {
     const renderSettings = (layout: 'expanded' | 'icon') => (
         <HoverPrefetchLink href="/dashboard/settings">
             <button
-                title={layout === 'icon' ? t('sidebar.settings') : undefined}
+                title={layout === 'icon' ? t('Dashboard.sidebar.settings') : undefined}
                 className={clsx(
                     'flex items-center gap-3 rounded-2xl transition-all duration-200',
                     'text-muted-foreground hover:text-foreground hover:bg-muted/60',
@@ -147,7 +150,7 @@ export default function DashboardSidebar() {
                 )}
             >
                 <Settings className={clsx('shrink-0', layout === 'expanded' ? 'w-4 h-4' : 'w-5 h-5')} />
-                {layout === 'expanded' && <span className="truncate">{t('sidebar.settings')}</span>}
+                {layout === 'expanded' && <span className="truncate">{t('Dashboard.sidebar.settings')}</span>}
             </button>
         </HoverPrefetchLink>
     );
@@ -199,12 +202,15 @@ export default function DashboardSidebar() {
                 <div className="mt-4 mx-1 p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-                            Live
+                        <span className={clsx(
+                            "text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400",
+                            isAr ? "tracking-normal" : "tracking-widest"
+                        )}>
+                            {t('RssSources.live_status')}
                         </span>
                     </div>
                     <p className="text-[9px] text-muted-foreground mt-1 leading-relaxed">
-                        Real-time monitoring active
+                        {t('RssSources.live_desc')}
                     </p>
                 </div>
             </aside>
@@ -264,7 +270,7 @@ export default function DashboardSidebar() {
                         >
                             <Icon className="w-5 h-5" />
                             <span className="text-[8px] font-black uppercase tracking-wider truncate max-w-[48px]">
-                                {t(item.labelKey as any)}
+                                {t(`Dashboard.${item.labelKey}` as any)}
                             </span>
                             {isActive && (
                                 <motion.div
@@ -281,7 +287,7 @@ export default function DashboardSidebar() {
                     <button className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl text-muted-foreground hover:text-foreground transition-all">
                         <Settings className="w-5 h-5" />
                         <span className="text-[8px] font-black uppercase tracking-wider">
-                            {t('sidebar.settings')}
+                            {t('Dashboard.sidebar.settings')}
                         </span>
                     </button>
                 </HoverPrefetchLink>

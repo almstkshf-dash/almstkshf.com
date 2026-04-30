@@ -108,7 +108,7 @@ export default memo(function HomeClient() {
                 style={{ contentVisibility: 'auto', containIntrinsicSize: '0 200px' }}
             >
                 <Container>
-                    <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-40 hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0">
+                    <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24">
                         {/* Use <img> for decorative trust badges â€” they are below fold, lazy by default */}
                         <div className="relative w-32 h-12">
                             <Image
@@ -119,7 +119,7 @@ export default memo(function HomeClient() {
                                 loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
-                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                                className="object-contain w-full h-full dark:brightness-110"
                             />
                         </div>
                         <div className="relative w-16 h-16">
@@ -131,7 +131,7 @@ export default memo(function HomeClient() {
                                 loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
-                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                                className="object-contain w-full h-full dark:brightness-110"
                             />
                         </div>
                         <div className="relative w-32 h-12">
@@ -143,7 +143,7 @@ export default memo(function HomeClient() {
                                 loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
-                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                                className="object-contain w-full h-full dark:brightness-110"
                             />
                         </div>
                         <div className="relative w-32 h-12">
@@ -155,7 +155,7 @@ export default memo(function HomeClient() {
                                 loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
-                                className="object-contain w-full h-full dark:brightness-110 opacity-70 hover:opacity-100 transition-opacity"
+                                className="object-contain w-full h-full dark:brightness-110"
                             />
                         </div>
                     </div>

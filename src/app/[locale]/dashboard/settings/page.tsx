@@ -8,8 +8,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
 import { Save, Upload, Loader2, CreditCard, Link2, Settings, Key, Share2, MessageSquare, Shield, Zap, BarChart3, Globe } from 'lucide-react';
@@ -20,6 +20,7 @@ import Button from '@/components/ui/Button';
 import { Link } from '@/i18n/routing';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
+import { ALL_COUNTRIES, MultiSelectDropdown } from '@/components/media-pulse/NewsGenerator';
 
 interface Payment {
     _id: string;
@@ -56,7 +57,15 @@ export default function SettingsPage() {
     const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
     const [diffbotKey, setDiffbotKey] = useState('');
     const [zenrowsKey, setZenrowsKey] = useState('');
-    const [targetCountries, setTargetCountries] = useState('AE,SA');
+    const locale = useLocale();
+    const isAr = locale === 'ar';
+    const [targetCountries, setTargetCountries] = useState<string[]>(['AE', 'SA']);
+    const countryItems = ALL_COUNTRIES.map((c) => ({
+        id: c.code,
+        label: isAr ? c.ar : c.en,
+        searchStr: `${c.en} ${c.ar} ${c.code}`,
+    }));
+
     const [aveMultiplier, setAveMultiplier] = useState(0.005);
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -105,7 +114,7 @@ export default function SettingsPage() {
             setStripeWebhookSecret(apiKeys?.stripeWebhookSecret || '');
             setDiffbotKey(apiKeys?.diffbot || '');
             setZenrowsKey(apiKeys?.zenrows || '');
-            setTargetCountries(settings.defaults?.targetCountries?.join(',') || 'AE,SA');
+            setTargetCountries(settings.defaults?.targetCountries || ['AE', 'SA']);
             setAveMultiplier(settings.defaults?.aveMultiplier || 0.005);
         }
     }, [settings]);
@@ -113,14 +122,8 @@ export default function SettingsPage() {
     const validate = () => {
         const newErrors: Record<string, string> = {};
         
-        if (!targetCountries.trim()) {
+        if (!targetCountries || targetCountries.length === 0) {
             newErrors.targetCountries = t('error_required');
-        } else {
-            const countryCodes = targetCountries.split(',').map(c => c.trim());
-            const isValid = countryCodes.every(c => /^[A-Z]{2}$/i.test(c));
-            if (!isValid) {
-                newErrors.targetCountries = t('error_invalid_countries');
-            }
         }
 
         if (isNaN(Number(aveMultiplier)) || Number(aveMultiplier) <= 0) {
@@ -134,8 +137,6 @@ export default function SettingsPage() {
     const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Guard against Convex's 1MB document limit — base64 adds ~33% overhead.
-            // Combined with all API keys in the same document, 700KB is a safe ceiling.
             if (file.size > 700 * 1024) {
                 setErrors({
                     logo: `Logo file is too large (${Math.round(file.size / 1024)}KB). Please use an image under 700KB.`
@@ -186,14 +187,13 @@ export default function SettingsPage() {
                     zenrows: zenrowsKey,
                 },
                 defaults: {
-                    targetCountries: targetCountries.split(',').map(c => c.trim().toUpperCase()),
+                    targetCountries: targetCountries,
                     aveMultiplier: Number(aveMultiplier),
                 },
             });
             setMessage({ type: 'success', text: t('saved_success') });
         } catch (error: any) {
             console.error('Failed to save settings:', error);
-            // Give specific feedback for auth failures vs generic errors
             const msg = error?.message || '';
             const isAuthError = msg.toLowerCase().includes('not authorized') || msg.toLowerCase().includes('admin');
             setMessage({
@@ -224,6 +224,8 @@ export default function SettingsPage() {
         { id: 'social', label: t('social'), icon: Share2 },
         { id: 'integrations', label: t('integrations'), icon: Shield },
     ];
+
+    const getCountryByCode = (code: string) => ALL_COUNTRIES.find((c) => c.code === code);
 
     return (
         <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-10">
@@ -320,28 +322,40 @@ export default function SettingsPage() {
                             </section>
 
                             <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
-                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 font-poppins">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Settings className="h-5 w-5 text-blue-500" />
                                     {t('defaults')}
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-2">
-                                        <label htmlFor="target-countries" className="text-sm font-bold text-foreground/80">{t('target_countries')}</label>
-                                        <input
-                                            id="target-countries"
-                                            name="target-countries"
-                                            value={targetCountries}
-                                            onChange={(e) => setTargetCountries(e.target.value)}
-                                            className={clsx(
-                                                "w-full px-4 py-3 rounded-xl border bg-muted/20 focus:ring-2 outline-none text-foreground transition-all",
-                                                errors.targetCountries ? "border-rose-500 focus:ring-rose-200" : "border-border focus:ring-primary"
-                                            )}
+                                        <span id="target-countries-label" className="block text-sm font-bold text-foreground/80">{t('target_countries')}</span>
+                                        <MultiSelectDropdown
+                                            id="target-countries-select"
+                                            aria-labelledby="target-countries-label"
+                                            items={countryItems}
+                                            selected={targetCountries}
+                                            onChange={(v) => setTargetCountries(v)}
                                             placeholder={t('placeholder_countries')}
+                                            searchPlaceholder={t('search_countries') || 'Search countries...'}
+                                            selectedText={t('selected') || 'selected'}
+                                            clearAllText={t('clear_all') || 'Clear all'}
+                                            icon={<Globe className="w-4 h-4" />}
+                                            error={errors.targetCountries}
+                                            renderItem={(item) => (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-lg">{getCountryByCode(item.id)?.flag}</span>
+                                                    <span>{item.label}</span>
+                                                </div>
+                                            )}
+                                            renderTag={(id) => (
+                                                <div className="flex items-center gap-1.5">
+                                                    <span>{getCountryByCode(id)?.flag}</span>
+                                                    <span>{id}</span>
+                                                </div>
+                                            )}
                                         />
                                         <div className="min-h-[1.25rem]">
-                                        {errors.targetCountries ? (
-                                            <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-top-1">{errors.targetCountries}</p>
-                                        ) : (
+                                        {!errors.targetCountries && (
                                             <p className="text-xs text-muted-foreground">{t('iso_hint')}</p>
                                         )}
                                         </div>
@@ -590,37 +604,35 @@ export default function SettingsPage() {
                                             value={stripePublishableKey}
                                             onChange={(e) => setStripePublishableKey(e.target.value)}
                                             className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
-                                            placeholder={t('placeholder_api_key')}
+                                            placeholder="pk_test_..."
                                             autoComplete="off"
                                         />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label htmlFor="stripe-secret" className="text-sm font-bold text-foreground/80">{t('stripe_secret')}</label>
-                                            <input
-                                                id="stripe-secret"
-                                                name="stripe-secret"
-                                                type="password"
-                                                value={stripeSecretKey}
-                                                onChange={(e) => setStripeSecretKey(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
-                                                placeholder={t('placeholder_api_key')}
-                                                autoComplete="off"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="stripe-webhook" className="text-sm font-bold text-foreground/80">{t('stripe_webhook')}</label>
-                                            <input
-                                                id="stripe-webhook"
-                                                name="stripe-webhook"
-                                                type="password"
-                                                value={stripeWebhookSecret}
-                                                onChange={(e) => setStripeWebhookSecret(e.target.value)}
-                                                className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
-                                                placeholder={t('placeholder_api_key')}
-                                                autoComplete="off"
-                                            />
-                                        </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="stripe-secret" className="text-sm font-bold text-foreground/80">{t('stripe_secret')}</label>
+                                        <input
+                                            id="stripe-secret"
+                                            name="stripe-secret"
+                                            type="password"
+                                            value={stripeSecretKey}
+                                            onChange={(e) => setStripeSecretKey(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
+                                            placeholder="sk_test_..."
+                                            autoComplete="off"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="stripe-webhook" className="text-sm font-bold text-foreground/80">{t('stripe_webhook')}</label>
+                                        <input
+                                            id="stripe-webhook"
+                                            name="stripe-webhook"
+                                            type="password"
+                                            value={stripeWebhookSecret}
+                                            onChange={(e) => setStripeWebhookSecret(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-violet-500 outline-none font-mono text-foreground"
+                                            placeholder="whsec_..."
+                                            autoComplete="off"
+                                        />
                                     </div>
                                 </div>
                                 <div className="mt-8 pt-6 border-t border-border flex justify-end">
@@ -635,57 +647,6 @@ export default function SettingsPage() {
                                     </Button>
                                 </div>
                             </section>
-
-                            {/* Billing History Section */}
-                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm" >
-                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-foreground">
-                                    <BarChart3 className="h-5 w-5 text-primary" />
-                                    {t('billing')}
-                                </h2>
-                                <div className="overflow-x-auto -mx-8">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-muted/50 border-y border-border">
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_date')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_product')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_amount')}</th>
-                                                <th className="py-4 px-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('col_status')}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {!payments || payments.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={4} className="py-12 text-center text-muted-foreground italic">
-                                                        {t('no_payments')}
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                payments.map((payment: Payment) => (
-                                                    <tr key={payment._id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                                                        <td className="py-4 px-8 text-sm text-muted-foreground">
-                                                            {new Date(payment.createdAt).toLocaleDateString()}
-                                                        </td>
-                                                        <td className="py-4 px-8 text-sm font-bold text-foreground">
-                                                            {payment.productName}
-                                                        </td>
-                                                        <td className="py-4 px-8 text-sm text-muted-foreground">
-                                                            {payment.amount} {payment.currency.toUpperCase()}
-                                                        </td>
-                                                        <td className="py-4 px-8 text-sm">
-                                                            <span className={clsx(
-                                                                "inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                                                                payment.status === 'paid' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-                                                            )}>
-                                                                {payment.status}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section >
                         </div>
                     )}
                 </div>

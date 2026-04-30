@@ -241,6 +241,7 @@ export default defineSchema({
             zenrows: v.optional(v.string()),
         })),
         isSubscribed: v.optional(v.boolean()),
+        plan: v.optional(v.union(v.literal("standard"), v.literal("professional"), v.literal("enterprise"))),
         isTrialActive: v.optional(v.boolean()),
         trialEndsAt: v.optional(v.number()),
         kycStatus: v.optional(v.union(v.literal("Pending"), v.literal("Verified"), v.literal("Rejected"))),
