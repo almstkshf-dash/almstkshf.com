@@ -52,6 +52,10 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const ref = useRef<HTMLDivElement>(null);
+    const ariaLabelledById = ariaLabelledBy?.trim() || undefined;
+    const comboboxLabelProps = ariaLabelledById
+        ? { 'aria-labelledby': ariaLabelledById }
+        : { 'aria-label': placeholder };
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -79,7 +83,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
                 aria-controls={`${id || 'dropdown'}-listbox`}
-                aria-labelledby={ariaLabelledBy}
+                {...comboboxLabelProps}
                 tabIndex={0}
                 onClick={() => setIsOpen(!isOpen)}
                 onKeyDown={(e) => {

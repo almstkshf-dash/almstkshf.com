@@ -88,7 +88,7 @@ export async function analyzeImageFile(file: File): Promise<ImageAnalysisResult>
         canvas.width = Math.floor(img.width * scale);
         canvas.height = Math.floor(img.height * scale);
 
-        const ctx = canvas.getContext("2d")!;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);

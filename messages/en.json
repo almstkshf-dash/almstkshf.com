@@ -136,6 +136,7 @@
     "osint_ready": "OSINT Result Ready",
     "press_release_found": "New Press Release Found",
     "critical_mention": "Alert: Critical Mention",
+    "Deep Scan Completed": "Deep Scan Completed",
     "Subscription Activated": "Subscription Activated",
     "Subscription Expiring Soon": "Subscription Expiring Soon",
     "Payment Failed": "Payment Failed"
@@ -856,6 +857,7 @@
       "More": "More",
       "volume_heatmap_title": "News Cycle Heatmap",
       "volume_heatmap_desc": "Days of the week vs. Hour of the day (UAE Time)",
+      "heatmap_label": "Activity heatmap",
       "heatmap_cell_label": "{count} articles on {day} at {time}",
       "at": "at",
       "am": "AM",

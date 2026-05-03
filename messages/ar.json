@@ -53,6 +53,7 @@
     "osint_ready": "نتيجة OSINT جاهزة",
     "press_release_found": "تم العثور على بيان صحفي جديد",
     "critical_mention": "تنبيه: ذكر حرج",
+    "Deep Scan Completed": "اكتمل الفحص العميق",
     "Subscription Activated": "تم تفعيل الاشتراك",
     "Subscription Expiring Soon": "ستنتهي اشتراكك قريباً",
     "Payment Failed": "فشل الدفع"
@@ -909,6 +910,7 @@
       "at": "في",
       "am": "ص",
       "pm": "م",
+      "heatmap_label": "مخطط حرارة النشاط",
       "heatmap_cell_label": "{count} مقالة في يوم {day} عند {time}",
       "ToneLabels": {
         "positive": "إيجابي",

@@ -79,6 +79,8 @@ const ArticleRow = memo(({
         >
             <td className="p-4">
                 <input
+                    id={`select-article-${article._id}`}
+                    name="select_article"
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => onToggleSelect(article._id)}
@@ -393,6 +395,8 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                         <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
                             <th scope="col" className="p-4 w-10">
                                 <input
+                                    id="select-all-articles"
+                                    name="select_all_articles"
                                     type="checkbox"
                                     checked={selectedIds.size === displayedArticles.length && displayedArticles.length > 0}
                                     onChange={toggleSelectAll}

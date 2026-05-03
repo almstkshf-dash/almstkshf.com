@@ -200,7 +200,12 @@ export default function AIInspectorPage() {
                   <AnimatePresence mode="wait">
                     {mode === 'text' ? (
                       <motion.div key="text-input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                        <label htmlFor="inspector-textarea" className="sr-only">
+                          {t('text.placeholder')}
+                        </label>
                         <textarea
+                          id="inspector-textarea"
+                          name="inspector-text"
                           value={inputText}
                           onChange={(e) => setInputText(e.target.value)}
                           placeholder={t('text.placeholder')}
@@ -211,9 +216,12 @@ export default function AIInspectorPage() {
                       <motion.div key="file-input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <div className="relative group/upload h-[400px] flex flex-col items-center justify-center border-4 border-dashed border-zinc-100 dark:border-zinc-900 rounded-[32px] hover:border-zinc-200 dark:hover:border-zinc-800 transition-all cursor-pointer">
                           <input
+                            id="inspector-file-upload"
+                            name="inspector-file-upload"
                             type="file"
                             accept={mode === 'image' ? "image/*" : "video/*"}
                             onChange={handleFileUpload}
+                            aria-label={t('upload.title')}
                             className="absolute inset-0 opacity-0 cursor-pointer z-10"
                           />
                           {uploadedFile ? (

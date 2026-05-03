@@ -85,8 +85,8 @@ export default React.memo(function ReportsChart({ data }: ReportsChartProps) {
         return (
             <div className="w-full h-[300px] p-4 bg-card border border-border rounded-2xl mb-8 flex flex-col transition-opacity duration-300">
                 <h3 className="text-lg font-bold mb-4 px-2 shrink-0">{t('reports_overview')} (Demo)</h3>
-                <div className="flex-1 w-full min-h-0">
-                    <ResponsiveContainer width="100%" height="100%" minHeight={100} minWidth={0} debounce={50}>
+                <div className="flex-1 w-full min-h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%" aspect={2} minHeight={100} minWidth={0} debounce={50}>
                         <AreaChart data={mockData}>
                             <defs>
                                 <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
@@ -136,8 +136,8 @@ export default React.memo(function ReportsChart({ data }: ReportsChartProps) {
     return (
         <div className="w-full h-[300px] p-4 bg-card border border-border rounded-2xl mb-8 flex flex-col transition-opacity duration-300">
             <h3 className="text-lg font-bold mb-4 px-2 shrink-0">{t('reports_overview')}</h3>
-            <div className="flex-1 w-full min-h-0">
-                <ResponsiveContainer width="100%" height="100%" minHeight={100} minWidth={0} debounce={50}>
+            <div className="flex-1 w-full min-h-[220px]">
+                <ResponsiveContainer width="100%" height="100%" aspect={2} minHeight={100} minWidth={0} debounce={50}>
                     <AreaChart data={processedData}>
                         <defs>
                             <linearGradient id="colorCountReal" x1="0" y1="0" x2="0" y2="1">

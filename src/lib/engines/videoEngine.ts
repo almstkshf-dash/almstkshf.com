@@ -82,7 +82,7 @@ async function extractFrame(
     video.currentTime = time;
     const onSeeked = () => {
       video.removeEventListener('seeked', onSeeked);
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (!ctx) return resolve(null);
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       resolve(ctx.getImageData(0, 0, canvas.width, canvas.height));
