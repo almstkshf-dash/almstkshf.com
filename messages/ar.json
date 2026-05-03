@@ -880,8 +880,11 @@
       "total_reach": "إجمالي الانتشار",
       "reach_desc": "التعرض الجماهيري التقديري عبر جميع المصادر الإعلامية المرصودة.",
       "sentiment_distribution": "توزيع الاتجاه التحريري",
+      "sentiment_distribution_label": "توزيع الاتجاه التحريري: {positive}% إيجابي، {neutral}% محايد، {negative}% سلبي",
       "emotional_integrity": "مؤشر التحول العاطفي",
       "article_volume_trend": "منحنى حجم التغطية الإعلامية",
+      "Less": "أقل",
+      "More": "أكثر",
       "trend_subtitle": "الحركة اليومية للمواد الإعلامية المرصودة خلال 7 أيام",
       "geographic_activity_heat": "مصفوفة النشاط الإعلامي الزمني",
       "activity_heatmap_desc": "توزيع الوقت والحجم للتغطية الإعلامية المرصودة",
@@ -891,6 +894,19 @@
       "gemini_osint_pulse": "محرك التحليل الاستخباراتي",
       "live_analysis": "رصد وتحليل حي",
       "full_ai_report": "استعراض التقرير التحليلي الكامل",
+      "days": {
+        "Sun": "أحد",
+        "Mon": "اثن",
+        "Tue": "ثلث",
+        "Wed": "أربع",
+        "Thu": "خمس",
+        "Fri": "جمعة",
+        "Sat": "سبت"
+      },
+      "at": "في",
+      "am": "ص",
+      "pm": "م",
+      "heatmap_cell_label": "{count} مقالة في يوم {day} عند {time}",
       "ToneLabels": {
         "positive": "إيجابي",
         "neutral": "محايد",
@@ -904,6 +920,8 @@
         "watchlist match": "تطابق مع قوائم المراقبة",
         "crisis signals": "مؤشرات أزمة إعلامية"
       },
+      "specialized_services": "خدمات متخصصة",
+      "advanced_solutions": "حلول متقدمة",
       "ai_placeholder": "تُشير المعطيات الحالية إلى تصاعد في وتيرة الروايات الإعلامية المحيطة بالأمن الإقليمي. يستقر الاتجاه الإيجابي تدريجياً، في حين يتصاعد حجم التقارير ذات الاتجاه المحايد..."
     },
     "sentiment_donut": {
@@ -1198,7 +1216,10 @@
     "placeholder_secret": "أدخل السر الخاص بك",
     "placeholder_id": "أدخل المعرف الخاص بك",
     "placeholder_url": "أدخل الرابط",
-    "placeholder_countries": "مثال: AE، SA"
+    "placeholder_countries": "مثال: AE، SA",
+    "search_countries": "البحث عن الدول...",
+    "selected": "مختارة",
+    "clear_all": "مسح الكل"
   },
   "Dashboard": {
     "title": "مركز الرصد الإعلامي",
@@ -1257,6 +1278,24 @@
     "monitor_standard_title": "مراقب قياسي",
     "monitor_deep_title": "مراقب عميق",
     "monitor_osint_title": "مراقب OSINT",
+    "view": {
+      "standard_label": "مراقبة قياسية",
+      "standard_title": "وضع التغطية القياسية",
+      "standard_description": "مراقبة التغطية النشطة والبيانات الصحفية وتحليلات النبض لمتابعة التشغيل اليومي.",
+      "standard_bullet_1": "نظرة سريعة على وسائل الإعلام الحية والتغطية الإخبارية والصحفية",
+      "standard_bullet_2": "تحليلات موجزة لحجم البيانات الحالي والمشاعر والمدى",
+      "standard_bullet_3": "وصول سريع إلى سجلات التغطية والتغذية في الوقت الفعلي",
+      "deep_label": "تحقيق متعمق",
+      "deep_title": "وضع التحليل المتعمق",
+      "deep_description": "تحليل محتوى أعمق وإشارات تحقيقية مع تصنيف غني وتتبع الحالة العميقة والرؤى طويلة الأمد.",
+      "deep_bullet_1": "عمق مصادر ممتد مع تصنيف متعمق",
+      "deep_bullet_2": "ذكاء مخاطرة وتغطية متقدم",
+      "deep_bullet_3": "يتضمن لوحة الحالة العميقة وتنبيهات المحلل",
+      "standard_badge": "قياسي",
+      "deep_only_badge": "متعمق فقط",
+      "quick_access": "الوصول السريع",
+      "deep_only": "متعمق فقط"
+    },
     "limit_results": "الحد: {count} نتائج",
     "live_stream": "النبض: البث في الوقت الفعلي",
     "reputation_safeguard": "حماية السمعة",
@@ -1315,8 +1354,10 @@
     },
     "section": {
       "discovery": "محرك اكتشاف المحتوى",
+      "standard_discovery": "اكتشاف قياسي",
       "press": "رصد البيانات الصحفية",
       "analytics": "التحليلات الإعلامية",
+      "deep_analytics": "التحليلات المتعمقة",
       "coverage": "سجل التغطية الإعلامية",
       "live_feed": "التغذية الإخبارية الحية"
     }
@@ -1550,6 +1591,7 @@
         "match_found": "تطابق مُكتشف",
         "match_count": "عدد التطابقات",
         "match_percent": "نسبة التطابق: {count}%",
+        "save_collection": "حفظ في المجموعة",
         "no_matches": "لا توجد تطابقات في قوائم العقوبات",
         "toggle_raw": "عرض البيانات الخام (JSON)",
         "asn": "رقم ASN",

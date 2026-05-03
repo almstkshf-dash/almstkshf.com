@@ -78,6 +78,36 @@ export default function DashboardPage() {
 
     // ── Derive active view directly from URL — sidebar owns navigation ───────
     const activeView = ((searchParams.get('view') as ViewId) || 'standard') satisfies ViewId;
+    const depthFilter: 'standard' | 'deep' = activeView === 'deep' ? 'deep' : 'standard';
+    const viewDetails = useMemo(() => {
+        if (activeView === 'deep') {
+            return {
+                label: t('view.deep_label', { defaultValue: 'Deep Investigation' }),
+                title: t('view.deep_title', { defaultValue: 'Deep analysis mode' }),
+                description: t('view.deep_description', { defaultValue: 'Analyze deeper content and investigative signals with enriched scoring, deep-status tracking, and long-running insights.' }),
+                bullets: [
+                    t('view.deep_bullet_1', { defaultValue: 'Extended source depth with deep classification' }),
+                    t('view.deep_bullet_2', { defaultValue: 'Advanced risk and coverage intelligence' }),
+                    t('view.deep_bullet_3', { defaultValue: 'Includes Deep Status panel and analyst alerts' }),
+                ],
+                icon: Search,
+                badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
+            };
+        }
+
+        return {
+            label: t('view.standard_label', { defaultValue: 'Standard monitoring' }),
+            title: t('view.standard_title', { defaultValue: 'Standard coverage mode' }),
+            description: t('view.standard_description', { defaultValue: 'Monitor active coverage, press releases, and pulse analytics for day-to-day operational tracking.' }),
+            bullets: [
+                t('view.standard_bullet_1', { defaultValue: 'Fast overview of live media, press and news coverage' }),
+                t('view.standard_bullet_2', { defaultValue: 'Summary analytics for current volume, sentiment and reach' }),
+                t('view.standard_bullet_3', { defaultValue: 'Quick access to coverage logs and real-time feeds' }),
+            ],
+            icon: Globe,
+            badgeClass: 'bg-primary/10 text-primary border-primary/20',
+        };
+    }, [activeView, t]);
 
     // ── Local UI state ────────────────────────────────────────────────────────
     const [isManualModalOpen, setManualModalOpen] = useState(false);
@@ -117,21 +147,38 @@ export default function DashboardPage() {
         skip,
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-        depth: activeView === 'deep' ? 'deep' : undefined,
+        depth: depthFilter,
     }) as { items: ArticleItem[]; total: number; nextSkip: number | null };
 
-    const analyticsOverview = useQuery(api.monitoring.getAnalyticsOverview, {});
-    const emotionAggregates = useQuery(api.monitoring.getEmotionAggregates, {});
-    const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {});
+    const analyticsOverview = useQuery(api.monitoring.getAnalyticsOverview, {
+        sourceType: selectedType === 'All' ? undefined : selectedType,
+        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
+        depth: depthFilter,
+    });
+    const emotionAggregates = useQuery(api.monitoring.getEmotionAggregates, {
+        sourceType: selectedType === 'All' ? undefined : selectedType,
+        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
+        depth: depthFilter,
+    });
+    const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {
+        sourceType: selectedType === 'All' ? undefined : selectedType,
+        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
+        depth: depthFilter,
+    });
 
     const analytics = useMemo(() => {
         if (!analyticsOverview) return undefined;
+        const sentimentDistribution = analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 };
         return {
             nss: analyticsOverview.nss ?? 0,
             riskScore: analyticsOverview.riskScore ?? 0,
             velocity: analyticsOverview.velocity ?? 0,
             totalReach: analyticsOverview.totalReach ?? 0,
-            sentimentDistribution: analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 },
+            sentimentDistribution: {
+                positive: sentimentDistribution.Positive ?? 0,
+                neutral: sentimentDistribution.Neutral ?? 0,
+                negative: sentimentDistribution.Negative ?? 0,
+            },
             crisisProbability: analyticsOverview.crisisProbability ?? 0,
             emotions: (emotionAggregates as Record<string, number>) ?? {},
             geography: (geographyAggregates as Record<string, number>) ?? {},
@@ -450,6 +497,36 @@ export default function DashboardPage() {
             </header>
 
             {/* ── MAIN CONTENT ─────────────────────────────────────────────── */}
+            {(activeView === 'standard' || activeView === 'deep') && (
+                <div className="mb-8 rounded-[2rem] border border-border/50 bg-muted/70 p-6 shadow-lg shadow-black/5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-foreground/70 mb-2">
+                            {viewDetails.label}
+                        </p>
+                        <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                            {viewDetails.title}
+                        </h2>
+                        <p className="mt-2 text-sm leading-6 text-foreground/80 max-w-2xl">
+                            {viewDetails.description}
+                        </p>
+                        <ul className="mt-4 grid gap-2 text-xs text-foreground/80 sm:grid-cols-2">
+                            {viewDetails.bullets.map((bullet, index) => (
+                                <li key={index} className="inline-flex items-start gap-2">
+                                    <span className="mt-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-foreground/20" />
+                                    {bullet}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="mt-4 sm:mt-0 flex items-center gap-2">
+                        <span className={clsx('inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.3em]', viewDetails.badgeClass)}>
+                            {activeView === 'deep' ? t('view.deep_only_badge', { defaultValue: 'Deep only' }) : t('view.standard_badge', { defaultValue: 'Standard' })}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            )}
             <Suspense fallback={<TabSkeleton />}>
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -469,8 +546,9 @@ export default function DashboardPage() {
                                     {/* Section: Discovery */}
                                     <DashboardSection
                                         id="discovery"
-                                        title={t('section.discovery')}
+                                        title={t('section.standard_discovery', { defaultValue: t('section.discovery') })}
                                         icon={Globe}
+                                        headerSlot={<span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-primary">{t('view.quick_access', { defaultValue: 'Quick access' })}</span>}
                                     >
                                         <NewsGenerator defaultSourceType="Online News" />
                                     </DashboardSection>
@@ -543,8 +621,9 @@ export default function DashboardPage() {
 
                                 <DashboardSection
                                     id="deep-analytics"
-                                    title={t('section.analytics')}
+                                    title={t('section.deep_analytics', { defaultValue: t('section.analytics') })}
                                     icon={BarChart3}
+                                    headerSlot={<span className="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-amber-700">{t('view.deep_only', { defaultValue: 'Deep-only' })}</span>}
                                 >
                                     <DashboardGrid articles={filteredArticles} analytics={analytics} />
                                 </DashboardSection>

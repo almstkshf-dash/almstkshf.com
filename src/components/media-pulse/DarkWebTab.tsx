@@ -248,10 +248,10 @@ export default function DarkWebTab() {
 
           {results.length > 0 && (
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} className="h-9 px-3 text-xs">
+              <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} className="h-9 px-3 text-xs text-foreground bg-muted/10 hover:bg-muted/20 border border-border">
                 <FileDown className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> PDF
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleExport('excel')} className="h-9 px-3 text-xs">
+              <Button variant="outline" size="sm" onClick={() => handleExport('excel')} className="h-9 px-3 text-xs text-foreground bg-muted/10 hover:bg-muted/20 border border-border">
                 <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> Excel
               </Button>
             </div>

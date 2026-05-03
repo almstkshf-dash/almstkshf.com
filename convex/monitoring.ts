@@ -9,6 +9,18 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+function applyMonitoringFilters(q: any, args: { sourceType?: string; sourceCountry?: string; depth?: string }) {
+    if (args.sourceType && args.sourceType !== "All") {
+        q = q.filter((q: any) => q.eq(q.field("sourceType"), args.sourceType));
+    }
+    if (args.sourceCountry && args.sourceCountry !== "All") {
+        q = q.filter((q: any) => q.eq(q.field("sourceCountry"), args.sourceCountry));
+    }
+    if (args.depth && args.depth !== "All") {
+        q = q.filter((q: any) => q.eq(q.field("depth"), args.depth));
+    }
+    return q;
+}
 
 // 1. QUERY: Get all articles for the dashboard
 export const getArticles = query({
@@ -24,18 +36,7 @@ export const getArticles = query({
         const skip = args.skip ?? 0;
 
         let q = ctx.db.query("media_monitoring_articles");
-
-        if (args.sourceType && args.sourceType !== "All") {
-            q = q.filter((q) => q.eq(q.field("sourceType"), args.sourceType));
-        }
-
-        if (args.sourceCountry && args.sourceCountry !== "All") {
-            q = q.filter((q) => q.eq(q.field("sourceCountry"), args.sourceCountry));
-        }
-        if (args.depth && args.depth !== "All") {
-            q = q.filter((q) => q.eq(q.field("depth"), args.depth));
-        }
-
+        q = applyMonitoringFilters(q, args);
         const all = await q.collect();
 
         const parseDate = (d: string) => {
@@ -248,11 +249,17 @@ export const updateKeyword = mutation({
 export const getAnalyticsOverview = query({
     args: {
         keyword: v.optional(v.string()),
+        sourceType: v.optional(v.string()),
+        sourceCountry: v.optional(v.string()),
+        depth: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const articles = args.keyword
-            ? await ctx.db.query("media_monitoring_articles").filter(q => q.eq(q.field("keyword"), args.keyword)).collect()
-            : await ctx.db.query("media_monitoring_articles").collect();
+        let q = ctx.db.query("media_monitoring_articles");
+        q = applyMonitoringFilters(q, args);
+        if (args.keyword) {
+            q = q.filter((q: any) => q.eq(q.field("keyword"), args.keyword));
+        }
+        const articles = await q.collect();
 
         if (articles.length === 0) {
             return {
@@ -319,9 +326,15 @@ export const getAnalyticsOverview = query({
 });
 // 7. QUERY: Get Emotion Aggregates
 export const getEmotionAggregates = query({
-    args: {},
-    handler: async (ctx) => {
-        const articles = await ctx.db.query("media_monitoring_articles").collect();
+    args: {
+        sourceType: v.optional(v.string()),
+        sourceCountry: v.optional(v.string()),
+        depth: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        let q = ctx.db.query("media_monitoring_articles");
+        q = applyMonitoringFilters(q, args);
+        const articles = await q.collect();
         const emotions: Record<string, number> = { joy: 0, anger: 0, sadness: 0, fear: 0, disgust: 0, surprise: 0, trust: 0, anticipation: 0 };
         let count = 0;
 
@@ -357,9 +370,15 @@ export const getEmotionAggregates = query({
 
 // 8. QUERY: Get Geography Aggregates
 export const getGeographyAggregates = query({
-    args: {},
-    handler: async (ctx) => {
-        const articles = await ctx.db.query("media_monitoring_articles").collect();
+    args: {
+        sourceType: v.optional(v.string()),
+        sourceCountry: v.optional(v.string()),
+        depth: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        let q = ctx.db.query("media_monitoring_articles");
+        q = applyMonitoringFilters(q, args);
+        const articles = await q.collect();
         const countries: Record<string, number> = {};
 
         articles.forEach(a => {

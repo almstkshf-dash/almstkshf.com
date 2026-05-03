@@ -938,7 +938,7 @@ export default function OsintTab() {
                   onClick={() => handleExport('pdf')}
                   disabled={!!isExporting}
                   isLoading={isExporting === 'pdf'}
-                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                 >
                   <FileText className="w-3 h-3" />
                   PDF
@@ -949,7 +949,7 @@ export default function OsintTab() {
                   onClick={() => handleExport('excel')}
                   disabled={!!isExporting}
                   isLoading={isExporting === 'excel'}
-                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2"
+                  className="h-7 text-[9px] uppercase tracking-widest font-bold gap-1.5 rounded-lg px-2 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                 >
                   <FileSpreadsheet className="w-3 h-3" />
                   EXCEL

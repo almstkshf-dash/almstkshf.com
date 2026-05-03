@@ -8,7 +8,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -47,6 +47,7 @@ export default function AiInspectorTab() {
   const [imageResults, setImageResults] = useState<ImageAnalysisReport | null>(null);
   const [videoResults, setVideoResults] = useState<VideoAnalysisResult | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
@@ -143,8 +144,14 @@ export default function AiInspectorTab() {
     setTextResults(null);
     setImageResults(null);
     setVideoResults(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setPreviewUrl(null);
     setLoading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleTextAnalyze = () => {
@@ -174,6 +181,7 @@ export default function AiInspectorTab() {
       return;
     }
 
+    reset();
     setLoading(true);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
@@ -204,6 +212,9 @@ export default function AiInspectorTab() {
       console.error(err);
     } finally {
       setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -317,6 +328,7 @@ export default function AiInspectorTab() {
                       <input
                         id="file-upload"
                         type="file"
+                        ref={fileInputRef}
                         accept={mode === "image" ? "image/*" : "video/*"}
                         onChange={handleFileUpload}
                         className="hidden"

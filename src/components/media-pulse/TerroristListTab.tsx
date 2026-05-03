@@ -250,7 +250,7 @@ export default function TerroristListTab() {
                 <button
                   onClick={() => handleExport('pdf')}
                   aria-label="Export as PDF"
-                  className="h-8 px-3 flex items-center gap-2 rounded-lg hover:bg-muted text-[10px] font-black uppercase tracking-widest transition-all"
+                  className="h-8 px-3 flex items-center gap-2 rounded-lg text-foreground bg-muted/10 hover:bg-muted/20 border border-border text-[10px] font-black uppercase tracking-widest transition-all"
                 >
                   <Download className="w-3.5 h-3.5" aria-hidden="true" />
                   PDF
@@ -258,7 +258,7 @@ export default function TerroristListTab() {
                 <button
                   onClick={() => handleExport('excel')}
                   aria-label="Export as Excel"
-                  className="h-8 px-3 flex items-center gap-2 rounded-lg hover:bg-muted text-[10px] font-black uppercase tracking-widest transition-all"
+                  className="h-8 px-3 flex items-center gap-2 rounded-lg text-foreground bg-muted/10 hover:bg-muted/20 border border-border text-[10px] font-black uppercase tracking-widest transition-all"
                 >
                   <FileText className="w-3.5 h-3.5" aria-hidden="true" />
                   EXCEL

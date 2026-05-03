@@ -68,14 +68,18 @@ export default function RssFeeder({
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const proxyUrl = `${origin}/api/proxy-rss?url=${encodeURIComponent(activeUrl)}&t=${Date.now()}`;
-      console.log(`[RssFeeder] [${new Date().toISOString()}] Attempting fetch to: ${proxyUrl} (Origin: ${origin})`);
+      const proxyUrl = typeof window !== 'undefined'
+        ? new URL('/api/proxy-rss', window.location.href).href
+        : `/api/proxy-rss`;
+      const proxiedUrl = `${proxyUrl}?url=${encodeURIComponent(activeUrl)}&t=${Date.now()}`;
+      console.log(`[RssFeeder] [${new Date().toISOString()}] Attempting fetch to: ${proxiedUrl}`);
       
       const performFetch = async (retries = 2): Promise<Response> => {
         try {
-          return await fetch(proxyUrl, {
+          return await fetch(proxiedUrl, {
             signal: controller.signal,
+            credentials: 'same-origin',
+            cache: 'no-store',
             headers: {
               'Accept': 'application/json',
               'Cache-Control': 'no-cache'

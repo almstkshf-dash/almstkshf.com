@@ -832,6 +832,7 @@
       "alerts_desc": "Critical shifts in public perception trigger instant notifications to your leadership war room.",
       "specialized_services": "Specialized Services",
       "advanced_solutions": "Advanced Solutions",
+      "ai_placeholder": "Current data indicates a rising momentum in regional media narratives. Positive trends are stabilizing while neutral coverage is growing in volume.",
       "total_ave": "Total AVE",
       "positive_sent": "Positive Tone",
       "top_topics": "Top Topics",
@@ -1190,7 +1191,10 @@
     "placeholder_secret": "Enter your secret",
     "placeholder_id": "Enter your ID",
     "placeholder_url": "Enter the URL",
-    "placeholder_countries": "AE, SA, EG"
+    "placeholder_countries": "AE, SA, EG",
+    "search_countries": "Search countries...",
+    "selected": "selected",
+    "clear_all": "Clear All"
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -1243,6 +1247,24 @@
     "monitor_standard_title": "Standard Monitor",
     "monitor_deep_title": "Deep Monitor",
     "monitor_osint_title": "OSINT Monitor",
+    "view": {
+      "standard_label": "Standard monitoring",
+      "standard_title": "Standard coverage mode",
+      "standard_description": "Monitor active coverage, press releases, and pulse analytics for day-to-day operational tracking.",
+      "standard_bullet_1": "Fast overview of live media, press and news coverage",
+      "standard_bullet_2": "Summary analytics for current volume, sentiment and reach",
+      "standard_bullet_3": "Quick access to coverage logs and real-time feeds",
+      "deep_label": "Deep Investigation",
+      "deep_title": "Deep analysis mode",
+      "deep_description": "Analyze deeper content and investigative signals with enriched scoring, deep-status tracking, and long-running insights.",
+      "deep_bullet_1": "Extended source depth with deep classification",
+      "deep_bullet_2": "Advanced risk and coverage intelligence",
+      "deep_bullet_3": "Includes Deep Status panel and analyst alerts",
+      "standard_badge": "Standard",
+      "deep_only_badge": "Deep only",
+      "quick_access": "Quick access",
+      "deep_only": "Deep-only"
+    },
     "limit_results": "Limit: {count} results",
     "live_stream": "Pulse: Real-Time Stream",
     "reputation_safeguard": "Reputation Safeguard",
@@ -1303,8 +1325,10 @@
     },
     "section": {
       "discovery": "Discovery Engine",
+      "standard_discovery": "Standard Discovery",
       "press": "Press Monitor",
       "analytics": "Media Pulse Analytics",
+      "deep_analytics": "Deep Media Analytics",
       "coverage": "Coverage Log",
       "live_feed": "Live Feed"
     }
@@ -1403,6 +1427,8 @@
     "syncing": "Syncing...",
     "fetch_failed": "Failed to synchronize PR wire feeds. Please verify the upstream PR sources are responding and your network connection is active.",
     "not_authenticated": "Not authenticated. Please sign in first.",
+    "admin_only": "This feature is available to admin users only.",
+    "admin_only_badge": "Admins only",
     "failed": "Sync Failed",
     "cron_hint": "Auto-sync runs every 6 hours."
   },
@@ -1652,7 +1678,8 @@
         "name": "OpenCorporates",
         "desc": "The largest open database of companies in the world."
       }
-    }
+    },
+    "live_badge": "Live"
   },
   "Export": {
     "sheet_name": "Coverage Report",

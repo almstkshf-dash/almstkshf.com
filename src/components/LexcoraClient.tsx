@@ -81,7 +81,7 @@ export default function LexcoraClient() {
                             <motion.h1
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-6xl lg:text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-primary/10 transition-colors duration-300"
+                                className="text-6xl lg:text-8xl font-bold tracking-tight text-foreground transition-colors duration-300"
                             >
                                 {t("title")}
                             </motion.h1>

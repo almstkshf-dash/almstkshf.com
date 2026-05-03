@@ -177,15 +177,38 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
     }, [articles]);
 
     const heatmapData = useMemo(() => {
-        // Mock heatmap data for now based on articles or random for visualization
-        const mockData = [];
-        for (let d = 0; d < 7; d++) {
-            for (let h = 0; h < 24; h++) {
-                mockData.push({ day: d, hour: h, value: Math.floor(Math.random() * 50) });
+        const counts: Record<string, number> = {};
+
+        const parseArticleDate = (article: MonitoringArticle) => {
+            if (article._creationTime) {
+                const date = new Date(article._creationTime);
+                return Number.isNaN(date.getTime()) ? null : date;
             }
-        }
-        return mockData;
-    }, []);
+            if (article.publishedDate) {
+                const [dd, mm, yyyy] = article.publishedDate.split("/").map((value) => Number(value));
+                if ([dd, mm, yyyy].some((value) => Number.isNaN(value))) return null;
+                return new Date(yyyy, mm - 1, dd);
+            }
+            return null;
+        };
+
+        articles?.forEach((article) => {
+            const date = parseArticleDate(article as MonitoringArticle);
+            if (!date) return;
+            const day = date.getDay();
+            const hour = date.getHours();
+            const key = `${day}-${hour}`;
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
+        return Array.from({ length: 7 }, (_, day) =>
+            Array.from({ length: 24 }, (_, hour) => ({
+                day,
+                hour,
+                value: counts[`${day}-${hour}`] || 0,
+            }))
+        ).flat();
+    }, [articles]);
 
     return (
         <div className="space-y-6">
@@ -202,7 +225,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                             size="sm"
                             onClick={() => handleDownload('pdf')}
                             disabled={isGenerating}
-                            className="text-xs h-8 px-3"
+                            className="text-xs h-8 px-3 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                         >
                             <FileText className="w-3.5 h-3.5 ltr:mr-1.5 rtl:ml-1.5" />
                             PDF
@@ -212,7 +235,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                             size="sm"
                             onClick={() => handleDownload('csv')}
                             disabled={isGenerating}
-                            className="text-xs h-8 px-3"
+                            className="text-xs h-8 px-3 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                         >
                             <FileSpreadsheet className="w-3.5 h-3.5 ltr:mr-1.5 rtl:ml-1.5" />
                             CSV
@@ -384,7 +407,13 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Button variant="primary" size="sm" className="w-full text-xs font-bold h-10 tracking-widest uppercase">
+                            <Button
+                                variant="primary"
+                                size="sm"
+                                className="w-full text-xs font-bold h-10 tracking-widest uppercase"
+                                onClick={() => handleDownload('pdf')}
+                                disabled={isGenerating || !articles || articles.length === 0}
+                            >
                                 {t("full_ai_report")}
                             </Button>
                         </div>
