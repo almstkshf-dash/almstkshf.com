@@ -71,9 +71,9 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                 {/* Grid container */}
                 <div className="flex-1 min-w-[600px] flex flex-col">
                     {/* Activity Grid */}
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1.5" role="grid" aria-label={t('heatmap_label', { defaultValue: 'Activity heatmap' })}>
                         {DAYS.map((_, dayIndex) => (
-                            <div key={dayIndex} className="flex gap-1.5 justify-between">
+                            <div key={dayIndex} className="flex gap-1.5 justify-between" role="row" aria-rowindex={dayIndex + 1}>
                                 {HOURS.map((hour) => {
                                     const val = dataMap[`${dayIndex}-${hour}`] || 0;
                                     const intensity = val / maxVal;
@@ -122,6 +122,8 @@ const VolumeHeatmapChart = memo(function VolumeHeatmapChart({ data }: VolumeHeat
                                             key={`${dayIndex}-${hour}`}
                                             className="group relative flex-1 aspect-square max-h-[28px]"
                                             role="gridcell"
+                                            aria-rowindex={dayIndex + 1}
+                                            aria-colindex={hour + 1}
                                             aria-label={t("heatmap_cell_label", {
                                                 day: DAYS[dayIndex],
                                                 time: formatHour(hour),

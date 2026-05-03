@@ -398,7 +398,7 @@ const NavbarContent = memo(function NavbarContent() {
 
 export default memo(function Navbar() {
     return (
-        <header className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur-md transition-all duration-300 min-h-[64px]">
+        <header className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur-md h-16 min-h-[64px] transition-colors duration-300">
             <Suspense fallback={<div className="h-16 w-full" />}>
                 <NavbarContent />
             </Suspense>

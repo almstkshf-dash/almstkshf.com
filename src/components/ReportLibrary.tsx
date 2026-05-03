@@ -21,7 +21,7 @@ import { useTranslations } from "next-intl";
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
-    const collectionsResult = useQuery(api.collections.getCollections) || [];
+    const collectionsResult = useQuery(api.collections.getCollections) ?? [];
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 

@@ -10,8 +10,8 @@ import { useTranslations } from 'next-intl';
 // SEARCHABLE MULTI-SELECT DROPDOWN COMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
 export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
-    items,
-    selected,
+    items = [],
+    selected = [],
     onChange,
     placeholder,
     searchPlaceholder,
@@ -25,8 +25,8 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     "aria-labelledby": ariaLabelledBy,
     id,
 }: {
-    items: { id: string; label: string; searchStr: string }[];
-    selected: string[];
+    items?: { id: string; label: string; searchStr: string }[];
+    selected?: string[];
     onChange: (selected: string[]) => void;
     placeholder: string;
     searchPlaceholder: string;
@@ -62,7 +62,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     }, []);
 
     const filtered = React.useMemo(() => {
-        return items.filter(
+        return (items || []).filter(
             (item) => search.length === 0 || item.searchStr.toLowerCase().includes(search.toLowerCase())
         );
     }, [items, search]);

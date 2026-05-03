@@ -29,7 +29,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Column 1: About */}
                     <div className="space-y-6">
-                        <Link href="/" aria-label={tCommon('logo_alt')} className="flex items-center gap-3">
+                        <Link href="/" className="flex items-center gap-3">
                             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent app-name">
                                 {tCommon('app_name')}
                             </span>
