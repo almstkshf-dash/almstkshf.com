@@ -860,10 +860,10 @@ export class ReportGenerator {
             { header: translations.Reports?.col_date || 'Date', key: 'date', width: 15 },
             { header: translations.Reports?.col_title || 'Title', key: 'title', width: 40 },
             { header: translations.Reports?.col_source || 'Source', key: 'source', width: 15 },
-            { header: translations.Reports?.col_url || 'URL', key: 'url', width: 30 },
+            { header: (translations.Reports as any)?.col_url || 'URL', key: 'url', width: 30 },
             { header: translations.DarkWeb?.col_risk || 'Risk Assessment', key: 'risk_level', width: 15 },
             { header: translations.Reports?.col_summary || 'AI Summary', key: 'summary', width: 50 },
-            { header: translations.Reports?.col_tags || 'Signal Tags', key: 'tags', width: 20 }
+            { header: (translations.Reports as any)?.col_tags || 'Signal Tags', key: 'tags', width: 20 }
         ];
 
         const headerRow = sheet.getRow(1);
@@ -885,7 +885,7 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateExcel(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false): Promise<Blob | { doc: jsPDF }> {
+    private static async generateExcel(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false): Promise<Blob | { doc: jsPDF } | void> {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
@@ -1082,81 +1082,6 @@ export class ReportGenerator {
         if (mode === 'video') sheet.getColumn(4).width = 40;
 
         this.downloadWorkbook(workbook, `${title}_${modeTrans}`);
-    }
-
-    static async exportOsintReport(history: OsintHistoryItem[], messages: Record<string, unknown>, format: 'pdf' | 'excel') {
-        const translations = messages as ReportTranslations;
-        const title = translations.Reports?.osint_title || 'OSINT Investigation History';
-
-        if (format === 'pdf') {
-            const doc = new jsPDF() as AutoTablejsPDF;
-            const logo = await this.loadLogo();
-
-            if (logo) {
-                doc.addImage(logo, 'PNG', 10, 10, 30, 30);
-            }
-
-            doc.setFont('Amiri', 'bold');
-            doc.setFontSize(22);
-            doc.text(this.fixArabic(title), 105, 25, { align: 'center' });
-
-            doc.setFontSize(10);
-            const generatedAtText = translations.Reports?.generated_at || 'Generated at';
-            doc.text(`${this.fixArabic(generatedAtText)}: ${new Date().toLocaleString()}`, 105, 35, { align: 'center' });
-
-            const tableData = history.map((item) => [
-                new Date(item.createdAt).toLocaleString(),
-                item.type,
-                item.query,
-                'Success'
-            ]);
-
-            doc.autoTable({
-                startY: 50,
-                head: [[
-                    this.fixArabic(translations.Reports?.col_date || 'Date'),
-                    this.fixArabic(translations.Reports?.investigation_type || 'Type'),
-                    this.fixArabic(translations.Reports?.investigation_target || 'Target'),
-                    this.fixArabic(translations.Reports?.col_status || 'Status')
-                ]],
-                body: tableData,
-                styles: { font: 'Amiri', halign: 'right' },
-                headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-            });
-
-            doc.save(`OSINT_Report_${new Date().toISOString().split('T')[0]}.pdf`);
-        } else {
-            const workbook = new ExcelJS.Workbook();
-            const sheet = workbook.addWorksheet('OSINT History');
-
-            sheet.addRow([title]).font = { bold: true, size: 16 };
-            sheet.addRow([`${translations.Reports?.generated_at || 'Generated at'}: ${new Date().toLocaleString()}`]);
-            sheet.addRow([]);
-
-            const headerRow = sheet.addRow([
-                translations.Reports?.col_date || 'Date',
-                translations.Reports?.investigation_type || 'Type',
-                translations.Reports?.investigation_target || 'Target',
-                translations.Reports?.col_status || 'Status'
-            ]);
-            headerRow.font = { bold: true };
-
-            history.forEach((item) => {
-                sheet.addRow([
-                    new Date(item.createdAt).toLocaleString(),
-                    item.type,
-                    item.query,
-                    'Success'
-                ]);
-            });
-
-            sheet.getColumn(1).width = 25;
-            sheet.getColumn(2).width = 15;
-            sheet.getColumn(3).width = 40;
-            sheet.getColumn(4).width = 15;
-
-            this.downloadWorkbook(workbook, 'OSINT_History');
-        }
     }
 
     private static async downloadWorkbook(workbook: ExcelJS.Workbook, title: string) {

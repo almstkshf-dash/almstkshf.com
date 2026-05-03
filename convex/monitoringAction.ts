@@ -789,8 +789,7 @@ export const fetchNews = action({
             const stack = globalError instanceof Error ? globalError.stack : "No stack trace";
             return { 
                 success: false, 
-                error: `Unable to process news monitoring: ${errorMessage}`,
-                details: stack
+                error: `Unable to process news monitoring: ${errorMessage} | Stack: ${stack}`
             };
 
 

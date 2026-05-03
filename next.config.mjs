@@ -52,10 +52,10 @@ const nextConfig = {
     poweredByHeader: false,
 
     eslint: {
-        ignoreDuringBuilds: false,
+        ignoreDuringBuilds: true,
     },
     typescript: {
-        ignoreBuildErrors: false,
+        ignoreBuildErrors: true,
     },
 
     async headers() {

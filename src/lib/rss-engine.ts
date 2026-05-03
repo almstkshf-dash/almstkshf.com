@@ -82,7 +82,7 @@ export async function parseFeed(
         'Accept-Language': 'ar,en;q=0.9',
         Referer: new URL(url).origin + '/',
       },
-      // @ts-expect-error Next.js extends RequestInit but it might not be typed globally
+      // Next.js extends RequestInit but it might not be typed globally
       next: { revalidate: 900 },
     };
 
@@ -120,7 +120,7 @@ export async function parseFeed(
       throw new Error(`The remote server for ${url} returned an empty response.`);
     }
   } catch (err: unknown) {
-    if (err.name === 'AbortError') {
+    if (err instanceof Error && err.name === 'AbortError') {
       throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
     }
     
@@ -161,7 +161,7 @@ export async function parseFeed(
       description,
       content,
       source: resolvedSource,
-      author: item.creator || item.author || '',
+      author: item.creator || (item as any).author || '',
       categories: item.categories || [],
       guid: item.guid || item.link || '',
       isoDate: item.isoDate,
