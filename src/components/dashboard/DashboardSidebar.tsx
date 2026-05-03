@@ -39,12 +39,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-    { id: 'standard',        labelKey: 'sidebar.standard',        icon: Globe,       adminOnly: false },
-    { id: 'deep',            labelKey: 'sidebar.deep',            icon: Search,      adminOnly: false },
-    { id: 'darkweb',         labelKey: 'sidebar.darkweb',         icon: GlobeLock,   adminOnly: true  },
-    { id: 'osint',           labelKey: 'sidebar.osint',           icon: ShieldCheck, adminOnly: true  },
-    { id: 'inspect',         labelKey: 'sidebar.inspect',         icon: InspectIcon, adminOnly: false },
-    { id: 'terrorist_list',  labelKey: 'sidebar.terrorist_list',  icon: Shield,      adminOnly: true  },
+    { id: 'standard', labelKey: 'sidebar.standard', icon: Globe, adminOnly: false },
+    { id: 'deep', labelKey: 'sidebar.deep', icon: Search, adminOnly: false },
+    { id: 'osint', labelKey: 'sidebar.osint', icon: ShieldCheck, adminOnly: false },
+    { id: 'inspect', labelKey: 'sidebar.inspect', icon: InspectIcon, adminOnly: false },
+    { id: 'darkweb', labelKey: 'sidebar.darkweb', icon: GlobeLock, adminOnly: false },
+    { id: 'terrorist_list', labelKey: 'sidebar.terrorist_list', icon: Shield, adminOnly: false },
 ];
 
 /**
@@ -87,12 +87,7 @@ export default function DashboardSidebar() {
         });
     };
 
-    const visibleItems = NAV_ITEMS.filter((item) => {
-        if (!item.adminOnly) return true;
-        // Hide while loading — don't flash items
-        if (isAdminLoading) return false;
-        return isAdmin;
-    });
+    const visibleItems = NAV_ITEMS;
 
     /* ─── Shared item renderer ──────────────────────────────────────── */
     const renderItem = (item: NavItem, layout: 'expanded' | 'icon') => {
@@ -157,18 +152,17 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            {/* ── DESKTOP EXPANDED SIDEBAR (xl+) ─────────────────────────── */}
+            {/* ── DESKTOP EXPANDED (lg+) ─────────────────────────────────── */}
             <aside
                 aria-label="Dashboard navigation"
                 className={clsx(
-                    'hidden xl:flex flex-col',
-                    'fixed top-0 bottom-0 z-30',
+                    'hidden lg:flex flex-col',
+                    'fixed top-0 bottom-0 z-50',
                     'w-60',
-                    // RTL: pin to right; LTR: pin to left
                     'ltr:left-0 rtl:right-0',
                     'bg-background/95 backdrop-blur-xl border-border/60',
                     'ltr:border-r rtl:border-l',
-                    'pt-20 pb-6 px-4',          // pt-20 clears the global Navbar
+                    'pt-20 pb-6 px-4',
                     'overflow-y-auto'
                 )}
             >
@@ -178,18 +172,6 @@ export default function DashboardSidebar() {
                 {/* Nav items */}
                 <nav className="flex flex-col gap-1.5 flex-1">
                     {visibleItems.map((item) => renderItem(item, 'expanded'))}
-
-                    {/* Admin loading skeletons */}
-                    {isAdminLoading && (
-                        <div className="flex flex-col gap-1.5">
-                            {[1, 2, 3].map((i) => (
-                                <div
-                                    key={i}
-                                    className="h-11 rounded-2xl bg-muted/40 animate-pulse"
-                                />
-                            ))}
-                        </div>
-                    )}
                 </nav>
 
                 {/* Divider */}
@@ -215,44 +197,36 @@ export default function DashboardSidebar() {
                 </div>
             </aside>
 
-            {/* ── TABLET ICON-ONLY STRIP (lg → xl) ──────────────────────── */}
+            {/* ── TABLET STRIP (md to lg) ────────────────────────────────── */}
             <aside
                 aria-label="Dashboard navigation"
                 className={clsx(
-                    'hidden lg:flex xl:hidden flex-col items-center gap-2',
-                    'fixed top-0 bottom-0 z-30 w-16',
+                    'hidden md:flex lg:hidden flex-col items-center gap-2',
+                    'fixed top-0 bottom-0 z-50 w-16',
                     'ltr:left-0 rtl:right-0',
                     'bg-background/95 backdrop-blur-xl',
                     'ltr:border-r rtl:border-l border-border/60',
-                    'pt-20 pb-6 py-4',
+                    'pt-20 pb-6',
                     'overflow-y-auto'
                 )}
             >
                 <nav className="flex flex-col items-center gap-2 flex-1">
                     {visibleItems.map((item) => renderItem(item, 'icon'))}
-                    {isAdminLoading && (
-                        <>
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="w-10 h-10 rounded-2xl bg-muted/40 animate-pulse" />
-                            ))}
-                        </>
-                    )}
                 </nav>
                 <div className="my-2 w-8 h-px bg-border/40" />
                 {renderSettings('icon')}
             </aside>
 
-            {/* ── MOBILE BOTTOM BAR (< lg) ───────────────────────────────── */}
+            {/* ── MOBILE BOTTOM BAR (< md) ───────────────────────────────── */}
             <nav
                 aria-label="Dashboard navigation"
                 className={clsx(
-                    'lg:hidden fixed bottom-0 inset-x-0 z-30 h-16',
-                    'bg-background/95 backdrop-blur-xl border-t border-border/60',
-                    'flex items-center justify-around px-2'
+                    'md:hidden fixed bottom-0 inset-x-0 z-50 h-16',
+                    'bg-background/95 backdrop-blur-xl border-t border-border/60 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)]',
+                    'flex items-center justify-around px-1'
                 )}
             >
-                {visibleItems.slice(0, 5).map((item) => {
-                    // On mobile show at most 5 items — drop the 6th if admin has it
+                {visibleItems.map((item) => {
                     const Icon: LucideIcon = item.icon;
                     const isActive = activeView === item.id;
                     return (
@@ -262,14 +236,14 @@ export default function DashboardSidebar() {
                             disabled={isPending}
                             aria-current={isActive ? 'page' : undefined}
                             className={clsx(
-                                'flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-200',
+                                'relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all duration-200',
                                 isActive
                                     ? 'text-primary'
                                     : 'text-muted-foreground hover:text-foreground'
                             )}
                         >
                             <Icon className="w-5 h-5" />
-                            <span className="text-[8px] font-black uppercase tracking-wider truncate max-w-[48px]">
+                            <span className="text-[10px] font-bold uppercase tracking-tight truncate max-w-[64px] opacity-90 leading-tight">
                                 {t(`Dashboard.${item.labelKey}` as any)}
                             </span>
                             {isActive && (

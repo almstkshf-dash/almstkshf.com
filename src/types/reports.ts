@@ -183,7 +183,7 @@ export interface MonitoringArticle {
     publishedDate: string;
     url: string;
     resolvedUrl?: string;
-    source: string;
+    source?: string;
     sourceType: 'Press Release' | 'Online News' | 'Social Media' | 'Blog' | 'Print' | string;
     sourceCountry?: string;
     country?: string;
@@ -195,7 +195,7 @@ export interface MonitoringArticle {
     likes?: number;
     retweets?: number;
     replies?: number;
-    status: 'live' | 'in_progress' | string;
+    status?: 'live' | 'in_progress' | string;
     imageUrl?: string;
     isManual?: boolean;
     manualSentimentOverride?: boolean;

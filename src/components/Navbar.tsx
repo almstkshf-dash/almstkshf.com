@@ -9,6 +9,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, memo } from "react";
+import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -288,7 +289,8 @@ const NavbarContent = memo(function NavbarContent() {
 
 
             {/* ——— Mobile Menu Overlay ——— */}
-            <AnimatePresence>
+            {mounted && createPortal(
+                <AnimatePresence>
                 {mobileMenuOpen && (
                     <motion.div
                         initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
@@ -387,7 +389,9 @@ const NavbarContent = memo(function NavbarContent() {
                         </Container>
                     </motion.div>
                 )}
-            </AnimatePresence >
+            </AnimatePresence>,
+            document.body
+            )}
         </>
     );
 });

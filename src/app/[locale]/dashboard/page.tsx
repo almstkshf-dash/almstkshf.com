@@ -18,6 +18,7 @@ import {
     Activity, BarChart3, Rss,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { MonitoringArticle } from '@/types/reports';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,17 +63,7 @@ const RssFeeder = dynamic(() => import('@/components/dashboard/RssFeeder'), { ss
 // ── Types ────────────────────────────────────────────────────────────────────
 type ViewId = 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb';
 
-type ArticleItem = {
-    _id: string;
-    title: string;
-    keyword?: string;
-    sourceType?: string;
-    sourceCountry?: string;
-    publishedDate?: string;
-    sentiment?: string;
-    url?: string;
-    [key: string]: unknown;
-};
+type ArticleItem = MonitoringArticle;
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {

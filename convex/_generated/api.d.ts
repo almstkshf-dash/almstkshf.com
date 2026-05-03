@@ -18,6 +18,8 @@ import type * as darkWeb from "../darkWeb.js";
 import type * as darkWebDb from "../darkWebDb.js";
 import type * as debug from "../debug.js";
 import type * as deepSources from "../deepSources.js";
+import type * as dumpSettings from "../dumpSettings.js";
+import type * as emails from "../emails.js";
 import type * as init from "../init.js";
 import type * as media from "../media.js";
 import type * as monitoring from "../monitoring.js";
@@ -57,6 +59,8 @@ declare const fullApi: ApiFromModules<{
   darkWebDb: typeof darkWebDb;
   debug: typeof debug;
   deepSources: typeof deepSources;
+  dumpSettings: typeof dumpSettings;
+  emails: typeof emails;
   init: typeof init;
   media: typeof media;
   monitoring: typeof monitoring;

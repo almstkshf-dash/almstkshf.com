@@ -8,10 +8,11 @@
 
 import { SignIn } from "@clerk/nextjs";
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   return (
     <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <SignIn />
+      <SignIn path={`/${locale}/sign-in`} routing="path" />
     </div>
   );
 }

@@ -8,9 +8,7 @@
 
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendResendEmail } from "./utils/email";
 
 export const sendSubscriptionEmail = action({
     args: {
@@ -32,13 +30,12 @@ export const sendSubscriptionEmail = action({
         }
 
         try {
-            await resend.emails.send({
-                from: "Almstkshf <notifications@almstkshf.com>",
+            const result = await sendResendEmail({
                 to: args.to,
                 subject: args.subject,
-                text: content,
+                html: content.replace(/\n/g, "<br/>"), // Convert plain text to simple HTML
             });
-            return { success: true };
+            return { success: result.success, error: result.error };
         } catch (error) {
             console.error("Failed to send email via Resend:", error);
             return { success: false, error: String(error) };

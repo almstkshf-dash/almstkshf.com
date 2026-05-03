@@ -19,3 +19,10 @@ export const debugListAllKeys = query({
         }));
     }
 });
+export const debugListArticlesCount = query({
+    args: {},
+    handler: async (ctx) => {
+        const count = await ctx.db.query("media_monitoring_articles").collect();
+        return { total: count.length };
+    }
+});

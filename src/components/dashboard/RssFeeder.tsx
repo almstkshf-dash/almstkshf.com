@@ -115,20 +115,17 @@ export default function RssFeeder({
         throw new Error(data.error || 'Invalid feed format');
       }
     } catch (err: unknown) {
-      // Log full error details for debugging in developmental environments
-      console.error('[RssFeeder] Fetch error technical details:', {
-        url: activeUrl,
-        error: err,
-        timestamp: new Date().toISOString()
-      });
+      // Log full error details for debugging without triggering Next.js error overlays
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.warn(`[RssFeeder] Fetch error technical details for ${activeUrl}: ${errorMessage}`);
       
-      const message = err instanceof Error ? err.message : String(err);
+      const message = errorMessage;
       
       // Explicitly handle network-level failures vs API errors
       if (err instanceof TypeError && (message === 'Failed to fetch' || message.includes('network'))) {
         setError(t('failed_fetch') + ' - Network or CORS issue. See console for details.');
-        console.error('[RssFeeder] CRITICAL: Network failure detected. Possible causes:\n1. Ad-blocker or Firewall blocking the request.\n2. The server is not reachable at the current origin.\n3. SSL/TLS handshake failure.');
-        console.error('[RssFeeder] Full Error Object:', err);
+        console.warn('[RssFeeder] CRITICAL: Network failure detected. Possible causes:\n1. Ad-blocker or Firewall blocking the request.\n2. The server is not reachable at the current origin.\n3. SSL/TLS handshake failure.');
+        console.warn('[RssFeeder] Full Error Object:', err);
       } else if (err instanceof Error && err.name === 'AbortError') {
         setError(t('error_fetching') + ' (Request Timed Out)');
         console.warn('[RssFeeder] Request was aborted due to timeout.');

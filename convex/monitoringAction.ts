@@ -121,11 +121,12 @@ Return valid JSON ONLY with these exact fields:
 }
 Note: The sum of emotions does not need to be 100, they are independent intensities. Joy/Sadness, Anger/Fear, Surprise/Expectation, Trust/Disgust are pairs. Focus on intensities.`;
 
-    const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-pro"];
 
     for (const model of models) {
         try {
-            console.log(`ðŸ§  Trying Gemini model: ${model}`);
+            if (!apiKey || apiKey === "None") break;
+            console.log(`🧠 Trying Gemini model: ${model}`);
             const response = await fetch(
                 `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
                 {
@@ -318,6 +319,7 @@ export const fetchNews = action({
                 console.warn("âš ï¸ Gemini API key is missing. Falling back to Heuristic Engine for analysis.");
             }
 
+            console.log("🔍 [fetchNews] Starting resolution...");
             const newsdataKey = await resolveApiKey(ctx, "NEWSDATA_API_KEY", "newsdata");
             const newsapiKey = await resolveApiKey(ctx, "NEWSAPI_API_KEY", "newsapi");
             const gnewsKey = await resolveApiKey(ctx, "GNEWS_API_KEY", "gnews");
@@ -326,6 +328,9 @@ export const fetchNews = action({
             const bingKey = await resolveApiKey(ctx, "BING_API_KEY", "bing");
             const mediastackKey = await resolveApiKey(ctx, "MEDIASTACK_API_KEY", "mediastack");
             const serperKey = await resolveApiKey(ctx, "SERPER_API_KEY", "serper");
+            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+            console.log(`🔑 Keys: NewsData:${!!newsdataKey}, GNews:${!!gnewsKey}, WorldNews:${!!worldnewsKey}, Gemini:${!!geminiKey}`);
 
             const providers = [
                 { name: 'NewsData.io', key: newsdataKey, type: 'newsdata' },
@@ -352,13 +357,24 @@ export const fetchNews = action({
             let dateFromObj: Date | null = null;
             let dateToObj: Date | null = null;
             if (args.dateFrom) {
-                const [d, m, y] = args.dateFrom.split('/');
-                dateFromObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                const parts = args.dateFrom.split('/');
+                if (parts.length === 3) {
+                    const [d, m, y] = parts;
+                    dateFromObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                    if (isNaN(dateFromObj.getTime())) dateFromObj = null;
+                }
             }
             if (args.dateTo) {
-                const [d, m, y] = args.dateTo.split('/');
-                dateToObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-                dateToObj.setHours(23, 59, 59, 999); // End of day
+                const parts = args.dateTo.split('/');
+                if (parts.length === 3) {
+                    const [d, m, y] = parts;
+                    dateToObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+                    if (isNaN(dateToObj.getTime())) {
+                        dateToObj = null;
+                    } else {
+                        dateToObj.setHours(23, 59, 59, 999);
+                    }
+                }
             }
 
             // Full-phrase search â€” wrap in quotes for exact match on Google News
@@ -376,11 +392,11 @@ export const fetchNews = action({
             }
 
             // Enhance query with date operators for exact matching
-            if (dateFromObj) {
+            if (dateFromObj && !isNaN(dateFromObj.getTime())) {
                 const after = dateFromObj.toISOString().split('T')[0];
                 enrichedQuery += ` after:${after}`;
             }
-            if (dateToObj) {
+            if (dateToObj && !isNaN(dateToObj.getTime())) {
                 const before = dateToObj.toISOString().split('T')[0];
                 enrichedQuery += ` before:${before}`;
             }
@@ -399,8 +415,8 @@ export const fetchNews = action({
             let totalSuccess = 0;
             const totalSkipped = 0;
 
-            // â”€â”€ Parallel Provider Fetching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            console.log(`ðŸš€ Starting parallel fetch for keyword: ${args.keyword}`);
+            // ————————————————— Parallel Provider Fetching ———————————————————————————————————————————————
+            console.log(`🚀 Starting parallel fetch for keyword: ${args.keyword}`);
 
             const fetchPromises = [];
 
@@ -408,7 +424,9 @@ export const fetchNews = action({
             for (const combo of rssCombos) {
                 fetchPromises.push((async () => {
                     try {
+                        console.log(`📡 [RSS] Fetching: ${combo.url.substring(0, 100)}...`);
                         const feed = await parser.parseURL(combo.url);
+                        console.log(`✅ [RSS] Got ${feed.items?.length || 0} items from ${combo.country}-${combo.lang}`);
                         const items = feed.items.slice(0, 10);
                         let localSuccess = 0;
                         for (const item of items) {
@@ -767,7 +785,15 @@ export const fetchNews = action({
             return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: results.length };
         } catch (globalError: any) {
             console.error("ðŸ CRITICAL: Global fetchNews failure", globalError);
-            return { success: false, error: "Unable to process news monitoring." };
+            const errorMessage = globalError instanceof Error ? globalError.message : String(globalError);
+            const stack = globalError instanceof Error ? globalError.stack : "No stack trace";
+            return { 
+                success: false, 
+                error: `Unable to process news monitoring: ${errorMessage}`,
+                details: stack
+            };
+
+
         }
     },
 });

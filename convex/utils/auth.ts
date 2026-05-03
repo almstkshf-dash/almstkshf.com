@@ -32,6 +32,7 @@ function hasAdminRole(identity: any): boolean {
 
 export async function requireUser(auth: Auth) {
     const identity = await auth.getUserIdentity();
+    console.log(`[auth] Identity check - Subject: ${identity?.subject}, Name: ${identity?.name}`);
     if (!identity) {
         throw new ConvexError("Not authenticated: Identity is null. If testing in the Dashboard/CLI, please use 'Impersonate' or provide a user token.");
     }
@@ -40,6 +41,7 @@ export async function requireUser(auth: Auth) {
 
 export async function requireAdmin(auth: Auth) {
     const identity = await requireUser(auth);
+    console.log(`[requireAdmin] Checking admin role for subject: ${identity.subject}`);
 
     // In development only, we check for 'fake_id' (impersonation)
     if (process.env.NODE_ENV !== "production" && identity.subject === "fake_id") {

@@ -68,11 +68,11 @@ export default function DashboardLayout({
                 className={[
                     'min-h-screen',
                     // LTR offsets
-                    'ltr:pl-0 ltr:lg:pl-16 ltr:xl:pl-60',
+                    'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
                     // RTL offsets (sidebar is on the right)
-                    'rtl:pr-0 rtl:lg:pr-16 rtl:xl:pr-60',
+                    'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
                     // Bottom space for mobile nav bar
-                    'pb-20 lg:pb-0',
+                    'pb-20 md:pb-0',
                 ].join(' ')}
             >
                 <Suspense
