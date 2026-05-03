@@ -49,7 +49,7 @@ export const getUserPayments = query({
     },
 });
 
-async function createBillingNotification(ctx: any, userId: string, title: string, message: string) {
+async function createBillingNotificationHelper(ctx: any, userId: string, title: string, message: string) {
     await ctx.db.insert("notifications", {
         userId,
         title,
@@ -90,7 +90,7 @@ export const syncSubscription = mutation({
             });
 
             if (!wasActive && isActive) {
-                await createBillingNotification(
+                await createBillingNotificationHelper(
                     ctx,
                     args.userId,
                     "Subscription Activated",
@@ -109,7 +109,7 @@ export const syncSubscription = mutation({
                 updatedAt: Date.now(),
             });
 
-            await createBillingNotification(
+            await createBillingNotificationHelper(
                 ctx,
                 args.userId,
                 "Subscription Activated",
@@ -142,7 +142,7 @@ export const createBillingNotification = mutation({
         message: v.string(),
     },
     handler: async (ctx, args) => {
-        await createBillingNotification(ctx, args.userId, args.title, args.message);
+        await createBillingNotificationHelper(ctx, args.userId, args.title, args.message);
     },
 });
 
@@ -192,7 +192,7 @@ export const checkSubscriptions = mutation({
                 .first();
 
             if (!recentNotif) {
-                await createBillingNotification(
+                await createBillingNotificationHelper(
                     ctx,
                     sub.userId,
                     "Subscription Expiring Soon",
