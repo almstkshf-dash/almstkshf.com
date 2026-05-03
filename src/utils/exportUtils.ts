@@ -97,16 +97,16 @@ export async function exportToExcel(
     const sheet = workbook.addWorksheet(translations.sheet_name || 'Coverage Report');
 
     sheet.columns = [
-        { header: translations.date || 'Date', key: 'date', width: 12 },
+        { header: translations.date || 'Publication Date', key: 'date', width: 12 },
         { header: translations.title || 'Title', key: 'title', width: 50 },
         { header: translations.url || 'URL', key: 'url', width: 40 },
-        { header: translations.type || 'Type', key: 'type', width: 15 },
+        { header: translations.type || 'Source Type', key: 'type', width: 15 },
         { header: translations.source || 'Source', key: 'source', width: 18 },
-        { header: translations.depth || 'Depth', key: 'depth', width: 10 },
+        { header: translations.depth || 'Coverage Depth', key: 'depth', width: 10 },
         { header: translations.country || 'Country', key: 'country', width: 10 },
-        { header: translations.sentiment || 'Sentiment', key: 'sentiment', width: 12 },
-        { header: translations.reach || 'Reach', key: 'reach', width: 15 },
-        { header: translations.ave || 'AVE ($)', key: 'ave', width: 15 },
+        { header: translations.sentiment || 'Sentiment Direction', key: 'sentiment', width: 12 },
+        { header: translations.reach || 'Reach / Impressions', key: 'reach', width: 15 },
+        { header: translations.ave || 'AVE (Advertising Value Equivalent)', key: 'ave', width: 15 },
         { header: translations.hashtags || 'Hashtags', key: 'hashtags', width: 30 },
     ];
 
@@ -386,8 +386,8 @@ export async function exportToPDF(
 
     const boxW = (pageWidth - 42) / 3;
     const boxes: { label: string; value: string; color: [number, number, number] }[] = [
-        { label: translations.total_reach || 'TOTAL REACH', value: totalReach.toLocaleString(), color: [31, 78, 120] },
-        { label: translations.ad_value || 'AD VALUE (AVE)', value: `$${totalAVE.toLocaleString()}`, color: [218, 165, 32] },
+        { label: translations.total_reach || 'TOTAL REACH / IMPRESSIONS', value: totalReach.toLocaleString(), color: [31, 78, 120] },
+        { label: translations.ad_value || 'ADVERTISING VALUE EQUIVALENT (AVE)', value: `$${totalAVE.toLocaleString()}`, color: [218, 165, 32] },
         { label: translations.total_articles || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] },
     ];
 
@@ -407,13 +407,13 @@ export async function exportToPDF(
 
     doc.setFontSize(12);
     doc.setTextColor(...BRAND_DARK);
-    addText(translations.sentiment_title || 'Sentiment Distribution', 14, y);
+    addText(translations.sentiment_title || 'Sentiment Direction Distribution', 14, y);
     y += 8;
 
     const sentimentData = [
-        { label: translations.sentiment_pos || 'Positive', count: pos, pct: articles.length ? Math.round(pos / articles.length * 100) : 0, color: [16, 185, 129] as [number, number, number] },
-        { label: translations.sentiment_neu || 'Neutral', count: neu, pct: articles.length ? Math.round(neu / articles.length * 100) : 0, color: [59, 130, 246] as [number, number, number] },
-        { label: translations.sentiment_neg || 'Negative', count: neg, pct: articles.length ? Math.round(neg / articles.length * 100) : 0, color: [244, 63, 94] as [number, number, number] },
+        { label: translations.sentiment_pos || 'Positive Direction', count: pos, pct: articles.length ? Math.round(pos / articles.length * 100) : 0, color: [16, 185, 129] as [number, number, number] },
+        { label: translations.sentiment_neu || 'Neutral Direction', count: neu, pct: articles.length ? Math.round(neu / articles.length * 100) : 0, color: [59, 130, 246] as [number, number, number] },
+        { label: translations.sentiment_neg || 'Negative Direction', count: neg, pct: articles.length ? Math.round(neg / articles.length * 100) : 0, color: [244, 63, 94] as [number, number, number] },
     ];
 
     sentimentData.forEach((s) => {
@@ -432,7 +432,7 @@ export async function exportToPDF(
     y += 10;
     doc.setFontSize(12);
     doc.setTextColor(...BRAND_DARK);
-    addText(translations.ai_recommendation || 'AI Recommendation', 14, y);
+    addText(translations.ai_recommendation || 'AI Strategic Recommendation', 14, y);
     y += 8;
 
     doc.setFillColor(255, 250, 235);
@@ -462,7 +462,7 @@ export async function exportToPDF(
 
     doc.setFontSize(14);
     doc.setTextColor(...BRAND_DARK);
-    addText(translations.coverage_log || 'Coverage Log', pageWidth - 14, 28, { align: 'right' });
+    addText(translations.coverage_log || 'Media Coverage Log', pageWidth - 14, 28, { align: 'right' });
 
     const tableData = articles.map(a => {
         const parsedTitle = fixArabicForPDF(a.title);
@@ -480,13 +480,13 @@ export async function exportToPDF(
 
     autoTable(doc, {
         head: [[
-            translations.date || 'Date',
+            translations.date || 'Publication Date',
             translations.title || 'Title',
-            translations.type || 'Type',
+            translations.type || 'Source Type',
             translations.country || 'Country',
-            translations.sentiment || 'Sentiment',
-            translations.reach || 'Reach',
-            translations.ave || 'AVE'
+            translations.sentiment || 'Sentiment Direction',
+            translations.reach || 'Reach / Impressions',
+            translations.ave || 'AVE (Advertising Value Equivalent)'
         ]],
         body: tableData,
         startY: 33,

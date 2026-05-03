@@ -211,15 +211,15 @@ export default function DarkWebTab() {
       const exportTranslations: ReportTranslations = {
         DarkWeb: { 
           tab_label: t('tab_label'),
-          col_risk: t('col_risk') 
+          col_risk: t('col_risk'),   // مستوى الخطورة
         },
         Reports: {
-          col_date: tCommon('date') || 'Date',
-          col_title: t('col_title') || 'Title',
-          col_source: t('col_source') || 'Source',
-          col_url: t('col_url') || 'URL',
-          col_summary: t('ai_summary') || 'AI Summary',
-          col_tags: t('detected_tags') || 'Signal Tags',
+          col_date: t('col_date') || 'تاريخ النشر',
+          col_title: t('col_title') || 'العنوان',
+          col_source: t('col_source') || 'المصدر',
+          col_url: t('col_url') || 'الرابط',
+          col_summary: t('ai_summary') || 'الملخص التحليلي بالذكاء الاصطناعي',
+          col_tags: t('detected_tags') || 'وسوم الإشارة المكتشفة',
         },
       };
       await ReportGenerator.exportDarkWebReport(results, exportTranslations, format);

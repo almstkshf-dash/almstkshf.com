@@ -261,25 +261,24 @@ export default function DashboardPage() {
 
     // ── Coverage log filter bar (reused in both standard & deep) ─────────────
     const coverageFilterBar = (
-        <div className="p-6 md:p-8 border-b border-border/50 bg-muted/20 backdrop-blur-sm space-y-6">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <p className="text-sm text-foreground/70 font-medium flex items-center gap-2">
-                        <span className="text-blue-800 dark:text-blue-300 font-black">{totalArticles}</span>
-                        {t('total_articles_detected')}
-                    </p>
-                </div>
+        <div className="px-5 py-4 border-b border-border/40 bg-muted/10 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                {/* Article count */}
+                <p className="text-xs text-foreground/60 font-medium flex items-center gap-1.5">
+                    <span className="text-foreground font-black tabular-nums">{totalArticles}</span>
+                    {t('total_articles_detected')}
+                </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     {/* Country filter */}
-                    <div className="relative group">
-                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="relative">
+                        <Globe className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                         <select
                             id="dashboard-country-select"
                             aria-label={t('filters.country') || 'Select Country'}
                             value={selectedCountry}
                             onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
-                            className="w-full sm:w-[220px] appearance-none bg-background/50 border border-border/50 rounded-2xl pl-11 pr-10 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer hover:bg-background"
+                            className="w-full sm:w-[200px] appearance-none bg-background border border-border/60 rounded-xl ltr:pl-9 rtl:pr-9 ltr:pr-8 rtl:pl-8 py-2.5 text-[11px] font-bold uppercase tracking-wide focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer"
                         >
                             <option value="All">{t('filters.all_countries')}</option>
                             {ALL_COUNTRIES.map((c) => (
@@ -288,40 +287,38 @@ export default function DashboardPage() {
                                 </option>
                             ))}
                         </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                            <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="absolute ltr:right-3 rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
                     </div>
 
                     {/* Search */}
-                    <div className="relative w-full sm:w-80 group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-primary/10 rounded-lg text-primary opacity-60 group-hover:opacity-100 transition-opacity">
-                            <Search className="w-3.5 h-3.5" />
-                        </div>
+                    <div className="relative w-full sm:w-72">
+                        <Search className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                         <input
                             type="text"
                             placeholder={t('search_placeholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-background/50 border border-border/50 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/10 focus:border-primary/50 outline-none transition-all placeholder:text-foreground/50 text-foreground"
+                            className="w-full bg-background border border-border/60 rounded-xl ltr:pl-9 rtl:pr-9 ltr:pr-4 rtl:pl-4 py-2.5 text-[11px] font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/60 text-foreground"
                         />
                     </div>
                 </div>
             </div>
 
-            {/* Source type chips */}
-            <div className="flex flex-wrap gap-2">
+            {/* Source type filter chips — uniform style */}
+            <div className="flex flex-wrap gap-1.5">
                 {sourceTypes.map((type) => (
                     <button
                         key={type.id}
                         onClick={() => startTransition(() => setSelectedType(type.id))}
                         className={clsx(
-                            'inline-flex items-center h-10 px-5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border',
+                            'inline-flex items-center h-8 px-3.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all',
                             selectedType === type.id
-                                ? 'bg-primary shadow-lg shadow-primary/20 border-primary text-primary-foreground scale-105'
-                                : 'bg-background hover:bg-muted border-border/50 text-foreground/80 dark:text-slate-200 hover:text-foreground hover:border-border'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'bg-background border border-border/60 text-foreground/70 hover:text-foreground hover:border-border'
                         )}
                     >
                         {type.label}
@@ -374,78 +371,78 @@ export default function DashboardPage() {
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
-        <div className="p-4 md:p-6 lg:p-8 relative z-10 flex flex-col gap-8">
+        <div className="p-4 md:p-5 lg:p-6 relative z-10 flex flex-col gap-6">
 
             {/* ── SLIM HEADER ──────────────────────────────────────────────── */}
-            <header className="glass-card p-5 md:p-6 rounded-[2rem] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl border-primary/10 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
-
-                {/* Title + status */}
+            <header className="glass-card p-4 md:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-border/50 relative overflow-hidden">
+                {/* Title + live status */}
                 <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner shrink-0">
-                        <Activity className="w-5 h-5 text-primary animate-pulse" />
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                        <Activity className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70">
+                        <h1 className="text-lg md:text-xl font-black tracking-tight text-foreground">
                             {t('title')}
                         </h1>
-                        <p className="text-muted-foreground text-xs font-medium flex items-center gap-2 mt-0.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        <p className="text-muted-foreground text-[11px] font-medium flex items-center gap-1.5 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
                             {t('subtitle')}
                         </p>
                     </div>
                 </div>
 
-                {/* Actions */}
+                {/* Actions — unified color system */}
                 <div className="flex items-center gap-2 flex-wrap relative z-10">
+
+                    {/* Manual entry */}
+                    <button
+                        onClick={() => setManualModalOpen(true)}
+                        className="h-9 px-3 flex items-center gap-1.5 rounded-xl bg-muted/60 hover:bg-muted text-foreground text-[11px] font-bold uppercase tracking-widest transition-all border border-border/60"
+                    >
+                        <Plus className="w-3.5 h-3.5" />
+                        {t('manual_entry')}
+                    </button>
+
+                    {/* Export — only for article views, unified primary color */}
+                    {(activeView === 'standard' || activeView === 'deep') && (
+                        <div className="flex items-center gap-1 p-1 bg-muted/40 rounded-xl border border-border/50">
+                            <button
+                                onClick={() => handleExport('pdf')}
+                                disabled={isExporting || filteredArticles.length === 0}
+                                className="h-8 px-3 flex items-center gap-1.5 rounded-lg hover:bg-primary/10 text-foreground/80 hover:text-primary text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40"
+                            >
+                                {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileDown className="w-3 h-3" />}
+                                {t('pdf_label')}
+                            </button>
+                            <div className="w-px h-5 bg-border/60" />
+                            <button
+                                onClick={() => handleExport('excel')}
+                                disabled={isExporting || filteredArticles.length === 0}
+                                className="h-8 px-3 flex items-center gap-1.5 rounded-lg hover:bg-primary/10 text-foreground/80 hover:text-primary text-[11px] font-bold uppercase tracking-widest transition-all disabled:opacity-40"
+                            >
+                                {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileSpreadsheet className="w-3 h-3" />}
+                                {t('excel_label')}
+                            </button>
+                        </div>
+                    )}
+
                     {/* Settings */}
                     <HoverPrefetchLink href="/dashboard/settings">
                         <button
-                            className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-primary transition-all border border-border/50"
+                            className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all border border-border/50"
                             title={t('settings')}
                         >
                             <Settings className="w-4 h-4" />
                         </button>
                     </HoverPrefetchLink>
 
-                    {/* Manual entry */}
-                    <button
-                        onClick={() => setManualModalOpen(true)}
-                        className="h-10 px-4 flex items-center gap-2 rounded-xl bg-muted/40 hover:bg-muted text-foreground text-xs font-black uppercase tracking-widest transition-all border border-border/50"
-                    >
-                        <Plus className="w-4 h-4 text-primary" />
-                        {t('manual_entry')}
-                    </button>
-
-                    {/* Export — only for article views */}
-                    {(activeView === 'standard' || activeView === 'deep') && (
-                        <div className="flex items-center p-1 bg-primary/10 rounded-2xl border border-primary/20">
-                            <button
-                                onClick={() => handleExport('pdf')}
-                                disabled={isExporting || filteredArticles.length === 0}
-                                className="h-9 px-4 flex items-center gap-2 rounded-xl hover:bg-primary/20 text-primary dark:text-blue-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                            >
-                                {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
-                                {t('pdf_label')}
-                            </button>
-                            <button
-                                onClick={() => handleExport('excel')}
-                                disabled={isExporting || filteredArticles.length === 0}
-                                className="h-9 px-4 flex items-center gap-2 rounded-xl hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
-                            >
-                                {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileSpreadsheet className="w-3.5 h-3.5" />}
-                                {t('excel_label')}
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Clear all */}
+                    {/* Clear all — danger, always rightmost */}
                     {totalArticles > 0 && (
                         <button
                             onClick={() => setIsClearDialogOpen(true)}
-                            className="h-10 px-4 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-rose-600 dark:text-rose-400 border border-destructive/20 text-xs font-black uppercase tracking-[0.15em] transition-all flex items-center gap-2 group/del"
+                            className="h-9 px-3 rounded-xl bg-destructive/8 hover:bg-destructive/15 text-destructive border border-destructive/20 text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5"
                         >
-                            <Trash2 className="w-3.5 h-3.5 group-hover/del:rotate-12 transition-transform" />
+                            <Trash2 className="w-3 h-3" />
                             {t('clear_all')}
                         </button>
                     )}

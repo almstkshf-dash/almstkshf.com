@@ -70,7 +70,7 @@ export default function PressReleasePanel() {
 
     const handleSync = async () => {
         if (!isAuthenticated) { setError(t('not_authenticated')); return; }
-        if (!isAdmin) { setError('This action requires admin privileges.'); return; }
+        if (!isAdmin) { setError(t('admin_only')); return; }
         setLoading(true);
         setError('');
         setSyncResult(null);
@@ -187,7 +187,7 @@ export default function PressReleasePanel() {
                     {!isAdmin && isAuthenticated && (
                         <span className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-2.5 py-1.5 rounded-lg">
                             <Lock className="w-3 h-3" aria-hidden="true" />
-                            Admin only
+                            {t('admin_only_badge')}
                         </span>
                     )}
                     <Button
@@ -196,7 +196,7 @@ export default function PressReleasePanel() {
                         disabled={loading || !isAuthenticated || !isAdmin}
                         isLoading={loading}
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
-                        title={!isAdmin ? 'This feature requires admin privileges' : undefined}
+                        title={!isAdmin ? t('admin_only') : undefined}
                     >
                         {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />{t('sync_now')}</>}
                     </Button>
@@ -235,14 +235,14 @@ export default function PressReleasePanel() {
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                             <span>{syncResult.message}</span>
                             {syncResult.totalErrors > 0 && (
-                                <span className="ml-auto text-xs opacity-70">{syncResult.totalErrors} feed(s) failed</span>
+                                <span className="ml-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
                             )}
                         </div>
 
                         {syncResult.totalSaved === 0 && keyword.trim() && (
                             <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
                                 <span className="text-lg">🔎</span>
-                                <span>No articles matched <strong>&quot;{keyword}&quot;</strong> across all 9 feeds. Try a shorter or broader keyword.</span>
+                                <span>{t('no_keyword_match', { keyword })}</span>
                             </div>
                         )}
                         {/* Per-feed breakdown */}

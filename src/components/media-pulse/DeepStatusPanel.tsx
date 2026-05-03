@@ -261,7 +261,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                             className="flex flex-wrap items-center justify-between bg-muted/40 border border-border rounded-lg px-3 py-2 text-sm gap-2"
                         >
                             <span className="font-semibold text-xs text-foreground/80" suppressHydrationWarning>
-                                {new Date(run.startedAt).toLocaleString()}
+                                {new Date(run._creationTime).toLocaleString()}
                             </span>
                             <span
                                 className={`text-xs font-bold px-2 py-1 rounded-full uppercase tracking-widest ${run.status === 'success'
@@ -303,7 +303,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                     item={{
                         id: runToSave._id,
                         type: "deep_web",
-                        title: `Deep Web Run: ${new Date(runToSave.startedAt).toLocaleString()}`,
+                        title: `${t('export_deep_title')} — ${new Date(runToSave._creationTime).toLocaleString()}`,
                         data: runToSave
                     }}
                 />

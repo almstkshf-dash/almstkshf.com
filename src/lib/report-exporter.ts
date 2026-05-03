@@ -36,11 +36,11 @@ export const exportToPdf = (articles: ArticleData[], namespace: string = 'Press'
 
   // Define Table Columns
   const tableColumn = [
-    'Date',
+    'Publication Date',
     'Source',
-    'Type',
-    'Sentiment',
-    'Reach',
+    'Source Type',
+    'Sentiment Direction',
+    'Reach / Impressions',
     'Title'
   ];
 

@@ -380,7 +380,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                     <div className="space-y-4">
                         <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
                             <p className="text-sm leading-relaxed italic text-foreground/70">
-                                "The current trajectory shows a significant uptick in narrative velocity around regional security. Positive sentiment is stabilizing, but neutral reports are increasing in volume..."
+                                &ldquo;{t('ai_placeholder')}&rdquo;
                             </p>
                         </div>
                         <div className="flex items-center gap-3">

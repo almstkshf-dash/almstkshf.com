@@ -69,21 +69,29 @@ export default function TerroristListTab() {
   const handleExport = async (format: 'pdf' | 'excel') => {
     if (!entries || entries.length === 0) return;
     try {
-      // Create a simplified translations object for ReportGenerator
+      // Build export translations using correct media monitoring terminology
       const exportTranslations: ReportTranslations = {
         TerroristList: {
-          title: t('title'),
+          title: t('title'),           // تقرير فحص قوائم العقوبات
           fields: {
-            name_arabic: t('fields.name_arabic'),
-            name_latin: t('fields.name_latin'),
-            nationality: t('fields.nationality'),
-            doc_number: t('fields.doc_number'),
-            category: t('fields.category'),
-            reasons: t('fields.reasons')
+            name_arabic: t('fields.name_arabic'),       // الاسم بالعربي
+            name_latin: t('fields.name_latin'),         // الاسم بالأحرف اللاتينية
+            nationality: t('fields.nationality'),       // الجنسية
+            doc_number: t('fields.doc_number'),         // رقم الوثيقة
+            category: t('fields.category'),             // التصنيف
+            reasons: t('fields.reasons'),               // أسباب الإدراج
+            dob: t('fields.dob'),                       // تاريخ الميلاد
+            pob: t('fields.pob'),                       // مكان الميلاد
+            address: t('fields.address'),               // عنوان الإقامة
+            issuing_authority: t('fields.issuing_authority'), // جهة الإصدار
+            issue_date: t('fields.issue_date'),         // تاريخ القرار
+            expiry_date: t('fields.expiry_date'),       // تاريخ انتهاء السريان
+            other_info: t('fields.other_info'),         // بيانات إضافية
           }
         },
         Reports: {
-          generated_at: tCommon('status') // Or a more appropriate key if available
+          generated_at: 'تاريخ الإصدار',  // Issue Date
+          pr_title: t('title'),
         }
       };
 

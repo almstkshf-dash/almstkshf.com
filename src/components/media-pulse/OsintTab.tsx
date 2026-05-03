@@ -766,7 +766,7 @@ export default function OsintTab() {
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-              <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">{tCommon('status')}</span>
+              <span className="text-[10px] font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">{t('live_badge')}</span>
             </div>
           </div>
 
