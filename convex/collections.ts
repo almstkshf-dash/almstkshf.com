@@ -116,7 +116,7 @@ export const addToCollection = mutation({
 
         // Avoid exact duplicates
         if (collection.items.find(i => i.id === args.item.id)) {
-            return collection._id;
+            return { collectionId: collection._id, isDuplicate: true };
         }
 
         const updatedItems = [...collection.items, { ...args.item, addedAt: Date.now() }];
@@ -126,7 +126,7 @@ export const addToCollection = mutation({
             updatedAt: Date.now()
         });
 
-        return collection._id;
+        return { collectionId: collection._id, isDuplicate: false };
     }
 });
 

@@ -277,7 +277,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                     {/* Sentiment Donut */}
                     <div className="bg-card border border-border/50 rounded-3xl p-6 relative group overflow-hidden">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("sentiment_distribution")}</h3>
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/80">{t("sentiment_distribution")}</h3>
                             <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                                 <TrendingUp className="w-3 h-3" />
                                 +2.4%
@@ -289,15 +289,15 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/40">
                             <div className="text-center">
                                 <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{sentimentData.positive}%</div>
-                                <div className="text-[10px] text-foreground/50 uppercase">{t("ToneLabels.positive")}</div>
+                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.positive")}</div>
                             </div>
                             <div className="text-center border-x border-border/40">
                                 <div className="text-xs font-bold text-amber-500">{sentimentData.neutral}%</div>
-                                <div className="text-[10px] text-foreground/50 uppercase">{t("ToneLabels.neutral")}</div>
+                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.neutral")}</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-xs font-bold text-rose-500">{sentimentData.negative}%</div>
-                                <div className="text-[10px] text-foreground/50 uppercase">{t("ToneLabels.negative")}</div>
+                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.negative")}</div>
                             </div>
                         </div>
                     </div>
@@ -315,8 +315,8 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                     <div className="bg-card border border-border/50 rounded-3xl p-6">
                         <div className="flex items-center justify-between mb-8">
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("article_volume_trend")}</h3>
-                                <p className="text-[10px] text-foreground/40 mt-0.5">{t("trend_subtitle")}</p>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/80">{t("article_volume_trend")}</h3>
+                                <p className="text-[10px] text-foreground/60 mt-0.5">{t("trend_subtitle")}</p>
                             </div>
                             <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-lg">
                                 <div className="px-3 py-1 rounded bg-card shadow-sm text-[10px] font-bold border border-border/40">7D</div>

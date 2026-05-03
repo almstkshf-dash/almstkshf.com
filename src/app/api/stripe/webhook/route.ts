@@ -170,11 +170,10 @@ export async function POST(request: NextRequest) {
                 }
 
                 if (userId) {
-                    await convex.mutation(api.monitoring.createNotification, {
+                    await convex.mutation(api.payments.createBillingNotification, {
                         userId: userId as string,
                         title: "Payment Failed",
                         message: `Payment failed for your subscription. Please update your billing info to avoid service interruption.`,
-                        type: "billing"
                     });
                 }
 

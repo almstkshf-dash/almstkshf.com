@@ -135,7 +135,10 @@
     "dismiss": "Dismiss",
     "osint_ready": "OSINT Result Ready",
     "press_release_found": "New Press Release Found",
-    "critical_mention": "Alert: Critical Mention"
+    "critical_mention": "Alert: Critical Mention",
+    "Subscription Activated": "Subscription Activated",
+    "Subscription Expiring Soon": "Subscription Expiring Soon",
+    "Payment Failed": "Payment Failed"
   },
   "Common": {
     "confirm": "Confirm",

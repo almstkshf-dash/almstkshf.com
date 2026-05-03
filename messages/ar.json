@@ -52,7 +52,10 @@
     "dismiss": "تجاهل",
     "osint_ready": "نتيجة OSINT جاهزة",
     "press_release_found": "تم العثور على بيان صحفي جديد",
-    "critical_mention": "تنبيه: ذكر حرج"
+    "critical_mention": "تنبيه: ذكر حرج",
+    "Subscription Activated": "تم تفعيل الاشتراك",
+    "Subscription Expiring Soon": "ستنتهي اشتراكك قريباً",
+    "Payment Failed": "فشل الدفع"
   },
   "Common": {
     "confirm": "تأكيد",

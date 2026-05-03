@@ -57,14 +57,14 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
                             dataKey="date" 
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
                             interval="preserveStartEnd"
                             minTickGap={20}
                         />
                         <YAxis 
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
                         />
                         <Tooltip
                             contentStyle={{
@@ -76,7 +76,8 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
                                 color: "var(--popover-foreground)",
                                 boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
                             }}
-                            itemStyle={{ color: "var(--primary)" }}
+                            labelStyle={{ color: "var(--popover-foreground)", fontWeight: 700 }}
+                            itemStyle={{ color: "var(--popover-foreground)", fontWeight: 600 }}
                         />
                         <CartesianGrid 
                             strokeDasharray="3 3" 

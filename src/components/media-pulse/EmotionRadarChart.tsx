@@ -55,10 +55,11 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
                         role="img"
                         aria-label="Emotional intensity radar chart"
                     >
-                        <PolarGrid stroke="currentColor" className="text-border" strokeOpacity={0.5} />
+                        <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
                         <PolarAngleAxis 
                             dataKey="subject" 
-                            tick={{ fill: "#475569", fontSize: 10, fontWeight: 500 }}
+                            tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
+                            tickLine={false}
                         />
                         <Radar
                             name="Emotion"

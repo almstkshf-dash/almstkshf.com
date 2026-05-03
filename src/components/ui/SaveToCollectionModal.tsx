@@ -37,7 +37,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     const [isCreating, setIsCreating] = useState(false);
     const [newCollectionName, setNewCollectionName] = useState("");
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
+    const [status, setStatus] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
     // Keyboard: close on Escape
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -45,7 +45,14 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     }, [onClose, loading]);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            setIsCreating(false);
+            setNewCollectionName("");
+            setLoading(false);
+            setStatus(null);
+            return;
+        }
+        setStatus(null);
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, handleKeyDown]);
@@ -54,15 +61,21 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
 
     const handleSave = async (collectionId: string) => {
         setLoading(true);
+        setStatus(null);
         try {
-            await addToCollection({ collectionId: collectionId as Id<"collections">, item });
-            setSuccess(true);
-            setTimeout(() => {
-                setSuccess(false);
-                onClose();
-            }, 1000);
+            const result = await addToCollection({ collectionId: collectionId as Id<"collections">, item });
+            if (result.isDuplicate) {
+                setStatus({ type: 'info', text: 'This item is already in the selected collection.' });
+            } else {
+                setStatus({ type: 'success', text: 'Saved successfully!' });
+                setTimeout(() => {
+                    setStatus(null);
+                    onClose();
+                }, 1000);
+            }
         } catch (e) {
             console.error(e);
+            setStatus({ type: 'error', text: 'Unable to save item. Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -71,18 +84,24 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
     const handleCreateAndSave = async () => {
         if (!newCollectionName.trim()) return;
         setLoading(true);
+        setStatus(null);
         try {
             const newId = await createCollection({ name: newCollectionName.trim() });
-            await addToCollection({ collectionId: newId, item });
-            setSuccess(true);
-            setTimeout(() => {
-                setSuccess(false);
-                setIsCreating(false);
-                setNewCollectionName("");
-                onClose();
-            }, 1000);
+            const result = await addToCollection({ collectionId: newId, item });
+            if (result.isDuplicate) {
+                setStatus({ type: 'info', text: 'This item is already in the created collection.' });
+            } else {
+                setStatus({ type: 'success', text: 'Created collection and saved successfully!' });
+                setTimeout(() => {
+                    setStatus(null);
+                    setIsCreating(false);
+                    setNewCollectionName("");
+                    onClose();
+                }, 1000);
+            }
         } catch (e) {
             console.error(e);
+            setStatus({ type: 'error', text: 'Unable to create collection. Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -119,15 +138,27 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                 </div>
 
                 <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-                    {success ? (
+                    {status?.type === 'success' ? (
                         <div className="flex flex-col items-center justify-center py-8 space-y-4">
                             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
                                 <Check className="w-8 h-8" />
                             </div>
-                            <p className="font-bold text-lg text-emerald-600 dark:text-emerald-400">Saved Successfully!</p>
+                            <p className="font-bold text-lg text-emerald-600 dark:text-emerald-400">{status.text}</p>
                         </div>
                     ) : (
                         <>
+                            {status && status.type !== 'success' && (
+                                <div
+                                    role="alert"
+                                    className={`rounded-3xl border px-4 py-3 text-sm ${
+                                        status.type === 'error'
+                                            ? 'bg-rose-500/10 border-rose-200 text-rose-700'
+                                            : 'bg-amber-500/10 border-amber-200 text-amber-700'
+                                    }`}
+                                >
+                                    {status.text}
+                                </div>
+                            )}
                             {isCreating ? (
                                 <div className="space-y-4 animate-in slide-in-from-right-4">
                                     <div className="space-y-2">

@@ -154,6 +154,11 @@ export const createNotification = mutation({
         type: v.union(v.literal("alert"), v.literal("system"), v.literal("billing")),
     },
     handler: async (ctx, args) => {
+        const ident = await ctx.auth.getUserIdentity();
+        if (!ident || ident.subject !== args.userId) {
+            throw new Error("Unauthorized to create a notification for this user.");
+        }
+
         await ctx.db.insert("notifications", {
             ...args,
             isRead: false,

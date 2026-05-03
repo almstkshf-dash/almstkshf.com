@@ -100,6 +100,8 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
                                 fontSize: "12px",
                                 color: colors.popoverFg,
                             }}
+                            labelStyle={{ color: colors.popoverFg, fontWeight: 700 }}
+                            itemStyle={{ color: colors.popoverFg, fontWeight: 600 }}
                         />
                     </PieChart>
                 </ResponsiveContainer>

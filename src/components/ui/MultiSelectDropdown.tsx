@@ -106,7 +106,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         selected.map((selected_id) => (
                             <span
                                 key={selected_id}
-                                className="inline-flex items-center gap-1 bg-primary/10 text-blue-800 dark:text-blue-300 border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                                className="inline-flex items-center gap-1 bg-primary/15 text-primary-foreground border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
                                 {finalRenderTag(selected_id)}
                                 <button
@@ -178,7 +178,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                         className={clsx(
                                             "w-full flex justify-start items-center gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors focus:bg-muted focus:outline-none",
                                             selected.includes(item.id)
-                                                ? 'bg-primary/10 text-blue-800 dark:text-blue-300 font-semibold'
+                                                ? 'bg-primary/10 text-primary-foreground font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
                                         )}
                                     >
