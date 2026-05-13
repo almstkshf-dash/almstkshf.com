@@ -20,6 +20,34 @@ interface ArticleData {
   description?: string;
 }
 
+interface PressReleaseOnlineNewsReport {
+  No: number;
+  URL: string;
+  "Published Date": string;
+  Title: string;
+  Content: string;
+  Language: string;
+  Sentiment: string;
+  "Source Type": string;
+  "Source Country": string;
+  Reach: number;
+  AVE: number;
+}
+
+interface PressReleaseSocialMediaReport {
+  No: number;
+  URL: string;
+  "Published Date": string;
+  Title: string;
+  Content: string;
+  Language: string;
+  Sentiment: string;
+  source_type: string;
+  "Source.country": string;
+  Reach: number;
+  AVE: number;
+}
+
 export const exportToPdf = (articles: ArticleData[], namespace: string = 'Press') => {
   const doc = new jsPDF();
   const timestamp = new Date().toLocaleString();
@@ -86,5 +114,83 @@ export const exportToPdf = (articles: ArticleData[], namespace: string = 'Press'
 
   // Save the PDF
   const filename = `ALMSTKSHF_${namespace}_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(filename);
+};
+
+export const exportPressReleaseOnlineNewsReportToPdf = (reports: PressReleaseOnlineNewsReport[]) => {
+  const doc = new jsPDF({ orientation: reports.length > 10 ? 'landscape' : 'portrait' });
+  const timestamp = new Date().toLocaleString();
+
+  // Cover Page
+  doc.setFillColor(41, 128, 185);
+  doc.rect(0, 0, doc.internal.pageSize.width, 70, 'F');
+  doc.setFontSize(24);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Press Release Online News Report', doc.internal.pageSize.width / 2, 30, { align: 'center' });
+  doc.setFontSize(12);
+  doc.text(`Generated on: ${timestamp}`, doc.internal.pageSize.width / 2, 45, { align: 'center' });
+  doc.text(`Total Reports: ${reports.length}`, doc.internal.pageSize.width / 2, 55, { align: 'center' });
+
+  doc.addPage();
+
+  // Table
+  const tableColumn = ['No', 'URL', 'Published Date', 'Title', 'Content', 'Language', 'Sentiment', 'Source Type', 'Source Country', 'Reach', 'AVE'];
+  const tableRows = reports.map(r => [r.No, r.URL, r['Published Date'], r.Title, r.Content, r.Language, r.Sentiment, r['Source Type'], r['Source Country'], r.Reach, r.AVE]);
+
+  autoTable(doc, {
+    startY: 20,
+    head: [tableColumn],
+    body: tableRows,
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    didDrawPage: (data) => {
+      const str = 'Page ' + doc.getNumberOfPages();
+      doc.setFontSize(10);
+      const pageHeight = doc.internal.pageSize.height;
+      doc.text(str, data.settings.margin.left, pageHeight - 10);
+    }
+  });
+
+  const filename = `Press_Release_Online_News_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(filename);
+};
+
+export const exportPressReleaseSocialMediaReportToPdf = (reports: PressReleaseSocialMediaReport[]) => {
+  const doc = new jsPDF({ orientation: reports.length > 10 ? 'landscape' : 'portrait' });
+  const timestamp = new Date().toLocaleString();
+
+  // Cover Page
+  doc.setFillColor(41, 128, 185);
+  doc.rect(0, 0, doc.internal.pageSize.width, 70, 'F');
+  doc.setFontSize(24);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Press Release Social Media Report', doc.internal.pageSize.width / 2, 30, { align: 'center' });
+  doc.setFontSize(12);
+  doc.text(`Generated on: ${timestamp}`, doc.internal.pageSize.width / 2, 45, { align: 'center' });
+  doc.text(`Total Reports: ${reports.length}`, doc.internal.pageSize.width / 2, 55, { align: 'center' });
+
+  doc.addPage();
+
+  // Table
+  const tableColumn = ['No', 'URL', 'Published Date', 'Title', 'Content', 'Language', 'Sentiment', 'source_type', 'Source.country', 'Reach', 'AVE'];
+  const tableRows = reports.map(r => [r.No, r.URL, r['Published Date'], r.Title, r.Content, r.Language, r.Sentiment, r.source_type, r['Source.country'], r.Reach, r.AVE]);
+
+  autoTable(doc, {
+    startY: 20,
+    head: [tableColumn],
+    body: tableRows,
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [41, 128, 185], textColor: [255, 255, 255] },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    didDrawPage: (data) => {
+      const str = 'Page ' + doc.getNumberOfPages();
+      doc.setFontSize(10);
+      const pageHeight = doc.internal.pageSize.height;
+      doc.text(str, data.settings.margin.left, pageHeight - 10);
+    }
+  });
+
+  const filename = `Press_Release_Social_Media_Report_${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
 };

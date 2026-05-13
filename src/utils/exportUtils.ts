@@ -282,7 +282,10 @@ export async function exportToPDF(
         (autoTableMod as { default?: AutoTableFn }).default ??
         (autoTableMod as unknown as AutoTableFn);
 
-    const doc = new JsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
+    const totalContentLength = articles.reduce((sum, a) => sum + (a.content?.length || 0) + (a.title?.length || 0), 0);
+    const useLandscape = articles.length > 20 || totalContentLength > 10000; // Adjust thresholds as needed
+
+    const doc = new JsPDF({ orientation: useLandscape ? 'l' : 'p', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
