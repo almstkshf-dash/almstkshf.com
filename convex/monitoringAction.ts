@@ -1056,6 +1056,68 @@ const PR_WIRE_FEEDS: Array<{
         { name: "AETOSWire (AR)", url: "https://aetoswire.com/rss?lang=ar", country: "AE", lang: "ar" },
     ];
 
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// HISTORICAL SEARCH â€" NewsAPI.org for archives beyond RSS feed retention
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/**
+ * Fetches historical news articles from NewsAPI.org when RSS feeds don't have enough historical data.
+ * This is used when the user provides a keyword and date range.
+ * 
+ * @param ctx Action context to resolve API keys
+ * @param keyword Search keyword
+ * @param dateFrom ISO date string (e.g. "2025-01-01")
+ * @param dateTo ISO date string (e.g. "2025-12-31")
+ * @param limit Max articles per API call
+ * @returns Array of normalized article objects
+ */
+async function fetchHistoricalArticles(
+    ctx: any,
+    keyword: string,
+    dateFrom: string | null,
+    dateTo: string | null,
+    limit: number = 30
+): Promise<Array<{ link: string; title: string; contentSnippet: string; pubDate: string; source: string }>> {
+    // Try to resolve NewsAPI key
+    const newsApiKey = await resolveApiKey(ctx, "NEWSAPI_KEY", "newsapi");
+    if (!newsApiKey) {
+        console.warn("[Historical Search] No NewsAPI key configured, skipping historical search");
+        return [];
+    }
+
+    try {
+        // Build query with keyword and date range
+        const query = encodeURIComponent(keyword);
+        let url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&pageSize=${Math.min(limit, 100)}&apiKey=${newsApiKey}`;
+        
+        if (dateFrom) url += `&from=${dateFrom}`;
+        if (dateTo) url += `&to=${dateTo}`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.warn(`[Historical Search] NewsAPI returned ${response.status}: ${response.statusText}`);
+            return [];
+        }
+
+        const data = await response.json();
+        if (!data.articles || !Array.isArray(data.articles)) {
+            console.warn("[Historical Search] No articles returned from NewsAPI");
+            return [];
+        }
+
+        // Normalize to match RSS parser format
+        return data.articles.map((article: any) => ({
+            link: article.url,
+            title: article.title,
+            contentSnippet: article.description || article.content || article.title,
+            pubDate: article.publishedAt,
+            source: article.source?.name || "NewsAPI"
+        }));
+    } catch (error) {
+        console.warn("[Historical Search] Error fetching from NewsAPI:", error);
+        return [];
+    }
+}
+
 export const fetchPressReleaseSources = action({
     args: {
         keyword: v.optional(v.string()),
@@ -1181,6 +1243,99 @@ export const fetchPressReleaseSources = action({
                 }
             })
         );
+
+        // â"€â"€ HISTORICAL SEARCH (NewsAPI) â€" When keyword+dates provided â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+        // If user provided keyword AND date range, also fetch from historical archives via NewsAPI
+        if (fetchedKeyword && args.dateFrom && args.dateTo) {
+            try {
+                const historicalArticles = await fetchHistoricalArticles(
+                    ctx,
+                    fetchedKeyword,
+                    args.dateFrom,
+                    args.dateTo,
+                    itemLimit
+                );
+
+                if (historicalArticles.length > 0) {
+                    let historicalSaved = 0;
+                    for (const article of historicalArticles) {
+                        if (!article.link || !article.title) continue;
+
+                        try {
+                            // Deduplication: skip if already seen
+                            const isSeen = await checkAndSetSeen(article.link, article.title);
+                            if (isSeen) continue;
+
+                            const pubDate = new Date(article.pubDate);
+                            const dd = pubDate.getDate().toString().padStart(2, "0");
+                            const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
+                            const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
+
+                            const snippet = article.contentSnippet || article.title;
+                            const isArabic = /[\u0600-\u06FF]/.test(article.title + snippet);
+
+                            // Simple sentiment detection
+                            let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
+                            const lowerSnippet = snippet.toLowerCase();
+                            if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
+                                sentiment = "Positive";
+                            } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
+                                sentiment = "Negative";
+                            }
+
+                            const reach = 50000;
+                            const ave = Math.round(reach * 0.02 * 5);
+
+                            await ctx.runMutation(api.monitoring.saveArticle, {
+                                keyword,
+                                url: article.link,
+                                publishedDate: formattedDate,
+                                title: article.title,
+                                content: snippet.slice(0, 300),
+                                language: isArabic ? "AR" : "EN",
+                                sentiment,
+                                sourceType: "Press Release",
+                                source: article.source,
+                                sourceCountry: "MENA",
+                                reach,
+                                ave,
+                                depth: "standard",
+                                ingestMethod: "newsapi",
+                                emotions: {
+                                    joy: sentiment === "Positive" ? 60 : 0,
+                                    sadness: sentiment === "Negative" ? 40 : 0,
+                                    anger: sentiment === "Negative" ? 30 : 0,
+                                    fear: sentiment === "Negative" ? 50 : 0,
+                                    surprise: 20,
+                                    trust: sentiment === "Positive" ? 70 : 30
+                                },
+                            });
+
+                            historicalSaved++;
+                            totalSaved++;
+                        } catch (err) {
+                            console.warn("[Historical] Failed to save article:", err);
+                            totalErrors++;
+                        }
+                    }
+
+                    if (historicalSaved > 0) {
+                        feedResults.push({
+                            feed: "NewsAPI Historical Search",
+                            saved: historicalSaved,
+                            total: historicalArticles.length
+                        });
+                    }
+                }
+            } catch (histErr) {
+                console.warn("[Historical Search] Error:", histErr);
+                feedResults.push({
+                    feed: "NewsAPI Historical Search",
+                    error: histErr instanceof Error ? histErr.message : "historical search failed"
+                });
+                totalErrors++;
+            }
+        }
 
         return {
             success: true,

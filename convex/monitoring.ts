@@ -393,3 +393,85 @@ export const getGeographyAggregates = query({
         return countries;
     },
 });
+
+// 9. QUERY: Get Press Release Online News Reports
+export const getPressReleaseOnlineNewsReports = query({
+    args: { keyword: v.optional(v.string()) },
+    handler: async (ctx, args) => {
+        let q = ctx.db.query("media_monitoring_articles")
+            .filter(q => q.eq(q.field("sourceType"), "Press Release"));
+
+        if (args.keyword) {
+            q = q.filter(q => q.eq(q.field("keyword"), args.keyword));
+        }
+
+        const articles = await q.collect();
+
+        const parseDate = (d: string) => {
+            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
+            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
+        };
+
+        // Sort by publishedDate desc
+        articles.sort((a, b) => {
+            const da = parseDate(a.publishedDate);
+            const db = parseDate(b.publishedDate);
+            return db - da;
+        });
+
+        return articles.map((article, index) => ({
+            No: index + 1,
+            URL: article.url,
+            "Published Date": article.publishedDate,
+            Title: article.title,
+            Content: article.content,
+            Language: article.language,
+            Sentiment: article.sentiment,
+            "Source Type": article.sourceType,
+            "Source Country": article.sourceCountry,
+            Reach: article.reach,
+            AVE: article.ave,
+        }));
+    },
+});
+
+// 10. QUERY: Get Press Release Social Media Reports
+export const getPressReleaseSocialMediaReports = query({
+    args: { keyword: v.optional(v.string()) },
+    handler: async (ctx, args) => {
+        let q = ctx.db.query("media_monitoring_articles")
+            .filter(q => q.eq(q.field("sourceType"), "Social Media"));
+
+        if (args.keyword) {
+            q = q.filter(q => q.eq(q.field("keyword"), args.keyword));
+        }
+
+        const articles = await q.collect();
+
+        const parseDate = (d: string) => {
+            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
+            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
+        };
+
+        // Sort by publishedDate desc
+        articles.sort((a, b) => {
+            const da = parseDate(a.publishedDate);
+            const db = parseDate(b.publishedDate);
+            return db - da;
+        });
+
+        return articles.map((article, index) => ({
+            No: index + 1,
+            URL: article.url,
+            "Published Date": article.publishedDate,
+            Title: article.title,
+            Content: article.content,
+            Language: article.language,
+            Sentiment: article.sentiment,
+            source_type: article.sourceType,
+            "Source.country": article.sourceCountry,
+            Reach: article.reach,
+            AVE: article.ave,
+        }));
+    },
+});

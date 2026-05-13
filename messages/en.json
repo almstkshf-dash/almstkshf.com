@@ -1435,7 +1435,9 @@
     "admin_only": "This feature is available to admin users only.",
     "admin_only_badge": "Admins only",
     "failed": "Sync Failed",
-    "cron_hint": "Auto-sync runs every 6 hours."
+    "cron_hint": "Auto-sync runs every 6 hours.",
+    "feeds_failed": "{count} feeds failed to sync",
+    "no_keyword_match": "No PR articles found matching \"{keyword}\" in the last 24 hours."
   },
   "Error": {
     "title": "System Alert: Page Loading Failed",
