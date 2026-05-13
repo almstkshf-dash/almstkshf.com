@@ -88,7 +88,14 @@ export function matchesBooleanFilter(
     if (haystack.includes(term)) return false;
   }
 
-  // 3. At least one member of each OR group must be present
+  // 3. All plain soft terms must also be present.
+  // This makes plain keyword searches behave like an AND query,
+  // matching the API query semantics used by buildApiQuery.
+  for (const term of expr.soft) {
+    if (!haystack.includes(term)) return false;
+  }
+
+  // 4. At least one member of each OR group must be present
   for (const group of expr.orGroups) {
     if (!group.some(term => haystack.includes(term))) {
       return false;

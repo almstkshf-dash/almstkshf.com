@@ -1192,22 +1192,27 @@ export const fetchPressReleaseSources = action({
                             const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
 
                             const snippet = item.contentSnippet || item.content || item.title;
-                            const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
-
-                            let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
-                            const summary = snippet.slice(0, 300);
-                            const reach = 75000;
-                            const emotions = { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
-
-                            // â”€â”€ Cost-Cutting Sentiment Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                            // Simplified regex-based sentiment detection instead of AI API
-                            const lowerSnippet = snippet.toLowerCase();
-                            if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
-                                sentiment = "Positive";
-                            } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
-                                sentiment = "Negative";
+                            const boolExpr = parseBooleanKeyword(fetchedKeyword);
+                            if (fetchedKeyword && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
+                                console.log(`⚡ PR Boolean reject: "${item.title.substring(0, 50)}..." (keyword: ${fetchedKeyword})`);
+                                continue;
                             }
 
+                            const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+
+                            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                            const aiData = await callGeminiForAnalysis(
+                                geminiKey,
+                                item.title,
+                                snippet,
+                                fetchedKeyword || "Press Release",
+                                []
+                            );
+
+                            const sentiment = aiData.sentiment;
+                            const summary = aiData.summary || snippet.slice(0, 300);
+                            const reach = aiData.reach_estimate || 50000;
+                            const emotions = aiData.emotions || { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
                             const ave = Math.round(reach * 0.02 * 5);
 
                             await ctx.runMutation(api.monitoring.saveArticle, {
