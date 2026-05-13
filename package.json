@@ -38,6 +38,7 @@
     "@upstash/redis": "^1.36.2",
     "@upstash/search": "^0.1.7",
     "@vercel/analytics": "^1.6.1",
+    "@vercel/functions": "^3.5.1",
     "@vercel/otel": "^2.1.0",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^6.0.168",
