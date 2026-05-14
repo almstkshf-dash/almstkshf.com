@@ -11,7 +11,6 @@
 import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import SentimentTracker from "@/components/SentimentTracker";
 import { useTranslations } from "next-intl";
 import { useMemo, memo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
@@ -56,14 +55,17 @@ interface DashboardGridProps {
         geography?: Record<string, number>;
         riskFactors?: string[];
     };
+    aiSummary?: string;
+    isAiLoading?: boolean;
     topLeftSlot?: React.ReactNode;
     topRightSlot?: React.ReactNode;
 }
 
-const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: DashboardGridProps) => {
+const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLeftSlot, topRightSlot }: DashboardGridProps) => {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const localeTranslations = useMessages();
     const [isGenerating, setIsGenerating] = useState(false);
+    const [trendRange, setTrendRange] = useState<7 | 30>(7);
     const saveReport = useMutation(api.userActions.saveReport);
 
     const handleDownload = useCallback(async (format: 'pdf' | 'csv' | 'excel') => {
@@ -161,36 +163,40 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
         { subject: 'Surprise', value: analytics?.emotions?.surprise || 0, fullMark: 100 },
     ], [analytics]);
 
+    const parseArticleDate = useCallback((article: MonitoringArticle) => {
+        if (article._creationTime) {
+            const date = new Date(article._creationTime);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+        if (article.publishedDate) {
+            const [dd, mm, yyyy] = article.publishedDate.split("/").map((value) => Number(value));
+            if ([dd, mm, yyyy].some((value) => Number.isNaN(value))) return null;
+            return new Date(yyyy, mm - 1, dd);
+        }
+        return null;
+    }, []);
+
     const trendData = useMemo(() => {
         if (!articles) return [];
-        // Group by date for the last 7 days
-        const last7Days = Array.from({ length: 7 }, (_, i) => {
+        // Group by date for the last X days
+        const lastXDays = Array.from({ length: trendRange }, (_, i) => {
             const d = new Date();
             d.setDate(d.getDate() - i);
             return d.toISOString().split('T')[0];
         }).reverse();
 
-        return last7Days.map(date => ({
-            date: date.split('-').slice(1).join('/'),
-            count: articles.filter(a => a._creationTime && new Date(a._creationTime).toISOString().startsWith(date)).length
+        return lastXDays.map(dateStr => ({
+            date: dateStr.split('-').slice(1).join('/'),
+            count: articles.filter(a => {
+                const date = parseArticleDate(a);
+                if (!date) return false;
+                return date.toISOString().startsWith(dateStr);
+            }).length
         }));
-    }, [articles]);
+    }, [articles, trendRange, parseArticleDate]);
 
     const heatmapData = useMemo(() => {
         const counts: Record<string, number> = {};
-
-        const parseArticleDate = (article: MonitoringArticle) => {
-            if (article._creationTime) {
-                const date = new Date(article._creationTime);
-                return Number.isNaN(date.getTime()) ? null : date;
-            }
-            if (article.publishedDate) {
-                const [dd, mm, yyyy] = article.publishedDate.split("/").map((value) => Number(value));
-                if ([dd, mm, yyyy].some((value) => Number.isNaN(value))) return null;
-                return new Date(yyyy, mm - 1, dd);
-            }
-            return null;
-        };
 
         articles?.forEach((article) => {
             const date = parseArticleDate(article as MonitoringArticle);
@@ -208,17 +214,17 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                 value: counts[`${day}-${hour}`] || 0,
             }))
         ).flat();
-    }, [articles]);
+    }, [articles, parseArticleDate]);
 
     return (
         <div className="space-y-6">
             {/* Header with Slot & Actions */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    {topLeftSlot}
+                    {topLeftSlot || <div className="h-8 w-32 bg-muted/20 animate-pulse rounded-lg" />}
                 </div>
                 <div className="flex items-center gap-2">
-                    {topRightSlot}
+                    {topRightSlot || <div className="h-8 w-24 bg-muted/20 animate-pulse rounded-lg" />}
                     <div className="flex bg-muted/30 p-1 rounded-xl border border-border/50">
                         <Button
                             variant="ghost"
@@ -307,6 +313,30 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                         <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-6">{t("emotional_integrity")}</h3>
                         <EmotionRadarChart data={emotionData} />
                     </div>
+
+                    {/* Geographic Activity */}
+                    {analytics?.geography && Object.keys(analytics.geography).length > 0 && (
+                        <div className="bg-card border border-border/50 rounded-3xl p-6 relative overflow-hidden">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-6">{t("geographic_reach", { defaultValue: "Geographic Reach" })}</h3>
+                            <div className="space-y-4">
+                                {Object.entries(analytics.geography)
+                                    .sort(([, a], [, b]) => b - a)
+                                    .slice(0, 5)
+                                    .map(([country, count]) => (
+                                        <div key={country} className="flex items-center justify-between">
+                                            <span className="text-xs font-bold w-20 truncate">{country}</span>
+                                            <div className="flex-1 mx-4 h-1.5 bg-muted rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-emerald-500"
+                                                    style={{ width: `${Math.min(100, (count / (articles?.length || 1)) * 100)}%` }}
+                                                />
+                                            </div>
+                                            <span className="text-xs font-bold text-foreground/60">{count}</span>
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column: Trends & Activity */}
@@ -319,8 +349,18 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                                 <p className="text-[10px] text-foreground/60 mt-0.5">{t("trend_subtitle")}</p>
                             </div>
                             <div className="flex items-center gap-2 p-1 bg-muted/30 rounded-lg">
-                                <div className="px-3 py-1 rounded bg-card shadow-sm text-[10px] font-bold border border-border/40">7D</div>
-                                <div className="px-3 py-1 text-[10px] font-bold opacity-50 cursor-not-allowed">30D</div>
+                                <button
+                                    onClick={() => setTrendRange(7)}
+                                    className={clsx("px-3 py-1 rounded shadow-sm text-[10px] font-bold border transition-colors", trendRange === 7 ? "bg-card border-border/40 text-foreground" : "border-transparent opacity-50 hover:opacity-100")}
+                                >
+                                    7D
+                                </button>
+                                <button
+                                    onClick={() => setTrendRange(30)}
+                                    className={clsx("px-3 py-1 rounded shadow-sm text-[10px] font-bold border transition-colors", trendRange === 30 ? "bg-card border-border/40 text-foreground" : "border-transparent opacity-50 hover:opacity-100")}
+                                >
+                                    30D
+                                </button>
                             </div>
                         </div>
                         <div className="h-[200px]">
@@ -332,7 +372,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                     <div className="bg-card border border-border/50 rounded-3xl p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("geographic_activity_heat")}</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("volume_activity_heatmap", { defaultValue: "Volume Activity Heatmap" })}</h3>
                                 <p className="text-[10px] text-foreground/40 mt-0.5">{t("activity_heatmap_desc")}</p>
                             </div>
                             <Globe className="w-4 h-4 text-foreground/20" />
@@ -345,9 +385,9 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
             </div>
 
             {/* Bottom Row: Risk Factors & AI Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Risk Breakdown */}
-                <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-6 relative overflow-hidden">
+                <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-6 relative overflow-hidden lg:col-span-1">
                     <div className="flex items-center gap-2 mb-6">
                         <ShieldAlert className="w-5 h-5 text-rose-500" />
                         <h3 className="text-sm font-bold uppercase tracking-widest text-rose-500/80">{t("critical_risk_factors")}</h3>
@@ -383,7 +423,7 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                 </div>
 
                 {/* AI Inspector Placeholder */}
-                <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6">
+                <div className="bg-primary/5 border border-primary/20 rounded-3xl p-6 lg:col-span-2">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
@@ -392,8 +432,8 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
                             <div>
                                 <h3 className="text-sm font-bold uppercase tracking-widest text-primary/80">{t("gemini_osint_pulse")}</h3>
                                 <div className="flex items-center gap-1 text-[10px] text-primary font-bold">
-                                    <div className="w-1 h-1 rounded-full bg-primary animate-ping" />
-                                    {t("live_analysis")}
+                                    <div className={clsx("w-1 h-1 rounded-full bg-primary", isAiLoading ? "animate-ping" : "")} />
+                                    {isAiLoading ? t("live_analysis", { defaultValue: "Live Analysis..." }) : t("analysis_complete", { defaultValue: "Analysis Complete" })}
                                 </div>
                             </div>
                         </div>
@@ -402,9 +442,17 @@ const DashboardGrid = memo(({ articles, analytics, topLeftSlot, topRightSlot }: 
 
                     <div className="space-y-4">
                         <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                            <p className="text-sm leading-relaxed italic text-foreground/70">
-                                &ldquo;{t('ai_placeholder')}&rdquo;
-                            </p>
+                            {isAiLoading ? (
+                                <div className="space-y-2 animate-pulse">
+                                    <div className="h-4 bg-primary/20 rounded w-3/4"></div>
+                                    <div className="h-4 bg-primary/20 rounded w-1/2"></div>
+                                    <div className="h-4 bg-primary/20 rounded w-5/6"></div>
+                                </div>
+                            ) : (
+                                <p className="text-sm leading-relaxed italic text-foreground/70">
+                                    {aiSummary ? aiSummary : `"${t('ai_placeholder')}"`}
+                                </p>
+                            )}
                         </div>
                         <div className="flex items-center gap-3">
                             <Button

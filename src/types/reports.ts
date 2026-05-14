@@ -179,6 +179,7 @@ export interface DeepWebResult {
 
 export interface MonitoringArticle {
     _id: string;
+    _creationTime?: number;
     title: string;
     publishedDate: string;
     url: string;
@@ -200,4 +201,5 @@ export interface MonitoringArticle {
     isManual?: boolean;
     manualSentimentOverride?: boolean;
     originalSentiment?: string;
+    [key: string]: unknown;
 }
