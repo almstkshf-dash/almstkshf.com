@@ -19,6 +19,7 @@ import { resolveApiKey } from "./utils/keys";
 import { parseBooleanKeyword, matchesBooleanFilter, buildApiQuery } from "./utils/booleanFilter";
 import { checkAndSetSeen } from "./utils/dedup";
 import { sendResendEmail } from "./utils/email";
+import { callWithAiRetry } from "./utils/aiRetry";
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // THE SPIDER â€” Inlined link resolver for Convex Node Runtime
@@ -121,83 +122,85 @@ Return valid JSON ONLY with these exact fields:
 }
 Note: The sum of emotions does not need to be 100, they are independent intensities. Joy/Sadness, Anger/Fear, Surprise/Expectation, Trust/Disgust are pairs. Focus on intensities.`;
 
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro", "gemini-pro"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
 
     for (const model of models) {
         try {
             if (!apiKey || apiKey === "None") break;
             console.log(`🧠 Trying Gemini model: ${model}`);
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.3,
-                            responseMimeType: "application/json",
-                        },
-                    }),
-                }
-            );
 
-            if (!response.ok) {
-                if (response.status === 404) {
-                    console.warn(`Model ${model} not found, trying next...`);
-                    continue;
-                }
-                const errorBody = await response.text();
-                console.error(`Gemini ${model} error: ${response.status} - ${errorBody.substring(0, 200)}`);
-                continue;
+            const result = await callWithAiRetry<any>(async () => {
+                return await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature: 0.3,
+                                responseMimeType: "application/json",
+                            },
+                        }),
+                    }
+                );
+            }, { maxRetries: 2 });
+
+            if (result.capacityExhausted) {
+                console.warn(`⚠️ Model ${model} reports capacity exhaustion. Propagating retryAfter: ${result.retryAfter}s`);
+                const err = new Error("MODEL_CAPACITY_EXHAUSTED");
+                (err as any).retryAfter = result.retryAfter;
+                throw err;
             }
 
-            const data = await response.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) { continue; }
+            if (result.success && result.data) {
+                const data = result.data;
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) continue;
 
-            const parsed = JSON.parse(text.trim());
+                const parsed = JSON.parse(text.trim());
+                const validSentiments = ["Positive", "Neutral", "Negative"];
+                const validSourceTypes = ["Online News", "Blog", "Press Release", "Social Media", "Print"];
 
-            const validSentiments = ["Positive", "Neutral", "Negative"];
-            const validSourceTypes = ["Online News", "Blog", "Press Release", "Social Media", "Print"];
-
-            return {
-                sentiment: validSentiments.includes(parsed.sentiment) ? parsed.sentiment : "Neutral",
-                summary: typeof parsed.summary === "string" ? parsed.summary : title,
-                sourceType: validSourceTypes.includes(parsed.sourceType) ? parsed.sourceType : "Online News",
-                reach_estimate: typeof parsed.reach_estimate === "number" ? parsed.reach_estimate : 50000,
-                tone: typeof parsed.tone === "string" ? parsed.tone : "Analytical",
-                risk: ["Low", "Medium", "High"].includes(parsed.risk) ? parsed.risk : "Medium",
-                hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
-                emotions: (parsed.emotions && typeof parsed.emotions === 'object') ? {
-                    joy: typeof parsed.emotions.joy === 'number' ? parsed.emotions.joy : 0,
-                    sadness: typeof parsed.emotions.sadness === 'number' ? parsed.emotions.sadness : 0,
-                    anger: typeof parsed.emotions.anger === 'number' ? parsed.emotions.anger : 0,
-                    fear: typeof parsed.emotions.fear === 'number' ? parsed.emotions.fear : 0,
-                    surprise: typeof parsed.emotions.surprise === 'number' ? parsed.emotions.surprise : 0,
-                    trust: typeof parsed.emotions.trust === 'number' ? parsed.emotions.trust : 0,
-                } : {
-                    joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0
-                }
-            };
-        } catch (error) {
-            console.warn(`Gemini ${model} failed:`, error);
+                return {
+                    sentiment: (validSentiments.includes(parsed.sentiment) ? parsed.sentiment : "Neutral") as any,
+                    summary: typeof parsed.summary === "string" ? parsed.summary : title,
+                    sourceType: (validSourceTypes.includes(parsed.sourceType) ? parsed.sourceType : "Online News") as any,
+                    reach_estimate: typeof parsed.reach_estimate === "number" ? parsed.reach_estimate : 50000,
+                    tone: typeof parsed.tone === "string" ? parsed.tone : "Analytical",
+                    risk: (["Low", "Medium", "High"].includes(parsed.risk) ? parsed.risk : "Medium") as any,
+                    hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : [],
+                    emotions: (parsed.emotions && typeof parsed.emotions === 'object') ? {
+                        joy: typeof parsed.emotions.joy === 'number' ? parsed.emotions.joy : 0,
+                        sadness: typeof parsed.emotions.sadness === 'number' ? parsed.emotions.sadness : 0,
+                        anger: typeof parsed.emotions.anger === 'number' ? parsed.emotions.anger : 0,
+                        fear: typeof parsed.emotions.fear === 'number' ? parsed.emotions.fear : 0,
+                        surprise: typeof parsed.emotions.surprise === 'number' ? parsed.emotions.surprise : 0,
+                        trust: typeof parsed.emotions.trust === 'number' ? parsed.emotions.trust : 0,
+                    } : {
+                        joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0
+                    }
+                };
+            }
+        } catch (e: any) {
+            if (e.message === "MODEL_CAPACITY_EXHAUSTED") throw e;
+            console.warn(`⚠️ Model ${model} failed:`, e.message);
             continue;
         }
     }
 
     console.error("âŒ All Gemini models failed or key is missing. Using heuristic values.");
-    
+
     // â”€â”€ HEURISTIC FALLBACK LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const lowerText = (title + " " + snippet).toLowerCase();
     let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
     let risk: "Low" | "Medium" | "High" = "Medium";
-    
+
     // EN/AR Positive keywords
     if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|Ù†Ø¬Ø§Ø­|Ø§Ø±Ø¨Ø§Ø­|ÙÙˆØ²|Ø§Ø²Ø¯Ù‡Ø§Ø±|Ù†Ù…Ùˆ|ØªØ·ÙˆØ±|Ø´Ø±Ø§ÙƒØ©|Ø§Ø·Ù„Ø§Ù‚|Ø§Ø¨ØªÙƒØ§Ø±)/i)) {
         sentiment = "Positive";
         risk = "Low";
-    } 
+    }
     // EN/AR Negative keywords (Colloquial + Formal + Harmful)
     else if (lowerText.match(/(Ù†ØµØ¨|Ø®Ø±Ø§Ø¨|Ø²ÙØª|ÙØ¶ÙŠØ­Ø©|ÙˆØ±Ø·Ø©|ØªØ¹ÙŠØ³|ÙØ§Ø´Ù„|Ø­Ø´ÙŠØ´|Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§|ÙƒØ±ÙŠØ³ØªØ§Ù„|ÙƒÙˆÙƒ|ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„|Ù„Ø§Ø±ÙŠÙƒØ§|Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|Ø®Ø³Ø§Ø±Ø©|ØªØ±Ø§Ø¬Ø¹|ÙØ´Ù„|ÙØ¶ÙŠØ­Ø©|Ø§Ø®ØªØ±Ø§Ù‚|Ø¯Ø¹ÙˆÙ‰|Ø§Ù†ØªÙ‡Ø§Ùƒ|Ø§Ø­ØªÙŠØ§Ù„|Ø§Ø²Ù…Ø©|ØªØ­Ø°ÙŠØ±|Ø®Ø·Ø±)/i)) {
         sentiment = "Negative";
@@ -254,41 +257,46 @@ Return valid JSON ONLY:
     if (!apiKey) return 100; // Fail-open (pass) if no key
 
     // Use the fastest available model for this quick gate
-    const models = ["gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
 
     for (const model of models) {
         try {
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.1,
-                            responseMimeType: "application/json",
-                        },
-                    }),
-                }
-            );
+            const result = await callWithAiRetry<any>(async () => {
+                return await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature: 0.1,
+                                responseMimeType: "application/json",
+                            },
+                        }),
+                    }
+                );
+            }, { maxRetries: 1 });
 
-            if (!response.ok) {
-                if (response.status === 404) continue;
-                console.warn(`Relevancy check ${model} returned ${response.status}`);
-                return 100; // Fail-open: allow article if API errors
+            if (result.capacityExhausted) {
+                const err = new Error("MODEL_CAPACITY_EXHAUSTED");
+                (err as any).retryAfter = result.retryAfter;
+                throw err;
             }
 
-            const data = await response.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!text) return 100;
+            if (result.success && result.data) {
+                const data = result.data;
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) continue;
 
-            const parsed = JSON.parse(text.trim());
-            const score = typeof parsed.relevancy_score === "number" ? parsed.relevancy_score : 100;
-            console.log(`ðŸŽ¯ Relevancy [${score}/100] â€” ${parsed.reason || ""} â€” "${title.substring(0, 50)}"`);
-            return score;
-        } catch (e) {
-            console.warn(`Relevancy model ${model} failed:`, e);
+                const parsed = JSON.parse(text.trim());
+                const score = typeof parsed.relevancy_score === "number" ? parsed.relevancy_score : 100;
+                console.log(`🎯 Relevancy [${score}/100] — ${parsed.reason || ""} — "${title.substring(0, 50)}"`);
+                return score;
+            }
+        } catch (e: any) {
+            if (e.message === "MODEL_CAPACITY_EXHAUSTED") throw e;
+            console.warn(`⚠️ Relevancy check failed for ${model}:`, e.message);
             continue;
         }
     }
@@ -309,7 +317,7 @@ export const fetchNews = action({
         dateFrom: v.optional(v.string()),  // DD/MM/YYYY
         dateTo: v.optional(v.string()),    // DD/MM/YYYY
     },
-    handler: async (ctx, args): Promise<{ success: boolean; count?: number; skipped?: number; feeds?: number; error?: string }> => {
+    handler: async (ctx, args): Promise<{ success: boolean; count?: number; skipped?: number; feeds?: number; error?: string; capacityExhausted?: boolean; retryAfter?: number }> => {
         try {
             // Check if user is admin
             await requireAdmin(ctx.auth);
@@ -430,8 +438,14 @@ export const fetchNews = action({
                         const items = feed.items.slice(0, 10);
                         let localSuccess = 0;
                         for (const item of items) {
-                            const success = await processArticle(ctx, item, combo.country, combo.lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, true);
-                            if (success) localSuccess++;
+                            try {
+                                const success = await processArticle(ctx, item, combo.country, combo.lang, args.keyword, apiKey, stList, dateFromObj, dateToObj, true);
+                                if (success) localSuccess++;
+                            } catch (e: any) {
+                                if (e.message === "MODEL_CAPACITY_EXHAUSTED") {
+                                    throw e; // Bubble up to stop the action
+                                }
+                            }
                         }
                         return { name: `RSS-${combo.country}`, success: localSuccess };
                     } catch (e) {
@@ -784,11 +798,20 @@ export const fetchNews = action({
             console.log(`ðŸ“Š Parallel Fetch Complete: ${totalSuccess} saved articles.`);
             return { success: true, count: totalSuccess, skipped: totalSkipped, feeds: results.length };
         } catch (globalError: any) {
+            if (globalError.message === "MODEL_CAPACITY_EXHAUSTED") {
+                console.warn(`âš ï¸  Terminating fetchNews early due to AI capacity exhaustion. Retry after ${globalError.retryAfter}s`);
+                return {
+                    success: false,
+                    error: "AI_CAPACITY_EXHAUSTED",
+                    capacityExhausted: true,
+                    retryAfter: globalError.retryAfter || 60
+                };
+            }
             console.error("ðŸ CRITICAL: Global fetchNews failure", globalError);
             const errorMessage = globalError instanceof Error ? globalError.message : String(globalError);
             const stack = globalError instanceof Error ? globalError.stack : "No stack trace";
-            return { 
-                success: false, 
+            return {
+                success: false,
                 error: `Unable to process news monitoring: ${errorMessage} | Stack: ${stack}`
             };
 
@@ -1088,7 +1111,7 @@ async function fetchHistoricalArticles(
         // Build query with keyword and date range
         const query = encodeURIComponent(keyword);
         let url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&pageSize=${Math.min(limit, 100)}&apiKey=${newsApiKey}`;
-        
+
         if (dateFrom) url += `&from=${dateFrom}`;
         if (dateTo) url += `&to=${dateTo}`;
 
@@ -1126,229 +1149,244 @@ export const fetchPressReleaseSources = action({
         dateTo: v.optional(v.string()),     // ISO date string e.g. "2025-12-31"
     },
     handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: Record<string, unknown>[]; message: string }> => {
-        await requireAdmin(ctx.auth);
+        try {
+            await requireAdmin(ctx.auth);
 
-        const fetchedKeyword = args.keyword?.trim() || "";
-        // Support Boolean logic in Press Release filtering
-        const booleanExpr = parseBooleanKeyword(fetchedKeyword);
-        const keyword = fetchedKeyword || "Press Release";
-        const itemLimit = args.limit ?? 30;   // per-feed cap â€” user controlled
+            const fetchedKeyword = args.keyword?.trim() || "";
+            // Support Boolean logic in Press Release filtering
+            const booleanExpr = parseBooleanKeyword(fetchedKeyword);
+            const keyword = fetchedKeyword || "Press Release";
+            const itemLimit = args.limit ?? 30;   // per-feed cap â€” user controlled
 
-        // Date range (optional) â€” ISO strings from the UI date picker
-        const dateFromObj = args.dateFrom ? new Date(args.dateFrom) : null;
-        const dateToObj = args.dateTo ? new Date(args.dateTo + "T23:59:59Z") : null;
-        const parser = new Parser({ timeout: 10000 });
+            // Date range (optional) â€” ISO strings from the UI date picker
+            const dateFromObj = args.dateFrom ? new Date(args.dateFrom) : null;
+            const dateToObj = args.dateTo ? new Date(args.dateTo + "T23:59:59Z") : null;
+            const parser = new Parser({ timeout: 10000 });
 
-        let totalSaved = 0;
-        let totalErrors = 0;
-        const feedResults: Record<string, unknown>[] = [];
+            let totalSaved = 0;
+            let totalErrors = 0;
+            const feedResults: Record<string, unknown>[] = [];
 
-        // Fetch all feeds in parallel (each feed error is isolated)
-        await Promise.all(
-            PR_WIRE_FEEDS.map(async (feed) => {
-                let savedCount = 0;
+            // Fetch all feeds in parallel (each feed error is isolated)
+            await Promise.all(
+                PR_WIRE_FEEDS.map(async (feed) => {
+                    let savedCount = 0;
+                    try {
+                        const feedData = await parser.parseURL(feed.url);
+
+                        // Each feed pulls up to itemLimit candidates, then we filter by keyword
+                        const candidates = feedData.items.slice(0, itemLimit);
+
+                        // â”€â”€ Keyword filter (Boolean logic) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                        const afterKeyword = fetchedKeyword
+                            ? candidates.filter((item) => {
+                                const title = item.title ?? "";
+                                const snippet = item.contentSnippet || item.content || "";
+                                return matchesBooleanFilter(booleanExpr, title, snippet);
+                            })
+                            : candidates;
+
+                        // â”€â”€ Date range filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                        const items = (dateFromObj || dateToObj)
+                            ? afterKeyword.filter((item) => {
+                                if (!item.pubDate) return true;
+                                const pub = new Date(item.pubDate);
+                                if (isNaN(pub.getTime())) return true;
+                                if (dateFromObj && pub < dateFromObj) return false;
+                                if (dateToObj && pub > dateToObj) return false;
+                                return true;
+                            })
+                            : afterKeyword;
+
+                        for (const item of items) {
+                            if (!item.link || !item.title) continue;
+
+                            try {
+                                // â”€â”€ GATE 1: Redis Deduplication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                                // Prevent identical PRs from overlapping feeds or multiple runs
+                                const isSeen = await checkAndSetSeen(item.link, item.title);
+                                if (isSeen) {
+                                    console.log(`ðŸ—‘ï¸ PR Dedup skip: ${item.title.substring(0, 50)}...`);
+                                    continue;
+                                }
+
+                                const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
+                                const dd = pubDate.getDate().toString().padStart(2, "0");
+                                const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
+                                const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
+
+                                const snippet = item.contentSnippet || item.content || item.title;
+                                const boolExpr = parseBooleanKeyword(fetchedKeyword);
+                                if (fetchedKeyword && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
+                                    console.log(`⚡ PR Boolean reject: "${item.title.substring(0, 50)}..." (keyword: ${fetchedKeyword})`);
+                                    continue;
+                                }
+
+                                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+
+                                const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                                const aiData = await callGeminiForAnalysis(
+                                    geminiKey,
+                                    item.title,
+                                    snippet,
+                                    fetchedKeyword || "Press Release",
+                                    []
+                                );
+
+                                const sentiment = aiData.sentiment;
+                                const summary = aiData.summary || snippet.slice(0, 300);
+                                const reach = aiData.reach_estimate || 50000;
+                                const emotions = aiData.emotions || { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
+                                const ave = Math.round(reach * 0.02 * 5);
+
+                                await ctx.runMutation(api.monitoring.saveArticle, {
+                                    keyword,
+                                    url: item.link,
+                                    publishedDate: formattedDate,
+                                    title: item.title,
+                                    content: summary,
+                                    language: (isArabic || feed.lang === "ar") ? "AR" : "EN",
+                                    sentiment,
+                                    sourceType: "Press Release",
+                                    source: feed.name,
+                                    sourceCountry: feed.country,
+                                    reach,
+                                    ave,
+                                    depth: "standard",
+                                    ingestMethod: "rss",
+                                    emotions,
+                                });
+
+                                savedCount++;
+                                totalSaved++;
+                            } catch (err) {
+                                totalErrors++;
+                            }
+                        }
+
+                        feedResults.push({ feed: feed.name, saved: savedCount, total: items.length });
+                    } catch (feedErr: unknown) {
+                        const message = feedErr instanceof Error ? feedErr.message : "fetch failed";
+                        feedResults.push({ feed: feed.name, error: message });
+                        totalErrors++;
+                    }
+                })
+            );
+
+            // â"€â"€ HISTORICAL SEARCH (NewsAPI) â€" When keyword+dates provided â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+            // If user provided keyword AND date range, also fetch from historical archives via NewsAPI
+            if (fetchedKeyword && args.dateFrom && args.dateTo) {
                 try {
-                    const feedData = await parser.parseURL(feed.url);
+                    const historicalArticles = await fetchHistoricalArticles(
+                        ctx,
+                        fetchedKeyword,
+                        args.dateFrom,
+                        args.dateTo,
+                        itemLimit
+                    );
 
-                    // Each feed pulls up to itemLimit candidates, then we filter by keyword
-                    const candidates = feedData.items.slice(0, itemLimit);
+                    if (historicalArticles.length > 0) {
+                        let historicalSaved = 0;
+                        for (const article of historicalArticles) {
+                            if (!article.link || !article.title) continue;
 
-                    // â”€â”€ Keyword filter (Boolean logic) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    const afterKeyword = fetchedKeyword
-                        ? candidates.filter((item) => {
-                            const title = item.title ?? "";
-                            const snippet = item.contentSnippet || item.content || "";
-                            return matchesBooleanFilter(booleanExpr, title, snippet);
-                        })
-                        : candidates;
+                            try {
+                                // Deduplication: skip if already seen
+                                const isSeen = await checkAndSetSeen(article.link, article.title);
+                                if (isSeen) continue;
 
-                    // â”€â”€ Date range filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                    const items = (dateFromObj || dateToObj)
-                        ? afterKeyword.filter((item) => {
-                            if (!item.pubDate) return true;
-                            const pub = new Date(item.pubDate);
-                            if (isNaN(pub.getTime())) return true;
-                            if (dateFromObj && pub < dateFromObj) return false;
-                            if (dateToObj && pub > dateToObj) return false;
-                            return true;
-                        })
-                        : afterKeyword;
+                                const pubDate = new Date(article.pubDate);
+                                const dd = pubDate.getDate().toString().padStart(2, "0");
+                                const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
+                                const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
 
-                    for (const item of items) {
-                        if (!item.link || !item.title) continue;
+                                const snippet = article.contentSnippet || article.title;
+                                const isArabic = /[\u0600-\u06FF]/.test(article.title + snippet);
 
-                        try {
-                            // â”€â”€ GATE 1: Redis Deduplication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                            // Prevent identical PRs from overlapping feeds or multiple runs
-                            const isSeen = await checkAndSetSeen(item.link, item.title);
-                            if (isSeen) {
-                                console.log(`ðŸ—‘ï¸ PR Dedup skip: ${item.title.substring(0, 50)}...`);
-                                continue;
+                                // Simple sentiment detection
+                                let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
+                                const lowerSnippet = snippet.toLowerCase();
+                                if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
+                                    sentiment = "Positive";
+                                } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
+                                    sentiment = "Negative";
+                                }
+
+                                const reach = 50000;
+                                const ave = Math.round(reach * 0.02 * 5);
+
+                                await ctx.runMutation(api.monitoring.saveArticle, {
+                                    keyword,
+                                    url: article.link,
+                                    publishedDate: formattedDate,
+                                    title: article.title,
+                                    content: snippet.slice(0, 300),
+                                    language: isArabic ? "AR" : "EN",
+                                    sentiment,
+                                    sourceType: "Press Release",
+                                    source: article.source,
+                                    sourceCountry: "MENA",
+                                    reach,
+                                    ave,
+                                    depth: "standard",
+                                    ingestMethod: "api",
+                                    emotions: {
+                                        joy: sentiment === "Positive" ? 60 : 0,
+                                        sadness: sentiment === "Negative" ? 40 : 0,
+                                        anger: sentiment === "Negative" ? 30 : 0,
+                                        fear: sentiment === "Negative" ? 50 : 0,
+                                        surprise: 20,
+                                        trust: sentiment === "Positive" ? 70 : 30
+                                    },
+                                });
+
+                                historicalSaved++;
+                                totalSaved++;
+                            } catch (err) {
+                                console.warn("[Historical] Failed to save article:", err);
+                                totalErrors++;
                             }
+                        }
 
-                            const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
-                            const dd = pubDate.getDate().toString().padStart(2, "0");
-                            const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
-                            const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
-
-                            const snippet = item.contentSnippet || item.content || item.title;
-                            const boolExpr = parseBooleanKeyword(fetchedKeyword);
-                            if (fetchedKeyword && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
-                                console.log(`⚡ PR Boolean reject: "${item.title.substring(0, 50)}..." (keyword: ${fetchedKeyword})`);
-                                continue;
-                            }
-
-                            const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
-
-                            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-                            const aiData = await callGeminiForAnalysis(
-                                geminiKey,
-                                item.title,
-                                snippet,
-                                fetchedKeyword || "Press Release",
-                                []
-                            );
-
-                            const sentiment = aiData.sentiment;
-                            const summary = aiData.summary || snippet.slice(0, 300);
-                            const reach = aiData.reach_estimate || 50000;
-                            const emotions = aiData.emotions || { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
-                            const ave = Math.round(reach * 0.02 * 5);
-
-                            await ctx.runMutation(api.monitoring.saveArticle, {
-                                keyword,
-                                url: item.link,
-                                publishedDate: formattedDate,
-                                title: item.title,
-                                content: summary,
-                                language: (isArabic || feed.lang === "ar") ? "AR" : "EN",
-                                sentiment,
-                                sourceType: "Press Release",
-                                source: feed.name,
-                                sourceCountry: feed.country,
-                                reach,
-                                ave,
-                                depth: "standard",
-                                ingestMethod: "rss",
-                                emotions,
+                        if (historicalSaved > 0) {
+                            feedResults.push({
+                                feed: "NewsAPI Historical Search",
+                                saved: historicalSaved,
+                                total: historicalArticles.length
                             });
-
-                            savedCount++;
-                            totalSaved++;
-                        } catch (err) {
-                            totalErrors++;
                         }
                     }
-
-                    feedResults.push({ feed: feed.name, saved: savedCount, total: items.length });
-                } catch (feedErr: unknown) {
-                    const message = feedErr instanceof Error ? feedErr.message : "fetch failed";
-                    feedResults.push({ feed: feed.name, error: message });
+                } catch (histErr) {
+                    console.warn("[Historical Search] Error:", histErr);
+                    feedResults.push({
+                        feed: "NewsAPI Historical Search",
+                        error: histErr instanceof Error ? histErr.message : "historical search failed"
+                    });
                     totalErrors++;
                 }
-            })
-        );
-
-        // â"€â"€ HISTORICAL SEARCH (NewsAPI) â€" When keyword+dates provided â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
-        // If user provided keyword AND date range, also fetch from historical archives via NewsAPI
-        if (fetchedKeyword && args.dateFrom && args.dateTo) {
-            try {
-                const historicalArticles = await fetchHistoricalArticles(
-                    ctx,
-                    fetchedKeyword,
-                    args.dateFrom,
-                    args.dateTo,
-                    itemLimit
-                );
-
-                if (historicalArticles.length > 0) {
-                    let historicalSaved = 0;
-                    for (const article of historicalArticles) {
-                        if (!article.link || !article.title) continue;
-
-                        try {
-                            // Deduplication: skip if already seen
-                            const isSeen = await checkAndSetSeen(article.link, article.title);
-                            if (isSeen) continue;
-
-                            const pubDate = new Date(article.pubDate);
-                            const dd = pubDate.getDate().toString().padStart(2, "0");
-                            const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
-                            const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
-
-                            const snippet = article.contentSnippet || article.title;
-                            const isArabic = /[\u0600-\u06FF]/.test(article.title + snippet);
-
-                            // Simple sentiment detection
-                            let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
-                            const lowerSnippet = snippet.toLowerCase();
-                            if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
-                                sentiment = "Positive";
-                            } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
-                                sentiment = "Negative";
-                            }
-
-                            const reach = 50000;
-                            const ave = Math.round(reach * 0.02 * 5);
-
-                            await ctx.runMutation(api.monitoring.saveArticle, {
-                                keyword,
-                                url: article.link,
-                                publishedDate: formattedDate,
-                                title: article.title,
-                                content: snippet.slice(0, 300),
-                                language: isArabic ? "AR" : "EN",
-                                sentiment,
-                                sourceType: "Press Release",
-                                source: article.source,
-                                sourceCountry: "MENA",
-                                reach,
-                                ave,
-                                depth: "standard",
-                                ingestMethod: "newsapi",
-                                emotions: {
-                                    joy: sentiment === "Positive" ? 60 : 0,
-                                    sadness: sentiment === "Negative" ? 40 : 0,
-                                    anger: sentiment === "Negative" ? 30 : 0,
-                                    fear: sentiment === "Negative" ? 50 : 0,
-                                    surprise: 20,
-                                    trust: sentiment === "Positive" ? 70 : 30
-                                },
-                            });
-
-                            historicalSaved++;
-                            totalSaved++;
-                        } catch (err) {
-                            console.warn("[Historical] Failed to save article:", err);
-                            totalErrors++;
-                        }
-                    }
-
-                    if (historicalSaved > 0) {
-                        feedResults.push({
-                            feed: "NewsAPI Historical Search",
-                            saved: historicalSaved,
-                            total: historicalArticles.length
-                        });
-                    }
-                }
-            } catch (histErr) {
-                console.warn("[Historical Search] Error:", histErr);
-                feedResults.push({
-                    feed: "NewsAPI Historical Search",
-                    error: histErr instanceof Error ? histErr.message : "historical search failed"
-                });
-                totalErrors++;
             }
-        }
 
-        return {
-            success: true,
-            totalSaved,
-            totalErrors,
-            feedResults,
-            message: `Ingested ${totalSaved} press releases from ${PR_WIRE_FEEDS.length} wire sources`,
-        };
+            return {
+                success: true,
+                totalSaved,
+                totalErrors,
+                feedResults,
+                message: `Ingested ${totalSaved} press releases from ${PR_WIRE_FEEDS.length} wire sources`,
+            };
+        } catch (globalError: any) {
+            if (globalError.message === "MODEL_CAPACITY_EXHAUSTED") {
+                return {
+                    success: false,
+                    totalSaved: 0,
+                    totalErrors: 1,
+                    feedResults: [],
+                    message: "AI_CAPACITY_EXHAUSTED",
+                    capacityExhausted: true,
+                    retryAfter: globalError.retryAfter || 60
+                } as any;
+            }
+            throw globalError;
+        }
     },
 });
 

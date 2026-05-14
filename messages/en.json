@@ -428,6 +428,7 @@
     "instruction": "awaiting_instruction...",
     "prompt": "PROMPT",
     "response": "AGENT RESPONSE",
+    "ai_busy_wait": "AI services are currently busy. Please wait {seconds}s before trying again.",
     "capabilities": {
       "title": "On-Demand Intelligence",
       "subtitle": "AI-Powered Workflow",
@@ -484,6 +485,7 @@
     "placeholder": "e.g., Brand X receives major environmental award in Dubai...",
     "button": "Analyze Impact",
     "analyzing": "ALMSTKSHF AI is analyzing...",
+    "ai_busy_wait": "AI services are currently busy. Please wait {seconds}s before trying again.",
     "results_title": "AI Insight Report",
     "sentiment": "Public Sentiment",
     "risk": "Reputation Risk",
@@ -599,6 +601,7 @@
       "press_intelligence": "Press Intelligence",
       "pickup_rate": "Pick-up Rate",
       "monitoring": "Monitoring",
+      "ai_busy_wait": "AI services are currently busy. Please wait {seconds}s before trying again.",
       "everything_in_one": "\"Everything in one place: monitoring, social listening, and distribution.\"",
       "use_cases": {
         "title": "Meet our Users",
@@ -1377,7 +1380,8 @@
     "search_sources": "Search sources...",
     "clear_all": "Clear All",
     "remove": "Remove",
-    "not_authenticated": "Not authenticated. Please sign in first."
+    "not_authenticated": "Not authenticated. Please sign in first.",
+    "ai_busy_wait": "The AI service is currently at maximum capacity. Please wait {seconds} seconds before your next request."
   },
   "DeepSources": {
     "title": "Deep Web Monitoring",
@@ -1402,7 +1406,8 @@
     "config_panel": "Scan Configuration",
     "result_count": "fetched {count} items",
     "status_success": "Success",
-    "status_failed": "Failed"
+    "status_failed": "Failed",
+    "ai_busy_wait": "AI capacity reached. Please wait {seconds}s before retrying."
   },
   "SentimentTracker": {
     "title": "Live Pulse: Public Sentiment",

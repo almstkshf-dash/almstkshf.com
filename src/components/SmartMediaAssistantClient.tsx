@@ -27,6 +27,20 @@ export default function SmartMediaAssistantClient() {
     const [prompt, setPrompt] = React.useState("");
     const [analysis, setAnalysis] = React.useState<any>(null);
     const [isGenerating, setIsGenerating] = React.useState(false);
+    const [retryCountdown, setRetryCountdown] = React.useState<number | null>(null);
+
+    React.useEffect(() => {
+        if (retryCountdown === null) return;
+        if (retryCountdown <= 0) {
+            setRetryCountdown(null);
+            return;
+        }
+        const timer = setInterval(() => {
+            setRetryCountdown((prev) => (prev !== null ? prev - 1 : null));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [retryCountdown]);
+
     const analyzeAction = useAction(api.media.analyzeMedia);
 
     const capabilities = [
@@ -75,6 +89,10 @@ export default function SmartMediaAssistantClient() {
                 };
                 setAnalysis(mappedResult);
                 toast.success(tAi("analysis_complete"));
+            } else if ((result as any)?.capacityExhausted) {
+                const waitTime = (result as any).retryAfter || 60;
+                setRetryCountdown(waitTime);
+                toast.error(tAi("ai_busy_wait", { seconds: waitTime }));
             } else {
                 toast.error(result?.error || tAi("analysis_empty"));
             }
@@ -138,10 +156,10 @@ export default function SmartMediaAssistantClient() {
                             <Button
                                 onClick={handleGenerate}
                                 isLoading={isGenerating}
-                                disabled={!prompt}
+                                disabled={!prompt || retryCountdown !== null}
                                 className="px-8 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg shadow-primary/20 text-white whitespace-nowrap h-auto"
                             >
-                                {tAi("deploy")}
+                                {retryCountdown !== null ? `${retryCountdown}s` : tAi("deploy")}
                             </Button>
                         </motion.div>
                     </div>

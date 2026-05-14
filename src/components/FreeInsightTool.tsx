@@ -8,7 +8,8 @@
 
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ShieldAlert, TrendingUp, ArrowRight, Info } from "lucide-react";
@@ -36,6 +37,20 @@ export default function FreeInsightTool() {
         entities?: string[];
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (retryCountdown === null) return;
+        if (retryCountdown <= 0) {
+            setRetryCountdown(null);
+            setError(null);
+            return;
+        }
+        const timer = setInterval(() => {
+            setRetryCountdown((prev) => (prev !== null ? prev - 1 : null));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [retryCountdown]);
 
     const analyzeMedia = useAction(api.media.analyzeMedia);
 
@@ -61,6 +76,10 @@ export default function FreeInsightTool() {
                     topics: data.topics,
                     entities: data.entities
                 });
+            } else if ((res as any).capacityExhausted) {
+                const waitTime = (res as any).retryAfter || 60;
+                setRetryCountdown(waitTime);
+                setError(t("ai_busy_wait", { seconds: waitTime }));
             } else {
                 setError(res.error || "Analysis failed. Please try again.");
             }
@@ -112,26 +131,29 @@ export default function FreeInsightTool() {
                                 <div className="absolute bottom-6 right-6 flex gap-2">
                                     <Button
                                         onClick={handleAnalyze}
-                                        disabled={isAnalyzing || !input.trim()}
+                                        disabled={isAnalyzing || !input.trim() || retryCountdown !== null}
                                         variant="primary"
                                         size="lg"
                                         className="rounded-2xl shadow-xl shadow-primary/20"
                                         isLoading={isAnalyzing}
                                     >
-                                        {isAnalyzing ? t("analyzing") : t("button")}
+                                        {retryCountdown !== null ? `${retryCountdown}s` : (isAnalyzing ? t("analyzing") : t("button"))}
                                     </Button>
                                 </div>
                             </div>
 
                             <AnimatePresence mode="wait">
-                                {error && (
+                                {(error || retryCountdown !== null) && (
                                     <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
-                                        className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl text-destructive text-sm"
+                                        className={clsx(
+                                            "p-4 border rounded-2xl text-sm",
+                                            retryCountdown !== null ? "bg-amber-500/10 border-amber-500/20 text-amber-500" : "bg-destructive/10 border-destructive/20 text-destructive"
+                                        )}
                                     >
-                                        {error}
+                                        {retryCountdown !== null ? t("ai_busy_wait", { seconds: retryCountdown }) : error}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -237,6 +259,16 @@ export default function FreeInsightTool() {
                                     </motion.div>
                                 )}
                             </AnimatePresence>
+
+                            <div className="pt-8 text-center">
+                                <Link
+                                    href="/pricing"
+                                    className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-bold group"
+                                >
+                                    <span>{t("cta")}</span>
+                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

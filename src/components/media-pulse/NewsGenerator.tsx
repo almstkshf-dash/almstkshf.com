@@ -19,6 +19,7 @@ import { FetchNewsResponse, OptimizeQueryResponse } from '@/types/api';
 
 import { ALL_COUNTRIES, LANGUAGES } from '@/lib/countries';
 import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
+
 export default function NewsGenerator({ defaultSourceType }: { defaultSourceType?: string }) {
     const locale = useLocale();
     const t = useTranslations('NewsGenerator');
@@ -43,16 +44,9 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
     );
 
     const [loading, setLoading] = useState(false);
-
-        const sourceTypes = useMemo(() => [
-        { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
-        { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release بيان صحفي' },
-        { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog مدونة' },
-        { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
-        { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
-    ], [t]);
     const [result, setResult] = useState<FetchNewsResponse | null>(null);
     const [errorMsg, setErrorMsg] = useState('');
+    const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
 
     // Validation errors
     const [errors, setErrors] = useState<{ keyword?: string; countries?: string; languages?: string }>({});
@@ -64,7 +58,13 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         return `${d}/${m}/${y}`;
     }, []);
 
-
+    const sourceTypes = useMemo(() => [
+        { id: 'Online News', label: t('source_types_list.online_news'), searchStr: 'Online News أخبار عبر الإنترنت' },
+        { id: 'Press Release', label: t('source_types_list.press_release'), searchStr: 'Press Release بيان صحفي' },
+        { id: 'Blog', label: t('source_types_list.blog'), searchStr: 'Blog مدونة' },
+        { id: 'Social Media', label: t('source_types_list.social_media'), searchStr: 'Social Media وسائل التواصل الاجتماعي' },
+        { id: 'Print', label: t('source_types_list.print'), searchStr: 'Print صحافة مطبوعة' },
+    ], [t]);
 
     // Country helpers
     const countryItems = React.useMemo(() => ALL_COUNTRIES.map((c) => ({
@@ -91,6 +91,19 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
         return Object.keys(newErrors).length === 0;
     }, [keyword, selectedCountries, selectedLanguages, t]);
 
+    useEffect(() => {
+        if (retryCountdown === null) return;
+        if (retryCountdown <= 0) {
+            setRetryCountdown(null);
+            setErrorMsg('');
+            return;
+        }
+        const timer = setInterval(() => {
+            setRetryCountdown(prev => (prev !== null ? prev - 1 : null));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [retryCountdown]);
+
     const handleGenerate = useCallback(async () => {
         if (!validate()) return;
         // Safety: never invoke an authenticated action when Convex hasn't received the token yet
@@ -114,7 +127,12 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
             if (res.success) {
                 setResult(res);
             } else {
-                setErrorMsg(res.error || t('fetch_failed'));
+                if (res.capacityExhausted) {
+                    setRetryCountdown(res.retryAfter || 60);
+                    setErrorMsg(t('ai_busy_wait', { seconds: res.retryAfter || 60 }));
+                } else {
+                    setErrorMsg(res.error || t('fetch_failed'));
+                }
             }
         } catch (error: unknown) {
             console.error("News fetch internal error:", error);
@@ -366,12 +384,17 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
 
                     <Button
                         onClick={handleGenerate}
-                        isLoading={loading || authLoading}
-                        disabled={!isAuthenticated || authLoading}
+                        isLoading={loading || authLoading || retryCountdown !== null}
+                        disabled={!isAuthenticated || authLoading || retryCountdown !== null}
                         className="w-full md:w-auto font-bold px-10 py-3.5 shadow-xl shadow-primary/20 text-sm whitespace-nowrap"
                     >
                         {loading ? (
                             t('analyzing')
+                        ) : retryCountdown !== null ? (
+                            <span className="flex items-center gap-2">
+                                <span className="animate-spin h-3 w-3 border-2 border-current border-t-transparent rounded-full" />
+                                {retryCountdown}s
+                            </span>
                         ) : (
                             <>{t('generate_report')}</>
                         )}

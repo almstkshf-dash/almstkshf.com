@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
@@ -58,6 +58,7 @@ export default function PressReleasePanel() {
     const [limitPerFeed, setLimitPerFeed] = useState(30);
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
+    const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
 
     const fetchPR = useAction(api.monitoringAction.fetchPressReleaseSources);
 
@@ -67,6 +68,20 @@ export default function PressReleasePanel() {
         isAuthenticated ? { limit: 1, sourceType: 'Press Release' } : 'skip'
     ) as { total: number } | undefined | null;
     const prCount = prStats?.total ?? 0;
+    
+    // Countdown timer effect
+    useEffect(() => {
+        if (retryCountdown === null) return;
+        if (retryCountdown <= 0) {
+            setRetryCountdown(null);
+            setError('');
+            return;
+        }
+        const timer = setInterval(() => {
+            setRetryCountdown(prev => (prev !== null ? prev - 1 : null));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [retryCountdown]);
 
     const handleSync = async () => {
         if (!isAuthenticated) { setError(t('not_authenticated')); return; }
@@ -81,7 +96,14 @@ export default function PressReleasePanel() {
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
             }) as any;
-            setSyncResult(res);
+            if (res.success) {
+                setSyncResult(res);
+            } else if (res.capacityExhausted) {
+                setRetryCountdown(res.retryAfter || 60);
+                setError(t('ai_busy_wait', { seconds: res.retryAfter || 60 }));
+            } else {
+                setError(res.message || t('fetch_failed'));
+            }
         } catch (e: unknown) {
             const msg = e instanceof Error ? e.message : t('fetch_failed');
             setError(msg);
@@ -193,12 +215,12 @@ export default function PressReleasePanel() {
                     <Button
                         variant="primary"
                         onClick={handleSync}
-                        disabled={loading || !isAuthenticated || !isAdmin}
+                        disabled={loading || !!retryCountdown || !isAuthenticated || !isAdmin}
                         isLoading={loading}
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
                         title={!isAdmin ? t('admin_only') : undefined}
                     >
-                        {loading ? t('syncing') : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />{t('sync_now')}</>}
+                        {loading ? t('syncing') : retryCountdown ? `${retryCountdown}s` : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />{t('sync_now')}</>}
                     </Button>
                 </div>
 

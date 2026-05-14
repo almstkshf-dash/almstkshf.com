@@ -10,6 +10,7 @@ import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api } from "./_generated/api";
 import { resolveApiKey } from "./utils/keys";
+import { callWithAiRetry } from "./utils/aiRetry";
 
 // Define the expected structure from Gemini API
 interface GeminiResponse {
@@ -40,12 +41,12 @@ interface AnalysisResult {
  */
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string }> => {
+    handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string; capacityExhausted?: boolean; retryAfter?: number }> => {
         const identity = await ctx.auth.getUserIdentity();
         const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         if (!apiKey) {
-            console.error("âŒ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
+            console.error("❌ CRITICAL CONFIG ERROR: GEMINI_API_KEY is missing from Convex environment variables.");
             return {
                 success: false,
                 error: "The AI service is not configured. Please add your Gemini API key in Settings or contact support. (Error: CFG_MISSING)"
@@ -75,68 +76,59 @@ Return valid JSON ONLY:
   "recommendation": "strategic advice (2 sentences) in input language"
 }`;
 
-
         try {
-            // Helper function to call Gemini API
-            const callGemini = async (model: string) => {
-                console.log(`ðŸ§  Attempting analysis with model: ${model}`);
-                const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: {
-                                temperature: 0.7,
-                                responseMimeType: "application/json",
-                            },
-                        }),
-                    }
-                );
-                return response;
-            };
-
-            // Diagnostics: Identify Key Source (Masked)
-            const keyMasked = apiKey.length > 8 ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : "****";
-            console.log(`ðŸ§  AI Analysis Request: [Key: ${keyMasked}] [UserID: ${(identity?.subject || "ANONYMOUS").substring(0, 8)}]`);
-
-            // Try models in sequence (Sync with monitoringAction.ts)
-            const models = ["gemini-3.1-flash-preview", "gemini-3.0-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-pro"];
-            let response: Response | null = null;
+            const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+            let finalResult: any = null;
             let lastError = "";
 
             for (const model of models) {
                 try {
-                    response = await callGemini(model);
-                    if (response.ok) break;
+                    const result = await callWithAiRetry<any>(async () => {
+                        return await fetch(
+                            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                            {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    contents: [{ parts: [{ text: prompt }] }],
+                                    generationConfig: {
+                                        temperature: 0.7,
+                                        responseMimeType: "application/json",
+                                    },
+                                }),
+                            }
+                        );
+                    }, { maxRetries: 2 });
 
-                    const errText = await response.text();
-                    lastError = `Model ${model} failed (${response.status}): ${errText}`;
-                    console.warn(`âš ï¸ ${lastError}`);
+                    if (result.capacityExhausted) {
+                        const err = new Error("MODEL_CAPACITY_EXHAUSTED");
+                        (err as any).retryAfter = result.retryAfter;
+                        throw err;
+                    }
 
-                    // Only skip to next model if it's 404 (not found), 429 (rate limit), or 400 (bad request/invalid per model)
-                    // We no longer break on 400 as different models might have different key restrictions
+                    if (result.success && result.data) {
+                        finalResult = result.data;
+                        break;
+                    } else {
+                        lastError = `Model ${model} failed to return data.`;
+                    }
                 } catch (e: any) {
+                    if (e.message === "MODEL_CAPACITY_EXHAUSTED") throw e;
                     lastError = `Fetch failed for ${model}: ${e.message}`;
-                    console.warn(`âš ï¸ ${lastError}`);
+                    continue;
                 }
             }
 
-
-            if (!response || !response.ok) {
-                const status = response?.status || "UNKNOWN";
-                return { 
-                    success: false, 
-                    error: `The AI service is currently unavailable (Status: ${status}). Please ensure your API key and quota are active. ${lastError.substring(0, 50)}` 
+            if (!finalResult) {
+                return {
+                    success: false,
+                    error: `The AI service is currently unavailable. Please ensure your API key and quota are active. ${lastError.substring(0, 50)}`
                 };
             }
 
-            const data = (await response.json()) as GeminiResponse;
-            const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            const responseText = finalResult?.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!responseText) {
-                console.error("Empty Gemini response structure:", JSON.stringify(data));
                 return { success: false, error: "Received an empty response from our analysis engine." };
             }
 
@@ -189,6 +181,14 @@ Return valid JSON ONLY:
             };
 
         } catch (error: any) {
+            if (error.message === "MODEL_CAPACITY_EXHAUSTED") {
+                return {
+                    success: false,
+                    error: "AI_CAPACITY_EXHAUSTED",
+                    capacityExhausted: true,
+                    retryAfter: error.retryAfter || 60
+                };
+            }
             console.error("ALMSTKSHF AI Engine Global Error:", error);
             return { success: false, error: "Analysis failed due to a system error. Our team has been notified." };
         }

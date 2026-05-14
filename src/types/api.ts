@@ -12,6 +12,8 @@ export interface FetchNewsResponse {
     skipped?: number;
     feeds?: number;
     error?: string;
+    capacityExhausted?: boolean;
+    retryAfter?: number;
 }
 
 export interface OptimizeQueryResponse {

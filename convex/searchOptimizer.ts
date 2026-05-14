@@ -10,6 +10,7 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { resolveApiKey } from "./utils/keys";
+import { callWithAiRetry } from "./utils/aiRetry";
 
 /**
  * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -192,50 +193,52 @@ Return valid JSON ONLY with these exact fields:
   "explanation": "one short sentence explaining what was added"
 }`;
 
-    // Correct Gemini model names (3.x series does NOT exist in the API)
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-flash-8b"];
+    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
 
     for (const model of models) {
       try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-              generationConfig: {
-                temperature: 0.2,
-                responseMimeType: "application/json",
-              },
-            }),
+        const result = await callWithAiRetry<any>(async () => {
+          return await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  temperature: 0.2,
+                  responseMimeType: "application/json",
+                },
+              }),
+            }
+          );
+        }, { maxRetries: 2 });
+
+        if (result.capacityExhausted) {
+          console.warn(`SearchOptimizer: ${model} reports capacity exhaustion. Trying next model if available.`);
+          continue; // Search optimizer can fail-over to next model or heuristic
+        }
+
+        if (result.success && result.data) {
+          const data = result.data;
+          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!rawText) continue;
+
+          const parsed = safeParseJson(rawText);
+          if (!parsed || typeof parsed.optimizedQuery !== "string") {
+            console.warn(`SearchOptimizer: ${model} returned unparseable JSON, trying next...`);
+            continue;
           }
-        );
 
-        if (!response.ok) {
-          console.warn(`SearchOptimizer: ${model} returned ${response.status}, trying next...`);
-          continue;
+          return {
+            original: args.keyword,
+            optimized: parsed.optimizedQuery as string,
+            explanation: (parsed.explanation as string) || "AI-optimized query.",
+            method: "ai" as const,
+          };
         }
-
-        const data = await response.json();
-        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!rawText) continue;
-
-        // Robust parsing â€” strips markdown code fences Gemini sometimes emits
-        const parsed = safeParseJson(rawText);
-        if (!parsed || typeof parsed.optimizedQuery !== "string") {
-          console.warn(`SearchOptimizer: ${model} returned unparseable JSON, trying next...`);
-          continue;
-        }
-
-        return {
-          original: args.keyword,
-          optimized: parsed.optimizedQuery as string,
-          explanation: (parsed.explanation as string) || "AI-optimized query.",
-          method: "ai" as const,
-        };
-      } catch (e) {
-        console.error(`SearchOptimizer: ${model} threw`, e);
+      } catch (e: any) {
+        console.error(`SearchOptimizer: ${model} threw`, e.message);
         continue;
       }
     }
