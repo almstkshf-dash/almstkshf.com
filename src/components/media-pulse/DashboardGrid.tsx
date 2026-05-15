@@ -8,7 +8,7 @@
 
 "use client";
 
-import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Globe, Download, FileSpreadsheet, FileText, Clock } from "lucide-react";
+import { Activity, ShieldAlert, ShieldCheck, Zap, BarChart3, AlertCircle, Download, FileSpreadsheet, FileText, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
@@ -29,10 +29,6 @@ const EmotionRadarChart = dynamic(() => import("./EmotionRadarChart"), {
 const ArticlesTrendChart = dynamic(() => import("./ArticlesTrendChart"), {
     ssr: false,
     loading: () => <ChartSkeleton height="160px" />
-});
-const VolumeHeatmapChart = dynamic(() => import("./VolumeHeatmapChart"), {
-    ssr: false,
-    loading: () => <ChartSkeleton height="400px" />
 });
 
 import { ReportGenerator } from "@/lib/report-generator";
@@ -195,27 +191,6 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
         }));
     }, [articles, trendRange, parseArticleDate]);
 
-    const heatmapData = useMemo(() => {
-        const counts: Record<string, number> = {};
-
-        articles?.forEach((article) => {
-            const date = parseArticleDate(article as MonitoringArticle);
-            if (!date) return;
-            const day = date.getDay();
-            const hour = date.getHours();
-            const key = `${day}-${hour}`;
-            counts[key] = (counts[key] || 0) + 1;
-        });
-
-        return Array.from({ length: 7 }, (_, day) =>
-            Array.from({ length: 24 }, (_, hour) => ({
-                day,
-                hour,
-                value: counts[`${day}-${hour}`] || 0,
-            }))
-        ).flat();
-    }, [articles, parseArticleDate]);
-
     return (
         <div className="space-y-6">
             {/* Header with Slot & Actions */}
@@ -365,20 +340,6 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                         </div>
                         <div className="h-[200px]">
                             <ArticlesTrendChart data={trendData} />
-                        </div>
-                    </div>
-
-                    {/* Activity Heatmap */}
-                    <div className="bg-card border border-border/50 rounded-3xl p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70">{t("volume_activity_heatmap", { defaultValue: "Volume Activity Heatmap" })}</h3>
-                                <p className="text-[10px] text-foreground/40 mt-0.5">{t("activity_heatmap_desc")}</p>
-                            </div>
-                            <Globe className="w-4 h-4 text-foreground/20" />
-                        </div>
-                        <div className="h-[280px]">
-                            <VolumeHeatmapChart data={heatmapData} />
                         </div>
                     </div>
                 </div>
