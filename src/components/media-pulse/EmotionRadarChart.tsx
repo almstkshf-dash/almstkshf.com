@@ -29,24 +29,28 @@ interface EmotionRadarChartProps {
 }
 
 const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadarChartProps) {
-    const t = useTranslations("Dashboard.emotions");
+    const t = useTranslations("FreeTool.emotions");
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    const translatedData = useMemo(() => data.map((item) => ({
-        ...item,
-        subject: t(item.subject.toLowerCase()) || item.subject,
-    })), [data, t]);
+    const translatedData = useMemo(() => data.map((item) => {
+        // Handle potential case mismatches by checking both capitalized and lowercase
+        const label = t(item.subject) || t(item.subject.charAt(0).toUpperCase() + item.subject.slice(1).toLowerCase()) || item.subject;
+        return {
+            ...item,
+            subject: label,
+        };
+    }), [data, t]);
 
     if (!mounted) return <ChartSkeleton height="300px" />;
 
     return (
         <div className="relative w-full h-[300px] min-h-[300px]" style={{ minHeight: '300px' }}>
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" aspect={2} minHeight={300} minWidth={0} debounce={50}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={0} debounce={50}>
                     <RadarChart 
                         cx="50%" 
                         cy="50%" 

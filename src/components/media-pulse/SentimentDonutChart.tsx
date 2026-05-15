@@ -68,7 +68,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
     return (
         <div className="relative w-full h-[300px] min-h-[300px]" style={{ minHeight: '300px' }}>
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" aspect={2} minHeight={300} minWidth={0} debounce={50}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={0} debounce={50}>
                     <PieChart>
                         <Pie
                             data={chartData}

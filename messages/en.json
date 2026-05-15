@@ -421,41 +421,41 @@
   },
   "Services": {},
   "AI": {
-    "badge": "Generative AI Leadership",
-    "deploy": "Deploy Agent",
+    "badge": "Gemini OSINT Engine",
+    "deploy": "Deploy Analysis",
     "view_caps": "View Capabilities",
-    "status": "Agent Active",
-    "instruction": "awaiting_instruction...",
-    "prompt": "PROMPT",
-    "response": "AGENT RESPONSE",
-    "ai_busy_wait": "AI services are currently busy. Please wait {seconds}s before trying again.",
+    "status": "System Status",
+    "instruction": "Describe the narrative or crisis to analyze...",
+    "prompt": "Intelligence Prompt",
+    "response": "AI Response",
+    "ai_busy_wait": "Model at capacity. Retrying in {seconds}s...",
     "capabilities": {
-      "title": "On-Demand Intelligence",
-      "subtitle": "AI-Powered Workflow",
+      "title": "Quantum Intelligence Capabilities",
+      "subtitle": "Beyond Conventional Monitoring",
       "s1": {
-        "title": "Speech-to-Strategy",
-        "desc": "Convert press conferences and broadcasts into actionable strategy drafts instantly."
+        "title": "Narrative Synthesis",
+        "desc": "Converts thousands of articles into a single coherent narrative summary."
       },
       "s2": {
-        "title": "Multi-Channel Briefs",
-        "desc": "Generate tailored content for Twitter, LinkedIn, and Official Statements in one click."
+        "title": "Crisis Prediction",
+        "desc": "Identifies early warning signs of reputational damage before they peak."
       },
       "s3": {
-        "title": "Tactical Response",
-        "desc": "On-demand counter-messaging based on real-time sentiment shifts."
+        "title": "Strategic Recommendations",
+        "desc": "Provides actionable counter-narratives and response strategies."
       },
       "s4": {
-        "title": "Agent Deployment",
-        "desc": "Deploy autonomous AI agents to monitor specific narratives, interact with stakeholders, or manage communication channels 24/7."
+        "title": "Sentiment Deep-Dive",
+        "desc": "Multi-layered emotion detection across diverse cultural contexts."
       }
     },
     "integration": {
-      "title": "Integrated directly into your leadership workflow",
-      "desc": "The Almstkshf AI Agent doesn't just talk — it acts. It connects with your monitoring data to provide insights that are contextually accurate and tactically sound."
+      "title": "Seamless Intelligence Integration",
+      "desc": "Deploy your AI assistant across your existing leadership communication channels."
     },
-    "analysis_complete": "Analysis complete!",
-    "analysis_empty": "Received an empty response from our analysis engine.",
-    "analysis_error": "The AI analysis engine failed to process the request. The text might be too long or unsupported. Please shorten the input and try again.",
+    "analysis_complete": "Strategic analysis complete",
+    "analysis_empty": "No data extracted from the prompt.",
+    "analysis_error": "Strategic analysis failed due to system error.",
     "risk_label": "Risk",
     "sentiment_label": "Sentiment",
     "awaiting_instruction": "Awaiting instruction...",
@@ -500,6 +500,7 @@
       "medium": "Medium Risk",
       "high": "High Risk"
     },
+    "cta": "Get Started Now",
     "sentiments": {
       "positive": "Positive",
       "neutral": "Neutral",
@@ -899,12 +900,16 @@
       "crisis_probability": "Crisis Probability",
       "gemini_osint_pulse": "Gemini OSINT Pulse",
       "live_analysis": "Live Analysis",
+      "analysis_complete": "Analysis Complete",
       "full_ai_report": "Full AI Report",
+      "geographic_reach": "Geographic Reach",
       "factors": {
-        "negative_sentiment_spike": "Negative Sentiment Spike",
-        "volume_surge_negative": "Volume Surge (Negative Content)",
-        "high_reach_critical": "High Reach Critical Mention",
-        "sentiment_shift_detection": "Sudden Sentiment Shift"
+        "high negative sentiment": "High Negative Editorial Trend",
+        "rapid velocity": "Rapid Escalation in Coverage Volume",
+        "low diversity": "Concentration in Media Sources",
+        "dark web exposure": "Dark Web Exposure",
+        "watchlist match": "Watchlist Match",
+        "crisis signals": "Media Crisis Indicators"
       }
     },
     "sentiment_donut": {

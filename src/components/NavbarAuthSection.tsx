@@ -8,7 +8,7 @@
 
 "use client";
 import { memo } from "react";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { LayoutDashboard, Settings } from "lucide-react";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 
@@ -38,7 +38,7 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
         <>
             {/* â”€â”€â”€ Desktop auth â”€â”€â”€ */}
             <div className="hidden lg:flex items-center gap-2">
-                <SignedOut>
+                <Show when="signed-out">
                     <SignInButton mode="modal">
                         <button className="px-4 py-2 text-sm font-medium text-foreground/85 hover:text-foreground transition-colors">
                             {loginLabel}
@@ -50,9 +50,9 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
                     >
                         {getStartedLabel}
                     </HoverPrefetchLink>
-                </SignedOut>
+                </Show>
 
-                <SignedIn>
+                <Show when="signed-in">
                     <HoverPrefetchLink
                         href="/dashboard"
                         className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
@@ -69,20 +69,17 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
                         <span className="whitespace-nowrap">{settingsLabel}</span>
                     </HoverPrefetchLink>
                     <UserButton
-                        afterSignOutUrl="/"
                         appearance={{
                             elements: {
                                 userButtonAvatarBox: "w-9 h-9 border-2 border-border hover:border-primary transition-colors",
                                 userButtonTrigger: "focus:shadow-none focus:outline-none"
                             }
-                        }}
-                    />
-                </SignedIn>
+                        }} />
+                </Show>
             </div>
-
             {/* â”€â”€â”€ Mobile auth â”€â”€â”€ */}
             <div className="lg:hidden flex items-center gap-2">
-                <SignedIn>
+                <Show when="signed-in">
                     <HoverPrefetchLink
                         href="/dashboard"
                         className="w-9 h-9 rounded-full border border-border bg-background hover:bg-muted transition-colors flex items-center justify-center text-primary"
@@ -91,15 +88,13 @@ const NavbarAuthSection = memo(function NavbarAuthSection({
                         <LayoutDashboard className={iconSm} aria-hidden="true" />
                     </HoverPrefetchLink>
                     <UserButton
-                        afterSignOutUrl="/"
                         appearance={{
                             elements: {
                                 userButtonAvatarBox: "w-9 h-9 border border-border",
                                 userButtonTrigger: "focus:shadow-none focus:outline-none"
                             }
-                        }}
-                    />
-                </SignedIn>
+                        }} />
+                </Show>
             </div>
         </>
     );
@@ -127,19 +122,18 @@ export const MobileAuthFooter = memo(function MobileAuthFooter({
 }: MobileAuthFooterProps) {
     return (
         <>
-            <SignedOut>
+            <Show when="signed-out">
                 <SignInButton mode="modal">
                     <button className="w-full py-3 text-base font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
                         {getStartedLabel}
                     </button>
                 </SignInButton>
-            </SignedOut>
-
-            <SignedIn>
+            </Show>
+            <Show when="signed-in">
                 <div className="flex flex-col gap-3 p-3 bg-muted/30 rounded-xl border border-border">
                     <div className="flex items-center justify-between p-2">
                         <div className="flex items-center gap-3">
-                            <UserButton afterSignOutUrl="/" />
+                            <UserButton />
                             <span className="font-medium text-foreground text-sm">Account</span>
                         </div>
                     </div>
@@ -162,7 +156,7 @@ export const MobileAuthFooter = memo(function MobileAuthFooter({
                         </HoverPrefetchLink>
                     </div>
                 </div>
-            </SignedIn>
+            </Show>
         </>
     );
 });
