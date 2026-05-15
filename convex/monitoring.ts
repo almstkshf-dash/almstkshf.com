@@ -105,35 +105,40 @@ export const saveArticle = mutation({
         })),
     },
     handler: async (ctx, args) => {
-        // Ensure sourceType matches schema validator
-        const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
+        try {
+            // Ensure sourceType matches schema validator
+            const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
 
+            // Check for duplicates before inserting
+            const existing = await ctx.db
+                .query("media_monitoring_articles")
+                .withIndex("by_date", (q) => q.eq("publishedDate", args.publishedDate))
+                .filter((q) => q.eq(q.field("title"), args.title))
+                .first();
 
-        // Check for duplicates before inserting
-        const existing = await ctx.db
-            .query("media_monitoring_articles")
-            .withIndex("by_date", (q) => q.eq("publishedDate", args.publishedDate))
-            .filter((q) => q.eq(q.field("title"), args.title))
-            .first();
+            // 100% Data Validation: Ensure all literals are correct
+            const finalSourceType = validSourceTypes.includes(args.sourceType)
+                ? (args.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release")
+                : "Online News";
 
-        // 100% Data Validation: Ensure all literals are correct
-        const finalSourceType = validSourceTypes.includes(args.sourceType)
-            ? (args.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release")
-            : "Online News";
-
-        if (!existing) {
-            await ctx.db.insert("media_monitoring_articles", {
-                ...args,
-                createdAt: Date.now(),
-                sourceType: finalSourceType,
-                depth: (args.depth ?? "standard") as "standard" | "deep",
-                ingestMethod: args.ingestMethod,
-                manualSentimentOverride: args.manualSentimentOverride ?? false,
-                originalSentiment: args.originalSentiment ?? args.sentiment,
-                relevancy_score: args.relevancy_score,
-                hashtags: args.hashtags,
-                emotions: args.emotions,
-            });
+            if (!existing) {
+                await ctx.db.insert("media_monitoring_articles", {
+                    ...args,
+                    createdAt: Date.now(),
+                    sourceType: finalSourceType,
+                    depth: (args.depth ?? "standard") as "standard" | "deep",
+                    ingestMethod: args.ingestMethod,
+                    manualSentimentOverride: args.manualSentimentOverride ?? false,
+                    originalSentiment: args.originalSentiment ?? args.sentiment,
+                    relevancy_score: args.relevancy_score,
+                    hashtags: args.hashtags,
+                    emotions: args.emotions,
+                });
+            }
+        } catch (error) {
+            console.error("saveArticle failed. Args:", JSON.stringify(args));
+            console.error("saveArticle error:", error);
+            throw error;
         }
     },
 });
