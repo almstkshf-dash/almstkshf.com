@@ -38,9 +38,9 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
     if (!mounted) return <ChartSkeleton height="160px" />;
 
     return (
-        <div className="relative w-full h-[160px] min-h-[160px]" style={{ minHeight: '160px' }}>
+        <div className="relative w-full h-[160px] min-h-[160px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={160} minWidth={0} debounce={50}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={160}>
                     <AreaChart 
                         data={data} 
                         margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
