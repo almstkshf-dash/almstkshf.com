@@ -174,8 +174,29 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Egyptian Streets': [
     { id: 'egyptianstreets-en', name: 'Latest News', url: 'https://egyptianstreets.com/feed/', country: 'EG' }
   ],
-  'Newswire.com': [
+  'Newswire_com': [
     { id: 'newswire-en', name: 'Latest PR', url: 'https://www.newswire.com/newsroom/rss/all', country: 'US' }
+  ],
+  'UAE Interact': [
+    { id: 'uaeinteract-news', name: 'Latest News', url: 'https://www.uaeinteract.com/rss/news', country: 'UAE' }
+  ],
+  'Food Safety News': [
+    { id: 'foodsafetynews-latest', name: 'Latest News', url: 'https://www.foodsafetynews.com/rss/', country: 'US' }
+  ],
+  'Energy Intel': [
+    { id: 'energyintel-latest', name: 'Latest News', url: 'https://www.energyintel.com/rss-feed.rss', country: 'US' }
+  ],
+  'Business Day': [
+    { id: 'businessday-latest', name: 'Latest News', url: 'https://www.businessday.co.za/arc/outboundfeeds/rss/', country: 'ZA' }
+  ],
+  'India News Network': [
+    { id: 'indianewsnetwork-latest', name: 'Latest News', url: 'https://www.indianewsnetwork.com/rss.xml', country: 'IN' }
+  ],
+  'Al Wahda News': [
+    { id: 'alwahdanews-latest', name: 'Latest News', url: 'https://alwahdanews.ae/feed/', country: 'UAE' }
+  ],
+  'Nabd El Emirate': [
+    { id: 'nbdelemirate-latest', name: 'Latest News', url: 'https://nbdelemirate.com/feed/', country: 'UAE' }
   ],
 };
 

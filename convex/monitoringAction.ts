@@ -1114,7 +1114,7 @@ async function fetchRobustRss(url: string) {
 
 const PR_WIRE_FEEDS = [
     { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-news.rss", country: "US", lang: "en" },
-    { name: "Newswire.com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
+    { name: "Newswire_com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
     { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
     { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
     { name: "Zawya", url: "https://www.zawya.com/en/rss/all", country: "AE", lang: "en" },
@@ -1197,6 +1197,13 @@ const PR_WIRE_FEEDS = [
     { name: "First Avenue Magazine", url: "https://firstavenuemagazine.com/feed/", country: "AE", lang: "en" },
     { name: "Evision Worlds", url: "https://evisionworlds.com/?feed=rss2", country: "AE", lang: "en" },
     { name: "Pan Time Arabia", url: "https://pantimearabia.com/rss/", country: "AE", lang: "ar" },
+    { name: "UAE Interact", url: "https://www.uaeinteract.com/rss/news", country: "AE", lang: "en" },
+    { name: "Food Safety News", url: "https://www.foodsafetynews.com/rss/", country: "US", lang: "en" },
+    { name: "Energy Intel", url: "https://www.energyintel.com/rss-feed.rss", country: "US", lang: "en" },
+    { name: "Business Day", url: "https://www.businessday.co.za/arc/outboundfeeds/rss/", country: "ZA", lang: "en" },
+    { name: "India News Network", url: "https://www.indianewsnetwork.com/rss.xml", country: "IN", lang: "en" },
+    { name: "Al Wahda News", url: "https://alwahdanews.ae/feed/", country: "AE", lang: "ar" },
+    { name: "Nabd El Emirate", url: "https://nbdelemirate.com/feed/", country: "AE", lang: "ar" },
 ];
 
 export const fetchPressReleaseSources = action({
