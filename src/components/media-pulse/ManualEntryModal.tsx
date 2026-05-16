@@ -125,7 +125,15 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
             onClose();
         } catch (error) {
-            console.error("Failed to save:", error);
+            console.error("Failed to save. Payload:", {
+                title: formData.title,
+                sourceType: formData.sourceType,
+                date: formData.date,
+                url: formData.url,
+                sentiment: formData.sentiment,
+                reach: formData.reach,
+                imageUrlLength: formData.imageUrl ? formData.imageUrl.length : 0,
+            }, error);
             alert(t('save_failed'));
         } finally {
             setIsLoading(false);
@@ -142,13 +150,23 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 const data = result.data;
                 const d = data.publish_date ? new Date(data.publish_date) : new Date();
 
+                let parsedSentiment = formData.sentiment;
+                if (typeof data.sentiment === "number") {
+                    parsedSentiment = data.sentiment > 0.1 ? "Positive" : (data.sentiment < -0.1 ? "Negative" : "Neutral");
+                } else if (typeof data.sentiment === "string") {
+                    const s = data.sentiment.toLowerCase();
+                    if (s.includes("positive")) parsedSentiment = "Positive";
+                    else if (s.includes("negative")) parsedSentiment = "Negative";
+                    else if (s.includes("neutral")) parsedSentiment = "Neutral";
+                }
+
                 setFormData(prev => ({
                     ...prev,
                     title: data.title || prev.title,
                     content: data.text || prev.content,
-                    date: d.toISOString().split('T')[0],
+                    date: !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : prev.date,
                     imageUrl: data.image || prev.imageUrl,
-                    sentiment: data.sentiment || prev.sentiment,
+                    sentiment: parsedSentiment,
                 }));
             } else {
                 alert(t('extract_failed'));
@@ -166,7 +184,39 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+                const img = new window.Image();
+                img.onload = () => {
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+                        setFormData(prev => ({ ...prev, imageUrl: compressedBase64 }));
+                    } else {
+                        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+                    }
+                };
+                img.src = reader.result as string;
             };
             reader.readAsDataURL(file);
         }
