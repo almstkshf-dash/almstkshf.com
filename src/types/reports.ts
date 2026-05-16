@@ -95,6 +95,44 @@ export interface ReportTranslations {
     OsintTab?: {
         export_history?: string;
     };
+    sheet_name?: string;
+    date?: string;
+    title?: string;
+    url?: string;
+    type?: string;
+    source?: string;
+    depth?: string;
+    country?: string;
+    sentiment?: string;
+    relevancy?: string;
+    reach?: string;
+    likes?: string;
+    retweets?: string;
+    replies?: string;
+    status?: string;
+    ave?: string;
+    hashtags?: string;
+    brand_tagline?: string;
+    footer_url?: string;
+    generated_at?: string;
+    page_count?: string;
+    report_title?: string;
+    total_articles?: string;
+    keyword_label?: string;
+    region_label?: string;
+    langs_label?: string;
+    summary_title?: string;
+    total_reach?: string;
+    ad_value?: string;
+    sentiment_title?: string;
+    sentiment_pos?: string;
+    sentiment_neu?: string;
+    sentiment_neg?: string;
+    ai_recommendation?: string;
+    rec_high_neg?: string;
+    rec_mod_neg?: string;
+    rec_healthy?: string;
+    coverage_log?: string;
     [key: string]: unknown;
 }
 

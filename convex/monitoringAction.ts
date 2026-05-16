@@ -1174,6 +1174,20 @@ const PR_WIRE_FEEDS = [
     { name: "US News", url: "http://www.usnews.com/rss/news", country: "US", lang: "en" },
     { name: "Sky News UK", url: "http://news.sky.com/feeds/rss/uk.xml", country: "GB", lang: "en" },
     { name: "The Telegraph", url: "http://www.telegraph.co.uk/news/uknews/rss", country: "GB", lang: "en" },
+    { name: "Deadline", url: "http://deadline.com/feed/", country: "US", lang: "en" },
+    { name: "Vulture", url: "http://feeds.feedburner.com/nymag/vulture", country: "US", lang: "en" },
+    { name: "CNN", url: "http://rss.cnn.com/rss/cnn_showbiz.rss", country: "US", lang: "en" },
+    { name: "Esquire", url: "http://www.esquire.com/blogs/culture/culture-rss", country: "US", lang: "en" },
+    { name: "CBS News", url: "http://www.cbsnews.com/latest/rss/entertainment", country: "US", lang: "en" },
+    { name: "TMZ", url: "http://www.tmz.com/rss.xml", country: "US", lang: "en" },
+    { name: "BuzzFeed", url: "http://www.buzzfeed.com/tvandmovies.xml", country: "US", lang: "en" },
+    { name: "Variety", url: "http://variety.com/feed/", country: "US", lang: "en" },
+    { name: "The New Yorker", url: "http://www.newyorker.com/feed/culture", country: "US", lang: "en" },
+    { name: "Yahoo News", url: "http://news.yahoo.com/rss/entertainment", country: "US", lang: "en" },
+    { name: "LA Times", url: "http://www.latimes.com/entertainment/rss2.0.xml", country: "US", lang: "en" },
+    { name: "NBC News", url: "http://feeds.nbcnews.com/feeds/todayentertainment", country: "US", lang: "en" },
+    { name: "ABC News", url: "http://feeds.abcnews.com/abcnews/entertainmentheadlines", country: "US", lang: "en" },
+    { name: "Huffington Post", url: "https://www.huffpost.com/dept/entertainment/feed", country: "US", lang: "en" },
 ];
 
 export const fetchPressReleaseSources = action({

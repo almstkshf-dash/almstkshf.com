@@ -21,6 +21,8 @@ import CrisisPlanCard from "./CrisisPlanCard";
 import { SkeletonReportRow, SkeletonCard } from "./ui/Skeleton";
 import ReportsChart from "./ReportsChart";
 import SaveToCollectionModal from "./ui/SaveToCollectionModal";
+import { ReportGenerator } from "@/lib/report-generator";
+import { toast } from "sonner";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
 type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
@@ -102,6 +104,70 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         }));
     }, [reports]);
 
+    const tExport = useTranslations("MediaMonitoring.dashboard.export_translations");
+
+    const exportTranslations = {
+        sheet_name: tExport('sheet_name'),
+        date: tExport('date'),
+        title: tExport('title'),
+        url: tExport('url'),
+        type: tExport('type'),
+        source: tExport('source'),
+        depth: tExport('depth'),
+        country: tExport('country'),
+        sentiment: tExport('sentiment'),
+        relevancy: tExport('relevancy'),
+        reach: tExport('reach'),
+        likes: tExport('likes'),
+        retweets: tExport('retweets'),
+        replies: tExport('replies'),
+        status: tExport('status'),
+        ave: tExport('ave'),
+        hashtags: tExport('hashtags'),
+        brand_name: tExport('brand_name'),
+        brand_tagline: tExport('brand_tagline'),
+        footer_url: tExport('footer_url'),
+        generated_at: tExport('generated_at'),
+        page_count: tExport('page_count'),
+        report_title: tExport('report_title'),
+        total_articles: tExport('total_articles'),
+        keyword_label: tExport('keyword_label'),
+        region_label: tExport('region_label'),
+        langs_label: tExport('langs_label'),
+        summary_title: tExport('summary_title'),
+        total_reach: tExport('total_reach'),
+        ad_value: tExport('ad_value'),
+        sentiment_title: tExport('sentiment_title'),
+        sentiment_pos: tExport('sentiment_pos'),
+        sentiment_neu: tExport('sentiment_neu'),
+        sentiment_neg: tExport('sentiment_neg'),
+        ai_recommendation: tExport('ai_recommendation'),
+        rec_high_neg: tExport('rec_high_neg'),
+        rec_mod_neg: tExport('rec_mod_neg'),
+        rec_healthy: tExport('rec_healthy'),
+        coverage_log: tExport('coverage_log')
+    };
+
+    const handleExport = async (format: 'pdf' | 'excel') => {
+        if (!reports || reports.length === 0) {
+            toast.error(tCommon('no_data'));
+            return;
+        }
+        
+        try {
+            toast.loading(tCommon('exporting'), { id: 'export-dashboard' });
+            await ReportGenerator.exportMediaMonitoringReport(
+                reports as any,
+                exportTranslations as any,
+                format
+            );
+            toast.success(tCommon('success'), { id: 'export-dashboard' });
+        } catch (error) {
+            console.error('Export failed', error);
+            toast.error(tCommon('error'), { id: 'export-dashboard' });
+        }
+    };
+
     if (!mounted) {
         return (
             <div className="space-y-8 animate-pulse">
@@ -165,11 +231,35 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         <span className="w-1 h-8 bg-primary rounded-full block"></span>
                         {tMedia('coverage_log') || "Coverage Log"}
                     </h2>
-                    {reports && reports.length > 0 && (
-                        <div className="text-sm text-muted-foreground bg-muted/30 px-3 py-1 rounded-lg border border-border/50">
-                            {reports.length} {tCommon('articles_count') || "Articles"}
-                        </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {reports && reports.length > 0 && (
+                            <div className="flex items-center gap-2 mr-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    leftIcon={<Download className="w-3.5 h-3.5" />}
+                                    onClick={() => handleExport('excel')}
+                                    className="text-xs h-8"
+                                >
+                                    Excel
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    leftIcon={<FileText className="w-3.5 h-3.5" />}
+                                    onClick={() => handleExport('pdf')}
+                                    className="text-xs h-8"
+                                >
+                                    PDF
+                                </Button>
+                            </div>
+                        )}
+                        {reports && reports.length > 0 && (
+                            <div className="text-sm text-muted-foreground bg-muted/30 px-3 py-1 rounded-lg border border-border/50">
+                                {reports.length} {tCommon('articles_count') || "Articles"}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {reports === undefined ? (

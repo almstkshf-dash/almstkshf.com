@@ -43,7 +43,12 @@ interface ExportTranslations {
     depth?: string;
     country?: string;
     sentiment?: string;
+    relevancy?: string;
     reach?: string;
+    likes?: string;
+    retweets?: string;
+    replies?: string;
+    status?: string;
     ave?: string;
     hashtags?: string;
     // PDF — brand
@@ -88,7 +93,7 @@ interface AutoTableCellData {
 // ════════════════════════════════════════════════════════════════════════
 // EXCEL EXPORT
 // ════════════════════════════════════════════════════════════════════════
-export async function exportToExcel(
+private static async generateMediaMonitoringExcel(
     articles: Article[],
     translations: ExportTranslations,
     reportName: string = 'Media_Monitoring_Report',
@@ -105,8 +110,13 @@ export async function exportToExcel(
         { header: translations.depth || 'Coverage Depth', key: 'depth', width: 10 },
         { header: translations.country || 'Country', key: 'country', width: 10 },
         { header: translations.sentiment || 'Sentiment Direction', key: 'sentiment', width: 12 },
+        { header: translations.relevancy || 'Relevancy', key: 'relevancy', width: 10 },
         { header: translations.reach || 'Reach / Impressions', key: 'reach', width: 15 },
+        { header: translations.likes || 'Likes', key: 'likes', width: 10 },
+        { header: translations.retweets || 'Retweets', key: 'retweets', width: 10 },
+        { header: translations.replies || 'Replies', key: 'replies', width: 10 },
         { header: translations.ave || 'AVE (Advertising Value Equivalent)', key: 'ave', width: 15 },
+        { header: translations.status || 'Status', key: 'status', width: 12 },
         { header: translations.hashtags || 'Hashtags', key: 'hashtags', width: 30 },
     ];
 
@@ -126,8 +136,13 @@ export async function exportToExcel(
             depth: article.depth || 'standard',
             country: article.sourceCountry,
             sentiment: article.sentiment,
+            relevancy: article.relevancy_score !== undefined ? `${article.relevancy_score}%` : '-',
             reach: article.reach,
+            likes: article.likes !== undefined ? article.likes : '-',
+            retweets: article.retweets !== undefined ? article.retweets : '-',
+            replies: article.replies !== undefined ? article.replies : '-',
             ave: article.ave,
+            status: article.status === 'in_progress' ? 'In Progress' : (article.status || 'Live'),
             hashtags: Array.isArray(article.hashtags) ? article.hashtags.join(', ') : '',
         });
     });
@@ -155,7 +170,7 @@ const BRAND_AMBER = [218, 165, 32] as const;   // #DAA520 (golden)
 const ACCENT_BG = [245, 247, 250] as const;    // #F5F7FA
 
 // Helper: add header with logo
-function addPageHeader(
+const addPageHeader = (
     doc: jsPDF,
     logoBase64: string | null,
     pageWidth: number,
@@ -187,7 +202,7 @@ function addPageHeader(
 }
 
 // Helper: add footer with page number and URL
-function addPageFooter(
+const addPageFooter = (
     doc: jsPDF,
     pageWidth: number,
     pageHeight: number,
@@ -256,7 +271,7 @@ type JsPDFConstructor = new (opts: {
 /** Typed wrapper around jspdf-autotable's default export. */
 type AutoTableFn = (doc: jsPDF, opts: object) => void;
 
-export async function exportToPDF(
+private static async generateMediaMonitoringPDF(
     articles: Article[],
     translations: ExportTranslations,
     logoUrl?: string,
@@ -282,10 +297,8 @@ export async function exportToPDF(
         (autoTableMod as { default?: AutoTableFn }).default ??
         (autoTableMod as unknown as AutoTableFn);
 
-    const totalContentLength = articles.reduce((sum, a) => sum + (a.content?.length || 0) + (a.title?.length || 0), 0);
-    const useLandscape = articles.length > 20 || totalContentLength > 10000; // Adjust thresholds as needed
-
-    const doc = new JsPDF({ orientation: useLandscape ? 'l' : 'p', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
+    const useLandscape = true;
+    const doc = new JsPDF({ orientation: useLandscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
@@ -476,8 +489,13 @@ export async function exportToPDF(
             a.sourceType ?? '',
             a.sourceCountry ?? '',
             a.sentiment ?? '',
+            a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-',
             (a.reach ?? 0).toLocaleString(),
-            `$${(a.ave ?? 0).toLocaleString()}`
+            a.likes !== undefined && a.likes !== null ? a.likes.toLocaleString() : '-',
+            a.retweets !== undefined && a.retweets !== null ? a.retweets.toLocaleString() : '-',
+            a.replies !== undefined && a.replies !== null ? a.replies.toLocaleString() : '-',
+            `$${(a.ave ?? 0).toLocaleString()}`,
+            a.status === 'in_progress' ? 'In Progress' : (a.status || 'Live')
         ];
     });
 
@@ -488,8 +506,13 @@ export async function exportToPDF(
             translations.type || 'Source Type',
             translations.country || 'Country',
             translations.sentiment || 'Sentiment Direction',
-            translations.reach || 'Reach / Impressions',
-            translations.ave || 'AVE (Advertising Value Equivalent)'
+            translations.relevancy || 'Relevancy',
+            translations.reach || 'Reach',
+            translations.likes || 'Likes',
+            translations.retweets || 'Retweets',
+            translations.replies || 'Replies',
+            translations.ave || 'AVE ($)',
+            translations.status || 'Status'
         ]],
         body: tableData,
         startY: 33,
@@ -509,13 +532,18 @@ export async function exportToPDF(
         },
         alternateRowStyles: { fillColor: [245, 247, 250] },
         columnStyles: {
-            0: { cellWidth: 20 },
-            1: { cellWidth: 65, halign: 'left' },
-            2: { cellWidth: 22 },
-            3: { cellWidth: 15, halign: 'center' },
-            4: { cellWidth: 18, halign: 'center' },
-            5: { cellWidth: 20, halign: 'right' },
-            6: { cellWidth: 20, halign: 'right' },
+            0: { cellWidth: 15 }, // date
+            1: { cellWidth: 55, halign: 'left' }, // title
+            2: { cellWidth: 20 }, // type
+            3: { cellWidth: 15, halign: 'center' }, // country
+            4: { cellWidth: 15, halign: 'center' }, // sentiment
+            5: { cellWidth: 12, halign: 'center' }, // relevancy
+            6: { cellWidth: 15, halign: 'right' }, // reach
+            7: { cellWidth: 12, halign: 'right' }, // likes
+            8: { cellWidth: 12, halign: 'right' }, // retweets
+            9: { cellWidth: 12, halign: 'right' }, // replies
+            10: { cellWidth: 15, halign: 'right' }, // ave
+            11: { cellWidth: 15, halign: 'center' }, // status
         },
         didParseCell: (data: AutoTableCellData) => {
             if (data.section === 'body' && typeof data.cell.raw === 'string') {

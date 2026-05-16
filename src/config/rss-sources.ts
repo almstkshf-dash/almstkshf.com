@@ -87,6 +87,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'The New Yorker': [
     { id: 'newyorker-lede', name: 'The Lede', url: 'https://www.newyorker.com/feed/the-lede/rss', country: 'US' },
+    { id: 'newyorker-culture', name: 'Culture', url: 'http://www.newyorker.com/feed/culture', country: 'US' },
   ],
   'Wired': [
     { id: 'wired-business', name: 'Business', url: 'https://www.wired.com/feed/category/business/latest/rss', country: 'US' },
@@ -217,10 +218,12 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Yahoo News': [
     { id: 'yahoo-world', name: 'World News', url: 'http://rss.news.yahoo.com/rss/world', country: 'US' },
     { id: 'yahoo-us', name: 'US News', url: 'http://news.yahoo.com/rss/us', country: 'US' },
+    { id: 'yahoo-entertainment', name: 'Entertainment', url: 'http://news.yahoo.com/rss/entertainment', country: 'US' },
   ],
   'LA Times': [
     { id: 'latimes-world', name: 'World News', url: 'http://www.latimes.com/world/rss2.0.xml', country: 'US' },
     { id: 'latimes-national', name: 'National News', url: 'http://www.latimes.com/nation/rss2.0.xml', country: 'US' },
+    { id: 'latimes-entertainment', name: 'Entertainment', url: 'http://www.latimes.com/entertainment/rss2.0.xml', country: 'US' },
   ],
   'CS Monitor': [
     { id: 'csmonitor-usa', name: 'USA', url: 'http://rss.csmonitor.com/feeds/usa', country: 'US' },
@@ -228,6 +231,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'NBC News': [
     { id: 'nbcnews-top', name: 'Top Stories', url: 'http://feeds.nbcnews.com/feeds/topstories', country: 'US' },
     { id: 'nbcnews-world', name: 'World News', url: 'http://feeds.nbcnews.com/feeds/worldnews', country: 'US' },
+    { id: 'nbcnews-entertainment', name: 'Entertainment', url: 'http://feeds.nbcnews.com/feeds/todayentertainment', country: 'US' },
   ],
   'The Guardian': [
     { id: 'guardian-us', name: 'US News', url: 'http://www.theguardian.com/world/usa/rss', country: 'GB' },
@@ -238,6 +242,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'ABC News': [
     { id: 'abcnews-us', name: 'US Headlines', url: 'http://feeds.abcnews.com/abcnews/usheadlines', country: 'US' },
+    { id: 'abcnews-entertainment', name: 'Entertainment', url: 'http://feeds.abcnews.com/abcnews/entertainmentheadlines', country: 'US' },
   ],
   'Time': [
     { id: 'time-newsfeed', name: 'Newsfeed', url: 'http://time.com/newsfeed/feed/', country: 'US' },
@@ -250,6 +255,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'Huffington Post': [
     { id: 'huffpost-world', name: 'World News', url: 'http://www.huffingtonpost.com/feeds/verticals/world/index.xml', country: 'US' },
+    { id: 'huffpost-entertainment', name: 'Entertainment', url: 'https://www.huffpost.com/dept/entertainment/feed', country: 'US' },
   ],
   'US News': [
     { id: 'usnews-latest', name: 'Latest News', url: 'http://www.usnews.com/rss/news', country: 'US' },
@@ -259,6 +265,30 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'The Telegraph': [
     { id: 'telegraph-uk', name: 'UK News', url: 'http://www.telegraph.co.uk/news/uknews/rss', country: 'GB' },
+  ],
+  'Deadline': [
+    { id: 'deadline-entertainment', name: 'Entertainment', url: 'http://deadline.com/feed/', country: 'US' },
+  ],
+  'Vulture': [
+    { id: 'vulture-entertainment', name: 'Entertainment', url: 'http://feeds.feedburner.com/nymag/vulture', country: 'US' },
+  ],
+  'CNN': [
+    { id: 'cnn-entertainment', name: 'Entertainment News', url: 'http://rss.cnn.com/rss/cnn_showbiz.rss', country: 'US' },
+  ],
+  'Esquire': [
+    { id: 'esquire-culture', name: 'Culture', url: 'http://www.esquire.com/blogs/culture/culture-rss', country: 'US' },
+  ],
+  'CBS News': [
+    { id: 'cbsnews-entertainment', name: 'Entertainment', url: 'http://www.cbsnews.com/latest/rss/entertainment', country: 'US' },
+  ],
+  'TMZ': [
+    { id: 'tmz-entertainment', name: 'Entertainment', url: 'http://www.tmz.com/rss.xml', country: 'US' },
+  ],
+  'BuzzFeed': [
+    { id: 'buzzfeed-entertainment', name: 'TV and Movies', url: 'http://www.buzzfeed.com/tvandmovies.xml', country: 'US' },
+  ],
+  'Variety': [
+    { id: 'variety-entertainment', name: 'Entertainment', url: 'http://variety.com/feed/', country: 'US' },
   ],
 };
 

@@ -17,6 +17,8 @@ import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 
 import { useTranslations } from "next-intl";
+import { ReportGenerator } from "@/lib/report-generator";
+import { toast } from "sonner";
 
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
@@ -32,10 +34,83 @@ export default function ReportLibrary() {
         return () => clearTimeout(timer);
     }, [inputValue]);
 
-    const filteredCollections = collectionsResult?.filter((c: { _id: string; name: string; items?: unknown[]; [key: string]: unknown }) =>
+    const filteredCollections = collectionsResult?.filter((c: { _id: string; name: string; items?: any[]; [key: string]: any }) =>
         c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
         c.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
+
+    const tExport = useTranslations("MediaMonitoring.dashboard.export_translations");
+
+    const exportTranslations = {
+        sheet_name: tExport('sheet_name'),
+        date: tExport('date'),
+        title: tExport('title'),
+        url: tExport('url'),
+        type: tExport('type'),
+        source: tExport('source'),
+        depth: tExport('depth'),
+        country: tExport('country'),
+        sentiment: tExport('sentiment'),
+        relevancy: tExport('relevancy'),
+        reach: tExport('reach'),
+        likes: tExport('likes'),
+        retweets: tExport('retweets'),
+        replies: tExport('replies'),
+        status: tExport('status'),
+        ave: tExport('ave'),
+        hashtags: tExport('hashtags'),
+        brand_name: tExport('brand_name'),
+        brand_tagline: tExport('brand_tagline'),
+        footer_url: tExport('footer_url'),
+        generated_at: tExport('generated_at'),
+        page_count: tExport('page_count'),
+        report_title: tExport('report_title'),
+        total_articles: tExport('total_articles'),
+        keyword_label: tExport('keyword_label'),
+        region_label: tExport('region_label'),
+        langs_label: tExport('langs_label'),
+        summary_title: tExport('summary_title'),
+        total_reach: tExport('total_reach'),
+        ad_value: tExport('ad_value'),
+        sentiment_title: tExport('sentiment_title'),
+        sentiment_pos: tExport('sentiment_pos'),
+        sentiment_neu: tExport('sentiment_neu'),
+        sentiment_neg: tExport('sentiment_neg'),
+        ai_recommendation: tExport('ai_recommendation'),
+        rec_high_neg: tExport('rec_high_neg'),
+        rec_mod_neg: tExport('rec_mod_neg'),
+        rec_healthy: tExport('rec_healthy'),
+        coverage_log: tExport('coverage_log')
+    };
+
+    const handleDownload = async (collection: any) => {
+        if (!collection.items || collection.items.length === 0) {
+            toast.error(t('empty_collection'));
+            return;
+        }
+
+        const monitoringItems = collection.items
+            .filter((i: any) => i.type === "media_monitoring")
+            .map((i: any) => i.data);
+
+        if (monitoringItems.length === 0) {
+            toast.error(t('no_exportable_items'));
+            return;
+        }
+
+        try {
+            toast.loading(tCommon('downloading'), { id: 'download-report' });
+            await ReportGenerator.exportMediaMonitoringReport(
+                monitoringItems,
+                exportTranslations as any,
+                'pdf'
+            );
+            toast.success(tCommon('success'), { id: 'download-report' });
+        } catch (error) {
+            console.error('Download failed', error);
+            toast.error(tCommon('error'), { id: 'download-report' });
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -91,7 +166,7 @@ export default function ReportLibrary() {
                                     <div className="flex items-center gap-3 mt-1 text-[10px] text-foreground/70 font-bold uppercase tracking-widest">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" aria-hidden="true" />
-                                            {new Date(collection.updatedAt).toLocaleDateString()}
+                                            {new Date(collection.updatedAt as number).toLocaleDateString()}
                                         </span>
                                         <span>â€¢</span>
                                         <span className="text-foreground/70">{collection.items?.length || 0} Items</span>
@@ -112,6 +187,7 @@ export default function ReportLibrary() {
                                     size="sm"
                                     leftIcon={<Download className="w-3 h-3" aria-hidden="true" />}
                                     className="bg-blue-600 hover:bg-blue-500"
+                                    onClick={() => handleDownload(collection)}
                                 >
                                     {tCommon('download')}
                                 </Button>

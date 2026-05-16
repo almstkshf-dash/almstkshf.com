@@ -25,8 +25,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
 import { ALL_COUNTRIES } from '@/lib/countries';
+import { ReportGenerator } from '@/lib/report-generator';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import { PREMIUM_SOURCES } from '@/config/rss-sources';
@@ -257,7 +257,12 @@ export default function DashboardPage() {
             depth: tExport('depth'),
             country: tExport('country'),
             sentiment: tExport('sentiment'),
+            relevancy: tExport('relevancy'),
             reach: tExport('reach'),
+            likes: tExport('likes'),
+            retweets: tExport('retweets'),
+            replies: tExport('replies'),
+            status: tExport('status'),
             ave: tExport('ave'),
             brand_name: tExport('brand_name'),
             brand_tagline: tExport('brand_tagline'),
@@ -285,25 +290,20 @@ export default function DashboardPage() {
 
         setIsExporting(true);
         setTimeout(async () => {
-            if (type === 'excel') {
-                try {
-                    exportToExcel(filteredArticles, exportTranslations, exportTranslations.report_title);
-                    showToast('success', t('export_success'));
-                } catch {
-                    showToast('error', t('export_failed'));
-                } finally {
-                    setIsExporting(false);
-                }
-            } else {
-                try {
-                    await exportToPDF(filteredArticles, exportTranslations, appSettings?.logoUrl);
-                    showToast('success', t('export_success'));
-                } catch (e) {
-                    console.error('Export failed', e);
-                    showToast('error', t('export_failed'));
-                } finally {
-                    setIsExporting(false);
-                }
+            try {
+                // Pass format as the third argument to the new unified generator
+                await ReportGenerator.exportMediaMonitoringReport(
+                    filteredArticles,
+                    exportTranslations as any,
+                    type,
+                    appSettings?.logoUrl
+                );
+                showToast('success', t('export_success'));
+            } catch (e) {
+                console.error('Export failed', e);
+                showToast('error', t('export_failed'));
+            } finally {
+                setIsExporting(false);
             }
         }, 16);
     };
