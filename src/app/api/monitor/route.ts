@@ -115,14 +115,14 @@ export async function POST(req: NextRequest) {
 
         // Fix Language: Check for Arabic characters
         const isArabic = /[\u0600-\u06FF]/.test(title + content);
-        // @ts-expect-error - Language detection overrides standard schema in runtime
         articleData.language = isArabic ? "AR" : "EN";
+
 
         // Fix Date format to DD/MM/YYYY
         if (!manualData?.date) {
             const d = new Date();
-            // @ts-expect-error - Custom date formatting override
             articleData.publishedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+
         }
 
         // @ts-expect-error - Using raw document payload before runtime validation
@@ -132,7 +132,8 @@ export async function POST(req: NextRequest) {
 
     } catch (error: unknown) {
         console.error("Monitor API Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+
     }
 }
 

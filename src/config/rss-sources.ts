@@ -10,39 +10,51 @@ export interface RSSCategory {
   id: string;
   name: string;
   url: string;
+  country?: string;
 }
 
 export const AAWSAT_SOURCES: RSSCategory[] = [
-  { id: 'main', name: 'main', url: 'https://aawsat.com/feed' },
-  { id: 'news', name: 'news', url: 'https://aawsat.com/feed' },
-  { id: 'world', name: 'world', url: 'https://aawsat.com/feed/arab-world' },
-  { id: 'gulf', name: 'gulf', url: 'https://aawsat.com/feed/gulf' },
-  { id: 'europe', name: 'europe', url: 'https://aawsat.com/feed/europe' },
-  { id: 'america', name: 'america', url: 'https://aawsat.com/feed/america' },
-  { id: 'asia', name: 'asia', url: 'https://aawsat.com/feed/asia' },
-  { id: 'africa', name: 'africa', url: 'https://aawsat.com/feed/africa' },
-  { id: 'economy', name: 'economy', url: 'https://aawsat.com/feed/economy' },
-  { id: 'political', name: 'political', url: 'https://aawsat.com/feed/political' },
-  { id: 'sport', name: 'sport', url: 'https://aawsat.com/feed/sport' },
-  { id: 'last-page', name: 'last-page', url: 'https://aawsat.com/feed/last-page' },
-  { id: 'reviews', name: 'reviews', url: 'https://aawsat.com/feed/reviews' },
-  { id: 'fundamentalism', name: 'fundamentalism', url: 'https://aawsat.com/feed/fundamentalism' },
-  { id: 'press', name: 'press', url: 'https://aawsat.com/feed/press' },
-  { id: 'education', name: 'education', url: 'https://aawsat.com/feed/education' },
-  { id: 'hassad', name: 'hassad', url: 'https://aawsat.com/feed/hassad' },
-  { id: 'travel', name: 'travel', url: 'https://aawsat.com/feed/travel' },
-  { id: 'it', name: 'it', url: 'https://aawsat.com/feed/information-technology' },
-  { id: 'culture', name: 'culture', url: 'https://aawsat.com/feed/culture' },
-  { id: 'vehicles', name: 'vehicles', url: 'https://aawsat.com/feed/vehicles' },
-  { id: 'cinema', name: 'cinema', url: 'https://aawsat.com/feed/cinema' },
-  { id: 'health', name: 'health', url: 'https://aawsat.com/feed/health' },
-  { id: 'realestate', name: 'realestate', url: 'https://aawsat.com/feed/realestate' },
-  { id: 'science', name: 'science', url: 'https://aawsat.com/feed/science' },
-  { id: 'arts', name: 'arts', url: 'https://aawsat.com/feed/arts' },
-  { id: 'food', name: 'food', url: 'https://aawsat.com/feed/food' },
-  { id: 'fashion', name: 'fashion', url: 'https://aawsat.com/feed/fashion' },
-  { id: 'investigation', name: 'investigation', url: 'https://aawsat.com/feed/investigation' },
-  { id: 'all', name: 'all', url: 'https://aawsat.com/feed/all' },
-  { id: 'first', name: 'first', url: 'https://aawsat.com/feed/first' },
-  { id: 'opinion', name: 'opinion', url: 'https://aawsat.com/feed/opinion' }
+  { id: 'news', name: 'News', url: 'https://aawsat.com/feed' },
+  { id: 'world', name: 'Arab World', url: 'https://aawsat.com/feed/arab-world' },
+  { id: 'gulf', name: 'Gulf', url: 'https://aawsat.com/feed/gulf' },
+  { id: 'economy', name: 'Economy', url: 'https://aawsat.com/feed/economy' },
+  { id: 'political', name: 'Political', url: 'https://aawsat.com/feed/political' },
+  { id: 'sport', name: 'Sport', url: 'https://aawsat.com/feed/sport' },
 ];
+
+/**
+ * Curated list of premium media monitoring sources for the UAE and Middle East.
+ */
+export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
+  'WAM (UAE)': [
+    { id: 'wam-ar', name: 'WAM Arabic', url: 'https://wam.ae/ar/rss', country: 'UAE' },
+    { id: 'wam-en', name: 'WAM English', url: 'https://wam.ae/en/rss', country: 'UAE' },
+  ],
+  'Al Arabiya': [
+    { id: 'alarabiya-latest', name: 'Latest News', url: 'https://www.alarabiya.net/.mrss/ar/last-24-hours.xml', country: 'SA' },
+    { id: 'alarabiya-saudi', name: 'Saudi Arabia', url: 'https://www.alarabiya.net/.mrss/ar/saudi-arabia.xml', country: 'SA' },
+  ],
+  'Sky News Arabia': [
+    { id: 'skynews-me', name: 'Middle East', url: 'https://www.skynewsarabia.com/feeds/rss/1.xml', country: 'UAE' },
+    { id: 'skynews-world', name: 'World', url: 'https://www.skynewsarabia.com/feeds/rss/2.xml', country: 'UAE' },
+    { id: 'skynews-uae', name: 'UAE', url: 'https://www.skynewsarabia.com/feeds/rss/12.xml', country: 'UAE' },
+  ],
+  'Asharq Al-Awsat': AAWSAT_SOURCES,
+  'PR Newswire': [
+    { id: 'prnewswire-me', name: 'Middle East News', url: 'https://www.prnewswire.com/rss/middle-east/news/middle-east-news.rss' }
+  ],
+  'BBC Arabic': [
+    { id: 'bbc-ar-me', name: 'Middle East', url: 'https://feeds.bbci.co.uk/arabic/rss.xml' }
+  ],
+  'Al Jazeera': [
+    { id: 'aljazeera-news', name: 'Latest', url: 'https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84dbbe43033/2013-8-4' }
+  ]
+};
+
+export const ALL_SOURCES = Object.entries(PREMIUM_SOURCES).flatMap(([publisher, categories]) => 
+  categories.map(cat => ({
+    ...cat,
+    publisher,
+    label: `${publisher} - ${cat.name}`
+  }))
+);

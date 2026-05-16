@@ -158,6 +158,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `LexcoraClient.tsx` | `/case-studies/lexcora` | Lexcora ERP showcase |
 | `StylingAssistantClient.tsx` | `/case-studies/styling-assistant` | VA showcase + waitlist |
 | `SmartMediaAssistantClient.tsx` | Media monitoring pages | Smart assistant embed |
+| `RssFeeder.tsx` | Dashboard (Live Feed) | Premium RSS monitor with modal details and direct ingestion |
 | `CrisisManagementClient.tsx` | `/technical-solutions/crisis-management` | Crisis plan cards |
 | `KYCVerification.tsx` | `/technical-solutions/kyc-compliance` | KYC upload UI |
 | `IntegrationHub.tsx` | `/technical-solutions/integration-hub` | API integration docs |
@@ -278,7 +279,8 @@ User sets keyword + countries + languages
   → POST /api/monitor
   → Calls monitoringAction (Convex Node.js Action)
   → Fetches from: NewsData.io, NewsAPI.org, GNews.io, World News API
-  → Fetches from RSS Feeds: MENA press wire sources (WAM, SPA, KUNA) via custom localized parsers
+  → Fetches from RSS Feeds: Premium regional publishers (WAM, Sky News Arabia, Al Arabiya, Asharq Al-Awsat, BBC Arabic) via custom localized engine (`rss-engine.ts`)
+  → RSS Engine features: Image extraction, redirect following, multilingual normalization (EN/AR), and country detection.
   → For each article: dedup check → sentiment analysis (Gemini) → store in media_monitoring_articles
   → Dashboard re-renders via Convex real-time subscription
 ```

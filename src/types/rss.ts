@@ -17,6 +17,12 @@ export interface FeedItem {
   categories?: string[];
   guid?: string;
   isoDate?: string;
+  // Enhanced fields for monitoring
+  image?: string;
+  language?: 'EN' | 'AR';
+  country?: string; // ISO Code
+  sentiment?: 'Positive' | 'Neutral' | 'Negative';
+  sourceType?: 'Online News' | 'Social Media' | 'Blog' | 'Print' | 'Press Release';
 }
 
 export interface FeedResponse {

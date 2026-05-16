@@ -49,6 +49,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const feedUrl = searchParams.get('url');
   const sourceName = searchParams.get('source') || undefined;
+  const country = searchParams.get('country') || undefined;
 
   // Basic validation
   if (!feedUrl) {
@@ -71,7 +72,7 @@ export async function GET(request: Request) {
 
   try {
     console.log(`[API Proxy] [${new Date().toISOString()}] Calling parseFeed for: ${feedUrl}`);
-    const data = await parseFeed(feedUrl, sourceName);
+    const data = await parseFeed(feedUrl, sourceName, country);
     console.log(`[API Proxy] [${new Date().toISOString()}] parseFeed successful, items found: ${data?.length || 0}`);
 
     // Check if we actually got items

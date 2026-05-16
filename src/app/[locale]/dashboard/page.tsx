@@ -29,7 +29,7 @@ import { exportToExcel, exportToPDF } from '@/utils/exportUtils';
 import { ALL_COUNTRIES } from '@/lib/countries';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
-import { AAWSAT_SOURCES } from '@/config/rss-sources';
+import { PREMIUM_SOURCES } from '@/config/rss-sources';
 import { DashboardSection } from '@/components/dashboard/DashboardSection';
 
 // ── Lazy-load heavy components ───────────────────────────────────────────────
@@ -599,9 +599,9 @@ export default function DashboardPage() {
                                             icon={Rss}
                                         >
                                             <RssFeeder
-                                                initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'https://feeds.bbci.co.uk/news/world/rss.xml'}
-                                                initialSourceName={isAr ? 'main' : 'global_intel_bbc'}
-                                                categories={isAr ? AAWSAT_SOURCES : []}
+                                                initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'https://wam.ae/en/rss'}
+                                                initialSourceName={isAr ? 'news' : 'wam-en'}
+                                                allSources={PREMIUM_SOURCES}
                                                 maxItems={10}
                                             />
                                         </DashboardSection>

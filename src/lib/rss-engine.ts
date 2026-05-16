@@ -47,22 +47,46 @@ const parser = new Parser({
 });
 
 /**
+ * Extracts a representative image URL from various RSS fields.
+ */
+function extractImage(item: any): string | undefined {
+  // 1. Check media:content (from rss-parser custom fields)
+  if (item.media && item.media.$ && item.media.$.url) {
+    return item.media.$.url;
+  }
+  
+  // 2. Check enclosures
+  if (item.enclosure && item.enclosure.url) {
+    return item.enclosure.url;
+  }
+  
+  // 3. Extract from description or content (HTML)
+  const combined = (item.contentEncoded || '') + (item.description || '') + (item.content || '');
+  const imgMatch = combined.match(/<img[^>]+src="([^">]+)"/i);
+  if (imgMatch && imgMatch[1]) {
+    // Some feeds use relative URLs which won't work
+    if (imgMatch[1].startsWith('http')) return imgMatch[1];
+  }
+  
+  return undefined;
+}
+
+/**
+ * Heuristic to detect if text is primarily Arabic.
+ */
+function isArabic(text: string): boolean {
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F]/;
+  return arabicPattern.test(text);
+}
+
+/**
  * Fetches a remote RSS/Atom feed as raw XML using a spoofed browser User-Agent,
  * then parses it server-side into a standardised FeedItem array.
- *
- * Bypassing parseURL gives us:
- *  1. Full header control (User-Agent, Accept, Accept-Language)
- *  2. A hard timeout via AbortController
- *  3. Compatibility with Vercel's `fetch` instrumentation for data caching
- *
- * @param url        The HTTPS RSS/Atom feed URL.
- * @param sourceName Optional display name; falls back to the feed's own title or hostname.
- * @returns          Array of normalised FeedItem objects.
- * @throws           Error with a human-readable message on network or parse failure.
  */
 export async function parseFeed(
   url: string,
-  sourceName: string = 'RSS Feed'
+  sourceName: string = 'RSS Feed',
+  country?: string
 ): Promise<FeedItem[]> {
   // â”€â”€ 1. FETCH raw XML with spoofed headers + timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const controller = new AbortController();
@@ -71,8 +95,6 @@ export async function parseFeed(
   let rawXml: string;
   let response: Response;
   try {
-    // We use redirect: 'manual' to catch broken redirects (like aawsat.com redirecting to :80 on HTTPS)
-    // and fix them before following.
     const fetchOptions: RequestInit = {
       signal: controller.signal,
       redirect: 'manual',
@@ -82,26 +104,19 @@ export async function parseFeed(
         'Accept-Language': 'ar,en;q=0.9',
         Referer: new URL(url).origin + '/',
       },
-      // Next.js extends RequestInit but it might not be typed globally
       next: { revalidate: 900 },
     };
 
     response = await fetch(url, fetchOptions);
 
-    // Handle redirects manually to fix broken Location headers (common in some Arabic news servers)
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location');
       if (location) {
-        // Fix for broken redirects: some servers redirect https://domain.com/... to https://domain.com:80/...
-        // Port 80 is for HTTP, so browsers and node-fetch fail the TLS handshake on a :80 port.
         const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
-
         console.log(`[RSS Engine] Following manual redirect: ${url} -> ${fixedLocation}`);
-
-        // Follow the redirect once
         const nextResponse = await fetch(fixedLocation, {
           ...fetchOptions,
-          redirect: 'follow', // Follow subsequent redirects automatically
+          redirect: 'follow',
         });
         response = nextResponse;
       }
@@ -115,7 +130,6 @@ export async function parseFeed(
 
     rawXml = await response.text();
     
-    // Safety check for empty responses which can happen with some proxies
     if (!rawXml || rawXml.trim().length === 0) {
       throw new Error(`The remote server for ${url} returned an empty response.`);
     }
@@ -123,15 +137,11 @@ export async function parseFeed(
     if (err instanceof Error && err.name === 'AbortError') {
       throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
     }
-    
     const errorMessage = err instanceof Error ? err.message : String(err);
     console.error(`[RSS Engine] Fetch failed for ${url}:`, errorMessage);
-    
-    // Check for specific network errors that common RSS feeds might trigger
     if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('ENOTFOUND')) {
       throw new Error(`The feed server at ${url} is currently unreachable.`);
     }
-    
     throw new Error(`Network error fetching feed from ${url}: ${errorMessage}`);
   } finally {
     clearTimeout(timeoutId);
@@ -153,9 +163,12 @@ export async function parseFeed(
   return (feed.items ?? []).map((item): FeedItem => {
     const description = item.description || item.contentSnippet || '';
     const content = item.contentEncoded || item.content || description;
+    const title = (item.title || 'Untitled Article').trim();
+    const image = extractImage(item);
+    const language = isArabic(title + description) ? 'AR' : 'EN';
 
     return {
-      title: (item.title || 'Untitled Article').trim(),
+      title,
       link: item.link || '',
       pubDate: item.isoDate || item.pubDate || new Date().toISOString(),
       description,
@@ -165,6 +178,11 @@ export async function parseFeed(
       categories: item.categories || [],
       guid: item.guid || item.link || '',
       isoDate: item.isoDate,
+      image,
+      language,
+      country,
+      sentiment: 'Neutral', // Default for RSS stream
+      sourceType: 'Online News', // Default
     };
   });
 }
