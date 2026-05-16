@@ -8,6 +8,7 @@
 
 import { mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
+import { isAdmin, getAdminIds } from "./utils/auth";
 
 /**
  * Fetches user settings by Clerk user ID.
@@ -18,11 +19,10 @@ export const get = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return null;
 
-        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-        const isAdmin = adminIds.includes(identity.subject);
+        const isUserAdmin = await isAdmin(ctx.auth);
 
         // Authorization: Only allow user to see their own settings OR an admin to see any.
-        if (identity.subject !== args.userId && !isAdmin) {
+        if (identity.subject !== args.userId && !isUserAdmin) {
             throw new ConvexError("Not authorized to view these settings.");
         }
 
@@ -40,8 +40,8 @@ export const get = query({
 export const init = mutation({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
-        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-        const isAdmin = adminIds.includes(args.userId);
+        const adminIds = getAdminIds();
+        const isAdminUser = adminIds.includes(args.userId);
 
         const existing = await ctx.db
             .query("userSettings")
@@ -55,9 +55,9 @@ export const init = mutation({
 
         return await ctx.db.insert("userSettings", {
             userId: args.userId,
-            isTrialActive: !isAdmin,
-            trialEndsAt: isAdmin ? undefined : trialEndsAt,
-            isSubscribed: isAdmin,
+            isTrialActive: !isAdminUser,
+            trialEndsAt: isAdminUser ? undefined : trialEndsAt,
+            isSubscribed: isAdminUser,
             createdAt: Date.now(),
             updatedAt: Date.now(),
         });
@@ -66,7 +66,7 @@ export const init = mutation({
 
 /**
  * Updates the user's personal Gemini API key (BYOK).
- * userId is derived server-side from the authenticated session â€” never trusted from the client.
+ * userId is derived server-side from the authenticated session — never trusted from the client.
  */
 export const updateGeminiKey = mutation({
     args: { geminiApiKey: v.string() },
@@ -85,12 +85,14 @@ export const updateGeminiKey = mutation({
         if (existing) {
             await ctx.db.patch(existing._id, {
                 geminiApiKey: args.geminiApiKey,
+                apiKeys: { ...(existing.apiKeys || {}), gemini: args.geminiApiKey },
                 updatedAt: Date.now(),
             });
         } else {
             await ctx.db.insert("userSettings", {
                 userId,
                 geminiApiKey: args.geminiApiKey,
+                apiKeys: { gemini: args.geminiApiKey },
                 isTrialActive: false,
                 isSubscribed: false,
                 createdAt: Date.now(),
@@ -115,6 +117,19 @@ export const updateApiKeys = mutation({
             mediastack: v.optional(v.string()),
             serper: v.optional(v.string()),
             twitterBearer: v.optional(v.string()),
+            twitterConsumerKey: v.optional(v.string()),
+            twitterConsumerSecret: v.optional(v.string()),
+            twitterAccessToken: v.optional(v.string()),
+            twitterAccessTokenSecret: v.optional(v.string()),
+            hibp: v.optional(v.string()),
+            whoisjson: v.optional(v.string()),
+            abuseipdb: v.optional(v.string()),
+            numverify: v.optional(v.string()),
+            qstash: v.optional(v.string()),
+            gleif: v.optional(v.string()),
+            opensanctions: v.optional(v.string()),
+            diffbot: v.optional(v.string()),
+            zenrows: v.optional(v.string()),
         })
     },
     handler: async (ctx, args) => {
@@ -152,7 +167,7 @@ export const updateApiKeys = mutation({
 
 /**
  * Sets the subscription status for a user.
- * ADMIN-ONLY â€” typically called by the Stripe webhook handler.
+ * ADMIN-ONLY — typically called by the Stripe webhook handler.
  */
 export const setSubscriptionStatus = mutation({
     args: { userId: v.string(), isSubscribed: v.boolean() },
@@ -161,9 +176,8 @@ export const setSubscriptionStatus = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (identity) {
             // If a user is authenticated, they must be an admin.
-            const adminIds = (process.env.ADMIN_USER_IDS || "")
-                .split(",").map((s) => s.trim()).filter(Boolean);
-            if (!adminIds.includes(identity.subject)) {
+            const isUserAdmin = await isAdmin(ctx.auth);
+            if (!isUserAdmin) {
                 throw new ConvexError("Admin access required to update subscription status.");
             }
         }

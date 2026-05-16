@@ -9,7 +9,7 @@
 import { Auth } from "convex/server";
 import { ConvexError } from "convex/values";
 
-function getAdminIds(): string[] {
+export function getAdminIds(): string[] {
     // Only Actions have access to process.env in some Convex environments.
     // Queries/Mutations might fail or return undefined.
     try {

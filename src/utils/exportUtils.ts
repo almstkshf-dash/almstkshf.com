@@ -218,10 +218,10 @@ function addPageFooter(
     doc.text(isArabic(pageText) ? fixArabicForPDF(pageText) : pageText, pageWidth - 14, footerY, { align: 'right' });
 }
 
-// Load logo from /logo.png as base64
-async function loadLogo(): Promise<string | null> {
+// Load logo from provided URL or fallback to /logo.png as base64
+async function loadLogo(logoUrl?: string): Promise<string | null> {
     try {
-        const res = await fetch('/logo.png');
+        const res = await fetch(logoUrl || '/logo.png');
         if (!res.ok) return null;
         const blob = await res.blob();
         return new Promise<string>((resolve) => {
@@ -259,7 +259,7 @@ type AutoTableFn = (doc: jsPDF, opts: object) => void;
 export async function exportToPDF(
     articles: Article[],
     translations: ExportTranslations,
-    _logoUrl?: string,
+    logoUrl?: string,
     reportTitle?: string,
 ) {
     if (typeof window === 'undefined') throw new Error('PDF export is client-only');
@@ -309,7 +309,7 @@ export async function exportToPDF(
         console.warn('All Arabic font sources failed. Arabic text may not render correctly.');
     }
 
-    const logoBase64 = await loadLogo();
+    const logoBase64 = await loadLogo(logoUrl);
 
     // Helper to set font and handle Arabic text
     const addText = (text: string, x: number, y: number, options: { align?: 'center' | 'right' | 'left' } = {}) => {

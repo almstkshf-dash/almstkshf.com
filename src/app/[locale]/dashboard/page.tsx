@@ -142,6 +142,8 @@ export default function DashboardPage() {
     }, [selectedType, selectedCountry, activeView]);
 
     // ── Convex data ───────────────────────────────────────────────────────────
+    const appSettings = useQuery(api.settings.getSettings);
+    
     const result = useQuery(api.monitoring.getArticles, {
         limit: 50,
         skip,
@@ -294,7 +296,7 @@ export default function DashboardPage() {
                 }
             } else {
                 try {
-                    await exportToPDF(filteredArticles, exportTranslations);
+                    await exportToPDF(filteredArticles, exportTranslations, appSettings?.logoUrl);
                     showToast('success', t('export_success'));
                 } catch (e) {
                     console.error('Export failed', e);

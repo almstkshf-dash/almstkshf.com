@@ -201,5 +201,6 @@ export interface MonitoringArticle {
     isManual?: boolean;
     manualSentimentOverride?: boolean;
     originalSentiment?: string;
+    keyword?: string;
     [key: string]: unknown;
 }
