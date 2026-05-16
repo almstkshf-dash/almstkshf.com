@@ -25,6 +25,7 @@ export interface ReportArticle {
     title: string;
     publishedDate?: string;
     url?: string;
+    imageUrl?: string;
     source?: string;
     sourceType?: string;
     sentiment?: string;
@@ -87,7 +88,8 @@ export class ReportGenerator {
      */
     public async generateExcel(): Promise<Blob> {
         const title = this.translations.Reports?.pr_title || 'Media Coverage Report';
-        return await ReportGenerator.generateExcel(this.articles, this.translations, title, true);
+        const result = await ReportGenerator.generateExcel(this.articles, this.translations, title, true);
+        return result as Blob;
     }
 
     /**
@@ -116,9 +118,9 @@ export class ReportGenerator {
 
     // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // PUBLIC STATIC METHODS
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-// UTILITY: REPORT GENERATOR
-// Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    // UTILITY: REPORT GENERATOR
+    // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -302,6 +304,34 @@ export class ReportGenerator {
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false) {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF();
 
+        // Pre-load images to base64
+        const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
+            if (!a.imageUrl) return a;
+            // If it's already base64, keep it
+            if (a.imageUrl.startsWith('data:')) return a;
+
+            try {
+                const response = await fetch(a.imageUrl, { mode: 'no-cors' });
+                // Note: no-cors fetch won't allow reading the body for images. 
+                // We typically need a proxy or the image must be on the same domain or have CORS.
+                // For manual entries, it's already base64, so it works perfectly.
+                // For external news, we'll try standard fetch first.
+                const corsResponse = await fetch(a.imageUrl).catch(() => null);
+                if (corsResponse && corsResponse.ok) {
+                    const blob = await corsResponse.blob();
+                    const reader = new FileReader();
+                    const b64 = await new Promise<string>((resolve) => {
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(blob);
+                    });
+                    return { ...a, imageUrl: b64 };
+                }
+            } catch (e) {
+                console.warn("Could not pre-load image for report:", a.imageUrl);
+            }
+            return a;
+        }));
+
         // Cover Page
         this.addCoverPage(doc, title, articles.length, translations, logoBase64, fontLoaded);
 
@@ -326,7 +356,8 @@ export class ReportGenerator {
         // Article Table
         this.drawHeading(doc, translations.Reports?.coverage_details || 'Media Coverage Log', 14, y, fontLoaded);
 
-        const tableData = articles.map(a => [
+        const tableData = articlesWithImages.map(a => [
+            '', // Image Placeholder
             a.publishedDate || '',
             this.fixArabic(a.title),
             a.source || '',
@@ -336,6 +367,7 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
+                '', // Image Header
                 translations.Reports?.col_date || 'Publication Date',
                 translations.Reports?.col_title || 'Title',
                 translations.Reports?.col_source || 'Source',
@@ -346,7 +378,31 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 20 }, // Fixed width for image column
+                2: { cellWidth: 'auto', minCellWidth: 40 }, // Title column
+            },
+            didDrawCell: (data: any) => {
+                if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
+                    const img = articlesWithImages[data.row.index].imageUrl;
+                    if (img && img.startsWith('data:')) {
+                        try {
+                            const padding = 2;
+                            doc.addImage(
+                                img,
+                                'JPEG',
+                                data.cell.x + padding,
+                                data.cell.y + padding,
+                                data.cell.width - (padding * 2),
+                                data.cell.height - (padding * 2)
+                            );
+                        } catch (e) {
+                            // Skip if image is invalid
+                        }
+                    }
+                }
+            }
         });
 
         this.finalizePDF(doc, title, translations, fontLoaded, returnOnly);
@@ -532,9 +588,9 @@ export class ReportGenerator {
             medium: [245, 158, 11],
             high: [239, 68, 68]
         };
-        const rColor = colorMap[riskLevel?.toLowerCase()] || BRAND_DARK;
+        const rColor = colorMap[(riskLevel || 'low').toLowerCase()] || BRAND_DARK;
 
-        const localizedRiskLevel = translations.AiInspector?.[`risk_${riskLevel?.toLowerCase()}` as keyof typeof translations.AiInspector] || riskLevel?.toUpperCase() || 'UNKNOWN';
+        const localizedRiskLevel = translations.AiInspector?.[`risk_${(riskLevel || 'low').toLowerCase()}` as keyof typeof translations.AiInspector] || riskLevel?.toUpperCase() || 'UNKNOWN';
 
         this.drawMetricBoxes(doc, [
             { label: translations.AiInspector?.label_mode || 'MODE', value: modeTrans, color: BRAND_DARK },
@@ -567,10 +623,10 @@ export class ReportGenerator {
         } else if (mode === 'image' && data) {
             this.drawHeading(doc, translations.AiInspector?.visual_signals || 'Visual Signals', 14, y, fontLoaded);
             const tableData = data.pixelLogicSignals?.map((s: { label?: string; description?: string; detectedValue?: string; risk?: string }) => [
-                this.fixArabic(s.label),
-                this.fixArabic(s.description),
-                this.fixArabic(s.detectedValue),
-                this.fixArabic(translations.AiInspector?.[`risk_${s.risk?.toLowerCase()}` as keyof typeof translations.AiInspector] || s.risk?.toUpperCase() || s.risk)
+                this.fixArabic(s.label || ''),
+                this.fixArabic(s.description || ''),
+                this.fixArabic(s.detectedValue || ''),
+                this.fixArabic(translations.AiInspector?.[`risk_${(s.risk || 'low').toLowerCase()}` as keyof typeof translations.AiInspector] || s.risk?.toUpperCase() || s.risk || '')
             ]) || [];
 
             await this.addAutoTable(doc, {
@@ -608,7 +664,7 @@ export class ReportGenerator {
                     allAnomalies.forEach((a: { name?: string; id?: string }) => {
                         mlData.push([
                             this.fixArabic(translations.AiInspector?.anatomy_consistency || 'Anatomy Consistency'),
-                            this.fixArabic(a.name || a.id),
+                            this.fixArabic(a.name || a.id || ''),
                             this.fixArabic(translations.AiInspector?.anomaly_detected || 'Anomaly Detected'),
                             this.fixArabic(translations.AiInspector?.risk_high || 'High')
                         ]);
@@ -637,7 +693,7 @@ export class ReportGenerator {
                     data.deepMl.watermarks.forEach((w: { name?: string; id?: string }) => {
                         mlData.push([
                             this.fixArabic(translations.AiInspector?.detected_ai_signature || 'AI Watermark'),
-                            this.fixArabic(w.name || w.id),
+                            this.fixArabic(w.name || w.id || ''),
                             this.fixArabic('Detected'),
                             this.fixArabic(translations.AiInspector?.risk_high || 'High')
                         ]);
@@ -662,9 +718,9 @@ export class ReportGenerator {
             this.drawHeading(doc, translations.AiInspector?.frame_analysis || 'Video Frame Analysis', 14, y, fontLoaded);
             const tableData = data.frameAnomalies?.map((f: { timestamp?: string | number; type?: string; severity?: number; description?: string }) => [
                 f.timestamp,
-                this.fixArabic(f.type),
+                this.fixArabic(f.type || ''),
                 `${((f.severity ?? 0) * 100).toFixed(1)}%`,
-                this.fixArabic(f.description)
+                this.fixArabic(f.description || '')
             ]) || [];
 
             await this.addAutoTable(doc, {
@@ -753,21 +809,37 @@ export class ReportGenerator {
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
     }
 
-    private static async addAutoTable(doc: jsPDF, options: { head: string[][]; body: (string | number | undefined)[][]; startY: number; fontLoaded: boolean; logoBase64: string | null; translations: ReportTranslations }) {
+    private static async addAutoTable(doc: jsPDF, options: { head: string[][]; body: (string | number | undefined)[][]; startY: number; fontLoaded: boolean; logoBase64: string | null; translations: ReportTranslations; didDrawPage?: (data: any) => void; didDrawCell?: (data: any) => void; columnStyles?: any }) {
         const autoTable = (await import('jspdf-autotable')).default;
+        const sanitizedBody = options.body.map(row => row.map(cell => cell ?? ''));
+
         return autoTable(doc, {
             ...options,
+            body: sanitizedBody as any,
+            margin: { horizontal: 10 },
             styles: {
                 fontSize: 8,
                 font: options.fontLoaded ? 'Amiri' : 'helvetica',
                 cellPadding: 3,
+                overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
+                cellWidth: 'auto',    // Allow columns to shrink/expand based on content
+                valign: 'middle'
             },
             headStyles: {
-                fillColor: BRAND_DARK,
+                fillColor: [31, 78, 120], // Explicitly pass mutable array for BRAND_DARK
                 textColor: [255, 255, 255],
-                fontStyle: 'bold'
+                fontStyle: 'bold',
+                halign: 'center'
             },
-            alternateRowStyles: { fillColor: ACCENT_BG },
+            alternateRowStyles: {
+                fillColor: [241, 245, 249] // Explicitly pass mutable array for ACCENT_BG
+            },
+            columnStyles: options.columnStyles || {
+                // Default: Title columns often need more room, while numeric ones are small
+                1: { cellWidth: 'auto', minCellWidth: 40 }, // Usually the Title column
+            },
+            didDrawCell: options.didDrawCell,
+            didDrawPage: options.didDrawPage,
             didParseCell: (data) => {
                 const text = String(data.cell.raw || '');
                 if (data.section === 'body' && /[\u0600-\u06FF]/.test(text)) {
@@ -860,10 +932,10 @@ export class ReportGenerator {
             { header: translations.Reports?.col_date || 'Publication Date', key: 'date', width: 15 },
             { header: translations.Reports?.col_title || 'Title', key: 'title', width: 40 },
             { header: translations.Reports?.col_source || 'Source', key: 'source', width: 15 },
-            { header: (translations.Reports as any)?.col_url || 'URL', key: 'url', width: 30 },
+            { header: translations.Reports?.col_url || 'URL', key: 'url', width: 30 },
             { header: translations.DarkWeb?.col_risk || 'Risk Level', key: 'risk_level', width: 15 },
             { header: translations.Reports?.col_summary || 'AI Analysis Summary', key: 'summary', width: 50 },
-            { header: (translations.Reports as any)?.col_tags || 'Signal Tags', key: 'tags', width: 20 }
+            { header: translations.Reports?.col_tags || 'Signal Tags', key: 'tags', width: 20 }
         ];
 
         const headerRow = sheet.getRow(1);
@@ -885,7 +957,7 @@ export class ReportGenerator {
         await this.downloadWorkbook(workbook, title);
     }
 
-    private static async generateExcel(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false): Promise<Blob | { doc: jsPDF } | void> {
+    private static async generateExcel(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false): Promise<Blob | void> {
         const ExcelJS = (await import('exceljs')).default;
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
@@ -950,7 +1022,7 @@ export class ReportGenerator {
             });
         });
 
-        this.downloadWorkbook(workbook, title);
+        await this.downloadWorkbook(workbook, title);
     }
 
     private static async generateAiInspectorExcel(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
@@ -1081,7 +1153,7 @@ export class ReportGenerator {
         sheet.getColumn(3).width = 15;
         if (mode === 'video') sheet.getColumn(4).width = 40;
 
-        this.downloadWorkbook(workbook, `${title}_${modeTrans}`);
+        await this.downloadWorkbook(workbook, `${title}_${modeTrans}`);
     }
 
     private static async downloadWorkbook(workbook: ExcelJS.Workbook, title: string) {

@@ -147,7 +147,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                         </div>
                     ) : (
                         <>
-                            {status && status.type !== 'success' && (
+                            {status && (
                                 <div
                                     role="alert"
                                     className={`rounded-3xl border px-4 py-3 text-sm ${
@@ -160,7 +160,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                 </div>
                             )}
                             {isCreating ? (
-                                <div className="space-y-4 animate-in slide-in-from-right-4">
+                                <div className="space-y-4 animate-in slide-in-from-end">
                                     <div className="space-y-2">
                                         <label htmlFor="collection-name" className="text-sm font-medium text-foreground">Collection Name</label>
                                         <input
@@ -193,7 +193,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                 <div className="space-y-3">
                                     <button
                                         onClick={() => setIsCreating(true)}
-                                        className="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left group"
+                                        className="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-start group"
                                     >
                                         <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-110 transition-transform">
                                             <Plus className="w-5 h-5" />
@@ -218,7 +218,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                                                     key={col._id}
                                                     onClick={() => handleSave(col._id)}
                                                     disabled={loading}
-                                                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all text-left group disabled:opacity-50"
+                                                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all text-start group disabled:opacity-50"
                                                 >
                                                     <div className="flex items-center gap-3 min-w-0">
                                                         <FolderPlus className="w-5 h-5 text-foreground/60 group-hover:text-primary transition-colors shrink-0" />

@@ -108,30 +108,37 @@ export default function SmartMediaAssistantClient() {
         <main className="min-h-screen pt-32 pb-20 bg-background text-foreground overflow-hidden">
             <Container>
                 {/* Hero / AI Agent Intro */}
-                <div className="flex flex-col lg:flex-row items-center gap-16 mb-32">
-                    <div className="flex-1 space-y-8">
+                <div className="flex flex-col lg:flex-row items-center gap-16 mb-32 relative">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute -top-24 -start-24 w-96 h-96 bg-primary/20 blur-[120px] rounded-full -z-10 animate-pulse-slow" />
+                    <div className="absolute -bottom-24 -end-24 w-96 h-96 bg-accent/20 blur-[120px] rounded-full -z-10 animate-pulse-slow" style={{ animationDelay: '2s' }} />
+
+                    <div className="flex-1 space-y-10 relative z-10">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-[0.2em] shadow-sm"
                         >
-                            <Sparkles className="w-4 h-4" aria-hidden="true" />
+                            <Sparkles className="w-4 h-4 animate-pulse" aria-hidden="true" />
                             <span>{tAi("badge")}</span>
                         </motion.div>
 
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-5xl lg:text-7xl font-bold tracking-tight bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent"
+                            className="text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] transition-colors"
                         >
-                            {tWhy("ai_agent.title")}
+                            <span className="block text-foreground">{tWhy("ai_agent.title").split(' ')[0]}</span>
+                            <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
+                                {tWhy("ai_agent.title").split(' ').slice(1).join(' ')}
+                            </span>
                         </motion.h1>
 
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="text-xl text-foreground/80 font-light leading-relaxed max-w-2xl"
+                            className="text-xl text-foreground/70 font-light leading-relaxed max-w-2xl border-s-2 border-primary/20 ps-6"
                         >
                             {tWhy("ai_agent.desc")}
                         </motion.p>
@@ -140,103 +147,130 @@ export default function SmartMediaAssistantClient() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex flex-col sm:flex-row gap-4"
+                            className="flex flex-col sm:flex-row gap-4 p-2 bg-card/50 backdrop-blur-xl border border-border rounded-2xl shadow-2xl focus-within:ring-2 focus-within:ring-primary/20 transition-all"
                         >
                             <label htmlFor="ai-prompt" className="sr-only">{tAi("prompt")}</label>
-                            <input
-                                id="ai-prompt"
-                                name="ai-prompt"
-                                type="text"
-                                value={prompt}
-                                onChange={(e) => setPrompt(e.target.value)}
-                                placeholder={tAi("instruction")}
-                                autoComplete="on"
-                                className="flex-1 px-6 py-4 bg-muted/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-foreground/50"
-                            />
+                            <div className="flex-1 relative flex items-center">
+                                <MessageSquare className="absolute start-4 w-5 h-5 text-primary/50" />
+                                <input
+                                    id="ai-prompt"
+                                    name="ai-prompt"
+                                    type="text"
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    placeholder={tAi("instruction")}
+                                    autoComplete="on"
+                                    className="w-full ps-12 pe-4 py-4 bg-transparent border-none focus:ring-0 transition-all text-foreground text-lg placeholder:text-foreground/30 font-medium"
+                                />
+                            </div>
                             <Button
                                 onClick={handleGenerate}
                                 isLoading={isGenerating}
                                 disabled={!prompt || retryCountdown !== null}
-                                className="px-8 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-lg shadow-primary/20 text-white whitespace-nowrap h-auto"
+                                className="px-10 py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-black transition-all shadow-lg shadow-primary/20 text-white whitespace-nowrap h-auto group"
                             >
-                                {retryCountdown !== null ? `${retryCountdown}s` : tAi("deploy")}
+                                {retryCountdown !== null ? `${retryCountdown}s` : (
+                                    <span className="flex items-center gap-2">
+                                        {tAi("deploy")}
+                                        <Zap className="w-4 h-4 group-hover:fill-current transition-all" />
+                                    </span>
+                                )}
                             </Button>
                         </motion.div>
                     </div>
 
                     <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="flex-1 relative w-full max-w-xl"
+                        initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                        transition={{ delay: 0.3, type: 'spring' }}
+                        className="flex-1 relative w-full max-w-xl group"
                     >
-                        <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full animate-pulse-slow"></div>
-                        <div className="relative p-8 bg-card/50 border border-primary/30 rounded-[3rem] backdrop-blur-2xl shadow-2xl overflow-hidden">
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-4 border-b border-border/50 pb-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
-                                        <Brain className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
+                        <div className="absolute inset-0 bg-primary/30 blur-[120px] rounded-full animate-pulse-slow group-hover:bg-primary/40 transition-colors" />
+                        <div className="relative p-1 bg-gradient-to-br from-primary/30 via-border to-accent/30 rounded-[3.5rem] shadow-2xl">
+                            <div className="relative bg-card/80 backdrop-blur-[40px] rounded-[3.25rem] p-10 overflow-hidden">
+                                <div className="absolute top-0 start-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+                                
+                                <div className="space-y-8">
+                                    <div className="flex items-center gap-5 border-b border-border/50 pb-8">
+                                        <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 group-hover:rotate-6 transition-transform">
+                                            <Brain className="w-8 h-8 text-primary-foreground" aria-hidden="true" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">{tAi("status")}</p>
+                                            <p className="text-xl font-bold italic tracking-tight">{isGenerating ? tAi("processing_input") : tAi("instruction")}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-bold uppercase tracking-widest text-primary">{tAi("status")}</p>
-                                        <p className="text-foreground font-bold italic">{isGenerating ? tAi("processing_input") : tAi("instruction")}</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <AnimatePresence mode="wait">
-                                        {(prompt || analysis) && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="space-y-4"
-                                            >
-                                                <div className="p-4 bg-background/50 border border-border rounded-2xl">
-                                                    <p className="text-xs text-foreground/70 mb-2">{tAi("prompt")}</p>
-                                                    <p className="text-sm font-medium">{prompt || "..."}</p>
-                                                </div>
 
-                                                <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl min-h-[100px] flex flex-col justify-center">
-                                                    <p className="text-xs text-primary mb-2">{tAi("response")}</p>
-                                                    {isGenerating ? (
-                                                        <div className="space-y-2">
-                                                            <div className="h-2 bg-primary/30 rounded-full w-full animate-pulse"></div>
-                                                            <div className="h-2 bg-primary/30 rounded-full w-5/6 animate-pulse" style={{ animationDelay: "200ms" }}></div>
-                                                            <div className="h-2 bg-primary/30 rounded-full w-4/6 animate-pulse" style={{ animationDelay: "400ms" }}></div>
-                                                        </div>
-                                                    ) : (
-                                                        <motion.div
-                                                            initial={{ opacity: 0 }}
-                                                            animate={{ opacity: 1 }}
-                                                            className="text-sm space-y-4"
-                                                        >
-                                                            {analysis ? (
-                                                                <>
-                                                                    <div className="flex flex-wrap gap-2 mb-2">
-                                                                        <span className={clsx(
-                                                                            "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
-                                                                            analysis.risk === "High" ? "bg-red-500/10 text-red-600 dark:text-red-500" :
-                                                                                analysis.risk === "Medium" ? "bg-amber-500/10 text-amber-600 dark:text-amber-400" :
-                                                                                    "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                                                        )}>
-                                                                            {tAi("risk_label")}: {analysis.risk}
-                                                                        </span>
-                                                                        <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase">
-                                                                            {tAi("sentiment_label")}: {analysis.sentiment}
-                                                                        </span>
+                                    <div className="space-y-6">
+                                        <AnimatePresence mode="wait">
+                                            {(prompt || analysis) ? (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="space-y-6"
+                                                >
+                                                    <div className="p-5 bg-background/40 backdrop-blur-md border border-border/50 rounded-[2rem] shadow-inner">
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/40 mb-3">{tAi("prompt")}</p>
+                                                        <p className="text-base font-medium leading-relaxed">{prompt || "..."}</p>
+                                                    </div>
+
+                                                    <div className="p-6 bg-primary/5 border border-primary/20 rounded-[2rem] min-h-[160px] flex flex-col relative overflow-hidden group/res">
+                                                        <div className="absolute top-0 end-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -z-10 group-hover/res:bg-primary/20 transition-colors" />
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-4">{tAi("response")}</p>
+                                                        
+                                                        {isGenerating ? (
+                                                            <div className="space-y-3 pt-2">
+                                                                <div className="h-2.5 bg-primary/20 rounded-full w-full animate-pulse" />
+                                                                <div className="h-2.5 bg-primary/20 rounded-full w-[92%] animate-pulse" style={{ animationDelay: "200ms" }} />
+                                                                <div className="h-2.5 bg-primary/20 rounded-full w-[85%] animate-pulse" style={{ animationDelay: "400ms" }} />
+                                                                <div className="h-2.5 bg-primary/20 rounded-full w-[95%] animate-pulse" style={{ animationDelay: "600ms" }} />
+                                                            </div>
+                                                        ) : (
+                                                            <motion.div
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                className="text-base space-y-6"
+                                                            >
+                                                                {analysis ? (
+                                                                    <>
+                                                                        <div className="flex flex-wrap gap-3">
+                                                                            <span className={clsx(
+                                                                                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm",
+                                                                                analysis.risk === "High" ? "bg-red-500/10 text-red-600 border-red-500/20" :
+                                                                                    analysis.risk === "Medium" ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                                                                                        "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                                            )}>
+                                                                                {tAi("risk_label")}: {analysis.risk}
+                                                                            </span>
+                                                                            <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 border border-blue-500/20 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                                                                                {tAi("sentiment_label")}: {analysis.sentiment}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="relative">
+                                                                            <div className="absolute start-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent rounded-full" />
+                                                                            <p className="leading-relaxed ps-5 italic text-foreground font-medium text-lg">
+                                                                                {analysis.recommendation}
+                                                                            </p>
+                                                                        </div>
+                                                                    </>
+                                                                ) : (
+                                                                    <div className="flex flex-col items-center justify-center py-4 opacity-40">
+                                                                        <Sparkles className="w-8 h-8 mb-3 animate-pulse" />
+                                                                        <p className="text-sm font-medium">{tAi("awaiting_instruction")}</p>
                                                                     </div>
-                                                                    <p className="leading-relaxed border-l-2 border-primary/30 pl-3 italic text-foreground">
-                                                                        {analysis.recommendation}
-                                                                    </p>
-                                                                </>
-                                                            ) : (
-                                                                <p className="text-foreground/80 italic">{tAi("awaiting_instruction")}</p>
-                                                            )}
-                                                        </motion.div>
-                                                    )}
+                                                                )}
+                                                            </motion.div>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center py-20 opacity-20 border-2 border-dashed border-border rounded-[2rem]">
+                                                    <Bot className="w-16 h-16 mb-4" />
+                                                    <p className="font-bold uppercase tracking-widest text-xs">Ready for input</p>
                                                 </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
                             </div>
                         </div>

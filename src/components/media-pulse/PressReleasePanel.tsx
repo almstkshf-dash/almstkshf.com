@@ -22,14 +22,18 @@ import { useTranslations } from 'next-intl';
 // ─── PR wire sources metadata (mirrored from backend for display) ────
 const PR_WIRES = [
     { name: 'PR Newswire', region: 'Global', flag: '🌐' },
-    { name: 'Business Wire', region: 'Global', flag: '🌐' },
-    { name: 'GlobeNewswire MENA', region: 'MENA', flag: '🌐' },
-    { name: 'Zawya PR', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (UAE EN)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (UAE AR)', region: 'AE', flag: '🇦🇪' },
-    { name: 'SPA (Saudi)', region: 'SA', flag: '🇸🇦' },
-    { name: 'MENA FN', region: 'MENA', flag: '🌐' },
-    { name: 'Gulf News PR', region: 'AE', flag: '🇦🇪' },
+    { name: 'Newswire.com', region: 'Global', flag: '🌐' },
+    { name: 'AETOSWire', region: 'MENA', flag: '🇦🇪' },
+    { name: 'WAM (Economy)', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (Sport)', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (Culture)', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (Latest)', region: 'AE', flag: '🇦🇪' },
+    { name: 'WAM (Tech)', region: 'AE', flag: '🇦🇪' },
+    { name: 'Middle East Eye', region: 'UK', flag: '🇬🇧' },
+    { name: 'MEED Business', region: 'MENA', flag: '🌐' },
+    { name: 'Al Bawaba', region: 'MENA', flag: '🇯🇴' },
+    { name: 'Mehr News', region: 'IR', flag: '🇮🇷' },
+    { name: 'Egyptian Streets', region: 'EG', flag: '🇪🇬' },
 ];
 
 type FeedResult = {
@@ -142,7 +146,7 @@ export default function PressReleasePanel() {
                 {/* Row 1: keyword + limit */}
                 <div className="flex gap-3">
                     <div className="flex-1 relative">
-                        <Newspaper className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
+                        <Newspaper className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
                         <label htmlFor="pr-keyword-input" className="sr-only">{t('keyword_placeholder')}</label>
                         <input
                             id="pr-keyword-input"
@@ -151,7 +155,7 @@ export default function PressReleasePanel() {
                             value={keyword}
                             onChange={e => setKeyword(e.target.value)}
                             placeholder={t('keyword_placeholder')}
-                            className="w-full pl-9 pr-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-foreground/40"
+                            className="w-full ps-9 pe-3 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-foreground/40"
                             disabled={loading}
                         />
                     </div>
@@ -220,7 +224,7 @@ export default function PressReleasePanel() {
                         className="px-5 font-bold text-sm h-auto whitespace-nowrap shrink-0"
                         title={!isAdmin ? t('admin_only') : undefined}
                     >
-                        {loading ? t('syncing') : retryCountdown ? `${retryCountdown}s` : <><RefreshCw className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />{t('sync_now')}</>}
+                        {loading ? t('syncing') : retryCountdown ? `${retryCountdown}s` : <><RefreshCw className="w-3.5 h-3.5 me-1.5" aria-hidden="true" />{t('sync_now')}</>}
                     </Button>
                 </div>
 
@@ -257,7 +261,7 @@ export default function PressReleasePanel() {
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                             <span>{syncResult.message}</span>
                             {syncResult.totalErrors > 0 && (
-                                <span className="ml-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
+                                <span className="ms-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
                             )}
                         </div>
 
@@ -281,9 +285,9 @@ export default function PressReleasePanel() {
                                 >
                                     <span className="truncate">{f.feed}</span>
                                     {f.error ? (
-                                        <span className="ml-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
+                                        <span className="ms-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
                                     ) : (
-                                        <span className="ml-2 flex-shrink-0 text-emerald-800 dark:text-emerald-400 font-bold">
+                                        <span className="ms-2 flex-shrink-0 text-emerald-800 dark:text-emerald-400 font-bold">
                                             +{f.saved ?? 0}
                                         </span>
                                     )}

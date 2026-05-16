@@ -10,8 +10,26 @@ import React from 'react'
 import MediaMonitoringDashboard from './MediaMonitoringDashboard'
 
 describe('<MediaMonitoringDashboard />', () => {
-  it('renders', () => {
-    // see: https://on.cypress.io/mounting-react
-    cy.mount(<MediaMonitoringDashboard />)
-  })
+  it('renders all filter chips and the coverage log', () => {
+    cy.mount(<MediaMonitoringDashboard />);
+    
+    // Check main title
+    cy.contains('Coverage Log').should('be.visible');
+    
+    // Check filter chips
+    cy.contains('All').should('be.visible');
+    cy.contains('Online News').should('be.visible');
+    cy.contains('Social Media').should('be.visible');
+    cy.contains('Press').should('be.visible');
+    
+    // Check search input
+    cy.get('input[placeholder*="Search"]').should('be.visible');
+  });
+
+  it('changes filter when a chip is clicked', () => {
+    cy.mount(<MediaMonitoringDashboard />);
+    
+    cy.contains('Press').click();
+    cy.contains('Press').should('have.class', 'bg-primary');
+  });
 })

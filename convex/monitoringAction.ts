@@ -1025,73 +1025,22 @@ async function processArticle(
                             `
                         });
                     }
-                } catch (err) {
-                    console.error("Failed to create notification or send email:", err);
+                } catch (emailErr) {
+                    console.error("[Email Alert] Failed:", emailErr);
                 }
             }
         }
-
-        return true;
-    } catch (e) {
-        console.error(`Error processing item: ${item.title}`, e);
+    } catch (error) {
+        console.error(`â Œ Article processing failed for "${item.link}":`, error);
         return false;
     }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// PRESS RELEASE WIRE INGESTION
-// Directly pulls from major global and Arab PR wire RSS feeds.
-// Bypasses news aggregator APIs â€” content is first-party from wire services.
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-
-// PR wire RSS sources â€” mix of global and MENA-focused feeds
-const PR_WIRE_FEEDS: Array<{
-    name: string;
-    url: string;
-    country: string;
-    lang: "en" | "ar";
-}> = [
-        // Global / Regional Verified Wires (English)
-        { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-list.rss", country: "US", lang: "en" },
-        { name: "Newswire.com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
-        { name: "Al Bawaba PR", url: "https://www.albawaba.com/rss/business", country: "JO", lang: "en" },
-        { name: "AETOSWire (EN)", url: "https://aetoswire.com/rss", country: "AE", lang: "en" },
-        { name: "Middle East Eye", url: "https://www.middleeasteye.net/rss", country: "UK", lang: "en" },
-        { name: "MEED Business", url: "https://www.meed.com/rss", country: "AE", lang: "en" },
-        { name: "Mehr News (EN)", url: "https://en.mehrnews.com/rss", country: "IR", lang: "en" },
-        { name: "Egyptian Streets", url: "https://egyptianstreets.com/feed", country: "EG", lang: "en" },
-
-        // WAM - Emirates News Agency (EN Categories)
-        { name: "WAM (Economy EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-002-1jc72emk1y2i&type=rss", country: "AE", lang: "en" },
-        { name: "WAM (Sport EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-002-1jc73gac78yp&type=rss", country: "AE", lang: "en" },
-        { name: "WAM (Culture EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73gac79l5&type=rss", country: "AE", lang: "en" },
-        { name: "WAM (Latest news EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx3w&type=rss", country: "AE", lang: "en" },
-        { name: "WAM (Science/Tech EN)", url: "https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx70&type=rss", country: "AE", lang: "en" },
-
-        // WAM - Emirates News Agency (AR Categories)
-        { name: "WAM (Economy AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-001-1jc74qmetxqw&type=rss", country: "AE", lang: "ar" },
-        { name: "WAM (Sport AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-001-1jc74qmetyul&type=rss", country: "AE", lang: "ar" },
-        { name: "WAM (Culture AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmetzbr&type=rss", country: "AE", lang: "ar" },
-        { name: "WAM (Latest News AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmeu03a&type=rss", country: "AE", lang: "ar" },
-        { name: "WAM (Science/Tech AR)", url: "https://www.wam.ae/ar/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-001-1jc74qmeu0pl&type=rss", country: "AE", lang: "ar" },
-
-        // MENA / Arab wires
-        { name: "AETOSWire (AR)", url: "https://aetoswire.com/rss?lang=ar", country: "AE", lang: "ar" },
-    ];
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// HISTORICAL SEARCH â€" NewsAPI.org for archives beyond RSS feed retention
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// HISTORICAL SEARCH — NewsAPI.org for archives beyond RSS feed retention
+// ─────────────────────────────────────────────────────────────────────────────────────────
 /**
  * Fetches historical news articles from NewsAPI.org when RSS feeds don't have enough historical data.
- * This is used when the user provides a keyword and date range.
- * 
- * @param ctx Action context to resolve API keys
- * @param keyword Search keyword
- * @param dateFrom ISO date string (e.g. "2025-01-01")
- * @param dateTo ISO date string (e.g. "2025-12-31")
- * @param limit Max articles per API call
- * @returns Array of normalized article objects
  */
 async function fetchHistoricalArticles(
     ctx: any,
@@ -1100,34 +1049,21 @@ async function fetchHistoricalArticles(
     dateTo: string | null,
     limit: number = 30
 ): Promise<Array<{ link: string; title: string; contentSnippet: string; pubDate: string; source: string }>> {
-    // Try to resolve NewsAPI key
     const newsApiKey = await resolveApiKey(ctx, "NEWSAPI_KEY", "newsapi");
-    if (!newsApiKey) {
-        console.warn("[Historical Search] No NewsAPI key configured, skipping historical search");
-        return [];
-    }
+    if (!newsApiKey) return [];
 
     try {
-        // Build query with keyword and date range
         const query = encodeURIComponent(keyword);
         let url = `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&pageSize=${Math.min(limit, 100)}&apiKey=${newsApiKey}`;
-
         if (dateFrom) url += `&from=${dateFrom}`;
         if (dateTo) url += `&to=${dateTo}`;
 
         const response = await fetch(url);
-        if (!response.ok) {
-            console.warn(`[Historical Search] NewsAPI returned ${response.status}: ${response.statusText}`);
-            return [];
-        }
+        if (!response.ok) return [];
 
         const data = await response.json();
-        if (!data.articles || !Array.isArray(data.articles)) {
-            console.warn("[Historical Search] No articles returned from NewsAPI");
-            return [];
-        }
+        if (!data.articles || !Array.isArray(data.articles)) return [];
 
-        // Normalize to match RSS parser format
         return data.articles.map((article: any) => ({
             link: article.url,
             title: article.title,
@@ -1141,228 +1077,182 @@ async function fetchHistoricalArticles(
     }
 }
 
+async function fetchRobustRss(url: string) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5,ar;q=0.3',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            },
+            redirect: 'follow',
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP_${response.status}`);
+        }
+
+        let xml = await response.text();
+        // Sanitization for AETOSWire and others with potential malformed XML
+        xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
+        return xml;
+    } catch (error: any) {
+        throw error;
+    }
+}
+
+const PR_WIRE_FEEDS = [
+    { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-news.rss", country: "US", lang: "en" },
+    { name: "Newswire.com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
+    { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
+    { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
+    { name: "Zawya", url: "https://www.zawya.com/en/rss/all", country: "AE", lang: "en" },
+    { name: "Arab News", url: "https://www.arabnews.com/rss.xml", country: "SA", lang: "en" },
+    { name: "Gulf News", url: "https://gulfnews.com/rss", country: "AE", lang: "en" },
+    { name: "Khaleej Times", url: "https://www.khaleejtimes.com/rss", country: "AE", lang: "en" },
+    { name: "The National", url: "https://www.thenationalnews.com/rss", country: "AE", lang: "en" },
+    { name: "Middle East Eye", url: "https://www.middleeasteye.net/rss", country: "GB", lang: "en" },
+    { name: "Al Bawaba", url: "https://www.albawaba.com/rss/all", country: "JO", lang: "en" },
+    { name: "MEED", url: "https://www.meed.com/rss", country: "AE", lang: "en" },
+    { name: "Mehr News", url: "https://en.mehrnews.com/rss", country: "IR", lang: "en" },
+    { name: "Egyptian Streets", url: "https://egyptianstreets.com/feed/", country: "EG", lang: "en" },
+];
+
 export const fetchPressReleaseSources = action({
     args: {
         keyword: v.optional(v.string()),
-        limit: v.optional(v.number()),      // max candidates per feed (user-controlled)
-        dateFrom: v.optional(v.string()),   // ISO date string e.g. "2025-01-01"
-        dateTo: v.optional(v.string()),     // ISO date string e.g. "2025-12-31"
+        limit: v.optional(v.number()),
+        dateFrom: v.optional(v.string()),
+        dateTo: v.optional(v.string()),
     },
-    handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: Record<string, unknown>[]; message: string }> => {
+    handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: any[]; message: string }> => {
         try {
             await requireAdmin(ctx.auth);
 
             const fetchedKeyword = args.keyword?.trim() || "";
-            // Support Boolean logic in Press Release filtering
             const booleanExpr = parseBooleanKeyword(fetchedKeyword);
             const keyword = fetchedKeyword || "Press Release";
-            const itemLimit = args.limit ?? 30;   // per-feed cap â€” user controlled
+            const itemLimit = args.limit ?? 30;
 
-            // Date range (optional) â€” ISO strings from the UI date picker
             const dateFromObj = args.dateFrom ? new Date(args.dateFrom) : null;
             const dateToObj = args.dateTo ? new Date(args.dateTo + "T23:59:59Z") : null;
-            const parser = new Parser({ timeout: 10000 });
+            const parser = new Parser({
+                timeout: 10000,
+                customFields: {
+                    item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
+                }
+            });
 
             let totalSaved = 0;
             let totalErrors = 0;
-            const feedResults: Record<string, unknown>[] = [];
+            const feedResults: any[] = [];
 
-            // Fetch all feeds in parallel (each feed error is isolated)
+            // 1. Parallel RSS Ingestion
             await Promise.all(
                 PR_WIRE_FEEDS.map(async (feed) => {
                     let savedCount = 0;
                     try {
-                        const feedData = await parser.parseURL(feed.url);
-
-                        // Each feed pulls up to itemLimit candidates, then we filter by keyword
+                        const xml = await fetchRobustRss(feed.url);
+                        const feedData = await parser.parseString(xml);
                         const candidates = feedData.items.slice(0, itemLimit);
 
-                        // â”€â”€ Keyword filter (Boolean logic) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                        const afterKeyword = fetchedKeyword
-                            ? candidates.filter((item) => {
-                                const title = item.title ?? "";
-                                const snippet = item.contentSnippet || item.content || "";
-                                return matchesBooleanFilter(booleanExpr, title, snippet);
-                            })
-                            : candidates;
+                        const items = candidates.filter((item) => {
+                            const title = item.title ?? "";
+                            const snippet = item.contentSnippet || item.content || "";
 
-                        // â”€â”€ Date range filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                        const items = (dateFromObj || dateToObj)
-                            ? afterKeyword.filter((item) => {
+                            // Keyword Filter
+                            if (fetchedKeyword && !matchesBooleanFilter(booleanExpr, title, snippet)) return false;
+
+                            // Date Filter
+                            if (dateFromObj || dateToObj) {
                                 if (!item.pubDate) return true;
                                 const pub = new Date(item.pubDate);
                                 if (isNaN(pub.getTime())) return true;
                                 if (dateFromObj && pub < dateFromObj) return false;
                                 if (dateToObj && pub > dateToObj) return false;
-                                return true;
-                            })
-                            : afterKeyword;
+                            }
+                            return true;
+                        });
 
                         for (const item of items) {
                             if (!item.link || !item.title) continue;
+                            const isSeen = await checkAndSetSeen(item.link, item.title);
+                            if (isSeen) continue;
 
-                            try {
-                                // â”€â”€ GATE 1: Redis Deduplication â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                                // Prevent identical PRs from overlapping feeds or multiple runs
-                                const isSeen = await checkAndSetSeen(item.link, item.title);
-                                if (isSeen) {
-                                    console.log(`ðŸ—‘ï¸ PR Dedup skip: ${item.title.substring(0, 50)}...`);
-                                    continue;
-                                }
-
-                                const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
-                                const dd = pubDate.getDate().toString().padStart(2, "0");
-                                const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
-                                const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
-
-                                const snippet = item.contentSnippet || item.content || item.title;
-                                const boolExpr = parseBooleanKeyword(fetchedKeyword);
-                                if (fetchedKeyword && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
-                                    console.log(`⚡ PR Boolean reject: "${item.title.substring(0, 50)}..." (keyword: ${fetchedKeyword})`);
-                                    continue;
-                                }
-
-                                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
-
-                                const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-                                const aiData = await callGeminiForAnalysis(
-                                    geminiKey,
-                                    item.title,
-                                    snippet,
-                                    fetchedKeyword || "Press Release",
-                                    []
-                                );
-
-                                const sentiment = aiData.sentiment;
-                                const summary = aiData.summary || snippet.slice(0, 300);
-                                const reach = aiData.reach_estimate || 50000;
-                                const emotions = aiData.emotions || { joy: 0, sadness: 0, anger: 0, fear: 0, surprise: 0, trust: 0 };
-                                const ave = Math.round(reach * 0.02 * 5);
-
-                                await ctx.runMutation(api.monitoring.saveArticle, {
-                                    keyword,
-                                    url: item.link,
-                                    publishedDate: formattedDate,
-                                    title: item.title,
-                                    content: summary,
-                                    language: (isArabic || feed.lang === "ar") ? "AR" : "EN",
-                                    sentiment,
-                                    sourceType: "Press Release",
-                                    source: feed.name,
-                                    sourceCountry: feed.country,
-                                    reach,
-                                    ave,
-                                    depth: "standard",
-                                    ingestMethod: "rss",
-                                    emotions,
-                                });
-
+                            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                            const processed = await processArticle(
+                                ctx,
+                                {
+                                    ...item,
+                                    link: item.link,
+                                    pubDate: item.pubDate,
+                                },
+                                feed.country,
+                                feed.lang,
+                                keyword,
+                                geminiKey,
+                                ["Press Release"],
+                                dateFromObj,
+                                dateToObj,
+                                false,
+                                "Press Release"
+                            );
+                            if (processed) {
                                 savedCount++;
                                 totalSaved++;
-                            } catch (err) {
-                                totalErrors++;
                             }
                         }
+                        feedResults.push({ name: feed.name, status: "Success", saved: savedCount, total: items.length });
+                    } catch (err: any) {
+                        const message = err.message || String(err);
+                        console.error(`❌ Feed Failed: ${feed.name}`, message);
+                        let errorLabel = "Failed";
+                        if (message.includes("HTTP_403")) errorLabel = "Access Denied (403)";
+                        else if (message.includes("HTTP_400")) errorLabel = "Bad Request (400)";
+                        else if (message.includes("timeout")) errorLabel = "Timeout";
 
-                        feedResults.push({ feed: feed.name, saved: savedCount, total: items.length });
-                    } catch (feedErr: unknown) {
-                        const message = feedErr instanceof Error ? feedErr.message : "fetch failed";
-                        feedResults.push({ feed: feed.name, error: message });
+                        feedResults.push({ name: feed.name, status: "Failed", error: errorLabel, saved: 0 });
                         totalErrors++;
                     }
                 })
             );
 
-            // â"€â"€ HISTORICAL SEARCH (NewsAPI) â€" When keyword+dates provided â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
-            // If user provided keyword AND date range, also fetch from historical archives via NewsAPI
+            // 2. Historical Search
             if (fetchedKeyword && args.dateFrom && args.dateTo) {
                 try {
-                    const historicalArticles = await fetchHistoricalArticles(
-                        ctx,
-                        fetchedKeyword,
-                        args.dateFrom,
-                        args.dateTo,
-                        itemLimit
-                    );
+                    const historical = await fetchHistoricalArticles(ctx, fetchedKeyword, args.dateFrom, args.dateTo, itemLimit);
+                    let histSaved = 0;
+                    for (const article of historical) {
+                        const isSeen = await checkAndSetSeen(article.link, article.title);
+                        if (isSeen) continue;
 
-                    if (historicalArticles.length > 0) {
-                        let historicalSaved = 0;
-                        for (const article of historicalArticles) {
-                            if (!article.link || !article.title) continue;
-
-                            try {
-                                // Deduplication: skip if already seen
-                                const isSeen = await checkAndSetSeen(article.link, article.title);
-                                if (isSeen) continue;
-
-                                const pubDate = new Date(article.pubDate);
-                                const dd = pubDate.getDate().toString().padStart(2, "0");
-                                const mm = (pubDate.getMonth() + 1).toString().padStart(2, "0");
-                                const formattedDate = `${dd}/${mm}/${pubDate.getFullYear()}`;
-
-                                const snippet = article.contentSnippet || article.title;
-                                const isArabic = /[\u0600-\u06FF]/.test(article.title + snippet);
-
-                                // Simple sentiment detection
-                                let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
-                                const lowerSnippet = snippet.toLowerCase();
-                                if (lowerSnippet.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative)/i)) {
-                                    sentiment = "Positive";
-                                } else if (lowerSnippet.match(/(loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk)/i)) {
-                                    sentiment = "Negative";
-                                }
-
-                                const reach = 50000;
-                                const ave = Math.round(reach * 0.02 * 5);
-
-                                await ctx.runMutation(api.monitoring.saveArticle, {
-                                    keyword,
-                                    url: article.link,
-                                    publishedDate: formattedDate,
-                                    title: article.title,
-                                    content: snippet.slice(0, 300),
-                                    language: isArabic ? "AR" : "EN",
-                                    sentiment,
-                                    sourceType: "Press Release",
-                                    source: article.source,
-                                    sourceCountry: "MENA",
-                                    reach,
-                                    ave,
-                                    depth: "standard",
-                                    ingestMethod: "api",
-                                    emotions: {
-                                        joy: sentiment === "Positive" ? 60 : 0,
-                                        sadness: sentiment === "Negative" ? 40 : 0,
-                                        anger: sentiment === "Negative" ? 30 : 0,
-                                        fear: sentiment === "Negative" ? 50 : 0,
-                                        surprise: 20,
-                                        trust: sentiment === "Positive" ? 70 : 30
-                                    },
-                                });
-
-                                historicalSaved++;
-                                totalSaved++;
-                            } catch (err) {
-                                console.warn("[Historical] Failed to save article:", err);
-                                totalErrors++;
-                            }
-                        }
-
-                        if (historicalSaved > 0) {
-                            feedResults.push({
-                                feed: "NewsAPI Historical Search",
-                                saved: historicalSaved,
-                                total: historicalArticles.length
-                            });
+                        const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                        const processed = await processArticle(
+                            ctx,
+                            article,
+                            "Global",
+                            "en",
+                            keyword,
+                            geminiKey,
+                            ["Press Release"],
+                            dateFromObj,
+                            dateToObj,
+                            false,
+                            "Press Release"
+                        );
+                        if (processed) {
+                            histSaved++;
+                            totalSaved++;
                         }
                     }
-                } catch (histErr) {
-                    console.warn("[Historical Search] Error:", histErr);
-                    feedResults.push({
-                        feed: "NewsAPI Historical Search",
-                        error: histErr instanceof Error ? histErr.message : "historical search failed"
-                    });
-                    totalErrors++;
+                    if (historical.length > 0) {
+                        feedResults.push({ name: "NewsAPI Historical", status: "Success", saved: histSaved, total: historical.length });
+                    }
+                } catch (e) {
+                    console.warn("[Historical Search] Failed:", e);
                 }
             }
 
@@ -1371,7 +1261,7 @@ export const fetchPressReleaseSources = action({
                 totalSaved,
                 totalErrors,
                 feedResults,
-                message: `Ingested ${totalSaved} press releases from ${PR_WIRE_FEEDS.length} wire sources`,
+                message: `Sync complete. ${totalSaved} articles ingested.`
             };
         } catch (globalError: any) {
             if (globalError.message === "MODEL_CAPACITY_EXHAUSTED") {

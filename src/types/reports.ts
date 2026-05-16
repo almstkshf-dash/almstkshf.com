@@ -22,6 +22,8 @@ export interface ReportTranslations {
         col_status?: string;
         col_count?: string;
         col_sentiment?: string;
+        col_url?: string;
+        col_tags?: string;
         summary?: string;
         total_reach?: string;
         total_ave?: string;
@@ -40,6 +42,7 @@ export interface ReportTranslations {
         entity_name?: string;
         entity_type?: string;
         relevance?: string;
+        page?: string;
     };
     DarkWeb?: {
         tab_label?: string;

@@ -53,7 +53,7 @@ export default function PressClient() {
         <div className="space-y-20 pb-20 bg-background text-foreground transition-colors duration-300">
             {/* Hero Section */}
             <section className="relative pt-12 overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/10 blur-[120px] rounded-full -z-10 transition-opacity"></div>
+                <div className="absolute top-0 start-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/10 blur-[120px] rounded-full -z-10 transition-opacity"></div>
                 <Container>
                     <div className="max-w-4xl mx-auto text-center space-y-6">
                         <motion.div
@@ -132,7 +132,7 @@ export default function PressClient() {
                         viewport={{ once: true }}
                         className="max-w-5xl mx-auto p-10 rounded-[3rem] bg-card border border-border relative overflow-hidden group shadow-lg transition-all"
                     >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors"></div>
+                        <div className="absolute top-0 end-0 w-64 h-64 bg-primary/5 blur-3xl rounded-full group-hover:bg-primary/10 transition-colors"></div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
                             <div className="space-y-8">

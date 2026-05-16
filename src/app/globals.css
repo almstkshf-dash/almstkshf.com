@@ -531,6 +531,21 @@ svg.lucide-moon {
   animation-name: slideInFromRight;
 }
 
+.slide-in-from-left {
+  --tw-translate-x: -1rem;
+  animation-name: slideInFromLeft;
+}
+
+[dir="rtl"] .slide-in-from-end {
+  --tw-translate-x: -1rem;
+  animation-name: slideInFromLeft;
+}
+
+[dir="ltr"] .slide-in-from-end {
+  --tw-translate-x: 1rem;
+  animation-name: slideInFromRight;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0
@@ -557,6 +572,18 @@ svg.lucide-moon {
   from {
     opacity: 0;
     transform: translateX(1rem)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0)
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-1rem)
   }
 
   to {

@@ -7,11 +7,29 @@
  */
 
 import React from 'react'
-import SmartMediaAssistantPage from './page'
+import SmartMediaAssistantClient from './page'
 
 describe('<SmartMediaAssistantPage />', () => {
-  it('renders', () => {
-    // see: https://on.cypress.io/mounting-react
-    cy.mount(<SmartMediaAssistantPage />)
-  })
+  it('renders the assistant intro and input area', () => {
+    cy.mount(<SmartMediaAssistantClient />);
+    
+    // Check for AI badge
+    cy.contains('Powered by Gemini').should('be.visible');
+    
+    // Check for title
+    cy.contains('Smart Media Assistant').should('be.visible');
+    
+    // Check for input area
+    cy.get('textarea[placeholder*="Ask"]').should('be.visible');
+    
+    // Check for deploy button
+    cy.contains('Deploy Assistant').should('be.visible');
+  });
+
+  it('allows typing a prompt', () => {
+    cy.mount(<SmartMediaAssistantClient />);
+    const prompt = 'Analyze the latest press releases about Almstkshf';
+    cy.get('textarea').type(prompt);
+    cy.get('textarea').should('have.value', prompt);
+  });
 })
