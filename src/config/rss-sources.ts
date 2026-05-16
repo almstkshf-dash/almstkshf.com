@@ -198,6 +198,68 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Nabd El Emirate': [
     { id: 'nbdelemirate-latest', name: 'Latest News', url: 'https://nbdelemirate.com/feed/', country: 'UAE' }
   ],
+  // ── International News Sources ─────────────────────────────────────────────
+  'NPR': [
+    { id: 'npr-world', name: 'World News', url: 'http://www.npr.org/rss/rss.php?id=1004', country: 'US' },
+    { id: 'npr-national', name: 'National News', url: 'http://www.npr.org/rss/rss.php?id=1003', country: 'US' },
+  ],
+  'Fox News': [
+    { id: 'foxnews-latest', name: 'Latest News', url: 'http://feeds.foxnews.com/foxnews/latest', country: 'US' },
+  ],
+  'BBC News': [
+    { id: 'bbc-us-canada', name: 'US & Canada', url: 'http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml', country: 'GB' },
+    { id: 'bbc-world', name: 'World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml', country: 'GB' },
+    { id: 'bbc-uk', name: 'UK', url: 'http://feeds.bbci.co.uk/news/uk/rss.xml', country: 'GB' },
+  ],
+  'Politico': [
+    { id: 'politico-picks', name: 'Politico Picks', url: 'http://www.politico.com/rss/politicopicks.xml', country: 'US' },
+  ],
+  'Yahoo News': [
+    { id: 'yahoo-world', name: 'World News', url: 'http://rss.news.yahoo.com/rss/world', country: 'US' },
+    { id: 'yahoo-us', name: 'US News', url: 'http://news.yahoo.com/rss/us', country: 'US' },
+  ],
+  'LA Times': [
+    { id: 'latimes-world', name: 'World News', url: 'http://www.latimes.com/world/rss2.0.xml', country: 'US' },
+    { id: 'latimes-national', name: 'National News', url: 'http://www.latimes.com/nation/rss2.0.xml', country: 'US' },
+  ],
+  'CS Monitor': [
+    { id: 'csmonitor-usa', name: 'USA', url: 'http://rss.csmonitor.com/feeds/usa', country: 'US' },
+  ],
+  'NBC News': [
+    { id: 'nbcnews-top', name: 'Top Stories', url: 'http://feeds.nbcnews.com/feeds/topstories', country: 'US' },
+    { id: 'nbcnews-world', name: 'World News', url: 'http://feeds.nbcnews.com/feeds/worldnews', country: 'US' },
+  ],
+  'The Guardian': [
+    { id: 'guardian-us', name: 'US News', url: 'http://www.theguardian.com/world/usa/rss', country: 'GB' },
+    { id: 'guardian-uk', name: 'UK News', url: 'http://www.theguardian.com/uk/rss', country: 'GB' },
+  ],
+  'Newsweek': [
+    { id: 'newsweek-latest', name: 'Latest News', url: 'http://www.newsweek.com/rss', country: 'US' },
+  ],
+  'ABC News': [
+    { id: 'abcnews-us', name: 'US Headlines', url: 'http://feeds.abcnews.com/abcnews/usheadlines', country: 'US' },
+  ],
+  'Time': [
+    { id: 'time-newsfeed', name: 'Newsfeed', url: 'http://time.com/newsfeed/feed/', country: 'US' },
+  ],
+  'Vice News': [
+    { id: 'vice-news', name: 'Latest News', url: 'https://news.vice.com/rss', country: 'US' },
+  ],
+  'Wall Street Journal': [
+    { id: 'wsj-latest', name: 'Latest News', url: 'http://online.wsj.com/xml/rss/3_7085.xml', country: 'US' },
+  ],
+  'Huffington Post': [
+    { id: 'huffpost-world', name: 'World News', url: 'http://www.huffingtonpost.com/feeds/verticals/world/index.xml', country: 'US' },
+  ],
+  'US News': [
+    { id: 'usnews-latest', name: 'Latest News', url: 'http://www.usnews.com/rss/news', country: 'US' },
+  ],
+  'Sky News UK': [
+    { id: 'skynews-uk', name: 'UK News', url: 'http://news.sky.com/feeds/rss/uk.xml', country: 'GB' },
+  ],
+  'The Telegraph': [
+    { id: 'telegraph-uk', name: 'UK News', url: 'http://www.telegraph.co.uk/news/uknews/rss', country: 'GB' },
+  ],
 };
 
 export const ALL_SOURCES = Object.entries(PREMIUM_SOURCES).flatMap(([publisher, categories]) =>

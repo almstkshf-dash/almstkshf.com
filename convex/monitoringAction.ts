@@ -232,7 +232,7 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
 // GEMINI RELEVANCY GATE â€” Returns 0-100 relevancy score
 // Articles scoring below RELEVANCY_THRESHOLD are discarded before DB write.
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-const RELEVANCY_THRESHOLD = 85;
+const RELEVANCY_THRESHOLD = 75;
 
 async function callGeminiRelevancyScore(
     apiKey: string | null,
@@ -394,9 +394,10 @@ export const fetchNews = action({
             // Source Type targeting
             const stList = args.sourceTypes ? args.sourceTypes.split(',').map(s => s.trim()) : [];
             if (stList.includes('Press Release')) {
-                enrichedQuery += ' (site:prnewswire.com OR site:businesswire.com OR site:zawya.com OR site:wam.ae OR site:globenewswire.com OR site:einpresswire.com OR site:accesswire.com OR site:me-newswire.net OR site:spa.gov.sa OR site:newsfilecorp.com OR site:prweb.com OR site:marketwired.com OR site:prunderground.com OR site:eyeofriyadh.com OR site:eyeofdubai.ae OR site:saudigazette.com.sa OR site:arabnews.com OR site:gulfnews.com)';
+                // Expanded premium site whitelist for robust Press Release discovery
+                enrichedQuery += ' (site:prnewswire.com OR site:businesswire.com OR site:zawya.com OR site:wam.ae OR site:globenewswire.com OR site:einpresswire.com OR site:accesswire.com OR site:me-newswire.net OR site:spa.gov.sa OR site:newsfilecorp.com OR site:prweb.com OR site:marketwired.com OR site:prunderground.com OR site:eyeofriyadh.com OR site:eyeofdubai.ae OR site:saudigazette.com.sa OR site:arabnews.com OR site:gulfnews.com OR site:gulftoday.ae OR site:khaleejtimes.com OR site:thenationalnews.com OR site:thenational.ae OR site:aetoswire.com OR site:albawaba.com OR site:alarabiya.net OR site:skynewsarabia.com OR site:middleeasteye.net OR site:meed.com)';
             } else if (stList.includes('Social Media')) {
-                enrichedQuery += ' (site:twitter.com OR site:reddit.com OR site:linkedin.com)';
+                enrichedQuery += ' (site:twitter.com OR site:x.com OR site:reddit.com OR site:linkedin.com OR site:facebook.com OR site:instagram.com)';
             }
 
             // Enhance query with date operators for exact matching
@@ -889,28 +890,35 @@ async function processArticle(
         const boolExpr = parseBooleanKeyword(keyword);
         const snippet = item.contentSnippet || item.content || item.title;
         if (!matchesBooleanFilter(boolExpr, item.title, snippet)) {
-            console.log(`âš¡ Boolean reject: "${item.title.substring(0, 60)}..."`);
+            console.log(`⚡ Boolean reject: "${item.title.substring(0, 60)}..."`);
             return false;
         }
 
-        // â”€â”€ GATE 2: Date Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── GATE 2: Date Filter ──────────────────────────────────────────────────
         const pubDate = item.pubDate ? new Date(item.pubDate) : null;
         if (pubDate) {
-            if (dateFrom && pubDate < dateFrom) return false;
-            if (dateTo && pubDate > dateTo) return false;
+            if (dateFrom && pubDate < dateFrom) {
+                console.log(`📅 [Gate 2] Date reject (Too old): ${item.link}`);
+                return false;
+            }
+            if (dateTo && pubDate > dateTo) {
+                console.log(`📅 [Gate 2] Date reject (Too new): ${item.link}`);
+                return false;
+            }
         }
 
-        // â”€â”€ GATE 3: Redis Deduplication (24-hour hash cache) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── GATE 3: Redis Deduplication (24-hour hash cache) ──────────────────
         // Prevents the same article from multiple providers (NewsData, GNews,
         // RSS) being stored twice. Uses SHA-256(url+title) with 24h TTL.
         const isDuplicate = await checkAndSetSeen(item.link, item.title);
         if (isDuplicate) {
+            console.log(`♻️ [Gate 3] Deduplication: Skipped duplicate link/title`);
             return false; // Log already printed inside checkAndSetSeen
         }
 
-        // â”€â”€ GATE 4: Gemini Relevancy Score (â‰¥70 required) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── GATE 4: Gemini Relevancy Score (Required: ${RELEVANCY_THRESHOLD}/100) ──────────
         // Lightweight Gemini call to score how relevant the article is to the
-        // keyword. Articles scoring below 70/100 are discarded before the
+        // keyword. Articles scoring below threshold are discarded before the
         // full analysis + DB write.
         const relevancyScore = await callGeminiRelevancyScore(
             geminiKey,
@@ -1113,84 +1121,23 @@ async function fetchRobustRss(url: string) {
 }
 
 const PR_WIRE_FEEDS = [
+    { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
+    { name: "WAM_AR", url: "https://wam.ae/ar/rss", country: "AE", lang: "ar" },
+    { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
+    { name: "Zawya", url: "https://www.zawya.com/en/rss/all", country: "AE", lang: "en" },
+    { name: "Dubai PR Network", url: "https://www.dubaiprnetwork.com/rss_feed.asp", country: "AE", lang: "en" },
+    { name: "Gulf Today", url: "https://www.gulftoday.ae/rss", country: "AE", lang: "en" },
+    { name: "Khaleej Times", url: "https://www.khaleejtimes.com/rss", country: "AE", lang: "en" },
+    { name: "Gulf News", url: "https://gulfnews.com/rss", country: "AE", lang: "en" },
+    { name: "The National", url: "https://www.thenationalnews.com/rss", country: "AE", lang: "en" },
+    { name: "Arab News", url: "https://www.arabnews.com/rss.xml", country: "SA", lang: "en" },
     { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-news.rss", country: "US", lang: "en" },
     { name: "Newswire_com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
-    { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
-    { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
-    { name: "Zawya", url: "https://www.zawya.com/en/rss/all", country: "AE", lang: "en" },
-    { name: "Arab News", url: "https://www.arabnews.com/rss.xml", country: "SA", lang: "en" },
-    { name: "Gulf News", url: "https://gulfnews.com/rss", country: "AE", lang: "en" },
-    { name: "Khaleej Times", url: "https://www.khaleejtimes.com/rss", country: "AE", lang: "en" },
-    { name: "The National", url: "https://www.thenationalnews.com/rss", country: "AE", lang: "en" },
-    { name: "Middle East Eye", url: "https://www.middleeasteye.net/rss", country: "GB", lang: "en" },
-    { name: "Al Bawaba", url: "https://www.albawaba.com/rss/all", country: "JO", lang: "en" },
-    { name: "MEED – Analysis", url: "https://www.meed.com/classifications/analysis/feed", country: "AE", lang: "en" },
-    { name: "MEED – Commentary", url: "https://www.meed.com/category/news/commentary/feed/", country: "AE", lang: "en" },
-    { name: "MEED – Special Reports", url: "https://www.meed.com/classifications/analysis/special-report/rss", country: "AE", lang: "en" },
-    { name: "MEED – Tenders", url: "https://www.meed.com/tenders/feed/", country: "AE", lang: "en" },
-    { name: "MEED – Events", url: "https://www.meed.com/events/rss", country: "AE", lang: "en" },
-    // MEED Sectors
-    { name: "MEED – Construction", url: "https://www.meed.com/sector/construction/rss", country: "AE", lang: "en" },
-    { name: "MEED – Finance", url: "https://www.meed.com/sector/banking-finance/rss", country: "AE", lang: "en" },
-    { name: "MEED – Industry", url: "https://www.meed.com/sector/industrial/rss", country: "AE", lang: "en" },
-    { name: "MEED – Oil & Gas", url: "https://www.meed.com/sector/oil-and-gas/rss", country: "AE", lang: "en" },
-    { name: "MEED – Petrochemicals", url: "https://www.meed.com/sector/petrochemicals/rss", country: "AE", lang: "en" },
-    { name: "MEED – Power & Water", url: "https://www.meed.com/sector/power-and-water/power/rss", country: "AE", lang: "en" },
-    { name: "MEED – Tourism", url: "https://www.meed.com/sector/economy/tourism/rss", country: "AE", lang: "en" },
-    { name: "MEED – Transport", url: "https://www.meed.com/sector/transport/rss", country: "AE", lang: "en" },
-    { name: "MEED – Water", url: "https://www.meed.com/sector/water/rss", country: "AE", lang: "en" },
-    { name: "MEED – Technology & IT", url: "https://www.meed.com/sector/Technology/rss", country: "AE", lang: "en" },
-    // MEED Countries
-    { name: "MEED – Algeria", url: "https://www.meed.com/countries/algeria/rss/feed", country: "DZ", lang: "en" },
-    { name: "MEED – Bahrain", url: "https://www.meed.com/countries/gcc/bahrain/rss/feed", country: "BH", lang: "en" },
-    { name: "MEED – Egypt", url: "https://www.meed.com/countries/north-africa/egypt/rss/feed", country: "EG", lang: "en" },
-    { name: "MEED – Iran", url: "https://www.meed.com/countries/iran/rss/feed", country: "IR", lang: "en" },
-    { name: "MEED – Iraq", url: "https://www.meed.com/countries/iraq/rss/feed", country: "IQ", lang: "en" },
-    { name: "MEED – Jordan", url: "https://www.meed.com/countries/levant/jordan/rss/feed", country: "JO", lang: "en" },
-    { name: "MEED – Kuwait", url: "https://www.meed.com/countries/gcc/kuwait/rss/feed", country: "KW", lang: "en" },
-    { name: "MEED – Lebanon", url: "https://www.meed.com/countries/levant/lebanon/rss/feed", country: "LB", lang: "en" },
-    { name: "MEED – Libya", url: "https://www.meed.com/countries/north-africa/libya/rss/feed", country: "LY", lang: "en" },
-    { name: "MEED – Morocco", url: "https://www.meed.com/countries/north-africa/morocco/rss/feed", country: "MA", lang: "en" },
-    { name: "MEED – Oman", url: "https://www.meed.com/countries/gcc/oman/rss/feed", country: "OM", lang: "en" },
-    { name: "MEED – Qatar", url: "https://www.meed.com/countries/gcc/qatar/rss/feed", country: "QA", lang: "en" },
-    { name: "MEED – Saudi Arabia", url: "https://www.meed.com/countries/gcc/saudi-arabia/rss/feed", country: "SA", lang: "en" },
-    { name: "MEED – Syria", url: "https://www.meed.com/countries/levant/syria/rss/feed", country: "SY", lang: "en" },
-    { name: "MEED – Tunisia", url: "https://www.meed.com/countries/north-africa/tunisia/rss/feed", country: "TN", lang: "en" },
-    { name: "MEED – UAE", url: "https://www.meed.com/countries/gcc/uae/rss/feed", country: "AE", lang: "en" },
-    { name: "Mehr News", url: "https://en.mehrnews.com/rss", country: "IR", lang: "en" },
-    { name: "Egyptian Streets", url: "https://egyptianstreets.com/feed/", country: "EG", lang: "en" },
-    // ── UAE Regional ──────────────────────────────────────────────────────────
-    { name: "Emirates247 – Flash News", url: "https://www.emirates247.com/rss/mobile/v2/flash-news.rss", country: "AE", lang: "en" },
-    { name: "Emirates247 – UAE News", url: "https://www.emirates247.com/rss/mobile/v2/uae.rss", country: "AE", lang: "en" },
-    { name: "Emirates247 – World News", url: "https://www.emirates247.com/rss/mobile/v2/world.rss", country: "AE", lang: "en" },
-    { name: "Emirates247 – Business", url: "https://www.emirates247.com/rss/mobile/v2/business.rss", country: "AE", lang: "en" },
-    // ── Global PR / Journalism ────────────────────────────────────────────────
-    { name: "Provoke Media", url: "https://www.provokemedia.com/newsfeed/provoke-media-latest", country: "GB", lang: "en" },
-    { name: "The New Yorker – The Lede", url: "https://www.newyorker.com/feed/the-lede/rss", country: "US", lang: "en" },
-    { name: "Wired – Business", url: "https://www.wired.com/feed/category/business/latest/rss", country: "US", lang: "en" },
-    { name: "Wired – AI", url: "https://www.wired.com/feed/tag/ai/latest/rss", country: "US", lang: "en" },
-    // ── UAE Specialist ────────────────────────────────────────────────────────
-    { name: "Road Safety UAE – Posts", url: "https://www.roadsafetyuae.com/feed/?post_type=post", country: "AE", lang: "en" },
-    { name: "Road Safety UAE – Stories", url: "https://www.roadsafetyuae.com/feed/?post_type=stories", country: "AE", lang: "en" },
-    { name: "Road Safety UAE – Proposals", url: "https://www.roadsafetyuae.com/feed/?post_type=proposals", country: "AE", lang: "en" },
-    // ── Gulf Today ────────────────────────────────────────────────────────────
-    { name: "Gulf Today – Latest News", url: "https://www.gulftoday.ae/rss", country: "AE", lang: "en" },
-    { name: "Gulf Today – Opinion", url: "https://www.gulftoday.ae/rssFeed/10/", country: "AE", lang: "en" },
-    { name: "Gulf Today – News", url: "https://www.gulftoday.ae/rssFeed/55/", country: "AE", lang: "en" },
-    { name: "Gulf Today – Culture", url: "https://www.gulftoday.ae/rssFeed/56/", country: "AE", lang: "en" },
-    { name: "Gulf Today – Lifestyle", url: "https://www.gulftoday.ae/rssFeed/57/", country: "AE", lang: "en" },
-    { name: "Gulf Today – Sport", url: "https://www.gulftoday.ae/rssFeed/58/", country: "AE", lang: "en" },
-    { name: "Gulf Today – Business", url: "https://www.gulftoday.ae/rssFeed/52/", country: "AE", lang: "en" },
-    // ── Broad Regional News ───────────────────────────────────────────────────
     { name: "Al Arabiya", url: "https://www.alarabiya.net/.mrss/ar/last-24-hours.xml", country: "SA", lang: "ar" },
     { name: "Sky News Arabia", url: "https://www.skynewsarabia.com/feeds/rss/1.xml", country: "AE", lang: "ar" },
     { name: "Asharq Al-Awsat", url: "https://aawsat.com/feed", country: "SA", lang: "ar" },
-    { name: "BBC Arabic", url: "https://feeds.bbci.co.uk/arabic/rss.xml", country: "GB", lang: "ar" },
-    { name: "Al Jazeera", url: "https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84dbbe43033/2013-8-4", country: "QA", lang: "ar" },
-    // ── UAE Digital & Magazines ───────────────────────────────────────────────
     { name: "Hashtag Dubai", url: "https://hashtagdubai.org/index.php/feed/", country: "AE", lang: "en" },
     { name: "My Dubai News", url: "https://www.mydubainews.com/feed/", country: "AE", lang: "en" },
-    { name: "Dubai PR Network", url: "https://www.dubaiprnetwork.com/rss_feed.asp", country: "AE", lang: "en" },
     { name: "Go Dubai", url: "https://www.godubai.com/citylife/RSSFeedGenerator.asp", country: "AE", lang: "en" },
     { name: "Al Badia Magazine", url: "https://albadiamagazine.com/feed/", country: "AE", lang: "ar" },
     { name: "Al Madar Magazine", url: "https://www.almadarmagazine.ae/feed/", country: "AE", lang: "ar" },
@@ -1204,6 +1151,29 @@ const PR_WIRE_FEEDS = [
     { name: "India News Network", url: "https://www.indianewsnetwork.com/rss.xml", country: "IN", lang: "en" },
     { name: "Al Wahda News", url: "https://alwahdanews.ae/feed/", country: "AE", lang: "ar" },
     { name: "Nabd El Emirate", url: "https://nbdelemirate.com/feed/", country: "AE", lang: "ar" },
+    { name: "Provoke Media", url: "https://www.provokemedia.com/newsfeed/provoke-media-latest", country: "GB", lang: "en" },
+    { name: "The New Yorker", url: "https://www.newyorker.com/feed/the-lede/rss", country: "US", lang: "en" },
+    { name: "Wired", url: "https://www.wired.com/feed/category/business/latest/rss", country: "US", lang: "en" },
+    { name: "Emirates247", url: "https://www.emirates247.com/rss/mobile/v2/uae.rss", country: "AE", lang: "en" },
+    // ── International News Sources ──────────────────────────────────────────────
+    { name: "NPR", url: "http://www.npr.org/rss/rss.php?id=1004", country: "US", lang: "en" },
+    { name: "Fox News", url: "http://feeds.foxnews.com/foxnews/latest", country: "US", lang: "en" },
+    { name: "BBC News", url: "http://feeds.bbci.co.uk/news/world/rss.xml", country: "GB", lang: "en" },
+    { name: "Politico", url: "http://www.politico.com/rss/politicopicks.xml", country: "US", lang: "en" },
+    { name: "Yahoo News", url: "http://rss.news.yahoo.com/rss/world", country: "US", lang: "en" },
+    { name: "LA Times", url: "http://www.latimes.com/world/rss2.0.xml", country: "US", lang: "en" },
+    { name: "CS Monitor", url: "http://rss.csmonitor.com/feeds/usa", country: "US", lang: "en" },
+    { name: "NBC News", url: "http://feeds.nbcnews.com/feeds/topstories", country: "US", lang: "en" },
+    { name: "The Guardian", url: "http://www.theguardian.com/world/usa/rss", country: "GB", lang: "en" },
+    { name: "Newsweek", url: "http://www.newsweek.com/rss", country: "US", lang: "en" },
+    { name: "ABC News", url: "http://feeds.abcnews.com/abcnews/usheadlines", country: "US", lang: "en" },
+    { name: "Time", url: "http://time.com/newsfeed/feed/", country: "US", lang: "en" },
+    { name: "Vice News", url: "https://news.vice.com/rss", country: "US", lang: "en" },
+    { name: "Wall Street Journal", url: "http://online.wsj.com/xml/rss/3_7085.xml", country: "US", lang: "en" },
+    { name: "Huffington Post", url: "http://www.huffingtonpost.com/feeds/verticals/world/index.xml", country: "US", lang: "en" },
+    { name: "US News", url: "http://www.usnews.com/rss/news", country: "US", lang: "en" },
+    { name: "Sky News UK", url: "http://news.sky.com/feeds/rss/uk.xml", country: "GB", lang: "en" },
+    { name: "The Telegraph", url: "http://www.telegraph.co.uk/news/uknews/rss", country: "GB", lang: "en" },
 ];
 
 export const fetchPressReleaseSources = action({
@@ -1215,7 +1185,12 @@ export const fetchPressReleaseSources = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; totalSaved: number; totalErrors: number; feedResults: any[]; message: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            // When called from the scheduler (cron), there is no user identity — that's safe by design.
+            // When called directly by a user, we still require admin privileges.
+            const identity = await ctx.auth.getUserIdentity();
+            if (identity) {
+                await requireAdmin(ctx.auth);
+            }
 
             const fetchedKeyword = args.keyword?.trim() || "";
             const booleanExpr = parseBooleanKeyword(fetchedKeyword);

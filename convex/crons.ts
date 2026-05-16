@@ -37,4 +37,15 @@ crons.daily(
     api.payments.checkSubscriptions
 );
 
+// ── RSS Wire Sweep ─────────────────────────────────────────────────────────
+// Auto-ingests all PR_WIRE_FEEDS (UAE + international sources) every 4 hours.
+// No keyword = defaults to "Press Release" as the monitoring keyword.
+// Runs without user auth (cron-safe pattern in fetchPressReleaseSources).
+crons.interval(
+    "press-release-sweep",
+    { hours: 4 },
+    api.monitoringAction.fetchPressReleaseSources,
+    { limit: 20 }
+);
+
 export default crons;
