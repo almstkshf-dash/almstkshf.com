@@ -279,7 +279,7 @@ User sets keyword + countries + languages
   → POST /api/monitor
   → Calls monitoringAction (Convex Node.js Action)
   → Fetches from: NewsData.io, NewsAPI.org, GNews.io, World News API
-  → Fetches from RSS Feeds: Premium regional publishers (WAM, Sky News Arabia, Al Arabiya, Asharq Al-Awsat, BBC Arabic) via custom localized engine (`rss-engine.ts`)
+  → Fetches from RSS Feeds: Premium regional publishers (WAM, Sky News Arabia, Al Arabiya, Asharq Al-Awsat, BBC Arabic, Gulf Today, Khaleej Times, Gulf News, Zawya, AETOSWire, etc.) via custom localized engine (`rss-engine.ts`)
   → RSS Engine features: Image extraction, redirect following, multilingual normalization (EN/AR), and country detection.
   → For each article: dedup check → sentiment analysis (Gemini) → store in media_monitoring_articles
   → Dashboard re-renders via Convex real-time subscription

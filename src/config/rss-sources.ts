@@ -56,7 +56,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'mydubai-news', name: 'Latest News', url: 'https://www.mydubainews.com/feed/', country: 'UAE' }
   ],
   'Dubai PR Network': [
-    { id: 'dubai-pr', name: 'Latest PR', url: 'https://www.dubaiprnetwork.com/rssfeed.asp', country: 'UAE' }
+    { id: 'dubai-pr', name: 'Latest PR', url: 'https://www.dubaiprnetwork.com/rss_feed.asp', country: 'UAE' }
   ],
   'Go Dubai': [
     { id: 'go-dubai', name: 'City Life', url: 'https://www.godubai.com/citylife/RSSFeedGenerator.asp', country: 'UAE' }
@@ -75,10 +75,111 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'Pan Time Arabia': [
     { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
-  ]
+  ],
+  'Emirates247': [
+    { id: 'e247-flash', name: 'Flash News', url: 'https://www.emirates247.com/rss/mobile/v2/flash-news.rss', country: 'UAE' },
+    { id: 'e247-uae', name: 'UAE News', url: 'https://www.emirates247.com/rss/mobile/v2/uae.rss', country: 'UAE' },
+    { id: 'e247-world', name: 'World News', url: 'https://www.emirates247.com/rss/mobile/v2/world.rss', country: 'UAE' },
+    { id: 'e247-business', name: 'Business', url: 'https://www.emirates247.com/rss/mobile/v2/business.rss', country: 'UAE' },
+  ],
+  'Provoke Media': [
+    { id: 'provoke-latest', name: 'Latest News', url: 'https://www.provokemedia.com/newsfeed/provoke-media-latest', country: 'GB' },
+  ],
+  'The New Yorker': [
+    { id: 'newyorker-lede', name: 'The Lede', url: 'https://www.newyorker.com/feed/the-lede/rss', country: 'US' },
+  ],
+  'Wired': [
+    { id: 'wired-business', name: 'Business', url: 'https://www.wired.com/feed/category/business/latest/rss', country: 'US' },
+    { id: 'wired-ai', name: 'Artificial Intelligence', url: 'https://www.wired.com/feed/tag/ai/latest/rss', country: 'US' },
+  ],
+  // ── MEED — Middle East Economic Digest ────────────────────────────────────
+  'MEED': [
+    // Content & Analysis
+    { id: 'meed-analysis', name: 'Analysis', url: 'https://www.meed.com/classifications/analysis/feed', country: 'AE' },
+    { id: 'meed-comment', name: 'Commentary', url: 'https://www.meed.com/category/news/commentary/feed/', country: 'AE' },
+    { id: 'meed-special', name: 'Special Reports', url: 'https://www.meed.com/classifications/analysis/special-report/rss', country: 'AE' },
+    { id: 'meed-tenders', name: 'Tenders', url: 'https://www.meed.com/tenders/feed/', country: 'AE' },
+    { id: 'meed-events', name: 'Events', url: 'https://www.meed.com/events/rss', country: 'AE' },
+    // Sector feeds
+    { id: 'meed-construction', name: 'Construction', url: 'https://www.meed.com/sector/construction/rss', country: 'AE' },
+    { id: 'meed-finance', name: 'Finance', url: 'https://www.meed.com/sector/banking-finance/rss', country: 'AE' },
+    { id: 'meed-industry', name: 'Industry', url: 'https://www.meed.com/sector/industrial/rss', country: 'AE' },
+    { id: 'meed-oilgas', name: 'Oil & Gas', url: 'https://www.meed.com/sector/oil-and-gas/rss', country: 'AE' },
+    { id: 'meed-petrochem', name: 'Petrochemicals', url: 'https://www.meed.com/sector/petrochemicals/rss', country: 'AE' },
+    { id: 'meed-power', name: 'Power & Water', url: 'https://www.meed.com/sector/power-and-water/power/rss', country: 'AE' },
+    { id: 'meed-tourism', name: 'Tourism', url: 'https://www.meed.com/sector/economy/tourism/rss', country: 'AE' },
+    { id: 'meed-transport', name: 'Transport', url: 'https://www.meed.com/sector/transport/rss', country: 'AE' },
+    { id: 'meed-water', name: 'Water', url: 'https://www.meed.com/sector/water/rss', country: 'AE' },
+    { id: 'meed-tech', name: 'Technology & IT', url: 'https://www.meed.com/sector/Technology/rss', country: 'AE' },
+    // Country feeds
+    { id: 'meed-algeria', name: 'Algeria', url: 'https://www.meed.com/countries/algeria/rss/feed', country: 'DZ' },
+    { id: 'meed-bahrain', name: 'Bahrain', url: 'https://www.meed.com/countries/gcc/bahrain/rss/feed', country: 'BH' },
+    { id: 'meed-egypt', name: 'Egypt', url: 'https://www.meed.com/countries/north-africa/egypt/rss/feed', country: 'EG' },
+    { id: 'meed-iran', name: 'Iran', url: 'https://www.meed.com/countries/iran/rss/feed', country: 'IR' },
+    { id: 'meed-iraq', name: 'Iraq', url: 'https://www.meed.com/countries/iraq/rss/feed', country: 'IQ' },
+    { id: 'meed-jordan', name: 'Jordan', url: 'https://www.meed.com/countries/levant/jordan/rss/feed', country: 'JO' },
+    { id: 'meed-kuwait', name: 'Kuwait', url: 'https://www.meed.com/countries/gcc/kuwait/rss/feed', country: 'KW' },
+    { id: 'meed-lebanon', name: 'Lebanon', url: 'https://www.meed.com/countries/levant/lebanon/rss/feed', country: 'LB' },
+    { id: 'meed-libya', name: 'Libya', url: 'https://www.meed.com/countries/north-africa/libya/rss/feed', country: 'LY' },
+    { id: 'meed-morocco', name: 'Morocco', url: 'https://www.meed.com/countries/north-africa/morocco/rss/feed', country: 'MA' },
+    { id: 'meed-oman', name: 'Oman', url: 'https://www.meed.com/countries/gcc/oman/rss/feed', country: 'OM' },
+    { id: 'meed-qatar', name: 'Qatar', url: 'https://www.meed.com/countries/gcc/qatar/rss/feed', country: 'QA' },
+    { id: 'meed-saudi', name: 'Saudi Arabia', url: 'https://www.meed.com/countries/gcc/saudi-arabia/rss/feed', country: 'SA' },
+    { id: 'meed-syria', name: 'Syria', url: 'https://www.meed.com/countries/levant/syria/rss/feed', country: 'SY' },
+    { id: 'meed-tunisia', name: 'Tunisia', url: 'https://www.meed.com/countries/north-africa/tunisia/rss/feed', country: 'TN' },
+    { id: 'meed-uae', name: 'UAE', url: 'https://www.meed.com/countries/gcc/uae/rss/feed', country: 'AE' },
+  ],
+  'Road Safety UAE': [
+    { id: 'roadsafety-posts', name: 'Posts', url: 'https://www.roadsafetyuae.com/feed/?post_type=post', country: 'UAE' },
+    { id: 'roadsafety-stories', name: 'Stories', url: 'https://www.roadsafetyuae.com/feed/?post_type=stories', country: 'UAE' },
+    { id: 'roadsafety-proposals', name: 'Proposals', url: 'https://www.roadsafetyuae.com/feed/?post_type=proposals', country: 'UAE' },
+  ],
+  'Gulf Today': [
+    { id: 'gulftoday-latest', name: 'Latest News', url: 'https://www.gulftoday.ae/rss', country: 'UAE' },
+    { id: 'gulftoday-main', name: 'Latest News (Feed)', url: 'https://www.gulftoday.ae/rssFeed/0/', country: 'UAE' },
+    { id: 'gulftoday-opinion', name: 'Opinion', url: 'https://www.gulftoday.ae/rssFeed/10/', country: 'UAE' },
+    { id: 'gulftoday-news', name: 'News', url: 'https://www.gulftoday.ae/rssFeed/55/', country: 'UAE' },
+    { id: 'gulftoday-culture', name: 'Culture', url: 'https://www.gulftoday.ae/rssFeed/56/', country: 'UAE' },
+    { id: 'gulftoday-lifestyle', name: 'Lifestyle', url: 'https://www.gulftoday.ae/rssFeed/57/', country: 'UAE' },
+    { id: 'gulftoday-sport', name: 'Sport', url: 'https://www.gulftoday.ae/rssFeed/58/', country: 'UAE' },
+    { id: 'gulftoday-business', name: 'Business', url: 'https://www.gulftoday.ae/rssFeed/52/', country: 'UAE' },
+  ],
+  'Zawya': [
+    { id: 'zawya-en', name: 'Latest News', url: 'https://www.zawya.com/en/rss/all', country: 'UAE' }
+  ],
+  'AETOSWire': [
+    { id: 'aetoswire-en', name: 'Latest PR', url: 'https://www.aetoswire.com/en/rss', country: 'UAE' }
+  ],
+  'Arab News': [
+    { id: 'arabnews-en', name: 'Latest News', url: 'https://www.arabnews.com/rss.xml', country: 'SA' }
+  ],
+  'Gulf News': [
+    { id: 'gulfnews-en', name: 'Latest News', url: 'https://gulfnews.com/rss', country: 'UAE' }
+  ],
+  'Khaleej Times': [
+    { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://www.khaleejtimes.com/rss', country: 'UAE' }
+  ],
+  'The National': [
+    { id: 'thenational-en', name: 'Latest News', url: 'https://www.thenationalnews.com/rss', country: 'UAE' }
+  ],
+  'Middle East Eye': [
+    { id: 'mee-en', name: 'Latest News', url: 'https://www.middleeasteye.net/rss', country: 'GB' }
+  ],
+  'Al Bawaba': [
+    { id: 'albawaba-en', name: 'Latest News', url: 'https://www.albawaba.com/rss/all', country: 'JO' }
+  ],
+  'Mehr News': [
+    { id: 'mehr-en', name: 'Latest News', url: 'https://en.mehrnews.com/rss', country: 'IR' }
+  ],
+  'Egyptian Streets': [
+    { id: 'egyptianstreets-en', name: 'Latest News', url: 'https://egyptianstreets.com/feed/', country: 'EG' }
+  ],
+  'Newswire.com': [
+    { id: 'newswire-en', name: 'Latest PR', url: 'https://www.newswire.com/newsroom/rss/all', country: 'US' }
+  ],
 };
 
-export const ALL_SOURCES = Object.entries(PREMIUM_SOURCES).flatMap(([publisher, categories]) => 
+export const ALL_SOURCES = Object.entries(PREMIUM_SOURCES).flatMap(([publisher, categories]) =>
   categories.map(cat => ({
     ...cat,
     publisher,
