@@ -105,6 +105,7 @@ export default defineSchema({
         defaults: v.object({
             targetCountries: v.array(v.string()),
             aveMultiplier: v.number(),
+            standardKeywords: v.optional(v.array(v.string())),
         }),
     }),
 

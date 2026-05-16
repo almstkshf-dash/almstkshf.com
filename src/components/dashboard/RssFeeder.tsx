@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
-import { useMutation } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
@@ -53,159 +53,73 @@ export default function RssFeeder({
   const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [items, setItems] = useState<FeedItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
-  const [isSaving, setIsSaving] = useState<string | null>(null);
+  
+  const articlesQuery = useQuery(api.monitoring.getArticles, {
+    limit: 100, // Fetch enough to filter locally
+    sourceType: 'Press Release' // Assuming RSS is mostly press releases
+  });
 
-  const saveArticle = useMutation(api.monitoring.saveArticle);
+  const isLoading = articlesQuery === undefined;
+  const error = null;
+
+  // Filter and map articles to match the FeedItem interface
+  useEffect(() => {
+    if (!articlesQuery?.items) return;
+
+    let filtered = articlesQuery.items;
+    
+    // Filter by publisher/source name if active
+    if (activeName) {
+      filtered = filtered.filter(a => a.source === activeName || a.source === activePublisher);
+    }
+
+    // Map to FeedItem format
+    const mappedItems: FeedItem[] = filtered.map(a => {
+      // Convert DD/MM/YYYY to ISO for the component's existing logic
+      let isoDate = new Date().toISOString();
+      if (a.publishedDate) {
+        const parts = a.publishedDate.split('/');
+        if (parts.length === 3) {
+          isoDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).toISOString();
+        }
+      }
+
+      return {
+        title: a.title,
+        link: a.url,
+        description: a.content,
+        isoDate: isoDate,
+        pubDate: a.publishedDate,
+        image: a.imageUrl,
+        source: a.source || 'RSS',
+        country: a.sourceCountry,
+        language: a.language,
+        guid: a._id
+      };
+    });
+
+    setItems(mappedItems.slice(0, maxItems));
+    setLastSynced(new Date()); // Or use the latest createdAt from the items
+  }, [articlesQuery, activeName, activePublisher, maxItems]);
+
+  const fetchFeed = useCallback(async (silent = false) => {
+     // No-op since we are using Convex reactivity
+  }, []);
 
   // Helper to translate source name if it's a key
   const translateSourceName = (name: string | undefined): string => {
     if (!name) return t('title');
     try {
-      // Try to translate. If it fails or returns the same key, it might not be a key.
-      const translated = tSources(name);
-      return translated;
+      return tSources(name);
     } catch {
       return name;
     }
   };
 
-  const fetchFeed = useCallback(async (silent = false) => {
-    if (!silent) setIsLoading(true);
-    setError(null);
-
-    // Use AbortController to handle stale requests
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const proxyUrl = typeof window !== 'undefined'
-        ? new URL('/api/proxy-rss', window.location.href).href
-        : `/api/proxy-rss`;
-      const proxiedUrl = `${proxyUrl}?url=${encodeURIComponent(activeUrl)}&country=${activeCountry || ''}&t=${Date.now()}`;
-      console.log(`[RssFeeder] [${new Date().toISOString()}] Attempting fetch to: ${proxiedUrl}`);
-      
-      const performFetch = async (retries = 2): Promise<Response> => {
-        try {
-          return await fetch(proxiedUrl, {
-            signal: controller.signal,
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: {
-              'Accept': 'application/json',
-              'Cache-Control': 'no-cache'
-            }
-          });
-        } catch (err) {
-          if (retries > 0 && err instanceof TypeError) {
-            console.warn(`[RssFeeder] Fetch failed, retrying in 1.5s... (${retries} left)`);
-            await new Promise(r => setTimeout(r, 1500));
-            return performFetch(retries - 1);
-          }
-          throw err;
-        }
-      };
-
-      const response = await performFetch();
-
-      if (!response.ok) {
-        // Try to get error from JSON if possible
-        let errorMsg = 'Failed to fetch feed data';
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.error || errorMsg;
-        } catch {
-          // Fallback to status text
-          errorMsg = `${response.status} ${response.statusText}`;
-        }
-        throw new Error(errorMsg);
-      }
-
-      const data = await response.json();
-
-      if (data.success && Array.isArray(data.data)) {
-        setItems(data.data.slice(0, maxItems));
-        setLastSynced(new Date());
-      } else {
-        throw new Error(data.error || 'Invalid feed format');
-      }
-    } catch (err: unknown) {
-      // Log full error details for debugging without triggering Next.js error overlays
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.warn(`[RssFeeder] Fetch error technical details for ${activeUrl}: ${errorMessage}`);
-      
-      const message = errorMessage;
-      
-      // Explicitly handle network-level failures vs API errors
-      if (err instanceof TypeError && (message === 'Failed to fetch' || message.includes('network'))) {
-        setError(t('failed_fetch') + ' - Network or CORS issue. See console for details.');
-        console.warn('[RssFeeder] CRITICAL: Network failure detected. Possible causes:\n1. Ad-blocker or Firewall blocking the request.\n2. The server is not reachable at the current origin.\n3. SSL/TLS handshake failure.');
-        console.warn('[RssFeeder] Full Error Object:', err);
-      } else if (err instanceof Error && err.name === 'AbortError') {
-        setError(t('error_fetching') + ' (Request Timed Out)');
-        console.warn('[RssFeeder] Request was aborted due to timeout.');
-      } else {
-        setError(message || t('error_fetching'));
-      }
-      
-      if (!silent) toast.error(t('error_fetching'));
-    } finally {
-      clearTimeout(timeoutId);
-      if (!silent) setIsLoading(false);
-    }
-  }, [activeUrl, maxItems, t]);
-
-  const handleSaveToMonitoring = async (item: FeedItem) => {
-    setIsSaving(item.link);
-    try {
-      const d = item.isoDate ? new Date(item.isoDate) : new Date();
-      const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-
-      await saveArticle({
-        title: item.title,
-        url: item.link,
-        resolvedUrl: item.link,
-        publishedDate: formattedDate,
-        content: DOMPurify.sanitize(item.description || '', { ALLOWED_TAGS: [] }),
-        language: (item.language?.toUpperCase() === 'EN' ? 'EN' : 'AR') as "EN" | "AR",
-        sentiment: 'Neutral',
-        sourceType: 'Online News',
-        source: item.source || activeName || 'RSS Feed',
-        sourceCountry: item.country || activeCountry || 'UAE',
-        imageUrl: item.image || undefined,
-        ave: 5000,
-        reach: 50000,
-        keyword: 'RSS Ingestion',
-        isManual: false,
-        ingestMethod: 'rss',
-        depth: 'standard'
-      });
-      console.log(`[RssFeeder] Article saved successfully: ${item.title}`);
-      toast.success(t('saved_success'));
-    } catch (err) {
-      console.error('[RssFeeder] Save failed:', err);
-      toast.error(t('save_failed'));
-    } finally {
-      setIsSaving(null);
-    }
-  };
-
   useEffect(() => {
-    // Add a small delay to avoid race conditions during initial mount/hydration
-    const initialTimer = setTimeout(() => {
-      fetchFeed();
-    }, 1200);
-
-    // Auto-refresh every 15 minutes
-    const interval = setInterval(() => fetchFeed(true), 15 * 60 * 1000);
-    
-    return () => {
-      clearTimeout(initialTimer);
-      clearInterval(interval);
-    };
-  }, [fetchFeed]);
+    // Component mounted, setup complete. No need for polling anymore as Convex is reactive.
+  }, []);
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
@@ -420,21 +334,6 @@ export default function RssFeeder({
                           <Eye size={14} className="mr-1 rtl:ml-1 rtl:mr-0" />
                           {t('read_more')}
                         </Button>
-
-                        <button
-                          className={clsx(
-                            "text-[10px] font-bold flex items-center gap-1 transition-all",
-                            isSaving === item.link ? "text-muted-foreground animate-pulse" : "text-foreground/60 hover:text-primary"
-                          )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSaveToMonitoring(item);
-                          }}
-                          disabled={isSaving === item.link}
-                        >
-                          <Save size={12} />
-                          {isSaving === item.link ? t('saving') : t('save_to_monitoring')}
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -497,16 +396,6 @@ export default function RssFeeder({
                       <div className="p-6 border-t border-border bg-muted/10 flex flex-wrap gap-3 justify-end">
                         <Button variant="ghost" onClick={() => setIsDetailOpen(false)}>
                           {t('close')}
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            handleSaveToMonitoring(selectedItem);
-                            setIsDetailOpen(false);
-                          }}
-                          isLoading={isSaving === selectedItem.link}
-                          leftIcon={<Save size={18} />}
-                        >
-                          {t('save_to_monitoring')}
                         </Button>
                         <a 
                           href={selectedItem.link} 

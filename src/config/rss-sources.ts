@@ -48,6 +48,33 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   'Al Jazeera': [
     { id: 'aljazeera-news', name: 'Latest', url: 'https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84dbbe43033/2013-8-4' }
+  ],
+  'Hashtag Dubai': [
+    { id: 'hashtag-dubai', name: 'Latest News', url: 'https://hashtagdubai.org/index.php/feed/', country: 'UAE' }
+  ],
+  'My Dubai News': [
+    { id: 'mydubai-news', name: 'Latest News', url: 'https://www.mydubainews.com/feed/', country: 'UAE' }
+  ],
+  'Dubai PR Network': [
+    { id: 'dubai-pr', name: 'Latest PR', url: 'https://www.dubaiprnetwork.com/rssfeed.asp', country: 'UAE' }
+  ],
+  'Go Dubai': [
+    { id: 'go-dubai', name: 'City Life', url: 'https://www.godubai.com/citylife/RSSFeedGenerator.asp', country: 'UAE' }
+  ],
+  'Al Badia Magazine': [
+    { id: 'albadia-mag', name: 'Latest Articles', url: 'https://albadiamagazine.com/feed/', country: 'UAE' }
+  ],
+  'Al Madar Magazine': [
+    { id: 'almadar-mag', name: 'Latest Articles', url: 'https://www.almadarmagazine.ae/feed/', country: 'UAE' }
+  ],
+  'First Avenue Magazine': [
+    { id: 'firstavenue-mag', name: 'Latest Articles', url: 'https://firstavenuemagazine.com/feed/', country: 'UAE' }
+  ],
+  'Evision Worlds': [
+    { id: 'evision-worlds', name: 'Latest News', url: 'https://evisionworlds.com/?feed=rss2', country: 'UAE' }
+  ],
+  'Pan Time Arabia': [
+    { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
   ]
 };
 

@@ -18,6 +18,11 @@ const authConfig = {
             domain: clerkDomain,
             applicationID: "convex",
         },
+        // Fallback for local development using Clerk dev keys
+        {
+            domain: "https://integral-bulldog-65.clerk.accounts.dev",
+            applicationID: "convex",
+        }
     ],
 };
 

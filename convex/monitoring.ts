@@ -60,6 +60,18 @@ export const getArticles = query({
     },
 });
 
+// 1.5. QUERY: Check if article exists by URL
+export const checkDuplicate = query({
+    args: { url: v.string() },
+    handler: async (ctx, args) => {
+        const existing = await ctx.db
+            .query("media_monitoring_articles")
+            .filter((q) => q.eq(q.field("url"), args.url))
+            .first();
+        return !!existing;
+    },
+});
+
 // 2. MUTATION: Save a single article (called by the Action below)
 export const saveArticle = mutation({
     args: {
