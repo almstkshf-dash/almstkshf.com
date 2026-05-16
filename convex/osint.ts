@@ -9,7 +9,7 @@
 "use node";
 import { action } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
 
@@ -25,7 +25,7 @@ export const lookupEmail = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const email = args.email.trim().toLowerCase();
             if (!email || !email.includes("@")) {
                 return { success: false, error: "Invalid email address style." };
@@ -95,7 +95,7 @@ export const lookupEmail = action({
             } catch (_) { /* DNS check failed */ }
 
             // Save result to DB
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "email",
                 query: email,
                 result: results,
@@ -127,7 +127,7 @@ export const lookupDomain = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const domain = args.domain.trim().toLowerCase()
                 .replace(/^https?:\/\//, "")
                 .replace(/\/.*$/, "");
@@ -243,7 +243,7 @@ export const lookupDomain = action({
                 }
             } catch (_) { /* Wayback unavailable */ }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "domain",
                 query: domain,
                 result: results,
@@ -275,7 +275,7 @@ export const lookupIp = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const ip = args.ip.trim();
             if (!ip) return { success: false, error: "IP address is required." };
 
@@ -341,7 +341,7 @@ export const lookupIp = action({
                 }
             } catch (_) { /* Reverse DNS failed */ }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "ip",
                 query: ip,
                 result: results,
@@ -373,7 +373,7 @@ export const lookupUsername = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const username = args.username.trim().replace(/^@/, "");
 
             if (!username) {
@@ -457,7 +457,7 @@ export const lookupUsername = action({
                 unknownOn: platformResults.filter((p) => p.found === null).map((p) => p.platform),
             };
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "username",
                 query: username,
                 result: results,
@@ -489,7 +489,7 @@ export const lookupPhone = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const phone = args.phone.trim().replace(/\s+/g, "");
 
             if (!phone || phone.length < 7) {
@@ -530,7 +530,7 @@ export const lookupPhone = action({
                 results.validationNote = `Phone lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "phone",
                 query: phone,
                 result: results,
@@ -565,7 +565,7 @@ export const lookupNews = action({
     },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.query.trim();
             if (!query) return { success: false, error: "Query is required." };
 
@@ -610,7 +610,7 @@ export const lookupNews = action({
                 return { success: false, error: "Failed to connect to the news provider." };
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "news",
                 query: query,
                 result: results,
@@ -640,7 +640,7 @@ export const lookupCorporate = action({
     args: { companyName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.companyName.trim();
             if (!query) return { success: false, error: "Company name is required." };
             const results: Record<string, any> = { query };
@@ -665,7 +665,7 @@ export const lookupCorporate = action({
                 results.error = `OpenCorporates unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "corporate",
                 query: query,
                 result: results,
@@ -694,7 +694,7 @@ export const lookupLocation = action({
     args: { locationName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.locationName.trim();
             if (!query) return { success: false, error: "Location is required." };
             const results: Record<string, any> = { query, locations: [] };
@@ -720,7 +720,7 @@ export const lookupLocation = action({
                 results.error = `Nominatim unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "location",
                 query: query,
                 result: results,
@@ -749,7 +749,7 @@ export const lookupWikipedia = action({
     args: { query: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.query.trim();
             if (!query) return { success: false, error: "Query is required." };
             const results: Record<string, any> = { query };
@@ -783,7 +783,7 @@ export const lookupWikipedia = action({
                 results.error = `Wikipedia unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "wikipedia",
                 query: query,
                 result: results,
@@ -812,7 +812,7 @@ export const lookupGleif = action({
     args: { companyName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.companyName.trim();
             if (!query) return { success: false, error: "Company name is required." };
             const results: Record<string, any> = { query };
@@ -837,7 +837,7 @@ export const lookupGleif = action({
                 results.error = `GLEIF unavailable: ${e.message}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "gleif",
                 query: query,
                 result: results,
@@ -866,7 +866,7 @@ export const lookupWatchlist = action({
     args: { query: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
         try {
-            await requireAdmin(ctx.auth);
+            if (await ctx.auth.getUserIdentity()) await requireAdmin(ctx.auth);
             const query = args.query.trim();
             if (!query) return { success: false, error: "Search query is required." };
             const results: Record<string, any> = { query };
@@ -904,7 +904,7 @@ export const lookupWatchlist = action({
                 results.error = `Watchlist unavailable: ${e.message}`;
             }
 
-            const recordId = await ctx.runMutation(api.osintDb.saveOsintResult, {
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "watchlist",
                 query: query,
                 result: results,

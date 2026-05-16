@@ -78,7 +78,7 @@ async function callGeminiForAnalysis(
     sourceType: "Online News" | "Blog" | "Press Release" | "Social Media" | "Print";
     reach_estimate: number;
     tone?: string;
-    risk?: "Low" | "Medium" | "High";
+    risk?: "Low" | "Medium" | "High" | "Critical" | "critical";
     hashtags?: string[];
     emotions?: {
         joy: number;
@@ -109,7 +109,7 @@ Return valid JSON ONLY with these exact fields:
   "sourceType": "Online News" | "Blog" | "Press Release" | "Social Media" | "Print",
   "reach_estimate": number,
   "tone": "short phrase describing tone (e.g., Sarcastic, Informative, Alarming)",
-  "risk": "Low" | "Medium" | "High",
+  "risk": "Low" | "Medium" | "High" | "Critical",
   "hashtags": ["list", "of", "relevant", "hashtags"],
   "emotions": {
     "joy": number (0-100),
@@ -955,6 +955,8 @@ async function processArticle(
         const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
         const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
 
+        const depth = (aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical") ? "deep" : "standard";
+
         await ctx.runMutation(api.monitoring.saveArticle, {
             keyword,
             url: item.link,
@@ -978,30 +980,37 @@ async function processArticle(
             relevancy_score: relevancyScore,
             hashtags: aiData.hashtags,
             emotions: aiData.emotions,
+            depth,
         });
 
-        const ident = await ctx.auth.getUserIdentity();
-        const userId = ident?.subject;
+        // --- Deep Enrichment ---
+        if (depth === "deep") {
+            console.log(`ðŸ” [Deep Promotion] Article for "${keyword}" promoted to Deep Analysis. Triggering enrichment...`);
+            // We trigger these in the background. Note: lookupNews/searchAhmia were updated to support identity-less calls.
+            ctx.runAction(api.osint.lookupNews, { query: keyword }).catch(console.error);
+            ctx.runAction(api.darkWeb.searchAhmia, { query: keyword }).catch(console.error);
+        }
 
-        if (userId) {
-            const isPressRelease = forceSourceType === "Press Release" || aiData.sourceType === "Press Release";
-            const isCritical = aiData.risk === "High" || aiData.sentiment === "Negative";
+        const userId = "system"; // Background monitoring defaults to system
+        const finalUserId = userId;
+        const isPressRelease = forceSourceType === "Press Release" || aiData.sourceType === "Press Release";
+        const isCritical = aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical" || aiData.sentiment === "Negative";
 
-            if (isCritical || isPressRelease) {
-                try {
-                    await ctx.runMutation(api.monitoring.createNotification, {
-                        userId,
-                        title: isCritical ? "critical_mention" : "press_release_found",
-                        message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${keyword}": ${item.title.substring(0, 60)}...`,
-                        type: isCritical ? "alert" : "system"
-                    });
+        if (isCritical || isPressRelease) {
+            try {
+                await ctx.runMutation(api.monitoring.createNotification, {
+                    userId: finalUserId,
+                    title: isCritical ? "critical_mention" : "press_release_found",
+                    message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${keyword}": ${item.title.substring(0, 60)}...`,
+                    type: isCritical ? "alert" : "system"
+                });
 
-                    if (isCritical) {
-                        const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
-                        await sendResendEmail({
-                            to: CONTACT_EMAIL,
-                            subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
-                            html: `
+                if (isCritical) {
+                    const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
+                    await sendResendEmail({
+                        to: CONTACT_EMAIL,
+                        subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
+                        html: `
                                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
                                     <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
                                         <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
@@ -1023,15 +1032,14 @@ async function processArticle(
                                     </div>
                                 </div>
                             `
-                        });
-                    }
-                } catch (emailErr) {
-                    console.error("[Email Alert] Failed:", emailErr);
+                    });
                 }
+            } catch (emailErr) {
+                console.error("[Email Alert] Failed:", emailErr);
             }
         }
     } catch (error) {
-        console.error(`â Œ Article processing failed for "${item.link}":`, error);
+        console.error(`❌ Article processing failed for "${item.link}":`, error);
         return false;
     }
 }

@@ -7,10 +7,48 @@
  */
 
 // No "use node" â€” mutations and queries run on the default Convex runtime.
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation, internalQuery } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 
-// â”€â”€â”€ Save a new OSINT lookup result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export const getGlobalSettingsInternal = internalQuery({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db.query("app_settings")
+            .filter(q => q.eq(q.field("type"), "global"))
+            .unique();
+    },
+});
+
+// --- Internal version for background jobs (Crons/Actions) ---
+export const saveOsintResultInternal = internalMutation({
+    args: {
+        type: v.union(
+            v.literal("email"),
+            v.literal("domain"),
+            v.literal("ip"),
+            v.literal("username"),
+            v.literal("phone"),
+            v.literal("gdelt"),
+            v.literal("news"),
+            v.literal("corporate"),
+            v.literal("location"),
+            v.literal("wikipedia"),
+            v.literal("gleif"),
+            v.literal("watchlist")
+        ),
+        query: v.string(),
+        result: v.any(),
+        userId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.insert("osint_results", {
+            ...args,
+            createdAt: Date.now(),
+        });
+    },
+});
+
+// â”€â”€â”€ Save a new OSINT lookup result (Public API) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const saveOsintResult = mutation({
     args: {
         type: v.union(

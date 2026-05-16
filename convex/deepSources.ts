@@ -8,7 +8,7 @@
 
 import { action, mutation, query } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { requireAdmin } from "./utils/auth";
 import { resolveApiKey } from "./utils/keys";
 
@@ -61,7 +61,7 @@ export const fetchDeepSources = action({
             await requireAdmin(ctx.auth);
         }
         const start = Date.now();
-        const limit = args.limit ?? 20;
+        const limit = args.limit ?? 10; // Lower default limit for deep scans
         let itemCount = 0;
         try {
             const newsapiKey = await resolveApiKey(ctx, "NEWSAPI_API_KEY", "newsapi");
@@ -95,7 +95,7 @@ export const fetchDeepSources = action({
                     const published = art.publishedAt ? new Date(art.publishedAt) : new Date();
                     const formattedDate = `${published.getDate().toString().padStart(2, "0")}/${(published.getMonth() + 1).toString().padStart(2, "0")}/${published.getFullYear()}`;
                     await ctx.runMutation(api.monitoring.saveArticle, {
-                        keyword: "Deep",
+                        keyword: "Deep Discovery",
                         url: art.url,
                         resolvedUrl: art.url,
                         publishedDate: formattedDate,
@@ -114,6 +114,20 @@ export const fetchDeepSources = action({
                         isManual: false,
                     });
                     itemCount++;
+                }
+            }
+
+            // --- OSINT & Dark Web Enrichment for Active Keywords ---
+            console.log("ðŸš€ [Deep Scan] Starting Unified Intelligence enrichment...");
+            const settings = await ctx.runQuery(internal.osintDb.getGlobalSettingsInternal);
+            const keywords = settings?.defaults?.standardKeywords || [];
+
+            if (keywords.length > 0) {
+                console.log(`ðŸ”  [Deep Scan] Enriching ${keywords.length} keywords via OSINT and Dark Web...`);
+                for (const kw of keywords) {
+                    // Trigger in background
+                    ctx.runAction(api.osint.lookupNews, { query: kw }).catch(e => console.error(`[OSINT] ${kw} failed:`, e));
+                    ctx.runAction(api.darkWeb.searchAhmia, { query: kw }).catch(e => console.error(`[DarkWeb] ${kw} failed:`, e));
                 }
             }
 

@@ -156,7 +156,7 @@ export const searchAhmia = action({
     args: { query: v.string() },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new ConvexError("Not authenticated");
+        // Background jobs (crons) won't have identity.
 
         const q = encodeURIComponent(args.query);
         const jsonUrl = `https://ahmia.fi/search/?q=${q}&output=json`;
@@ -308,7 +308,10 @@ HTML: ${html.substring(0, 15000)}
 
             // Batch insert into DB
             if (processedResults.length > 0) {
-                await ctx.runMutation(api.darkWebDb.insertMany, { results: processedResults });
+                await ctx.runMutation(internal.darkWebDb.insertManyInternal, { 
+                    results: processedResults,
+                    user_id: identity?.subject || "system" 
+                });
                 console.log(`[DarkWeb] Successfully saved ${processedResults.length} results.`);
             }
 
