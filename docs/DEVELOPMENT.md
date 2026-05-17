@@ -29,6 +29,10 @@ npm run dev
 # → Convex dev server syncs schema and functions
 ```
 
+### Package Overrides & Security Fixes
+We utilize the `overrides` field in `package.json` to force modern, secure, and non-deprecated versions of nested sub-dependencies (e.g., `rimraf`, `glob`, `inflight`) pulled in by external dependencies (such as `@tensorflow-models` or `exceljs`). 
+This guarantees the prevention of security vulnerability warnings and keeps deep dependencies clean. Run `npm install` normally, and npm will automatically apply these overrides.
+
 ---
 
 ## 2. Environment Variables
