@@ -111,6 +111,7 @@ export default function DashboardPage() {
 
     // ── Local UI state ────────────────────────────────────────────────────────
     const [isManualModalOpen, setManualModalOpen] = useState(false);
+    const [editingArticle, setEditingArticle] = useState<ArticleItem | null>(null);
     const [selectedType, setSelectedType] = useState('All');
     const [selectedCountry, setSelectedCountry] = useState('All');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -254,6 +255,7 @@ export default function DashboardPage() {
             url: tExport('url'),
             type: tExport('type'),
             source: tExport('source'),
+            publisher_username: tExport('publisher_username'),
             depth: tExport('depth'),
             country: tExport('country'),
             sentiment: tExport('sentiment'),
@@ -382,7 +384,14 @@ export default function DashboardPage() {
         <div className="bg-background/30 backdrop-blur-md">
             {filteredArticles.length > 0 ? (
                 <div className="animate-in fade-in duration-1000">
-                    <ArticleTable articles={filteredArticles} limit={50} />
+                    <ArticleTable
+                        articles={filteredArticles}
+                        limit={50}
+                        onEditClick={(article) => {
+                            setEditingArticle(article);
+                            setManualModalOpen(true);
+                        }}
+                    />
                     {result?.nextSkip !== null && (
                         <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
                             <button
@@ -706,7 +715,11 @@ export default function DashboardPage() {
 
             <ManualEntryModal
                 isOpen={isManualModalOpen}
-                onClose={() => setManualModalOpen(false)}
+                onClose={() => {
+                    setManualModalOpen(false);
+                    setEditingArticle(null);
+                }}
+                articleToEdit={editingArticle || undefined}
             />
         </div>
     );

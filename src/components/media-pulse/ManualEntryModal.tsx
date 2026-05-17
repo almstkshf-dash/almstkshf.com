@@ -19,6 +19,7 @@ import Button from '@/components/ui/Button';
 interface ManualEntryModalProps {
     isOpen: boolean;
     onClose: () => void;
+    articleToEdit?: any;
 }
 
 const sanitizeUrl = (inputUrl: string): string => {
@@ -90,10 +91,11 @@ const detectSocialMedia = (url: string) => {
     return null;
 };
 
-export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalProps) {
+export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: ManualEntryModalProps) {
     const t = useTranslations('ManualEntry');
 
     const saveArticle = useMutation(api.monitoring.saveArticle);
+    const updateArticle = useMutation(api.monitoring.updateArticle);
     const extractArticle = useAction(api.monitoringAction.extractArticle);
     const settings = useQuery(api.settings.getSettings);
     const { isAuthenticated } = useConvexAuth();
@@ -131,7 +133,57 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         likes: 0,
         retweets: 0,
         replies: 0,
+        publisherUsername: '',
     });
+
+    useEffect(() => {
+        if (articleToEdit) {
+            let dateVal = new Date().toISOString().split('T')[0];
+            if (articleToEdit.publishedDate) {
+                const parts = articleToEdit.publishedDate.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0].padStart(2, '0');
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2];
+                    dateVal = `${year}-${month}-${day}`;
+                }
+            }
+
+            setFormData({
+                title: articleToEdit.title || '',
+                sourceType: articleToEdit.sourceType || 'Print',
+                source: articleToEdit.source || '',
+                date: dateVal,
+                url: articleToEdit.url === 'http://manual-entry.local' ? '' : (articleToEdit.url || ''),
+                sentiment: articleToEdit.sentiment || 'Neutral',
+                reach: articleToEdit.reach || 0,
+                content: articleToEdit.content || '',
+                imageUrl: articleToEdit.imageUrl || '',
+                sourceCountry: articleToEdit.sourceCountry || 'AE',
+                likes: articleToEdit.likes || 0,
+                retweets: articleToEdit.retweets || 0,
+                replies: articleToEdit.replies || 0,
+                publisherUsername: articleToEdit.publisherUsername || '',
+            });
+        } else {
+            setFormData({
+                title: '',
+                sourceType: 'Print',
+                source: '',
+                date: new Date().toISOString().split('T')[0],
+                url: '',
+                sentiment: 'Neutral',
+                reach: 0,
+                content: '',
+                imageUrl: '',
+                sourceCountry: 'AE',
+                likes: 0,
+                retweets: 0,
+                replies: 0,
+                publisherUsername: '',
+            });
+        }
+    }, [articleToEdit, isOpen]);
 
     if (!mounted || !isOpen) return null;
 
@@ -156,26 +208,49 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
             // Detect language
             const isArabic = /[\u0600-\u06FF]/.test(formData.title + formData.content);
 
-            await saveArticle({
-                keyword: 'Manual',
-                url: sanitizedUrl || 'http://manual-entry.local',
-                resolvedUrl: sanitizedUrl || 'http://manual-entry.local',
-                publishedDate: formattedDate,
-                title: formData.title,
-                content: formData.content,
-                language: isArabic ? 'AR' : 'EN',
-                sentiment: formData.sentiment as 'Positive' | 'Neutral' | 'Negative',
-                sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
-                sourceCountry: formData.sourceCountry,
-                source: formData.source || 'Manual Source',
-                reach: reachValue,
-                ave: ave,
-                imageUrl: formData.imageUrl || undefined,
-                likes: formData.likes || 0,
-                retweets: formData.retweets || 0,
-                replies: formData.replies || 0,
-                isManual: true,
-            });
+            if (articleToEdit) {
+                await updateArticle({
+                    id: articleToEdit._id,
+                    url: sanitizedUrl || 'http://manual-entry.local',
+                    resolvedUrl: sanitizedUrl || 'http://manual-entry.local',
+                    publishedDate: formattedDate,
+                    title: formData.title,
+                    content: formData.content,
+                    sentiment: formData.sentiment as 'Positive' | 'Neutral' | 'Negative',
+                    sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
+                    sourceCountry: formData.sourceCountry,
+                    source: formData.source || 'Manual Source',
+                    reach: reachValue,
+                    ave: ave,
+                    imageUrl: formData.imageUrl || undefined,
+                    likes: formData.likes || 0,
+                    retweets: formData.retweets || 0,
+                    replies: formData.replies || 0,
+                    publisherUsername: formData.sourceType === 'Social Media' ? (formData.publisherUsername || undefined) : undefined,
+                });
+            } else {
+                await saveArticle({
+                    keyword: 'Manual',
+                    url: sanitizedUrl || 'http://manual-entry.local',
+                    resolvedUrl: sanitizedUrl || 'http://manual-entry.local',
+                    publishedDate: formattedDate,
+                    title: formData.title,
+                    content: formData.content,
+                    language: isArabic ? 'AR' : 'EN',
+                    sentiment: formData.sentiment as 'Positive' | 'Neutral' | 'Negative',
+                    sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
+                    sourceCountry: formData.sourceCountry,
+                    source: formData.source || 'Manual Source',
+                    reach: reachValue,
+                    ave: ave,
+                    imageUrl: formData.imageUrl || undefined,
+                    likes: formData.likes || 0,
+                    retweets: formData.retweets || 0,
+                    replies: formData.replies || 0,
+                    isManual: true,
+                    publisherUsername: formData.sourceType === 'Social Media' ? (formData.publisherUsername || undefined) : undefined,
+                });
+            }
 
             // Reset form
             setFormData({
@@ -192,6 +267,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 likes: 0,
                 retweets: 0,
                 replies: 0,
+                publisherUsername: '',
             });
 
             onClose();
@@ -343,7 +419,7 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                 <div className="p-6 border-b border-border flex justify-between items-center bg-muted/50 transition-colors">
                     <h2 id="manual-entry-title" className="text-xl font-bold text-foreground flex items-center gap-2 transition-colors">
                         <Plus className="w-5 h-5 text-primary" aria-hidden="true" />
-                        {t('title')}
+                        {articleToEdit ? t('edit_title') : t('title')}
                     </h2>
                     <Button
                         variant="ghost"
@@ -388,6 +464,23 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                             />
                         </div>
                     </div>
+
+                    {formData.sourceType === 'Social Media' && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            <label htmlFor="publisher_username" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">
+                                {t('publisher_username')}
+                            </label>
+                            <input
+                                id="publisher_username"
+                                name="publisher_username"
+                                type="text"
+                                placeholder={t('publisher_username_placeholder')}
+                                value={formData.publisherUsername}
+                                onChange={e => setFormData({ ...formData, publisherUsername: e.target.value })}
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                            />
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>

@@ -102,6 +102,7 @@ export interface ReportTranslations {
     url?: string;
     type?: string;
     source?: string;
+    publisher_username?: string;
     depth?: string;
     country?: string;
     sentiment?: string;

@@ -25,13 +25,24 @@ export interface ReportArticle {
     title: string;
     publishedDate?: string;
     url?: string;
+    resolvedUrl?: string;
     imageUrl?: string;
     source?: string;
     sourceType?: string;
+    publisherUsername?: string;
     sentiment?: string;
     reach?: number;
     ave?: number;
+    likes?: number;
+    retweets?: number;
+    replies?: number;
+    depth?: string;
+    sourceCountry?: string;
+    status?: string;
+    relevancy_score?: number;
+    hashtags?: string[];
     content?: string;
+    keyword?: string;
     [key: string]: unknown;
 }
 
@@ -906,7 +917,8 @@ export class ReportGenerator {
             { header: translations.title || 'Title', key: 'title', width: 50 },
             { header: translations.url || 'URL', key: 'url', width: 40 },
             { header: translations.type || 'Source Type', key: 'type', width: 15 },
-            { header: translations.source || 'Source', key: 'source', width: 18 },
+            { header: translations.source || 'Source Name', key: 'source', width: 20 },
+            { header: translations.publisher_username || 'Publisher Account Name', key: 'publisher_username', width: 22 },
             { header: translations.depth || 'Coverage Depth', key: 'depth', width: 10 },
             { header: translations.country || 'Country', key: 'country', width: 10 },
             { header: translations.sentiment || 'Sentiment Direction', key: 'sentiment', width: 12 },
@@ -933,6 +945,7 @@ export class ReportGenerator {
                 url: article.resolvedUrl || article.url,
                 type: article.sourceType,
                 source: article.source || '',
+                publisher_username: article.publisherUsername || '-',
                 depth: article.depth || 'standard',
                 country: article.sourceCountry,
                 sentiment: article.sentiment,
@@ -1164,7 +1177,9 @@ export class ReportGenerator {
                 '', // Image column placeholder
                 a.publishedDate ?? '',
                 parsedTitle + hashStr,
-                a.sourceType ?? '',
+                this.fixArabic(a.sourceType ?? ''),
+                this.fixArabic(a.source ?? ''),
+                this.fixArabic(a.publisherUsername ?? '-'),
                 a.sourceCountry ?? '',
                 a.sentiment ?? '',
                 a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-',
@@ -1183,6 +1198,8 @@ export class ReportGenerator {
                 translations.date || 'Publication Date',
                 translations.title || 'Title',
                 translations.type || 'Source Type',
+                translations.source || 'Source',
+                translations.publisher_username || 'Publisher Account Name',
                 translations.country || 'Country',
                 translations.sentiment || 'Sentiment Direction',
                 translations.relevancy || 'Relevancy',
@@ -1202,19 +1219,21 @@ export class ReportGenerator {
                 this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
             },
             columnStyles: {
-                0: { cellWidth: 15 }, // Image cell width
+                0: { cellWidth: 10 }, // Image cell width
                 1: { cellWidth: 15 },
-                2: { cellWidth: 50, halign: 'left' },
+                2: { cellWidth: 60, halign: 'left' },
                 3: { cellWidth: 20 },
-                4: { cellWidth: 15, halign: 'center' },
-                5: { cellWidth: 15, halign: 'center' },
-                6: { cellWidth: 12, halign: 'center' },
-                7: { cellWidth: 15, halign: 'right' },
-                8: { cellWidth: 12, halign: 'right' },
-                9: { cellWidth: 12, halign: 'right' },
-                10: { cellWidth: 12, halign: 'right' },
-                11: { cellWidth: 15, halign: 'right' },
-                12: { cellWidth: 15, halign: 'center' },
+                4: { cellWidth: 22, halign: 'left' },
+                5: { cellWidth: 22, halign: 'left' },
+                6: { cellWidth: 15, halign: 'center' },
+                7: { cellWidth: 15, halign: 'center' },
+                8: { cellWidth: 12, halign: 'center' },
+                9: { cellWidth: 15, halign: 'right' },
+                10: { cellWidth: 10, halign: 'right' },
+                11: { cellWidth: 10, halign: 'right' },
+                12: { cellWidth: 10, halign: 'right' },
+                13: { cellWidth: 15, halign: 'right' },
+                14: { cellWidth: 15, halign: 'center' },
             },
             didDrawCell: (data: any) => {
                 if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
@@ -1362,11 +1381,13 @@ export class ReportGenerator {
 
         sheet.columns = [
             { header: translations.Reports?.col_image || 'Image', key: 'image', width: 15 },
-            { header: translations.Reports?.col_date || 'Publication Date', key: 'date', width: 15 },
-            { header: translations.Reports?.col_title || 'Title', key: 'title', width: 50 },
-            { header: translations.Reports?.col_source || 'Source', key: 'source', width: 20 },
-            { header: translations.Reports?.col_reach || 'Reach / Impressions', key: 'reach', width: 15 },
-            { header: translations.Reports?.col_ave || 'AVE (Advertising Value Equivalent)', key: 'ave', width: 15 },
+            { header: translations.Reports?.col_date || translations.date || 'Publication Date', key: 'date', width: 15 },
+            { header: translations.Reports?.col_title || translations.title || 'Title', key: 'title', width: 50 },
+            { header: translations.type || 'Source Type', key: 'type', width: 20 },
+            { header: translations.Reports?.col_source || translations.source || 'Source', key: 'source', width: 20 },
+            { header: translations.publisher_username || 'Publisher Account Name', key: 'publisher_username', width: 25 },
+            { header: translations.Reports?.col_reach || translations.reach || 'Reach / Impressions', key: 'reach', width: 15 },
+            { header: translations.Reports?.col_ave || translations.ave || 'AVE (Advertising Value Equivalent)', key: 'ave', width: 15 },
         ];
 
         const headerRow = sheet.getRow(1);
@@ -1378,7 +1399,9 @@ export class ReportGenerator {
                 image: '', // Image placeholder
                 date: a.publishedDate,
                 title: a.title,
-                source: a.source,
+                type: a.sourceType || '',
+                source: a.source || '',
+                publisher_username: a.publisherUsername || '',
                 reach: a.reach,
                 ave: a.ave
             });
@@ -1412,7 +1435,9 @@ export class ReportGenerator {
                 image: '',
                 date: a.publishedDate,
                 title: a.title,
-                source: a.source,
+                type: a.sourceType || '',
+                source: a.source || '',
+                publisher_username: a.publisherUsername || '',
                 reach: a.reach,
                 ave: a.ave
             });

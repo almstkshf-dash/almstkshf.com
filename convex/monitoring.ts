@@ -103,6 +103,7 @@ export const saveArticle = mutation({
         likes: v.optional(v.number()),
         retweets: v.optional(v.number()),
         replies: v.optional(v.number()),
+        publisherUsername: v.optional(v.string()),
         relevancy_score: v.optional(v.number()),
         manualSentimentOverride: v.optional(v.boolean()),
         originalSentiment: v.optional(v.string()),
@@ -162,6 +163,45 @@ export const deleteArticle = mutation({
         await ctx.db.delete(args.id);
     },
 });
+
+// 3.1. MUTATION: Update a single article's details (both manual and auto-ingested)
+export const updateArticle = mutation({
+    args: {
+        id: v.id("media_monitoring_articles"),
+        keyword: v.optional(v.string()),
+        url: v.optional(v.string()),
+        resolvedUrl: v.optional(v.string()),
+        publishedDate: v.optional(v.string()),
+        title: v.optional(v.string()),
+        content: v.optional(v.string()),
+        language: v.optional(v.union(v.literal("EN"), v.literal("AR"))),
+        sentiment: v.optional(v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative"))),
+        sourceType: v.optional(v.union(
+            v.literal("Online News"),
+            v.literal("Social Media"),
+            v.literal("Blog"),
+            v.literal("Print"),
+            v.literal("Press Release")
+        )),
+        sourceCountry: v.optional(v.string()),
+        source: v.optional(v.string()),
+        depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
+        reach: v.optional(v.number()),
+        ave: v.optional(v.number()),
+        imageUrl: v.optional(v.string()),
+        likes: v.optional(v.number()),
+        retweets: v.optional(v.number()),
+        replies: v.optional(v.number()),
+        publisherUsername: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const { id, ...fields } = args;
+        const existing = await ctx.db.get(id);
+        if (!existing) throw new Error("Article not found");
+        await ctx.db.patch(id, fields);
+    },
+});
+
 
 export const createNotification = mutation({
     args: {

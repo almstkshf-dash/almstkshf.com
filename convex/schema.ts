@@ -53,6 +53,7 @@ export default defineSchema({
             surprise: v.number(),
             trust: v.number(),
         })),
+        publisherUsername: v.optional(v.string()),
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
 

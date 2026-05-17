@@ -56,6 +56,7 @@ const ArticleRow = memo(({
     isUpdating,
     onToggleSelect,
     onDeleteClick,
+    onEditClick,
     onUpdateSentiment,
     t
 }: {
@@ -65,6 +66,7 @@ const ArticleRow = memo(({
     isUpdating: boolean,
     onToggleSelect: (id: string) => void,
     onDeleteClick: (id: string) => void,
+    onEditClick: (article: any) => void,
     onUpdateSentiment: (id: string, s: string) => void,
     t: ReturnType<typeof import('next-intl').useTranslations>
 }) => {
@@ -140,7 +142,14 @@ const ArticleRow = memo(({
                 </div>
             </td>
             <td className="p-4 text-sm text-foreground/80">
-                {article.source || article.sourceCountry || 'â€”'}
+                <div className="flex flex-col items-start gap-1 justify-center min-h-[40px]" dir="auto">
+                    <span className="font-semibold text-foreground">{article.source || article.sourceCountry || '—'}</span>
+                    {article.sourceType === 'Social Media' && !!article.publisherUsername && (
+                        <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full font-bold font-mono">
+                            @{String(article.publisherUsername)}
+                        </span>
+                    )}
+                </div>
             </td>
             <td className="p-4 text-center">
                 <div className="flex flex-col gap-1.5 items-center">
@@ -267,17 +276,29 @@ const ArticleRow = memo(({
                 </span>
             </td>
             <td className="p-4 text-center">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDeleteClick(article._id)}
-                    isLoading={isDeleting}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-rose-600 dark:hover:text-rose-400 h-8 w-8 shadow-none"
-                    title={t('delete')}
-                    aria-label={t('delete')}
-                >
-                    {!isDeleting && <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
-                </Button>
+                <div className="flex items-center justify-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEditClick(article)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-primary/10 text-foreground/70 hover:text-primary h-8 w-8 shadow-none"
+                        title={t('edit') || 'Edit'}
+                        aria-label={t('edit') || 'Edit'}
+                    >
+                        <Edit className="w-3.5 h-3.5" aria-hidden="true" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onDeleteClick(article._id)}
+                        isLoading={isDeleting}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-rose-600 dark:hover:text-rose-400 h-8 w-8 shadow-none"
+                        title={t('delete')}
+                        aria-label={t('delete')}
+                    >
+                        {!isDeleting && <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
+                    </Button>
+                </div>
             </td>
         </tr>
     );
@@ -285,7 +306,15 @@ const ArticleRow = memo(({
 
 ArticleRow.displayName = 'ArticleRow';
 
-const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { articles: MonitoringArticle[], limit?: number }) {
+const ArticleTable = memo(function ArticleTable({
+    articles,
+    limit = 50,
+    onEditClick
+}: {
+    articles: MonitoringArticle[],
+    limit?: number,
+    onEditClick?: (article: any) => void
+}) {
     const t = useTranslations('ArticleTable');
     const deleteArticle = useMutation(api.monitoring.deleteArticle);
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
@@ -443,6 +472,7 @@ const ArticleTable = memo(function ArticleTable({ articles, limit = 50 }: { arti
                                 isUpdating={updatingId === article._id}
                                 onToggleSelect={toggleSelect}
                                 onDeleteClick={(id) => setSingleDeleteId(id)}
+                                onEditClick={onEditClick || (() => {})}
                                 onUpdateSentiment={handleSentimentUpdate}
                                 t={t}
                             />
