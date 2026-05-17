@@ -786,7 +786,7 @@ export const fetchNews = action({
                     }
                     return { name: 'GLEIF', success: 0 };
                 } catch (e) {
-                    console.error(`âŒ GLEIF fail`, e);
+                    console.error(`❌ GLEIF fail`, e);
                     return { name: 'GLEIF', error: true };
                 }
             })());
@@ -832,11 +832,17 @@ export const extractArticle = action({
     handler: async (ctx, args): Promise<{ success: boolean; data?: any; error?: string }> => {
         try {
             const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
-            if (!worldnewsKey) {
-                return { success: false, error: "Missing WorldNews API key. Configure in Settings." };
+            let result = null;
+            if (worldnewsKey) {
+                result = await extractWithWorldNews(args.url, worldnewsKey, args.analyze || false);
             }
 
-            const result = await extractWithWorldNews(args.url, worldnewsKey, args.analyze || false);
+            if (!result) {
+                console.log("ℹ️ WorldNews extractor unavailable or failed. Trying direct scraper...");
+                result = await extractWithDirectScraper(args.url, args.analyze || false);
+            }
+
+
             return { success: !!result, data: result };
         } catch (error) {
             console.error("âŒ Extract error:", error);
@@ -855,6 +861,120 @@ async function extractWithWorldNews(url: string, apiKey: string, analyze: boolea
         return await res.json();
     } catch (e) {
         console.error("âŒ WorldNews Extract fail", e);
+        return null;
+    }
+}
+
+async function extractWithDirectScraper(url: string, analyze: boolean = false) {
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 12000);
+
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'ar,en-US;q=0.7,en;q=0.3',
+            },
+            signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+        if (!response.ok) return null;
+
+        const html = await response.text();
+        const $ = cheerio.load(html);
+
+        // Extract title
+        let title = $('meta[property="og:title"]').attr('content') ||
+                    $('meta[name="twitter:title"]').attr('content') ||
+                    $('title').text() ||
+                    $('h1').first().text();
+
+        title = title ? title.trim() : '';
+
+        // Extract description/text
+        let text = $('meta[property="og:description"]').attr('content') ||
+                   $('meta[name="twitter:description"]').attr('content') ||
+                   $('meta[name="description"]').attr('content');
+
+        // Grab paragraph tags if text is short
+        const paragraphs: string[] = [];
+        $('article p, .entry-content p, .post-content p, p').each((_, el) => {
+            const pText = $(el).text().trim();
+            if (pText.length > 20) {
+                paragraphs.push(pText);
+            }
+        });
+
+        if (paragraphs.length > 0) {
+            text = paragraphs.join('\n\n');
+        } else {
+            text = text ? text.trim() : '';
+        }
+
+        // Extract image
+        const image = $('meta[property="og:image"]').attr('content') ||
+                      $('meta[name="twitter:image"]').attr('content') ||
+                      $('link[rel="image_src"]').attr('href') ||
+                      $('img').first().attr('src');
+
+        // Extract publish date
+        let publish_date = $('meta[property="article:published_time"]').attr('content') ||
+                           $('meta[property="og:article:published_time"]').attr('content') ||
+                           $('meta[name="publication_date"]').attr('content') ||
+                           $('meta[name="publish_date"]').attr('content') ||
+                           $('time').attr('datetime');
+
+        if (!publish_date) {
+            publish_date = new Date().toISOString();
+        }
+
+        // Lightweight sentiment analysis if requested
+        let sentiment = 0.0;
+        if (analyze) {
+            const textToAnalyze = ((title || '') + ' ' + (text || '')).toLowerCase();
+            
+            // Simple keyword dictionary
+            const positiveWords = [
+                'نجاح', 'تميز', 'رائع', 'شراكة', 'إنجاز', 'سعادة', 'مبادرة', 'خير', 'تقدم', 'تطوير', 'نمو', 'أمل', 'شكر', 'تقدير',
+                'success', 'excel', 'great', 'partner', 'achieve', 'happy', 'initiative', 'good', 'progress', 'develop', 'growth', 'hope', 'thanks'
+            ];
+            const negativeWords = [
+                'فشل', 'خسارة', 'تراجع', 'عجز', 'أزمة', 'مشكلة', 'خطر', 'سيء', 'وفاة', 'حادث', 'حزن', 'غضب', 'سرقة', 'جريمة',
+                'fail', 'loss', 'decline', 'deficit', 'crisis', 'problem', 'danger', 'bad', 'death', 'accident', 'sad', 'angry', 'theft', 'crime'
+            ];
+
+            let posCount = 0;
+            let negCount = 0;
+
+            positiveWords.forEach(word => {
+                const regex = new RegExp(word, 'g');
+                const matches = textToAnalyze.match(regex);
+                if (matches) posCount += matches.length;
+            });
+
+            negativeWords.forEach(word => {
+                const regex = new RegExp(word, 'g');
+                const matches = textToAnalyze.match(regex);
+                if (matches) negCount += matches.length;
+            });
+
+            const total = posCount + negCount;
+            if (total > 0) {
+                sentiment = (posCount - negCount) / total;
+            }
+        }
+
+        return {
+            title,
+            text,
+            image: image || '',
+            publish_date,
+            sentiment
+        };
+    } catch (e) {
+        console.error("â Œ Direct Scraper Extract fail", e);
         return null;
     }
 }

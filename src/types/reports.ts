@@ -58,6 +58,13 @@ export interface ReportTranslations {
             doc_number?: string;
             category?: string;
             reasons?: string;
+            dob?: string;
+            pob?: string;
+            address?: string;
+            issuing_authority?: string;
+            issue_date?: string;
+            expiry_date?: string;
+            other_info?: string;
         };
     };
     AiInspector?: {
@@ -181,12 +188,22 @@ export interface DarkWebResult {
 }
 
 export interface TerroristListItem {
+    _id?: string;
+    _creationTime?: number;
     nameArabic?: string;
     nameLatin?: string;
     nationality?: string;
     documentNumber?: string;
     category?: string;
     reasons?: string;
+    dob?: string;
+    pob?: string;
+    address?: string;
+    issuingAuthority?: string;
+    issueDate?: string;
+    expiryDate?: string;
+    otherInfo?: string;
+    type?: 'individual' | 'entity' | 'organization' | string;
     [key: string]: unknown;
 }
 

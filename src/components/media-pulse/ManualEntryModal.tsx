@@ -272,16 +272,12 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
 
             onClose();
         } catch (error) {
-            console.error("Failed to save. Payload:", {
-                title: formData.title,
-                sourceType: formData.sourceType,
-                date: formData.date,
-                url: formData.url,
-                sentiment: formData.sentiment,
-                reach: formData.reach,
-                imageUrlLength: formData.imageUrl ? formData.imageUrl.length : 0,
-            }, error);
-            alert(t('save_failed'));
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            if (errorMessage.includes("DuplicateArticle")) {
+                alert(t('duplicate_article_error'));
+            } else {
+                alert(t('save_failed'));
+            }
         } finally {
             setIsLoading(false);
         }

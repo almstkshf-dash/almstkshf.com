@@ -198,7 +198,7 @@ export default function TerroristListTab() {
           const chunkSize = 200;
           for (let i = 0; i < allData.length; i += chunkSize) {
             const chunk = allData.slice(i, i + chunkSize);
-            await addItems({ items: chunk });
+            await addItems({ items: chunk as any });
             setImportProgress(prev => ({ ...prev, current: prev.current + 1 }));
           }
 

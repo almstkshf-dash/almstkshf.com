@@ -449,3 +449,12 @@ To support adding all kinds of external links (including social media links such
 - The `handleExtract` method intercepts social media links before invoking external extraction hooks.
 - It displays a helpful, multi-lingual warning dialog asking the user to manually input the article title/content, while gracefully retaining the sanitized link in the form payload.
 
+---
+
+## 21. TypeScript Type-Checking & Watchlist Strict Safety
+
+To maintain high standards of code stability and a clean compiler profile:
+- **Watchlist & Sanitization Schema**: The `TerroristListItem` and its corresponding translations in `ReportTranslations` are strictly declared within `src/types/reports.ts`. Adding new columns/importers must be matched with explicit typings here to avoid falling back on `unknown` types which crash React 19 JSX renderings.
+- **Dynamic Models & TFJS Laziness**: In client-side ML processors (like `mlHelper.ts`), tensorflow/biometric models must be typed as `any` due to dynamic environment loading constraints, avoiding `unknown` restrictions on inference methods.
+- **Convex Custom Identifiers**: Handlers dealing with DB entities (e.g. notifications dropdowns) should use flexible typings like `any` or explicit `Id<"table">` generics when mapping variables directly to Convex mutation interfaces, resolving strict schema validation errors.
+

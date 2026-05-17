@@ -8,9 +8,9 @@
 
 import { createWorker } from 'tesseract.js';
 
-// Lazily-typed references â€” populated by loadModels() at runtime only.
-let faceModel: unknown | null = null;
-let handModel: unknown | null = null;
+// Lazily-typed references — populated by loadModels() at runtime only.
+let faceModel: any = null;
+let handModel: any = null;
 
 /**
  * Loads the face and hand models if not already loaded.
@@ -60,10 +60,12 @@ export async function analyzeOCR(canvas: HTMLCanvasElement): Promise<{
   // 1. Words with rare character transitions
   // 2. High ratio of symbols to letters
   // 3. Very low OCR confidence on structured areas
-  const garbledWords = (words as { text?: string }[]).filter((w: { text?: string }) => {
-    const hasManyConsonants = /[^aeiou]{5,}/i.test(w.text);
-    const hasSymbols = /[^a-z0-9]/i.test(w.text);
-    return w.confidence < 50 || (hasManyConsonants && hasSymbols);
+  const garbledWords = (words as { text?: string; confidence?: number }[]).filter((w: { text?: string; confidence?: number }) => {
+    const wordText = w.text || '';
+    const hasManyConsonants = /[^aeiou]{5,}/i.test(wordText);
+    const hasSymbols = /[^a-z0-9]/i.test(wordText);
+    const wordConfidence = w.confidence ?? 0;
+    return wordConfidence < 50 || (hasManyConsonants && hasSymbols);
   });
 
   const isGarbled = (garbledWords.length / Math.max(1, words.length)) > 0.3 && text.length > 5;

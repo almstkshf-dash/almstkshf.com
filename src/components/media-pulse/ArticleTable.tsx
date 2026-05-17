@@ -11,9 +11,10 @@
 import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle, Edit, History } from 'lucide-react';
+import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle, Edit, History, FolderPlus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 import { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 import { MonitoringArticle } from '@/types/reports';
@@ -57,6 +58,7 @@ const ArticleRow = memo(({
     onToggleSelect,
     onDeleteClick,
     onEditClick,
+    onSaveClick,
     onUpdateSentiment,
     t
 }: {
@@ -67,9 +69,11 @@ const ArticleRow = memo(({
     onToggleSelect: (id: string) => void,
     onDeleteClick: (id: string) => void,
     onEditClick: (article: any) => void,
+    onSaveClick: (article: any) => void,
     onUpdateSentiment: (id: string, s: string) => void,
     t: ReturnType<typeof import('next-intl').useTranslations>
 }) => {
+    const tCommon = useTranslations('Common');
     const theme = getSourceBadgeColor(article.sourceType);
 
     return (
@@ -280,6 +284,16 @@ const ArticleRow = memo(({
                     <Button
                         variant="ghost"
                         size="icon"
+                        onClick={() => onSaveClick(article)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-primary/10 text-foreground/70 hover:text-primary h-8 w-8 shadow-none"
+                        title={tCommon('save_to_collection') || 'Save to Collection'}
+                        aria-label={tCommon('save_to_collection') || 'Save to Collection'}
+                    >
+                        <FolderPlus className="w-3.5 h-3.5" aria-hidden="true" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => onEditClick(article)}
                         className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-primary/10 text-foreground/70 hover:text-primary h-8 w-8 shadow-none"
                         title={t('edit') || 'Edit'}
@@ -316,6 +330,7 @@ const ArticleTable = memo(function ArticleTable({
     onEditClick?: (article: any) => void
 }) {
     const t = useTranslations('ArticleTable');
+    const tCommon = useTranslations('Common');
     const deleteArticle = useMutation(api.monitoring.deleteArticle);
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
     const updateSentiment = useMutation(api.monitoring.updateSentiment);
@@ -331,6 +346,19 @@ const ArticleTable = memo(function ArticleTable({
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
     const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false);
     const [singleDeleteId, setSingleDeleteId] = useState<string | null>(null);
+
+    // Save to collection modal states
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [itemToSave, setItemToSave] = useState<any>(undefined);
+    const [itemsToSave, setItemsToSave] = useState<any[]>([]);
+
+    const mapArticleToCollectionItem = useCallback((article: MonitoringArticle) => ({
+        id: article._id,
+        type: "media_monitoring" as const,
+        title: article.title,
+        sourceId: article.sourceCountry || article.country,
+        data: article as unknown as Record<string, unknown>
+    }), []);
 
     const displayedArticles = useMemo(() => (articles ?? []).slice(0, limit), [articles, limit]);
 
@@ -417,16 +445,32 @@ const ArticleTable = memo(function ArticleTable({
                             {t('items_selected', { count: selectedIds.size })}
                         </span>
                     </div>
-                    <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => setIsBatchDialogOpen(true)}
-                        isLoading={isBatchDeleting}
-                        className="gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold shadow-lg shadow-destructive/25 h-auto transition-all"
-                        leftIcon={!isBatchDeleting && <Trash2 className="w-3.5 h-3.5" />}
-                    >
-                        {t('delete_selected', { count: selectedIds.size })}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => {
+                                const selectedArticles = displayedArticles.filter(a => selectedIds.has(a._id));
+                                setItemsToSave(selectedArticles.map(mapArticleToCollectionItem));
+                                setItemToSave(undefined);
+                                setIsSaveModalOpen(true);
+                            }}
+                            className="gap-2 px-4 py-2 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl text-xs font-bold shadow-lg shadow-primary/25 h-auto transition-all"
+                            leftIcon={<FolderPlus className="w-3.5 h-3.5" />}
+                        >
+                            {tCommon('save_to_collection')}
+                        </Button>
+                        <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => setIsBatchDialogOpen(true)}
+                            isLoading={isBatchDeleting}
+                            className="gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold shadow-lg shadow-destructive/25 h-auto transition-all"
+                            leftIcon={!isBatchDeleting && <Trash2 className="w-3.5 h-3.5" />}
+                        >
+                            {t('delete_selected', { count: selectedIds.size })}
+                        </Button>
+                    </div>
                 </div>
             )}
 
@@ -473,6 +517,11 @@ const ArticleTable = memo(function ArticleTable({
                                 onToggleSelect={toggleSelect}
                                 onDeleteClick={(id) => setSingleDeleteId(id)}
                                 onEditClick={onEditClick || (() => {})}
+                                onSaveClick={(art) => {
+                                    setItemToSave(mapArticleToCollectionItem(art));
+                                    setItemsToSave([]);
+                                    setIsSaveModalOpen(true);
+                                }}
                                 onUpdateSentiment={handleSentimentUpdate}
                                 t={t}
                             />
@@ -500,6 +549,19 @@ const ArticleTable = memo(function ArticleTable({
                 variant="danger"
                 isLoading={isBatchDeleting}
             />
+
+            {isSaveModalOpen && (
+                <SaveToCollectionModal
+                    isOpen={isSaveModalOpen}
+                    onClose={() => {
+                        setIsSaveModalOpen(false);
+                        setItemToSave(undefined);
+                        setItemsToSave([]);
+                    }}
+                    item={itemToSave}
+                    items={itemsToSave.length > 0 ? itemsToSave : undefined}
+                />
+            )}
         </div>
     );
 });

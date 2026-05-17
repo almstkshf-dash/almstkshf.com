@@ -19,20 +19,27 @@ import { useTranslations } from "next-intl";
 interface SaveToCollectionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    item: {
+    item?: {
         id: string;
         type: "media_monitoring" | "osint" | "ai_inspector" | "watchlist" | "deep_web" | "custom";
         title: string;
         sourceId?: string;
         data: Record<string, unknown>;
     };
+    items?: Array<{
+        id: string;
+        type: "media_monitoring" | "osint" | "ai_inspector" | "watchlist" | "deep_web" | "custom";
+        title: string;
+        sourceId?: string;
+        data: Record<string, unknown>;
+    }>;
 }
 
-export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToCollectionModalProps) {
+export default function SaveToCollectionModal({ isOpen, onClose, item, items }: SaveToCollectionModalProps) {
     const tCommon = useTranslations("Common");
     const collections = useQuery(api.collections.getCollections);
     const createCollection = useMutation(api.collections.createCollection);
-    const addToCollection = useMutation(api.collections.addToCollection);
+    const addMultipleToCollection = useMutation(api.collections.addMultipleToCollection);
 
     const [isCreating, setIsCreating] = useState(false);
     const [newCollectionName, setNewCollectionName] = useState("");
@@ -63,19 +70,39 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
         setLoading(true);
         setStatus(null);
         try {
-            const result = await addToCollection({ collectionId: collectionId as Id<"collections">, item });
-            if (result.isDuplicate) {
-                setStatus({ type: 'info', text: 'This item is already in the selected collection.' });
-            } else {
-                setStatus({ type: 'success', text: 'Saved successfully!' });
+            const itemsToSave = items || (item ? [item] : []);
+            if (itemsToSave.length === 0) {
+                setStatus({ type: 'error', text: 'No items selected to save.' });
+                setLoading(false);
+                return;
+            }
+
+            const result = await addMultipleToCollection({
+                collectionId: collectionId as Id<"collections">,
+                items: itemsToSave
+            });
+
+            if (result.addedCount === 0 && result.duplicateCount > 0) {
+                setStatus({ type: 'info', text: 'All items are already in the selected collection.' });
+            } else if (result.duplicateCount > 0) {
+                setStatus({
+                    type: 'success',
+                    text: `Saved ${result.addedCount} items successfully! (${result.duplicateCount} were already in collection)`
+                });
                 setTimeout(() => {
                     setStatus(null);
                     onClose();
-                }, 1000);
+                }, 1800);
+            } else {
+                setStatus({ type: 'success', text: `Saved ${result.addedCount} items successfully!` });
+                setTimeout(() => {
+                    setStatus(null);
+                    onClose();
+                }, 1200);
             }
         } catch (e) {
             console.error(e);
-            setStatus({ type: 'error', text: 'Unable to save item. Please try again.' });
+            setStatus({ type: 'error', text: 'Unable to save items. Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -86,10 +113,32 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
         setLoading(true);
         setStatus(null);
         try {
+            const itemsToSave = items || (item ? [item] : []);
+            if (itemsToSave.length === 0) {
+                setStatus({ type: 'error', text: 'No items selected to save.' });
+                setLoading(false);
+                return;
+            }
+
             const newId = await createCollection({ name: newCollectionName.trim() });
-            const result = await addToCollection({ collectionId: newId, item });
-            if (result.isDuplicate) {
-                setStatus({ type: 'info', text: 'This item is already in the created collection.' });
+            const result = await addMultipleToCollection({
+                collectionId: newId,
+                items: itemsToSave
+            });
+
+            if (result.addedCount === 0 && result.duplicateCount > 0) {
+                setStatus({ type: 'info', text: 'All items are already in the created collection.' });
+            } else if (result.duplicateCount > 0) {
+                setStatus({
+                    type: 'success',
+                    text: `Created collection and saved ${result.addedCount} items successfully! (${result.duplicateCount} were already in collection)`
+                });
+                setTimeout(() => {
+                    setStatus(null);
+                    setIsCreating(false);
+                    setNewCollectionName("");
+                    onClose();
+                }, 1800);
             } else {
                 setStatus({ type: 'success', text: 'Created collection and saved successfully!' });
                 setTimeout(() => {
@@ -97,7 +146,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                     setIsCreating(false);
                     setNewCollectionName("");
                     onClose();
-                }, 1000);
+                }, 1200);
             }
         } catch (e) {
             console.error(e);
@@ -150,11 +199,10 @@ export default function SaveToCollectionModal({ isOpen, onClose, item }: SaveToC
                             {status && (
                                 <div
                                     role="alert"
-                                    className={`rounded-3xl border px-4 py-3 text-sm ${
-                                        status.type === 'error'
+                                    className={`rounded-3xl border px-4 py-3 text-sm ${status.type === 'error'
                                             ? 'bg-rose-500/10 border-rose-200 text-rose-700'
                                             : 'bg-amber-500/10 border-amber-200 text-amber-700'
-                                    }`}
+                                        }`}
                                 >
                                     {status.text}
                                 </div>

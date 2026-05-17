@@ -7,7 +7,7 @@
  */
 
 import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 
 function applyMonitoringFilters(q: any, args: { sourceType?: string; sourceCountry?: string; depth?: string }) {
     if (args.sourceType && args.sourceType !== "All") {
@@ -122,32 +122,47 @@ export const saveArticle = mutation({
             // Ensure sourceType matches schema validator
             const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
 
-            // Check for duplicates before inserting
+            // Check for duplicates before inserting: title AND url (or resolvedUrl)
             const existing = await ctx.db
                 .query("media_monitoring_articles")
                 .withIndex("by_date", (q) => q.eq("publishedDate", args.publishedDate))
-                .filter((q) => q.eq(q.field("title"), args.title))
+                .filter((q) =>
+                    q.and(
+                        q.eq(q.field("title"), args.title),
+                        q.or(
+                            q.eq(q.field("url"), args.url),
+                            q.eq(q.field("resolvedUrl"), args.url),
+                            q.eq(q.field("url"), args.resolvedUrl || args.url),
+                            q.eq(q.field("resolvedUrl"), args.resolvedUrl || args.url)
+                        )
+                    )
+                )
                 .first();
+
+            if (existing) {
+                if (args.isManual) {
+                    throw new ConvexError("DuplicateArticle: This article already exists in your monitoring feed.");
+                }
+                return;
+            }
 
             // 100% Data Validation: Ensure all literals are correct
             const finalSourceType = validSourceTypes.includes(args.sourceType)
                 ? (args.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release")
                 : "Online News";
 
-            if (!existing) {
-                await ctx.db.insert("media_monitoring_articles", {
-                    ...args,
-                    createdAt: Date.now(),
-                    sourceType: finalSourceType,
-                    depth: (args.depth ?? "standard") as "standard" | "deep",
-                    ingestMethod: args.ingestMethod,
-                    manualSentimentOverride: args.manualSentimentOverride ?? false,
-                    originalSentiment: args.originalSentiment ?? args.sentiment,
-                    relevancy_score: args.relevancy_score,
-                    hashtags: args.hashtags,
-                    emotions: args.emotions,
-                });
-            }
+            await ctx.db.insert("media_monitoring_articles", {
+                ...args,
+                createdAt: Date.now(),
+                sourceType: finalSourceType,
+                depth: (args.depth ?? "standard") as "standard" | "deep",
+                ingestMethod: args.ingestMethod,
+                manualSentimentOverride: args.manualSentimentOverride ?? false,
+                originalSentiment: args.originalSentiment ?? args.sentiment,
+                relevancy_score: args.relevancy_score,
+                hashtags: args.hashtags,
+                emotions: args.emotions,
+            });
         } catch (error) {
             console.error("saveArticle failed. Args:", JSON.stringify(args));
             console.error("saveArticle error:", error);

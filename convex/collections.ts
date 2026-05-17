@@ -156,3 +156,58 @@ export const removeFromCollection = mutation({
         return collection._id;
     }
 });
+
+export const addMultipleToCollection = mutation({
+    args: {
+        collectionId: v.id("collections"),
+        items: v.array(
+            v.object({
+                id: v.string(),
+                type: v.union(
+                    v.literal("media_monitoring"),
+                    v.literal("osint"),
+                    v.literal("ai_inspector"),
+                    v.literal("watchlist"),
+                    v.literal("deep_web"),
+                    v.literal("custom")
+                ),
+                title: v.string(),
+                sourceId: v.optional(v.string()),
+                data: v.any(),
+            })
+        )
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new Error("Unauthenticated");
+        }
+
+        const collection = await ctx.db.get(args.collectionId);
+        if (!collection || collection.userId !== identity.subject) {
+            throw new Error("Unauthorized");
+        }
+
+        let addedCount = 0;
+        let duplicateCount = 0;
+        const currentItems = [...collection.items];
+
+        for (const item of args.items) {
+            if (currentItems.find(i => i.id === item.id)) {
+                duplicateCount++;
+            } else {
+                currentItems.push({ ...item, addedAt: Date.now() });
+                addedCount++;
+            }
+        }
+
+        if (addedCount > 0) {
+            await ctx.db.patch(args.collectionId, {
+                items: currentItems,
+                updatedAt: Date.now()
+            });
+        }
+
+        return { collectionId: collection._id, addedCount, duplicateCount };
+    }
+});
