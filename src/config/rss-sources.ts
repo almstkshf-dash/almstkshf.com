@@ -290,6 +290,12 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Variety': [
     { id: 'variety-entertainment', name: 'Entertainment', url: 'http://variety.com/feed/', country: 'US' },
   ],
+  'X (Twitter)': [
+    { id: 'x-twitter-sky-news-arabia', name: 'Sky News Arabia (X)', url: 'https://syndication.twitter.com/srv/timeline-profile/screen-name=SkyNewsArabia', country: 'UAE' },
+    { id: 'x-twitter-alarabiya', name: 'Al Arabiya (X)', url: 'https://syndication.twitter.com/srv/timeline-profile/screen-name=AlArabiya', country: 'SA' },
+    { id: 'x-twitter-ajmubasher', name: 'Al Jazeera Mubasher (X)', url: 'https://syndication.twitter.com/srv/timeline-profile/screen-name=AJMubasher', country: 'QA' },
+    { id: 'x-twitter-alkass-tv', name: 'Al Kass TV (X)', url: 'https://syndication.twitter.com/srv/timeline-profile/screen-name=alkass_tv', country: 'QA' },
+  ],
 };
 
 export const ALL_SOURCES = Object.entries(PREMIUM_SOURCES).flatMap(([publisher, categories]) =>

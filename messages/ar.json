@@ -2496,7 +2496,12 @@
     "latimes-entertainment": "لوس أنجلوس تايمز - ترفيه",
     "nbcnews-entertainment": "إن بي سي نيوز - ترفيه",
     "abcnews-entertainment": "إيه بي سي نيوز - ترفيه",
-    "huffpost-entertainment": "هافينغتون بوست - ترفيه"
+    "huffpost-entertainment": "هافينغتون بوست - ترفيه",
+    "X (Twitter)": "منصة إكس (تويتر)",
+    "x-twitter-sky-news-arabia": "سكاي نيوز عربية (إكس)",
+    "x-twitter-alarabiya": "العربية (إكس)",
+    "x-twitter-ajmubasher": "الجزيرة مباشر (إكس)",
+    "x-twitter-alkass-tv": "قنوات الكأس (إكس)"
   },
   "Pricing": {
     "title": "خطط الأسعار",

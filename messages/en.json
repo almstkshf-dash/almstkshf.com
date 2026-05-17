@@ -2466,7 +2466,12 @@
     "latimes-entertainment": "LA Times Entertainment",
     "nbcnews-entertainment": "NBC News Entertainment",
     "abcnews-entertainment": "ABC News Entertainment",
-    "huffpost-entertainment": "Huffington Post Entertainment"
+    "huffpost-entertainment": "Huffington Post Entertainment",
+    "X (Twitter)": "X (Twitter)",
+    "x-twitter-sky-news-arabia": "Sky News Arabia (X)",
+    "x-twitter-alarabiya": "Al Arabiya (X)",
+    "x-twitter-ajmubasher": "Al Jazeera Mubasher (X)",
+    "x-twitter-alkass-tv": "Al Kass TV (X)"
   },
   "Pricing": {
     "title": "Pricing Plans",

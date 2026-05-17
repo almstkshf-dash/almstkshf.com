@@ -387,3 +387,26 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | `ReferenceError: Button is not defined` | `Button` import removed from `dashboard/page.tsx` but usages remain | Convert remaining `<Button>` to native `<button>` — see §11 above |
 | Recharts tooltip `payload` type error | `payload` is `readonly any[]` — cannot be spread into typed interface | Inline the render callback or cast with `as { value?: number }` |
 | `Session History Item Has Been Marked Skippable` | Programmatic navigation pushing sign-in redirect to history stack | Use `router.replace()` instead of `router.push()` for auth redirects |
+
+---
+
+## 18. X (Twitter) Dual Ingestion Pipeline
+
+To maximize coverage and guarantee 100% uptime for social media news tracking, the application implements a dual-strategy ingestion engine for X (Twitter) profile feeds:
+
+### Ingestion Modes
+- **Primary Mode (Official API v2)**: If an official `X_BEARER_TOKEN` or `BEARER_TOKEN` is detected, the engine queries the official Twitter API endpoints (`users/by/username/${username}` and `users/${id}/tweets`) to retrieve real-time posts.
+- **Self-Healing Fallback (Public Syndication)**: If Vercel environment variables are missing, rate-limited, or encounter errors, the crawler automatically falls back to scraping `syndication.twitter.com/srv/timeline-profile/screen-name=${username}` HTML content using `cheerio`. It extracts raw JSON payloads from `#__NEXT_DATA__` safely.
+
+### Source Classification & DB Mapping
+- Unlike standard RSS feeds classified as `Press Release` or `Online News`, X (Twitter) sources are automatically mapped as `"Social Media"`.
+- This propagates correctly through the database to support precise multi-channel filtering, reach evaluation, and sentiment analysis on the user's dashboard.
+
+### Adding New Twitter Profiles
+1. Open [rss-sources.ts](file:///c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/src/config/rss-sources.ts) and add the profile under the `PREMIUM_SOURCES` configuration with a category key of `'X (Twitter)'`.
+2. Open [monitoringAction.ts](file:///c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/convex/monitoringAction.ts) and append the target profile configuration to the `PR_WIRE_FEEDS` list using the format:
+   ```typescript
+   { name: "Sky News Arabia (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=SkyNewsArabia", country: "AE", lang: "ar" }
+   ```
+3. Update both `messages/en.json` and `messages/ar.json` under `"RssSources"` namespace with safe keys (using underscores instead of dots to prevent key nesting errors).
+

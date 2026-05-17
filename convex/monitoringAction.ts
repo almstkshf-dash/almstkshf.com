@@ -1120,7 +1120,102 @@ async function fetchRobustRss(url: string) {
     }
 }
 
+async function fetchTwitterTweets(username: string, bearerToken: string | null): Promise<any[]> {
+    console.log(`🐦 [fetchTwitterTweets] Fetching tweets for @${username} (Bearer token available: ${!!bearerToken})`);
+    
+    // 1. Try official API v2 if bearer token is available
+    if (bearerToken) {
+        try {
+            // First, lookup user ID by username
+            const lookupUrl = `https://api.twitter.com/2/users/by/username/${username}`;
+            const lookupRes = await fetch(lookupUrl, {
+                headers: { 'Authorization': `Bearer ${bearerToken}` }
+            });
+            if (lookupRes.ok) {
+                const lookupData = await lookupRes.json();
+                if (lookupData?.data?.id) {
+                    const userId = lookupData.data.id;
+                    // Now, fetch latest 20 tweets for this user ID
+                    const tweetsUrl = `https://api.twitter.com/2/users/${userId}/tweets?max_results=20&tweet.fields=created_at,author_id,entities,public_metrics&expansions=author_id`;
+                    const tweetsRes = await fetch(tweetsUrl, {
+                        headers: { 'Authorization': `Bearer ${bearerToken}` }
+                    });
+                    if (tweetsRes.ok) {
+                        const tweetsData = await tweetsRes.json();
+                        if (tweetsData?.data) {
+                            console.log(`✅ [fetchTwitterTweets] Fetched ${tweetsData.data.length} tweets via API v2 for @${username}`);
+                            return tweetsData.data.map((tweet: any) => ({
+                                title: `Tweet by @${username}`,
+                                link: `https://twitter.com/${username}/status/${tweet.id}`,
+                                pubDate: tweet.created_at,
+                                contentSnippet: tweet.text,
+                                content: tweet.text,
+                                imageUrl: null
+                            }));
+                        }
+                    } else {
+                        console.warn(`⚠️ Twitter API tweets endpoint failed for @${username}: ${tweetsRes.status}`);
+                    }
+                }
+            } else {
+                console.warn(`⚠️ Twitter API user lookup failed for @${username}: ${lookupRes.status}`);
+            }
+        } catch (err) {
+            console.error(`❌ Twitter API failed for @${username}, falling back to syndication...`, err);
+        }
+    }
+
+    // 2. Fallback to syndication.twitter.com/srv/timeline-profile/screen-name=...
+    try {
+        const syndicationUrl = `https://syndication.twitter.com/srv/timeline-profile/screen-name=${username}`;
+        const res = await fetch(syndicationUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5,ar;q=0.3',
+            }
+        });
+        if (res.ok) {
+            const html = await res.text();
+            const $ = cheerio.load(html);
+            const nextDataJson = $('#__NEXT_DATA__').html();
+            if (nextDataJson) {
+                const parsed = JSON.parse(nextDataJson);
+                // The tweets are nested in prop entries
+                const timelineEntries = parsed?.props?.pageProps?.timeline?.entries || [];
+                const tweets: any[] = [];
+                for (const entry of timelineEntries) {
+                    const tweet = entry?.content?.tweet;
+                    if (tweet) {
+                        tweets.push({
+                            title: `Tweet by @${username}`,
+                            link: `https://twitter.com/${username}/status/${tweet.id_str}`,
+                            pubDate: tweet.created_at,
+                            contentSnippet: tweet.full_text || tweet.text || "",
+                            content: tweet.full_text || tweet.text || "",
+                            imageUrl: tweet.mediaDetails?.[0]?.media_url_https || null
+                        });
+                    }
+                }
+                if (tweets.length > 0) {
+                    console.log(`✅ [fetchTwitterTweets] Scraped ${tweets.length} tweets from syndication for @${username}`);
+                    return tweets;
+                }
+            }
+        }
+        console.warn(`⚠️ Syndication scraping returned no tweets for @${username}`);
+    } catch (err) {
+        console.error(`❌ Twitter syndication fallback failed for @${username}`, err);
+    }
+
+    return [];
+}
+
 const PR_WIRE_FEEDS = [
+    { name: "Sky News Arabia (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=SkyNewsArabia", country: "AE", lang: "ar" },
+    { name: "Al Arabiya (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AlArabiya", country: "SA", lang: "ar" },
+    { name: "Al Jazeera Mubasher (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AJMubasher", country: "QA", lang: "ar" },
+    { name: "Al Kass TV (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=alkass_tv", country: "QA", lang: "ar" },
     { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
     { name: "WAM_AR", url: "https://wam.ae/ar/rss", country: "AE", lang: "ar" },
     { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
@@ -1220,20 +1315,41 @@ export const fetchPressReleaseSources = action({
                 }
             });
 
+            const twitterBearer = (await resolveApiKey(ctx, "X_BEARER_TOKEN", "twitterBearer")) || process.env.BEARER_TOKEN || null;
+
             let totalSaved = 0;
             let totalErrors = 0;
             const feedResults: any[] = [];
 
-            // 1. Parallel RSS Ingestion
+            // 1. Parallel RSS & Twitter Ingestion
             await Promise.all(
                 PR_WIRE_FEEDS.map(async (feed) => {
                     let savedCount = 0;
                     try {
-                        const xml = await fetchRobustRss(feed.url);
-                        const feedData = await parser.parseString(xml);
-                        const candidates = feedData.items.slice(0, itemLimit);
+                        let candidates: any[] = [];
+                        const isTwitter = feed.url.includes("twitter.com") || feed.url.includes("x.com");
 
-                        const items = candidates.filter((item) => {
+                        if (isTwitter) {
+                            let username = "";
+                            if (feed.url.includes("screen-name=")) {
+                                const match = feed.url.match(/screen-name=([^&]+)/);
+                                if (match) username = match[1];
+                            } else {
+                                const match = feed.url.match(/(?:twitter|x)\.com\/([^\/\?]+)/);
+                                if (match) username = match[1];
+                            }
+                            if (username) {
+                                candidates = await fetchTwitterTweets(username, twitterBearer);
+                            }
+                        } else {
+                            const xml = await fetchRobustRss(feed.url);
+                            const feedData = await parser.parseString(xml);
+                            candidates = feedData.items;
+                        }
+
+                        const rawItems = candidates.slice(0, itemLimit);
+
+                        const items = rawItems.filter((item) => {
                             const title = item.title ?? "";
                             const snippet = item.contentSnippet || item.content || "";
 
@@ -1268,11 +1384,11 @@ export const fetchPressReleaseSources = action({
                                 feed.lang,
                                 keyword,
                                 geminiKey,
-                                ["Press Release"],
+                                isTwitter ? ["Social Media"] : ["Press Release"],
                                 dateFromObj,
                                 dateToObj,
                                 false,
-                                "Press Release"
+                                isTwitter ? "Social Media" : "Press Release"
                             );
                             if (processed) {
                                 savedCount++;
