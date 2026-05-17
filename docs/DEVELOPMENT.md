@@ -31,6 +31,12 @@ npm run dev
 
 ### Package Overrides & Security Fixes
 We utilize the `overrides` field in `package.json` to force modern, secure, and non-deprecated versions of nested sub-dependencies (e.g., `rimraf`, `glob`, `inflight`) pulled in by external dependencies (such as `@tensorflow-models` or `exceljs`). 
+
+Specifically:
+- `glob` is forced to `^13.0.0` because the author of `glob` has deprecated all older major versions up to the current modern release line (v13+) to prevent security vulnerabilities and ensure ongoing support.
+- `rimraf` is forced to `^5.0.5`.
+- `inflight` is forced to use the modern `lru-cache@^10.2.2` package.
+
 This guarantees the prevention of security vulnerability warnings and keeps deep dependencies clean. Run `npm install` normally, and npm will automatically apply these overrides.
 
 ---
