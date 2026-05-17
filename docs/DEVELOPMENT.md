@@ -425,3 +425,27 @@ To bypass CORS blocks natively and enable high-fidelity image rendering within P
 
 ### Dynamic Format Resolution
 Always dynamically resolve the `data:image/` MIME type back to standard uppercase formats (like `PNG` or `JPEG`) before injecting it into jsPDF's `addImage` function. This prevents rendering crashes caused by invalid byte parsing.
+
+---
+
+## 20. Manual Entry URL Validation & Social Media Interceptor
+
+To support adding all kinds of external links (including social media links such as TikTok, Instagram, Facebook, Twitter/X, YouTube, LinkedIn, Pinterest, Snapchat, Reddit, Threads, Telegram, WhatsApp, Twitch, and Radiant, as well as complex Arabic news URLs with trailing spaces or missing protocols), the Manual Entry Modal utilizes an intelligent validation and interceptor pipeline:
+
+### Input Normalization & Sanitization
+- **URL Input Type**: The input field uses `type="text"` instead of the native HTML5 `type="url"`. This prevents strict browser-level HTML validation popups from blocking form submission when trailing whitespace or copy-paste artifacts are present.
+- **Helper Function `sanitizeUrl`**: Processes raw URL inputs by:
+  - Trimming leading and trailing whitespaces.
+  - Splitting by space, commas, or newlines, and extracting only the first valid URL if multiple links are pasted together.
+  - Automatically prepending `https://` if the input resembles a domain (e.g., contains a `.`) but lacks a protocol.
+- **On Blur & On Submit Sanitization**: Sanitizes URLs automatically on input `onBlur`, during background auto-extraction, and prior to saving the article to Convex.
+
+### Social Media Smart Auto-Fill
+- **Auto-Detection**: When a social media link is pasted or loses focus (`onBlur`), the `detectSocialMedia` helper checks the domain (e.g., `tiktok.com`, `instagram.com`, `facebook.com`, `x.com`, `youtube.com`, `linkedin.com`, `pinterest.com`, `snapchat.com`, `reddit.com`, `threads.net`, `telegram.org`, `whatsapp.com`, `twitch.tv`, `radiant.social`).
+- **Form Auto-Update**: Instantly updates the coverage **Type** selector to `"Social Media"` and populates the **Source Name** with the detected platform (e.g., `"TikTok"`, `"Instagram"`, `"Facebook"`, `"Twitter/X"`, `"YouTube"`, `"LinkedIn"`, `"Pinterest"`, `"Snapchat"`, `"Reddit"`, `"Threads"`, `"Telegram"`, `"WhatsApp"`, `"Twitch"`, `"Radiant"`).
+
+### Extraction Safeguards & Interception
+- Standard scraping APIs (like WorldNews API) fail when fetching authentication-gated social media pages.
+- The `handleExtract` method intercepts social media links before invoking external extraction hooks.
+- It displays a helpful, multi-lingual warning dialog asking the user to manually input the article title/content, while gracefully retaining the sanitized link in the form payload.
+

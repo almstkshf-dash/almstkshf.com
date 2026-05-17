@@ -21,6 +21,75 @@ interface ManualEntryModalProps {
     onClose: () => void;
 }
 
+const sanitizeUrl = (inputUrl: string): string => {
+    if (!inputUrl) return '';
+    let cleaned = inputUrl.trim();
+    
+    // Split by whitespace or newlines or commas and pick the first one
+    const urls = cleaned.split(/[\s,\n]+/);
+    if (urls.length > 0) {
+        cleaned = urls[0].trim();
+    }
+
+    if (!cleaned) return '';
+
+    // If it doesn't have http:// or https:// but contains a dot, prepend https://
+    if (!/^https?:\/\//i.test(cleaned)) {
+        if (cleaned.includes('.')) {
+            cleaned = 'https://' + cleaned;
+        }
+    }
+
+    return cleaned;
+};
+
+const detectSocialMedia = (url: string) => {
+    const lowercaseUrl = url.toLowerCase();
+    if (lowercaseUrl.includes('tiktok.com') || lowercaseUrl.includes('vt.tiktok.com')) {
+        return { sourceType: 'Social Media', source: 'TikTok' };
+    }
+    if (lowercaseUrl.includes('instagram.com')) {
+        return { sourceType: 'Social Media', source: 'Instagram' };
+    }
+    if (lowercaseUrl.includes('facebook.com') || lowercaseUrl.includes('fb.watch') || lowercaseUrl.includes('fb.com')) {
+        return { sourceType: 'Social Media', source: 'Facebook' };
+    }
+    if (lowercaseUrl.includes('twitter.com') || lowercaseUrl.includes('x.com')) {
+        return { sourceType: 'Social Media', source: 'Twitter/X' };
+    }
+    if (lowercaseUrl.includes('youtube.com') || lowercaseUrl.includes('youtu.be')) {
+        return { sourceType: 'Social Media', source: 'YouTube' };
+    }
+    if (lowercaseUrl.includes('linkedin.com')) {
+        return { sourceType: 'Social Media', source: 'LinkedIn' };
+    }
+    if (lowercaseUrl.includes('pinterest.com') || lowercaseUrl.includes('pintrest.com') || lowercaseUrl.includes('pin.it')) {
+        return { sourceType: 'Social Media', source: 'Pinterest' };
+    }
+    if (lowercaseUrl.includes('snapchat.com') || lowercaseUrl.includes('snap.com')) {
+        return { sourceType: 'Social Media', source: 'Snapchat' };
+    }
+    if (lowercaseUrl.includes('reddit.com') || lowercaseUrl.includes('redd.it')) {
+        return { sourceType: 'Social Media', source: 'Reddit' };
+    }
+    if (lowercaseUrl.includes('threads.net')) {
+        return { sourceType: 'Social Media', source: 'Threads' };
+    }
+    if (lowercaseUrl.includes('telegram.org') || lowercaseUrl.includes('t.me')) {
+        return { sourceType: 'Social Media', source: 'Telegram' };
+    }
+    if (lowercaseUrl.includes('whatsapp.com') || lowercaseUrl.includes('wa.me')) {
+        return { sourceType: 'Social Media', source: 'WhatsApp' };
+    }
+    if (lowercaseUrl.includes('twitch.tv')) {
+        return { sourceType: 'Social Media', source: 'Twitch' };
+    }
+    if (lowercaseUrl.includes('radiant') || lowercaseUrl.includes('radiant.social')) {
+        return { sourceType: 'Social Media', source: 'Radiant' };
+    }
+    return null;
+};
+
 export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalProps) {
     const t = useTranslations('ManualEntry');
 
@@ -72,6 +141,8 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         setIsLoading(true);
 
         try {
+            const sanitizedUrl = sanitizeUrl(formData.url);
+
             // Format date to DD/MM/YYYY
             const [year, month, day] = formData.date.split('-');
             const formattedDate = `${day}/${month}/${year}`;
@@ -87,8 +158,8 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
 
             await saveArticle({
                 keyword: 'Manual',
-                url: formData.url || 'http://manual-entry.local',
-                resolvedUrl: formData.url || 'http://manual-entry.local',
+                url: sanitizedUrl || 'http://manual-entry.local',
+                resolvedUrl: sanitizedUrl || 'http://manual-entry.local',
                 publishedDate: formattedDate,
                 title: formData.title,
                 content: formData.content,
@@ -140,12 +211,49 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
         }
     };
 
+    const handleUrlBlur = () => {
+        const sanitized = sanitizeUrl(formData.url);
+        if (sanitized !== formData.url) {
+            setFormData(prev => ({ ...prev, url: sanitized }));
+        }
+        
+        if (sanitized) {
+            const detected = detectSocialMedia(sanitized);
+            if (detected) {
+                setFormData(prev => ({
+                    ...prev,
+                    url: sanitized,
+                    sourceType: detected.sourceType,
+                    source: prev.source || detected.source
+                }));
+            }
+        }
+    };
+
     const handleExtract = async () => {
-        if (!formData.url || !isAuthenticated) return;
+        const sanitized = sanitizeUrl(formData.url);
+        if (!sanitized || !isAuthenticated) return;
+
+        // Auto-sanitize URL in form
+        setFormData(prev => ({ ...prev, url: sanitized }));
+
+        // Intercept social media
+        const detected = detectSocialMedia(sanitized);
+        if (detected) {
+            setFormData(prev => ({
+                ...prev,
+                url: sanitized,
+                sourceType: detected.sourceType,
+                source: prev.source || detected.source
+            }));
+            alert(t('social_extract_warning'));
+            return;
+        }
+
         setIsExtracting(true);
 
         try {
-            const result = await extractArticle({ url: formData.url, analyze: true });
+            const result = await extractArticle({ url: sanitized, analyze: true });
             if (result.success && result.data) {
                 const data = result.data;
                 const d = data.publish_date ? new Date(data.publish_date) : new Date();
@@ -300,10 +408,11 @@ export default function ManualEntryModal({ isOpen, onClose }: ManualEntryModalPr
                                 <input
                                     id="article_url"
                                     name="article_url"
-                                    type="url"
+                                    type="text"
                                     placeholder="https://..."
                                     value={formData.url}
                                     onChange={e => setFormData({ ...formData, url: e.target.value })}
+                                    onBlur={handleUrlBlur}
                                     autoComplete="url"
                                     className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
                                 />

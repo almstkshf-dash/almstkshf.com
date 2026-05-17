@@ -127,6 +127,7 @@
     "fetch_article": "Fetch & Auto-Analyze",
     "extracting": "Extracting...",
     "extract_failed": "We couldn't extract the content automatically from the provided link. Ensure the URL is public and correct, or paste the content manually into the text field.",
+    "social_extract_warning": "Social media links cannot be automatically extracted due to platform restrictions. Please fill in the details manually.",
     "not_authenticated": "Not authenticated. Please sign in first."
   },
   "Notifications": {
