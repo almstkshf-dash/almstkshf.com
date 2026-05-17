@@ -1470,3 +1470,9 @@ export const fetchPressReleaseSources = action({
     },
 });
 
+
+export const testAction = action({ args: {}, handler: async () => { const parser = new Parser(); return "ok"; } });
+
+export const testCheerio = action({ args: {}, handler: async () => { const ch = require('cheerio'); return 'ok'; } });
+
+export const testRssParser = action({ args: {}, handler: async () => { const Parser = require('rss-parser'); const parser = new Parser(); return 'ok'; } });

@@ -92,37 +92,50 @@ const ArticleRow = memo(({
                 {article.publishedDate}
             </td>
             <td className="p-4 max-w-sm">
-                <div className="flex flex-col gap-1 items-start rtl:items-end">
-                    <a
-                        href={article.resolvedUrl || article.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-semibold text-foreground hover:text-blue-800 transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
-                        dir="auto"
-                    >
-                        <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
-                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" aria-hidden="true" />
-                    </a>
-                    <div className="flex items-center gap-2 flex-wrap" dir="auto">
-                        <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${theme}`}>
-                            {getSourceIcon(article.sourceType)}
-                            {article.sourceType === 'Press Release' ? t('types.press_release') :
-                                article.sourceType === 'Online News' ? t('types.online_news') :
-                                    article.sourceType === 'Social Media' ? t('types.social_media') :
-                                        article.sourceType === 'Blog' ? t('types.blog') :
-                                            article.sourceType === 'Print' ? t('types.print') :
-                                                article.sourceType}
-                        </span>
-                        <span className="text-[10px] text-foreground/80 dark:text-slate-200 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
-                            <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-                            {article.sourceCountry || article.country}
-                        </span>
-                        {article.imageUrl && <ImageIcon className="w-3 h-3 text-status-info-fg/70" aria-hidden="true" />}
-                        {article.isManual && (
-                            <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
-                                {t('manual')}
+                <div className="flex items-center gap-3">
+                    {article.imageUrl && (
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted/40 border border-border group-hover:border-primary/30 transition-colors shadow-sm">
+                            <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
+                                onError={(e) => {
+                                    (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                                }}
+                            />
+                        </div>
+                    )}
+                    <div className="flex flex-col gap-1 items-start rtl:items-end flex-grow">
+                        <a
+                            href={article.resolvedUrl || article.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-semibold text-foreground hover:text-blue-800 transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
+                            dir="auto"
+                        >
+                            <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
+                            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" aria-hidden="true" />
+                        </a>
+                        <div className="flex items-center gap-2 flex-wrap" dir="auto">
+                            <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${theme}`}>
+                                {getSourceIcon(article.sourceType)}
+                                {article.sourceType === 'Press Release' ? t('types.press_release') :
+                                    article.sourceType === 'Online News' ? t('types.online_news') :
+                                        article.sourceType === 'Social Media' ? t('types.social_media') :
+                                            article.sourceType === 'Blog' ? t('types.blog') :
+                                                article.sourceType === 'Print' ? t('types.print') :
+                                                    article.sourceType}
                             </span>
-                        )}
+                            <span className="text-[10px] text-foreground/80 dark:text-slate-200 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
+                                <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
+                                {article.sourceCountry || article.country}
+                            </span>
+                            {article.isManual && (
+                                <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
+                                    {t('manual')}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </td>

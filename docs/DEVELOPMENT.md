@@ -410,3 +410,18 @@ To maximize coverage and guarantee 100% uptime for social media news tracking, t
    ```
 3. Update both `messages/en.json` and `messages/ar.json` under `"RssSources"` namespace with safe keys (using underscores instead of dots to prevent key nesting errors).
 
+---
+
+## 19. PDF Image Proxy & Visual Thumbnails
+
+When rendering external images (like news thumbnails) inside standard HTML elements (`img`), the browser usually handles cross-domain policies automatically (or fails gracefully with `onError`). However, generating PDF exports (`generatePressReleasePDF` and `generateMediaMonitoringPDF`) via client-side `jsPDF` requires downloading the raw image blob via `fetch()`, which is strictly blocked by browser CORS security policies.
+
+### Server-Side Proxy Strategy
+To bypass CORS blocks natively and enable high-fidelity image rendering within PDF exports:
+- Do not call `fetch(imageUrl)` directly on third-party domains.
+- Instead, utilize the built-in server proxy endpoint: `fetch('/api/proxy-image?url=' + encodeURIComponent(imageUrl))`.
+- The Next.js server route securely resolves the image from the external host, forwarding it back to the client as a clean local payload.
+- Convert the resulting blob into a base64 string using `FileReader`.
+
+### Dynamic Format Resolution
+Always dynamically resolve the `data:image/` MIME type back to standard uppercase formats (like `PNG` or `JPEG`) before injecting it into jsPDF's `addImage` function. This prevents rendering crashes caused by invalid byte parsing.

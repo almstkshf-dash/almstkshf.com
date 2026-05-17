@@ -304,21 +304,17 @@ export class ReportGenerator {
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false) {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF();
 
-        // Pre-load images to base64
+        // Pre-load images to base64 using local CORS-bypassing proxy
         const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
             if (!a.imageUrl) return a;
             // If it's already base64, keep it
             if (a.imageUrl.startsWith('data:')) return a;
 
             try {
-                const response = await fetch(a.imageUrl, { mode: 'no-cors' });
-                // Note: no-cors fetch won't allow reading the body for images. 
-                // We typically need a proxy or the image must be on the same domain or have CORS.
-                // For manual entries, it's already base64, so it works perfectly.
-                // For external news, we'll try standard fetch first.
-                const corsResponse = await fetch(a.imageUrl).catch(() => null);
-                if (corsResponse && corsResponse.ok) {
-                    const blob = await corsResponse.blob();
+                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
                     const reader = new FileReader();
                     const b64 = await new Promise<string>((resolve) => {
                         reader.onloadend = () => resolve(reader.result as string);
@@ -388,10 +384,12 @@ export class ReportGenerator {
                     const img = articlesWithImages[data.row.index].imageUrl;
                     if (img && img.startsWith('data:')) {
                         try {
+                            const matches = img.match(/^data:image\/([a-zA-Z+]+);base64,/);
+                            const format = matches ? matches[1].toUpperCase() : 'JPEG';
                             const padding = 2;
                             doc.addImage(
                                 img,
-                                'JPEG',
+                                format === 'PNG' ? 'PNG' : 'JPEG',
                                 data.cell.x + padding,
                                 data.cell.y + padding,
                                 data.cell.width - (padding * 2),
@@ -999,6 +997,29 @@ export class ReportGenerator {
 
         const logoBase64 = await this.loadLogo();
 
+        // Pre-load images to base64 for up to top 50 articles using local CORS proxy
+        const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
+            if (idx >= 50 || !a.imageUrl) return a;
+            if (a.imageUrl.startsWith('data:')) return a;
+
+            try {
+                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    const b64 = await new Promise<string>((resolve) => {
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(blob);
+                    });
+                    return { ...a, imageUrl: b64 };
+                }
+            } catch (e) {
+                console.warn("Could not pre-load image for report:", a.imageUrl);
+            }
+            return a;
+        }));
+
         const addText = (text: string, x: number, y: number, options: { align?: 'center' | 'right' | 'left' } = {}) => {
             doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
             const processedText = this.fixArabic(text);
@@ -1136,10 +1157,11 @@ export class ReportGenerator {
         doc.setTextColor(...BRAND_DARK);
         addText(translations.coverage_log || 'Media Coverage Log', pageWidth - 14, 28, { align: 'right' });
 
-        const tableData = articles.map(a => {
+        const tableData = articlesWithImages.map(a => {
             const parsedTitle = this.fixArabic(a.title);
             const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
             return [
+                '', // Image column placeholder
                 a.publishedDate ?? '',
                 parsedTitle + hashStr,
                 a.sourceType ?? '',
@@ -1157,6 +1179,7 @@ export class ReportGenerator {
 
         await this.addAutoTable(doc, {
             head: [[
+                '', // Image header
                 translations.date || 'Publication Date',
                 translations.title || 'Title',
                 translations.type || 'Source Type',
@@ -1179,18 +1202,41 @@ export class ReportGenerator {
                 this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
             },
             columnStyles: {
-                0: { cellWidth: 15 },
-                1: { cellWidth: 55, halign: 'left' },
-                2: { cellWidth: 20 },
-                3: { cellWidth: 15, halign: 'center' },
+                0: { cellWidth: 15 }, // Image cell width
+                1: { cellWidth: 15 },
+                2: { cellWidth: 50, halign: 'left' },
+                3: { cellWidth: 20 },
                 4: { cellWidth: 15, halign: 'center' },
-                5: { cellWidth: 12, halign: 'center' },
-                6: { cellWidth: 15, halign: 'right' },
-                7: { cellWidth: 12, halign: 'right' },
+                5: { cellWidth: 15, halign: 'center' },
+                6: { cellWidth: 12, halign: 'center' },
+                7: { cellWidth: 15, halign: 'right' },
                 8: { cellWidth: 12, halign: 'right' },
                 9: { cellWidth: 12, halign: 'right' },
-                10: { cellWidth: 15, halign: 'right' },
-                11: { cellWidth: 15, halign: 'center' },
+                10: { cellWidth: 12, halign: 'right' },
+                11: { cellWidth: 15, halign: 'right' },
+                12: { cellWidth: 15, halign: 'center' },
+            },
+            didDrawCell: (data: any) => {
+                if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
+                    const img = articlesWithImages[data.row.index].imageUrl;
+                    if (img && img.startsWith('data:')) {
+                        try {
+                            const matches = img.match(/^data:image\/([a-zA-Z+]+);base64,/);
+                            const format = matches ? matches[1].toUpperCase() : 'JPEG';
+                            const padding = 2;
+                            doc.addImage(
+                                img,
+                                format === 'PNG' ? 'PNG' : 'JPEG',
+                                data.cell.x + padding,
+                                data.cell.y + padding,
+                                data.cell.width - (padding * 2),
+                                data.cell.height - (padding * 2)
+                            );
+                        } catch (e) {
+                            // Skip if image is invalid
+                        }
+                    }
+                }
             }
         });
 
@@ -1285,6 +1331,29 @@ export class ReportGenerator {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Report');
 
+        // Pre-load images to base64 using local CORS-bypassing proxy (limit to 100 for Excel to prevent massive file bloat)
+        const articlesWithImages = await Promise.all(articles.slice(0, 100).map(async (a) => {
+            if (!a.imageUrl) return a;
+            if (a.imageUrl.startsWith('data:')) return a;
+
+            try {
+                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    const b64 = await new Promise<string>((resolve) => {
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(blob);
+                    });
+                    return { ...a, imageUrl: b64 };
+                }
+            } catch (e) {
+                console.warn("Could not pre-load image for excel:", a.imageUrl);
+            }
+            return a;
+        }));
+
         // Detect if we should use RTL for the sheet
         const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '');
         if (isArabicMode) {
@@ -1292,6 +1361,7 @@ export class ReportGenerator {
         }
 
         sheet.columns = [
+            { header: translations.Reports?.col_image || 'Image', key: 'image', width: 15 },
             { header: translations.Reports?.col_date || 'Publication Date', key: 'date', width: 15 },
             { header: translations.Reports?.col_title || 'Title', key: 'title', width: 50 },
             { header: translations.Reports?.col_source || 'Source', key: 'source', width: 20 },
@@ -1303,14 +1373,50 @@ export class ReportGenerator {
         headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
         headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
 
-        articles.forEach(a => {
-            sheet.addRow({
+        articlesWithImages.forEach(a => {
+            const row = sheet.addRow({
+                image: '', // Image placeholder
                 date: a.publishedDate,
                 title: a.title,
                 source: a.source,
                 reach: a.reach,
                 ave: a.ave
             });
+            row.height = 40; // Expand height for thumbnail
+            row.alignment = { vertical: 'middle', wrapText: true };
+
+            if (a.imageUrl && a.imageUrl.startsWith('data:')) {
+                try {
+                    const matches = a.imageUrl.match(/^data:image\/([a-zA-Z+]+);base64,/);
+                    const format = matches ? matches[1].toLowerCase() : 'jpeg';
+                    const base64Data = a.imageUrl.split(',')[1];
+                    
+                    const imageId = workbook.addImage({
+                        base64: base64Data,
+                        extension: format === 'png' ? 'png' : 'jpeg',
+                    });
+
+                    sheet.addImage(imageId, {
+                        tl: { col: 0, row: row.number - 1 }, // 0-indexed positioning relative to cell corner
+                        ext: { width: 45, height: 45 }
+                    });
+                } catch (e) {
+                    console.warn("Could not embed image into excel sheet", e);
+                }
+            }
+        });
+
+        // Add remaining articles without images
+        articles.slice(100).forEach(a => {
+            const row = sheet.addRow({
+                image: '',
+                date: a.publishedDate,
+                title: a.title,
+                source: a.source,
+                reach: a.reach,
+                ave: a.ave
+            });
+            row.alignment = { vertical: 'middle', wrapText: true };
         });
 
         if (returnOnly) {

@@ -31,6 +31,7 @@ import type * as queries from "../queries.js";
 import type * as searchOptimizer from "../searchOptimizer.js";
 import type * as settings from "../settings.js";
 import type * as terroristList from "../terroristList.js";
+import type * as testAction from "../testAction.js";
 import type * as userActions from "../userActions.js";
 import type * as userSettings from "../userSettings.js";
 import type * as utils_aiRetry from "../utils/aiRetry.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   searchOptimizer: typeof searchOptimizer;
   settings: typeof settings;
   terroristList: typeof terroristList;
+  testAction: typeof testAction;
   userActions: typeof userActions;
   userSettings: typeof userSettings;
   "utils/aiRetry": typeof utils_aiRetry;

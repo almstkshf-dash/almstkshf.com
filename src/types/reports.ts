@@ -12,6 +12,7 @@ export interface ReportTranslations {
         pr_title?: string;
         deep_title?: string;
         osint_title?: string;
+        col_image?: string;
         col_date?: string;
         col_title?: string;
         col_source?: string;
