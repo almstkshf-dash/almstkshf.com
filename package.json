@@ -108,6 +108,9 @@
   "overrides": {
     "rimraf": "^5.0.5",
     "glob": "^13.0.0",
-    "inflight": "npm:lru-cache@^10.2.2"
+    "inflight": "npm:lru-cache@^10.2.2",
+    "unzipper": "^0.12.3",
+    "encoding-sniffer": "^1.0.2",
+    "fast-csv": "^5.0.7"
   }
 }
