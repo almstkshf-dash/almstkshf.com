@@ -142,7 +142,11 @@ export default function RssFeeder({
   const translateSourceName = (name: string | undefined): string => {
     if (!name) return t('title');
     try {
-      return tSources(name);
+      const sanitizedKey = name.replace(/\./g, '_');
+      if (tSources.has(sanitizedKey)) {
+        return tSources(sanitizedKey);
+      }
+      return name;
     } catch {
       return name;
     }
