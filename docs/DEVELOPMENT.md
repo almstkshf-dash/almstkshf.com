@@ -458,3 +458,117 @@ To maintain high standards of code stability and a clean compiler profile:
 - **Dynamic Models & TFJS Laziness**: In client-side ML processors (like `mlHelper.ts`), tensorflow/biometric models must be typed as `any` due to dynamic environment loading constraints, avoiding `unknown` restrictions on inference methods.
 - **Convex Custom Identifiers**: Handlers dealing with DB entities (e.g. notifications dropdowns) should use flexible typings like `any` or explicit `Id<"table">` generics when mapping variables directly to Convex mutation interfaces, resolving strict schema validation errors.
 
+---
+
+## 22. Recharts ResponsiveContainer & Next.js Preloading Optimizations
+
+To maintain a zero-warning console log profile in production and development:
+
+### Recharts "width(-1) and height(-1) of chart should be greater than 0" Resolution
+- **Cause**: Recharts' `<ResponsiveContainer>` initializes with `{ width: -1, height: -1 }` before the standard `ResizeObserver` evaluates parent pixel sizes. If child charts (e.g., `AreaChart`, `RadarChart`, `PieChart`) attempt to render before this measurement is complete, Recharts will print dimensions warnings.
+- **Solution**: Always configure the `initialDimension` prop on `<ResponsiveContainer>` components to match their layout fallbacks:
+  - `ArticlesTrendChart.tsx`: `initialDimension={{ width: 10, height: 160 }}` (matches 160px height).
+  - `EmotionRadarChart.tsx` & `SentimentDonutChart.tsx`: `initialDimension={{ width: 10, height: 300 }}` (matches 300px height).
+  - `ReportsChart.tsx`: `initialDimension={{ width: 440, height: 220 }}` (matches 2:1 aspect ratio constraint).
+
+### Dynamic Dynamic Preloading Interception
+- **Cause**: Standard root layouts (`layout.tsx`) preloading page-specific textures (like `/noise.svg`) will trigger browser "resource was preloaded but not used" console warnings on clean interior subpages (like dashboards, Stripe checkout, etc.).
+- **Solution**: Never preload highly localized, section-specific images globally. Instead, call `ReactDOM.preload('/noise.svg', { as: 'image' })` dynamically within the specific component that renders them (e.g. `HeroSection.tsx` for the home page). Keep only global layout requirements (like `/logo.png`) in the root `layout.tsx`.
+
+---
+
+## 23. Next.js API Cron Job (standard-sweep) & RSS Ingestion Engine
+
+To support automated background media sweeps via Vercel Cron, the application implements a background pipeline under `/api/cron/standard-sweep` which fetches registered RSS feeds and updates the database via `/api/monitor`:
+
+### Dynamic Base URL Resolution
+- In serverless server environments, `process.env.NEXT_PUBLIC_APP_URL` can be unreliable.
+- To prevent `connect ECONNREFUSED 127.0.0.1:3000` failures, the sweep route dynamically resolves its hosting domain using `new URL(request.url).origin` for all internal self-calls to the monitor API.
+
+### Relative Redirect Support in RSS Connection Engine
+- Some premium publishers (e.g. *The National*) return relative HTTP redirects (e.g., `/rss/`).
+- The manual connection engine inside `rss-engine.ts` resolves these redirects against the target feed's base URL using the standard `new URL(fixedLocation, url).toString()` constructor, ensuring robust connection resolution.
+
+### Graceful Vercel Blob Token Handling
+- To prevent missing `BLOB_READ_WRITE_TOKEN` warning spam in development environments or localized builds, `uploadImageToBlob` instantly short-circuits and returns the original image URL if the token is not present. This keeps system logs clean and clutter-free.
+
+---
+
+## 24. Saved Collections UI & Report Library Integration
+
+To bridge the gap between saved search articles (via `SaveToCollectionModal`) and dashboard accessibility, the Central Media Repository (`/media-monitoring/central-media-repository`) incorporates the `ReportLibrary` component inside a premium, glassmorphic segmented tabbed switcher:
+
+### Tabbed Switcher Layout
+- **Saved Collections (Active Library)**: Default active tab. Displays `<ReportLibrary />` providing real-time search, category filtering, and direct PDF generation of saved reports using `ReportGenerator`.
+- **System Specifications & Overview**: Displays standard Almstkshf enterprise hub features, bulk uploading breakdowns, facial recognition specifications, and premium CTAs.
+- Uses smooth dynamic transitions powered by `framer-motion`'s `<AnimatePresence>` for an organic, responsive app experience.
+
+### Arabic Localization & Logical Layout Mirroring
+- **CSS Logical Properties**: The search input element in `ReportLibrary.tsx` has been transitioned to fully use CSS logical spacing properties (`left-3` -> `start-3`, `pl-10` -> `ps-10`, `pr-4` -> `pe-4`). This aligns with standard Arabic specification guidelines, ensuring that search icons and text paddings dynamically swap their spatial directions between English (LTR) and Arabic (RTL).
+- **Directional Icon Mirroring**: The primary transition chevron / arrow icons (e.g., `ArrowRight` inside capabilities learning actions) are configured with the `.rtl-mirror` class, automatically mirroring directional visual flow for Arabic users.
+
+---
+
+## 25. SimilarWeb API Integration & Domain Reach Estimation
+
+To bring high-fidelity traffic-based reach estimations for digital news media sources (which is standard for social media but not normally available for general online news), the application utilizes a premium SimilarWeb API integration:
+
+### Integration Strategy & Flow
+1. **API Key Setup**: Administrators can add their `SIMILARWEB_API_KEY` (configured in the database settings object under `similarweb`) under **System Settings** -> **News** (tab `ai`) or `/dashboard/settings/api-keys`.
+2. **Domain Traffic Retrieval**: In `monitoringAction.ts`, when a digital article is parsed, the engine extracts the base domain (e.g. `skynewsarabia.com`).
+3. **Smart Caching Layer**: The system queries the `similarweb_domain_traffic` database cache first. If a recent monthly traffic record for the domain is found, it is reused.
+4. **SimilarWeb Fetch**: If no cache entry exists, the action initiates an external HTTPS request to `api.similarweb.com/v1/website/${domain}/total-traffic-and-engagement/visits` to retrieve the monthly world visits.
+5. **Visits-to-Reach Formula**: The retrieved monthly domain visits are divided by `100` (`Visits / 100`) to compute a realistic "Article Reach", providing instant estimation parity with social media.
+6. **Robust Fallback**: If the key is not set, or the limit is hit, or the domain has no recorded traffic, the system falls back to standard default values, keeping sweeps resilient and fully error-free.
+
+---
+
+## 26. White Label & Custom Branding
+
+To enable premium brand styling and reports customization across exported PDF and Excel reports:
+- **Database Schema**: Added `brandName`, `brandTagline`, and `footerUrl` optionally to `settings` in `convex/schema.ts`.
+- **General Settings**: The settings management page (`/dashboard/settings`) contains a dedicated **White Label & Custom Branding** grid panel allowing standard and professional tier users to save their brand logo, name, tagline, and custom footer domain.
+- **Export Integration**: Dynamic branding values are resolved in `src/lib/report-generator.ts` which loads custom logos (with clean fallback to system assets), custom taglines on report cover pages, and custom footer domains on page numbers. Both `ReportLibrary.tsx` (for collection downloads) and `MediaMonitoringDashboard.tsx` (for direct dashboard exports) query global settings and pass branding parameters automatically.
+
+---
+
+## 27. Next-intl Translation Namespace & Template Formatting Constraints
+
+To ensure zero console and runtime errors when rendering localized components with dynamic variables:
+- **Correct Translation Namespace Access**: The export settings configuration (e.g. `exportTranslations`) in components must strictly bind to the modern root namespace `"Export"` instead of deprecated hierarchical sub-namespaces (such as `"MediaMonitoring.dashboard.export_translations"`). Accessing keys through incorrect namespaces will throw `MISSING_MESSAGE` exceptions.
+- **Required Variable Injection**: For localized strings that contain parameter placeholders (e.g., `"generated_at": "تاريخ الإصدار: {date}"` or `"page_count": "Page {current} / {total}"`), standard next-intl rendering requires passing the expected template variables. When translating configurations that will be evaluated later at the utility/library level (such as in `ReportGenerator.ts`), you must explicitly forward raw placeholder tags by calling:
+  ```typescript
+  generated_at: tExport('generated_at', { date: '{date}' }),
+  page_count: tExport('page_count', { current: '{current}', total: '{total}' })
+  ```
+  This avoids immediate `FORMATTING_ERROR` exceptions during translation lookup in parent components while retaining full template variable functionality in the down-stream generator.
+
+---
+
+## 28. Manual Social Entry & Persistent Coverage Editing
+
+To support comprehensive media monitoring campaigns across online, offline, and social media channels:
+- **Unified Schema Field**: Added `publisherUsername` (Publisher Account Name) field to the schema and database models.
+- **Full Social Coverage Entry**: The manual article entry form supports all platform details including title, content, custom image URLs, source type, country, language, sentiment direction, reach, AVE, and publisher account name.
+- **Persistent Media Editing UI**: Implements direct editing inside the Coverage Log table. Users can click the edit icon on any row to open the editing sheet, modify metrics, update metadata (such as the Publisher Account Name), and save changes instantly back to the database via the `updateArticle` Convex mutation.
+- **Arabic Translation & Directional Layout**: Supported in both English and Arabic translations for manual entry, editing dialogs, table grids, and exported PDF/Excel sheets. RTL sheets views are automatically enabled for Arabic exports, keeping the dashboard and generated assets professional and fully compliant.
+
+## 29. Windows Local Development & Convex ESM Absolute Path Resolution
+
+When developing locally on Windows, Convex's local backend (ephemeral or dev server) runs sandboxed functions inside a Node.js process using dynamic `import()`. Node's default ESM loader on Windows expects absolute paths to have a valid `file://` scheme, and throws an error if an absolute path starts with a drive letter protocol (`c:`):
+`Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol 'c:'`
+
+### Solution & Cross-Platform Best Practices
+1. **Reduce "use node" Directives**: Only apply `"use node";` to files that absolutely require Node.js core libraries (like `rss-parser`, `cheerio` or `xml2js` when pulling feeds in `monitoringAction.ts`).
+2. **Remove Node dependencies from utils & utilities**: Ensure utility helpers (like QStash publishers, database key resolvers, deduplication engines, and query/action triggers) are written using cross-platform standard JavaScript and Web APIs.
+   - For example, `searchOptimizer.ts` and `osint.ts` now execute entirely inside standard Convex V8 runtime, making them extremely fast and avoiding any Windows local backend compatibility issues.
+3. **Pure JS Cryptographic Hashing**:
+   - For **MD5**: Replaced the Node.js core `crypto` dependency inside helper functions with a pure JavaScript MD5 implementation.
+   - For **SHA-256**: Replaced `createHash` imports with standard globally-available Web Crypto:
+     ```typescript
+     const data = new TextEncoder().encode(raw);
+     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+     const hashArray = Array.from(new Uint8Array(hashBuffer));
+     const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+     ```
+This keeps backend code ultra-portable, dramatically improves execution speed, and guarantees that local testing on Windows matches production deployment behavior perfectly.

@@ -40,9 +40,9 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
     return (
         <div className="relative w-full h-[160px] min-h-[160px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={160} minWidth={10} debounce={100}>
-                    <AreaChart 
-                        data={data} 
+                <ResponsiveContainer width="100%" height="100%" minHeight={160} minWidth={10} debounce={100} initialDimension={{ width: 10, height: 160 }}>
+                    <AreaChart
+                        data={data}
                         margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                         role="img"
                         aria-label="Article volume trend chart over time"
@@ -53,15 +53,15 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
                                 <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <XAxis 
-                            dataKey="date" 
+                        <XAxis
+                            dataKey="date"
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
                             interval="preserveStartEnd"
                             minTickGap={20}
                         />
-                        <YAxis 
+                        <YAxis
                             axisLine={false}
                             tickLine={false}
                             tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
@@ -79,10 +79,10 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
                             labelStyle={{ color: "var(--popover-foreground)", fontWeight: 700 }}
                             itemStyle={{ color: "var(--popover-foreground)", fontWeight: 600 }}
                         />
-                        <CartesianGrid 
-                            strokeDasharray="3 3" 
-                            vertical={false} 
-                            stroke="var(--border)" 
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            vertical={false}
+                            stroke="var(--border)"
                             opacity={0.3}
                         />
                         <Area

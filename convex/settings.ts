@@ -39,6 +39,9 @@ export const getSettings = query({
             _creationTime: settings._creationTime,
             type: settings.type,
             logoUrl: settings.logoUrl,
+            brandName: settings.brandName,
+            brandTagline: settings.brandTagline,
+            footerUrl: settings.footerUrl,
             defaults: settings.defaults,
             apiKeys: undefined as any, // Tell TS this property exists but is undefined
         };
@@ -59,6 +62,9 @@ export const getSystemSettings = internalQuery({
 export const updateSettings = mutation({
     args: {
         logoUrl: v.optional(v.string()),
+        brandName: v.optional(v.string()),
+        brandTagline: v.optional(v.string()),
+        footerUrl: v.optional(v.string()),
         apiKeys: v.object({
             gemini: v.optional(v.string()),
             instagram: v.optional(v.string()),
@@ -92,6 +98,7 @@ export const updateSettings = mutation({
             opensanctions: v.optional(v.string()), // For Watchlist checks
             diffbot: v.optional(v.string()),
             zenrows: v.optional(v.string()),
+            similarweb: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),

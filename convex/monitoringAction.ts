@@ -988,6 +988,91 @@ function sanitizeSourceType(val: string | undefined): ValidSourceType {
     return "Online News";
 }
 
+/**
+ * Helper to get reach for an article based on domain traffic from SimilarWeb, with fallbacks.
+ */
+async function getArticleReach(
+    ctx: any,
+    urlStr: string,
+    sourceType: string,
+    aiReachEstimate: number
+): Promise<{ reach: number; source: string }> {
+    const validReachTypes = ["Online News", "Blog", "Press Release"];
+    if (!validReachTypes.includes(sourceType)) {
+        return { reach: aiReachEstimate || 15000, source: "ai" };
+    }
+
+    try {
+        const url = new URL(urlStr);
+        let domain = url.hostname.toLowerCase();
+        if (domain.startsWith("www.")) {
+            domain = domain.substring(4);
+        }
+
+        if (!domain) {
+            return { reach: aiReachEstimate || 50000, source: "fallback" };
+        }
+
+        // 1. Check if SimilarWeb API Key is configured
+        const similarwebKey = await resolveApiKey(ctx, "SIMILARWEB_API_KEY", "similarweb");
+        if (!similarwebKey || similarwebKey === "None") {
+            return { reach: aiReachEstimate || 50000, source: "ai_no_key" };
+        }
+
+        // 2. Check if we have cached traffic volume for this domain
+        const cached = await ctx.runQuery(api.monitoring.getCachedDomainTraffic, { domain });
+        const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+        let monthlyVisits: number | null = null;
+
+        if (cached && (Date.now() - cached.lastFetchedAt) < THIRTY_DAYS) {
+            console.log(`[SimilarWeb Cache] Found cached traffic for ${domain}: ${cached.monthlyVisits} visits`);
+            monthlyVisits = cached.monthlyVisits;
+        } else {
+            // 3. Fetch from SimilarWeb API
+            console.log(`[SimilarWeb API] Fetching traffic for ${domain}...`);
+            const apiUrl = `https://api.similarweb.com/v1/website/${encodeURIComponent(domain)}/total-traffic-and-engagement/visits?api_key=${encodeURIComponent(similarwebKey)}&country=world&granularity=monthly`;
+            
+            const response = await fetch(apiUrl, {
+                headers: { "Accept": "application/json" }
+            });
+
+            if (response.ok) {
+                const data = await response.json() as any;
+                if (data && Array.isArray(data.visits) && data.visits.length > 0) {
+                    const sortedVisits = [...data.visits].sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                    const latestPeriod = sortedVisits[sortedVisits.length - 1];
+                    if (latestPeriod && typeof latestPeriod.visits === "number") {
+                        monthlyVisits = latestPeriod.visits;
+                        console.log(`[SimilarWeb API] Traffic for ${domain}: ${monthlyVisits} visits`);
+                        
+                        // Save to cache
+                        await ctx.runMutation(api.monitoring.saveCachedDomainTraffic, {
+                            domain,
+                            monthlyVisits
+                        });
+                    }
+                }
+            } else {
+                console.warn(`[SimilarWeb API] Error or no data for ${domain}: ${response.statusText} (${response.status})`);
+            }
+        }
+
+        if (monthlyVisits !== null && monthlyVisits > 0) {
+            // Estimate article reach as 1% of the domain's monthly visits, bounded between 1,000 and 10,000,000.
+            let reachVal = Math.round(monthlyVisits / 100);
+            if (reachVal < 1000) reachVal = 1000;
+            if (reachVal > 10000000) reachVal = 10000000;
+            
+            console.log(`[SimilarWeb Reach] Domain monthly visits: ${monthlyVisits} => Article Reach (Visits/100): ${reachVal}`);
+            return { reach: reachVal, source: "similarweb" };
+        }
+    } catch (err) {
+        console.error(`[SimilarWeb Reach Estimation] Failed for ${urlStr}:`, err);
+    }
+
+    return { reach: aiReachEstimate || 50000, source: "ai_fallback" };
+}
+
 async function processArticle(
     ctx: any,
     item: any,
@@ -1075,7 +1160,17 @@ async function processArticle(
             stList
         );
 
-        const reach = aiData.reach_estimate || 50000;
+        const parsedSourceType = sanitizeSourceType(forceSourceType || aiData.sourceType);
+        
+        // SimilarWeb-based Reach lookup
+        const reachResult = await getArticleReach(
+            ctx,
+            resolvedUrl || item.link,
+            parsedSourceType,
+            aiData.reach_estimate
+        );
+
+        const reach = reachResult.reach;
         const ave = Math.round(reach * 0.02 * 5);
         const d = pubDate || new Date();
         const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
@@ -1094,7 +1189,7 @@ async function processArticle(
             content: aiData.summary || item.title,
             language: language as "EN" | "AR",
             sentiment: aiData.sentiment,
-            sourceType: sanitizeSourceType(forceSourceType || aiData.sourceType),
+            sourceType: parsedSourceType,
             sourceCountry: country,
             source: sourceName || new URL(resolvedUrl || item.link).hostname,
             tone: aiData.tone,

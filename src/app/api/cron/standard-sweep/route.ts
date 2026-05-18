@@ -55,7 +55,7 @@ export async function GET(request: Request) {
 
                         // Send to /api/monitor to handle Gemini analysis and AVE calculations
                         // We use the existing API so we don't duplicate logic.
-                        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+                        const baseUrl = new URL(request.url).origin;
                         await fetch(`${baseUrl}/api/monitor`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },

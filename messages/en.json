@@ -153,6 +153,7 @@
     "delete": "Delete",
     "save": "Save",
     "loading": "Loading...",
+    "downloading": "Downloading report...",
     "error": "System Error",
     "success": "Success",
     "app_name": "ALMSTKSHF",
@@ -681,13 +682,19 @@
         "subtitle": "Join elite government and media organizations using AlMstkshf to secure their digital history.",
         "button": "Request a Demo"
       },
+      "tabs": {
+        "saved_collections": "Saved Collections",
+        "capabilities": "System Specifications"
+      },
       "library": {
         "search_placeholder": "Search reports...",
         "search_label": "Search reports",
         "filter": "Filter",
         "recent_first": "Recent First",
         "no_results": "No reports found matching your search.",
-        "preview": "Preview"
+        "preview": "Preview",
+        "empty_collection": "This collection is empty.",
+        "no_exportable_items": "No media monitoring coverage found in this collection."
       }
     },
     "dashboard": {
@@ -1129,6 +1136,7 @@
     "serper_key": "Serper.dev API Key",
     "diffbot_key": "Diffbot API Key",
     "zenrows_key": "ZenRows API Key",
+    "similarweb_key": "SimilarWeb API Key",
     "phyllo_client_id": "Phyllo Client ID",
     "phyllo_client_secret": "Phyllo Client Secret",
     "defaults": "Default Metrics",
@@ -1195,7 +1203,14 @@
     "placeholder_countries": "AE, SA, EG",
     "search_countries": "Search countries...",
     "selected": "selected",
-    "clear_all": "Clear All"
+    "clear_all": "Clear All",
+    "white_label_branding": "White Label & Custom Branding",
+    "brand_name": "Brand Name",
+    "brand_name_hint": "Custom brand name displayed in exported PDF/Excel headers.",
+    "brand_tagline": "Brand Tagline",
+    "brand_tagline_hint": "Custom brand description or tagline for cover pages.",
+    "footer_url": "Footer Domain / URL",
+    "footer_url_hint": "Custom footer URL linked at the bottom of all report pages."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -1696,13 +1711,14 @@
     "depth": "Depth",
     "country": "Country",
     "sentiment": "Sentiment",
-    "relevancy": "Relevancy",
+    "relevancy": "Relevancy Score",
     "reach": "Reach",
     "likes": "Likes",
     "retweets": "Retweets",
     "replies": "Replies",
     "status": "Status",
     "ave": "AVE ($)",
+    "hashtags": "Hashtags",
     "brand_name": "ALMSTKSHF",
     "brand_tagline": "Media Monitoring & Development",
     "footer_url": "www.almstkshf.com",
@@ -1711,6 +1727,9 @@
     "report_title": "Media Coverage Report",
     "summary_title": "Executive Summary",
     "sentiment_title": "Sentiment Distribution",
+    "sentiment_pos": "Positive",
+    "sentiment_neu": "Neutral",
+    "sentiment_neg": "Negative",
     "ai_recommendation": "AI Recommendation",
     "total_reach": "TOTAL REACH",
     "ad_value": "AD VALUE (AVE)",

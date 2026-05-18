@@ -6,7 +6,6 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-"use node";
 /**
  * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
  * DEDUPLICATION ENGINE â€” Upstash Redis
@@ -22,10 +21,8 @@
  * Redis credentials consumed from environment:
  *   UPSTASH_REDIS_REST_URL
  *   UPSTASH_REDIS_REST_TOKEN
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+ * â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
  */
-
-import { createHash } from "crypto";
 
 const DEDUP_TTL_SECONDS = 86400; // 24 hours
 const DEDUP_KEY_PREFIX = "monitoring:dedup:";
@@ -49,11 +46,14 @@ function getRedisClient() {
  * Normalises the URL (lowercase, strip trailing slash & query params for
  * canonical comparison) before hashing.
  */
-function buildDedupHash(url: string, title: string): string {
+async function buildDedupHash(url: string, title: string): Promise<string> {
   const normalizedUrl = url.toLowerCase().split("?")[0].replace(/\/$/, "");
   const normalizedTitle = title.toLowerCase().trim();
   const raw = `${normalizedUrl}::${normalizedTitle}`;
-  return createHash("sha256").update(raw).digest("hex").substring(0, 32);
+  const data = new TextEncoder().encode(raw);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("").substring(0, 32);
 }
 
 /**
@@ -76,7 +76,7 @@ export async function checkAndSetSeen(url: string, title: string): Promise<boole
     return false;
   }
 
-  const hash = buildDedupHash(url, title);
+  const hash = await buildDedupHash(url, title);
   const key = `${DEDUP_KEY_PREFIX}${hash}`;
 
   try {

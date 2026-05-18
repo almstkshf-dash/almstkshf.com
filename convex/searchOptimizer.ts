@@ -6,7 +6,6 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-"use node";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { resolveApiKey } from "./utils/keys";

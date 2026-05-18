@@ -32,11 +32,9 @@ import ReactDOM from 'react-dom';
  * These hints tell the browser to start fetching assets as early as possible —
  * before the page's JS executes or CSS is even parsed.
  *
- * noise.svg is used in the HeroSection above the fold. Without a preload hint,
- * the browser discovers it only when the CSS background rule is evaluated,
- * which introduces a waterfall delay that adds to Speed Index and LCP.
+ * logo.png is used globally in the Navbar above the fold on all pages. Without a preload hint,
+ * the browser discovers it late, introducing a waterfall delay.
  */
-ReactDOM.preload('/noise.svg', { as: 'image', fetchPriority: 'low' });
 ReactDOM.preload('/logo.png', { as: 'image', fetchPriority: 'high' });
 
 

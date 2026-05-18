@@ -69,6 +69,9 @@ export default defineSchema({
     app_settings: defineTable({
         type: v.literal("global"), // Singleton pattern
         logoUrl: v.optional(v.string()),
+        brandName: v.optional(v.string()),
+        brandTagline: v.optional(v.string()),
+        footerUrl: v.optional(v.string()),
         apiKeys: v.object({
             gemini: v.optional(v.string()),
             instagram: v.optional(v.string()),
@@ -102,6 +105,7 @@ export default defineSchema({
             opensanctions: v.optional(v.string()), // For Watchlist checks
             diffbot: v.optional(v.string()),
             zenrows: v.optional(v.string()),
+            similarweb: v.optional(v.string()),
         }),
         defaults: v.object({
             targetCountries: v.array(v.string()),
@@ -241,6 +245,7 @@ export default defineSchema({
             opensanctions: v.optional(v.string()),
             diffbot: v.optional(v.string()),
             zenrows: v.optional(v.string()),
+            similarweb: v.optional(v.string()),
         })),
         isSubscribed: v.optional(v.boolean()),
         plan: v.optional(v.union(v.literal("standard"), v.literal("professional"), v.literal("enterprise"))),
@@ -310,4 +315,10 @@ export default defineSchema({
         articleCount: v.number(),
         timestamp: v.number(),
     }).index("by_userId", ["userId"]),
+
+    similarweb_domain_traffic: defineTable({
+        domain: v.string(),
+        monthlyVisits: v.number(),
+        lastFetchedAt: v.number(),
+    }).index("by_domain", ["domain"]),
 });

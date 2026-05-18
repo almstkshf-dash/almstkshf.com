@@ -24,6 +24,7 @@ export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
     const collectionsResult = useQuery(api.collections.getCollections) ?? [];
+    const settings = useQuery(api.settings.getSettings);
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
@@ -39,7 +40,7 @@ export default function ReportLibrary() {
         c.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
 
-    const tExport = useTranslations("MediaMonitoring.dashboard.export_translations");
+    const tExport = useTranslations("Export");
 
     const exportTranslations = {
         sheet_name: tExport('sheet_name'),
@@ -48,6 +49,7 @@ export default function ReportLibrary() {
         url: tExport('url'),
         type: tExport('type'),
         source: tExport('source'),
+        publisher_username: tExport('publisher_username'),
         depth: tExport('depth'),
         country: tExport('country'),
         sentiment: tExport('sentiment'),
@@ -59,11 +61,12 @@ export default function ReportLibrary() {
         status: tExport('status'),
         ave: tExport('ave'),
         hashtags: tExport('hashtags'),
-        brand_name: tExport('brand_name'),
-        brand_tagline: tExport('brand_tagline'),
-        footer_url: tExport('footer_url'),
-        generated_at: tExport('generated_at'),
-        page_count: tExport('page_count'),
+        brand_name: settings?.brandName || tExport('brand_name'),
+        brand_tagline: settings?.brandTagline || tExport('brand_tagline'),
+        footer_url: settings?.footerUrl || tExport('footer_url'),
+        logo_url: settings?.logoUrl || undefined,
+        generated_at: tExport('generated_at', { date: '{date}' }),
+        page_count: tExport('page_count', { current: '{current}', total: '{total}' }),
         report_title: tExport('report_title'),
         total_articles: tExport('total_articles'),
         keyword_label: tExport('keyword_label'),
@@ -103,7 +106,8 @@ export default function ReportLibrary() {
             await ReportGenerator.exportMediaMonitoringReport(
                 monitoringItems,
                 exportTranslations as any,
-                'pdf'
+                'pdf',
+                settings?.logoUrl || undefined
             );
             toast.success(tCommon('success'), { id: 'download-report' });
         } catch (error) {
@@ -116,14 +120,14 @@ export default function ReportLibrary() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-muted/50 p-4 rounded-2xl border border-border">
                 <div className="relative w-full md:max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70" aria-hidden="true" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70" aria-hidden="true" />
                     <label htmlFor="report-search" className="sr-only">{t('search_label')}</label>
                     <input
                         id="report-search"
                         name="q"
                         type="text"
                         placeholder={t('search_placeholder')}
-                        className="w-full bg-background border border-border rounded-xl py-2 pl-10 pr-4 text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                        className="w-full bg-background border border-border rounded-xl py-2 ps-10 pe-4 text-sm text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         autoComplete="off"

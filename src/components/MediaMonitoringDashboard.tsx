@@ -53,6 +53,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const t = useTranslations("Navigation");
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
+    const settings = useQuery(api.settings.getSettings);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -104,7 +105,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         }));
     }, [reports]);
 
-    const tExport = useTranslations("MediaMonitoring.dashboard.export_translations");
+    const tExport = useTranslations("Export");
 
     const exportTranslations = {
         sheet_name: tExport('sheet_name'),
@@ -113,6 +114,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         url: tExport('url'),
         type: tExport('type'),
         source: tExport('source'),
+        publisher_username: tExport('publisher_username'),
         depth: tExport('depth'),
         country: tExport('country'),
         sentiment: tExport('sentiment'),
@@ -124,11 +126,12 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         status: tExport('status'),
         ave: tExport('ave'),
         hashtags: tExport('hashtags'),
-        brand_name: tExport('brand_name'),
-        brand_tagline: tExport('brand_tagline'),
-        footer_url: tExport('footer_url'),
-        generated_at: tExport('generated_at'),
-        page_count: tExport('page_count'),
+        brand_name: settings?.brandName || tExport('brand_name'),
+        brand_tagline: settings?.brandTagline || tExport('brand_tagline'),
+        footer_url: settings?.footerUrl || tExport('footer_url'),
+        logo_url: settings?.logoUrl || undefined,
+        generated_at: tExport('generated_at', { date: '{date}' }),
+        page_count: tExport('page_count', { current: '{current}', total: '{total}' }),
         report_title: tExport('report_title'),
         total_articles: tExport('total_articles'),
         keyword_label: tExport('keyword_label'),
@@ -159,7 +162,8 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
             await ReportGenerator.exportMediaMonitoringReport(
                 reports as any,
                 exportTranslations as any,
-                format
+                format,
+                settings?.logoUrl || undefined
             );
             toast.success(tCommon('success'), { id: 'export-dashboard' });
         } catch (error) {

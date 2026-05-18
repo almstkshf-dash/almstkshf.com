@@ -130,6 +130,7 @@ export const updateApiKeys = mutation({
             opensanctions: v.optional(v.string()),
             diffbot: v.optional(v.string()),
             zenrows: v.optional(v.string()),
+            similarweb: v.optional(v.string()),
         })
     },
     handler: async (ctx, args) => {

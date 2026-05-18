@@ -6,7 +6,6 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-"use node";
 import { Client } from "@upstash/qstash";
 import { ActionCtx } from "../_generated/server";
 import { resolveApiKey } from "./keys";

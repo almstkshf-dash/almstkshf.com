@@ -15,6 +15,11 @@ export async function uploadImageToBlob(imageUrl: string, prefix: string = 'arti
     return imageUrl;
   }
 
+  // If no Vercel Blob token is configured, return original URL immediately without logging errors
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return imageUrl;
+  }
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
@@ -25,7 +30,7 @@ export async function uploadImageToBlob(imageUrl: string, prefix: string = 'arti
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       }
     });
-    
+
     clearTimeout(timeoutId);
 
     if (!response.ok) {
@@ -35,7 +40,7 @@ export async function uploadImageToBlob(imageUrl: string, prefix: string = 'arti
 
     const contentType = response.headers.get('content-type') || 'image/jpeg';
     const blob = await response.blob();
-    
+
     // Generate a unique filename
     const extension = contentType.split('/')[1] || 'jpg';
     const filename = `${prefix}/${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;

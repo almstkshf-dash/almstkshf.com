@@ -34,6 +34,9 @@ export default function SettingsPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');
+    const [brandName, setBrandName] = useState('');
+    const [brandTagline, setBrandTagline] = useState('');
+    const [footerUrl, setFooterUrl] = useState('');
     const [geminiKey, setGeminiKey] = useState('');
     const [instagramKey, setInstagramKey] = useState('');
     const [twitterKey, setTwitterKey] = useState('');
@@ -51,6 +54,7 @@ export default function SettingsPage() {
     const [stripeWebhookSecret, setStripeWebhookSecret] = useState('');
     const [diffbotKey, setDiffbotKey] = useState('');
     const [zenrowsKey, setZenrowsKey] = useState('');
+    const [similarwebKey, setSimilarwebKey] = useState('');
     const locale = useLocale();
     const isAr = locale === 'ar';
     const [targetCountries, setTargetCountries] = useState<string[]>(['AE', 'SA']);
@@ -108,6 +112,10 @@ export default function SettingsPage() {
             setStripeWebhookSecret(apiKeys?.stripeWebhookSecret || '');
             setDiffbotKey(apiKeys?.diffbot || '');
             setZenrowsKey(apiKeys?.zenrows || '');
+            setSimilarwebKey(apiKeys?.similarweb || '');
+            setBrandName(settings.brandName || '');
+            setBrandTagline(settings.brandTagline || '');
+            setFooterUrl(settings.footerUrl || '');
             setTargetCountries(settings.defaults?.targetCountries || ['AE', 'SA']);
             setAveMultiplier(settings.defaults?.aveMultiplier || 0.005);
         }
@@ -161,6 +169,9 @@ export default function SettingsPage() {
         try {
             await updateSettings({
                 logoUrl,
+                brandName: brandName.trim() || undefined,
+                brandTagline: brandTagline.trim() || undefined,
+                footerUrl: footerUrl.trim() || undefined,
                 apiKeys: {
                     gemini: geminiKey,
                     instagram: instagramKey,
@@ -179,6 +190,7 @@ export default function SettingsPage() {
                     stripeWebhookSecret: stripeWebhookSecret,
                     diffbot: diffbotKey,
                     zenrows: zenrowsKey,
+                    similarweb: similarwebKey,
                 },
                 defaults: {
                     targetCountries: targetCountries,
@@ -311,6 +323,54 @@ export default function SettingsPage() {
                                         <p className="font-medium text-foreground">{t('logo_desc')}</p>
                                         <p className="text-sm text-muted-foreground">{t('logo_size_hint')}</p>
                                         {errors.logo && <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-left-2">{errors.logo}</p>}
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                                    <Shield className="h-5 w-5 text-blue-500 animate-pulse" />
+                                    {t('white_label_branding')}
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <label htmlFor="brand-name" className="text-sm font-bold text-foreground/80">{t('brand_name')}</label>
+                                        <input
+                                            id="brand-name"
+                                            name="brand-name"
+                                            type="text"
+                                            value={brandName}
+                                            onChange={(e) => setBrandName(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground transition-all focus:border-primary"
+                                            placeholder="e.g. Almstkshf"
+                                        />
+                                        <p className="text-xs text-muted-foreground">{t('brand_name_hint')}</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="brand-tagline" className="text-sm font-bold text-foreground/80">{t('brand_tagline')}</label>
+                                        <input
+                                            id="brand-tagline"
+                                            name="brand-tagline"
+                                            type="text"
+                                            value={brandTagline}
+                                            onChange={(e) => setBrandTagline(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground transition-all focus:border-primary"
+                                            placeholder="e.g. Media Monitoring & Analysis"
+                                        />
+                                        <p className="text-xs text-muted-foreground">{t('brand_tagline_hint')}</p>
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <label htmlFor="footer-url" className="text-sm font-bold text-foreground/80">{t('footer_url')}</label>
+                                        <input
+                                            id="footer-url"
+                                            name="footer-url"
+                                            type="text"
+                                            value={footerUrl}
+                                            onChange={(e) => setFooterUrl(e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-border bg-muted/20 focus:ring-2 focus:ring-primary outline-none text-foreground transition-all focus:border-primary"
+                                            placeholder="e.g. www.almstkshf.com"
+                                        />
+                                        <p className="text-xs text-muted-foreground">{t('footer_url_hint')}</p>
                                     </div>
                                 </div>
                             </section>
@@ -448,6 +508,7 @@ export default function SettingsPage() {
                                         { id: 'worldnews', label: t('worldnews_key'), value: worldnewsKey, set: setWorldnewsKey },
                                         { id: 'diffbot', label: t('diffbot_key'), value: diffbotKey, set: setDiffbotKey },
                                         { id: 'zenrows', label: t('zenrows_key'), value: zenrowsKey, set: setZenrowsKey },
+                                        { id: 'similarweb', label: t('similarweb_key'), value: similarwebKey, set: setSimilarwebKey },
                                     ].map((field) => (
                                         <div key={field.id} className="space-y-2">
                                             <label htmlFor={field.id} className="text-sm font-bold text-foreground/80">{field.label}</label>

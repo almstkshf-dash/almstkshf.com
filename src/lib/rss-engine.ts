@@ -113,8 +113,9 @@ export async function parseFeed(
       const location = response.headers.get('location');
       if (location) {
         const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
-        console.log(`[RSS Engine] Following manual redirect: ${url} -> ${fixedLocation}`);
-        const nextResponse = await fetch(fixedLocation, {
+        const redirectUrl = new URL(fixedLocation, url).toString();
+        console.log(`[RSS Engine] Following manual redirect: ${url} -> ${redirectUrl}`);
+        const nextResponse = await fetch(redirectUrl, {
           ...fetchOptions,
           redirect: 'follow',
         });

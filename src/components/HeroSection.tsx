@@ -9,6 +9,10 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import Image from "next/image";
+import ReactDOM from "react-dom";
+
+// RENDER-BLOCKING CSS FIX: Preload noise.svg above-the-fold strictly on the home page where it is used.
+ReactDOM.preload('/noise.svg', { as: 'image', fetchPriority: 'low' });
 
 /**
  * HeroSection — Server Component.

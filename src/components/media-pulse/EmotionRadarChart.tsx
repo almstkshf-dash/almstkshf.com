@@ -50,7 +50,7 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
     return (
         <div className="relative w-full h-[300px] min-h-[300px] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={10} debounce={100}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={10} debounce={100} initialDimension={{ width: 10, height: 300 }}>
                     <RadarChart 
                         cx="50%" 
                         cy="50%" 

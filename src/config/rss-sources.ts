@@ -27,22 +27,28 @@ export const AAWSAT_SOURCES: RSSCategory[] = [
  */
 export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'WAM (UAE)': [
-    { id: 'wam-ar', name: 'WAM Arabic', url: 'https://wam.ae/ar/rss', country: 'UAE' },
-    { id: 'wam-en', name: 'WAM English', url: 'https://wam.ae/en/rss', country: 'UAE' },
+    { id: 'wam-en-economy', name: 'Economy', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-002-1jc72emk1y2i&type=rss', country: 'UAE' },
+    { id: 'wam-en-sport', name: 'Sport', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-002-1jc73gac78yp&type=rss', country: 'UAE' },
+    { id: 'wam-en-culture', name: 'Culture', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73gac79l5&type=rss', country: 'UAE' },
+    { id: 'wam-en-latest', name: 'Latest news', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx3w&type=rss', country: 'UAE' },
+    { id: 'wam-en-science-tech', name: 'Science and technology', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx70&type=rss', country: 'UAE' },
+    { id: 'wam-en-emirates', name: 'Emirates News', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=uae-news&vsCode=avs-001-1jc8icryj4wi&type=rss', country: 'UAE' },
+    { id: 'wam-en-gmc', name: 'Global Media Congress', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-001-1jc8icryj5m8&type=rss', country: 'UAE' },
+    { id: 'wam-en-world', name: 'World', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-view-world&vsCode=avs-001-1jc8ikj2nrv8&type=rss', country: 'UAE' },
   ],
-  'Al Arabiya': [
-    { id: 'alarabiya-latest', name: 'Latest News', url: 'https://www.alarabiya.net/.mrss/ar/last-24-hours.xml', country: 'SA' },
-    { id: 'alarabiya-saudi', name: 'Saudi Arabia', url: 'https://www.alarabiya.net/.mrss/ar/saudi-arabia.xml', country: 'SA' },
-  ],
-  'Sky News Arabia': [
-    { id: 'skynews-me', name: 'Middle East', url: 'https://www.skynewsarabia.com/feeds/rss/1.xml', country: 'UAE' },
-    { id: 'skynews-world', name: 'World', url: 'https://www.skynewsarabia.com/feeds/rss/2.xml', country: 'UAE' },
-    { id: 'skynews-uae', name: 'UAE', url: 'https://www.skynewsarabia.com/feeds/rss/12.xml', country: 'UAE' },
-  ],
+  // 'Al Arabiya': [
+  //   { id: 'alarabiya-latest', name: 'Latest News', url: 'https://www.alarabiya.net/.mrss/ar/last-24-hours.xml', country: 'SA' },
+  //   { id: 'alarabiya-saudi', name: 'Saudi Arabia', url: 'https://www.alarabiya.net/.mrss/ar/saudi-arabia.xml', country: 'SA' },
+  // ],
+  // 'Sky News Arabia': [
+  //   { id: 'skynews-me', name: 'Middle East', url: 'https://www.skynewsarabia.com/feeds/rss/1.xml', country: 'UAE' },
+  //   { id: 'skynews-world', name: 'World', url: 'https://www.skynewsarabia.com/feeds/rss/2.xml', country: 'UAE' },
+  //   { id: 'skynews-uae', name: 'UAE', url: 'https://www.skynewsarabia.com/feeds/rss/12.xml', country: 'UAE' },
+  // ],
   'Asharq Al-Awsat': AAWSAT_SOURCES,
-  'PR Newswire': [
-    { id: 'prnewswire-me', name: 'Middle East News', url: 'https://www.prnewswire.com/rss/middle-east/news/middle-east-news.rss' }
-  ],
+  // 'PR Newswire': [
+  //   { id: 'prnewswire-me', name: 'Middle East News', url: 'https://www.prnewswire.com/rss/middle-east/news/middle-east-news.rss' }
+  // ],
   'BBC Arabic': [
     { id: 'bbc-ar-me', name: 'Middle East', url: 'https://feeds.bbci.co.uk/arabic/rss.xml' }
   ],
@@ -52,36 +58,36 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Hashtag Dubai': [
     { id: 'hashtag-dubai', name: 'Latest News', url: 'https://hashtagdubai.org/index.php/feed/', country: 'UAE' }
   ],
-  'My Dubai News': [
-    { id: 'mydubai-news', name: 'Latest News', url: 'https://www.mydubainews.com/feed/', country: 'UAE' }
-  ],
+  // 'My Dubai News': [
+  //   { id: 'mydubai-news', name: 'Latest News', url: 'https://www.mydubainews.com/feed/', country: 'UAE' }
+  // ],
   'Dubai PR Network': [
     { id: 'dubai-pr', name: 'Latest PR', url: 'https://www.dubaiprnetwork.com/rss_feed.asp', country: 'UAE' }
   ],
-  'Go Dubai': [
-    { id: 'go-dubai', name: 'City Life', url: 'https://www.godubai.com/citylife/RSSFeedGenerator.asp', country: 'UAE' }
-  ],
-  'Al Badia Magazine': [
-    { id: 'albadia-mag', name: 'Latest Articles', url: 'https://albadiamagazine.com/feed/', country: 'UAE' }
-  ],
-  'Al Madar Magazine': [
-    { id: 'almadar-mag', name: 'Latest Articles', url: 'https://www.almadarmagazine.ae/feed/', country: 'UAE' }
-  ],
-  'First Avenue Magazine': [
-    { id: 'firstavenue-mag', name: 'Latest Articles', url: 'https://firstavenuemagazine.com/feed/', country: 'UAE' }
-  ],
-  'Evision Worlds': [
-    { id: 'evision-worlds', name: 'Latest News', url: 'https://evisionworlds.com/?feed=rss2', country: 'UAE' }
-  ],
-  'Pan Time Arabia': [
-    { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
-  ],
-  'Emirates247': [
-    { id: 'e247-flash', name: 'Flash News', url: 'https://www.emirates247.com/rss/mobile/v2/flash-news.rss', country: 'UAE' },
-    { id: 'e247-uae', name: 'UAE News', url: 'https://www.emirates247.com/rss/mobile/v2/uae.rss', country: 'UAE' },
-    { id: 'e247-world', name: 'World News', url: 'https://www.emirates247.com/rss/mobile/v2/world.rss', country: 'UAE' },
-    { id: 'e247-business', name: 'Business', url: 'https://www.emirates247.com/rss/mobile/v2/business.rss', country: 'UAE' },
-  ],
+  // 'Go Dubai': [
+  //   { id: 'go-dubai', name: 'City Life', url: 'https://www.godubai.com/citylife/RSSFeedGenerator.asp', country: 'UAE' }
+  // ],
+  // 'Al Badia Magazine': [
+  //   { id: 'albadia-mag', name: 'Latest Articles', url: 'https://albadiamagazine.com/feed/', country: 'UAE' }
+  // ],
+  // 'Al Madar Magazine': [
+  //   { id: 'almadar-mag', name: 'Latest Articles', url: 'https://www.almadarmagazine.ae/feed/', country: 'UAE' }
+  // ],
+  // 'First Avenue Magazine': [
+  //   { id: 'firstavenue-mag', name: 'Latest Articles', url: 'https://firstavenuemagazine.com/feed/', country: 'UAE' }
+  // ],
+  // 'Evision Worlds': [
+  //   { id: 'evision-worlds', name: 'Latest News', url: 'https://evisionworlds.com/?feed=rss2', country: 'UAE' }
+  // ],
+  // 'Pan Time Arabia': [
+  //   { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
+  // ],
+  // 'Emirates247': [
+  //   { id: 'e247-flash', name: 'Flash News', url: 'https://www.emirates247.com/rss/mobile/v2/flash-news.rss', country: 'UAE' },
+  //   { id: 'e247-uae', name: 'UAE News', url: 'https://www.emirates247.com/rss/mobile/v2/uae.rss', country: 'UAE' },
+  //   { id: 'e247-world', name: 'World News', url: 'https://www.emirates247.com/rss/mobile/v2/world.rss', country: 'UAE' },
+  //   { id: 'e247-business', name: 'Business', url: 'https://www.emirates247.com/rss/mobile/v2/business.rss', country: 'UAE' },
+  // ],
   'Provoke Media': [
     { id: 'provoke-latest', name: 'Latest News', url: 'https://www.provokemedia.com/newsfeed/provoke-media-latest', country: 'GB' },
   ],
@@ -136,7 +142,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'roadsafety-proposals', name: 'Proposals', url: 'https://www.roadsafetyuae.com/feed/?post_type=proposals', country: 'UAE' },
   ],
   'Gulf Today': [
-    { id: 'gulftoday-latest', name: 'Latest News', url: 'https://www.gulftoday.ae/rss', country: 'UAE' },
+    // { id: 'gulftoday-latest', name: 'Latest News', url: 'https://www.gulftoday.ae/rss', country: 'UAE' },
     { id: 'gulftoday-main', name: 'Latest News (Feed)', url: 'https://www.gulftoday.ae/rssFeed/0/', country: 'UAE' },
     { id: 'gulftoday-opinion', name: 'Opinion', url: 'https://www.gulftoday.ae/rssFeed/10/', country: 'UAE' },
     { id: 'gulftoday-news', name: 'News', url: 'https://www.gulftoday.ae/rssFeed/55/', country: 'UAE' },
@@ -145,21 +151,21 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'gulftoday-sport', name: 'Sport', url: 'https://www.gulftoday.ae/rssFeed/58/', country: 'UAE' },
     { id: 'gulftoday-business', name: 'Business', url: 'https://www.gulftoday.ae/rssFeed/52/', country: 'UAE' },
   ],
-  'Zawya': [
-    { id: 'zawya-en', name: 'Latest News', url: 'https://www.zawya.com/en/rss/all', country: 'UAE' }
-  ],
-  'AETOSWire': [
-    { id: 'aetoswire-en', name: 'Latest PR', url: 'https://www.aetoswire.com/en/rss', country: 'UAE' }
-  ],
+  // 'Zawya': [
+  //   { id: 'zawya-en', name: 'Latest News', url: 'https://www.zawya.com/en/rss/all', country: 'UAE' }
+  // ],
+  // 'AETOSWire': [
+  //   { id: 'aetoswire-en', name: 'Latest PR', url: 'https://www.aetoswire.com/en/rss', country: 'UAE' }
+  // ],
   'Arab News': [
     { id: 'arabnews-en', name: 'Latest News', url: 'https://www.arabnews.com/rss.xml', country: 'SA' }
   ],
-  'Gulf News': [
-    { id: 'gulfnews-en', name: 'Latest News', url: 'https://gulfnews.com/rss', country: 'UAE' }
-  ],
-  'Khaleej Times': [
-    { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://www.khaleejtimes.com/rss', country: 'UAE' }
-  ],
+  // 'Gulf News': [
+  //   { id: 'gulfnews-en', name: 'Latest News', url: 'https://gulfnews.com/rss', country: 'UAE' }
+  // ],
+  // 'Khaleej Times': [
+  //   { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://www.khaleejtimes.com/rss', country: 'UAE' }
+  // ],
   'The National': [
     { id: 'thenational-en', name: 'Latest News', url: 'https://www.thenationalnews.com/rss', country: 'UAE' }
   ],

@@ -754,7 +754,7 @@ export class ReportGenerator {
     // PRIVATE HELPERS: PDF CORE
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
-    private static async initPDF() {
+    private static async initPDF(logoUrl?: string) {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4', hotfixes: ["px_line_height"] });
         const pageWidth = doc.internal.pageSize.width;
@@ -780,7 +780,7 @@ export class ReportGenerator {
             console.warn('Amiri font load failed or timed out. Falling back to system fonts.', e);
         }
 
-        const logoBase64 = await this.loadLogo();
+        const logoBase64 = await this.loadLogo(logoUrl);
 
         return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
     }
@@ -799,7 +799,13 @@ export class ReportGenerator {
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
-        doc.text(this.fixArabic(translations.brand_name || 'ALMSTKSHF'), pageWidth / 2, 55, { align: 'center' });
+        doc.text(this.fixArabic(translations.brand_name || 'ALMSTKSHF'), pageWidth / 2, 53, { align: 'center' });
+
+        if (translations.brand_tagline) {
+            doc.setFontSize(8);
+            doc.setTextColor(220, 220, 220);
+            doc.text(this.fixArabic(translations.brand_tagline), pageWidth / 2, 60, { align: 'center' });
+        }
 
         doc.setFontSize(24);
         doc.setTextColor(...BRAND_DARK);
@@ -1638,17 +1644,45 @@ export class ReportGenerator {
         return words.reverse().join(' ');
     }
 
-    private static async loadLogo(): Promise<string | null> {
+    private static async loadLogo(logoUrl?: string): Promise<string | null> {
         try {
-            const res = await fetch('/logo.png');
-            if (!res.ok) return null;
+            const urlToFetch = logoUrl || '/logo.png';
+            const res = await fetch(urlToFetch);
+            if (!res.ok) {
+                if (logoUrl) {
+                    const fallbackRes = await fetch('/logo.png');
+                    if (!fallbackRes.ok) return null;
+                    const blob = await fallbackRes.blob();
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+                return null;
+            }
             const blob = await res.blob();
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
                 reader.readAsDataURL(blob);
             });
-        } catch { return null; }
+        } catch {
+            if (logoUrl) {
+                try {
+                    const fallbackRes = await fetch('/logo.png');
+                    if (fallbackRes.ok) {
+                        const blob = await fallbackRes.blob();
+                        return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+                            reader.readAsDataURL(blob);
+                        });
+                    }
+                } catch {}
+            }
+            return null;
+        }
     }
 
     private static arrayBufferToBase64(buffer: ArrayBuffer): string {

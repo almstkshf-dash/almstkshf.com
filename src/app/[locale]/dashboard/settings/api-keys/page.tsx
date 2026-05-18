@@ -32,6 +32,7 @@ export default function ApiKeysPage() {
         mediastack: '',
         serper: '',
         twitterBearer: '',
+        similarweb: '',
     });
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -243,6 +244,7 @@ export default function ApiKeysPage() {
                                 { id: 'bing', label: t('bing_key') },
                                 { id: 'mediastack', label: t('mediastack_key') },
                                 { id: 'serper', label: t('serper_key') },
+                                { id: 'similarweb', label: t('similarweb_key') },
                             ].map((field) => (
                                 <div key={field.id} className="space-y-2">
                                     <label htmlFor={field.id} className="text-xs font-bold text-foreground/70 flex items-center justify-between uppercase tracking-tight">
