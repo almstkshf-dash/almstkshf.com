@@ -390,6 +390,7 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | `ReferenceError: Button is not defined` | `Button` import removed from `dashboard/page.tsx` but usages remain | Convert remaining `<Button>` to native `<button>` — see §11 above |
 | Recharts tooltip `payload` type error | `payload` is `readonly any[]` — cannot be spread into typed interface | Inline the render callback or cast with `as { value?: number }` |
 | `Session History Item Has Been Marked Skippable` | Programmatic navigation pushing sign-in redirect to history stack | Use `router.replace()` instead of `router.push()` for auth redirects |
+| `GET /__clerk/v1/... 400` | Clerk internal handshake/proxy routes being intercepted by `auth.protect()` or localized by `next-intl` | Skip paths starting with `/__clerk` at the very beginning of the `clerkMiddleware` callback |
 
 ---
 
@@ -622,4 +623,27 @@ To resolve runtime server errors during collection fetching and schema synchroni
   }
   ```
   Mutations and actions still enforce hard authentication checks as they represent state-changing actions.
+
+---
+
+## 32. Central Media Repository details modal & reports library views
+
+To bridge the final gap in saved media monitoring collection management and provide users with comprehensive tools to review their collections, we have implemented an interactive, RTL-compliant, and fully localized Details Modal:
+
+### Details Modal Architecture & Flow
+- **Component File**: Added [CollectionDetailsModal.tsx](file:///c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/src/components/ui/CollectionDetailsModal.tsx) under the UI components folder.
+- **Integration**: Mapped the previously non-responsive "View Details" button in [ReportLibrary.tsx](file:///c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/src/components/ReportLibrary.tsx) to trigger the modal reactively:
+  ```typescript
+  onClick={() => setSelectedCollectionId(collection._id)}
+  ```
+- **Real-time Reactive Fetching**: Inside the modal, the collection is retrieved reactively by its unique identifier using `useQuery(api.collections.getCollection, { id: collectionId })`.
+
+### Key Capabilities & Premium Features
+1. **Interactive Search**: Users can filter items inside the collection in real-time by title or content snippet.
+2. **Individual Item Management**: A small trash icon next to each item triggers the `removeFromCollection` Convex mutation, with visual loading states for each action.
+3. **Entire Collection Deletion**: Supports deleting the entire collection directly from the details panel using `deleteCollection` Convex mutation, with a double-click safety confirmation step to prevent accidental loss.
+4. **Full PDF Exporting**: Integrates the same robust multi-lingual PDF export logic (`ReportGenerator`) as the main collections table, resolving settings metadata (such as brand names, taglines, and footers) seamlessly.
+5. **Arabic Localization & RTL Compliance**:
+   - Spacing is defined entirely via CSS logical properties (`ps-10`, `pe-4`, `start-3`), matching strict Arabic specification parameters.
+   - Text alignments, tag labels, source sites, and sentiments mirror dynamically according to the active translation language direction.
 

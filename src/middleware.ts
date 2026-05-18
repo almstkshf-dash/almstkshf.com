@@ -48,6 +48,11 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+    // Skip Clerk internal requests to prevent 400 Bad Request / infinite protect loops
+    if (req.nextUrl.pathname.startsWith("/__clerk")) {
+        return NextResponse.next();
+    }
+
     // 0. Skip localization for API routes
     if (req.nextUrl.pathname.startsWith("/api/")) {
         return NextResponse.next();

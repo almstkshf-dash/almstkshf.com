@@ -19,10 +19,12 @@ import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
+import CollectionDetailsModal from "./ui/CollectionDetailsModal";
 
 export default function ReportLibrary() {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
+    const [selectedCollectionId, setSelectedCollectionId] = useState<any>(null);
     const collectionsResult = useQuery(api.collections.getCollections) ?? [];
     const settings = useQuery(api.settings.getSettings);
     const [inputValue, setInputValue] = useState("");
@@ -183,6 +185,7 @@ export default function ReportLibrary() {
                                     variant="outline"
                                     size="sm"
                                     className="border-border hover:bg-muted"
+                                    onClick={() => setSelectedCollectionId(collection._id)}
                                 >
                                     {tCommon('view_details')}
                                 </Button>
@@ -200,6 +203,14 @@ export default function ReportLibrary() {
                     ))
                 )}
             </div>
+
+            {selectedCollectionId && (
+                <CollectionDetailsModal
+                    isOpen={!!selectedCollectionId}
+                    onClose={() => setSelectedCollectionId(null)}
+                    collectionId={selectedCollectionId}
+                />
+            )}
         </div>
     );
 }
