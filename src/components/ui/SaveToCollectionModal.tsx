@@ -282,6 +282,18 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
                         </>
                     )}
                 </div>
+                {status?.type !== 'success' && !isCreating && (
+                    <div className="p-4 border-t border-border bg-muted/10 shrink-0 flex justify-end">
+                        <Button 
+                            variant="outline" 
+                            onClick={onClose}
+                            disabled={loading}
+                            className="text-sm px-6"
+                        >
+                            {tCommon("close")}
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

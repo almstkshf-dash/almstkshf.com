@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
-import { X, Trash2, ExternalLink, Download, Search, FileText, Calendar, Loader2, AlertCircle } from "lucide-react";
+import { X, Trash2, ExternalLink, Download, Search, FileText, Calendar, Loader2, AlertCircle, History, FileSpreadsheet } from "lucide-react";
 import Button from "./Button";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -118,7 +118,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
         coverage_log: tExport('coverage_log')
     };
 
-    const handleDownload = async () => {
+    const handleDownloadPdf = async () => {
         if (!collection || !collection.items || collection.items.length === 0) {
             toast.error(tLibrary('empty_collection'));
             return;
@@ -145,6 +145,36 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
         } catch (error) {
             console.error('Download failed', error);
             toast.error(tCommon('error'), { id: 'download-collection' });
+        }
+    };
+
+    const handleDownloadExcel = async () => {
+        if (!collection || !collection.items || collection.items.length === 0) {
+            toast.error(tLibrary('empty_collection'));
+            return;
+        }
+
+        const monitoringItems = collection.items
+            .filter((i: any) => i.type === "media_monitoring")
+            .map((i: any) => i.data);
+
+        if (monitoringItems.length === 0) {
+            toast.error(tLibrary('no_exportable_items'));
+            return;
+        }
+
+        try {
+            toast.loading(tCommon('downloading'), { id: 'download-collection-excel' });
+            await ReportGenerator.exportMediaMonitoringReport(
+                monitoringItems,
+                exportTranslations as any,
+                'excel',
+                settings?.logoUrl || undefined
+            );
+            toast.success(tCommon('success'), { id: 'download-collection-excel' });
+        } catch (error) {
+            console.error('Download failed', error);
+            toast.error(tCommon('error'), { id: 'download-collection-excel' });
         }
     };
 
@@ -201,11 +231,22 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                                 variant="outline" 
                                 size="sm" 
                                 leftIcon={<Download className="w-3.5 h-3.5" />}
-                                onClick={handleDownload}
+                                onClick={handleDownloadPdf}
                                 disabled={items.length === 0}
                                 className="text-xs py-1.5 h-auto bg-background"
                             >
-                                {tCommon("download")}
+                                {tCommon("download")} (PDF)
+                            </Button>
+                            
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                leftIcon={<FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />}
+                                onClick={handleDownloadExcel}
+                                disabled={items.length === 0}
+                                className="text-xs py-1.5 h-auto bg-background"
+                            >
+                                {tExport("sheet_name")} (Excel)
                             </Button>
                             
                             {confirmDelete ? (
@@ -291,12 +332,17 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                                                     {publishedDate}
                                                 </span>
                                                 <span className="shrink-0">•</span>
-                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shrink-0 ${
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shrink-0 flex items-center gap-1 ${
                                                     sentiment === "Positive" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
                                                     sentiment === "Negative" ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
                                                     "bg-amber-500/10 text-amber-500 border-amber-500/20"
                                                 }`}>
                                                     {sentiment}
+                                                    {item.data?.manualSentimentOverride && (
+                                                        <span title={`Original: ${item.data.originalSentiment}`}>
+                                                            <History className="w-2.5 h-2.5 opacity-60 ml-0.5" aria-hidden="true" />
+                                                        </span>
+                                                    )}
                                                 </span>
                                             </div>
 
@@ -340,6 +386,15 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                             })}
                         </div>
                     )}
+                </div>
+                <div className="p-4 border-t border-border bg-muted/10 shrink-0 flex justify-end">
+                    <Button 
+                        variant="outline" 
+                        onClick={onClose}
+                        className="text-sm px-6"
+                    >
+                        {tCommon("close")}
+                    </Button>
                 </div>
             </div>
         </div>

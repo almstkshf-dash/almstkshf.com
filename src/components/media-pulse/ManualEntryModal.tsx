@@ -271,12 +271,18 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
             });
 
             onClose();
-        } catch (error) {
+        } catch (error: any) {
+            const dataMsg = typeof error.data === 'string' ? error.data : '';
             const errorMessage = error instanceof Error ? error.message : String(error);
-            if (errorMessage.includes("DuplicateArticle")) {
+            
+            console.error("Mutation failed:", error);
+
+            if (errorMessage.includes("DuplicateArticle") || dataMsg.includes("DuplicateArticle")) {
                 alert(t('duplicate_article_error'));
+            } else if (errorMessage.includes("Type mismatch") || errorMessage.includes("Validator") || errorMessage.includes("Invalid")) {
+                alert(`Data Validation Error: Please check your inputs. Details: ${errorMessage}`);
             } else {
-                alert(t('save_failed'));
+                alert(`${t('save_failed')} (${errorMessage})`);
             }
         } finally {
             setIsLoading(false);

@@ -79,9 +79,27 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   // 'Evision Worlds': [
   //   { id: 'evision-worlds', name: 'Latest News', url: 'https://evisionworlds.com/?feed=rss2', country: 'UAE' }
   // ],
-  // 'Pan Time Arabia': [
-  //   { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
-  // ],
+  'Pan Time Arabia': [
+    { id: 'pantime-arabia', name: 'Latest Articles', url: 'https://pantimearabia.com/rss/', country: 'UAE' }
+  ],
+  '24.ae': [
+    { id: '24ae-latest', name: 'Latest News', url: 'https://24.ae/rss.aspx', country: 'UAE' }
+  ],
+  'UAE Barq': [
+    { id: 'uaebarq-latest', name: 'Latest News', url: 'https://www.uaebarq.ae/ar/feed/', country: 'UAE' }
+  ],
+  'Gulf Time': [
+    { id: 'gulftime-latest', name: 'Latest News', url: 'https://gulftime.online/feed/', country: 'UAE' }
+  ],
+  'New Vora Group': [
+    { id: 'newvora-latest', name: 'Latest News', url: 'https://newvoragroup.com/feed/', country: 'UAE' }
+  ],
+  'Ain Al Emirate': [
+    { id: 'ainalemirate-latest', name: 'Latest News', url: 'https://www.ainalemirate.com/feed/', country: 'UAE' }
+  ],
+  'Mena Scoop': [
+    { id: 'menascoop-latest', name: 'Latest News', url: 'https://menascoop.com/feed/', country: 'UAE' }
+  ],
   // 'Emirates247': [
   //   { id: 'e247-flash', name: 'Flash News', url: 'https://www.emirates247.com/rss/mobile/v2/flash-news.rss', country: 'UAE' },
   //   { id: 'e247-uae', name: 'UAE News', url: 'https://www.emirates247.com/rss/mobile/v2/uae.rss', country: 'UAE' },

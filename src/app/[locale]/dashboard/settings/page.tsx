@@ -198,10 +198,14 @@ export default function SettingsPage() {
                 },
             });
             setMessage({ type: 'success', text: t('saved_success') });
-        } catch (error: unknown) {
+        } catch (error: any) {
             console.error('Failed to save settings:', error);
-            const msg = error instanceof Error ? error.message : '';
-            const isAuthError = msg.toLowerCase().includes('not authorized') || msg.toLowerCase().includes('admin');
+            // In Convex, custom errors have the details in `error.data`
+            const msg = error.data?.message || (error instanceof Error ? error.message : '');
+            const isAuthError = msg.toLowerCase().includes('not authenticated') || 
+                                msg.toLowerCase().includes('not authorized') || 
+                                msg.toLowerCase().includes('admin');
+            
             setMessage({
                 type: 'error',
                 text: isAuthError

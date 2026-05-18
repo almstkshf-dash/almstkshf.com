@@ -647,3 +647,37 @@ To bridge the final gap in saved media monitoring collection management and prov
    - Spacing is defined entirely via CSS logical properties (`ps-10`, `pe-4`, `start-3`), matching strict Arabic specification parameters.
    - Text alignments, tag labels, source sites, and sentiments mirror dynamically according to the active translation language direction.
 
+---
+
+## 33. Media Ingestion Sources and System Criteria Compliance
+
+To guarantee high success rates, preserve parser stability, and keep background errors at zero, the application enforces strict system criteria on media sources registered in the frontend config (`PREMIUM_SOURCES` in `src/config/rss-sources.ts`) and backend scanner (`PR_WIRE_FEEDS` in `convex/monitoringAction.ts`).
+
+### 1. Ingestion Requirements & System Criteria
+For a source to be successfully registered and wired into the system, it MUST:
+- Provide a standard, fetchable XML RSS feed structure.
+- Successfully parse via the core backend parsing library `rss-parser`.
+- Return a `200 OK` HTTP status code on background fetches.
+- NOT be protected behind Cloudflare or generic bot detection mechanisms that return `403 Forbidden` on automated crawls.
+- NOT return HTML pages, directory lists, or empty XML frameworks.
+
+### 2. Active Compliant Feeds
+The following 8 feeds fully comply with all requirements and are active in both frontend and backend configurations:
+- **24.ae**: `https://24.ae/rss.aspx` (Country: UAE, Language: Arabic)
+- **UAE Barq**: `https://www.uaebarq.ae/ar/feed/` (Country: UAE, Language: Arabic)
+- **Pan Time Arabia**: `https://pantimearabia.com/rss/` (Country: UAE, Language: Arabic)
+- **Nabd El Emirate**: `https://nbdelemirate.com/feed/` (Country: UAE, Language: Arabic)
+- **Gulf Time**: `https://gulftime.online/feed/` (Country: UAE, Language: Arabic)
+- **New Vora Group**: `https://newvoragroup.com/feed/` (Country: UAE, Language: Arabic)
+- **Ain Al Emirate**: `https://www.ainalemirate.com/feed/` (Country: UAE, Language: Arabic)
+- **Mena Scoop**: `https://menascoop.com/feed/` (Country: UAE, Language: Arabic)
+
+### 3. Excluded Feeds (Non-Compliant)
+The following requested feeds failed validation audits and are explicitly excluded from integration to prevent system alerts:
+- **Emarat Al Youm** (`https://www.emaratalyoum.com/rss-7.951867`): Returns text/html web layout instead of standard XML RSS.
+- **Monte Carlo Doualiya (MCD)** (`https://www.mc-doualiya.com/%D8%AE%D8%AF%D9%85%D8%A9-RSS`): Returns HTML podcast lists, no standard XML feed.
+- **ADNOC Press Releases** (`https://adnoc.ae/ar/news-and-media/press-releases`): Returns raw HTML pages.
+- **The News Mirror** (`https://thenewsmirror.in/`): Standard `/feed/` path returns 404.
+- **Ya Watan** (`https://www.ya-watan.com/`): Strictly blocked by Cloudflare (returns `403 Forbidden` on crawls).
+
+

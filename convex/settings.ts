@@ -114,7 +114,17 @@ export const updateSettings = mutation({
                 .first();
 
             if (existing) {
-                await ctx.db.patch(existing._id, args);
+                await ctx.db.patch(existing._id, {
+                    ...args,
+                    apiKeys: {
+                        ...existing.apiKeys,
+                        ...args.apiKeys,
+                    },
+                    defaults: {
+                        ...existing.defaults,
+                        ...args.defaults,
+                    }
+                });
             } else {
                 await ctx.db.insert("app_settings", {
                     type: "global",

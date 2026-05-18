@@ -2513,7 +2513,11 @@
     "x-twitter-sky-news-arabia": "Sky News Arabia (X)",
     "x-twitter-alarabiya": "Al Arabiya (X)",
     "x-twitter-ajmubasher": "Al Jazeera Mubasher (X)",
-    "x-twitter-alkass-tv": "Al Kass TV (X)"
+    "x-twitter-alkass-tv": "Al Kass TV (X)",
+    "Latest news": "Latest News",
+    "Science and technology": "Science and Technology",
+    "Emirates News": "Emirates News",
+    "World news": "World News"
   },
   "Pricing": {
     "title": "Pricing Plans",

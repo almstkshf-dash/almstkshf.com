@@ -2541,7 +2541,11 @@
     "x-twitter-sky-news-arabia": "سكاي نيوز عربية (إكس)",
     "x-twitter-alarabiya": "العربية (إكس)",
     "x-twitter-ajmubasher": "الجزيرة مباشر (إكس)",
-    "x-twitter-alkass-tv": "قنوات الكأس (إكس)"
+    "x-twitter-alkass-tv": "قنوات الكأس (إكس)",
+    "Latest news": "آخر الأخبار",
+    "Science and technology": "العلوم والتكنولوجيا",
+    "Emirates News": "أخبار الإمارات",
+    "World news": "أخبار العالم"
   },
   "Pricing": {
     "title": "خطط الأسعار",
