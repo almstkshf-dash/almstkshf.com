@@ -887,16 +887,16 @@ async function extractWithDirectScraper(url: string, analyze: boolean = false) {
 
         // Extract title
         let title = $('meta[property="og:title"]').attr('content') ||
-                    $('meta[name="twitter:title"]').attr('content') ||
-                    $('title').text() ||
-                    $('h1').first().text();
+            $('meta[name="twitter:title"]').attr('content') ||
+            $('title').text() ||
+            $('h1').first().text();
 
         title = title ? title.trim() : '';
 
         // Extract description/text
         let text = $('meta[property="og:description"]').attr('content') ||
-                   $('meta[name="twitter:description"]').attr('content') ||
-                   $('meta[name="description"]').attr('content');
+            $('meta[name="twitter:description"]').attr('content') ||
+            $('meta[name="description"]').attr('content');
 
         // Grab paragraph tags if text is short
         const paragraphs: string[] = [];
@@ -915,16 +915,16 @@ async function extractWithDirectScraper(url: string, analyze: boolean = false) {
 
         // Extract image
         const image = $('meta[property="og:image"]').attr('content') ||
-                      $('meta[name="twitter:image"]').attr('content') ||
-                      $('link[rel="image_src"]').attr('href') ||
-                      $('img').first().attr('src');
+            $('meta[name="twitter:image"]').attr('content') ||
+            $('link[rel="image_src"]').attr('href') ||
+            $('img').first().attr('src');
 
         // Extract publish date
         let publish_date = $('meta[property="article:published_time"]').attr('content') ||
-                           $('meta[property="og:article:published_time"]').attr('content') ||
-                           $('meta[name="publication_date"]').attr('content') ||
-                           $('meta[name="publish_date"]').attr('content') ||
-                           $('time').attr('datetime');
+            $('meta[property="og:article:published_time"]').attr('content') ||
+            $('meta[name="publication_date"]').attr('content') ||
+            $('meta[name="publish_date"]').attr('content') ||
+            $('time').attr('datetime');
 
         if (!publish_date) {
             publish_date = new Date().toISOString();
@@ -934,7 +934,7 @@ async function extractWithDirectScraper(url: string, analyze: boolean = false) {
         let sentiment = 0.0;
         if (analyze) {
             const textToAnalyze = ((title || '') + ' ' + (text || '')).toLowerCase();
-            
+
             // Simple keyword dictionary
             const positiveWords = [
                 'نجاح', 'تميز', 'رائع', 'شراكة', 'إنجاز', 'سعادة', 'مبادرة', 'خير', 'تقدم', 'تطوير', 'نمو', 'أمل', 'شكر', 'تقدير',
@@ -1031,7 +1031,7 @@ async function getArticleReach(
             // 3. Fetch from SimilarWeb API
             console.log(`[SimilarWeb API] Fetching traffic for ${domain}...`);
             const apiUrl = `https://api.similarweb.com/v1/website/${encodeURIComponent(domain)}/total-traffic-and-engagement/visits?api_key=${encodeURIComponent(similarwebKey)}&country=world&granularity=monthly`;
-            
+
             const response = await fetch(apiUrl, {
                 headers: { "Accept": "application/json" }
             });
@@ -1044,7 +1044,7 @@ async function getArticleReach(
                     if (latestPeriod && typeof latestPeriod.visits === "number") {
                         monthlyVisits = latestPeriod.visits;
                         console.log(`[SimilarWeb API] Traffic for ${domain}: ${monthlyVisits} visits`);
-                        
+
                         // Save to cache
                         await ctx.runMutation(api.monitoring.saveCachedDomainTraffic, {
                             domain,
@@ -1062,7 +1062,7 @@ async function getArticleReach(
             let reachVal = Math.round(monthlyVisits / 100);
             if (reachVal < 1000) reachVal = 1000;
             if (reachVal > 10000000) reachVal = 10000000;
-            
+
             console.log(`[SimilarWeb Reach] Domain monthly visits: ${monthlyVisits} => Article Reach (Visits/100): ${reachVal}`);
             return { reach: reachVal, source: "similarweb" };
         }
@@ -1092,9 +1092,10 @@ async function processArticle(
         // â”€â”€ GATE 1: Boolean Pre-Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Evaluates mandatory (+), excluded (-), and phrase terms BEFORE any
         // API call. Zero cost â€” pure string matching.
+        const isGeneralPressRelease = keyword === "Press Release";
         const boolExpr = parseBooleanKeyword(keyword);
         const snippet = item.contentSnippet || item.content || item.title;
-        if (!matchesBooleanFilter(boolExpr, item.title, snippet)) {
+        if (!isGeneralPressRelease && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
             console.log(`⚡ Boolean reject: "${item.title.substring(0, 60)}..."`);
             return false;
         }
@@ -1125,14 +1126,17 @@ async function processArticle(
         // Lightweight Gemini call to score how relevant the article is to the
         // keyword. Articles scoring below threshold are discarded before the
         // full analysis + DB write.
-        const relevancyScore = await callGeminiRelevancyScore(
-            geminiKey,
-            item.title,
-            snippet,
-            keyword
-        );
+        let relevancyScore = 100;
+        if (!isGeneralPressRelease) {
+            relevancyScore = await callGeminiRelevancyScore(
+                geminiKey,
+                item.title,
+                snippet,
+                keyword
+            );
+        }
         if (relevancyScore < RELEVANCY_THRESHOLD) {
-            console.log(`âš ï¸ Low relevancy (${relevancyScore}/100) â€” discarded: "${item.title.substring(0, 60)}"`);
+            console.log(`âš ï¸  Low relevancy (${relevancyScore}/100) â€” discarded: "${item.title.substring(0, 60)}"`);
             return false;
         }
 
@@ -1161,7 +1165,7 @@ async function processArticle(
         );
 
         const parsedSourceType = sanitizeSourceType(forceSourceType || aiData.sourceType);
-        
+
         // SimilarWeb-based Reach lookup
         const reachResult = await getArticleReach(
             ctx,
@@ -1337,7 +1341,7 @@ async function fetchRobustRss(url: string) {
 
 async function fetchTwitterTweets(username: string, bearerToken: string | null): Promise<any[]> {
     console.log(`🐦 [fetchTwitterTweets] Fetching tweets for @${username} (Bearer token available: ${!!bearerToken})`);
-    
+
     // 1. Try official API v2 if bearer token is available
     if (bearerToken) {
         try {
@@ -1600,6 +1604,7 @@ export const fetchPressReleaseSources = action({
                                     ...item,
                                     link: item.link,
                                     pubDate: item.pubDate,
+                                    source: normalizePublisherName(feed.name)
                                 },
                                 feed.country,
                                 feed.lang,
@@ -1697,3 +1702,96 @@ export const testAction = action({ args: {}, handler: async () => { const parser
 export const testCheerio = action({ args: {}, handler: async () => { const ch = require('cheerio'); return 'ok'; } });
 
 export const testRssParser = action({ args: {}, handler: async () => { const Parser = require('rss-parser'); const parser = new Parser(); return 'ok'; } });
+
+function normalizePublisherName(name: string): string {
+    const n = name.trim();
+    if (n === "WAM" || n === "WAM_AR") return "WAM (UAE)";
+    if (n === "BBC News" || n === "BBC Arabic") return "BBC Arabic";
+    return n;
+}
+
+export const syncSpecificRssFeed = action({
+    args: {
+        feedUrl: v.string(),
+        publisher: v.string(),
+        country: v.optional(v.string()),
+        lang: v.optional(v.string()),
+        limit: v.optional(v.number()),
+    },
+    handler: async (ctx, args): Promise<{ success: boolean; savedCount: number; message: string }> => {
+        try {
+            const identity = await ctx.auth.getUserIdentity();
+            if (!identity) {
+                throw new Error("Unauthenticated call");
+            }
+
+            const url = args.feedUrl;
+            const publisher = args.publisher;
+            const country = args.country || "UAE";
+            const lang = args.lang || "ar";
+            const limit = args.limit ?? 10;
+
+            const parser = new Parser({
+                timeout: 10000,
+                customFields: {
+                    item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
+                }
+            });
+
+            console.log(`📡 [syncSpecificRssFeed] On-demand sync for publisher: ${publisher}, URL: ${url}`);
+
+            const xml = await fetchRobustRss(url);
+            const feedData = await parser.parseString(xml);
+            const rawItems = feedData.items.slice(0, limit);
+
+            let savedCount = 0;
+            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+            for (const item of rawItems) {
+                if (!item.link || !item.title) continue;
+                const isSeen = await checkAndSetSeen(item.link, item.title);
+                if (isSeen) continue;
+
+                // Process the article (skip relevancy check for general feed syncs)
+                const processed = await processArticle(
+                    ctx,
+                    {
+                        ...item,
+                        link: item.link,
+                        pubDate: item.pubDate,
+                        source: publisher
+                    },
+                    country,
+                    lang,
+                    "Press Release",
+                    geminiKey,
+                    ["Press Release"],
+                    null,
+                    null,
+                    false,
+                    "Press Release"
+                );
+
+                if (processed) {
+                    savedCount++;
+                }
+            }
+
+            return {
+                success: true,
+                savedCount,
+                message: `Successfully synced ${savedCount} new articles for ${publisher}.`
+            };
+
+        } catch (err) {
+            console.error(`❌ [syncSpecificRssFeed] Failed:`, err);
+            const errMsg = err instanceof Error ? err.message : String(err);
+            return {
+                success: false,
+                savedCount: 0,
+                message: errMsg
+            };
+        }
+    }
+});
+

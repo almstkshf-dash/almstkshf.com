@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
-import { useQuery } from 'convex/react';
+import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
@@ -63,6 +63,9 @@ export default function RssFeeder({
   const isLoading = articlesQuery === undefined;
   const error = null;
 
+  const [isSyncing, setIsSyncing] = useState(false);
+  const syncFeedAction = useAction(api.monitoringAction.syncSpecificRssFeed);
+
   // Filter and map articles to match the FeedItem interface
   useEffect(() => {
     if (!articlesQuery?.items) return;
@@ -103,9 +106,37 @@ export default function RssFeeder({
     setLastSynced(new Date()); // Or use the latest createdAt from the items
   }, [articlesQuery, activeName, activePublisher, maxItems]);
 
+  const triggerSync = useCallback(async () => {
+    if (!activeUrl || !activePublisher) return;
+    setIsSyncing(true);
+    try {
+      const result = await syncFeedAction({
+        feedUrl: activeUrl,
+        publisher: activePublisher,
+        country: activeCountry,
+        lang: activeName?.toLowerCase().includes('ar') ? 'ar' : 'en',
+        limit: 10
+      });
+      if (result?.success) {
+        if (result.savedCount > 0) {
+          toast.success(`Synced ${result.savedCount} new articles!`);
+        } else {
+          toast.info('Feed is up to date.');
+        }
+      } else {
+        toast.error(result?.message || 'Sync failed.');
+      }
+    } catch (err) {
+      console.error('RSS Sync error:', err);
+      toast.error('Failed to sync RSS feed.');
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [activeUrl, activePublisher, activeCountry, activeName, syncFeedAction]);
+
   const fetchFeed = useCallback(async (silent = false) => {
-     // No-op since we are using Convex reactivity
-  }, []);
+    await triggerSync();
+  }, [triggerSync]);
 
   // Helper to translate source name if it's a key
   const translateSourceName = (name: string | undefined): string => {
@@ -118,8 +149,8 @@ export default function RssFeeder({
   };
 
   useEffect(() => {
-    // Component mounted, setup complete. No need for polling anymore as Convex is reactive.
-  }, []);
+    triggerSync();
+  }, [activeUrl, triggerSync]);
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
@@ -144,12 +175,12 @@ export default function RssFeeder({
 
         <button
           onClick={() => fetchFeed()}
-          disabled={isLoading}
+          disabled={isLoading || isSyncing}
           className="p-2 hover:bg-muted rounded-full transition-colors disabled:opacity-50 text-foreground/60 hover:text-foreground"
           aria-label={t('refresh')}
           title={t('refresh')}
         >
-          <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={isLoading || isSyncing ? 'animate-spin' : ''} />
         </button>
       </div>
 
