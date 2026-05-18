@@ -58,6 +58,15 @@ const nextConfig = {
         ignoreBuildErrors: true,
     },
 
+    webpack: (config, { webpack }) => {
+        config.plugins.push(
+            new webpack.IgnorePlugin({
+                resourceRegExp: /^@aws-sdk\/client-s3$/,
+            })
+        );
+        return config;
+    },
+
     async headers() {
         return [
             {
