@@ -575,3 +575,51 @@ When developing locally on Windows, Convex's local backend (ephemeral or dev ser
      const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
      ```
 This keeps backend code ultra-portable, dramatically improves execution speed, and guarantees that local testing on Windows matches production deployment behavior perfectly.
+
+---
+
+## 30. Monitored Keyword Collections & Press Release sync status
+
+To provide enterprise-grade capabilities for public relations and media agencies, the Press Monitor (PR Wire Monitoring panel) includes a complete, interactive **Monitored Keyword Collections** system:
+
+### Keyword Collections Architecture & Schema
+- **Database Schema**: Managed via the `keyword_collections` table, storing `{ name: string, keywords: string[] }` entries.
+- **CRUD Operations**: Handlers are defined in `convex/keywordCollections.ts` and exported as queries/mutations:
+  - `getKeywordCollections`: Lists all registered collections.
+  - `createKeywordCollection`: Creates a new collection with an empty keyword array.
+  - `deleteKeywordCollection`: Deletes a collection by its identifier.
+  - `addKeyword`: Appends a keyword to a collection's `keywords` array, avoiding duplicates.
+  - `deleteKeyword`: Removes a keyword from a collection's `keywords` array.
+
+### Premium UI & Interactive Pills
+- **Inline Forms**: Allows administrators to create new collections and add keywords in-place.
+- **Interactive Pills**: Renders keyword pills inside the active collection card. Clicking a pill automatically populates the core keyword input field, streamlining search workflows.
+- **Glassmorphic Styling**: Adheres to modern design parameters with border animations, glass containers (`bg-muted/30 border-border/80`), and micro-interactions.
+
+### Re-evaluated Search Success Summary & Messaging
+- The search status summary replaces static result text with dynamic, localized templates.
+- If news articles are successfully synced, it renders `sync_success_with_sources`, listing the specific news outlets (e.g., *Sky News Arabia, Al Arabiya*) that returned new coverage.
+- If no news matches are found, it gracefully flags `sync_success_no_articles` or `no_keyword_match`, keeping operations informative, accurate, and completely localized in both Arabic and English.
+
+---
+
+## 31. Convex Collections Schema Resilience & Unauthenticated Query Handling
+
+To resolve runtime server errors during collection fetching and schema synchronization:
+
+### 1. Robust Schema Widening & Narrowing Pattern
+- **Problem**: Legacy records created prior to strict schema validation definitions (or documents containing missing timestamp/metadata fields) would cause Convex's internal validator to throw a `ValidationError` on fetching (bubbles up as a generic "Server Error").
+- **Solution**: Widened the `collections` table schema in `convex/schema.ts` by making `createdAt` and `updatedAt` optional (`v.optional(v.number())`), and strictly typed the array of `items` while keeping `addedAt` optional (`v.optional(v.number())`). This ensures that legacy records compile and execute perfectly.
+- **Backfill Migration**: Implemented a database backfill mutation `debug:backfillCollections` in `convex/debug.ts` to automatically populate missing timestamps with their `_creationTime` fallback and sanitize items.
+
+### 2. Graceful Unauthenticated Query Fallbacks
+- **Problem**: Queries such as `collections:getCollections` and `collections:getCollection` were throwing a hard `Error("Unauthenticated")` if called before the client's auth state (Clerk) had fully hydrated or if a guest user visited the page. This triggered severe console errors.
+- **Solution**: Updated queries to return graceful empty responses (e.g., `[]` or `null`) when the user's `identity` is unauthenticated:
+  ```typescript
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+      return []; // Graceful empty fallback instead of throwing error
+  }
+  ```
+  Mutations and actions still enforce hard authentication checks as they represent state-changing actions.
+

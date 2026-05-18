@@ -21,6 +21,7 @@ import type * as deepSources from "../deepSources.js";
 import type * as dumpSettings from "../dumpSettings.js";
 import type * as emails from "../emails.js";
 import type * as init from "../init.js";
+import type * as keywordCollections from "../keywordCollections.js";
 import type * as media from "../media.js";
 import type * as monitoring from "../monitoring.js";
 import type * as monitoringAction from "../monitoringAction.js";
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   dumpSettings: typeof dumpSettings;
   emails: typeof emails;
   init: typeof init;
+  keywordCollections: typeof keywordCollections;
   media: typeof media;
   monitoring: typeof monitoring;
   monitoringAction: typeof monitoringAction;

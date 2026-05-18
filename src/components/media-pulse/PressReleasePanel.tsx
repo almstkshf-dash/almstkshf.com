@@ -9,15 +9,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAction, useQuery, useConvexAuth } from 'convex/react';
+import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
     Newspaper, RefreshCw, CheckCircle2, XCircle, Rss,
-    TrendingUp, Clock, Lock,
+    TrendingUp, Clock, Lock, FolderPlus, Trash2, Plus, X, ListFilter,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 // ─── PR wire sources metadata (mirrored from backend for display) ────
 const PR_WIRES = [
@@ -38,6 +39,7 @@ const PR_WIRES = [
 
 type FeedResult = {
     feed: string;
+    name?: string;
     saved?: number;
     total?: number;
     error?: string;
@@ -63,6 +65,27 @@ export default function PressReleasePanel() {
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
+
+    // Keyword collection hooks and state
+    const [activeCollectionId, setActiveCollectionId] = useState<string>('');
+    const [newCollectionName, setNewCollectionName] = useState('');
+    const [newKeyword, setNewKeyword] = useState('');
+    const [creatingCol, setCreatingCol] = useState(false);
+    const [addingKeyword, setAddingKeyword] = useState(false);
+
+    const collections = useQuery(api.keywordCollections.getKeywordCollections) || [];
+    const createColMut = useMutation(api.keywordCollections.createKeywordCollection);
+    const deleteColMut = useMutation(api.keywordCollections.deleteKeywordCollection);
+    const addKeywordMut = useMutation(api.keywordCollections.addKeyword);
+    const deleteKeywordMut = useMutation(api.keywordCollections.deleteKeyword);
+
+    useEffect(() => {
+        if (collections.length > 0 && !activeCollectionId) {
+            setActiveCollectionId(collections[0]._id);
+        }
+    }, [collections, activeCollectionId]);
+
+    const activeCollection = collections.find((c: any) => c._id === activeCollectionId);
 
     const fetchPR = useAction(api.monitoringAction.fetchPressReleaseSources);
 
@@ -113,6 +136,66 @@ export default function PressReleasePanel() {
             setError(msg);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateCollection = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const name = newCollectionName.trim();
+        if (!name) return;
+        setCreatingCol(true);
+        try {
+            const colId = await createColMut({ name });
+            setNewCollectionName('');
+            setActiveCollectionId(colId);
+            toast.success(t('collection_created'));
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : t('fetch_failed'));
+        } finally {
+            setCreatingCol(false);
+        }
+    };
+
+    const handleDeleteCollection = async (colId: string) => {
+        if (!confirm(t('confirm_delete_collection', { defaultValue: 'Are you sure you want to delete this collection?' }))) return;
+        try {
+            await deleteColMut({ id: colId as any });
+            setActiveCollectionId(collections.find((c: any) => c._id !== colId)?._id || '');
+            toast.success(t('collection_deleted', { defaultValue: 'Collection deleted successfully!' }));
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : t('fetch_failed'));
+        }
+    };
+
+    const handleAddKeyword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const kw = newKeyword.trim();
+        if (!activeCollectionId || !kw) return;
+        setAddingKeyword(true);
+        try {
+            await addKeywordMut({
+                collectionId: activeCollectionId as any,
+                keyword: kw
+            });
+            setNewKeyword('');
+            toast.success(t('keyword_added'));
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : t('fetch_failed'));
+        } finally {
+            setAddingKeyword(false);
+        }
+    };
+
+    const handleDeleteKeyword = async (kw: string) => {
+        if (!activeCollectionId) return;
+        try {
+            await deleteKeywordMut({
+                collectionId: activeCollectionId as any,
+                keyword: kw
+            });
+            toast.success(t('keyword_deleted'));
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : t('fetch_failed'));
         }
     };
 
@@ -228,6 +311,132 @@ export default function PressReleasePanel() {
                     </Button>
                 </div>
 
+                {/* Monitored Keyword Collections Card */}
+                <div className="bg-muted/30 border border-border/80 rounded-xl p-5 space-y-4">
+                    {/* Collection Header/Selector */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-4">
+                        <div className="flex items-center gap-2">
+                            <ListFilter className="w-4 h-4 text-primary" aria-hidden="true" />
+                            <div>
+                                <span className="text-xs font-semibold text-foreground/80">{t('collection_label')}</span>
+                                <div className="flex items-center gap-1.5 mt-1">
+                                    <select
+                                        value={activeCollectionId}
+                                        onChange={e => setActiveCollectionId(e.target.value)}
+                                        className="bg-background border border-border rounded-lg text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/40 font-medium cursor-pointer"
+                                    >
+                                        <option value="">{t('select_collection_placeholder')}</option>
+                                        {collections.map((c: any) => (
+                                            <option key={c._id} value={c._id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                    {activeCollectionId && (
+                                        <button
+                                            onClick={() => handleDeleteCollection(activeCollectionId)}
+                                            className="p-1.5 text-foreground/50 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg transition-colors"
+                                            title={t('delete_keyword_tooltip')}
+                                            aria-label={t('delete_keyword_tooltip')}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Inline Create Collection Form */}
+                        <form onSubmit={handleCreateCollection} className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={newCollectionName}
+                                onChange={e => setNewCollectionName(e.target.value)}
+                                placeholder={t('new_collection_placeholder')}
+                                className="px-3 py-1.5 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/40 w-44"
+                                disabled={creatingCol}
+                            />
+                            <button
+                                type="submit"
+                                disabled={creatingCol || !newCollectionName.trim()}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                            >
+                                <FolderPlus className="w-3.5 h-3.5" aria-hidden="true" />
+                                {creatingCol ? '...' : t('create_collection_btn')}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Keywords pills display and inline add form */}
+                    {activeCollectionId ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-xs font-bold text-foreground">{t('keywords_card_title')}</h4>
+                                    <p className="text-[10px] text-foreground/60">{t('keywords_card_subtitle')}</p>
+                                </div>
+                            </div>
+
+                            {!activeCollection || activeCollection.keywords.length === 0 ? (
+                                <div className="text-center py-4 bg-background/40 border border-dashed border-border rounded-lg text-[11px] text-foreground/50">
+                                    {t('no_keywords')}
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {activeCollection.keywords.map((kw: string) => (
+                                        <div
+                                            key={kw}
+                                            className={clsx(
+                                                "group flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border transition-all cursor-pointer shadow-sm",
+                                                keyword === kw
+                                                    ? "bg-primary/10 border-primary text-primary"
+                                                    : "bg-background border-border text-foreground hover:border-primary/40 hover:text-primary"
+                                            )}
+                                            onClick={() => setKeyword(kw)}
+                                            title={t('sync_keyword_tooltip')}
+                                        >
+                                            <span>{kw}</span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteKeyword(kw);
+                                                }}
+                                                className="p-0.5 rounded-full text-foreground/40 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors"
+                                                title={t('delete_keyword_tooltip')}
+                                                aria-label={t('delete_keyword_tooltip')}
+                                            >
+                                                <X className="w-3 h-3" aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Add Keyword Form */}
+                            <form onSubmit={handleAddKeyword} className="flex items-center gap-2 pt-2 border-t border-border/20">
+                                <input
+                                    type="text"
+                                    value={newKeyword}
+                                    onChange={e => setNewKeyword(e.target.value)}
+                                    placeholder={t('add_keyword_placeholder')}
+                                    className="flex-1 max-w-md px-3 py-1.5 bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary/40"
+                                    disabled={addingKeyword}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={addingKeyword || !newKeyword.trim()}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary rounded-lg text-xs font-bold transition-all disabled:opacity-50"
+                                >
+                                    <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                                    {t('add_keyword_btn')}
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div className="text-center py-6 text-xs text-foreground/50">
+                            {t('no_collection_selected')}
+                        </div>
+                    )}
+                </div>
+
                 {/* Wire source badges */}
                 <div className="flex flex-wrap gap-2">
                     {PR_WIRES.map(w => (
@@ -259,7 +468,14 @@ export default function PressReleasePanel() {
                                 : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
                         )}>
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                            <span>{syncResult.message}</span>
+                            <span>
+                                {syncResult.totalSaved > 0
+                                    ? t('sync_success_with_sources', {
+                                        count: syncResult.totalSaved,
+                                        sources: syncResult.feedResults.filter(f => !f.error).map(f => f.name || f.feed).join(', ')
+                                      })
+                                    : t('sync_success_no_articles')}
+                            </span>
                             {syncResult.totalErrors > 0 && (
                                 <span className="ms-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
                             )}
@@ -275,7 +491,7 @@ export default function PressReleasePanel() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                             {syncResult.feedResults.map((f: FeedResult) => (
                                 <div
-                                    key={f.feed}
+                                    key={f.name || f.feed}
                                     className={clsx(
                                         'flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-medium',
                                         f.error
@@ -283,7 +499,7 @@ export default function PressReleasePanel() {
                                             : 'bg-muted border-border text-foreground'
                                     )}
                                 >
-                                    <span className="truncate">{f.feed}</span>
+                                    <span className="truncate">{f.name || f.feed}</span>
                                     {f.error ? (
                                         <span className="ms-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
                                     ) : (

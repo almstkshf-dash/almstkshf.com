@@ -14,14 +14,18 @@ export const getCollections = query({
     handler: async (ctx) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            return [];
         }
 
         const collections = await ctx.db.query("collections")
             .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
             .collect();
 
-        return collections.sort((a, b) => b.updatedAt - a.updatedAt);
+        return collections.sort((a, b) => {
+            const timeA = a.updatedAt ?? a.createdAt ?? a._creationTime;
+            const timeB = b.updatedAt ?? b.createdAt ?? b._creationTime;
+            return timeB - timeA;
+        });
     },
 });
 
@@ -30,7 +34,7 @@ export const getCollection = query({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            return null;
         }
 
         const collection = await ctx.db.get(args.id);

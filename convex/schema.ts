@@ -303,10 +303,10 @@ export default defineSchema({
             title: v.string(),
             sourceId: v.optional(v.string()),
             data: v.any(),
-            addedAt: v.number(),
+            addedAt: v.optional(v.number()),
         })),
-        createdAt: v.number(),
-        updatedAt: v.number(),
+        createdAt: v.optional(v.number()),
+        updatedAt: v.optional(v.number()),
     }).index("by_userId", ["userId"]),
 
     user_reports: defineTable({
@@ -321,4 +321,12 @@ export default defineSchema({
         monthlyVisits: v.number(),
         lastFetchedAt: v.number(),
     }).index("by_domain", ["domain"]),
+
+    keyword_collections: defineTable({
+        userId: v.string(),
+        name: v.string(),
+        keywords: v.array(v.string()),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_userId", ["userId"]),
 });
