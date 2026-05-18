@@ -180,19 +180,25 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
 
     return (
         <div 
+            role="presentation"
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         >
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
             <div 
                 role="dialog"
                 aria-modal="true"
+                aria-labelledby="collection-modal-title"
+                tabIndex={-1}
                 className="bg-card w-full max-w-2xl rounded-[2rem] border border-border overflow-hidden shadow-2xl relative flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30 shrink-0">
                     <div className="min-w-0">
-                        <h3 className="text-xl font-bold text-foreground truncate">
+                        <h3 id="collection-modal-title" className="text-xl font-bold text-foreground truncate">
                             {collection?.name || tCommon("loading")}
                         </h3>
                         {collection?.description && (
