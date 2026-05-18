@@ -119,3 +119,10 @@ export default function ChatbotTrigger() {
         </div>
     );
 }
+
+// Extend Window interface for TypeScript
+declare global {
+    interface Window {
+        chatbase: any;
+    }
+}

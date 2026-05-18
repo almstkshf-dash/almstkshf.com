@@ -60,6 +60,7 @@ interface DashboardGridProps {
 const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLeftSlot, topRightSlot }: DashboardGridProps) => {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const localeTranslations = useMessages();
+    const settings = useQuery(api.settings.getSettings);
     const [isGenerating, setIsGenerating] = useState(false);
     const [trendRange, setTrendRange] = useState<7 | 30>(7);
     const saveReport = useMutation(api.userActions.saveReport);
@@ -69,7 +70,14 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
 
         setIsGenerating(true);
         try {
-            const generator = new ReportGenerator(articles, localeTranslations);
+            const exportTranslations = {
+                ...(localeTranslations as any),
+                brand_name: settings?.brandName || 'ALMSTKSHF',
+                brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+                footer_url: settings?.footerUrl || 'www.almstkshf.com',
+                logo_url: settings?.logoUrl || undefined,
+            };
+            const generator = new ReportGenerator(articles, exportTranslations as any);
             let blob;
             let filename = `media-monitoring-report-${new Date().toISOString().split('T')[0]}`;
 

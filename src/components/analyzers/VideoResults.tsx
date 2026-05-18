@@ -560,7 +560,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     <div className="grid grid-cols-2 gap-3">
                       {result.frameReports[
                         selectedFrame
-                      ].report.pixelLogicSignals.map((sig: { id?: string; label?: string; risk?: string; detectedValue?: string }) => (
+                      ].report.pixelLogicSignals.map((sig: any) => (
                         <div
                           key={sig.id}
                           className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-900 flex flex-col justify-center items-center text-center"

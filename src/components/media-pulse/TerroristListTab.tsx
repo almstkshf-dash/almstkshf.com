@@ -64,13 +64,17 @@ export default function TerroristListTab() {
 
   const wipeAll = useMutation(api.terroristList.wipeAll);
   const addItems = useMutation(api.terroristList.addItems);
-  const messages = useTranslations(); // For passing to ReportGenerator if needed, but we'll use t scopes
+  const settings = useQuery(api.settings.getSettings);
 
   const handleExport = async (format: 'pdf' | 'excel') => {
     if (!entries || entries.length === 0) return;
     try {
       // Build export translations using correct media monitoring terminology
       const exportTranslations: ReportTranslations = {
+        brand_name: settings?.brandName || 'ALMSTKSHF',
+        brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+        footer_url: settings?.footerUrl || 'www.almstkshf.com',
+        logo_url: settings?.logoUrl || undefined,
         TerroristList: {
           title: t('title'),           // تقرير فحص قوائم العقوبات
           fields: {

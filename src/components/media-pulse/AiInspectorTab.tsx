@@ -19,6 +19,8 @@ import {
 
 import { ReportGenerator } from "@/lib/report-generator";
 import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 import { FolderPlus } from "lucide-react";
 
 // Components
@@ -38,6 +40,7 @@ type Mode = "text" | "image" | "video";
 
 export default function AiInspectorTab() {
   const t = useTranslations("AiInspector");
+  const settings = useQuery(api.settings.getSettings);
   const [mode, setMode] = useState<Mode>("text");
   const [loading, setLoading] = useState(false);
   const [textInput, setTextInput] = useState("");
@@ -63,7 +66,7 @@ export default function AiInspectorTab() {
         overallRisk: mode === 'text' ? (textResults?.score ?? 0 >= 70 ? 'high' : textResults?.score ?? 0 >= 30 ? 'medium' : 'low') : 
                     mode === 'image' ? (imageResults?.overallRisk ?? 'low') : 
                     (videoResults?.overallRisk ?? 'low'),
-        confidenceScore: activeData.score ?? activeData.confidenceScore ?? 0,
+        confidenceScore: (activeData as any).score ?? (activeData as any).confidenceScore ?? 0,
         sentenceBreakdown: textResults?.sentences?.map(s => ({
           text: s.text,
           flags: s.signals,
@@ -129,7 +132,10 @@ export default function AiInspectorTab() {
           col_detail: t("export.col_detail") || "Detail",
           col_status: t("export.col_status") || "Status",
         },
-        brand_name: "ALMSTKSHF"
+        brand_name: settings?.brandName || 'ALMSTKSHF',
+        brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+        footer_url: settings?.footerUrl || 'www.almstkshf.com',
+        logo_url: settings?.logoUrl || undefined,
       };
 
       await ReportGenerator.exportAiInspectorReport(mode, reportData, reportTranslations, format);
@@ -398,7 +404,7 @@ export default function AiInspectorTab() {
                   id: Math.random().toString(36).substring(7),
                   type: "ai_inspector",
                   title: t("collection_title", { mode: t(`modes.${mode}`) }),
-                  data: mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults
+                  data: (mode === 'text' ? textResults : mode === 'image' ? imageResults : videoResults) as any
                 }}
               />
 

@@ -128,7 +128,8 @@ export default function DarkWebTab() {
   const results = (useQuery(
     api.darkWebDb.getByUserId,
     isAuthenticated ? { limit: 50 } : 'skip'
-  ) || []) as DarkWebResult[];
+  ) || []) as any[];
+  const settings = useQuery(api.settings.getSettings);
 
   // â”€â”€ Risk badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRiskBadgeStyles = (risk: string) => {
@@ -209,6 +210,10 @@ export default function DarkWebTab() {
     if (!results || results.length === 0) return;
     try {
       const exportTranslations: ReportTranslations = {
+        brand_name: settings?.brandName || 'ALMSTKSHF',
+        brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+        footer_url: settings?.footerUrl || 'www.almstkshf.com',
+        logo_url: settings?.logoUrl || undefined,
         DarkWeb: { 
           tab_label: t('tab_label'),
           col_risk: t('col_risk'),   // مستوى الخطورة
@@ -476,7 +481,7 @@ export default function DarkWebTab() {
                           <p className="text-xs text-foreground/70 mt-1 line-clamp-2">{entry.snippet}</p>
                           {entry.tags && entry.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
-                              {entry.tags.map((tag, idx) => (
+                              {entry.tags.map((tag: string, idx: number) => (
                                 <span key={idx} className="px-1.5 py-0.5 rounded bg-muted text-[9px] font-bold uppercase tracking-wider text-foreground/60 border border-border/50">
                                   {tag}
                                 </span>
@@ -505,14 +510,14 @@ export default function DarkWebTab() {
                     <td className="px-6 py-4 text-center">
                       <span className={clsx(
                         'inline-flex px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-tight border',
-                        getRiskBadgeStyles(entry.risk_level)
+                        getRiskBadgeStyles(entry.risk_level || 'low')
                       )}>
-                        {t(`risk_${entry.risk_level}`)}
+                        {t(`risk_${entry.risk_level || 'low'}`)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => deleteById({ id: entry._id })}
+                        onClick={() => deleteById({ id: entry._id as any })}
                         aria-label={`${tCommon('delete')} ${entry.title}`}
                         className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-rose-600 dark:hover:text-rose-400 transition-colors group-hover:opacity-100 opacity-50"
                       >

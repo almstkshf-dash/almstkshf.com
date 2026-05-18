@@ -195,7 +195,7 @@ export class ReportGenerator {
     }
 
     private static async generateWatchlistPDF(items: TerroristListItem[], translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
         this.addCoverPage(doc, title, items.length, translations, logoBase64, fontLoaded);
 
         doc.addPage();
@@ -224,7 +224,14 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 30, halign: 'center' },
+                3: { cellWidth: 25, halign: 'center' },
+                4: { cellWidth: 25, halign: 'center' }
+            }
         });
 
         this.finalizePDF(doc, title, translations, fontLoaded);
@@ -274,7 +281,7 @@ export class ReportGenerator {
     }
 
     private static async generateDarkWebPDF(results: DarkWebResult[], translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         // Cover Page
         this.addCoverPage(doc, title, results.length, translations, logoBase64, fontLoaded);
@@ -306,14 +313,21 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 22, halign: 'center' },
+                1: { cellWidth: 45 },
+                2: { cellWidth: 22, halign: 'center' },
+                3: { cellWidth: 25, halign: 'center' },
+                4: { cellWidth: 'auto' }
+            }
         });
 
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
     private static async generatePressReleasePDF(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false) {
-        const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         // Pre-load images to base64 using local CORS-bypassing proxy
         const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
@@ -387,8 +401,12 @@ export class ReportGenerator {
             logoBase64,
             translations,
             columnStyles: {
-                0: { cellWidth: 20 }, // Fixed width for image column
-                2: { cellWidth: 'auto', minCellWidth: 40 }, // Title column
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 22, halign: 'center' },
+                2: { cellWidth: 'auto' },
+                3: { cellWidth: 22, halign: 'center' },
+                4: { cellWidth: 20, halign: 'center' },
+                5: { cellWidth: 20, halign: 'center' }
             },
             didDrawCell: (data: any) => {
                 if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
@@ -419,7 +437,7 @@ export class ReportGenerator {
     }
 
     private static async generateDeepWebPDF(runs: DeepWebRun[], threats: ReportArticle[], translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         this.addCoverPage(doc, title, threats.length, translations, logoBase64, fontLoaded);
 
@@ -448,7 +466,13 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 45, halign: 'center' },
+                1: { cellWidth: 45, halign: 'center' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 35, halign: 'center' }
+            }
         });
 
         // Identified Threats Section
@@ -461,7 +485,12 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 35, halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 35, halign: 'center' }
+            }
         });
         y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
 
@@ -469,7 +498,7 @@ export class ReportGenerator {
     }
 
     private static async generateOsintHistoryPDF(items: OsintResult[], translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         this.addCoverPage(doc, title, items.length, translations, logoBase64, fontLoaded);
 
@@ -497,14 +526,20 @@ export class ReportGenerator {
             startY: y + 8,
             fontLoaded,
             logoBase64,
-            translations
+            translations,
+            columnStyles: {
+                0: { cellWidth: 45, halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 35, halign: 'center' }
+            }
         });
 
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
     private static async generateOsintPDF(data: OsintResult, translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         // Custom Dossier Cover
         this.addCoverPage(doc, title, 1, translations, logoBase64, fontLoaded);
@@ -542,7 +577,11 @@ export class ReportGenerator {
                     startY: y + 8,
                     fontLoaded,
                     logoBase64,
-                    translations
+                    translations,
+                    columnStyles: {
+                        0: { cellWidth: 60, fontStyle: 'bold' },
+                        1: { cellWidth: 'auto' }
+                    }
                 });
                 y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
             }
@@ -565,7 +604,12 @@ export class ReportGenerator {
                 startY: y + 8,
                 fontLoaded,
                 logoBase64,
-                translations
+                translations,
+                columnStyles: {
+                    0: { cellWidth: 'auto' },
+                    1: { cellWidth: 40, halign: 'center' },
+                    2: { cellWidth: 40, halign: 'center' }
+                }
             });
             y = (doc as AutoTablejsPDF).lastAutoTable.finalY + 15;
         }
@@ -574,7 +618,7 @@ export class ReportGenerator {
     }
 
     private static async generateAiInspectorPDF(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
-        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF();
+        const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         const modeTrans = translations.AiInspector?.[`mode_${mode}` as keyof typeof translations.AiInspector] || mode.toUpperCase();
         this.addCoverPage(doc, `${title} - ${modeTrans}`, typeof data === 'object' ? Object.keys(data).length : 1, translations, logoBase64, fontLoaded);
@@ -626,7 +670,12 @@ export class ReportGenerator {
                 startY: y + 8,
                 fontLoaded,
                 logoBase64,
-                translations
+                translations,
+                columnStyles: {
+                    0: { cellWidth: 'auto' },
+                    1: { cellWidth: 40, halign: 'center' },
+                    2: { cellWidth: 35, halign: 'center' }
+                }
             });
             y = (doc as AutoTablejsPDF).lastAutoTable?.finalY || y + 50;
         } else if (mode === 'image' && data) {
@@ -650,6 +699,12 @@ export class ReportGenerator {
                 fontLoaded,
                 logoBase64,
                 translations,
+                columnStyles: {
+                    0: { cellWidth: 35 },
+                    1: { cellWidth: 'auto' },
+                    2: { cellWidth: 35 },
+                    3: { cellWidth: 25, halign: 'center' }
+                },
                 didDrawPage: (data) => {
                     if (data.pageNumber > 1) {
                         this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
@@ -720,7 +775,13 @@ export class ReportGenerator {
                     startY: y + 8,
                     fontLoaded,
                     logoBase64,
-                    translations
+                    translations,
+                    columnStyles: {
+                        0: { cellWidth: 35 },
+                        1: { cellWidth: 'auto' },
+                        2: { cellWidth: 35 },
+                        3: { cellWidth: 25, halign: 'center' }
+                    }
                 });
             }
         } else if (mode === 'video' && data) {
@@ -826,25 +887,36 @@ export class ReportGenerator {
 
     private static async addAutoTable(doc: jsPDF, options: { head: string[][]; body: (string | number | undefined)[][]; startY: number; fontLoaded: boolean; logoBase64: string | null; translations: ReportTranslations; didDrawPage?: (data: any) => void; didDrawCell?: (data: any) => void; columnStyles?: any }) {
         const autoTable = (await import('jspdf-autotable')).default;
-        const sanitizedBody = options.body.map(row => row.map(cell => cell ?? ''));
+
+        // Process head and body cells to automatically apply fixArabic if they contain Arabic text
+        const processedHead = options.head.map(row => row.map(cell => this.fixArabic(cell || '')));
+        const sanitizedBody = options.body.map(row => row.map(cell => {
+            if (typeof cell === 'string') {
+                return this.fixArabic(cell);
+            }
+            return cell ?? '';
+        }));
 
         return autoTable(doc, {
             ...options,
+            head: processedHead,
             body: sanitizedBody as any,
             margin: { horizontal: 10 },
             styles: {
-                fontSize: 8,
+                fontSize: 7.5,
                 font: options.fontLoaded ? 'Amiri' : 'helvetica',
-                cellPadding: 3,
+                cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
                 overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
                 cellWidth: 'auto',    // Allow columns to shrink/expand based on content
                 valign: 'middle'
             },
             headStyles: {
-                fillColor: [31, 78, 120], // Explicitly pass mutable array for BRAND_DARK
+                fillColor: [31, 78, 120], // BRAND_DARK
                 textColor: [255, 255, 255],
                 fontStyle: 'bold',
-                halign: 'center'
+                fontSize: 8.5,
+                cellPadding: { top: 3.5, bottom: 3.5, left: 2.5, right: 2.5 },
+                valign: 'middle'
             },
             alternateRowStyles: {
                 fillColor: [241, 245, 249] // Explicitly pass mutable array for ACCENT_BG
@@ -873,14 +945,25 @@ export class ReportGenerator {
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
 
+        const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '') || /[\u0600-\u06FF]/.test(title);
+
         for (let i = 1; i <= pages; i++) {
             doc.setPage(i);
             doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(150);
-            doc.text(this.fixArabic(`${translations.brand_name || 'ALMSTKSHF'} | ${title}`), 14, pageHeight - 10);
+
+            const brandInfo = this.fixArabic(`${translations.brand_name || 'ALMSTKSHF'} | ${title}`);
             const pageStr = translations.Reports?.page || 'Page';
-            doc.text(this.fixArabic(`${pageStr} ${i} / ${pages}`), pageWidth - 14, pageHeight - 10, { align: 'right' });
+            const pageInfo = this.fixArabic(`${pageStr} ${i} / ${pages}`);
+
+            if (isArabicMode) {
+                doc.text(brandInfo, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                doc.text(pageInfo, 14, pageHeight - 10, { align: 'left' });
+            } else {
+                doc.text(brandInfo, 14, pageHeight - 10);
+                doc.text(pageInfo, pageWidth - 14, pageHeight - 10, { align: 'right' });
+            }
         }
 
         if (returnOnly) return;
@@ -890,7 +973,7 @@ export class ReportGenerator {
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-    
+
     public static async exportMediaMonitoringReport(
         articles: ReportArticle[],
         translations: ReportTranslations,
@@ -981,6 +1064,7 @@ export class ReportGenerator {
         if (typeof window === 'undefined') throw new Error('PDF export is client-only');
 
         const finalReportTitle = reportTitle || translations.report_title || 'Media Coverage Report';
+        const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '') || /[\u0600-\u06FF]/.test(finalReportTitle);
 
         let JsPDF;
         try {
@@ -1014,7 +1098,7 @@ export class ReportGenerator {
             console.warn('Amiri font load failed', e);
         }
 
-        const logoBase64 = await this.loadLogo();
+        const logoBase64 = await this.loadLogo(logoUrl);
 
         // Pre-load images to base64 for up to top 50 articles using local CORS proxy
         const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
@@ -1100,7 +1184,11 @@ export class ReportGenerator {
         let y = 28;
         doc.setFontSize(18);
         doc.setTextColor(...BRAND_DARK);
-        addText(translations.summary_title || 'Executive Summary', 14, y);
+        if (isArabicMode) {
+            addText(translations.summary_title || 'Executive Summary', pageWidth - 14, y, { align: 'right' });
+        } else {
+            addText(translations.summary_title || 'Executive Summary', 14, y);
+        }
         y += 12;
 
         const totalReach = articles.reduce((sum, a) => sum + (a.reach || 0), 0);
@@ -1109,19 +1197,23 @@ export class ReportGenerator {
         const neu = articles.filter(a => a.sentiment === 'Neutral').length;
         const neg = articles.filter(a => a.sentiment === 'Negative').length;
 
-        const boxW = (pageWidth - 42) / 3;
         const boxes = [
             { label: translations.total_reach || 'TOTAL REACH / IMPRESSIONS', value: totalReach.toLocaleString(), color: [31, 78, 120] as [number, number, number] },
             { label: translations.ad_value || 'ADVERTISING VALUE EQUIVALENT (AVE)', value: `${totalAVE.toLocaleString()}`, color: [218, 165, 32] as [number, number, number] },
             { label: translations.total_articles || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] as [number, number, number] },
         ];
 
-        this.drawMetricBoxes(doc, boxes, y, pageWidth, fontLoaded);
+        const activeBoxes = isArabicMode ? [...boxes].reverse() : boxes;
+        this.drawMetricBoxes(doc, activeBoxes, y, pageWidth, fontLoaded);
         y += 38;
 
         doc.setFontSize(12);
         doc.setTextColor(...BRAND_DARK);
-        addText(translations.sentiment_title || 'Sentiment Direction Distribution', 14, y);
+        if (isArabicMode) {
+            addText(translations.sentiment_title || 'Sentiment Direction Distribution', pageWidth - 14, y, { align: 'right' });
+        } else {
+            addText(translations.sentiment_title || 'Sentiment Direction Distribution', 14, y);
+        }
         y += 8;
 
         const sentimentData = [
@@ -1133,12 +1225,25 @@ export class ReportGenerator {
         sentimentData.forEach((s) => {
             doc.setFontSize(9);
             doc.setTextColor(80);
-            addText(`${s.label}: ${s.count} (${s.pct}%)`, 20, y + 5);
-            doc.setFillColor(230, 230, 230);
-            doc.roundedRect(70, y + 1, 100, 5, 2, 2, 'F');
-            if (s.pct > 0) {
-                doc.setFillColor(...(s.color as [number, number, number]));
-                doc.roundedRect(70, y + 1, Math.max(s.pct, 2), 5, 2, 2, 'F');
+
+            if (isArabicMode) {
+                addText(`${s.label}: ${s.count} (${s.pct}%)`, pageWidth - 20, y + 5, { align: 'right' });
+                doc.setFillColor(230, 230, 230);
+                doc.roundedRect(pageWidth - 180, y + 1, 100, 5, 2, 2, 'F');
+                if (s.pct > 0) {
+                    doc.setFillColor(...(s.color as [number, number, number]));
+                    const filledWidth = Math.max(s.pct, 2);
+                    const barX = (pageWidth - 180) + 100 - filledWidth;
+                    doc.roundedRect(barX, y + 1, filledWidth, 5, 2, 2, 'F');
+                }
+            } else {
+                addText(`${s.label}: ${s.count} (${s.pct}%)`, 20, y + 5);
+                doc.setFillColor(230, 230, 230);
+                doc.roundedRect(70, y + 1, 100, 5, 2, 2, 'F');
+                if (s.pct > 0) {
+                    doc.setFillColor(...(s.color as [number, number, number]));
+                    doc.roundedRect(70, y + 1, Math.max(s.pct, 2), 5, 2, 2, 'F');
+                }
             }
             y += 10;
         });
@@ -1146,7 +1251,11 @@ export class ReportGenerator {
         y += 10;
         doc.setFontSize(12);
         doc.setTextColor(...BRAND_DARK);
-        addText(translations.ai_recommendation || 'AI Strategic Recommendation', 14, y);
+        if (isArabicMode) {
+            addText(translations.ai_recommendation || 'AI Strategic Recommendation', pageWidth - 14, y, { align: 'right' });
+        } else {
+            addText(translations.ai_recommendation || 'AI Strategic Recommendation', 14, y);
+        }
         y += 8;
 
         doc.setFillColor(255, 250, 235);
@@ -1166,7 +1275,11 @@ export class ReportGenerator {
         const splitRec = doc.splitTextToSize(recommendation, pageWidth - 40);
         const processedRec = splitRec.map((line: string) => this.fixArabic(line));
         doc.setTextColor(80);
-        doc.text(processedRec, 20, y + 10, { align: 'left' });
+        if (isArabicMode) {
+            doc.text(processedRec, pageWidth - 20, y + 10, { align: 'right' });
+        } else {
+            doc.text(processedRec, 20, y + 10, { align: 'left' });
+        }
 
         // PAGE 3+
         doc.addPage();
@@ -1174,49 +1287,141 @@ export class ReportGenerator {
 
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_DARK);
-        addText(translations.coverage_log || 'Media Coverage Log', pageWidth - 14, 28, { align: 'right' });
+        if (isArabicMode) {
+            addText(translations.coverage_log || 'Media Coverage Log', pageWidth - 14, 28, { align: 'right' });
+        } else {
+            addText(translations.coverage_log || 'Media Coverage Log', 14, 28);
+        }
 
-        const tableData = articlesWithImages.map(a => {
-            const parsedTitle = this.fixArabic(a.title);
-            const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
-            return [
-                '', // Image column placeholder
-                a.publishedDate ?? '',
-                parsedTitle + hashStr,
-                this.fixArabic(a.sourceType ?? ''),
-                this.fixArabic(a.source ?? ''),
-                this.fixArabic(a.publisherUsername ?? '-'),
-                a.sourceCountry ?? '',
-                a.sentiment ?? '',
-                a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-',
-                (a.reach ?? 0).toLocaleString(),
-                a.likes !== undefined && a.likes !== null ? a.likes.toLocaleString() : '-',
-                a.retweets !== undefined && a.retweets !== null ? a.retweets.toLocaleString() : '-',
-                a.replies !== undefined && a.replies !== null ? a.replies.toLocaleString() : '-',
-                `${(a.ave ?? 0).toLocaleString()}`,
-                a.status === 'in_progress' ? 'In Progress' : (a.status || 'Live')
-            ];
+        // Define columns dynamically to cleanly support dynamic sizing, custom alignments, and RTL mirroring
+        const columnDefinitions = [
+            {
+                id: 'image',
+                header: '',
+                width: 10,
+                halign: 'center',
+                getValue: (a: ReportArticle) => ''
+            },
+            {
+                id: 'date',
+                header: translations.date || 'Date',
+                width: 16,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.publishedDate ?? ''
+            },
+            {
+                id: 'title',
+                header: translations.title || 'Title',
+                width: 60,
+                halign: isArabicMode ? 'right' : 'left',
+                getValue: (a: ReportArticle) => {
+                    const titleText = a.title ?? '';
+                    const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
+                    return titleText + hashStr;
+                }
+            },
+            {
+                id: 'type',
+                header: translations.type || 'Type',
+                width: 18,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.sourceType ?? ''
+            },
+            {
+                id: 'source',
+                header: translations.source || 'Source',
+                width: 22,
+                halign: isArabicMode ? 'right' : 'left',
+                getValue: (a: ReportArticle) => a.source ?? ''
+            },
+            {
+                id: 'publisher_username',
+                header: translations.publisher_username || 'Publisher',
+                width: 24,
+                halign: isArabicMode ? 'right' : 'left',
+                getValue: (a: ReportArticle) => a.publisherUsername ?? '-'
+            },
+            {
+                id: 'country',
+                header: translations.country || 'Country',
+                width: 14,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.sourceCountry ?? ''
+            },
+            {
+                id: 'sentiment',
+                header: translations.sentiment || 'Sentiment',
+                width: 15,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.sentiment ?? ''
+            },
+            {
+                id: 'relevancy',
+                header: translations.relevancy || 'Relevancy',
+                width: 12,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-'
+            },
+            {
+                id: 'reach',
+                header: translations.reach || 'Reach',
+                width: 16,
+                halign: isArabicMode ? 'left' : 'right', // Numbers are LTR so align opposite in RTL
+                getValue: (a: ReportArticle) => (a.reach ?? 0).toLocaleString()
+            },
+            {
+                id: 'likes',
+                header: translations.likes || 'Likes',
+                width: 11,
+                halign: isArabicMode ? 'left' : 'right',
+                getValue: (a: ReportArticle) => a.likes !== undefined && a.likes !== null ? a.likes.toLocaleString() : '-'
+            },
+            {
+                id: 'retweets',
+                header: translations.retweets || 'Retweets',
+                width: 11,
+                halign: isArabicMode ? 'left' : 'right',
+                getValue: (a: ReportArticle) => a.retweets !== undefined && a.retweets !== null ? a.retweets.toLocaleString() : '-'
+            },
+            {
+                id: 'replies',
+                header: translations.replies || 'Replies',
+                width: 11,
+                halign: isArabicMode ? 'left' : 'right',
+                getValue: (a: ReportArticle) => a.replies !== undefined && a.replies !== null ? a.replies.toLocaleString() : '-'
+            },
+            {
+                id: 'ave',
+                header: translations.ave || 'AVE ($)',
+                width: 16,
+                halign: isArabicMode ? 'left' : 'right',
+                getValue: (a: ReportArticle) => `${(a.ave ?? 0).toLocaleString()}`
+            },
+            {
+                id: 'status',
+                header: translations.status || 'Status',
+                width: 16,
+                halign: 'center',
+                getValue: (a: ReportArticle) => a.status === 'in_progress' ? 'In Progress' : (a.status || 'Live')
+            }
+        ];
+
+        const activeColumns = isArabicMode ? [...columnDefinitions].reverse() : columnDefinitions;
+
+        const tableHead = [activeColumns.map(col => col.header)];
+        const tableBody = articlesWithImages.map(a => activeColumns.map(col => col.getValue(a)));
+
+        const columnStyles: Record<number, { cellWidth: number; halign: string }> = {};
+        activeColumns.forEach((col, idx) => {
+            columnStyles[idx] = {
+                cellWidth: col.width,
+                halign: col.halign
+            };
         });
 
         await this.addAutoTable(doc, {
-            head: [[
-                '', // Image header
-                translations.date || 'Publication Date',
-                translations.title || 'Title',
-                translations.type || 'Source Type',
-                translations.source || 'Source',
-                translations.publisher_username || 'Publisher Account Name',
-                translations.country || 'Country',
-                translations.sentiment || 'Sentiment Direction',
-                translations.relevancy || 'Relevancy',
-                translations.reach || 'Reach',
-                translations.likes || 'Likes',
-                translations.retweets || 'Retweets',
-                translations.replies || 'Replies',
-                translations.ave || 'AVE ($)',
-                translations.status || 'Status'
-            ]],
-            body: tableData as (string | number | undefined)[][],
+            head: tableHead,
+            body: tableBody as (string | number | undefined)[][],
             startY: 33,
             fontLoaded,
             logoBase64,
@@ -1224,31 +1429,16 @@ export class ReportGenerator {
             didDrawPage: () => {
                 this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
             },
-            columnStyles: {
-                0: { cellWidth: 10 }, // Image cell width
-                1: { cellWidth: 15 },
-                2: { cellWidth: 60, halign: 'left' },
-                3: { cellWidth: 20 },
-                4: { cellWidth: 22, halign: 'left' },
-                5: { cellWidth: 22, halign: 'left' },
-                6: { cellWidth: 15, halign: 'center' },
-                7: { cellWidth: 15, halign: 'center' },
-                8: { cellWidth: 12, halign: 'center' },
-                9: { cellWidth: 15, halign: 'right' },
-                10: { cellWidth: 10, halign: 'right' },
-                11: { cellWidth: 10, halign: 'right' },
-                12: { cellWidth: 10, halign: 'right' },
-                13: { cellWidth: 15, halign: 'right' },
-                14: { cellWidth: 15, halign: 'center' },
-            },
+            columnStyles,
             didDrawCell: (data: any) => {
-                if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
+                const imageColIndex = activeColumns.findIndex(col => col.id === 'image');
+                if (data.column.index === imageColIndex && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
                     const img = articlesWithImages[data.row.index].imageUrl;
                     if (img && img.startsWith('data:')) {
                         try {
                             const matches = img.match(/^data:image\/([a-zA-Z+]+);base64,/);
                             const format = matches ? matches[1].toUpperCase() : 'JPEG';
-                            const padding = 2;
+                            const padding = 1.5;
                             doc.addImage(
                                 img,
                                 format === 'PNG' ? 'PNG' : 'JPEG',
@@ -1419,7 +1609,7 @@ export class ReportGenerator {
                     const matches = a.imageUrl.match(/^data:image\/([a-zA-Z+]+);base64,/);
                     const format = matches ? matches[1].toLowerCase() : 'jpeg';
                     const base64Data = a.imageUrl.split(',')[1];
-                    
+
                     const imageId = workbook.addImage({
                         base64: base64Data,
                         extension: format === 'png' ? 'png' : 'jpeg',
@@ -1646,7 +1836,9 @@ export class ReportGenerator {
 
     private static async loadLogo(logoUrl?: string): Promise<string | null> {
         try {
-            const urlToFetch = logoUrl || '/logo.png';
+            const urlToFetch = logoUrl
+                ? (logoUrl.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(logoUrl)}` : logoUrl)
+                : '/logo.png';
             const res = await fetch(urlToFetch);
             if (!res.ok) {
                 if (logoUrl) {
@@ -1679,7 +1871,7 @@ export class ReportGenerator {
                             reader.readAsDataURL(blob);
                         });
                     }
-                } catch {}
+                } catch { }
             }
             return null;
         }

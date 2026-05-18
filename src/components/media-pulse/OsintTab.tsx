@@ -214,11 +214,11 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: (key: st
   );
 };
 
-const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Record<string, unknown>; t: (key: string, values?: Record<string, string | number>) => string }) => {
+const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: (key: string, values?: Record<string, string | number>) => string }) => {
   if (!data) return null;
 
   // Helper to get nested values safely
-  const get = (obj: Record<string, unknown>, path: string): unknown => path.split('.').reduce<unknown>((acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined), obj);
+  const get = (obj: Record<string, unknown>, path: string): any => path.split('.').reduce<any>((acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined), obj);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -377,7 +377,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Recor
 
             {get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
               <DataSection title={t('result_view.fields.articles_found')} icon={FileText}>
-                {(get(data, 'articles') as Array<Record<string, unknown>>).slice(0, 10).map((art, i: number) => (
+                {(get(data, 'articles') as any[]).slice(0, 10).map((art, i: number) => (
                   <a
                     key={i}
                     href={art.link}
@@ -400,7 +400,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Recor
         {type === 'corporate' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.fields.companies_found')} icon={Database}>
-              {(get(data, 'companies') as Array<Record<string, unknown>> | undefined)?.map((c, i: number) => (
+              {(get(data, 'companies') as any[] | undefined)?.map((c, i: number) => (
                 <a
                   key={i}
                   href={c.url}
@@ -423,7 +423,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Recor
         {type === 'location' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.fields.locations_found')} icon={Globe}>
-              {(get(data, 'locations') as Array<Record<string, unknown>> | undefined)?.map((loc, i: number) => (
+              {(get(data, 'locations') as any[] | undefined)?.map((loc, i: number) => (
                 <a
                   key={i}
                   href={loc.osmUrl}
@@ -462,7 +462,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Recor
         {type === 'gleif' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.lei_registration')} icon={Database}>
-              {(get(data, 'records') as Array<Record<string, unknown>> | undefined)?.map((r, i: number) => (
+              {(get(data, 'records') as any[] | undefined)?.map((r, i: number) => (
                 <div
                   key={i}
                   className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2"
@@ -482,7 +482,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: Recor
         {type === 'watchlist' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
-              {(get(data, 'matches') as Array<Record<string, unknown>> | undefined)?.map((m, i: number) => (
+              {(get(data, 'matches') as any[] | undefined)?.map((m, i: number) => (
                 <div
                   key={i}
                   className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
@@ -611,7 +611,14 @@ export default function OsintTab() {
     if (!history || history.length === 0) return;
     setIsExporting(format);
     try {
-      await ReportGenerator.exportOsintReport(history, messages, format);
+      const exportTranslations = {
+        ...(messages as any),
+        brand_name: settings?.brandName || 'ALMSTKSHF',
+        brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+        footer_url: settings?.footerUrl || 'www.almstkshf.com',
+        logo_url: settings?.logoUrl || undefined,
+      };
+      await ReportGenerator.exportOsintReport(history, exportTranslations as any, format);
     } catch (err) {
       console.error('OSINT export failed:', err);
     } finally {
@@ -638,6 +645,7 @@ export default function OsintTab() {
     api.osintDb.getOsintResults,
     isAuthenticated ? { limit: 20 } : 'skip'
   ) as HistoryItem[] | undefined;
+  const settings = useQuery(api.settings.getSettings);
 
   // â”€â”€ Resource directory state â”€â”€
   const [search, setSearch] = useState('');

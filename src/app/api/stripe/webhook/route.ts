@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
                 // Trigger email notification via Convex Action
                 try {
                     if (subscription.status === 'active' || subscription.status === 'trialing') {
-                        await convex.action((api as unknown as { emails: { sendSubscriptionEmail: string } }).emails.sendSubscriptionEmail as never, {
+                        await convex.action((api as any).emails.sendSubscriptionEmail as any, {
                             to: (subscription as unknown as { customer_email?: string, email?: string }).customer_email || (subscription as unknown as { email?: string }).email || "",
                             subject: subscription.status === 'trialing' ? "Welcome to your 15-day Free Trial!" : "Your Almstkshf Subscription is Active!",
                             userName: subscription.metadata?.userName || "Subscriber",

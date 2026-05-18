@@ -8,6 +8,9 @@
 
 export interface ReportTranslations {
     brand_name?: string;
+    logo_url?: string;
+    brand_tagline?: string;
+    footer_url?: string;
     Reports?: {
         pr_title?: string;
         deep_title?: string;
@@ -121,8 +124,6 @@ export interface ReportTranslations {
     status?: string;
     ave?: string;
     hashtags?: string;
-    brand_tagline?: string;
-    footer_url?: string;
     generated_at?: string;
     page_count?: string;
     report_title?: string;

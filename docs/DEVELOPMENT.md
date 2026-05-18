@@ -368,9 +368,12 @@ Strict accessibility limits are in place across the application to ensure WCAG 2
 ## 16. Export Generation (PDF & Excel)
 
 When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
-- All generated PDF exports MUST properly enforce UTF-8 text encoding and rely on centralized Arabic font loading.
-- Use the application's Arabic shaping/RTL reordering utility on dynamic text variables prior to rendering text onto the PDF canvas.
-- Failing to do so will result in text rendering as isolated letters from left-to-right or rendering as mojibake.
+- All generated PDF exports MUST properly enforce UTF-8 text encoding and rely on centralized Arabic font loading (Amiri font).
+- Use the application's Arabic shaping/RTL reordering utility on dynamic text variables prior to rendering text onto the PDF canvas. Failing to do so will result in text rendering as isolated letters from left-to-right or rendering as mojibake.
+- **Dynamic Table Configurations & Column Widths**: Column widths are precisely defined (e.g., image: 10, title: 60, source: 22, etc.) to fit cleanly within standard landscape formats.
+- **RTL Mirroring & Column Orders**: When Arabic mode is detected, the table columns (`activeColumns`) are completely reversed to naturally present columns from right to left (RTL).
+- **Context-Aware Column Alignments**: Text alignments (`halign`) are dynamically evaluated (e.g., aligning titles and sources to the right in Arabic mode, and keeping numeric data like reach/AVE aligned to the left so that digits flow naturally).
+- **Structural Layout Alignment**: Key non-tabular layout components (Executive Summary, Sentiment Distribution Gauges, and AI Strategic Recommendations) dynamically adjust their coordinates and alignments (`align: 'right'` vs. `'left'`) to match the selected layout direction.
 
 ---
 
@@ -528,7 +531,7 @@ To bring high-fidelity traffic-based reach estimations for digital news media so
 To enable premium brand styling and reports customization across exported PDF and Excel reports:
 - **Database Schema**: Added `brandName`, `brandTagline`, and `footerUrl` optionally to `settings` in `convex/schema.ts`.
 - **General Settings**: The settings management page (`/dashboard/settings`) contains a dedicated **White Label & Custom Branding** grid panel allowing standard and professional tier users to save their brand logo, name, tagline, and custom footer domain.
-- **Export Integration**: Dynamic branding values are resolved in `src/lib/report-generator.ts` which loads custom logos (with clean fallback to system assets), custom taglines on report cover pages, and custom footer domains on page numbers. Both `ReportLibrary.tsx` (for collection downloads) and `MediaMonitoringDashboard.tsx` (for direct dashboard exports) query global settings and pass branding parameters automatically.
+- **Export Integration**: Dynamic branding values are resolved in `src/lib/report-generator.ts` which loads custom logos (with clean fallback to system assets), custom taglines on report cover pages, and custom footer domains on page numbers. All tabs and dashboard elements — including `TerroristListTab.tsx`, `DarkWebTab.tsx`, `DeepStatusPanel.tsx`, `OsintTab.tsx`, `AiInspectorTab.tsx`, and `DashboardGrid.tsx` (the main media monitoring dashboard) — retrieve the custom settings database configuration via `useQuery(api.settings.getSettings)` and pass branding parameters automatically. This guarantees that custom logos and institutional metadata are fully rendered on every exported report.
 
 ---
 

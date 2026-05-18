@@ -50,50 +50,53 @@ export default function KYCVerification() {
                 <div className="relative space-y-4">
                     <div className="absolute left-[27px] top-6 bottom-6 w-px bg-border hidden md:block"></div>
 
-                    {initialSteps.map((step, idx) => (
-                        <div key={step.id} className="relative flex items-start gap-6 group">
-                            <div className={clsx(
-                                "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 transition-all",
-                                step.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
-                                    step.status === "active" ? "bg-primary/10 text-primary border border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.2)]" :
-                                        "bg-muted text-foreground/60 border border-border"
-                            )}>
-                                <step.icon className="w-7 h-7" />
-                            </div>
-
-                            <div className="flex-1 py-1">
-                                <div className="flex justify-between items-center mb-1">
-                                    <h4 className={clsx(
-                                        "font-bold text-lg transition-colors",
-                                        step.status === "pending" ? "text-foreground/60" : "text-foreground"
-                                    )}>
-                                        {step.title}
-                                    </h4>
-                                    {step.status === "completed" && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                    {initialSteps.map((step, idx) => {
+                        const Icon = step.icon as any;
+                        return (
+                            <div key={step.id} className="relative flex items-start gap-6 group">
+                                <div className={clsx(
+                                    "w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 z-10 transition-all",
+                                    step.status === "completed" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+                                        step.status === "active" ? "bg-primary/10 text-primary border border-primary/30 shadow-[0_0_15px_rgba(var(--primary),0.2)]" :
+                                            "bg-muted text-foreground/60 border border-border"
+                                )}>
+                                    <Icon className="w-7 h-7" />
                                 </div>
-                                <p className="text-foreground/70 text-sm">{step.description}</p>
 
-                                {step.status === "active" && (
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="mt-6 p-6 bg-muted border border-border rounded-2xl flex flex-col items-center justify-center text-center gap-6"
-                                    >
-                                        <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center border border-border border-dashed animate-spin-slow">
-                                            <Upload className="w-5 h-5 text-primary" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-foreground text-sm font-bold">Ready for Scanned Document</p>
-                                            <p className="text-foreground/60 text-xs">Maximum file size: 10MB (JPG, PNG, PDF)</p>
-                                        </div>
-                                        <Button size="sm" className="bg-primary hover:bg-primary/90">
-                                            Select File
-                                        </Button>
-                                    </motion.div>
-                                )}
+                                <div className="flex-1 py-1">
+                                    <div className="flex justify-between items-center mb-1">
+                                        <h4 className={clsx(
+                                            "font-bold text-lg transition-colors",
+                                            step.status === "pending" ? "text-foreground/60" : "text-foreground"
+                                        )}>
+                                            {step.title}
+                                        </h4>
+                                        {step.status === "completed" && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+                                    </div>
+                                    <p className="text-foreground/70 text-sm">{step.description}</p>
+
+                                    {step.status === "active" && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            className="mt-6 p-6 bg-muted border border-border rounded-2xl flex flex-col items-center justify-center text-center gap-6"
+                                        >
+                                            <div className="w-12 h-12 bg-background rounded-full flex items-center justify-center border border-border border-dashed animate-spin-slow">
+                                                <Upload className="w-5 h-5 text-primary" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-foreground text-sm font-bold">Ready for Scanned Document</p>
+                                                <p className="text-foreground/60 text-xs">Maximum file size: 10MB (JPG, PNG, PDF)</p>
+                                            </div>
+                                            <Button size="sm" className="bg-primary hover:bg-primary/90">
+                                                Select File
+                                            </Button>
+                                        </motion.div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 
@@ -132,4 +135,3 @@ export default function KYCVerification() {
         </div>
     );
 }
-

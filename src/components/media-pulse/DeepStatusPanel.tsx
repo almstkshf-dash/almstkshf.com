@@ -29,6 +29,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
         isAuthenticated ? { limit: 10 } : 'skip'
     ) as any;
     const fetchDeep = useAction(api.deepSources.fetchDeepSources);
+    const settings = useQuery(api.settings.getSettings);
 
     // Form state
     const [keyword, setKeyword] = useState('');
@@ -53,7 +54,14 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
         if (!runs || runs.length === 0) return;
         setIsExporting(format);
         try {
-            await ReportGenerator.exportDeepWebReport(runs, [], messages, format);
+            const exportTranslations = {
+                ...(messages as any),
+                brand_name: settings?.brandName || 'ALMSTKSHF',
+                brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
+                footer_url: settings?.footerUrl || 'www.almstkshf.com',
+                logo_url: settings?.logoUrl || undefined,
+            };
+            await ReportGenerator.exportDeepWebReport(runs, [], exportTranslations as any, format);
         } catch (err) {
             console.error('Deep Web export failed:', err);
         } finally {
@@ -87,7 +95,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                 setError(res?.error || t('fetch_failed'));
             }
         } catch (e: unknown) {
-            setError(e?.message || t('fetch_failed'));
+            setError((e as any)?.message || t('fetch_failed'));
         } finally {
             setLoading(false);
         }
@@ -255,7 +263,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                     <p className="text-sm text-foreground/70 py-2">{t('no_runs')}</p>
                 )}
                 <div className="space-y-2">
-                    {runs?.map((run: { _id: string; _creationTime: number; status: string; source?: string; articlesCount?: number; executionTimeMs?: number }) => (
+                    {runs?.map((run: any) => (
                         <div
                             key={run._id}
                             className="flex flex-wrap items-center justify-between bg-muted/40 border border-border rounded-lg px-3 py-2 text-sm gap-2"
