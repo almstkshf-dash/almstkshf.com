@@ -85,6 +85,14 @@ MISSING_MESSAGE: Could not resolve `Namespace.key` in messages for locale `ar`
 3. Find the missing key inside that namespace
 4. Add it to BOTH files
 
+> [!NOTE]
+> **Keys containing periods/dots (e.g. `24.ae`):** `next-intl` interprets dots inside keys as namespace traversal paths. Therefore, flat keys like `"24.ae": "24.ae"` inside a namespace will result in a `MISSING_MESSAGE: Namespace.24.ae` error. You must structure them as nested JSON objects in both files:
+> ```json
+> "24": {
+>   "ae": "24.ae"
+> }
+> ```
+
 ---
 
 ## Stripe Quick Reference
