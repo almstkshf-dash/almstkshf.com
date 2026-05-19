@@ -60,6 +60,7 @@
   },
   "Common": {
     "confirm": "تأكيد",
+    "close": "إغلاق",
     "cancel": "إلغاء",
     "delete": "حذف",
     "save": "حفظ",

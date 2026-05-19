@@ -1298,21 +1298,21 @@ export class ReportGenerator {
             {
                 id: 'image',
                 header: '',
-                width: 10,
+                width: 8,
                 halign: 'center',
                 getValue: (a: ReportArticle) => ''
             },
             {
                 id: 'date',
                 header: translations.date || 'Date',
-                width: 16,
+                width: 15,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.publishedDate ?? ''
             },
             {
                 id: 'title',
                 header: translations.title || 'Title',
-                width: 60,
+                width: 'auto' as const,
                 halign: isArabicMode ? 'right' : 'left',
                 getValue: (a: ReportArticle) => {
                     const titleText = a.title ?? '';
@@ -1323,84 +1323,84 @@ export class ReportGenerator {
             {
                 id: 'type',
                 header: translations.type || 'Type',
-                width: 18,
+                width: 14,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.sourceType ?? ''
             },
             {
                 id: 'source',
                 header: translations.source || 'Source',
-                width: 22,
+                width: 18,
                 halign: isArabicMode ? 'right' : 'left',
                 getValue: (a: ReportArticle) => a.source ?? ''
             },
             {
                 id: 'publisher_username',
                 header: translations.publisher_username || 'Publisher',
-                width: 24,
+                width: 18,
                 halign: isArabicMode ? 'right' : 'left',
                 getValue: (a: ReportArticle) => a.publisherUsername ?? '-'
             },
             {
                 id: 'country',
                 header: translations.country || 'Country',
-                width: 14,
+                width: 11,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.sourceCountry ?? ''
             },
             {
                 id: 'sentiment',
                 header: translations.sentiment || 'Sentiment',
-                width: 15,
+                width: 12,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.sentiment ?? ''
             },
             {
                 id: 'relevancy',
                 header: translations.relevancy || 'Relevancy',
-                width: 12,
+                width: 10,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-'
             },
             {
                 id: 'reach',
                 header: translations.reach || 'Reach',
-                width: 16,
+                width: 14,
                 halign: isArabicMode ? 'left' : 'right', // Numbers are LTR so align opposite in RTL
                 getValue: (a: ReportArticle) => (a.reach ?? 0).toLocaleString()
             },
             {
                 id: 'likes',
                 header: translations.likes || 'Likes',
-                width: 11,
+                width: 9,
                 halign: isArabicMode ? 'left' : 'right',
                 getValue: (a: ReportArticle) => a.likes !== undefined && a.likes !== null ? a.likes.toLocaleString() : '-'
             },
             {
                 id: 'retweets',
                 header: translations.retweets || 'Retweets',
-                width: 11,
+                width: 9,
                 halign: isArabicMode ? 'left' : 'right',
                 getValue: (a: ReportArticle) => a.retweets !== undefined && a.retweets !== null ? a.retweets.toLocaleString() : '-'
             },
             {
                 id: 'replies',
                 header: translations.replies || 'Replies',
-                width: 11,
+                width: 9,
                 halign: isArabicMode ? 'left' : 'right',
                 getValue: (a: ReportArticle) => a.replies !== undefined && a.replies !== null ? a.replies.toLocaleString() : '-'
             },
             {
                 id: 'ave',
                 header: translations.ave || 'AVE ($)',
-                width: 16,
+                width: 14,
                 halign: isArabicMode ? 'left' : 'right',
                 getValue: (a: ReportArticle) => `${(a.ave ?? 0).toLocaleString()}`
             },
             {
                 id: 'status',
                 header: translations.status || 'Status',
-                width: 16,
+                width: 14,
                 halign: 'center',
                 getValue: (a: ReportArticle) => a.status === 'in_progress' ? 'In Progress' : (a.status || 'Live')
             }
@@ -1411,7 +1411,7 @@ export class ReportGenerator {
         const tableHead = [activeColumns.map(col => col.header)];
         const tableBody = articlesWithImages.map(a => activeColumns.map(col => col.getValue(a)));
 
-        const columnStyles: Record<number, { cellWidth: number; halign: string }> = {};
+        const columnStyles: Record<number, { cellWidth: number | 'auto'; halign: string }> = {};
         activeColumns.forEach((col, idx) => {
             columnStyles[idx] = {
                 cellWidth: col.width,

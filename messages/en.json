@@ -149,6 +149,7 @@
   },
   "Common": {
     "confirm": "Confirm",
+    "close": "Close",
     "cancel": "Cancel",
     "delete": "Delete",
     "save": "Save",
