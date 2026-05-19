@@ -2,9 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const generatorPath = path.join(process.cwd(), 'src/lib/report-generator.ts');
-const utilsPath = path.join(process.cwd(), 'src/utils/exportUtils.ts');
 
-if (!fs.existsSync(generatorPath) || !fs.existsSync(utilsPath)) {
+if (!fs.existsSync(generatorPath)) {
     console.error('Required files not found');
     process.exit(1);
 }

@@ -1,6 +1,7 @@
 {
   "Navigation": {
     "landing_page": "Home",
+    "about_us": "About Us",
     "search": "Search",
     "dashboard": "Dashboard",
     "case_studies": "Case Studies",
@@ -146,6 +147,30 @@
     "Subscription Activated": "Subscription Activated",
     "Subscription Expiring Soon": "Subscription Expiring Soon",
     "Payment Failed": "Payment Failed"
+  },
+  "AboutUs": {
+    "title": "About ALMSTKSHF",
+    "subtitle": "Leading strategic media monitoring and corporate intelligence across executive-level institutions.",
+    "mission_title": "Our Mission",
+    "mission_desc": "To empower institutional leadership with complete, accurate, and real-time public sentiment and strategic data intelligence, converting complex media landscapes into actionable strategic foresight.",
+    "vision_title": "Our Vision",
+    "vision_desc": "To be the ultimate global intelligence hub for executive decision-makers, driving clarity, transparency, and strategic confidence through state-of-the-art AI technology.",
+    "story_title": "Our Story",
+    "story_desc": "Founded in the United Arab Emirates, Almstkshf has emerged as the premier localized firm specialized in building intelligent ecosystems for high-profile institutions, military-grade legal compliance, and real-time broadcast and digital media analysis.",
+    "stats": {
+      "channels": "1,200+ Channels Tracked",
+      "countries": "Gulf & International Reach",
+      "accuracy": "99.4% AI Accuracy"
+    },
+    "features_title": "Core Strategic Capabilities",
+    "features": {
+      "monitoring": "Enterprise Media Monitoring",
+      "monitoring_desc": "Real-time, cross-channel tracking of TV, Radio, Print, and Digital Media.",
+      "compliance": "KYC & Security Compliance",
+      "compliance_desc": "Military-grade verification and intelligence scanning aligned with strict TDRA guidelines.",
+      "analytics": "Strategic Sentiment Analysis",
+      "analytics_desc": "Advanced NLP systems that detect shifts in public tone, sentiment trends, and brand reputation immediately."
+    }
   },
   "Common": {
     "confirm": "Confirm",

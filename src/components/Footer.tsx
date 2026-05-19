@@ -62,6 +62,15 @@ export default function Footer() {
                             {t('links')}
                         </h3>
                         <ul className="space-y-4">
+                            <li>
+                                <Link
+                                    href="/about-us"
+                                    className="text-muted-foreground hover:text-foreground transition-colors text-sm flex items-center gap-2 group"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors"></span>
+                                    {tNav('about_us')}
+                                </Link>
+                            </li>
                             {/* Filter out items that are already top-level or have children, 
                                 and ensure we don't duplicate items that are explicitly listed below */}
                             {NAVIGATION_ITEMS.filter(item => !item.children && !['lexcora', 'contact', 'faq'].includes(item.label)).map((item) => (
