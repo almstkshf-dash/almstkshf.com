@@ -47,7 +47,7 @@ const isPublicRoute = createRouteMatcher([
     "/api/proxy-rss"
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+const clerk = clerkMiddleware(async (auth, req) => {
     // Skip Clerk internal requests to prevent 400 Bad Request / infinite protect loops
     if (req.nextUrl.pathname.startsWith("/__clerk")) {
         return NextResponse.next();
@@ -72,6 +72,28 @@ export default clerkMiddleware(async (auth, req) => {
     await auth.protect();
     return intlMiddleware(req);
 });
+
+export default async function middleware(req: any, event: any) {
+    const host = req.headers.get("host") || "";
+    const isVercelPreview = host.includes("vercel.app") && !host.includes("almstkshf.com");
+    const isLiveKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_");
+
+    // Intercept Clerk proxy requests on Vercel preview/deployment domains to prevent them from hitting Clerk servers and returning 400
+    if (req.nextUrl.pathname.startsWith("/__clerk") && isVercelPreview && isLiveKey) {
+        return new NextResponse(JSON.stringify({ 
+            error: "clerk_proxy_disabled_on_preview",
+            message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys." 
+        }), {
+            status: 200,
+            headers: { 
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store" 
+            }
+        });
+    }
+
+    return clerk(req, event);
+}
 
 export const config = {
     matcher: [

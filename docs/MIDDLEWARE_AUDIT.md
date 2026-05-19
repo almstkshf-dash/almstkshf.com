@@ -1,6 +1,6 @@
 # Middleware Audit — almstkshf.com
 
-> **Updated:** March 2026  
+> **Updated:** May 2026  
 > **File:** `src/middleware.ts`  
 > **Runtime:** Vercel Edge Runtime
 
@@ -24,18 +24,27 @@ const intlMiddleware = createMiddleware(routing);
 
 const isPublicRoute = createRouteMatcher([...]);
 
-export default clerkMiddleware(async (auth, req) => {
-    // 1. Skip i18n for API routes
-    if (req.nextUrl.pathname.startsWith('/api')) {
-        return NextResponse.next();
+export default async function middleware(req: any, event: any) {
+    const host = req.headers.get("host") || "";
+    const isVercelPreview = host.includes("vercel.app") && !host.includes("almstkshf.com");
+    const isLiveKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_");
+
+    // Intercept Clerk proxy requests on Vercel preview/deployment domains to prevent them from hitting Clerk servers and returning 400
+    if (req.nextUrl.pathname.startsWith("/__clerk") && isVercelPreview && isLiveKey) {
+        return new NextResponse(JSON.stringify({ 
+            error: "clerk_proxy_disabled_on_preview",
+            message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys." 
+        }), {
+            status: 200,
+            headers: { 
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store" 
+            }
+        });
     }
-    // 2. Protect non-public routes
-    if (!isPublicRoute(req)) {
-        await auth.protect();
-    }
-    // 3. Apply intl routing
-    return intlMiddleware(req);
-});
+
+    return clerk(req, event);
+}
 ```
 
 ---
@@ -109,6 +118,7 @@ export const config = {
 | Double locale in URL (`/en/en/`) | Locale prefix applied twice | Skipped intl middleware for already-localized paths |
 | API routes getting locale prefix | Intl middleware running on `/api/*` | Added early return for `/api` paths |
 | Cloudflare Web Analytics `/vitals` telemetry POST failures | Cloudflare Zaraz/Web Analytics proxies telemetry to subpaths ending in `/vitals`, triggering Clerk auth protection and causing 404/401 errors | Intercepted paths ending in `/vitals` early in middleware, returning a clean `204 No Content` response immediately |
+| Clerk Proxy 400 Errors on Vercel Preview | Clerk live keys reject custom domain proxying from Vercel preview domains (`*-projects.vercel.app`) | Intercepted Clerk proxy routes starting with `/__clerk` on Vercel preview domains if production keys are active, returning a clean `200 OK` with JSON to prevent `400 Bad Request` logging |
 
 ---
 
