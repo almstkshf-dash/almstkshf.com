@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
     // ── Convex data ───────────────────────────────────────────────────────────
     const appSettings = useQuery(api.settings.getSettings);
-    
+
     const result = useQuery(api.monitoring.getArticles, {
         limit: 50,
         skip,
@@ -511,32 +511,32 @@ export default function DashboardPage() {
             {(activeView === 'standard' || activeView === 'deep') && (
                 <div className="mb-8 rounded-[2rem] border border-border/50 bg-muted/70 p-6 shadow-lg shadow-black/5">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-foreground/70 mb-2">
-                            {viewDetails.label}
-                        </p>
-                        <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-                            {viewDetails.title}
-                        </h2>
-                        <p className="mt-2 text-sm leading-6 text-foreground/80 max-w-2xl">
-                            {viewDetails.description}
-                        </p>
-                        <ul className="mt-4 grid gap-2 text-xs text-foreground/80 sm:grid-cols-2">
-                            {viewDetails.bullets.map((bullet, index) => (
-                                <li key={index} className="inline-flex items-start gap-2">
-                                    <span className="mt-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-foreground/20" />
-                                    {bullet}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="mt-4 sm:mt-0 flex items-center gap-2">
-                        <span className={clsx('inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.3em]', viewDetails.badgeClass)}>
-                            {activeView === 'deep' ? t('view.deep_only_badge', { defaultValue: 'Deep only' }) : t('view.standard_badge', { defaultValue: 'Standard' })}
-                        </span>
+                        <div className="min-w-0">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-foreground/70 mb-2">
+                                {viewDetails.label}
+                            </p>
+                            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                                {viewDetails.title}
+                            </h2>
+                            <p className="mt-2 text-sm leading-6 text-foreground/80 max-w-2xl">
+                                {viewDetails.description}
+                            </p>
+                            <ul className="mt-4 grid gap-2 text-xs text-foreground/80 sm:grid-cols-2">
+                                {viewDetails.bullets.map((bullet, index) => (
+                                    <li key={index} className="inline-flex items-start gap-2">
+                                        <span className="mt-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-foreground/20" />
+                                        {bullet}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="mt-4 sm:mt-0 flex items-center gap-2">
+                            <span className={clsx('inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.3em]', viewDetails.badgeClass)}>
+                                {activeView === 'deep' ? t('view.deep_only_badge', { defaultValue: 'Deep only' }) : t('view.standard_badge', { defaultValue: 'Standard' })}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
             <Suspense fallback={<TabSkeleton />}>
                 <AnimatePresence mode="wait">
@@ -547,75 +547,66 @@ export default function DashboardPage() {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.25 }}
                     >
-                        {/* ── STANDARD VIEW — two-zone layout ─────────────── */}
+                        {/* ── STANDARD VIEW — Stacked Vertical Layout ─────────────── */}
                         {activeView === 'standard' && (
-                            <div className="flex flex-col xl:flex-row gap-8 items-start">
+                            <div className="flex flex-col gap-8 w-full">
+                                {/* Section: Discovery */}
+                                <DashboardSection
+                                    id="discovery"
+                                    title={t('section.standard_discovery', { defaultValue: t('section.discovery') })}
+                                    icon={Globe}
+                                    headerSlot={<span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-primary">{t('view.quick_access', { defaultValue: 'Quick access' })}</span>}
+                                >
+                                    <NewsGenerator defaultSourceType="Online News" />
+                                </DashboardSection>
 
-                                {/* Left: main content (~75%) */}
-                                <div className="flex-1 min-w-0 flex flex-col gap-8">
+                                {/* Section: Press Monitor */}
+                                <DashboardSection
+                                    id="press"
+                                    title={t('section.press')}
+                                    icon={FileDown}
+                                >
+                                    <PressReleasePanel />
+                                </DashboardSection>
 
-                                    {/* Section: Discovery */}
-                                    <DashboardSection
-                                        id="discovery"
-                                        title={t('section.standard_discovery', { defaultValue: t('section.discovery') })}
-                                        icon={Globe}
-                                        headerSlot={<span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-primary">{t('view.quick_access', { defaultValue: 'Quick access' })}</span>}
-                                    >
-                                        <NewsGenerator defaultSourceType="Online News" />
-                                    </DashboardSection>
-
-                                    {/* Section: Press Monitor */}
-                                    <DashboardSection
-                                        id="press"
-                                        title={t('section.press')}
-                                        icon={FileDown}
-                                    >
-                                        <PressReleasePanel />
-                                    </DashboardSection>
-
-                                    {/* Section: Media Pulse Analytics */}
-                                    <DashboardSection
-                                        id="analytics"
-                                        title={t('section.analytics')}
-                                        icon={BarChart3}
-                                    >
-                                        <DashboardGrid
-                                            articles={filteredArticles}
-                                            analytics={analytics}
-                                        />
-                                    </DashboardSection>
-
-                                    {/* Section: Coverage Log */}
-                                    <DashboardSection
-                                        id="coverage"
-                                        title={t('section.coverage')}
-                                        icon={Filter}
-                                    >
-                                        <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
-                                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
-                                            {coverageFilterBar}
-                                            {articleListBody}
-                                        </div>
-                                    </DashboardSection>
-                                </div>
-
-                                {/* Right: Live Feed Panel — sticky (~25%, xl+) */}
-                                <aside className="w-full xl:w-80 shrink-0">
-                                    <div className="xl:sticky xl:top-6">
-                                        <DashboardSection
-                                            id="live_feed"
-                                            title={t('section.live_feed')}
-                                            icon={Rss}
-                                        >
-                                            <RssFeeder
-                                                initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'https://wam.ae/en/rss'}
-                                                initialSourceName={isAr ? 'news' : 'wam-en'}
-                                                allSources={PREMIUM_SOURCES}
-                                                maxItems={10}
-                                            />
-                                        </DashboardSection>
+                                {/* Section: Coverage Log */}
+                                <DashboardSection
+                                    id="coverage"
+                                    title={t('section.coverage')}
+                                    icon={Filter}
+                                >
+                                    <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
+                                        {coverageFilterBar}
+                                        {articleListBody}
                                     </div>
-                                </aside>
+                                </DashboardSection>
+
+                                {/* Section: Media Pulse Analytics */}
+                                <DashboardSection
+                                    id="analytics"
+                                    title={t('section.analytics')}
+                                    icon={BarChart3}
+                                >
+                                    <DashboardGrid
+                                        articles={filteredArticles}
+                                        analytics={analytics}
+                                    />
+                                </DashboardSection>
+
+                                {/* Section: Live Feed Panel */}
+                                <DashboardSection
+                                    id="live_feed"
+                                    title={t('section.live_feed')}
+                                    icon={Rss}
+                                >
+                                    <RssFeeder
+                                        initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'https://www.gulftoday.ae/rssFeed/0/'}
+                                        initialSourceName={isAr ? 'News' : 'Latest News (Feed)'}
+                                        allSources={PREMIUM_SOURCES}
+                                        maxItems={10}
+                                    />
+                                </DashboardSection>
                             </div>
                         )}
 

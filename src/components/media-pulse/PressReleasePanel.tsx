@@ -22,19 +22,21 @@ import { toast } from 'sonner';
 
 // ─── PR wire sources metadata (mirrored from backend for display) ────
 const PR_WIRES = [
-    { name: 'PR Newswire', region: 'Global', flag: '🌐' },
     { name: 'Newswire.com', region: 'Global', flag: '🌐' },
-    { name: 'AETOSWire', region: 'MENA', flag: '🇦🇪' },
-    { name: 'WAM (Economy)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (Sport)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (Culture)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (Latest)', region: 'AE', flag: '🇦🇪' },
-    { name: 'WAM (Tech)', region: 'AE', flag: '🇦🇪' },
-    { name: 'Middle East Eye', region: 'UK', flag: '🇬🇧' },
-    { name: 'MEED Business', region: 'MENA', flag: '🌐' },
+    { name: 'Dubai PR Network', region: 'AE', flag: '🇦🇪' },
+    { name: 'Arab News', region: 'MENA', flag: '🌐' },
+    { name: 'Asharq Al-Awsat', region: 'MENA', flag: '🌐' },
     { name: 'Al Bawaba', region: 'MENA', flag: '🇯🇴' },
     { name: 'Mehr News', region: 'IR', flag: '🇮🇷' },
     { name: 'Egyptian Streets', region: 'EG', flag: '🇪🇬' },
+    { name: 'Middle East Eye', region: 'UK', flag: '🇬🇧' },
+    { name: '24.ae', region: 'AE', flag: '🇦🇪' },
+    { name: 'UAE Barq', region: 'AE', flag: '🇦🇪' },
+    { name: 'Gulf Time', region: 'AE', flag: '🇦🇪' },
+    { name: 'New Vora Group', region: 'AE', flag: '🇦🇪' },
+    { name: 'Ain Al Emirate', region: 'AE', flag: '🇦🇪' },
+    { name: 'Mena Scoop', region: 'AE', flag: '🇦🇪' },
+    { name: 'Pan Time Arabia', region: 'AE', flag: '🇦🇪' },
 ];
 
 type FeedResult = {
@@ -458,60 +460,78 @@ export default function PressReleasePanel() {
                     </div>
                 )}
 
-                {syncResult && (
-                    <div className="space-y-3">
-                        {/* Summary */}
-                        <div className={clsx(
-                            'flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl border',
-                            syncResult.totalErrors === 0
-                                ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-400'
-                                : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
-                        )}>
-                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                            <span>
-                                {syncResult.totalSaved > 0
-                                    ? t('sync_success_with_sources', {
-                                        count: syncResult.totalSaved,
-                                        sources: syncResult.feedResults.filter(f => !f.error).map(f => f.name || f.feed).join(', ')
-                                      })
-                                    : t('sync_success_no_articles')}
-                            </span>
-                            {syncResult.totalErrors > 0 && (
-                                <span className="ms-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
-                            )}
-                        </div>
-
-                        {syncResult.totalSaved === 0 && keyword.trim() && (
-                            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3">
-                                <span className="text-lg">🔎</span>
-                                <span>{t('no_keyword_match', { keyword })}</span>
+                {syncResult && (() => {
+                    const totalMatched = syncResult.feedResults.reduce((sum, f) => sum + (f.total ?? 0), 0);
+                    return (
+                        <div className="space-y-3">
+                            {/* Summary */}
+                            <div className={clsx(
+                                'flex items-center gap-2 text-sm font-semibold px-4 py-3 rounded-xl border',
+                                syncResult.totalErrors === 0
+                                    ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-400'
+                                    : 'bg-amber-500/5 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                            )}>
+                                <CheckCircle2 className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                                <span>
+                                    {syncResult.totalSaved > 0
+                                        ? t('sync_success_with_sources', {
+                                            count: syncResult.totalSaved,
+                                            sources: syncResult.feedResults.filter(f => !f.error).map(f => f.name || f.feed).join(', ')
+                                          })
+                                        : totalMatched > 0
+                                            ? t('sync_success_already_ingested', { count: totalMatched })
+                                            : t('sync_success_no_articles')}
+                                </span>
+                                {syncResult.totalErrors > 0 && (
+                                    <span className="ms-auto text-xs opacity-70">{t('feeds_failed', { count: syncResult.totalErrors })}</span>
+                                )}
                             </div>
-                        )}
-                        {/* Per-feed breakdown */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                            {syncResult.feedResults.map((f: FeedResult) => (
-                                <div
-                                    key={f.name || f.feed}
-                                    className={clsx(
-                                        'flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-medium',
-                                        f.error
-                                            ? 'bg-destructive/5 border-destructive/20 text-rose-700 dark:text-rose-300'
-                                            : 'bg-muted border-border text-foreground'
-                                    )}
-                                >
-                                    <span className="truncate">{f.name || f.feed}</span>
-                                    {f.error ? (
-                                        <span className="ms-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
-                                    ) : (
-                                        <span className="ms-2 flex-shrink-0 text-emerald-800 dark:text-emerald-400 font-bold">
-                                            +{f.saved ?? 0}
-                                        </span>
-                                    )}
+
+                            {syncResult.totalSaved === 0 && keyword.trim() && (
+                                <div className={clsx(
+                                    "flex items-center gap-2 text-sm rounded-xl px-4 py-3 border",
+                                    totalMatched > 0
+                                        ? "text-blue-700 dark:text-blue-300 bg-blue-500/5 border-blue-500/20"
+                                        : "text-amber-600 dark:text-amber-400 bg-amber-500/5 border-amber-500/20"
+                                )}>
+                                    <span className="text-lg">🔎</span>
+                                    <span>
+                                        {totalMatched > 0
+                                            ? t('existing_keyword_matches', { count: totalMatched, keyword })
+                                            : t('no_keyword_match', { keyword })
+                                        }
+                                    </span>
                                 </div>
-                            ))}
+                            )}
+                            {/* Per-feed breakdown */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                {syncResult.feedResults.map((f: FeedResult, index: number) => (
+                                    <div
+                                        key={`${f.name || f.feed || 'feed'}-${index}`}
+                                        className={clsx(
+                                            'flex items-center justify-between px-3 py-2 rounded-lg border text-xs font-medium',
+                                            f.error
+                                                ? 'bg-destructive/5 border-destructive/20 text-rose-700 dark:text-rose-300'
+                                                : 'bg-muted border-border text-foreground'
+                                        )}
+                                    >
+                                        <span className="truncate">{f.name || f.feed}</span>
+                                        {f.error ? (
+                                            <span className="ms-2 text-[10px] opacity-70 flex-shrink-0">{t('failed')}</span>
+                                        ) : (
+                                            <span className="ms-2 flex-shrink-0 text-emerald-800 dark:text-emerald-400 font-bold">
+                                                {f.total && f.total > 0
+                                                    ? t('feed_saved_with_total', { saved: f.saved ?? 0, total: f.total })
+                                                    : t('feed_saved_only', { saved: f.saved ?? 0 })
+                                                }
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
 
                 {/* Cron hint */}
                 <p className="text-[11px] text-foreground/60 flex items-center gap-1.5 border-t border-border/50 pt-4">

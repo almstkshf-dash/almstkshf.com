@@ -26,25 +26,6 @@ export const AAWSAT_SOURCES: RSSCategory[] = [
  * Curated list of premium media monitoring sources for the UAE and Middle East.
  */
 export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
-  'WAM (UAE)': [
-    { id: 'wam-en-economy', name: 'Economy', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-economy&vsCode=avs-002-1jc72emk1y2i&type=rss', country: 'UAE' },
-    { id: 'wam-en-sport', name: 'Sport', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-002-1jc73gac78yp&type=rss', country: 'UAE' },
-    { id: 'wam-en-culture', name: 'Culture', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73gac79l5&type=rss', country: 'UAE' },
-    { id: 'wam-en-latest', name: 'Latest news', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx3w&type=rss', country: 'UAE' },
-    { id: 'wam-en-science-tech', name: 'Science and technology', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=english-rss-viewnull&vsCode=avs-002-1jc73h1izx70&type=rss', country: 'UAE' },
-    { id: 'wam-en-emirates', name: 'Emirates News', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=uae-news&vsCode=avs-001-1jc8icryj4wi&type=rss', country: 'UAE' },
-    { id: 'wam-en-gmc', name: 'Global Media Congress', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=gmc-news&vsCode=avs-001-1jc8icryj5m8&type=rss', country: 'UAE' },
-    { id: 'wam-en-world', name: 'World', url: 'https://www.wam.ae/en/rss/feed/g50ndvocjz?slug=rss-view-world&vsCode=avs-001-1jc8ikj2nrv8&type=rss', country: 'UAE' },
-  ],
-  // 'Al Arabiya': [
-  //   { id: 'alarabiya-latest', name: 'Latest News', url: 'https://www.alarabiya.net/.mrss/ar/last-24-hours.xml', country: 'SA' },
-  //   { id: 'alarabiya-saudi', name: 'Saudi Arabia', url: 'https://www.alarabiya.net/.mrss/ar/saudi-arabia.xml', country: 'SA' },
-  // ],
-  // 'Sky News Arabia': [
-  //   { id: 'skynews-me', name: 'Middle East', url: 'https://www.skynewsarabia.com/feeds/rss/1.xml', country: 'UAE' },
-  //   { id: 'skynews-world', name: 'World', url: 'https://www.skynewsarabia.com/feeds/rss/2.xml', country: 'UAE' },
-  //   { id: 'skynews-uae', name: 'UAE', url: 'https://www.skynewsarabia.com/feeds/rss/12.xml', country: 'UAE' },
-  // ],
   'Asharq Al-Awsat': AAWSAT_SOURCES,
   // 'PR Newswire': [
   //   { id: 'prnewswire-me', name: 'Middle East News', url: 'https://www.prnewswire.com/rss/middle-east/news/middle-east-news.rss' }
@@ -159,16 +140,16 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'roadsafety-stories', name: 'Stories', url: 'https://www.roadsafetyuae.com/feed/?post_type=stories', country: 'UAE' },
     { id: 'roadsafety-proposals', name: 'Proposals', url: 'https://www.roadsafetyuae.com/feed/?post_type=proposals', country: 'UAE' },
   ],
-  'Gulf Today': [
-    // { id: 'gulftoday-latest', name: 'Latest News', url: 'https://www.gulftoday.ae/rss', country: 'UAE' },
-    { id: 'gulftoday-main', name: 'Latest News (Feed)', url: 'https://www.gulftoday.ae/rssFeed/0/', country: 'UAE' },
-    { id: 'gulftoday-opinion', name: 'Opinion', url: 'https://www.gulftoday.ae/rssFeed/10/', country: 'UAE' },
-    { id: 'gulftoday-news', name: 'News', url: 'https://www.gulftoday.ae/rssFeed/55/', country: 'UAE' },
-    { id: 'gulftoday-culture', name: 'Culture', url: 'https://www.gulftoday.ae/rssFeed/56/', country: 'UAE' },
-    { id: 'gulftoday-lifestyle', name: 'Lifestyle', url: 'https://www.gulftoday.ae/rssFeed/57/', country: 'UAE' },
-    { id: 'gulftoday-sport', name: 'Sport', url: 'https://www.gulftoday.ae/rssFeed/58/', country: 'UAE' },
-    { id: 'gulftoday-business', name: 'Business', url: 'https://www.gulftoday.ae/rssFeed/52/', country: 'UAE' },
-  ],
+  // 'Gulf Today': [
+  //   // { id: 'gulftoday-latest', name: 'Latest News', url: 'https://www.gulftoday.ae/rss', country: 'UAE' },
+  //   { id: 'gulftoday-main', name: 'Latest News (Feed)', url: 'https://www.gulftoday.ae/rssFeed/0/', country: 'UAE' },
+  //   { id: 'gulftoday-opinion', name: 'Opinion', url: 'https://www.gulftoday.ae/rssFeed/10/', country: 'UAE' },
+  //   { id: 'gulftoday-news', name: 'News', url: 'https://www.gulftoday.ae/rssFeed/55/', country: 'UAE' },
+  //   { id: 'gulftoday-culture', name: 'Culture', url: 'https://www.gulftoday.ae/rssFeed/56/', country: 'UAE' },
+  //   { id: 'gulftoday-lifestyle', name: 'Lifestyle', url: 'https://www.gulftoday.ae/rssFeed/57/', country: 'UAE' },
+  //   { id: 'gulftoday-sport', name: 'Sport', url: 'https://www.gulftoday.ae/rssFeed/58/', country: 'UAE' },
+  //   { id: 'gulftoday-business', name: 'Business', url: 'https://www.gulftoday.ae/rssFeed/52/', country: 'UAE' },
+  // ],
   // 'Zawya': [
   //   { id: 'zawya-en', name: 'Latest News', url: 'https://www.zawya.com/en/rss/all', country: 'UAE' }
   // ],
@@ -184,9 +165,9 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   // 'Khaleej Times': [
   //   { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://www.khaleejtimes.com/rss', country: 'UAE' }
   // ],
-  'The National': [
-    { id: 'thenational-en', name: 'Latest News', url: 'https://www.thenationalnews.com/rss', country: 'UAE' }
-  ],
+  // 'The National': [
+  //   { id: 'thenational-en', name: 'Latest News', url: 'https://www.thenationalnews.com/rss', country: 'UAE' }
+  // ],
   'Middle East Eye': [
     { id: 'mee-en', name: 'Latest News', url: 'https://www.middleeasteye.net/rss', country: 'GB' }
   ],
@@ -202,9 +183,9 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Newswire_com': [
     { id: 'newswire-en', name: 'Latest PR', url: 'https://www.newswire.com/newsroom/rss/all', country: 'US' }
   ],
-  'UAE Interact': [
-    { id: 'uaeinteract-news', name: 'Latest News', url: 'https://www.uaeinteract.com/rss/news', country: 'UAE' }
-  ],
+  // 'UAE Interact': [
+  //   { id: 'uaeinteract-news', name: 'Latest News', url: 'https://www.uaeinteract.com/rss/news', country: 'UAE' }
+  // ],
   'Food Safety News': [
     { id: 'foodsafetynews-latest', name: 'Latest News', url: 'https://www.foodsafetynews.com/rss/', country: 'US' }
   ],
@@ -236,9 +217,9 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'bbc-world', name: 'World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml', country: 'GB' },
     { id: 'bbc-uk', name: 'UK', url: 'http://feeds.bbci.co.uk/news/uk/rss.xml', country: 'GB' },
   ],
-  'Politico': [
-    { id: 'politico-picks', name: 'Politico Picks', url: 'http://www.politico.com/rss/politicopicks.xml', country: 'US' },
-  ],
+  // 'Politico': [
+  //   { id: 'politico-picks', name: 'Politico Picks', url: 'http://www.politico.com/rss/politicopicks.xml', country: 'US' },
+  // ],
   'Yahoo News': [
     { id: 'yahoo-world', name: 'World News', url: 'http://rss.news.yahoo.com/rss/world', country: 'US' },
     { id: 'yahoo-us', name: 'US News', url: 'http://news.yahoo.com/rss/us', country: 'US' },
@@ -261,9 +242,9 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'guardian-us', name: 'US News', url: 'http://www.theguardian.com/world/usa/rss', country: 'GB' },
     { id: 'guardian-uk', name: 'UK News', url: 'http://www.theguardian.com/uk/rss', country: 'GB' },
   ],
-  'Newsweek': [
-    { id: 'newsweek-latest', name: 'Latest News', url: 'http://www.newsweek.com/rss', country: 'US' },
-  ],
+  // 'Newsweek': [
+  //   { id: 'newsweek-latest', name: 'Latest News', url: 'http://www.newsweek.com/rss', country: 'US' },
+  // ],
   'ABC News': [
     { id: 'abcnews-us', name: 'US Headlines', url: 'http://feeds.abcnews.com/abcnews/usheadlines', country: 'US' },
     { id: 'abcnews-entertainment', name: 'Entertainment', url: 'http://feeds.abcnews.com/abcnews/entertainmentheadlines', country: 'US' },
@@ -271,9 +252,9 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   'Time': [
     { id: 'time-newsfeed', name: 'Newsfeed', url: 'http://time.com/newsfeed/feed/', country: 'US' },
   ],
-  'Vice News': [
-    { id: 'vice-news', name: 'Latest News', url: 'https://news.vice.com/rss', country: 'US' },
-  ],
+  // 'Vice News': [
+  //   { id: 'vice-news', name: 'Latest News', url: 'https://news.vice.com/rss', country: 'US' },
+  // ],
   'Wall Street Journal': [
     { id: 'wsj-latest', name: 'Latest News', url: 'http://online.wsj.com/xml/rss/3_7085.xml', country: 'US' },
   ],

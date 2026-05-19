@@ -391,6 +391,7 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | Recharts tooltip `payload` type error | `payload` is `readonly any[]` — cannot be spread into typed interface | Inline the render callback or cast with `as { value?: number }` |
 | `Session History Item Has Been Marked Skippable` | Programmatic navigation pushing sign-in redirect to history stack | Use `router.replace()` instead of `router.push()` for auth redirects |
 | `GET /__clerk/v1/... 400` | Clerk internal handshake/proxy routes being intercepted by `auth.protect()` or localized by `next-intl` | Skip paths starting with `/__clerk` at the very beginning of the `clerkMiddleware` callback |
+| `Encountered two children with the same key` | Non-unique mapped array element keys (e.g., duplicated feed names or GUIDs) | Append the map loop index to the element key (e.g., `key={\`${f.name || f.feed}-${index}\`}`) |
 
 ---
 
@@ -673,11 +674,37 @@ The following 8 feeds fully comply with all requirements and are active in both 
 - **Mena Scoop**: `https://menascoop.com/feed/` (Country: UAE, Language: Arabic)
 
 ### 3. Excluded Feeds (Non-Compliant)
-The following requested feeds failed validation audits and are explicitly excluded from integration to prevent system alerts:
+The following requested feeds failed validation audits and are explicitly excluded from integration to prevent system alerts and background failures:
+- **WAM (UAE)** (both English and Arabic RSS feeds): Violates standard HTTP/1.1 protocol response formatting (missing carriage returns after header values), causing low-level Node.js protocol parsing/fetching exceptions.
 - **Emarat Al Youm** (`https://www.emaratalyoum.com/rss-7.951867`): Returns text/html web layout instead of standard XML RSS.
 - **Monte Carlo Doualiya (MCD)** (`https://www.mc-doualiya.com/%D8%AE%D8%AF%D9%85%D8%A9-RSS`): Returns HTML podcast lists, no standard XML feed.
 - **ADNOC Press Releases** (`https://adnoc.ae/ar/news-and-media/press-releases`): Returns raw HTML pages.
 - **The News Mirror** (`https://thenewsmirror.in/`): Standard `/feed/` path returns 404.
 - **Ya Watan** (`https://www.ya-watan.com/`): Strictly blocked by Cloudflare (returns `403 Forbidden` on crawls).
+- **PR Newswire** & **AETOSWire**: Strictly protected behind Cloudflare bot protections or user-agent verification walls, resulting in persistent `403 Forbidden` blocks when accessed via cloud serverless functions.
+- **Gulf News**, **Khaleej Times**, **Zawya**, **The National**, **Sky News Arabia** (RSS feed), **Gulf Today**, **Vice News**, **Newsweek**, **Politico**, and **UAE Interact**: These feeds suffer from persistent timeouts, DNS resolution blocks, SSL connection handshake failures in Vercel/Convex serverless environments, or empty XML structures. Removing them guarantees zero background scanner errors and keeps execution speeds within safe limits.
+
+---
+
+## 34. Decoupling Live RSS Feed from Keyword-specific Search Results
+
+To ensure that the background Live RSS Feed sweep and general syncs are completely stable and separated features from keyword-specific media monitoring search results:
+- **Dedicated RSS Schema**: Added the `rss_feed_articles` table to `convex/schema.ts` to persistently store raw, unfiltered RSS feed items fetched during background sweeps.
+- **Backend Separation**: Updated the `fetchPressReleaseSources` action in `convex/monitoringAction.ts` to direct background sweeps (when no keyword is supplied) to save directly to `rss_feed_articles` table via `saveRssArticle` mutation, while keyword-specific searches continue to run AI-powered processing and persist to `media_monitoring_articles`.
+- **Sync Specific RSS Feeds**: Refactored `syncSpecificRssFeed` to save synced items into `rss_feed_articles`, separating general syncs from media monitoring keyword streams.
+- **Frontend Decoupled Lookup**: Re-routed `articlesQuery` in `RssFeeder.tsx` to retrieve items from `getRssArticles` (which queries the dedicated `rss_feed_articles` table), preventing general live feeds from being affected or cleared when keyword search results are deleted.
+
+---
+
+## 35. Standard View Dashboard Panel Order
+
+To offer an optimized and user-friendly experience on standard-tier screen layouts, the standard view panel configuration within `src/app/[locale]/dashboard/page.tsx` is structured vertically in the exact following chronological sequence:
+
+1. **Standard Discovery (اكتشاف قياسي)**: Real-time search engine query form for scanning news.
+2. **Press Release Monitor (رصد البيانات الصحفية)**: Sync and list news articles from targeted PR wires.
+3. **Media Coverage Log (سجل التغطية الإعلامية)**: Interactive list of active coverage reports and custom items.
+4. **Media Pulse Analytics (التحليلات الإعلامية)**: Core graphical data visualizer, Geographic Reach Map, and KPIs.
+5. **Live News Feed (التغذية الإخبارية الحية)**: persistent, automated RSS stream.
+
 
 

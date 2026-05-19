@@ -57,6 +57,18 @@ export default defineSchema({
         createdAt: v.number(),
     }).index("by_date", ["publishedDate"]),
 
+    rss_feed_articles: defineTable({
+        url: v.string(),
+        title: v.string(),
+        content: v.string(),
+        publishedDate: v.string(), // Format: DD/MM/YYYY
+        language: v.union(v.literal("EN"), v.literal("AR")),
+        source: v.optional(v.string()),
+        sourceCountry: v.string(),
+        imageUrl: v.optional(v.string()),
+        createdAt: v.number(),
+    }).index("by_url", ["url"]),
+
     ingestion_runs_deep: defineTable({
         startedAt: v.number(),
         status: v.union(v.literal("success"), v.literal("error")),

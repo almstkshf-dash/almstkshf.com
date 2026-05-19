@@ -45,6 +45,10 @@ const nextConfig = {
             // Stub @mediapipe/hands for the same reason — hand-pose-detection's
             // ESM bundle imports `Hands` which Turbopack can't find statically.
             '@mediapipe/hands': './src/lib/engines/stubs/mediapipe-hands.stub.js',
+
+            // Stub @aws-sdk/client-s3 to prevent Turbopack/Next.js from attempting to
+            // resolve it at build time when scanning unzipper (dependency of exceljs).
+            '@aws-sdk/client-s3': './src/lib/engines/stubs/aws-s3.stub.js',
         },
     },
 

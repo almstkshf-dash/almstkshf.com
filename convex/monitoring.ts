@@ -72,6 +72,70 @@ export const checkDuplicate = query({
     },
 });
 
+// 1.6. QUERY: Get decoupled RSS live feed articles
+export const getRssArticles = query({
+    args: {
+        limit: v.optional(v.number()),
+        skip: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const limit = args.limit ?? 100;
+        const skip = args.skip ?? 0;
+
+        const all = await ctx.db.query("rss_feed_articles").collect();
+
+        const parseDate = (d: string) => {
+            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
+            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
+        };
+
+        all.sort((a, b) => {
+            const da = parseDate(a.publishedDate);
+            const db = parseDate(b.publishedDate);
+            if (db !== da) return db - da;
+            return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+        const slice = all.slice(skip, skip + limit);
+        return {
+            items: slice,
+            total: all.length,
+            nextSkip: skip + slice.length < all.length ? skip + slice.length : null,
+        };
+    },
+});
+
+// 2.5. MUTATION: Save a single RSS feed article
+export const saveRssArticle = mutation({
+    args: {
+        url: v.string(),
+        title: v.string(),
+        content: v.string(),
+        publishedDate: v.string(),
+        language: v.union(v.literal("EN"), v.literal("AR")),
+        source: v.optional(v.string()),
+        sourceCountry: v.string(),
+        imageUrl: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        // Check if article with the same url exists
+        const existing = await ctx.db
+            .query("rss_feed_articles")
+            .withIndex("by_url", (q) => q.eq("url", args.url))
+            .first();
+
+        if (existing) {
+            return existing._id;
+        }
+
+        const id = await ctx.db.insert("rss_feed_articles", {
+            ...args,
+            createdAt: Date.now(),
+        });
+        return id;
+    },
+});
+
 // 2. MUTATION: Save a single article (called by the Action below)
 export const saveArticle = mutation({
     args: {

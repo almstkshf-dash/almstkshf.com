@@ -1467,7 +1467,11 @@
     "delete_keyword_tooltip": "Remove from collection",
     "collection_created": "Collection created successfully!",
     "keyword_added": "Keyword added successfully!",
-    "keyword_deleted": "Keyword removed successfully!"
+    "keyword_deleted": "Keyword removed successfully!",
+    "existing_keyword_matches": "All {count} matching articles for \"{keyword}\" are already saved in your database.",
+    "sync_success_already_ingested": "Sync complete. All {count} matching articles were already saved in your database.",
+    "feed_saved_only": "+{saved}",
+    "feed_saved_with_total": "+{saved} ({total} found)"
   },
   "Error": {
     "title": "System Alert: Page Loading Failed",

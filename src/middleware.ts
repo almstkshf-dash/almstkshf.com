@@ -53,6 +53,11 @@ export default clerkMiddleware(async (auth, req) => {
         return NextResponse.next();
     }
 
+    // Handle vitals beacons gracefully with 204 No Content to avoid Clerk interception/Next.js overhead
+    if (req.nextUrl.pathname.endsWith("/vitals")) {
+        return new NextResponse(null, { status: 204 });
+    }
+
     // 0. Skip localization for API routes
     if (req.nextUrl.pathname.startsWith("/api/")) {
         return NextResponse.next();

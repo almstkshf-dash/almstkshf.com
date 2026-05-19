@@ -1435,30 +1435,20 @@ const PR_WIRE_FEEDS = [
     { name: "Al Arabiya (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AlArabiya", country: "SA", lang: "ar" },
     { name: "Al Jazeera Mubasher (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AJMubasher", country: "QA", lang: "ar" },
     { name: "Al Kass TV (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=alkass_tv", country: "QA", lang: "ar" },
-    { name: "WAM", url: "https://wam.ae/en/rss/all", country: "AE", lang: "en" },
-    { name: "WAM_AR", url: "https://wam.ae/ar/rss", country: "AE", lang: "ar" },
-    { name: "AETOSWire", url: "https://www.aetoswire.com/en/rss", country: "AE", lang: "en" },
-    { name: "Zawya", url: "https://www.zawya.com/en/rss/all", country: "AE", lang: "en" },
     { name: "Dubai PR Network", url: "https://www.dubaiprnetwork.com/rss_feed.asp", country: "AE", lang: "en" },
-    { name: "Gulf Today", url: "https://www.gulftoday.ae/rss", country: "AE", lang: "en" },
-    { name: "Khaleej Times", url: "https://www.khaleejtimes.com/rss", country: "AE", lang: "en" },
-    { name: "Gulf News", url: "https://gulfnews.com/rss", country: "AE", lang: "en" },
-    { name: "The National", url: "https://www.thenationalnews.com/rss", country: "AE", lang: "en" },
+    // { name: "Gulf Today", url: "https://www.gulftoday.ae/rssFeed/0/", country: "AE", lang: "en" },
+    // { name: "The National", url: "https://www.thenationalnews.com/arc/outboundfeeds/rss/?outputType=xml", country: "AE", lang: "en" },
     { name: "Arab News", url: "https://www.arabnews.com/rss.xml", country: "SA", lang: "en" },
-    { name: "PR Newswire", url: "https://www.prnewswire.com/rss/news-releases-news.rss", country: "US", lang: "en" },
     { name: "Newswire_com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
-    { name: "Al Arabiya", url: "https://www.alarabiya.net/.mrss/ar/last-24-hours.xml", country: "SA", lang: "ar" },
-    { name: "Sky News Arabia", url: "https://www.skynewsarabia.com/feeds/rss/1.xml", country: "AE", lang: "ar" },
+    // { name: "Sky News Arabia", url: "https://www.skynewsarabia.com/rss.xml", country: "AE", lang: "ar" },
     { name: "Asharq Al-Awsat", url: "https://aawsat.com/feed", country: "SA", lang: "ar" },
     { name: "Hashtag Dubai", url: "https://hashtagdubai.org/index.php/feed/", country: "AE", lang: "en" },
     { name: "My Dubai News", url: "https://www.mydubainews.com/feed/", country: "AE", lang: "en" },
-    { name: "Go Dubai", url: "https://www.godubai.com/citylife/RSSFeedGenerator.asp", country: "AE", lang: "en" },
     { name: "Al Badia Magazine", url: "https://albadiamagazine.com/feed/", country: "AE", lang: "ar" },
     { name: "Al Madar Magazine", url: "https://www.almadarmagazine.ae/feed/", country: "AE", lang: "ar" },
     { name: "First Avenue Magazine", url: "https://firstavenuemagazine.com/feed/", country: "AE", lang: "en" },
     { name: "Evision Worlds", url: "https://evisionworlds.com/?feed=rss2", country: "AE", lang: "en" },
     { name: "Pan Time Arabia", url: "https://pantimearabia.com/rss/", country: "AE", lang: "ar" },
-    { name: "UAE Interact", url: "https://www.uaeinteract.com/rss/news", country: "AE", lang: "en" },
     { name: "Food Safety News", url: "https://www.foodsafetynews.com/rss/", country: "US", lang: "en" },
     { name: "Energy Intel", url: "https://www.energyintel.com/rss-feed.rss", country: "US", lang: "en" },
     { name: "Business Day", url: "https://www.businessday.co.za/arc/outboundfeeds/rss/", country: "ZA", lang: "en" },
@@ -1479,21 +1469,13 @@ const PR_WIRE_FEEDS = [
     { name: "NPR", url: "http://www.npr.org/rss/rss.php?id=1004", country: "US", lang: "en" },
     { name: "Fox News", url: "http://feeds.foxnews.com/foxnews/latest", country: "US", lang: "en" },
     { name: "BBC News", url: "http://feeds.bbci.co.uk/news/world/rss.xml", country: "GB", lang: "en" },
-    { name: "Politico", url: "http://www.politico.com/rss/politicopicks.xml", country: "US", lang: "en" },
     { name: "Yahoo News", url: "http://rss.news.yahoo.com/rss/world", country: "US", lang: "en" },
     { name: "LA Times", url: "http://www.latimes.com/world/rss2.0.xml", country: "US", lang: "en" },
     { name: "CS Monitor", url: "http://rss.csmonitor.com/feeds/usa", country: "US", lang: "en" },
     { name: "NBC News", url: "http://feeds.nbcnews.com/feeds/topstories", country: "US", lang: "en" },
     { name: "The Guardian", url: "http://www.theguardian.com/world/usa/rss", country: "GB", lang: "en" },
-    { name: "Newsweek", url: "http://www.newsweek.com/rss", country: "US", lang: "en" },
+    // { name: "Newsweek", url: "https://www.newsweek.com/rss", country: "US", lang: "en" },
     { name: "ABC News", url: "http://feeds.abcnews.com/abcnews/usheadlines", country: "US", lang: "en" },
-    { name: "Time", url: "http://time.com/newsfeed/feed/", country: "US", lang: "en" },
-    { name: "Vice News", url: "https://news.vice.com/rss", country: "US", lang: "en" },
-    { name: "Wall Street Journal", url: "http://online.wsj.com/xml/rss/3_7085.xml", country: "US", lang: "en" },
-    { name: "Huffington Post", url: "http://www.huffingtonpost.com/feeds/verticals/world/index.xml", country: "US", lang: "en" },
-    { name: "US News", url: "http://www.usnews.com/rss/news", country: "US", lang: "en" },
-    { name: "Sky News UK", url: "http://news.sky.com/feeds/rss/uk.xml", country: "GB", lang: "en" },
-    { name: "The Telegraph", url: "http://www.telegraph.co.uk/news/uknews/rss", country: "GB", lang: "en" },
     { name: "Deadline", url: "http://deadline.com/feed/", country: "US", lang: "en" },
     { name: "Vulture", url: "http://feeds.feedburner.com/nymag/vulture", country: "US", lang: "en" },
     { name: "CNN", url: "http://rss.cnn.com/rss/cnn_showbiz.rss", country: "US", lang: "en" },
@@ -1591,36 +1573,63 @@ export const fetchPressReleaseSources = action({
                             }
                             return true;
                         });
-
                         for (const item of items) {
                             if (!item.link || !item.title) continue;
                             const isSeen = await checkAndSetSeen(item.link, item.title);
                             if (isSeen) continue;
 
-                            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-                            const processed = await processArticle(
-                                ctx,
-                                {
-                                    ...item,
-                                    link: item.link,
-                                    pubDate: item.pubDate,
-                                    source: normalizePublisherName(feed.name)
-                                },
-                                feed.country,
-                                feed.lang,
-                                keyword,
-                                geminiKey,
-                                isTwitter ? ["Social Media"] : ["Press Release"],
-                                dateFromObj,
-                                dateToObj,
-                                false,
-                                isTwitter ? "Social Media" : "Press Release"
-                            );
-                            if (processed) {
+                            if (!fetchedKeyword) {
+                                // Background live feed sweep -> save to rss_feed_articles
+                                const pubDate = item.pubDate ? new Date(item.pubDate) : null;
+                                const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
+                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+
+                                const snippet = item.contentSnippet || item.content || item.title || "";
+                                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+                                const language = isArabic ? "AR" : (feed.lang === "ar" ? "AR" : "EN");
+
+                                const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
+
+                                await ctx.runMutation(api.monitoring.saveRssArticle, {
+                                    url: item.link,
+                                    title: item.title,
+                                    content: snippet,
+                                    publishedDate: formattedDate,
+                                    language,
+                                    source: normalizePublisherName(feed.name) || new URL(item.link).hostname,
+                                    sourceCountry: feed.country,
+                                    imageUrl,
+                                });
                                 savedCount++;
                                 totalSaved++;
+                            } else {
+                                // Specific keyword sweep -> save to media_monitoring_articles
+                                const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                                const processed = await processArticle(
+                                    ctx,
+                                    {
+                                        ...item,
+                                        link: item.link,
+                                        pubDate: item.pubDate,
+                                        source: normalizePublisherName(feed.name)
+                                    },
+                                    feed.country,
+                                    feed.lang,
+                                    keyword,
+                                    geminiKey,
+                                    isTwitter ? ["Social Media"] : ["Press Release"],
+                                    dateFromObj,
+                                    dateToObj,
+                                    false,
+                                    isTwitter ? "Social Media" : "Press Release"
+                                );
+                                if (processed) {
+                                    savedCount++;
+                                    totalSaved++;
+                                }
                             }
                         }
+
                         feedResults.push({ name: feed.name, status: "Success", saved: savedCount, total: items.length });
                     } catch (err: any) {
                         const message = err.message || String(err);
@@ -1752,29 +1761,30 @@ export const syncSpecificRssFeed = action({
                 const isSeen = await checkAndSetSeen(item.link, item.title);
                 if (isSeen) continue;
 
-                // Process the article (skip relevancy check for general feed syncs)
-                const processed = await processArticle(
-                    ctx,
-                    {
-                        ...item,
-                        link: item.link,
-                        pubDate: item.pubDate,
-                        source: publisher
-                    },
-                    country,
-                    lang,
-                    "Press Release",
-                    geminiKey,
-                    ["Press Release"],
-                    null,
-                    null,
-                    false,
-                    "Press Release"
-                );
+                // Format publication date to DD/MM/YYYY
+                const pubDate = item.pubDate ? new Date(item.pubDate) : null;
+                const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
+                const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
-                if (processed) {
-                    savedCount++;
-                }
+                // Language detection
+                const snippet = item.contentSnippet || item.content || item.title || "";
+                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+                const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
+
+                // Get image if available
+                const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
+
+                await ctx.runMutation(api.monitoring.saveRssArticle, {
+                    url: item.link,
+                    title: item.title,
+                    content: snippet,
+                    publishedDate: formattedDate,
+                    language,
+                    source: publisher || new URL(item.link).hostname,
+                    sourceCountry: country,
+                    imageUrl,
+                });
+                savedCount++;
             }
 
             return {

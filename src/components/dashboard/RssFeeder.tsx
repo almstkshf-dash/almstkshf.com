@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
-import { useQuery, useAction } from 'convex/react';
+import { useQuery, useAction, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
@@ -43,6 +43,7 @@ export default function RssFeeder({
   maxItems = 5,
   className = ""
 }: RssFeederProps) {
+  const { isAuthenticated } = useConvexAuth();
   const t = useTranslations('RssFeeder');
   const tSources = useTranslations('RssSources');
   const format = useFormatter();
@@ -55,10 +56,10 @@ export default function RssFeeder({
   const [items, setItems] = useState<FeedItem[]>([]);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   
-  const articlesQuery = useQuery(api.monitoring.getArticles, {
-    limit: 100, // Fetch enough to filter locally
-    sourceType: 'Press Release' // Assuming RSS is mostly press releases
-  });
+  const articlesQuery = useQuery(
+    api.monitoring.getRssArticles,
+    isAuthenticated ? { limit: 100 } : 'skip'
+  );
 
   const isLoading = articlesQuery === undefined;
   const error = null;
@@ -107,7 +108,7 @@ export default function RssFeeder({
   }, [articlesQuery, activeName, activePublisher, maxItems]);
 
   const triggerSync = useCallback(async () => {
-    if (!activeUrl || !activePublisher) return;
+    if (!isAuthenticated || !activeUrl || !activePublisher) return;
     setIsSyncing(true);
     try {
       const result = await syncFeedAction({
@@ -132,7 +133,7 @@ export default function RssFeeder({
     } finally {
       setIsSyncing(false);
     }
-  }, [activeUrl, activePublisher, activeCountry, activeName, syncFeedAction]);
+  }, [isAuthenticated, activeUrl, activePublisher, activeCountry, activeName, syncFeedAction]);
 
   const fetchFeed = useCallback(async (silent = false) => {
     await triggerSync();
@@ -145,6 +146,10 @@ export default function RssFeeder({
       const sanitizedKey = name.replace(/\./g, '_');
       if (tSources.has(sanitizedKey)) {
         return tSources(sanitizedKey);
+      }
+      const lowerKey = sanitizedKey.toLowerCase();
+      if (tSources.has(lowerKey)) {
+        return tSources(lowerKey);
       }
       return name;
     } catch {
@@ -205,7 +210,7 @@ export default function RssFeeder({
                   }
                 }}
                 className={clsx(
-                  "whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-black transition-all",
+                  "whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-black transition-all shrink-0",
                   activePublisher === publisher
                     ? 'bg-primary/20 text-primary border border-primary/30'
                     : 'bg-muted/50 text-foreground/50 border border-transparent hover:border-border'
@@ -228,7 +233,7 @@ export default function RssFeeder({
                   setActiveCountry(cat.country || 'UAE');
                 }}
                 className={clsx(
-                  "whitespace-nowrap px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all border",
+                  "whitespace-nowrap px-2.5 py-1.5 rounded-xl text-[10px] font-bold transition-all border shrink-0",
                   "rtl:tracking-normal ltr:tracking-tight",
                   activeUrl === cat.url
                     ? 'bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20'
@@ -298,7 +303,7 @@ export default function RssFeeder({
             >
               {items.map((item, index) => (
                 <motion.div
-                  key={item.guid || item.link}
+                  key={`${item.guid || item.link || 'item'}-${index}`}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -333,7 +338,7 @@ export default function RssFeeder({
 
                       <div className="flex items-center gap-3 text-[10px] text-foreground/60 font-bold uppercase tracking-wider">
                         <span className="text-[9px] px-1.5 py-0 h-4 border border-primary/20 bg-primary/5 text-primary rounded-full flex items-center">
-                          {item.source}
+                          {translateSourceName(item.source)}
                         </span>
                         {item.isoDate && (
                           <span className="flex items-center gap-1">
@@ -398,7 +403,7 @@ export default function RssFeeder({
                             <Rss size={20} />
                           </div>
                           <div>
-                            <h3 className="font-bold text-foreground leading-tight line-clamp-1">{selectedItem.source}</h3>
+                            <h3 className="font-bold text-foreground leading-tight line-clamp-1">{translateSourceName(selectedItem.source)}</h3>
                             <p className="text-[10px] text-foreground/50 uppercase tracking-widest font-bold">
                               {selectedItem.isoDate ? format.dateTime(new Date(selectedItem.isoDate), { dateStyle: 'medium' }) : ''}
                             </p>

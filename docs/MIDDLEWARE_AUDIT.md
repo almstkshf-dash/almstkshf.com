@@ -108,6 +108,7 @@ export const config = {
 | `MIDDLEWARE_INVOCATION_FAILED` in production | Convex or Node.js-only API in middleware | Removed all Convex calls from middleware |
 | Double locale in URL (`/en/en/`) | Locale prefix applied twice | Skipped intl middleware for already-localized paths |
 | API routes getting locale prefix | Intl middleware running on `/api/*` | Added early return for `/api` paths |
+| Cloudflare Web Analytics `/vitals` telemetry POST failures | Cloudflare Zaraz/Web Analytics proxies telemetry to subpaths ending in `/vitals`, triggering Clerk auth protection and causing 404/401 errors | Intercepted paths ending in `/vitals` early in middleware, returning a clean `204 No Content` response immediately |
 
 ---
 
