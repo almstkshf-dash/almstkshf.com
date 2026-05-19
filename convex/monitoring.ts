@@ -655,3 +655,76 @@ export const saveCachedDomainTraffic = mutation({
         }
     },
 });
+
+// 13. MUTATION: Purge old data to reduce Convex database usage and document count
+export const purgeOldData = mutation({
+    args: {},
+    handler: async (ctx) => {
+        let totalDeleted = 0;
+
+        // 1. Purge old RSS feed articles (Keep only the latest 200)
+        const rssArticles = await ctx.db
+            .query("rss_feed_articles")
+            .collect();
+        
+        if (rssArticles.length > 200) {
+            // Sort by createdAt descending
+            rssArticles.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            // Keep the first 200, delete the rest
+            const toDelete = rssArticles.slice(200);
+            for (const doc of toDelete) {
+                await ctx.db.delete(doc._id);
+                totalDeleted++;
+            }
+        }
+
+        // 2. Purge old OSINT results (older than 7 days)
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const osintResults = await ctx.db
+            .query("osint_results")
+            .collect();
+        for (const doc of osintResults) {
+            if (doc.createdAt < sevenDaysAgo) {
+                await ctx.db.delete(doc._id);
+                totalDeleted++;
+            }
+        }
+
+        // 3. Purge old Dark Web results (older than 7 days)
+        const darkwebResults = await ctx.db
+            .query("darkweb_results")
+            .collect();
+        for (const doc of darkwebResults) {
+            if (doc.discovered_at < sevenDaysAgo) {
+                await ctx.db.delete(doc._id);
+                totalDeleted++;
+            }
+        }
+
+        // 4. Purge old free analyses (older than 7 days)
+        const freeAnalyses = await ctx.db
+            .query("free_analyses")
+            .collect();
+        for (const doc of freeAnalyses) {
+            if (doc.timestamp < sevenDaysAgo) {
+                await ctx.db.delete(doc._id);
+                totalDeleted++;
+            }
+        }
+
+        // 5. Purge old media monitoring articles (older than 30 days)
+        const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        const monitoringArticles = await ctx.db
+            .query("media_monitoring_articles")
+            .collect();
+        for (const doc of monitoringArticles) {
+            if ((doc.createdAt || 0) < thirtyDaysAgo) {
+                await ctx.db.delete(doc._id);
+                totalDeleted++;
+            }
+        }
+
+        return { success: true, deletedCount: totalDeleted };
+    },
+});
+
