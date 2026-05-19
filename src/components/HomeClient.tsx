@@ -116,7 +116,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('tdra_alt')}
                                 width={128}
                                 height={48}
-                                loading="lazy"
+                                loading="eager"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -128,7 +128,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('soc2_alt')}
                                 width={64}
                                 height={64}
-                                loading="lazy"
+                                loading="eager"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -140,7 +140,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('secure_alt')}
                                 width={128}
                                 height={48}
-                                loading="lazy"
+                                loading="eager"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -152,7 +152,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('saas_awards_alt')}
                                 width={128}
                                 height={48}
-                                loading="lazy"
+                                loading="eager"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
