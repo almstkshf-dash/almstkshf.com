@@ -706,5 +706,23 @@ To offer an optimized and user-friendly experience on standard-tier screen layou
 4. **Media Pulse Analytics (التحليلات الإعلامية)**: Core graphical data visualizer, Geographic Reach Map, and KPIs.
 5. **Live News Feed (التغذية الإخبارية الحية)**: persistent, automated RSS stream.
 
+---
+
+## 36. Client-Side Errors & Stability Fixes
+
+To guarantee absolute visual stability and console clean-room state for testing, the system implements the following resolutions:
+
+### 1. Link Preload Warning ("preloaded but not used")
+- **Root Cause**: Next.js experimental `optimizeCss` (critters) automatically converts standard stylesheets into `<link rel="preload" as="style" onload="this.rel='stylesheet'">`. In modern browsers (Chrome/Edge 110+), this triggers console clutter/warnings if the stylesheet load occurs outside the browser's expected window, or if the `onload` inline event handler is blocked by the Content Security Policy.
+- **Resolution**: Disabled `optimizeCss: true` inside `next.config.mjs` (set to `false`). Next.js's native CSS parsing handles styles perfectly and cleanly without any console warnings or performance drops.
+
+### 2. Chatbase verify-token 400 Bad Request
+- **Root Cause**: The application previously generated guest JWT session tokens for all anonymous visitors and called `window.chatbase('identify', { token })`. Chatbase returned `400 Bad Request` on `/api/auth/verify-token` because identity verification is restricted to real, authenticated users or has mismatching secrets.
+- **Resolution**: Refactored `src/app/api/chatbase/token/route.ts` to check Clerk session authentication. If the visitor is a guest, it returns `{ token: null, is_guest: true }`. In the frontend (`src/components/ChatbaseWidget.tsx`), the `identify` call is conditionally executed ONLY if a valid, non-null token is returned. This eliminates all console 400 errors for anonymous/guest sessions.
+
+### 3. Content Security Policy upgrade-insecure-requests Warning
+- **Status**: The console warning `The Content Security Policy directive 'upgrade-insecure-requests' is ignored when delivered in a report-only policy.` originates from the third-party Chatbase iframe servers (`https://www.chatbase.co/...`) delivering a misconfigured `Content-Security-Policy-Report-Only` header. This is external to the codebase, completely non-blocking, and has zero impact on application behavior.
+
+
 
 

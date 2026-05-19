@@ -8,21 +8,12 @@ const withBundleAnalyzer = BundleAnalyzer({ enabled: process.env.ANALYZE === 'tr
 const nextConfig = {
     experimental: {
         /*
-         * RENDER-BLOCKING CSS FIX:
-         * optimizeCss uses `critters` to:
-         *   1. Scan the rendered HTML for CSS rules used above the fold
-         *   2. Inline those rules directly in <style> tags in the <head>
-         *   3. Convert the blocking <link rel="stylesheet"> to:
-         *        <link rel="preload" as="style" onload="this.rel='stylesheet'">
-         *      + <noscript><link rel="stylesheet"></noscript>
-         *
-         * This converts the 17.7 KiB render-blocking CSS file into a non-blocking
-         * async load. The above-fold content renders immediately using the inlined
-         * critical CSS, and the full stylesheet loads in the background.
-         *
-         * Estimated saving: 650 ms (per Lighthouse audit).
+         * optimizeCss (using `critters`) is disabled because it converts blocking stylesheets into 
+         * `<link rel="preload" as="style" onload="this.rel='stylesheet'">` tags. In modern browsers, 
+         * this triggers persistent "preload but not used within a few seconds" warnings in the console, 
+         * cluttering the dev logs and confusing testing suites, especially when inline JS is blocked by CSP.
          */
-        optimizeCss: true,
+        optimizeCss: false,
 
         optimizePackageImports: [
             'lucide-react',

@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { rateLimit } from '@/lib/rateLimit';
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
     try {
@@ -31,43 +32,53 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // For now, we'll create a guest/anonymous user token
-        const sessionId = request.cookies.get('session_id')?.value || generateSessionId();
+        // Check user authentication via Clerk
+        const authData = await auth();
+        const userId = authData?.userId;
 
-        // Get user info from your auth system
+        // If the user is not logged in, return token: null to prevent Chatbase verify-token 400 errors
+        if (!userId) {
+            return NextResponse.json(
+                { token: null, is_guest: true },
+                {
+                    headers: {
+                        "Cache-Control": "private, max-age=0, must-revalidate",
+                    },
+                }
+            );
+        }
+
+        // Retrieve the current user details for the JWT payload
+        const user = await currentUser();
+        if (!user) {
+            return NextResponse.json(
+                { token: null, is_guest: true },
+                {
+                    headers: {
+                        "Cache-Control": "private, max-age=0, must-revalidate",
+                    },
+                }
+            );
+        }
+
         const userPayload = {
-            user_id: sessionId,
-            email: 'guest@almstkshf.com',
-            is_guest: true,
+            user_id: user.id,
+            email: user.emailAddresses[0]?.emailAddress || '',
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+            is_guest: false,
         };
 
-        // Generate JWT token
+        // Generate JWT token signed with the secret key
         const token = jwt.sign(userPayload, secret, { expiresIn: '1h' });
 
-        // Set session cookie if it doesn't exist
-        const response = NextResponse.json(
-            { token },
+        return NextResponse.json(
+            { token, is_guest: false },
             {
                 headers: {
                     "Cache-Control": "private, max-age=0, must-revalidate",
                 },
             }
         );
-
-        try {
-            if (!request.cookies.get('session_id')) {
-                response.cookies.set('session_id', sessionId, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'lax',
-                    maxAge: 60 * 60 * 24 * 30, // 30 days
-                });
-            }
-        } catch (cookieError) {
-            console.warn('Error setting session cookie:', cookieError);
-        }
-
-        return response;
     } catch (error: unknown) {
         console.error('Error generating chatbase token:', error);
         return NextResponse.json(
@@ -77,7 +88,3 @@ export async function GET(request: NextRequest) {
     }
 }
 
-function generateSessionId(): string {
-    const rand = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
-    return `guest_${Date.now()}_${rand}`;
-}
