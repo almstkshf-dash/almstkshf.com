@@ -9,7 +9,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAction, useQuery, useMutation, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import {
@@ -99,7 +99,7 @@ export default function PressReleasePanel() {
         isAuthenticated ? { limit: 1, sourceType: 'Press Release' } : 'skip'
     ) as { total: number } | undefined | null;
     const prCount = prStats?.total ?? 0;
-    
+
     // Countdown timer effect
     useEffect(() => {
         if (retryCountdown === null) return;
@@ -479,7 +479,7 @@ export default function PressReleasePanel() {
                                         ? t('sync_success_with_sources', {
                                             count: syncResult.totalSaved,
                                             sources: syncResult.feedResults.filter(f => !f.error).map(f => f.name || f.feed).join(', ')
-                                          })
+                                        })
                                         : totalMatched > 0
                                             ? t('sync_success_already_ingested', { count: totalMatched })
                                             : t('sync_success_no_articles')}
