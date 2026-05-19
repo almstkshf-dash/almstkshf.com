@@ -275,7 +275,8 @@ export default defineSchema({
         type: v.union(v.literal("alert"), v.literal("system"), v.literal("billing")),
         isRead: v.boolean(),
         createdAt: v.number(),
-    }).index("by_userId", ["userId"]),
+    }).index("by_userId", ["userId"])
+        .index("by_userId_and_isRead", ["userId", "isRead"]),
 
     local_terrorist_list: defineTable({
         type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),

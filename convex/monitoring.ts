@@ -302,7 +302,6 @@ export const createNotification = mutation({
         });
     }
 });
-
 export const getUnreadNotifications = query({
     args: {},
     handler: async (ctx) => {
@@ -312,13 +311,13 @@ export const getUnreadNotifications = query({
         const userId = ident.subject;
         return await ctx.db
             .query("notifications")
-            .withIndex("by_userId", (q) => q.eq("userId", userId))
-            .filter((q) => q.eq(q.field("isRead"), false))
+            .withIndex("by_userId_and_isRead", (q) =>
+                q.eq("userId", userId).eq("isRead", false)
+            )
             .order("desc")
-            .collect();
+            .take(100);
     }
 });
-
 export const markNotificationAsRead = mutation({
     args: { id: v.id("notifications") },
     handler: async (ctx, args) => {
