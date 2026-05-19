@@ -166,7 +166,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         className="max-h-64 overflow-y-auto scrollbar-thin transition-colors"
                     >
                         {filtered.length === 0 ? (
-                            <div className="py-10 text-center" role="option" aria-disabled="true">
+                            <div className="py-10 text-center">
                                 <Search className="w-8 h-8 text-foreground/20 mx-auto mb-2" aria-hidden="true" />
                                 <p className="text-foreground/60 text-xs font-medium">{noResultsText}</p>
                             </div>

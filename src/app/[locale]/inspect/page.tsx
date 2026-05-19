@@ -104,7 +104,7 @@ export default function AIInspectorPage() {
         if (uploadedFile) {
           // Use the newer async file analyzer that includes ML scouts
           const result = await analyzeImageFile(uploadedFile);
-          // @ts-ignore - finalizeReport is internal but exported for this transition
+          // @ts-expect-error - finalizeReport is internal but exported for this transition
           const report = finalizeReport(result, result.stats);
           setImageResult(report);
         } else {

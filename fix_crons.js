@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = 'c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/convex/crons.ts';
-let content = fs.readFileSync(path, 'utf8');
+const content = fs.readFileSync(path, 'utf8');
 
 // The file looks like:
 /*

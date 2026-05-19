@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const path1 = 'c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/src/lib/engines/textEngine.ts';
-let c1 = fs.readFileSync(path1, 'utf8');
+const c1 = fs.readFileSync(path1, 'utf8');
 const lines1 = c1.split('\n');
 for (let i = 0; i < lines1.length; i++) {
     if (lines1[i].includes('Ø')) {
@@ -23,7 +23,7 @@ for (let i = 0; i < lines1.length; i++) {
 fs.writeFileSync(path1, lines1.join('\n'), 'utf8');
 
 const path2 = 'c:/Users/ceo/OneDrive/Desktop/projects/almstkshf.com/almstkshf.com/src/components/hero/MediaWave.tsx';
-let c2 = fs.readFileSync(path2, 'utf8');
+const c2 = fs.readFileSync(path2, 'utf8');
 const lines2 = c2.split('\n');
 for (let i = 0; i < lines2.length; i++) {
     if (lines2[i].includes('Ø')) {

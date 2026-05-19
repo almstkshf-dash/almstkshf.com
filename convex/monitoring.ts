@@ -284,19 +284,23 @@ export const updateArticle = mutation({
 
 export const createNotification = mutation({
     args: {
-        userId: v.string(),
         title: v.string(),
         message: v.string(),
         type: v.union(v.literal("alert"), v.literal("system"), v.literal("billing")),
     },
     handler: async (ctx, args) => {
         const ident = await ctx.auth.getUserIdentity();
-        if (!ident || ident.subject !== args.userId) {
-            throw new Error("Unauthorized to create a notification for this user.");
+        if (!ident) {
+            // Silently skip if user is not authenticated (e.g., called from system context)
+            return;
         }
 
+        const userId = ident.subject;
         await ctx.db.insert("notifications", {
-            ...args,
+            userId,
+            title: args.title,
+            message: args.message,
+            type: args.type,
             isRead: false,
             createdAt: Date.now(),
         });
@@ -309,13 +313,15 @@ export const getUnreadNotifications = query({
         if (!ident) return [];
 
         const userId = ident.subject;
-        return await ctx.db
+        // Use the simpler by_userId index and filter isRead in-memory to avoid
+        // any compound index data integrity issues on the production deployment
+        const allUserNotifications = await ctx.db
             .query("notifications")
-            .withIndex("by_userId_and_isRead", (q) =>
-                q.eq("userId", userId).eq("isRead", false)
-            )
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
             .order("desc")
-            .take(100);
+            .take(200);
+
+        return allUserNotifications.filter((n) => !n.isRead).slice(0, 100);
     }
 });
 export const markNotificationAsRead = mutation({

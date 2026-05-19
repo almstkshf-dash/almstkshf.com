@@ -456,6 +456,7 @@ export default function TerroristListTab() {
           <>
             {/* Overlay — no ARIA role, purely visual */}
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              { }
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -464,6 +465,7 @@ export default function TerroristListTab() {
                 className="absolute inset-0 bg-background/80 backdrop-blur-sm"
                 aria-hidden="true"
               />
+              { }
               {/* Dialog panel — role/aria-modal/aria-labelledby belong here (WAI-ARIA APG) */}
               <motion.div
                 role="dialog"

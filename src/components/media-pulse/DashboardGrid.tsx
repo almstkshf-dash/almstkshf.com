@@ -114,7 +114,7 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
         } finally {
             setIsGenerating(false);
         }
-    }, [articles, localeTranslations, saveReport]);
+    }, [articles, localeTranslations, saveReport, settings?.brandName, settings?.brandTagline, settings?.footerUrl, settings?.logoUrl]);
 
     const stats = useMemo(() => [
         {

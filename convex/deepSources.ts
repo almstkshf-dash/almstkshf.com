@@ -138,9 +138,9 @@ export const fetchDeepSources = action({
                 itemCount,
             });
 
-            const subjectId = identity?.subject || "system";
+            // createNotification derives userId from ctx.auth server-side;
+            // silently no-ops when called from background scheduler without auth.
             await ctx.runMutation(api.monitoring.createNotification, {
-                userId: subjectId,
                 title: "Deep Scan Completed",
                 message: `Background sweep finished. Discovered ${itemCount} new items.`,
                 type: "system"

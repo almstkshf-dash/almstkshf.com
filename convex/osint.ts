@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -104,7 +104,6 @@ export const lookupEmail = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Email lookup for ${email} finished. ${results.breachCount || 0} breaches found.`,
                     type: "system"
@@ -252,7 +251,6 @@ export const lookupDomain = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Domain lookup for ${domain} finished.`,
                     type: "system"
@@ -350,7 +348,6 @@ export const lookupIp = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `IP lookup for ${ip} finished.`,
                     type: "system"
@@ -466,7 +463,6 @@ export const lookupUsername = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Username lookup for ${username} finished.`,
                     type: "system"
@@ -539,7 +535,6 @@ export const lookupPhone = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Phone lookup for ${phone} finished.`,
                     type: "system"
@@ -619,7 +614,6 @@ export const lookupNews = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `News Analysis for "${query}" is ready.`,
                     type: "system"
@@ -673,7 +667,6 @@ export const lookupCorporate = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Corporate lookup for ${query} finished.`,
                     type: "system"
@@ -728,7 +721,6 @@ export const lookupLocation = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Location lookup for ${query} finished.`,
                     type: "system"
@@ -791,7 +783,6 @@ export const lookupWikipedia = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Wikipedia lookup for ${query} finished.`,
                     type: "system"
@@ -845,7 +836,6 @@ export const lookupGleif = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `GLEIF lookup for ${query} finished.`,
                     type: "system"
@@ -912,7 +902,6 @@ export const lookupWatchlist = action({
             const ident = await ctx.auth.getUserIdentity();
             if (ident) {
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: ident.subject,
                     title: "osint_ready",
                     message: `Watchlist screening for ${query} is complete.`,
                     type: "system"

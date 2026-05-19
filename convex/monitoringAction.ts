@@ -1218,15 +1218,14 @@ async function processArticle(
             ctx.runAction(api.darkWeb.searchAhmia, { query: keyword }).catch(console.error);
         }
 
-        const userId = "system"; // Background monitoring defaults to system
-        const finalUserId = userId;
         const isPressRelease = forceSourceType === "Press Release" || aiData.sourceType === "Press Release";
         const isCritical = aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical" || aiData.sentiment === "Negative";
 
         if (isCritical || isPressRelease) {
             try {
+                // Note: createNotification now derives userId from ctx.auth server-side.
+                // When called from background scheduler (no auth), it silently returns.
                 await ctx.runMutation(api.monitoring.createNotification, {
-                    userId: finalUserId,
                     title: isCritical ? "critical_mention" : "press_release_found",
                     message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${keyword}": ${item.title.substring(0, 60)}...`,
                     type: isCritical ? "alert" : "system"

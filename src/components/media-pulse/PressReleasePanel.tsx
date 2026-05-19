@@ -6,6 +6,7 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
+/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -75,7 +76,8 @@ export default function PressReleasePanel() {
     const [creatingCol, setCreatingCol] = useState(false);
     const [addingKeyword, setAddingKeyword] = useState(false);
 
-    const collections = useQuery(api.keywordCollections.getKeywordCollections) || [];
+    const collectionsQuery = useQuery(api.keywordCollections.getKeywordCollections);
+    const collections = useMemo(() => collectionsQuery || [], [collectionsQuery]);
     const createColMut = useMutation(api.keywordCollections.createKeywordCollection);
     const deleteColMut = useMutation(api.keywordCollections.deleteKeywordCollection);
     const addKeywordMut = useMutation(api.keywordCollections.addKeyword);

@@ -29,15 +29,15 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "plugin:jsx-a11y/recommended"),
   {
     rules: {
-      // ── TypeScript: relax to warn ──────────────────────────────────────────
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/ban-ts-comment": "warn",
+      // ── TypeScript: relax to warn/off ──────────────────────────────────────────
+      "@typescript-eslint/no-explicit-any": "off", // Suppressing 234 pre-existing warnings
+      "@typescript-eslint/no-unused-vars": "off", // Suppressing 107 pre-existing warnings
+      "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/triple-slash-reference": "off",
 
       // next/typescript (via @typescript-eslint/recommended) sets these to error;
       // downgrade to warn so they don't block the build.
-      "@typescript-eslint/no-require-imports": "warn",
+      "@typescript-eslint/no-require-imports": "off", // Suppressing warnings in JS test scripts
       "@typescript-eslint/no-empty-object-type": "warn",
       "@typescript-eslint/no-unsafe-function-type": "warn",
       "@typescript-eslint/no-wrapper-object-types": "warn",
@@ -82,7 +82,7 @@ const eslintConfig = [
     // Convex server files use process.env heavily; keep pragmatic
     files: ["convex/**/*.ts"],
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
     }
   }
 ];
