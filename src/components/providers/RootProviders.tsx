@@ -28,6 +28,6 @@ interface RootProvidersProps {
  */
 export function RootProviders({ children, locale, messages }: RootProvidersProps) {
 
-    return (<ClerkProvider telemetry={false} prefetchUI={false}><NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC"><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
+    return (<ClerkProvider telemetry={false}><NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC"><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
     );
 }

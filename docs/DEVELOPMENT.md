@@ -392,6 +392,8 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | `Session History Item Has Been Marked Skippable` | Programmatic navigation pushing sign-in redirect to history stack | Use `router.replace()` instead of `router.push()` for auth redirects |
 | `GET /__clerk/v1/... 400` | Clerk internal handshake/proxy routes being intercepted by `auth.protect()` or localized by `next-intl` | Skip paths starting with `/__clerk` at the very beginning of the `clerkMiddleware` callback |
 | `Encountered two children with the same key` | Non-unique mapped array element keys (e.g., duplicated feed names or GUIDs) | Append the map loop index to the element key (e.g., `key={\`${f.name || f.feed}-${index}\`}`) |
+| `Error: Clerk was not loaded with Ui components` | Setting `prefetchUI={false}` on `<ClerkProvider>` but rendering standard Clerk UI components (e.g., `<UserButton />`) | Remove `prefetchUI={false}` or set to `true` (default) on `<ClerkProvider>` in `RootProviders.tsx` |
+| `You don't have access to the selected project` (Convex) | `npm run dev` running concurrently before the local repository is linked to your authenticated Convex account/team | Run `npx convex dev --configure` interactively in a separate terminal once to link the project to your Convex account/team, then run `npm run dev` |
 
 ---
 
