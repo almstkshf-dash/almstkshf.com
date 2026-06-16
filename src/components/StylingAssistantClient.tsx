@@ -194,9 +194,9 @@ export default function StylingAssistantClient() {
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-name" className="text-sm font-medium text-foreground/70 ml-1">{t("form.name")}</label>
+                                            <label htmlFor="styling-name" className="text-sm font-medium text-foreground/70 ms-1">{t("form.name")}</label>
                                             <div className="relative group">
-                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
+                                                <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors" aria-hidden="true" />
                                                 <input
                                                     id="styling-name"
                                                     name="name"
@@ -206,15 +206,15 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setName(e.target.value)}
                                                     placeholder={t("form.placeholder_name")}
                                                     autoComplete="name"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 ps-12 pe-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label htmlFor="styling-email" className="text-sm font-medium text-foreground/70 ml-1">{t("form.email")}</label>
+                                            <label htmlFor="styling-email" className="text-sm font-medium text-foreground/70 ms-1">{t("form.email")}</label>
                                             <div className="relative group">
-                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors rtl:right-4 rtl:left-auto" aria-hidden="true" />
+                                                <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50 group-focus-within:text-purple-400 transition-colors" aria-hidden="true" />
                                                 <input
                                                     id="styling-email"
                                                     name="email"
@@ -224,7 +224,7 @@ export default function StylingAssistantClient() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder={t("form.placeholder_email")}
                                                     autoComplete="email"
-                                                    className="w-full bg-background border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all rtl:pr-12 rtl:pl-4"
+                                                    className="w-full bg-background border border-border rounded-2xl py-4 ps-12 pe-4 text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
                                                 />
                                             </div>
                                         </div>

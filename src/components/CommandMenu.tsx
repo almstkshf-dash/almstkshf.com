@@ -148,7 +148,7 @@ export function CommandMenu() {
                                     <LayoutDashboard className="h-4 w-4" />
                                 </div>
                                 <span className="font-medium">{tNav('dashboard')}</span>
-                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity rtl:rotate-180" />
                             </Command.Item>
                         </Command.Group>
 
@@ -172,7 +172,7 @@ export function CommandMenu() {
                                                 <span className="font-medium">{tNav(child.label)}</span>
                                                 <span className="text-[10px] text-foreground/70 font-medium line-clamp-1">{tNav(item.label)}</span>
                                             </div>
-                                            <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                            <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity rtl:rotate-180" />
                                         </Command.Item>
                                     ));
                                 }
@@ -190,7 +190,7 @@ export function CommandMenu() {
                                             {item.icon ? <item.icon className="h-4 w-4" /> : <Home className="h-4 w-4" />}
                                         </div>
                                         <span className="font-medium">{tNav(item.label)}</span>
-                                        <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                        <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity rtl:rotate-180" />
                                     </Command.Item>
                                 );
                             })}
@@ -209,7 +209,7 @@ export function CommandMenu() {
                                     <Settings className="h-4 w-4" />
                                 </div>
                                 <span className="font-medium">{tNav('settings')}</span>
-                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+                                <ChevronRight className="ms-auto h-4 w-4 opacity-0 group-aria-selected:opacity-100 transition-opacity rtl:rotate-180" />
                             </Command.Item>
 
                             <ThemeCommandItems runCommand={runCommand} />

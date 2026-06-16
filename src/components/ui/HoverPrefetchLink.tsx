@@ -9,8 +9,7 @@
 'use client';
 
 import { Link } from '@/i18n/routing';
-import { useState } from 'react';
-import { ComponentPropsWithoutRef } from 'react';
+import { useState, useRef, useEffect, ComponentPropsWithoutRef } from 'react';
 
 type HoverPrefetchLinkProps = ComponentPropsWithoutRef<typeof Link>;
 
@@ -18,18 +17,58 @@ export function HoverPrefetchLink({
     children,
     prefetch: prefetchProp,
     onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onTouchStart,
     ...props
 }: HoverPrefetchLinkProps) {
     const [shouldPrefetch, setShouldPrefetch] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!shouldPrefetch) {
+            // 80ms delay to make sure the hover is intentional (reduces unnecessary fetching on sweep)
+            timeoutRef.current = setTimeout(() => {
+                setShouldPrefetch(true);
+            }, 80);
+        }
+        onMouseEnter?.(e);
+    };
+
+    const handleMouseLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        onMouseLeave?.(e);
+    };
+
+    const handleFocus = (e: React.FocusEvent<HTMLAnchorElement>) => {
+        setShouldPrefetch(true);
+        onFocus?.(e);
+    };
+
+    const handleTouchStart = (e: React.TouchEvent<HTMLAnchorElement>) => {
+        setShouldPrefetch(true);
+        onTouchStart?.(e);
+    };
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     return (
         <Link
             {...props}
             prefetch={shouldPrefetch ? (prefetchProp === undefined ? true : prefetchProp) : false}
-            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                setShouldPrefetch(true);
-                onMouseEnter?.(e);
-            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onFocus={handleFocus}
+            onTouchStart={handleTouchStart}
         >
             {children}
         </Link>

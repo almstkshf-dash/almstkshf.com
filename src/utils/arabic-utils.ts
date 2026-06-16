@@ -6,25 +6,37 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
+// @ts-ignore
+import reshaper from 'arabic-persian-reshaper';
+
 export const isArabic = (text: string): boolean => {
     return /[\u0600-\u06FF]/.test(text);
 };
 
 /**
  * Fixes Arabic text for PDF rendering in jsPDF.
- * Since jsPDF is LTR, we reverse the word order to simulate RTL flow.
- * Note: For simple jsPDF usage without a shaper, we also reverse characters 
- * if the selected font doesn't handle shaping (like standard Helvetica).
- * With Amiri, we should only need word reversal if it supports Arabic shaping.
+ * Since jsPDF is LTR, we shape the Arabic characters and reverse them
+ * to simulate RTL flow on a per-word basis for proper connectivity and direction.
  */
 export const fixArabicForPDF = (text: string): string => {
     if (!text || !isArabic(text)) return text;
     
-    // Split into segments to handle mixed English/Arabic correctly
-    const words = text.trim().split(/\s+/);
+    // Shape characters using the reshaper to get correct connected glyph forms
+    const shaped = reshaper.reshape(text);
     
-    // Reverse word order for RTL paragraph flow
-    return words.reverse().join(' ');
+    // Split by spaces (retaining whitespace) to keep alignment intact
+    const words = shaped.split(/(\s+)/);
+    
+    const processedWords = words.map((w: string) => {
+        // Reverse characters only if it's an Arabic word (including shaped glyphs/presentation forms)
+        if (/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(w)) {
+            return w.split('').reverse().join('');
+        }
+        return w;
+    });
+    
+    // Reverse word order to align sentences from Right-to-Left (RTL)
+    return processedWords.reverse().join('');
 };
 
 /**

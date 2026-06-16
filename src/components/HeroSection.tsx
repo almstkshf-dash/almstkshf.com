@@ -54,7 +54,7 @@ export default async function HeroSection() {
                         {t("Common.slogan")}
                     </h2>
 
-                    <div className="w-20 h-1 bg-gradient-to-r from-primary to-transparent mb-8" />
+                    <div className="w-20 h-1 bg-gradient-to-r from-primary to-transparent rtl:bg-gradient-to-l mb-8" />
 
                     <p
                         id="hero-description"

@@ -809,7 +809,7 @@ export default function OsintTab() {
           <div className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
+                <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
                 <label htmlFor="lookup-input" className="sr-only">{currentType.placeholder}</label>
                 <input
                   id="lookup-input"
@@ -822,7 +822,7 @@ export default function OsintTab() {
                   }}
                   onKeyDown={e => e.key === 'Enter' && handleLookup()}
                   placeholder={currentType.placeholder}
-                  className="w-full pl-11 pr-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  className="w-full ps-11 pe-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                   disabled={loading}
                 />
                 <button
@@ -830,10 +830,10 @@ export default function OsintTab() {
                   onClick={handleOptimize}
                   disabled={isOptimizing || !query.trim() || loading}
                   title={tOpt('button_tooltip')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
                 >
                   <Wand2 className={clsx("w-4 h-4", isOptimizing && "animate-pulse")} aria-hidden="true" />
-                  <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
+                  <Sparkles className="absolute -top-1 -end-1 w-2 h-2 text-primary animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
                 </button>
               </div>
               <Button
@@ -846,7 +846,7 @@ export default function OsintTab() {
                   isAdmin ? "shadow-primary/20" : "opacity-80 grayscale"
                 )}
               >
-                {!isAdmin ? <Shield className="w-4 h-4 mr-2 inline" /> : null}
+                {!isAdmin ? <Shield className="w-4 h-4 me-2 inline" /> : null}
                 {loading ? tCommon('analyze_tone') : tCommon('generate_report')}
               </Button>
             </div>
@@ -1065,7 +1065,7 @@ export default function OsintTab() {
                   <h4 className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{tool.name}</h4>
                   <p className="text-[10px] text-foreground/70 truncate">{tool.description}</p>
                 </div>
-                <div className="w-7 h-7 rounded-lg bg-background border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all ml-3">
+                <div className="w-7 h-7 rounded-lg bg-background border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all ms-3">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </div>
               </a>
@@ -1139,8 +1139,8 @@ export default function OsintTab() {
                 <div className="space-y-1.5">
                   <label htmlFor="dir-search" className="text-[10px] font-black text-foreground/70 dark:text-slate-400 uppercase px-1">{tOsint('filters.search')}</label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" aria-hidden="true" />
-                    <input id="dir-search" name="search" className="w-full pl-9 pr-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" aria-hidden="true" />
+                    <input id="dir-search" name="search" className="w-full ps-9 pe-3 py-2.5 bg-muted/50 border border-border rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-primary/20" placeholder={tOsint('filters.search_placeholder')} value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} />
                   </div>
                 </div>
               </div>

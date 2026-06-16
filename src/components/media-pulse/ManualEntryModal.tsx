@@ -9,7 +9,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -25,7 +25,7 @@ interface ManualEntryModalProps {
 const sanitizeUrl = (inputUrl: string): string => {
     if (!inputUrl) return '';
     let cleaned = inputUrl.trim();
-    
+
     // Split by whitespace or newlines or commas and pick the first one
     const urls = cleaned.split(/[\s,\n]+/);
     if (urls.length > 0) {
@@ -103,6 +103,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
     const [mounted, setMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
+    const isSubmitting = isLoading;
 
     useEffect(() => {
         setMounted(true);
@@ -274,7 +275,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
         } catch (error: any) {
             const dataMsg = typeof error.data === 'string' ? error.data : '';
             const errorMessage = error instanceof Error ? error.message : String(error);
-            
+
             console.error("Mutation failed:", error);
 
             if (errorMessage.includes("DuplicateArticle") || dataMsg.includes("DuplicateArticle")) {
@@ -294,7 +295,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
         if (sanitized !== formData.url) {
             setFormData(prev => ({ ...prev, url: sanitized }));
         }
-        
+
         if (sanitized) {
             const detected = detectSocialMedia(sanitized);
             if (detected) {
@@ -393,7 +394,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext("2d");
-                    
+
                     if (ctx) {
                         ctx.drawImage(img, 0, 0, width, height);
                         const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
@@ -427,7 +428,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                         variant="ghost"
                         size="icon"
                         onClick={onClose}
-                        disabled={isLoading}
+                        disabled={isSubmitting}
                         className="text-foreground/80 hover:text-foreground transition-colors"
                         aria-label={t('cancel')}
                     >
@@ -444,11 +445,12 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 name="article_title"
                                 required
                                 type="text"
+                                disabled={isSubmitting}
                                 placeholder={t('title_placeholder')}
                                 value={formData.title}
                                 onChange={e => setFormData({ ...formData, title: e.target.value })}
                                 autoComplete="on"
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div>
@@ -458,11 +460,12 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 name="source_name"
                                 required
                                 type="text"
+                                disabled={isSubmitting}
                                 placeholder={t('source_placeholder')}
                                 value={formData.source}
                                 onChange={e => setFormData({ ...formData, source: e.target.value })}
                                 autoComplete="organization"
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -476,10 +479,11 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="publisher_username"
                                 name="publisher_username"
                                 type="text"
+                                disabled={isSubmitting}
                                 placeholder={t('publisher_username_placeholder')}
                                 value={formData.publisherUsername}
                                 onChange={e => setFormData({ ...formData, publisherUsername: e.target.value })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     )}
@@ -492,9 +496,10 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 name="pub_date"
                                 required
                                 type="date"
+                                disabled={isSubmitting}
                                 value={formData.date}
                                 onChange={e => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground [color-scheme:light] dark:[color-scheme:dark]"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground [color-scheme:light] dark:[color-scheme:dark] disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div>
@@ -504,19 +509,20 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                     id="article_url"
                                     name="article_url"
                                     type="text"
+                                    disabled={isSubmitting}
                                     placeholder="https://..."
                                     value={formData.url}
                                     onChange={e => setFormData({ ...formData, url: e.target.value })}
                                     onBlur={handleUrlBlur}
                                     autoComplete="url"
-                                    className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                    className="flex-1 p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                                 <Button
                                     type="button"
                                     variant="secondary"
                                     onClick={handleExtract}
                                     isLoading={isExtracting}
-                                    disabled={!formData.url}
+                                    disabled={!formData.url || isSubmitting || isExtracting}
                                     className="px-4 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm font-bold shrink-0 h-auto shadow-none"
                                     title={t('fetch_article')}
                                     aria-label={t('fetch_article')}
@@ -537,9 +543,10 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="source_type"
                                 name="source_type"
                                 aria-label={t('type')}
+                                disabled={isSubmitting}
                                 value={formData.sourceType}
                                 onChange={e => setFormData({ ...formData, sourceType: e.target.value })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <option value="Print">{t('types.print')}</option>
                                 <option value="Online News">{t('types.online_news')}</option>
@@ -554,9 +561,10 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="sentiment"
                                 name="sentiment"
                                 aria-label={t('sentiment')}
+                                disabled={isSubmitting}
                                 value={formData.sentiment}
                                 onChange={e => setFormData({ ...formData, sentiment: e.target.value })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <option value="Positive">{t('sentiments.positive')}</option>
                                 <option value="Neutral">{t('sentiments.neutral')}</option>
@@ -569,6 +577,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="reach"
                                 name="reach"
                                 type="number"
+                                disabled={isSubmitting}
                                 placeholder={t('reach_placeholder')}
                                 value={formData.reach}
                                 onChange={e => {
@@ -580,7 +589,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                     }
                                 }}
                                 autoComplete="on"
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div>
@@ -589,12 +598,13 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="source_country"
                                 name="source_country"
                                 type="text"
+                                disabled={isSubmitting}
                                 placeholder="AE"
                                 maxLength={2}
                                 value={formData.sourceCountry}
                                 onChange={e => setFormData({ ...formData, sourceCountry: e.target.value.toUpperCase() })}
                                 autoComplete="country"
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -606,10 +616,11 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="likes"
                                 name="likes"
                                 type="number"
+                                disabled={isSubmitting}
                                 placeholder="0"
                                 value={formData.likes}
                                 onChange={e => setFormData({ ...formData, likes: Number(e.target.value) })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div>
@@ -618,10 +629,11 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="retweets"
                                 name="retweets"
                                 type="number"
+                                disabled={isSubmitting}
                                 placeholder="0"
                                 value={formData.retweets}
                                 onChange={e => setFormData({ ...formData, retweets: Number(e.target.value) })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                         <div>
@@ -630,10 +642,11 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 id="replies"
                                 name="replies"
                                 type="number"
+                                disabled={isSubmitting}
                                 placeholder="0"
                                 value={formData.replies}
                                 onChange={e => setFormData({ ...formData, replies: Number(e.target.value) })}
-                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                                className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -645,11 +658,12 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                             name="content"
                             required
                             rows={3}
+                            disabled={isSubmitting}
                             placeholder={t('content_placeholder')}
                             value={formData.content}
                             onChange={e => setFormData({ ...formData, content: e.target.value })}
                             autoComplete="on"
-                            className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground"
+                            className="w-full p-3 bg-muted border-none rounded-xl focus:ring-2 focus:ring-primary transition-all text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                     </div>
 
@@ -661,17 +675,18 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 name="evidence_image"
                                 type="file"
                                 accept="image/*"
+                                disabled={isSubmitting}
                                 onChange={handleImageUpload}
                                 className="block w-full text-sm text-foreground/60 transition-colors
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-xs file:font-bold file:uppercase file:tracking-wider
                     file:bg-primary/10 file:text-primary
-                    hover:file:bg-primary/20 dark:file:bg-primary/10 dark:file:text-primary-foreground"
+                    hover:file:bg-primary/20 dark:file:bg-primary/10 dark:file:text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                             {formData.imageUrl && (
                                 <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
-                                    <Image src={formData.imageUrl} alt="" fill unoptimized className="object-cover" aria-hidden="true" />
+                                    <OptimizedImage src={formData.imageUrl} alt="" fill unoptimized className="object-cover" />
                                 </div>
                             )}
                         </div>
@@ -681,13 +696,15 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                         <Button
                             variant="ghost"
                             onClick={onClose}
+                            disabled={isSubmitting}
                             className="px-6 py-3 rounded-xl text-foreground/80 hover:text-foreground font-medium transition-colors h-auto shadow-none"
                         >
                             {t('cancel')}
                         </Button>
                         <Button
                             type="submit"
-                            isLoading={isLoading}
+                            isLoading={isSubmitting}
+                            disabled={isSubmitting}
                             className="px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] h-auto"
                         >
                             {t('save')}

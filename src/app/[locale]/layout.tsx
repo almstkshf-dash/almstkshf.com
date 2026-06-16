@@ -7,7 +7,7 @@
  */
 
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
+import { Cairo, Inter } from "next/font/google";
 import "../globals.css";
 import { routing } from '@/i18n/config';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -46,6 +46,19 @@ const cairo = Cairo({
     variable: "--font-cairo",
     display: "swap",
     preload: true,
+});
+
+/**
+ * Latin companion font — ensures Latin glyphs use a well-hinted,
+ * optically-balanced typeface instead of falling back to system-ui.
+ * This closes the perceived size gap between Arabic (Cairo) and Latin text.
+ */
+const inter = Inter({
+    subsets: ["latin"],
+    weight: ["300", "400", "500", "600", "700"],
+    variable: "--font-inter",
+    display: "swap",
+    preload: false, // Cairo is primary; Inter loads after
 });
 
 export function generateStaticParams() {
@@ -157,7 +170,7 @@ export default async function RootLayout({
                 <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} />
                 <script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} />
             </head>
-            <body className={`${cairo.variable} antialiased font-sans bg-background text-foreground`}>
+            <body className={`${cairo.variable} ${inter.variable} antialiased font-sans bg-background text-foreground`}>
                 <RootProviders locale={locale} messages={messages}>
                     <Suspense fallback={<div className="h-16 w-full bg-background border-b border-border" />}>
                         <Navbar />

@@ -28,6 +28,7 @@ import {
   Globe,
   AlertCircle,
   CheckCircle2,
+  ShieldCheck,
 } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
@@ -533,15 +534,25 @@ export default function DarkWebTab() {
 
         {/* Empty state */}
         {results.length === 0 && !isLoading && (
-          <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <GlobeLock className="w-8 h-8 text-foreground/20 opacity-20" aria-hidden="true" />
+          <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 relative overflow-hidden rounded-2xl border border-dashed border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-emerald-500/[0.01]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)] pointer-events-none" />
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center relative shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+              <div className="absolute inset-0 rounded-full border border-emerald-500/30 animate-ping opacity-40" />
+              <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">{t('no_results')}</h3>
-              <p className="text-sm text-foreground/70 max-w-xs mx-auto">
+            <div className="space-y-2 relative z-10 max-w-md px-4">
+              <h3 className="font-bold text-lg text-emerald-700 dark:text-emerald-400">
+                {t('no_results')}
+              </h3>
+              <p className="text-xs text-foreground/70 leading-relaxed">
                 {t('no_results_desc')}
               </p>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 rounded-full relative z-10 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+              <span className="text-[9px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+                {t('live_monitoring_active')}
+              </span>
             </div>
           </div>
         )}

@@ -15,24 +15,25 @@ import { useTranslations } from "next-intl";
 import { useMemo, memo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { TrendingUp } from "lucide-react";
-import { ChartSkeleton } from "@/components/ui/Skeleton";
+import Skeleton, { ChartSkeleton } from "@/components/ui/Skeleton";
 
 // Lazy-load charts to keep Recharts out of the critical bundle
 const SentimentDonutChart = dynamic(() => import("./SentimentDonutChart"), {
     ssr: false,
-    loading: () => <ChartSkeleton height="300px" />
+    loading: () => <ChartSkeleton className="w-full aspect-[4/3]" />
 });
 const EmotionRadarChart = dynamic(() => import("./EmotionRadarChart"), {
     ssr: false,
-    loading: () => <ChartSkeleton height="200px" />
+    loading: () => <ChartSkeleton className="w-full aspect-[4/3]" />
 });
 const ArticlesTrendChart = dynamic(() => import("./ArticlesTrendChart"), {
     ssr: false,
-    loading: () => <ChartSkeleton height="160px" />
+    loading: () => <ChartSkeleton className="w-full aspect-[2/1] md:aspect-[3/1]" />
 });
 
 import { ReportGenerator } from "@/lib/report-generator";
 import Button from "@/components/ui/Button";
+import html2canvas from "html2canvas";
 import { useMessages } from "next-intl";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -51,13 +52,14 @@ interface DashboardGridProps {
         geography?: Record<string, number>;
         riskFactors?: string[];
     };
+    isLoading?: boolean;
     aiSummary?: string;
     isAiLoading?: boolean;
     topLeftSlot?: React.ReactNode;
     topRightSlot?: React.ReactNode;
 }
 
-const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLeftSlot, topRightSlot }: DashboardGridProps) => {
+const DashboardGrid = memo(({ articles, analytics, isLoading, aiSummary, isAiLoading, topLeftSlot, topRightSlot }: DashboardGridProps) => {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const localeTranslations = useMessages();
     const settings = useQuery(api.settings.getSettings);
@@ -82,7 +84,30 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
             let filename = `media-monitoring-report-${new Date().toISOString().split('T')[0]}`;
 
             if (format === 'pdf') {
-                blob = await generator.generatePDF();
+                // Capture charts
+                const chartImages: { sentimentDonut?: string; emotionRadar?: string; articlesTrend?: string } = {};
+                
+                const capture = async (id: string) => {
+                    const el = document.getElementById(id);
+                    if (!el) return undefined;
+                    try {
+                        const canvas = await html2canvas(el, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: null
+                        });
+                        return canvas.toDataURL('image/png');
+                    } catch (e) {
+                        console.warn(`Could not capture ${id} chart:`, e);
+                        return undefined;
+                    }
+                };
+
+                chartImages.sentimentDonut = await capture('sentiment-donut-chart-container');
+                chartImages.emotionRadar = await capture('emotion-radar-chart-container');
+                chartImages.articlesTrend = await capture('articles-trend-chart-container');
+
+                blob = await generator.generatePDF(chartImages);
                 filename += '.pdf';
             } else if (format === 'csv') {
                 blob = generator.generateCSV();
@@ -248,10 +273,23 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                                 <div className={clsx("p-2 rounded-xl", stat.bg)}>
                                     <stat.icon className={clsx("w-5 h-5", stat.color)} />
                                 </div>
-                                <span className="text-2xl font-bold tracking-tight">{stat.value}</span>
+                                {isLoading ? (
+                                    <Skeleton className="h-8 w-16" />
+                                ) : (
+                                    <span className="text-2xl font-bold tracking-tight">{stat.value}</span>
+                                )}
                             </div>
-                            <p className="text-xs font-bold text-foreground/60 uppercase tracking-widest">{stat.label}</p>
-                            <p className="text-[10px] text-foreground/40 mt-1">{stat.description}</p>
+                            {isLoading ? (
+                                <div className="space-y-2 mt-2">
+                                    <Skeleton className="h-3.5 w-20" />
+                                    <Skeleton className="h-3 w-32" />
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="text-xs font-bold text-foreground/60 uppercase tracking-widest">{stat.label}</p>
+                                    <p className="text-[10px] text-foreground/40 mt-1">{stat.description}</p>
+                                </>
+                            )}
                         </div>
                         {/* Subtle background glow */}
                         <div className={clsx("absolute -right-4 -bottom-4 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity rounded-full", stat.bg)} />
@@ -272,52 +310,89 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                                 +2.4%
                             </div>
                         </div>
-                        <SentimentDonutChart data={sentimentData} nssIndex={analytics?.nss || 0} />
+                        {isLoading ? (
+                            <ChartSkeleton className="w-full aspect-[4/3]" />
+                        ) : (
+                            <SentimentDonutChart data={sentimentData} nssIndex={analytics?.nss || 0} />
+                        )}
 
                         {/* Legend */}
-                        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/40">
-                            <div className="text-center">
-                                <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{sentimentData.positive}%</div>
-                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.positive")}</div>
+                        {isLoading ? (
+                            <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/40 animate-pulse">
+                                <div className="text-center">
+                                    <Skeleton className="h-4 w-8 mx-auto" />
+                                    <Skeleton className="h-3 w-12 mx-auto mt-1" />
+                                </div>
+                                <div className="text-center border-x border-border/40">
+                                    <Skeleton className="h-4 w-8 mx-auto" />
+                                    <Skeleton className="h-3 w-12 mx-auto mt-1" />
+                                </div>
+                                <div className="text-center">
+                                    <Skeleton className="h-4 w-8 mx-auto" />
+                                    <Skeleton className="h-3 w-12 mx-auto mt-1" />
+                                </div>
                             </div>
-                            <div className="text-center border-x border-border/40">
-                                <div className="text-xs font-bold text-amber-500">{sentimentData.neutral}%</div>
-                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.neutral")}</div>
+                        ) : (
+                            <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/40">
+                                <div className="text-center">
+                                    <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{sentimentData.positive}%</div>
+                                    <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.positive")}</div>
+                                </div>
+                                <div className="text-center border-x border-border/40">
+                                    <div className="text-xs font-bold text-amber-500">{sentimentData.neutral}%</div>
+                                    <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.neutral")}</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-xs font-bold text-rose-500">{sentimentData.negative}%</div>
+                                    <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.negative")}</div>
+                                </div>
                             </div>
-                            <div className="text-center">
-                                <div className="text-xs font-bold text-rose-500">{sentimentData.negative}%</div>
-                                <div className="text-[10px] text-foreground/70 uppercase">{t("ToneLabels.negative")}</div>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Emotions Radar */}
                     <div className="bg-card border border-border/50 rounded-3xl p-6 relative overflow-hidden">
                         <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-6">{t("emotional_integrity")}</h3>
-                        <EmotionRadarChart data={emotionData} />
+                        {isLoading ? (
+                            <ChartSkeleton className="w-full aspect-[4/3]" />
+                        ) : (
+                            <EmotionRadarChart data={emotionData} />
+                        )}
                     </div>
 
                     {/* Geographic Activity */}
-                    {analytics?.geography && Object.keys(analytics.geography).length > 0 && (
+                    {((analytics?.geography && Object.keys(analytics.geography).length > 0) || isLoading) && (
                         <div className="bg-card border border-border/50 rounded-3xl p-6 relative overflow-hidden">
                             <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/70 mb-6">{t("geographic_reach", { defaultValue: "Geographic Reach" })}</h3>
-                            <div className="space-y-4">
-                                {Object.entries(analytics.geography)
-                                    .sort(([, a], [, b]) => b - a)
-                                    .slice(0, 5)
-                                    .map(([country, count]) => (
-                                        <div key={country} className="flex items-center justify-between">
-                                            <span className="text-xs font-bold w-20 truncate">{country}</span>
-                                            <div className="flex-1 mx-4 h-1.5 bg-muted rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-emerald-500"
-                                                    style={{ width: `${Math.min(100, (count / (articles?.length || 1)) * 100)}%` }}
-                                                />
-                                            </div>
-                                            <span className="text-xs font-bold text-foreground/60">{count}</span>
+                            {isLoading ? (
+                                <div className="space-y-4 animate-pulse">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="flex items-center justify-between">
+                                            <Skeleton className="h-4 w-16" />
+                                            <Skeleton className="h-2 flex-1 mx-4" />
+                                            <Skeleton className="h-4 w-8" />
                                         </div>
                                     ))}
-                            </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {Object.entries(analytics?.geography || {})
+                                        .sort(([, a], [, b]) => b - a)
+                                        .slice(0, 5)
+                                        .map(([country, count]) => (
+                                            <div key={country} className="flex items-center justify-between">
+                                                <span className="text-xs font-bold w-20 truncate">{country}</span>
+                                                <div className="flex-1 mx-4 h-1.5 bg-muted rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-emerald-500"
+                                                        style={{ width: `${Math.min(100, (count / (articles?.length || 1)) * 100)}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-bold text-foreground/60">{count}</span>
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -346,9 +421,13 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                                 </button>
                             </div>
                         </div>
-                        <div className="h-[200px]">
-                            <ArticlesTrendChart data={trendData} />
-                        </div>
+                        {isLoading ? (
+                            <ChartSkeleton className="w-full aspect-[2/1] md:aspect-[3/1]" />
+                        ) : (
+                            <div className="w-full aspect-[2/1] md:aspect-[3/1]">
+                                <ArticlesTrendChart data={trendData} />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -363,12 +442,20 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {riskFactorItems.length > 0 ? riskFactorItems.map((factor, i) => (
-                            <div key={i} className="flex items-center gap-2 p-3 bg-white/50 dark:bg-black/20 rounded-xl border border-rose-500/10">
-                                <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
-                                <span className="text-xs font-bold">{factor}</span>
-                            </div>
-                        )) : (
+                        {isLoading ? (
+                            [1, 2].map((i) => (
+                                <div key={i} className="h-12 bg-white/50 dark:bg-black/20 rounded-xl border border-rose-500/10 flex items-center px-3 animate-pulse">
+                                    <Skeleton className="h-4 w-full" />
+                                </div>
+                            ))
+                        ) : riskFactorItems.length > 0 ? (
+                            riskFactorItems.map((factor, i) => (
+                                <div key={i} className="flex items-center gap-2 p-3 bg-white/50 dark:bg-black/20 rounded-xl border border-rose-500/10">
+                                    <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
+                                    <span className="text-xs font-bold">{factor}</span>
+                                </div>
+                            ))
+                        ) : (
                             <div className="col-span-2 py-4 text-center text-xs text-foreground/40 font-bold uppercase tracking-widest">
                                 {t("no_risks_detected")}
                             </div>
@@ -379,14 +466,22 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                     <div className="mt-8 pt-6 border-t border-rose-500/10">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">{t("crisis_probability")}</span>
-                            <span className="text-xs font-black text-rose-500">{analytics?.crisisProbability || 0}%</span>
+                            {isLoading ? (
+                                <Skeleton className="h-4 w-8" />
+                            ) : (
+                                <span className="text-xs font-black text-rose-500">{analytics?.crisisProbability || 0}%</span>
+                            )}
                         </div>
                         <div className="w-full h-2 bg-rose-500/10 rounded-full overflow-hidden">
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${analytics?.crisisProbability || 0}%` }}
-                                className="h-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]"
-                            />
+                            {isLoading ? (
+                                <Skeleton className="h-full w-full" />
+                            ) : (
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${analytics?.crisisProbability || 0}%` }}
+                                    className="h-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.3)]"
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -401,8 +496,8 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
                             <div>
                                 <h3 className="text-sm font-bold uppercase tracking-widest text-primary/80">{t("gemini_osint_pulse")}</h3>
                                 <div className="flex items-center gap-1 text-[10px] text-primary font-bold">
-                                    <div className={clsx("w-1 h-1 rounded-full bg-primary", isAiLoading ? "animate-ping" : "")} />
-                                    {isAiLoading ? t("live_analysis", { defaultValue: "Live Analysis..." }) : t("analysis_complete", { defaultValue: "Analysis Complete" })}
+                                    <div className={clsx("w-1 h-1 rounded-full bg-primary", (isAiLoading || isLoading) ? "animate-ping" : "")} />
+                                    {(isAiLoading || isLoading) ? t("live_analysis", { defaultValue: "Live Analysis..." }) : t("analysis_complete", { defaultValue: "Analysis Complete" })}
                                 </div>
                             </div>
                         </div>
@@ -411,11 +506,11 @@ const DashboardGrid = memo(({ articles, analytics, aiSummary, isAiLoading, topLe
 
                     <div className="space-y-4">
                         <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                            {isAiLoading ? (
+                            {(isAiLoading || isLoading) ? (
                                 <div className="space-y-2 animate-pulse">
-                                    <div className="h-4 bg-primary/20 rounded w-3/4"></div>
-                                    <div className="h-4 bg-primary/20 rounded w-1/2"></div>
-                                    <div className="h-4 bg-primary/20 rounded w-5/6"></div>
+                                    <Skeleton className="h-4 w-3/4" />
+                                    <Skeleton className="h-4 w-1/2" />
+                                    <Skeleton className="h-4 w-5/6" />
                                 </div>
                             ) : (
                                 <p className="text-sm leading-relaxed italic text-foreground/70">

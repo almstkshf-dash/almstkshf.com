@@ -188,6 +188,9 @@ export default function DashboardPage() {
         };
     }, [analyticsOverview, emotionAggregates, geographyAggregates]);
 
+    const isArticlesLoading = result === undefined;
+    const isAnalyticsLoading = analyticsOverview === undefined;
+
     // ── Accumulate paginated articles ─────────────────────────────────────────
     useEffect(() => {
         if (result?.items) {
@@ -382,17 +385,18 @@ export default function DashboardPage() {
     // ── Article list body ─────────────────────────────────────────────────────
     const articleListBody = (
         <div className="bg-background/30 backdrop-blur-md">
-            {filteredArticles.length > 0 ? (
+            {(filteredArticles.length > 0 || isArticlesLoading) ? (
                 <div className="animate-in fade-in duration-1000">
                     <ArticleTable
                         articles={filteredArticles}
+                        isLoading={isArticlesLoading}
                         limit={50}
                         onEditClick={(article) => {
                             setEditingArticle(article);
                             setManualModalOpen(true);
                         }}
                     />
-                    {result?.nextSkip !== null && (
+                    {result?.nextSkip !== null && !isArticlesLoading && (
                         <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
                             <button
                                 onClick={() => setSkip(result.nextSkip || 0)}
@@ -591,6 +595,7 @@ export default function DashboardPage() {
                                     <DashboardGrid
                                         articles={filteredArticles}
                                         analytics={analytics}
+                                        isLoading={isAnalyticsLoading}
                                     />
                                 </DashboardSection>
 
@@ -627,7 +632,7 @@ export default function DashboardPage() {
                                     icon={BarChart3}
                                     headerSlot={<span className="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-amber-700">{t('view.deep_only', { defaultValue: 'Deep-only' })}</span>}
                                 >
-                                    <DashboardGrid articles={filteredArticles} analytics={analytics} />
+                                    <DashboardGrid articles={filteredArticles} analytics={analytics} isLoading={isAnalyticsLoading} />
                                 </DashboardSection>
 
                                 <DashboardSection

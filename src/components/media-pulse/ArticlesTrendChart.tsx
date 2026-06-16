@@ -35,12 +35,12 @@ const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTr
         setMounted(true);
     }, []);
 
-    if (!mounted) return <ChartSkeleton height="160px" />;
+    if (!mounted) return <ChartSkeleton className="w-full h-full" />;
 
     return (
-        <div className="relative w-full h-[160px] min-h-[160px] flex items-center justify-center">
+        <div id="articles-trend-chart-container" className="relative w-full h-full flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={160} minWidth={10} debounce={100} initialDimension={{ width: 10, height: 160 }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100} initialDimension={{ width: 10, height: 160 }}>
                     <AreaChart
                         data={data}
                         margin={{ top: 10, right: 10, left: -20, bottom: 0 }}

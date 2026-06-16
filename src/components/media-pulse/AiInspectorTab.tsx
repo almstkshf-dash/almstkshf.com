@@ -11,7 +11,7 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import {
   FileText, Image as ImageIcon, Video as VideoIcon,
   Upload, Search, Fingerprint, Loader2, RefreshCw, AlertCircle, Download, FileText as FileTextIcon
@@ -416,8 +416,8 @@ export default function AiInspectorTab() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                   <div className="lg:col-span-4 lg:sticky lg:top-8">
                     <div className="space-y-6">
-                      <div className="aspect-square rounded-[2.5rem] overflow-hidden border border-border shadow-2xl bg-card">
-                        <Image src={previewUrl!} className="object-cover" fill unoptimized alt="Source" />
+                      <div className="aspect-square rounded-[2.5rem] overflow-hidden border border-border shadow-2xl bg-card relative">
+                        <OptimizedImage src={previewUrl!} className="object-cover" fill unoptimized alt="Source" />
                       </div>
                       <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
                         <p className="text-[10px] text-foreground/80 uppercase font-black tracking-widest mb-3 opacity-60 italic">{t("file_info")}</p>

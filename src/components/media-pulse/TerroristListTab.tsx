@@ -12,7 +12,8 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Search, Shield, AlertTriangle, User, Users, Building2,
   FileText, Upload, Trash2, Clock, CheckCircle2, XCircle,
-  ExternalLink, Info, Filter, Download, ChevronDown, ChevronUp, X
+  ExternalLink, Info, Filter, Download, ChevronDown, ChevronUp, X,
+  ShieldCheck
 } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -279,7 +280,7 @@ export default function TerroristListTab() {
         {/* ─── Search & Filters ─── */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
             <input
               type="text"
               id="watchlist-search"
@@ -287,7 +288,7 @@ export default function TerroristListTab() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('search_placeholder')}
-              className="w-full pl-11 pr-4 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              className="w-full ps-11 pe-4 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
             />
           </div>
 
@@ -433,19 +434,36 @@ export default function TerroristListTab() {
 
         {/* ── Empty State ── */}
         {entries?.length === 0 && (
-          <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-              <Search className="w-8 h-8 text-foreground/20 opacity-20" aria-hidden="true" />
+          <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 relative overflow-hidden rounded-2xl border border-dashed border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-emerald-500/[0.01]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)] pointer-events-none" />
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 flex items-center justify-center relative shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+              <div className="absolute inset-0 rounded-full border border-emerald-500/30 animate-ping opacity-40" />
+              <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
             </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-lg">{t('no_results_title')}</h3>
-              <p className="text-sm text-foreground/70 max-w-xs mx-auto">
+            <div className="space-y-2 relative z-10 max-w-md px-4">
+              <h3 className="font-bold text-lg text-emerald-700 dark:text-emerald-400">
+                {t('no_results_title')}
+              </h3>
+              <p className="text-xs text-foreground/70 leading-relaxed">
                 {t('no_results_desc')}
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setSearchQuery('')}>
-              {tCommon('clear_search')}
-            </Button>
+            <div className="flex gap-2 relative z-10">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 rounded-full shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                <span className="text-[9px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+                  {t('sanctions_check_active')}
+                </span>
+              </div>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="px-3 py-1 bg-muted hover:bg-muted/80 border border-border text-[9px] font-black uppercase tracking-widest rounded-full transition-colors text-foreground"
+                >
+                  {tCommon('clear_search')}
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

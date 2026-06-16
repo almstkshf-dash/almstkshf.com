@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations, useFormatter } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import DOMPurify from 'dompurify';
@@ -64,6 +64,7 @@ export default function RssFeeder({
   const isLoading = articlesQuery === undefined;
   const error = null;
 
+  const lastSyncTimesRef = useRef<Record<string, number>>({});
   const [isSyncing, setIsSyncing] = useState(false);
   const syncFeedAction = useAction(api.monitoringAction.syncSpecificRssFeed);
 
@@ -107,8 +108,17 @@ export default function RssFeeder({
     setLastSynced(new Date()); // Or use the latest createdAt from the items
   }, [articlesQuery, activeName, activePublisher, maxItems]);
 
-  const triggerSync = useCallback(async () => {
+  const triggerSync = useCallback(async (force = false) => {
     if (!isAuthenticated || !activeUrl || !activePublisher) return;
+
+    const now = Date.now();
+    const lastSync = lastSyncTimesRef.current[activeUrl] || 0;
+    // 2-minute cooldown (120,000 ms) for automatic syncs to prevent HTTP 429 and server load
+    if (!force && now - lastSync < 120000) {
+      console.log(`[RssFeeder] Skipping auto-sync for ${activeUrl} (last synced ${Math.round((now - lastSync) / 1000)}s ago)`);
+      return;
+    }
+
     setIsSyncing(true);
     try {
       const res = await fetch('/api/rss-sync', {
@@ -127,6 +137,7 @@ export default function RssFeeder({
       }
       const result = await res.json();
       if (result?.success) {
+        lastSyncTimesRef.current[activeUrl] = Date.now();
         if (result.savedCount > 0) {
           toast.success(`Synced ${result.savedCount} new articles!`);
         } else {
@@ -135,16 +146,20 @@ export default function RssFeeder({
       } else {
         toast.error(result?.error || 'Sync failed.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('RSS Sync error:', err);
-      toast.error('Failed to sync RSS feed.');
+      if (err.message === 'HTTP_429') {
+        toast.error('Too many requests. Please wait a moment before syncing again.');
+      } else {
+        toast.error('Failed to sync RSS feed.');
+      }
     } finally {
       setIsSyncing(false);
     }
   }, [isAuthenticated, activeUrl, activePublisher, activeCountry, activeName]);
 
   const fetchFeed = useCallback(async (silent = false) => {
-    await triggerSync();
+    await triggerSync(true); // force = true (bypasses cooldown)
   }, [triggerSync]);
 
   // Helper to translate source name if it's a key
@@ -166,7 +181,7 @@ export default function RssFeeder({
   };
 
   useEffect(() => {
-    triggerSync();
+    triggerSync(false); // force = false (respects cooldown)
   }, [activeUrl, triggerSync]);
 
   return (
@@ -202,9 +217,9 @@ export default function RssFeeder({
       </div>
 
       {/* Publisher & Categories Selection */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 min-h-[72px]">
         {allSources && Object.keys(allSources).length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide px-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide px-1 min-h-[32px]">
             {Object.keys(allSources).map((publisher: string) => (
               <button
                 key={publisher}
@@ -231,7 +246,7 @@ export default function RssFeeder({
         )}
 
         {(categories.length > 0 || (activePublisher && allSources?.[activePublisher])) && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-3 -mb-1 scrollbar-hide px-1 select-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-3 -mb-1 scrollbar-hide px-1 select-none min-h-[36px]">
             {activePublisher && allSources[activePublisher]?.map((cat: RSSCategory) => (
               <button
                 key={cat.url}
@@ -256,7 +271,7 @@ export default function RssFeeder({
       </div>
 
       {/* Content Area */}
-      <div className="relative min-h-[300px] bg-card/40 border border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm shadow-sm transition-all hover:shadow-md hover:border-border">
+      <div className="relative min-h-[300px] bg-card/40 border border-border/50 rounded-2xl overflow-hidden backdrop-blur-sm shadow-sm transition-all hover:shadow-md hover:border-border [contain:layout]">
         <AnimatePresence mode="wait">
           {isLoading && items.length === 0 ? (
             <motion.div

@@ -9,8 +9,26 @@
  * 2. Update the --font-sans variable below.
  */
 @theme {
-  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
-  --font-arabic: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  /*
+   * FONT STACK
+   * LTR pages: Inter (Latin-optimised) → system-ui fallback
+   * RTL pages: Cairo (Arabic + Latin subsets) → system-ui fallback
+   * The Arabic optical-scale variables compensate for Cairo rendering ~6%
+   * smaller than Inter at identical font-size values.
+   */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans-ar: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif;
+
+  /* Arabic optical-balance tokens */
+  --arabic-size-scale: 1.06;        /* Cairo renders ~6% smaller optically */
+  --arabic-lh-body: 1.8;            /* Accommodates ascenders/descenders */
+  --arabic-lh-heading: 1.5;         /* Tighter for display/headlines */
+  --arabic-lh-table: 1.6;           /* Data tables: readable without excess */
+  --arabic-weight-body: 400;
+  --arabic-weight-ui: 500;          /* Buttons, links, form labels */
+  --arabic-weight-heading: 600;     /* h2–h6 */
+  --arabic-weight-display: 700;     /* h1 / hero titles */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -445,70 +463,173 @@
 
 /* ─── Component-level helpers ───────────────────────────────────────────── */
 
-/* RTL font and typography overrides — ABSOLUTE Cairo Enforcement */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ARABIC TYPOGRAPHY SYSTEM — Layered Weight Architecture
+ *
+ * Cairo renders optically ~6% smaller than Latin fonts at the same px size.
+ * Each layer below addresses a distinct UI role with the correct weight,
+ * line-height, and size compensation for comfortable Arabic reading.
+ *
+ * Layer 0 — Font family enforcement (no !important needed at this scope)
+ * Layer 1 — Body / editorial content  → weight 400, lh 1.8
+ * Layer 2 — Interactive UI elements   → weight 500, lh inherits
+ * Layer 3 — Section headings          → weight 600, lh 1.5
+ * Layer 4 — Display / hero heading    → weight 700
+ * Layer 5 — Data tables               → size-compensated, lh 1.6
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Layer 0: Base family + global resets ───────────────────────────────── */
 [dir="rtl"],
-[dir="rtl"] body,
+[dir="rtl"] body {
+  --font-sans: var(--font-sans-ar);
+  font-family: var(--font-sans-ar);
+}
+
 [dir="rtl"] * {
-  --font-sans: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
-  font-family: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
+  font-family: var(--font-sans-ar);
+  letter-spacing: 0;     /* Arabic script ignores letter-spacing */
+  text-transform: none;  /* No uppercase/lowercase in Arabic */
 }
 
-[dir="rtl"] {
-  font-weight: 400;
-}
-
-/* Reset and Enforce typography properties for all Arabic elements */
-[dir="rtl"] *,
-[dir="rtl"] *::before,
-[dir="rtl"] *::after {
-  font-family: var(--font-cairo), "Cairo", ui-sans-serif, system-ui, sans-serif !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
-}
-
-/* 1. Base weights for content & interactive elements (Cairo Regular - 400) */
-/* This covers body content, labels, and interactive elements per user request */
+/* ─── Layer 1: Body & editorial content — Regular 400 ───────────────────── */
 [dir="rtl"] p,
+[dir="rtl"] li,
+[dir="rtl"] blockquote,
+[dir="rtl"] figcaption,
+[dir="rtl"] dd,
+[dir="rtl"] .font-normal {
+  font-weight: var(--arabic-weight-body);
+  line-height: var(--arabic-lh-body);
+  font-size: calc(1em * var(--arabic-size-scale));
+}
+
+/* Plain spans and divs inherit — no fixed weight override so parent context
+   (heading / table / button) can set the correct weight instead. */
 [dir="rtl"] span,
-[dir="rtl"] a,
+[dir="rtl"] div {
+  font-family: var(--font-sans-ar);
+  line-height: inherit;
+}
+
+/* ─── Layer 2: Interactive UI elements — Medium 500 ─────────────────────── */
+/*
+ * Medium weight adds just enough visual weight to distinguish interactive
+ * elements from body copy without feeling heavy (Cairo 500 ≈ Latin semibold).
+ */
 [dir="rtl"] button,
+[dir="rtl"] a,
+[dir="rtl"] label,
 [dir="rtl"] input,
 [dir="rtl"] select,
 [dir="rtl"] textarea,
-[dir="rtl"] label,
-[dir="rtl"] div,
-[dir="rtl"] .font-normal,
-[dir="rtl"] .font-medium,
-[dir="rtl"] .font-semibold,
-[dir="rtl"] .font-bold {
-  font-weight: 400 !important;
+[dir="rtl"] [role="button"],
+[dir="rtl"] [role="tab"],
+[dir="rtl"] [role="menuitem"],
+[dir="rtl"] .font-medium {
+  font-weight: var(--arabic-weight-ui);
+  font-size: calc(1em * var(--arabic-size-scale));
 }
 
-/* 2. Headline and UI Header weights (Cairo SemiBold - 600) */
-/* We only allow SemiBold for actual headers or elements with explicitly heavy weight classes */
-[dir="rtl"] h1,
+/* ─── Layer 3: Section headings — SemiBold 600 ───────────────────────────── */
 [dir="rtl"] h2,
 [dir="rtl"] h3,
 [dir="rtl"] h4,
 [dir="rtl"] h5,
 [dir="rtl"] h6,
-[dir="rtl"] .font-extrabold,
-[dir="rtl"] .font-black {
-  font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif !important;
-  font-weight: 600 !important;
+[dir="rtl"] .font-semibold {
+  font-family: var(--font-sans-ar);
+  font-weight: var(--arabic-weight-heading);
+  line-height: var(--arabic-lh-heading);
+  font-size: calc(1em * var(--arabic-size-scale));
 }
 
-/* 3. Special Case: Force Bold on specifically heavy UI elements that act as headers */
+/* ─── Layer 4: Display / hero heading — Bold 700 ────────────────────────── */
+[dir="rtl"] h1,
+[dir="rtl"] .font-bold,
+[dir="rtl"] .font-extrabold,
+[dir="rtl"] .font-black,
+[dir="rtl"] .text-display-ar {
+  font-family: var(--font-sans-ar);
+  font-weight: var(--arabic-weight-display);
+  line-height: var(--arabic-lh-heading);
+  font-size: calc(1em * var(--arabic-size-scale));
+}
+
+/* ─── Layer 5: Data tables — size-compensated, readable density ─────────── */
+/*
+ * Dashboard tables need tighter line-height than body prose but still need
+ * the optical size compensation so Arabic digits/text aligns with column headers.
+ */
+[dir="rtl"] table {
+  font-family: var(--font-sans-ar);
+  font-weight: var(--arabic-weight-body);
+  font-size: calc(0.875rem * var(--arabic-size-scale)); /* 14px → ~14.84px */
+  line-height: var(--arabic-lh-table);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+[dir="rtl"] th {
+  font-weight: var(--arabic-weight-heading); /* Column headers: SemiBold */
+  line-height: var(--arabic-lh-table);
+}
+
+[dir="rtl"] td {
+  font-weight: var(--arabic-weight-body);
+  line-height: var(--arabic-lh-table);
+}
+
+/* ─── Named semantic classes ─────────────────────────────────────────────── */
+/* Used for special UI contexts that need explicit Cairo enforcement regardless
+   of locale direction (e.g., mixed-content cards with inline Arabic). */
 [dir="rtl"] .app-name,
 [dir="rtl"] .nav-header,
 [dir="rtl"] .section-title {
-  font-weight: 600 !important;
+  font-weight: var(--arabic-weight-heading);
+  line-height: var(--arabic-lh-heading);
+}
+
+/* ─── font-sans-ar utility ───────────────────────────────────────────────────
+ * Portable class for applying the Arabic font stack to any element regardless
+ * of locale — useful for mixed-direction content (e.g., Arabic quote inside an
+ * LTR card). Apply with className="font-sans-ar" in JSX.
+ *
+ * font-feature-settings:
+ *   "kern" 1  — kerning pairs (distance between glyph pairs)
+ *   "liga" 1  — standard ligatures (لا → لا connected form)
+ *   "calt" 1  — contextual alternates (shape selection by context)
+ */
+.font-sans-ar {
+  font-family: var(--font-sans-ar);
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 /* Theme-toggle icon — GPU layer so it doesn't repaint surrounding text */
 svg.lucide-moon {
   will-change: transform;
   contain: strict;
+}
+
+/*
+ * ─── Search input helper ──────────────────────────────────────────────────
+ * Utility for inputs that have an icon on the leading side.
+ * Uses CSS logical properties so the icon always appears on the reading-start
+ * side without needing `rtl:pl-N rtl:pr-N` overrides in each component.
+ *
+ * Usage: add class="input-with-start-icon" to the <input>, then position
+ * the icon with `absolute start-3` or `absolute start-4`.
+ */
+.input-with-start-icon {
+  padding-inline-start: 2.5rem; /* 40px — matches start-10 icon offset */
+  padding-inline-end: 1rem;
+}
+
+.input-with-start-icon-lg {
+  padding-inline-start: 2.75rem; /* 44px — matches start-11 icon offset */
+  padding-inline-end: 3rem;      /* room for an end-side action button  */
 }
 
 /* ─── Navbar dropdown animations ────────────────────────────────────────── */

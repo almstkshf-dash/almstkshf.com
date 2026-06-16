@@ -221,3 +221,12 @@ Step 4
 Login to production → run one Ahmia search → verify results appear
 Step 5
 Export PDF report → verify Dark Web sheet included
+
+# Phase 5 — UI Polish & Empty States
+## [x] T-16
+Refine Empty States UI
+Replace legacy gray empty states in DarkWebTab and TerroristListTab with premium emerald (green) shield check status indicators, custom safety messaging, and live monitoring active status pills.
+- Add `ShieldCheck` icon from `lucide-react`
+- Design circular pulse animations with `animate-ping` and `animate-pulse`
+- Add status pills (`LIVE MONITORING ACTIVE` and `SANCTIONS CHECK ACTIVE`)
+- Update `messages/ar.json` and `messages/en.json` localization files

@@ -23,6 +23,7 @@ import ReportsChart from "./ReportsChart";
 import SaveToCollectionModal from "./ui/SaveToCollectionModal";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
 type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
@@ -159,11 +160,32 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         
         try {
             toast.loading(tCommon('exporting'), { id: 'export-dashboard' });
+            
+            let chartImages: { reportsChart?: string } | undefined = undefined;
+            if (format === 'pdf') {
+                const element = document.getElementById('reports-chart-container');
+                if (element) {
+                    try {
+                        const canvas = await html2canvas(element, {
+                            scale: 2,
+                            useCORS: true,
+                            backgroundColor: null
+                        });
+                        chartImages = {
+                            reportsChart: canvas.toDataURL('image/png')
+                        };
+                    } catch (e) {
+                        console.warn("Could not capture reports chart:", e);
+                    }
+                }
+            }
+            
             await ReportGenerator.exportMediaMonitoringReport(
                 reports as any,
                 exportTranslations as any,
                 format,
-                settings?.logoUrl || undefined
+                settings?.logoUrl || undefined,
+                chartImages
             );
             toast.success(tCommon('success'), { id: 'export-dashboard' });
         } catch (error) {
@@ -192,8 +214,12 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
 
     return (
         <div className="space-y-8">
-            {/* Chart Section */}
-            {chartData && <ReportsChart data={chartData} />}
+            {/* Chart Section — maintains responsive aspect ratio to prevent layout shift */}
+            <div className="w-full aspect-[4/3] md:aspect-[2.5/1] mb-8">
+                {chartData
+                    ? <ReportsChart data={chartData} />
+                    : <div className="w-full h-full bg-muted/10 rounded-2xl border border-dashed border-border animate-pulse" aria-hidden="true" />}
+            </div>
 
             {/* Filter Section */}
             <div className="flex flex-wrap gap-3 py-2">
@@ -237,7 +263,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                     </h2>
                     <div className="flex items-center gap-3">
                         {reports && reports.length > 0 && (
-                            <div className="flex items-center gap-2 mr-2">
+                            <div className="flex items-center gap-2 me-2">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -267,7 +293,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                 </div>
 
                 {reports === undefined ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[480px]">
                         {Array.from({ length: 6 }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
@@ -289,11 +315,11 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[480px]">
                         {reports.map((article: any) => (
                             <div 
                                 key={article._id}
-                                className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full"
+                                className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full min-h-[260px]"
                             >
                                 <div className="p-5 flex-1 space-y-4">
                                     <div className="flex justify-between items-start gap-3">
@@ -336,11 +362,11 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                                     </p>
 
                                     <div className="grid grid-cols-2 gap-3 pt-2">
-                                        <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                                        <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 min-h-[52px]">
                                             <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter opacity-70">Reach</div>
                                             <div className="text-sm font-bold text-foreground">{(article.reach || 0).toLocaleString()}</div>
                                         </div>
-                                        <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                                        <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 min-h-[52px]">
                                             <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter opacity-70">AVE ($)</div>
                                             <div className="text-sm font-bold text-primary">${(article.ave || 0).toLocaleString()}</div>
                                         </div>
@@ -374,7 +400,7 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                     <span className="w-1 h-8 bg-rose-500 rounded-full block"></span>
                     {t('crisis_management')}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[220px]">
                     {crisisPlans === undefined ? (
                         Array.from({ length: 2 }).map((_, i) => (
                             <SkeletonCard key={i} />

@@ -52,6 +52,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const ref = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const ariaLabelledById = ariaLabelledBy?.trim() || undefined;
     const comboboxLabelProps = ariaLabelledById
         ? { 'aria-labelledby': ariaLabelledById }
@@ -64,6 +65,12 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
     }, []);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setSearch('');
+        }
+    }, [isOpen]);
 
     const filtered = React.useMemo(() => {
         return (items || []).filter(
@@ -80,16 +87,20 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
             {/* Trigger Button */}
             <div
                 role="combobox"
+                tabIndex={0}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
                 aria-controls={`${id || 'dropdown'}-listbox`}
                 {...comboboxLabelProps}
-                tabIndex={0}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    setIsOpen(true);
+                    inputRef.current?.focus();
+                }}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        setIsOpen(!isOpen);
+                        setIsOpen(true);
+                        inputRef.current?.focus();
                     }
                     if (e.key === 'Escape' && isOpen) {
                         setIsOpen(false);
@@ -103,27 +114,50 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     }`}
             >
                 {icon && <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>}
-                <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px]">
-                    {selected.length === 0 ? (
-                        <span className="text-foreground/60 text-sm transition-colors">{placeholder}</span>
-                    ) : (
-                        selected.map((selected_id) => (
-                            <span
-                                key={selected_id}
-                                className="inline-flex items-center gap-1 bg-primary/15 text-primary-foreground border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px] items-center">
+                    {selected.map((selected_id) => (
+                        <span
+                            key={selected_id}
+                            className="inline-flex items-center gap-1 bg-primary/15 text-primary-foreground border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                        >
+                            {finalRenderTag(selected_id)}
+                            <button
+                                type="button"
+                                aria-label={`${t('remove')} ${items.find(i => i.id === selected_id)?.label || selected_id}`}
+                                onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
                             >
-                                {finalRenderTag(selected_id)}
-                                <button
-                                    type="button"
-                                    aria-label={`${t('remove')} ${items.find(i => i.id === selected_id)?.label || selected_id}`}
-                                    onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
-                                    className="hover:text-primary/70 ml-0.5 cursor-pointer transition-colors"
-                                >
-                                    <X className="w-3 h-3" aria-hidden="true" />
-                                </button>
-                            </span>
-                        ))
-                    )}
+                                <X className="w-3 h-3" aria-hidden="true" />
+                            </button>
+                        </span>
+                    ))}
+                    
+                    {/* Inline Filter Input */}
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder={selected.length === 0 ? placeholder : ''}
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            if (!isOpen) setIsOpen(true);
+                        }}
+                        onFocus={() => setIsOpen(true)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsOpen(true);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Backspace' && search === '' && selected.length > 0) {
+                                toggle(selected[selected.length - 1]);
+                            }
+                            if (e.key === 'Escape') {
+                                e.stopPropagation();
+                                setIsOpen(false);
+                            }
+                        }}
+                        className="bg-transparent border-none outline-none text-sm text-foreground placeholder:text-foreground/40 min-w-[60px] flex-1 p-0 focus:ring-0 focus:outline-none"
+                    />
                 </div>
                 <ChevronDown className={`w-4 h-4 text-foreground/70 transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
             </div>
@@ -138,25 +172,6 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
             {/* Dropdown Panel */}
             {isOpen && (
                 <div className="absolute z-[90] mt-2 w-full bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ring-1 ring-black/5">
-                    {/* Search */}
-                    <div className="p-3 border-b border-border/50 bg-muted/20">
-                        <div className="relative">
-                            <label htmlFor={`${id || 'dropdown'}-search`} className="sr-only">{searchPlaceholder}</label>
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50" aria-hidden="true" />
-                            <input
-                                id={`${id || 'dropdown'}-search`}
-                                name={`${id || 'dropdown'}-search`}
-                                type="text"
-                                placeholder={searchPlaceholder}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                autoComplete="off"
-                                className="w-full bg-background/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-foreground/40 outline-none focus:ring-2 focus:ring-primary/20 border border-border transition-all shadow-sm"
-                                /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                                autoFocus
-                            />
-                        </div>
-                    </div>
 
                     {/* Items List */}
                     <div
@@ -196,7 +211,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                                 <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" aria-hidden="true" />
                                             )}
                                         </div>
-                                        <div className="flex-1 truncate text-left">{finalRenderItem(item)}</div>
+                                        <div className="flex-1 truncate text-start">{finalRenderItem(item)}</div>
                                     </button>
                                 ))}
                             </div>

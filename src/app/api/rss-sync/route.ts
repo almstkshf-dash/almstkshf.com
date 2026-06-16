@@ -18,7 +18,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 export async function POST(request: Request) {
     try {
         const rlKey = await getRateLimitKey(request, 'rss-sync');
-        const limitResult = await rateLimit(rlKey, 10, 60);
+        const limitResult = await rateLimit(rlKey, 30, 60);
         if (!limitResult.allowed) {
             return NextResponse.json({
                 success: false,

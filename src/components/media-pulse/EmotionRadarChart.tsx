@@ -45,12 +45,12 @@ const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadar
         };
     }), [data, t]);
 
-    if (!mounted) return <ChartSkeleton height="300px" />;
+    if (!mounted) return <ChartSkeleton className="w-full aspect-[4/3]" />;
 
     return (
-        <div className="relative w-full h-[300px] min-h-[300px] flex items-center justify-center">
+        <div id="emotion-radar-chart-container" className="relative w-full aspect-[4/3] flex items-center justify-center">
             {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minHeight={300} minWidth={10} debounce={100} initialDimension={{ width: 10, height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100} initialDimension={{ width: 10, height: 300 }}>
                     <RadarChart 
                         cx="50%" 
                         cy="50%" 

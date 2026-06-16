@@ -20,7 +20,8 @@ import { api } from "../../convex/_generated/api";
 export default function MediaPulseClient() {
     const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 }) as any;
     const articles = articlesResult?.items || [];
-    const analytics = useQuery(api.monitoring.getAnalyticsOverview, {}) || {
+    const rawAnalytics = useQuery(api.monitoring.getAnalyticsOverview, {});
+    const analytics = rawAnalytics || {
         nss: 0,
         riskScore: 0,
         velocity: 0,
@@ -32,6 +33,8 @@ export default function MediaPulseClient() {
     const emotions = useQuery(api.monitoring.getEmotionAggregates, {}) || {};
     const geography = useQuery(api.monitoring.getGeographyAggregates, {}) || {};
 
+    const isLoading = articlesResult === undefined || rawAnalytics === undefined;
+
     return (
         <main className="min-h-screen pt-32 pb-20 bg-background transition-colors">
             <Container>
@@ -39,6 +42,7 @@ export default function MediaPulseClient() {
                 <DashboardGrid
                     articles={articles}
                     analytics={{ ...analytics, emotions, geography }}
+                    isLoading={isLoading}
                 />
                 <div className="mt-32 space-y-32">
                     <DetailedContent />

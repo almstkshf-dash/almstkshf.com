@@ -9,7 +9,8 @@
 import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
 import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem } from '@/types/reports';
-// import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
+import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
+import { AMIRI_FONT_BASE64 } from '@/lib/fonts/amiri-font-base64';
 
 interface AutoTablejsPDF extends jsPDF {
     lastAutoTable: {
@@ -88,9 +89,9 @@ export class ReportGenerator {
     /**
      * Generate PDF as a Blob
      */
-    public async generatePDF(): Promise<Blob> {
+    public async generatePDF(chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }): Promise<Blob> {
         const title = this.translations.Reports?.pr_title || 'Media Coverage Report';
-        const result = await ReportGenerator.generatePressReleasePDF(this.articles, this.translations, title, true);
+        const result = await ReportGenerator.generatePressReleasePDF(this.articles, this.translations, title, true, chartImages);
         return (result as { doc: jsPDF }).doc.output('blob') as Blob;
     }
 
@@ -326,7 +327,13 @@ export class ReportGenerator {
         this.finalizePDF(doc, title, translations, fontLoaded);
     }
 
-    private static async generatePressReleasePDF(articles: ReportArticle[], translations: ReportTranslations, title: string, returnOnly = false) {
+    private static async generatePressReleasePDF(
+        articles: ReportArticle[],
+        translations: ReportTranslations,
+        title: string,
+        returnOnly = false,
+        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }
+    ) {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         // Pre-load images to base64 using local CORS-bypassing proxy
@@ -373,6 +380,56 @@ export class ReportGenerator {
             { label: translations.Reports?.article_count || 'TOTAL ARTICLES', value: articles.length.toString(), color: [16, 185, 129] }
         ], y, pageWidth, fontLoaded);
         y += 40;
+
+        // Render charts if available
+        if (chartImages && (chartImages.sentimentDonut || chartImages.emotionRadar || chartImages.reportsChart || chartImages.articlesTrend)) {
+            y += 5; // spacing
+            
+            // Draw donut and radar side-by-side if both are available
+            if (chartImages.sentimentDonut && chartImages.emotionRadar) {
+                const chartW = 85;
+                const chartH = 60;
+                try {
+                    doc.addImage(chartImages.sentimentDonut, 'PNG', 14, y, chartW, chartH);
+                    doc.addImage(chartImages.emotionRadar, 'PNG', 14 + chartW + 12, y, chartW, chartH);
+                    y += chartH + 10;
+                } catch (e) {
+                    console.warn("Error drawing charts side-by-side in PDF:", e);
+                }
+            } else {
+                // Otherwise draw sequentially
+                const chartW = 160;
+                const chartH = 70;
+                const chartsToDraw = [
+                    chartImages.reportsChart,
+                    chartImages.articlesTrend,
+                    chartImages.sentimentDonut,
+                    chartImages.emotionRadar
+                ].filter(Boolean);
+
+                chartsToDraw.forEach(img => {
+                    if (y + chartH > pageHeight - 20) {
+                        doc.addPage();
+                        this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+                        y = 25;
+                    }
+                    try {
+                        doc.addImage(img!, 'PNG', 25, y, chartW, chartH);
+                        y += chartH + 10;
+                    } catch (e) {
+                        console.warn("Error drawing single chart in PDF:", e);
+                    }
+                });
+            }
+        }
+
+        if (y > pageHeight - 35) {
+            doc.addPage();
+            this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+            y = 25;
+        } else {
+            y += 10;
+        }
 
         // Article Table
         this.drawHeading(doc, translations.Reports?.coverage_details || 'Media Coverage Log', 14, y, fontLoaded);
@@ -554,11 +611,25 @@ export class ReportGenerator {
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_AMBER);
-        doc.text(data.query, 20, y);
+        
+        const processedQuery = this.fixArabic(data.query);
+        if (isArabic(data.query)) {
+            doc.text(processedQuery, pageWidth - 20, y, { align: 'right' });
+        } else {
+            doc.text(processedQuery, 20, y);
+        }
         y += 8;
+        
         doc.setFontSize(9);
         doc.setTextColor(100);
-        doc.text(`${translations.Reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`, 20, y);
+        
+        const typeText = `${translations.Reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`;
+        const processedType = this.fixArabic(typeText);
+        if (isArabic(typeText)) {
+            doc.text(processedType, pageWidth - 20, y, { align: 'right' });
+        } else {
+            doc.text(processedType, 20, y);
+        }
         y += 15;
 
         // Parse Results JSON into structured tables
@@ -823,22 +894,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw74NL.ttf';
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout for font load
-
-            const res = await fetch(fontUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (res.ok) {
-                const arrayBuffer = await res.arrayBuffer();
-                const base64 = this.arrayBufferToBase64(arrayBuffer);
-                doc.addFileToVFS('Amiri-Regular.ttf', base64);
-                doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
-                fontLoaded = true;
-            }
+            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            fontLoaded = true;
         } catch (e) {
-            console.warn('Amiri font load failed or timed out. Falling back to system fonts.', e);
+            console.warn('Amiri font loading failed from local bundle', e);
         }
 
         const logoBase64 = await this.loadLogo(logoUrl);
@@ -951,11 +1011,12 @@ export class ReportGenerator {
             didDrawPage: options.didDrawPage,
             didParseCell: (data) => {
                 const text = String(data.cell.raw || '');
-                if (data.section === 'body' && /[\u0600-\u06FF]/.test(text)) {
+                const hasArabic = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
+                if (data.section === 'body' && hasArabic) {
                     data.cell.styles.halign = 'right';
                 }
                 // Also align headers for Arabic
-                if (data.section === 'head' && /[\u0600-\u06FF]/.test(text)) {
+                if (data.section === 'head' && hasArabic) {
                     data.cell.styles.halign = 'right';
                 }
             }
@@ -1000,12 +1061,13 @@ export class ReportGenerator {
         articles: ReportArticle[],
         translations: ReportTranslations,
         type: 'excel' | 'pdf',
-        logoUrl?: string
+        logoUrl?: string,
+        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }
     ) {
         if (type === 'excel') {
             await this.generateMediaMonitoringExcel(articles, translations, translations.report_title || 'Media_Monitoring_Report');
         } else {
-            await this.generateMediaMonitoringPDF(articles, translations, logoUrl, translations.report_title);
+            await this.generateMediaMonitoringPDF(articles, translations, logoUrl, translations.report_title, chartImages);
         }
     }
 
@@ -1081,7 +1143,8 @@ export class ReportGenerator {
         articles: ReportArticle[],
         translations: ReportTranslations,
         logoUrl?: string,
-        reportTitle?: string
+        reportTitle?: string,
+        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }
     ) {
         if (typeof window === 'undefined') throw new Error('PDF export is client-only');
 
@@ -1107,17 +1170,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw74NL.ttf';
-            const res = await fetch(fontUrl);
-            if (res.ok) {
-                const arrayBuffer = await res.arrayBuffer();
-                const base64 = this.arrayBufferToBase64(arrayBuffer);
-                doc.addFileToVFS('Amiri-Regular.ttf', base64);
-                doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
-                fontLoaded = true;
-            }
+            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            fontLoaded = true;
         } catch (e) {
-            console.warn('Amiri font load failed', e);
+            console.warn('Amiri font loading failed from local bundle', e);
         }
 
         const logoBase64 = await this.loadLogo(logoUrl);
@@ -1301,6 +1358,44 @@ export class ReportGenerator {
             doc.text(processedRec, pageWidth - 20, y + 10, { align: 'right' });
         } else {
             doc.text(processedRec, 20, y + 10, { align: 'left' });
+        }
+
+        // PAGE 3: Charts Page (only if chartImages are provided)
+        if (chartImages && (chartImages.reportsChart || chartImages.sentimentDonut || chartImages.emotionRadar || chartImages.articlesTrend)) {
+            doc.addPage();
+            this.addPageHeader(doc, logoBase64, pageWidth, translations, fontLoaded);
+
+            let chartY = 28;
+            doc.setFontSize(18);
+            doc.setTextColor(...BRAND_DARK);
+            if (isArabicMode) {
+                addText(translations.Reports?.visualizations || 'Analytical Insights & Charts', pageWidth - 14, chartY, { align: 'right' });
+            } else {
+                addText(translations.Reports?.visualizations || 'Analytical Insights & Charts', 14, chartY);
+            }
+            chartY += 10;
+
+            const trendImg = chartImages.reportsChart || chartImages.articlesTrend;
+            if (trendImg) {
+                try {
+                    doc.addImage(trendImg, 'PNG', 14, chartY, pageWidth - 28, 65);
+                    chartY += 75;
+                } catch (e) {
+                    console.warn("Error rendering trend chart in PDF:", e);
+                }
+            }
+
+            // Draw donut and radar side-by-side if available
+            if (chartImages.sentimentDonut || chartImages.emotionRadar) {
+                const chartW = (pageWidth - 34) / 2;
+                const chartH = 60;
+                if (chartImages.sentimentDonut) {
+                    try { doc.addImage(chartImages.sentimentDonut, 'PNG', 14, chartY, chartW, chartH); } catch (e) { }
+                }
+                if (chartImages.emotionRadar) {
+                    try { doc.addImage(chartImages.emotionRadar, 'PNG', 14 + chartW + 6, chartY, chartW, chartH); } catch (e) { }
+                }
+            }
         }
 
         // PAGE 3+
@@ -1489,7 +1584,12 @@ export class ReportGenerator {
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_DARK);
         const processed = this.fixArabic(text);
-        doc.text(processed, x, y);
+        if (isArabic(text)) {
+            const pageWidth = doc.internal.pageSize.width;
+            doc.text(processed, pageWidth - x, y, { align: 'right' });
+        } else {
+            doc.text(processed, x, y);
+        }
     }
 
     private static drawMetricBoxes(doc: jsPDF, boxes: { label: string, value: string, color: readonly [number, number, number] | [number, number, number] }[], y: number, pageWidth: number, fontLoaded: boolean) {
@@ -1511,13 +1611,26 @@ export class ReportGenerator {
     private static addPageHeader(doc: jsPDF, logoBase64: string | null, pageWidth: number, translations: ReportTranslations, fontLoaded: boolean) {
         doc.setFillColor(...BRAND_DARK);
         doc.rect(0, 0, pageWidth, 15, 'F');
+        
+        const isHeaderArabic = isArabic(translations.brand_name || 'ALMSTKSHF');
+        
         if (logoBase64) {
-            try { doc.addImage(logoBase64, 'PNG', 5, 2, 11, 11); } catch { /* */ }
+            try { 
+                const logoX = isHeaderArabic ? pageWidth - 16 : 5;
+                doc.addImage(logoBase64, 'PNG', logoX, 2, 11, 11); 
+            } catch { /* */ }
         }
+        
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setTextColor(255);
         doc.setFontSize(10);
-        doc.text(this.fixArabic(translations.brand_name || 'ALMSTKSHF'), 18, 9);
+        
+        const headerText = translations.brand_name || 'ALMSTKSHF';
+        if (isHeaderArabic) {
+            doc.text(this.fixArabic(headerText), pageWidth - 18, 9, { align: 'right' });
+        } else {
+            doc.text(this.fixArabic(headerText), 18, 9);
+        }
     }
 
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -1843,17 +1956,7 @@ export class ReportGenerator {
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
     private static fixArabic(text: string): string {
-        if (!text) return '';
-        // If it doesn't contain Arabic, return as is
-        if (!/[\u0600-\u06FF]/.test(text)) return text;
-
-        const words = text.trim().split(/\s+/);
-        // For jsPDF with Amiri font, we only need to reverse the word order
-        // because it renders words LTR, but we want the overall flow to be RTL.
-        // Reversing the individual letters is typically done for fonts that don't support Arabic,
-        // but Amiri does. However, if the text is still showing as separate letters,
-        // we might need a more advanced approach.
-        return words.reverse().join(' ');
+        return fixArabicForPDF(text);
     }
 
     private static async loadLogo(logoUrl?: string): Promise<string | null> {

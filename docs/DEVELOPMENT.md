@@ -372,14 +372,19 @@ Strict accessibility limits are in place across the application to ensure WCAG 2
 
 - **Input Latency:** Any component relying on high-frequency textual inputs (such as the `NewsGenerator`) or toggle states (`ThemeToggle`) should be optimized using `React.memo` for static sub-components to prevent the whole tree from re-rendering on every keystroke.
 - **CSS Transitions:** Avoid applying heavy `all` transitions on interactive wrappers. Target exact properties (`transition-colors`, `transition-opacity`) to avoid layout thrashing and Cumulative Layout Shift (CLS), such as in the site Footer and navigation items.
+- **Link Prefetching Debouncing:** Always use `HoverPrefetchLink` instead of raw next-intl or Next.js `Link` for prefetching routes. It introduces an `80ms` debounce delay and aborts on cursor exit, preventing excessive network prefetch spam when sweeping the cursor. It also supports focus-based and touch-based prefetching for mobile/keyboard users.
+- **Dynamic Image Sizing & Remounting:** Always use `OptimizedImage` for media uploads and article previews. It blocks Cumulative Layout Shift (CLS) by locking parent dimensions when `fill` is not enabled, resets loading/error states immediately when `src` changes via keying, and utilizes localized bilingual fallbacks (with the Lucide `ImageOff` icon) instead of plain hardcoded placeholders.
 
 ---
 
 ## 16. Export Generation (PDF & Excel)
 
 When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
-- All generated PDF exports MUST properly enforce UTF-8 text encoding and rely on centralized Arabic font loading (Amiri font).
-- Use the application's Arabic shaping/RTL reordering utility on dynamic text variables prior to rendering text onto the PDF canvas. Failing to do so will result in text rendering as isolated letters from left-to-right or rendering as mojibake.
+- **Offline Amiri Font Bundling**: All generated PDF exports rely on a local base64-encoded Amiri font module (`src/lib/fonts/amiri-font-base64.ts`) loaded directly via `doc.addFileToVFS` and `doc.addFont`. This ensures 100% offline reliability and removes gstatic network dependency.
+- **Arabic Glyph Shaping & Character Reversal**: Before passing text to jsPDF, the text is processed using `arabic-persian-reshaper` to shape disconnected Arabic characters into proper connected ligatures. Then, Arabic words are reversed at the character level while maintaining the LTR flow of English text and digits, and the overall sentence word order is reversed to support RTL text flow (see `src/utils/arabic-utils.ts`).
+- **Dynamic Bidi Coordinate Alignment**: Manual text rendering (`doc.text()`) dynamically adjusts coordinate origins. When Arabic/RTL is detected, the start coordinate `x` is mirrored (`pageWidth - x`) and aligned to the right (`{ align: 'right' }`).
+- **Table Cell Auto-Wrapping & Alignment**: Columns in `jspdf-autotable` are configured with `overflow: 'linebreak'` to prevent content overflow. Cells are parsed using `didParseCell` to check for both normal and shaped Arabic characters, dynamically setting `halign: 'right'` for Arabic/RTL text.
+- **Interactive Chart Capture**: Browser-rendered charts (`ReportsChart`, `EmotionRadarChart`, `SentimentDonutChart`, `ArticlesTrendChart`) are captured as PNG data URLs using `html2canvas` and dynamically embedded into the executive summary or visualizations pages of the PDF.
 - **Dynamic Table Configurations & Column Widths**: Column widths are precisely defined (e.g., image: 10, title: 60, source: 22, etc.) to fit cleanly within standard landscape formats.
 - **RTL Mirroring & Column Orders**: When Arabic mode is detected, the table columns (`activeColumns`) are completely reversed to naturally present columns from right to left (RTL).
 - **Context-Aware Column Alignments**: Text alignments (`halign`) are dynamically evaluated (e.g., aligning titles and sources to the right in Arabic mode, and keeping numeric data like reach/AVE aligned to the left so that digits flow naturally).
@@ -797,7 +802,31 @@ To prevent Arabic text deformation (Mojibake) when fetching feeds or scraping ar
 - If the decoded text contains known mojibake signatures (e.g., UTF-8 Arabic text mistakenly decoded as Windows-1252/Latin1, yielding characters like `Ø` or `Ù` followed by control/Latin symbols), `tryRecoverMojibake` is invoked.
 - It reverse-maps the character codes to recover the original raw bytes, then decodes them as proper UTF-8, restoring the original Arabic text.
 
+---
 
+## 39. Visual Skeleton Loading States and Layout Stability (CLS)
 
+To deliver a premium visual experience and eliminate Layout Shifting (CLS) and flashing empty states when fetching updates from Convex, the application implements highly matching skeleton loading loaders.
 
+### 1. Table Columns & Padding Alignment
+- **ArticleTable.tsx**: Features an `ArticleRowSkeleton` containing the exact column structure (13 columns) and css classes (such as `p-4`, `whitespace-nowrap`, `max-w-sm`, and text alignments) as the live `ArticleRow`.
+- When loading (`isLoading === true` or `articles === undefined`), the table remains rendered, and the body displays 5 skeleton rows. This avoids showing the "No Results" dialog prematurely during network roundtrips.
+
+### 2. Dashboard KPIs & Chart Skeletons
+- **DashboardGrid.tsx**: Accepts an `isLoading` prop.
+- When active, stats cards display pulsing placeholders (`<Skeleton />` from `src/components/ui/Skeleton.tsx`) instead of displaying `0` or jumping between uninitialized numbers.
+- Dynamic charts (Sentiment Donut, Emotions Radar, and Articles Trend) are loaded via `<ChartSkeleton />` with explicit heights (e.g., `300px` and `200px`) to prevent page height changes once Recharts resolves.
+- Lists like Geographic Reach and Risk Factors display matching row skeletons.
+---
+
+## 40. MultiSelectDropdown Inline Search Filter
+
+To streamline user selection in long lists (e.g., countries, source types, or categories), the `MultiSelectDropdown` component implements a dynamic **Inline Text Filter**:
+- **Inline Filter Input**: The trigger button contains an embedded text `<input type="text" />` positioned right after the selected tag list.
+- **Auto-Focus and Dropdown Synchronization**: Clicking anywhere on the dropdown trigger focuses the inline input field and displays the filtered list of options instantly.
+- **Search Query Lifespan**: The search state is automatically reset when the dropdown panel closes, ensuring the full list is visible upon reopening.
+- **Keyboard Shortcuts & UX Patterns**:
+  - Pressing `Backspace` when the input is empty removes the last selected item tag.
+  - Pressing `Escape` closes the dropdown and resets focus.
+- **Compact Popover**: The redundant separate search container inside the dropdown popover has been removed, improving vertical density.
 

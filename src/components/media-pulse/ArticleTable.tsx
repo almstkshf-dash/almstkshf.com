@@ -19,6 +19,8 @@ import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 import { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 import { MonitoringArticle } from '@/types/reports';
+import Skeleton from '@/components/ui/Skeleton';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 /**
  * Pure helper for source type styling
@@ -102,13 +104,11 @@ const ArticleRow = memo(({
                 <div className="flex items-center gap-3">
                     {article.imageUrl && (
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted/40 border border-border group-hover:border-primary/30 transition-colors shadow-sm">
-                            <img
+                            <OptimizedImage
                                 src={article.imageUrl}
                                 alt={article.title}
-                                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-300"
-                                onError={(e) => {
-                                    (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
-                                }}
+                                fill
+                                className="object-cover transition-transform group-hover:scale-105 duration-300"
                             />
                         </div>
                     )}
@@ -321,12 +321,89 @@ const ArticleRow = memo(({
 
 ArticleRow.displayName = 'ArticleRow';
 
+const ArticleRowSkeleton = () => {
+    return (
+        <tr className="hover:bg-muted/30 transition-colors border-b border-border/50">
+            {/* Checkbox */}
+            <td className="p-4 w-10">
+                <Skeleton className="w-4 h-4 rounded" />
+            </td>
+            {/* Date */}
+            <td className="p-4 whitespace-nowrap">
+                <Skeleton className="w-16 h-4" />
+            </td>
+            {/* Title & Badges */}
+            <td className="p-4 max-w-sm">
+                <div className="flex items-center gap-3">
+                    <Skeleton className="w-12 h-12 rounded-lg flex-shrink-0" />
+                    <div className="flex flex-col gap-2 items-start rtl:items-end flex-grow">
+                        <Skeleton className="w-48 h-4 rounded" />
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <Skeleton className="w-16 h-3.5 rounded-md" />
+                            <Skeleton className="w-12 h-3.5 rounded-md" />
+                        </div>
+                    </div>
+                </div>
+            </td>
+            {/* Source */}
+            <td className="p-4 text-sm">
+                <div className="flex flex-col items-start gap-1 justify-center min-h-[40px]">
+                    <Skeleton className="w-20 h-4 rounded" />
+                </div>
+            </td>
+            {/* Depth */}
+            <td className="p-4 text-center">
+                <div className="flex flex-col gap-1.5 items-center">
+                    <Skeleton className="w-12 h-4 rounded-full" />
+                </div>
+            </td>
+            {/* Sentiment */}
+            <td className="p-4">
+                <Skeleton className="w-16 h-6 rounded-full" />
+            </td>
+            {/* Reach */}
+            <td className="p-4 text-right">
+                <Skeleton className="w-12 h-3 rounded ml-auto rtl:mr-auto" />
+            </td>
+            {/* Likes */}
+            <td className="p-4 text-right">
+                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            </td>
+            {/* Retweets */}
+            <td className="p-4 text-right">
+                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            </td>
+            {/* Replies */}
+            <td className="p-4 text-right">
+                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            </td>
+            {/* AVE */}
+            <td className="p-4 text-right">
+                <Skeleton className="w-10 h-3 rounded ml-auto rtl:mr-auto" />
+            </td>
+            {/* Status */}
+            <td className="p-4 text-center">
+                <Skeleton className="w-14 h-4 rounded-full mx-auto" />
+            </td>
+            {/* Actions */}
+            <td className="p-4 text-center w-12">
+                <div className="flex justify-center gap-1">
+                    <Skeleton className="w-7 h-7 rounded-lg" />
+                    <Skeleton className="w-7 h-7 rounded-lg" />
+                </div>
+            </td>
+        </tr>
+    );
+};
+
 const ArticleTable = memo(function ArticleTable({
     articles,
+    isLoading,
     limit = 50,
     onEditClick
 }: {
     articles: MonitoringArticle[],
+    isLoading?: boolean,
     limit?: number,
     onEditClick?: (article: any) => void
 }) {
@@ -423,11 +500,43 @@ const ArticleTable = memo(function ArticleTable({
         }
     }, [updateSentiment]);
 
-    if (articles === undefined) {
+    if (articles === undefined || isLoading) {
         return (
-            <div className="p-8 space-y-4 animate-pulse">
-                <div className="h-10 bg-muted/20 rounded-xl w-full" />
-                <div className="h-64 bg-muted/10 rounded-xl w-full" />
+            <div className="overflow-x-auto">
+                <table className="w-full text-left rtl:text-right border-collapse">
+                    <thead>
+                        <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
+                            <th scope="col" className="p-4 w-10">
+                                <input
+                                    id="select-all-articles-skeleton"
+                                    name="select_all_articles"
+                                    type="checkbox"
+                                    disabled
+                                    className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors opacity-50"
+                                />
+                            </th>
+                            <th scope="col" className="p-4 font-bold">{t('col_date')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_title')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_source')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_depth')}</th>
+                            <th scope="col" className="p-4 font-bold">{t('col_sentiment')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_reach')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_likes')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_retweets')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_replies')}</th>
+                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_ave')}</th>
+                            <th scope="col" className="p-4 font-bold text-center">{t('col_status')}</th>
+                            <th scope="col" className="p-4 font-bold text-center w-12">
+                                <span className="sr-only">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/50">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <ArticleRowSkeleton key={i} />
+                        ))}
+                    </tbody>
+                </table>
             </div>
         );
     }
