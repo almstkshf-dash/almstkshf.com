@@ -30,6 +30,8 @@ export default function SettingsPage() {
     const { userId } = useAuth();
     const settings = useQuery(api.settings.getSettings);
     const updateSettings = useMutation(api.settings.updateSettings);
+    const systemConfig = useQuery(api.settings.getSystemConfig);
+    const updateSystemConfig = useMutation(api.settings.updateSystemConfig);
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +57,10 @@ export default function SettingsPage() {
     const [diffbotKey, setDiffbotKey] = useState('');
     const [zenrowsKey, setZenrowsKey] = useState('');
     const [similarwebKey, setSimilarwebKey] = useState('');
+    const [systemName, setSystemName] = useState('');
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [allowedFileTypes, setAllowedFileTypes] = useState<string[]>(['pdf', 'csv', 'xlsx']);
+    const [maxFileSize, setMaxFileSize] = useState(10);
     const locale = useLocale();
     const isAr = locale === 'ar';
     const [targetCountries, setTargetCountries] = useState<string[]>(['AE', 'SA']);
@@ -69,20 +75,20 @@ export default function SettingsPage() {
     const router = useRouter();
     const pathname = usePathname();
 
-    const [activeTab, setActiveTab] = useState<'general' | 'ai' | 'social' | 'integrations'>(
-        (searchParams.get('tab') as 'general' | 'ai' | 'social' | 'integrations') || 'general'
+    const [activeTab, setActiveTab] = useState<'general' | 'system' | 'ai' | 'social' | 'integrations'>(
+        (searchParams.get('tab') as 'general' | 'system' | 'ai' | 'social' | 'integrations') || 'general'
     );
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Sync state with URL search parameters
     useEffect(() => {
-        const tab = searchParams.get('tab') as 'general' | 'ai' | 'social' | 'integrations' | null;
-        if (tab && ['general', 'ai', 'social', 'integrations'].includes(tab)) {
+        const tab = searchParams.get('tab') as 'general' | 'system' | 'ai' | 'social' | 'integrations' | null;
+        if (tab && ['general', 'system', 'ai', 'social', 'integrations'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (newTab: 'general' | 'ai' | 'social' | 'integrations') => {
+    const handleTabChange = (newTab: 'general' | 'system' | 'ai' | 'social' | 'integrations') => {
         setActiveTab(newTab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', newTab);
@@ -121,6 +127,15 @@ export default function SettingsPage() {
         }
     }, [settings]);
 
+    useEffect(() => {
+        if (systemConfig) {
+            setSystemName(systemConfig.systemName || '');
+            setMaintenanceMode(systemConfig.maintenanceMode || false);
+            setAllowedFileTypes(systemConfig.allowedFileTypes || ['pdf', 'csv', 'xlsx']);
+            setMaxFileSize(systemConfig.maxFileSize || 10);
+        }
+    }, [systemConfig]);
+
     const validate = () => {
         const newErrors: Record<string, string> = {};
         
@@ -130,6 +145,18 @@ export default function SettingsPage() {
 
         if (isNaN(Number(aveMultiplier)) || Number(aveMultiplier) <= 0) {
             newErrors.aveMultiplier = t('error_required');
+        }
+
+        if (!systemName.trim()) {
+            newErrors.systemName = t('error_required');
+        }
+
+        if (isNaN(Number(maxFileSize)) || Number(maxFileSize) <= 0) {
+            newErrors.maxFileSize = t('error_required');
+        }
+
+        if (!allowedFileTypes || allowedFileTypes.length === 0) {
+            newErrors.allowedFileTypes = t('error_required');
         }
 
         setErrors(newErrors);
@@ -167,6 +194,7 @@ export default function SettingsPage() {
         setIsLoading(true);
         setMessage(null);
         try {
+            // Save global settings
             await updateSettings({
                 logoUrl,
                 brandName: brandName.trim() || undefined,
@@ -197,6 +225,15 @@ export default function SettingsPage() {
                     aveMultiplier: Number(aveMultiplier),
                 },
             });
+
+            // Save system settings
+            await updateSystemConfig({
+                systemName: systemName.trim(),
+                maintenanceMode: maintenanceMode,
+                allowedFileTypes: allowedFileTypes,
+                maxFileSize: Number(maxFileSize),
+            });
+
             setMessage({ type: 'success', text: t('saved_success') });
         } catch (error: any) {
             console.error('Failed to save settings:', error);
@@ -217,7 +254,7 @@ export default function SettingsPage() {
         }
     };
 
-    if (settings === undefined) {
+    if (settings === undefined || systemConfig === undefined) {
         return (
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
@@ -230,6 +267,7 @@ export default function SettingsPage() {
 
     const tabs = [
         { id: 'general', label: t('general'), icon: Settings },
+        { id: 'system', label: t('system'), icon: Shield },
         { id: 'ai', label: t('ai_data'), icon: Key },
         { id: 'social', label: t('social'), icon: Share2 },
         { id: 'integrations', label: t('integrations'), icon: Shield },
@@ -439,6 +477,133 @@ export default function SettingsPage() {
                                             <p className="text-sm text-muted-foreground">{t('default_value')}: 0.005</p>
                                         )}
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-border flex justify-end">
+                                    <Button
+                                        onClick={handleSave}
+                                        isLoading={isLoading}
+                                        variant="primary"
+                                        className="gap-2"
+                                        leftIcon={<Save className="h-4 w-4" />}
+                                    >
+                                        {t('save')}
+                                    </Button>
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {activeTab === 'system' && (
+                        <div className="space-y-8">
+                            {/* System Status & Metadata */}
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm space-y-6">
+                                <h2 className="text-xl font-bold mb-2 flex items-center gap-2 text-foreground">
+                                    <Shield className="h-5 w-5 text-blue-500" />
+                                    {t('system')}
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <label htmlFor="system-name" className="text-sm font-bold text-foreground/80">{t('system_name')}</label>
+                                        <input
+                                            id="system-name"
+                                            name="system-name"
+                                            type="text"
+                                            value={systemName}
+                                            onChange={(e) => setSystemName(e.target.value)}
+                                            className={clsx(
+                                                "w-full px-4 py-3 rounded-xl border bg-muted/20 focus:ring-2 outline-none text-foreground transition-all",
+                                                errors.systemName ? "border-rose-500 focus:ring-rose-200" : "border-border focus:ring-primary"
+                                            )}
+                                            placeholder="Almstkshf Media Monitor"
+                                        />
+                                        {errors.systemName && <p className="text-xs font-bold text-rose-500">{errors.systemName}</p>}
+                                    </div>
+
+                                    <div className="flex flex-col justify-end">
+                                        <div className="flex items-center justify-between p-4 bg-muted/10 border border-border rounded-xl h-[50px] md:h-[58px]">
+                                            <div>
+                                                <p className="text-sm font-bold text-foreground">{t('maintenance_mode')}</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setMaintenanceMode(!maintenanceMode)}
+                                                className={clsx(
+                                                    "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none",
+                                                    maintenanceMode ? "bg-rose-500" : "bg-slate-300 dark:bg-slate-700"
+                                                )}
+                                            >
+                                                <span
+                                                    className={clsx(
+                                                        "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                                                        maintenanceMode ? "translate-x-5" : "translate-x-0"
+                                                    )}
+                                                />
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mt-1.5 px-1">{t('maintenance_mode_desc')}</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* File Upload Policy */}
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm space-y-6">
+                                <div>
+                                    <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                                        <Upload className="h-5 w-5 text-blue-500" />
+                                        {t('file_policy_title')}
+                                    </h2>
+                                    <p className="text-sm text-muted-foreground mt-1">{t('file_policy_desc')}</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-3">
+                                        <span className="block text-sm font-bold text-foreground/80">{t('allowed_file_types')}</span>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {['pdf', 'csv', 'xlsx', 'jpg', 'png'].map((type) => {
+                                                const isSelected = allowedFileTypes.includes(type);
+                                                return (
+                                                    <button
+                                                        key={type}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (isSelected) {
+                                                                setAllowedFileTypes(allowedFileTypes.filter(t => t !== type));
+                                                            } else {
+                                                                setAllowedFileTypes([...allowedFileTypes, type]);
+                                                            }
+                                                        }}
+                                                        className={clsx(
+                                                            "px-4 py-2 rounded-xl text-sm font-bold uppercase transition-all border",
+                                                            isSelected
+                                                                ? "bg-primary/10 border-primary text-primary shadow-sm"
+                                                                : "bg-muted/30 border-border text-muted-foreground hover:bg-muted"
+                                                        )}
+                                                    >
+                                                        {type}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        {errors.allowedFileTypes && <p className="text-xs font-bold text-rose-500">{errors.allowedFileTypes}</p>}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label htmlFor="max-file-size" className="text-sm font-bold text-foreground/80">{t('max_file_size')}</label>
+                                        <input
+                                            id="max-file-size"
+                                            name="max-file-size"
+                                            type="number"
+                                            value={maxFileSize}
+                                            onChange={(e) => setMaxFileSize(parseInt(e.target.value))}
+                                            className={clsx(
+                                                "w-full px-4 py-3 rounded-xl border bg-muted/20 focus:ring-2 outline-none text-foreground transition-all",
+                                                errors.maxFileSize ? "border-rose-500 focus:ring-rose-200" : "border-border focus:ring-primary"
+                                            )}
+                                        />
+                                        {errors.maxFileSize && <p className="text-xs font-bold text-rose-500">{errors.maxFileSize}</p>}
                                     </div>
                                 </div>
 

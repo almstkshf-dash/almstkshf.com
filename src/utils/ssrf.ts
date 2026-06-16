@@ -36,6 +36,7 @@ const BLOCKED_IPV4: RegExp[] = [
   /^172\.(1[6-9]|2\d|3[0-1])\./,          // 172.16.0.0/12  — RFC 1918 private
   /^192\.0\.0\./,                          // 192.0.0.0/24   — IETF Protocol Assignments
   /^192\.0\.2\./,                          // 192.0.2.0/24   — TEST-NET-1 (RFC 5737)
+  /^192\.88\.99\./,                        // 192.88.99.0/24 — 6to4 Relay Anycast (RFC 3068)
   /^192\.168\./,                           // 192.168.0.0/16 — RFC 1918 private
   /^198\.18\./,                            // 198.18.0.0/15  — Benchmarking (RFC 2544)
   /^198\.19\./,                            // 198.19.0.0/15  — Benchmarking (RFC 2544)
@@ -58,9 +59,9 @@ const BLOCKED_IPV6: RegExp[] = [
   /^2001::/i,                              // Teredo tunnelling
   /^2001:db8:/i,                           // Documentation (RFC 3849)
   /^2002:/i,                               // 6to4
-  /^fc00:/i,                               // Unique local (RFC 4193)
-  /^fd[0-9a-f]{2}:/i,                      // Unique local (RFC 4193)
-  /^fe80:/i,                               // Link-local
+  /^fc[0-9a-f]{2}:/i,                      // Unique local (RFC 4193) — fc00::/7
+  /^fd[0-9a-f]{2}:/i,                      // Unique local (RFC 4193) — fc00::/7
+  /^fe[8-9a-f][0-9a-f]:/i,                 // Link-local (fe80::/10) & Site-local (fec0::/10)
   /^ff[0-9a-f]{2}:/i,                      // Multicast
 ];
 
@@ -174,6 +175,7 @@ export async function isSafeUrl(
  * for the general case.
  *
  * @returns `true` when the URL is safe, `false` otherwise.
+ * @deprecated Use the async `isSafeUrl` to perform DNS-backed resolution checks.
  */
 export function isSafePublicUrl(rawUrl: string): boolean {
   try {

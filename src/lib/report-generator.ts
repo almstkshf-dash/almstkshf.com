@@ -8,7 +8,7 @@
 
 import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
-import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem } from '@/types/reports';
+import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem, DeepWebRun, OsintHistoryItem } from '@/types/reports';
 import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
 import { AMIRI_FONT_BASE64 } from '@/lib/fonts/amiri-font-base64';
 
@@ -47,23 +47,7 @@ export interface ReportArticle {
     [key: string]: any;
 }
 
-export interface DeepWebRun {
-    _id: string;
-    _creationTime: number;
-    status: string;
-    source?: string;
-    articlesCount?: number;
-    errorMessage?: string;
-}
-
-export interface OsintResult {
-    _id?: string;
-    query: string;
-    type: string;
-    result: Record<string, unknown> | unknown[];
-    createdAt?: number;
-    timestamp?: number;
-}
+export type OsintResult = OsintHistoryItem;
 
 // -------------------------------------------------------------------------------------------------
 // CONSTANTS & COLORS
@@ -295,7 +279,7 @@ export class ReportGenerator {
         y += 10;
 
         const tableData = results.map(r => [
-            r.publishedDate ? new Date(r.publishedDate).toLocaleDateString() : '',
+            r.discovered_at ? new Date(r.discovered_at).toLocaleDateString() : '',
             this.fixArabic(r.title || ''),
             r.source_type || '',
             r.risk_level || 'Neutral',
@@ -509,7 +493,7 @@ export class ReportGenerator {
             new Date(r._creationTime).toLocaleString(),
             r.source || 'Generic',
             r.status.toUpperCase(),
-            r.articlesCount?.toString() || '0'
+            r.itemCount?.toString() || '0'
         ]);
 
         await this.addAutoTable(doc, {
@@ -566,7 +550,7 @@ export class ReportGenerator {
         this.drawHeading(doc, translations.OsintTab?.export_history || 'Investigation History', 14, y, fontLoaded);
 
         const tableData = items.map(item => [
-            new Date(item.createdAt || item.timestamp || Date.now()).toLocaleString(),
+            new Date(item.createdAt || Date.now()).toLocaleString(),
             item.query,
             item.type.toUpperCase(),
             typeof item.result === 'object' ? Object.keys(item.result as Record<string, unknown>).length.toString() : '1'
@@ -1663,7 +1647,7 @@ export class ReportGenerator {
 
         results.forEach(r => {
             sheet.addRow({
-                date: r.publishedDate ? new Date(r.publishedDate).toLocaleDateString() : '',
+                date: r.discovered_at ? new Date(r.discovered_at).toLocaleDateString() : '',
                 title: r.title,
                 source: r.source_type,
                 url: r.url,
@@ -1800,7 +1784,7 @@ export class ReportGenerator {
 
         items.forEach(item => {
             sheet.addRow({
-                time: new Date(item.createdAt || item.timestamp || Date.now()).toLocaleString(),
+                time: new Date(item.createdAt || Date.now()).toLocaleString(),
                 target: item.query,
                 type: item.type.toUpperCase(),
                 attrs: typeof item.result === 'object' ? Object.keys(item.result).length : 1

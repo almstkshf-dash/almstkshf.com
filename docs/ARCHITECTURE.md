@@ -293,10 +293,12 @@ User sets keyword + countries + languages (or Sync Keyword in Press Release Pane
 
 ## 10.1 Background Task Queue & AI Structured Outputs
 
-To prevent Vercel Serverless timeouts (60s limit) and handle long-running media analyses asynchronously, heavy AI tasks are moved to a Convex background queue:
-1. **Queued Execution**: Heavy AI operations in `fetchNews`, `analyzeMedia`, and `/api/monitor` are queued by saving records in a `"pending"` status. This schedules background actions asynchronously (`ctx.scheduler.runAfter`).
-2. **Polling / Async Updates**: Frontend-initiated tasks poll the database for completion (via a query like `getAnalysis` / `getArticle`), while background tasks process, update status to `"completed"` or `"failed"`, and record errors gracefully.
-3. **Structured Outputs**: All Gemini API integrations explicitly declare a native `responseSchema` (Gemini REST API) or configure `structuredOutputs: true` (Next.js server-side SDK) to enforce strict JSON shape constraints natively. This prevents parsing crashes and stabilizes UI rendering.
+To prevent Vercel Serverless timeouts (60s limit), mitigate concurrency spikes (preventing out-of-memory or rate-limiting bans on external scraping/Gemini APIs), and process heavy media analyses asynchronously, the system routes tasks through a database-backed queue:
+1. **Queued Execution & Rate Regulation**: When `fetchNews` or `syncSpecificRssFeedBackground` discover articles, they are inserted into the database in a `"pending"` status. The system registers a task in the `scraper_queue` table instead of firing parallel API invocations immediately. A queue processor (`processQueueBatch`) drains this queue sequentially in batches of 5, introducing a 5-second throttling delay between batches.
+2. **Distributed Queue Locking**: To prevent parallel running queue loops, a singleton document in `scraper_queue_state` acts as a distributed lock with a 5-minute expiry timeout.
+3. **Task Stale Recovery & Retries**: The queue processor automatically resets any task stuck in the `"processing"` state for more than 5 minutes back to `"pending"`, tracking a `retryCount` up to 3 before marking it as `"failed"`.
+4. **Polling / Async Updates**: Frontend-initiated tasks poll the database for completion (via queries like `getArticles`), while background queue tasks process, update the status to `"completed"` or `"failed"`, and record errors.
+5. **Structured Outputs**: All Gemini API integrations explicitly declare a native `responseSchema` (Gemini REST API) or configure `structuredOutputs: true` (Next.js server-side SDK) to enforce strict JSON shape constraints natively. This prevents parsing crashes and stabilizes UI rendering.
 
 ---
 
@@ -305,7 +307,7 @@ To prevent Vercel Serverless timeouts (60s limit) and handle long-running media 
 To secure endpoints from Denial of Service (DoS) and Server-Side Request Forgery (SSRF), the following security patterns are strictly enforced:
 1. **Rate Limiting Key Resolution**: Every rate-limited request resolves the client identity using `getRateLimitKey(req, prefix)`. This checks the Clerk User ID if authenticated, or falls back to resolving client IP securely checking multiple headers (`cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`). This prevents rate limiting collisions on the generic `'unknown'` fallback.
 2. **In-Memory Fallback rate limiter**: If Upstash Redis is down or missing credentials (e.g. in local development or custom deployments), the system automatically engages an in-memory rate-limiter fallback (`runInMemoryRateLimit`) so that API endpoints never fail open or lack rate limits.
-3. **SSRF Guard Protection**: For proxy endpoints like `/api/proxy-rss` and `/api/proxy-image` that fetch resources from dynamic external URLs, the application enforces the `isSafePublicUrl` SSRF guard (found in `src/utils/ssrf.ts`). This checks that URLs use the `https` protocol and do not point to local loopbacks (`127.0.0.1`, `localhost`), link-local metadata ranges (`169.254.169.254`), or private RFC-1918 blocks, preventing attackers from probing internal server networks.
+3. **SSRF Guard Protection**: For proxy endpoints like `/api/proxy-rss` and `/api/proxy-image` that fetch resources from dynamic external URLs, the application enforces the DNS-resolution-backed `isSafeUrl` SSRF guard (found in `src/utils/ssrf.ts`). This resolves the domain names to their actual IP addresses at runtime and verifies that they do not point to local loopbacks (`127.0.0.1`, `localhost`, `[::1]`), link-local metadata ranges (`169.254.169.254`), unique local IPv6 prefixes (`fc00::/7`), or private RFC-1918 blocks, preventing attackers from probing internal server networks via direct or redirected requests.
 
 ---
 

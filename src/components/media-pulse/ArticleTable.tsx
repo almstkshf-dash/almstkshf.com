@@ -19,6 +19,7 @@ import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 import { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import clsx from 'clsx';
 import { MonitoringArticle } from '@/types/reports';
+import { Id } from '../../../convex/_generated/dataModel';
 import Skeleton from '@/components/ui/Skeleton';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 
@@ -69,11 +70,11 @@ const ArticleRow = memo(({
     isSelected: boolean,
     isDeleting: boolean,
     isUpdating: boolean,
-    onToggleSelect: (id: string) => void,
-    onDeleteClick: (id: string) => void,
-    onEditClick: (article: any) => void,
-    onSaveClick: (article: any) => void,
-    onUpdateSentiment: (id: string, s: string) => void,
+    onToggleSelect: (id: Id<"media_monitoring_articles">) => void,
+    onDeleteClick: (id: Id<"media_monitoring_articles">) => void,
+    onEditClick: (article: MonitoringArticle) => void,
+    onSaveClick: (article: MonitoringArticle) => void,
+    onUpdateSentiment: (id: Id<"media_monitoring_articles">, s: "Positive" | "Neutral" | "Negative") => void,
     t: ReturnType<typeof import('next-intl').useTranslations>
 }) => {
     const tCommon = useTranslations('Common');
@@ -135,7 +136,7 @@ const ArticleRow = memo(({
                             </span>
                             <span className="text-[10px] text-foreground/80 dark:text-slate-200 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
                                 <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-                                {article.sourceCountry || article.country}
+                                {article.sourceCountry}
                             </span>
                             {article.isManual && (
                                 <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
@@ -269,15 +270,15 @@ const ArticleRow = memo(({
             <td className="p-4 text-center">
                 <span className={clsx(
                     "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.1em] border transition-all",
-                    article.status === 'in_progress'
+                    article.analysisStatus === 'pending'
                         ? 'bg-status-warning-bg text-status-warning-fg border-status-warning-fg/20'
                         : 'bg-status-success-bg text-status-success-fg border-status-success-fg/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]'
                 )}>
                     <span className={clsx(
                         "w-1 h-1 rounded-full mr-1.5 transition-all animate-pulse",
-                        article.status === 'in_progress' ? "bg-status-warning-fg" : "bg-status-success-fg"
+                        article.analysisStatus === 'pending' ? "bg-status-warning-fg" : "bg-status-success-fg"
                     )} aria-hidden="true" />
-                    {article.status === 'in_progress' ? t('status_in_progress') : t('status_live')}
+                    {article.analysisStatus === 'pending' ? t('status_in_progress') : t('status_live')}
                 </span>
             </td>
             <td className="p-4 text-center">
@@ -405,7 +406,7 @@ const ArticleTable = memo(function ArticleTable({
     articles: MonitoringArticle[],
     isLoading?: boolean,
     limit?: number,
-    onEditClick?: (article: any) => void
+    onEditClick?: (article: MonitoringArticle) => void
 }) {
     const t = useTranslations('ArticleTable');
     const tCommon = useTranslations('Common');
@@ -414,16 +415,16 @@ const ArticleTable = memo(function ArticleTable({
     const updateSentiment = useMutation(api.monitoring.updateSentiment);
 
     const [mounted, setMounted] = useState(false);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<Id<"media_monitoring_articles"> | null>(null);
 
     useEffect(() => {
         setMounted(true);
     }, []);
-    const [updatingId, setUpdatingId] = useState<string | null>(null);
-    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [updatingId, setUpdatingId] = useState<Id<"media_monitoring_articles"> | null>(null);
+    const [selectedIds, setSelectedIds] = useState<Set<Id<"media_monitoring_articles">>>(new Set());
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
     const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false);
-    const [singleDeleteId, setSingleDeleteId] = useState<string | null>(null);
+    const [singleDeleteId, setSingleDeleteId] = useState<Id<"media_monitoring_articles"> | null>(null);
 
     // Save to collection modal states
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -434,7 +435,7 @@ const ArticleTable = memo(function ArticleTable({
         id: article._id,
         type: "media_monitoring" as const,
         title: article.title,
-        sourceId: article.sourceCountry || article.country,
+        sourceId: article.sourceCountry,
         data: article as unknown as Record<string, unknown>
     }), []);
 
@@ -448,7 +449,7 @@ const ArticleTable = memo(function ArticleTable({
         }
     }, [displayedArticles, selectedIds.size]);
 
-    const toggleSelect = useCallback((id: string) => {
+    const toggleSelect = useCallback((id: Id<"media_monitoring_articles">) => {
         setSelectedIds(prev => {
             const next = new Set(prev);
             if (next.has(id)) {
@@ -460,11 +461,11 @@ const ArticleTable = memo(function ArticleTable({
         });
     }, []);
 
-    const handleDelete = async (articleId: string) => {
+    const handleDelete = async (articleId: Id<"media_monitoring_articles">) => {
         setSingleDeleteId(null);
         setDeletingId(articleId);
         try {
-            await deleteArticle({ id: articleId as any });
+            await deleteArticle({ id: articleId });
             setSelectedIds(prev => {
                 const next = new Set(prev);
                 next.delete(articleId);
@@ -482,7 +483,7 @@ const ArticleTable = memo(function ArticleTable({
         setIsBatchDialogOpen(false);
         setIsBatchDeleting(true);
         try {
-            await deleteArticles({ ids: Array.from(selectedIds) as any });
+            await deleteArticles({ ids: Array.from(selectedIds) });
             setSelectedIds(new Set());
         } catch (error) {
             console.error("Batch delete failed:", error);
@@ -491,10 +492,10 @@ const ArticleTable = memo(function ArticleTable({
         }
     };
 
-    const handleSentimentUpdate = useCallback(async (id: string, sentiment: string) => {
+    const handleSentimentUpdate = useCallback(async (id: Id<"media_monitoring_articles">, sentiment: "Positive" | "Neutral" | "Negative") => {
         setUpdatingId(id);
         try {
-            await updateSentiment({ id: id as any, sentiment: sentiment as any });
+            await updateSentiment({ id, sentiment });
         } finally {
             setUpdatingId(null);
         }

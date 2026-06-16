@@ -179,57 +179,17 @@ export interface AiInspectorData {
         description: string;
     }>;
 }
+import { Doc, Id } from "../../convex/_generated/dataModel";
 
-export interface DarkWebResult {
-    publishedDate?: string | number | Date;
-    title?: string;
-    source_type?: string;
-    risk_level?: string;
-    summary?: string;
-    [key: string]: unknown;
-}
+export type DarkWebResult = Doc<"darkweb_results">;
 
-export interface TerroristListItem {
-    _id?: string;
-    _creationTime?: number;
-    nameArabic?: string;
-    nameLatin?: string;
-    nationality?: string;
-    documentNumber?: string;
-    category?: string;
-    reasons?: string;
-    dob?: string;
-    pob?: string;
-    address?: string;
-    issuingAuthority?: string;
-    issueDate?: string;
-    expiryDate?: string;
-    otherInfo?: string;
-    type?: 'individual' | 'entity' | 'organization' | string;
-    [key: string]: unknown;
-}
+export type TerroristListItem = Doc<"local_terrorist_list">;
 
-export type OsintLookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist';
+export type OsintLookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist' | 'gdelt';
 
-export interface OsintHistoryItem {
-    _id: string;
-    _creationTime: number;
-    type: OsintLookupType;
-    query: string;
-    result: Record<string, unknown>; // Raw API response data varies significantly by lookup type
-    userId: string;
-    createdAt: number;
-}
+export type OsintHistoryItem = Doc<"osint_results">;
 
-export interface DeepWebRun {
-    _id: string;
-    startedAt: number;
-    status: 'success' | 'failed' | 'running';
-    itemCount: number;
-    error?: string;
-    languages?: string;
-    countries?: string;
-}
+export type DeepWebRun = Doc<"ingestion_runs_deep">;
 
 export interface DeepWebResult {
     title: string;
@@ -239,30 +199,4 @@ export interface DeepWebResult {
     date?: string;
 }
 
-export interface MonitoringArticle {
-    _id: string;
-    _creationTime?: number;
-    title: string;
-    publishedDate: string;
-    url: string;
-    resolvedUrl?: string;
-    source?: string;
-    sourceType: 'Press Release' | 'Online News' | 'Social Media' | 'Blog' | 'Print' | string;
-    sourceCountry?: string;
-    country?: string;
-    sentiment: 'Positive' | 'Neutral' | 'Negative' | string;
-    depth?: 'standard' | 'deep';
-    relevancy_score?: number;
-    reach?: number;
-    ave?: number;
-    likes?: number;
-    retweets?: number;
-    replies?: number;
-    status?: 'live' | 'in_progress' | string;
-    imageUrl?: string;
-    isManual?: boolean;
-    manualSentimentOverride?: boolean;
-    originalSentiment?: string;
-    keyword?: string;
-    [key: string]: any;
-}
+export type MonitoringArticle = Doc<"media_monitoring_articles">;

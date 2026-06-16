@@ -400,6 +400,7 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | `freeOnly is not defined` | Variable used in useMemo but not declared | Add `const [freeOnly, setFreeOnly] = useState(false)` |
 | `MIDDLEWARE_INVOCATION_FAILED` | Convex or Node.js API used in middleware | Remove any Convex calls from `src/middleware.ts` |
 | `Not authenticated` in Convex action | Missing auth context | Ensure `ctx.auth.getUserIdentity()` is checked, not skipped |
+| `401 Unauthorized` in Convex during navigation | Discrepancy between Next.js Edge Middleware and Convex backend Clerk domain configurations | Ensure `convex/auth.config.ts` includes multiple providers for both the custom production domain and the default accounts.dev domains. |
 | Duplicate locale in URL `/en/en/` | Middleware applying locale twice | Check `isPublicRoute` matcher isn't double-wrapping intl |
 | Chart renders black/transparent | `hsl(var(--token))` in SVG — tokens are hex, not HSL components | Use `getCSSVar()` pattern — see §10 above |
 | `ReferenceError: Button is not defined` | `Button` import removed from `dashboard/page.tsx` but usages remain | Convert remaining `<Button>` to native `<button>` — see §11 above |
@@ -719,7 +720,7 @@ The following requested feeds failed validation audits and are explicitly exclud
 To ensure that the background Live RSS Feed sweep and general syncs are completely stable and separated features from keyword-specific media monitoring search results:
 - **Dedicated RSS Schema**: Added the `rss_feed_articles` table to `convex/schema.ts` to persistently store raw, unfiltered RSS feed items fetched during background sweeps.
 - **Backend Separation**: Updated the `fetchPressReleaseSources` action in `convex/monitoringAction.ts` to direct background sweeps (when no keyword is supplied) to save directly to `rss_feed_articles` table via `saveRssArticle` mutation, while keyword-specific searches continue to run AI-powered processing and persist to `media_monitoring_articles`.
-- **Sync Specific RSS Feeds**: Refactored `syncSpecificRssFeed` to save synced items into `rss_feed_articles`, separating general syncs from media monitoring keyword streams.
+- **Sync Specific RSS Feeds**: Refactored the manual/on-demand sync to execute asynchronously by scheduling background tasks through a new `scheduleRssSync` mutation. This mutation schedules the `syncSpecificRssFeedBackground` action in Convex immediately (with 0ms delay) to fetch, parse, and save items into `rss_feed_articles` without blocking Next.js API routes, preventing serverless function timeouts.
 - **Frontend Decoupled Lookup**: Re-routed `articlesQuery` in `RssFeeder.tsx` to retrieve items from `getRssArticles` (which queries the dedicated `rss_feed_articles` table), preventing general live feeds from being affected or cleared when keyword search results are deleted.
 
 ---
@@ -829,4 +830,28 @@ To streamline user selection in long lists (e.g., countries, source types, or ca
   - Pressing `Backspace` when the input is empty removes the last selected item tag.
   - Pressing `Escape` closes the dropdown and resets focus.
 - **Compact Popover**: The redundant separate search container inside the dropdown popover has been removed, improving vertical density.
+
+---
+
+## 41. Optimistic Concurrency Control (OCC) & Database Index Optimizations
+
+To handle high-throughput parallel scraping updates and prevent Optimistic Concurrency Control (OCC) conflicts and front-end latency, the database schema and query structure have been optimized:
+
+### 1. Schema Indexes
+Added targeted indexes inside `convex/schema.ts` to restrict transaction read sets and avoid full table scans:
+- **`media_monitoring_articles`**:
+  - `by_keyword_and_createdAt`: `["keyword", "createdAt"]`
+  - `by_sourceType_and_createdAt`: `["sourceType", "createdAt"]`
+  - `by_sourceCountry_and_createdAt`: `["sourceCountry", "createdAt"]`
+  - `by_depth_and_createdAt`: `["depth", "createdAt"]`
+- **`rss_feed_articles`**:
+  - `by_source_and_createdAt`: `["source", "createdAt"]`
+- **`crisis_plans`**:
+  - `by_monitor_id`: `["monitor_id"]`
+
+### 2. Query Index Selection Helper
+Implemented a unified query helper `queryArticlesWithIndex` in `convex/monitoring.ts`. The helper dynamically resolves and selects the most specific index based on the active query filters (keyword, sourceType, sourceCountry, depth). This isolates read locks and eliminates full table scans.
+
+### 3. Batched Mutation Deletion
+Refactored the `deleteAllArticles` mutation inside `convex/monitoring.ts` to delete documents in batches of 200 and automatically reschedule itself via `ctx.scheduler` for subsequent batches. This keeps the transaction footprint minimal, avoiding OCC write conflicts and timeouts on large tables.
 

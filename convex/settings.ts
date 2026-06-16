@@ -8,7 +8,7 @@
 
 import { mutation, query, internalQuery } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { requireAdmin } from "./utils/auth";
+import { requireAdmin, isAdmin } from "./utils/auth";
 
 export const getSettings = query({
     args: {},
@@ -26,10 +26,9 @@ export const getSettings = query({
         if (!settings) return null;
 
         // Check if user is admin to return sensitive keys
-        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-        const isAdmin = adminIds.includes(identity.subject);
+        const isUserAdmin = await isAdmin(ctx.auth);
 
-        if (isAdmin) {
+        if (isUserAdmin) {
             return settings;
         }
 
@@ -140,3 +139,47 @@ export const updateSettings = mutation({
         }
     },
 });
+
+export const getSystemConfig = query({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db
+            .query("system_settings")
+            .filter((q) => q.eq(q.field("type"), "global"))
+            .first();
+    },
+});
+
+export const updateSystemConfig = mutation({
+    args: {
+        systemName: v.string(),
+        maintenanceMode: v.boolean(),
+        allowedFileTypes: v.array(v.string()),
+        maxFileSize: v.number(),
+    },
+    handler: async (ctx, args) => {
+        try {
+            await requireAdmin(ctx.auth);
+            const existing = await ctx.db
+                .query("system_settings")
+                .filter((q) => q.eq(q.field("type"), "global"))
+                .first();
+
+            if (existing) {
+                await ctx.db.patch(existing._id, args);
+            } else {
+                await ctx.db.insert("system_settings", {
+                    type: "global",
+                    ...args,
+                });
+            }
+        } catch (error: any) {
+            console.error("Error in updateSystemConfig:", error);
+            throw new ConvexError({
+                message: error.message || "Failed to update system config",
+                code: error.code || "INTERNAL_ERROR",
+            });
+        }
+    },
+});
+

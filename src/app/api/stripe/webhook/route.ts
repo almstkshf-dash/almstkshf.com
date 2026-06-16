@@ -12,11 +12,21 @@ import { stripe } from '../../../../lib/stripe';
 import Stripe from 'stripe';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../../convex/_generated/api';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 
 // Stripe webhook secret (required in production)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: NextRequest) {
+    const rlKey = await getRateLimitKey(request, 'stripe:webhook');
+    const limitResult = await rateLimit(rlKey, 100, 60);
+    if (!limitResult.allowed) {
+        return NextResponse.json(
+            { error: 'Rate limit exceeded' },
+            { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } }
+        );
+    }
+
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
 

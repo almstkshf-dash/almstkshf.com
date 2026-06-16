@@ -9,6 +9,7 @@
 import { getRedis } from '@/lib/redis';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
+import { headers } from 'next/headers';
 
 export interface RateLimitResult {
     allowed: boolean;
@@ -71,7 +72,11 @@ export async function rateLimit(key: string, limit: number, windowSeconds: numbe
     }
 }
 
-export async function getRateLimitKey(req: Request | NextRequest, prefix: string, userId?: string | null): Promise<string> {
+export async function getRateLimitKey(
+    req: Request | NextRequest | null | undefined,
+    prefix: string,
+    userId?: string | null
+): Promise<string> {
     if (!userId) {
         try {
             // Retrieve Clerk authentication data to restrict rate limiting by User ID
@@ -88,14 +93,26 @@ export async function getRateLimitKey(req: Request | NextRequest, prefix: string
 
     // Resolve Client IP securely from headers
     let ip: string | null = null;
-    if ('ip' in req && req.ip) {
-        ip = req.ip as string;
+    if (req) {
+        if ('ip' in req && req.ip) {
+            ip = req.ip as string;
+        } else {
+            const reqHeaders = req.headers;
+            ip = reqHeaders.get('cf-connecting-ip') ||
+                 reqHeaders.get('x-real-ip') ||
+                 reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                 null;
+        }
     } else {
-        const headers = req.headers;
-        ip = headers.get('cf-connecting-ip') ||
-             headers.get('x-real-ip') ||
-             headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-             null;
+        try {
+            const reqHeaders = await headers();
+            ip = reqHeaders.get('cf-connecting-ip') ||
+                 reqHeaders.get('x-real-ip') ||
+                 reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                 null;
+        } catch {
+            // fallback if headers() fails (e.g. outside next.js request context entirely)
+        }
     }
 
     return `${prefix}:ip:${ip || 'unknown'}`;

@@ -1,4 +1,5 @@
 import { put } from '@vercel/blob';
+import { isSafeUrl } from '@/utils/ssrf';
 
 /**
  * Downloads an image from a given URL and uploads it to Vercel Blob.
@@ -7,6 +8,12 @@ import { put } from '@vercel/blob';
  */
 export async function uploadImageToBlob(imageUrl: string, prefix: string = 'articles'): Promise<string> {
   if (!imageUrl || !imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+
+  // Avoid SSRF attacks by checking the image URL
+  if (!(await isSafeUrl(imageUrl, { allowHttp: true }))) {
+    console.warn(`[Blob] Blocked unsafe image URL: ${imageUrl}`);
     return imageUrl;
   }
 

@@ -6,24 +6,37 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-const clerkDomain = process.env.CLERK_FRONTEND_API_URL;
+const providers = [];
 
-if (!clerkDomain) {
-    throw new Error("CLERK_FRONTEND_API_URL is missing. Please set it in Convex environment variables.");
+// 1. Check if CLERK_FRONTEND_API_URL is configured (custom domain or staging domain)
+let envClerkDomain = process.env["CLERK_FRONTEND_API_URL"];
+if (envClerkDomain) {
+    if (!envClerkDomain.startsWith("http://") && !envClerkDomain.startsWith("https://")) {
+        envClerkDomain = `https://${envClerkDomain}`;
+    }
+    providers.push({
+        domain: envClerkDomain,
+        applicationID: "convex",
+    });
+}
+
+// 2. Fallbacks to prevent auth errors if environment variables are not yet fully updated on Convex
+const fallbacks = [
+    "https://integral-bulldog-65.clerk.accounts.dev", // Local dev/test key domain
+    "https://clerk.almstkshf.com",                     // Production custom domain
+];
+
+for (const fallback of fallbacks) {
+    if (!providers.some(p => p.domain === fallback)) {
+        providers.push({
+            domain: fallback,
+            applicationID: "convex",
+        });
+    }
 }
 
 const authConfig = {
-    providers: [
-        {
-            domain: clerkDomain,
-            applicationID: "convex",
-        },
-        // Fallback for local development using Clerk dev keys
-        {
-            domain: "https://integral-bulldog-65.clerk.accounts.dev",
-            applicationID: "convex",
-        }
-    ],
+    providers,
 };
 
 export default authConfig;

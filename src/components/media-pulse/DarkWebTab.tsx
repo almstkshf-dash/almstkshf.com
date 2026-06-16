@@ -126,10 +126,10 @@ export default function DarkWebTab() {
   const stealthFetch = useAction(api.darkWeb.stealthFetch);
   const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
   const deleteById = useMutation(api.darkWebDb.deleteById);
-  const results = (useQuery(
+  const results = useQuery(
     api.darkWebDb.getByUserId,
     isAuthenticated ? { limit: 50 } : 'skip'
-  ) || []) as any[];
+  ) || [];
   const settings = useQuery(api.settings.getSettings);
 
   // â”€â”€ Risk badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -459,7 +459,7 @@ export default function DarkWebTab() {
               )}
 
               <AnimatePresence mode="popLayout" initial={false}>
-                {results.map((entry: any) => (
+                {results.map((entry) => (
                   <motion.tr
                     key={entry._id}
                     layout
@@ -518,7 +518,7 @@ export default function DarkWebTab() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => deleteById({ id: entry._id as any })}
+                        onClick={() => deleteById({ id: entry._id })}
                         aria-label={`${tCommon('delete')} ${entry.title}`}
                         className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-rose-600 dark:hover:text-rose-400 transition-colors group-hover:opacity-100 opacity-50"
                       >

@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server';
 import { parseFeed } from '@/lib/rss-engine';
 import { FeedResponse } from '@/types/rss';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
-import { isSafePublicUrl } from '@/utils/ssrf';
+import { isSafeUrl } from '@/utils/ssrf';
 
 // Pin to Node.js runtime — rss-parser requires xml2js which is not Edge-compatible
 export const runtime = 'nodejs';
@@ -49,8 +49,8 @@ export async function GET(request: Request) {
   console.log(`[API Proxy] [${new Date().toISOString()}] Received request for URL: ${feedUrl}`);
   console.log(`[API Proxy] [${new Date().toISOString()}] Origin: ${request.headers.get('origin') || 'direct'}`);
 
-  // Security check: SSRF guard â€” rejects private IPs, loopback, and non-HTTPS URLs
-  if (!isSafePublicUrl(feedUrl)) {
+  // Security check: SSRF guard — rejects private IPs, loopback, and non-HTTPS URLs
+  if (!(await isSafeUrl(feedUrl))) {
     return NextResponse.json<FeedResponse>({
       success: false,
       error: 'Only public HTTPS feed URLs are supported.'

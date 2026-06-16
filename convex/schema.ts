@@ -59,7 +59,11 @@ export default defineSchema({
     }).index("by_date", ["publishedDate"])
       .index("by_url", ["url"])
       .index("by_resolvedUrl", ["resolvedUrl"])
-      .index("by_createdAt", ["createdAt"]),
+      .index("by_createdAt", ["createdAt"])
+      .index("by_keyword_and_createdAt", ["keyword", "createdAt"])
+      .index("by_sourceType_and_createdAt", ["sourceType", "createdAt"])
+      .index("by_sourceCountry_and_createdAt", ["sourceCountry", "createdAt"])
+      .index("by_depth_and_createdAt", ["depth", "createdAt"]),
 
     rss_feed_articles: defineTable({
         url: v.string(),
@@ -72,7 +76,8 @@ export default defineSchema({
         imageUrl: v.optional(v.string()),
         createdAt: v.number(),
     }).index("by_url", ["url"])
-      .index("by_createdAt", ["createdAt"]),
+      .index("by_createdAt", ["createdAt"])
+      .index("by_source_and_createdAt", ["source", "createdAt"]),
 
     ingestion_runs_deep: defineTable({
         startedAt: v.number(),
@@ -131,13 +136,21 @@ export default defineSchema({
         }),
     }),
 
+    system_settings: defineTable({
+        type: v.literal("global"),
+        systemName: v.string(),
+        maintenanceMode: v.boolean(),
+        allowedFileTypes: v.array(v.string()),
+        maxFileSize: v.number(),
+    }),
+
     crisis_plans: defineTable({
         title: v.string(),
         priority: v.union(v.literal("Low"), v.literal("Medium"), v.literal("High")),
         actions: v.array(v.string()),
         status: v.string(),
         monitor_id: v.optional(v.id("media_monitoring_articles")),
-    }),
+    }).index("by_monitor_id", ["monitor_id"]),
 
     contact_submissions: defineTable({
         name: v.string(),
@@ -349,4 +362,21 @@ export default defineSchema({
         createdAt: v.number(),
         updatedAt: v.number(),
     }).index("by_userId", ["userId"]),
+
+    scraper_queue: defineTable({
+        url: v.string(),
+        articleId: v.id("media_monitoring_articles"),
+        status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed")),
+        retryCount: v.number(),
+        error: v.optional(v.string()),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_status_and_createdAt", ["status", "createdAt"])
+      .index("by_articleId", ["articleId"]),
+
+    scraper_queue_state: defineTable({
+        type: v.literal("global"),
+        lockAcquiredAt: v.optional(v.number()),
+        lockExpiry: v.optional(v.number()),
+    }).index("by_type", ["type"]),
 });

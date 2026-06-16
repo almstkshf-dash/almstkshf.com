@@ -14,7 +14,7 @@ import Container from "@/components/ui/Container";
 import { Mic2, Sparkles, MessageSquare, PenTool, Brain, Share2, Zap, Layout, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import Button from "./ui/Button";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
@@ -27,7 +27,38 @@ export default function SmartMediaAssistantClient() {
     const [prompt, setPrompt] = React.useState("");
     const [analysis, setAnalysis] = React.useState<any>(null);
     const [isGenerating, setIsGenerating] = React.useState(false);
+    const [analysisId, setAnalysisId] = React.useState<any>(null);
     const [retryCountdown, setRetryCountdown] = React.useState<number | null>(null);
+
+    const currentAnalysis = useQuery(api.analyses.getAnalysis, analysisId ? { id: analysisId } : "skip");
+
+    React.useEffect(() => {
+        if (!currentAnalysis || !isGenerating) return;
+
+        if (currentAnalysis.status === "completed") {
+            const mappedResult = {
+                ...currentAnalysis,
+                score: Math.round(currentAnalysis.score || 70),
+                riskScore: Math.round(currentAnalysis.riskScore || 15),
+                id: currentAnalysis._id,
+            };
+            setAnalysis(mappedResult);
+            setIsGenerating(false);
+            setAnalysisId(null);
+            toast.success(tAi("analysis_complete"));
+        } else if (currentAnalysis.status === "failed") {
+            setIsGenerating(false);
+            setAnalysisId(null);
+            const isCapacity = currentAnalysis.error?.includes("CAPACITY") || currentAnalysis.error?.includes("exhausted");
+            if (isCapacity) {
+                const waitTime = 60;
+                setRetryCountdown(waitTime);
+                toast.error(tAi("ai_busy_wait", { seconds: waitTime }));
+            } else {
+                toast.error(currentAnalysis.error || tAi("analysis_empty"));
+            }
+        }
+    }, [currentAnalysis, isGenerating, tAi]);
 
     React.useEffect(() => {
         if (retryCountdown === null) return;
@@ -74,32 +105,21 @@ export default function SmartMediaAssistantClient() {
         if (!prompt) return;
         setIsGenerating(true);
         setAnalysis(null);
+        setAnalysisId(null);
 
         try {
             const result = await analyzeAction({ text: prompt });
             console.log("Analysis Result:", result);
 
-            if (result && result.success && result.data) {
-                const analysisData = result.data;
-                // Backend already returns 0-100 values
-                const mappedResult = {
-                    ...analysisData,
-                    score: Math.round(analysisData.score || 70),
-                    riskScore: Math.round(analysisData.riskScore || 15)
-                };
-                setAnalysis(mappedResult);
-                toast.success(tAi("analysis_complete"));
-            } else if ((result as any)?.capacityExhausted) {
-                const waitTime = (result as any).retryAfter || 60;
-                setRetryCountdown(waitTime);
-                toast.error(tAi("ai_busy_wait", { seconds: waitTime }));
+            if (result && result.success && result.analysisId) {
+                setAnalysisId(result.analysisId);
             } else {
-                toast.error(result?.error || tAi("analysis_empty"));
+                toast.error(result?.error || tAi("analysis_error"));
+                setIsGenerating(false);
             }
         } catch (error) {
             console.error("AI Assistant Error:", error);
             toast.error(tAi("analysis_error"));
-        } finally {
             setIsGenerating(false);
         }
     };

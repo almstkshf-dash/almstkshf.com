@@ -8,17 +8,52 @@
 
 import { query, mutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
+import { Doc } from "./_generated/dataModel";
 
-function applyMonitoringFilters(q: any, args: { sourceType?: string; sourceCountry?: string; depth?: string }) {
-    if (args.sourceType && args.sourceType !== "All") {
-        q = q.filter((q: any) => q.eq(q.field("sourceType"), args.sourceType));
-    }
-    if (args.sourceCountry && args.sourceCountry !== "All") {
-        q = q.filter((q: any) => q.eq(q.field("sourceCountry"), args.sourceCountry));
-    }
-    if (args.depth && args.depth !== "All") {
-        q = q.filter((q: any) => q.eq(q.field("depth"), args.depth));
+function queryArticlesWithIndex(
+    ctx: any,
+    args: { keyword?: string; sourceType?: string; sourceCountry?: string; depth?: string }
+) {
+    let q;
+    if (args.keyword) {
+        q = ctx.db.query("media_monitoring_articles")
+            .withIndex("by_keyword_and_createdAt", (q: any) => q.eq("keyword", args.keyword))
+            .order("desc");
+        if (args.sourceType && args.sourceType !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("sourceType"), args.sourceType));
+        }
+        if (args.sourceCountry && args.sourceCountry !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("sourceCountry"), args.sourceCountry));
+        }
+        if (args.depth && args.depth !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("depth"), args.depth));
+        }
+    } else if (args.sourceType && args.sourceType !== "All") {
+        q = ctx.db.query("media_monitoring_articles")
+            .withIndex("by_sourceType_and_createdAt", (q: any) => q.eq("sourceType", args.sourceType))
+            .order("desc");
+        if (args.sourceCountry && args.sourceCountry !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("sourceCountry"), args.sourceCountry));
+        }
+        if (args.depth && args.depth !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("depth"), args.depth));
+        }
+    } else if (args.sourceCountry && args.sourceCountry !== "All") {
+        q = ctx.db.query("media_monitoring_articles")
+            .withIndex("by_sourceCountry_and_createdAt", (q: any) => q.eq("sourceCountry", args.sourceCountry))
+            .order("desc");
+        if (args.depth && args.depth !== "All") {
+            q = q.filter((q: any) => q.eq(q.field("depth"), args.depth));
+        }
+    } else if (args.depth && args.depth !== "All") {
+        q = ctx.db.query("media_monitoring_articles")
+            .withIndex("by_depth_and_createdAt", (q: any) => q.eq("depth", args.depth))
+            .order("desc");
+    } else {
+        q = ctx.db.query("media_monitoring_articles")
+            .withIndex("by_createdAt")
+            .order("desc");
     }
     return q;
 }
@@ -36,8 +71,7 @@ export const getArticles = query({
         const limit = args.limit ?? 50;
         const skip = args.skip ?? 0;
 
-        let q = ctx.db.query("media_monitoring_articles");
-        q = applyMonitoringFilters(q, args);
+        const q = queryArticlesWithIndex(ctx, args);
         const all = await q.collect();
 
         const parseDate = (d: string) => {
@@ -45,7 +79,7 @@ export const getArticles = query({
             return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
         };
 
-        all.sort((a, b) => {
+        all.sort((a: Doc<"media_monitoring_articles">, b: Doc<"media_monitoring_articles">) => {
             const da = parseDate(a.publishedDate);
             const db = parseDate(b.publishedDate);
             if (db !== da) return db - da;
@@ -67,7 +101,7 @@ export const checkDuplicate = query({
     handler: async (ctx, args) => {
         const existing = await ctx.db
             .query("media_monitoring_articles")
-            .filter((q) => q.eq(q.field("url"), args.url))
+            .withIndex("by_url", (q) => q.eq("url", args.url))
             .first();
         return !!existing;
     },
@@ -84,9 +118,17 @@ export const getRssArticles = query({
         const limit = args.limit ?? 100;
         const skip = args.skip ?? 0;
 
-        let queryBuilder = ctx.db.query("rss_feed_articles");
+        let queryBuilder;
         if (args.source) {
-            queryBuilder = queryBuilder.filter((q) => q.eq(q.field("source"), args.source));
+            queryBuilder = ctx.db
+                .query("rss_feed_articles")
+                .withIndex("by_source_and_createdAt", (q) => q.eq("source", args.source))
+                .order("desc");
+        } else {
+            queryBuilder = ctx.db
+                .query("rss_feed_articles")
+                .withIndex("by_createdAt")
+                .order("desc");
         }
         const all = await queryBuilder.collect();
 
@@ -95,7 +137,7 @@ export const getRssArticles = query({
             return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
         };
 
-        all.sort((a, b) => {
+        all.sort((a: Doc<"rss_feed_articles">, b: Doc<"rss_feed_articles">) => {
             const da = parseDate(a.publishedDate);
             const db = parseDate(b.publishedDate);
             if (db !== da) return db - da;
@@ -139,6 +181,27 @@ export const saveRssArticle = mutation({
             createdAt: Date.now(),
         });
         return id;
+    },
+});
+
+// 2.6. MUTATION: Schedule a background RSS feed sync
+export const scheduleRssSync = mutation({
+    args: {
+        url: v.string(),
+        publisher: v.string(),
+        country: v.optional(v.string()),
+        lang: v.optional(v.string()),
+        limit: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        await ctx.scheduler.runAfter(0, internal.monitoringAction.syncSpecificRssFeedBackground, {
+            feedUrl: args.url,
+            publisher: args.publisher,
+            country: args.country,
+            lang: args.lang,
+            limit: args.limit,
+        });
+        return { success: true };
     },
 });
 
@@ -250,9 +313,15 @@ export const saveArticle = mutation({
             });
 
             if (args.analysisStatus === "pending") {
-                await ctx.scheduler.runAfter(0, internal.monitoringAction.analyzeArticleBackground, {
+                await ctx.db.insert("scraper_queue", {
+                    url: args.url,
                     articleId: id,
+                    status: "pending",
+                    retryCount: 0,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
                 });
+                await ctx.scheduler.runAfter(0, internal.monitoringAction.processQueueBatch, {});
             }
             return id;
         } catch (error) {
@@ -410,17 +479,33 @@ export const markNotificationAsRead = mutation({
     }
 });
 
-// 4. MUTATION: Delete ALL articles (clear report)
+// 4. MUTATION: Delete ALL articles (clear report) - batched to prevent timeouts/OCC
 export const deleteAllArticles = mutation({
-    args: {},
-    handler: async (ctx) => {
+    args: {
+        cursor: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const batchSize = 200;
         const articles = await ctx.db
             .query("media_monitoring_articles")
-            .collect();
+            .take(batchSize);
+
+        const currentDeleted = args.cursor ?? 0;
+        const count = articles.length;
+
         for (const article of articles) {
             await ctx.db.delete(article._id);
         }
-        return { deleted: articles.length };
+
+        const totalDeleted = currentDeleted + count;
+
+        if (count === batchSize) {
+            await ctx.scheduler.runAfter(0, api.monitoring.deleteAllArticles, {
+                cursor: totalDeleted,
+            });
+        }
+
+        return { deleted: totalDeleted };
     },
 });
 // 5. MUTATION: Delete multiple articles
@@ -456,8 +541,9 @@ export const updateSentiment = mutation({
 export const updateKeyword = mutation({
     args: { oldKeyword: v.string(), newKeyword: v.string() },
     handler: async (ctx, args) => {
-        const articles = await ctx.db.query("media_monitoring_articles")
-            .filter(q => q.eq(q.field("keyword"), args.oldKeyword))
+        const articles = await ctx.db
+            .query("media_monitoring_articles")
+            .withIndex("by_keyword_and_createdAt", (q) => q.eq("keyword", args.oldKeyword))
             .collect();
         for (const article of articles) {
             await ctx.db.patch(article._id, { keyword: args.newKeyword });
@@ -473,11 +559,7 @@ export const getAnalyticsOverview = query({
         depth: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles");
-        q = applyMonitoringFilters(q, args);
-        if (args.keyword) {
-            q = q.filter((q: any) => q.eq(q.field("keyword"), args.keyword));
-        }
+        const q = queryArticlesWithIndex(ctx, args);
         const articles = await q.collect();
 
         if (articles.length === 0) {
@@ -495,7 +577,7 @@ export const getAnalyticsOverview = query({
         let totalReach = 0;
         let weightedSentimentSum = 0;
 
-        articles.forEach(a => {
+        articles.forEach((a: Doc<"media_monitoring_articles">) => {
             counts[a.sentiment]++;
             totalReach += a.reach || 0;
 
@@ -506,12 +588,12 @@ export const getAnalyticsOverview = query({
             weightedSentimentSum += sentimentValue * weight;
         });
 
-        // NSS = (Î£ Weighted Sentiment) / Total Mentions * 100
+        // NSS = (Σ Weighted Sentiment) / Total Mentions * 100
         const nss = Math.round((weightedSentimentSum / articles.length) * 100);
 
         // Risk Score Composition
         const negativeDensity = counts.Negative / articles.length;
-        // Mocking Velocity for now â€” normally would compare with past 24h
+        // Mocking Velocity for now — normally would compare with past 24h
         const velocity = 0.05;
         const influencerNegativeWeight = 0.1; // Placeholder
         const topicSensitivity = 0.2; // Placeholder
@@ -551,13 +633,12 @@ export const getEmotionAggregates = query({
         depth: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles");
-        q = applyMonitoringFilters(q, args);
+        const q = queryArticlesWithIndex(ctx, args);
         const articles = await q.collect();
         const emotions: Record<string, number> = { joy: 0, anger: 0, sadness: 0, fear: 0, disgust: 0, surprise: 0, trust: 0, anticipation: 0 };
         let count = 0;
 
-        articles.forEach(a => {
+        articles.forEach((a: Doc<"media_monitoring_articles">) => {
             // Priority 1: Dedicated emotions field
             if (a.emotions) {
                 count++;
@@ -595,12 +676,11 @@ export const getGeographyAggregates = query({
         depth: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles");
-        q = applyMonitoringFilters(q, args);
+        const q = queryArticlesWithIndex(ctx, args);
         const articles = await q.collect();
         const countries: Record<string, number> = {};
 
-        articles.forEach(a => {
+        articles.forEach((a: Doc<"media_monitoring_articles">) => {
             countries[a.sourceCountry] = (countries[a.sourceCountry] || 0) + 1;
         });
 
@@ -612,12 +692,10 @@ export const getGeographyAggregates = query({
 export const getPressReleaseOnlineNewsReports = query({
     args: { keyword: v.optional(v.string()) },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles")
-            .filter(q => q.eq(q.field("sourceType"), "Press Release"));
-
-        if (args.keyword) {
-            q = q.filter(q => q.eq(q.field("keyword"), args.keyword));
-        }
+        const q = queryArticlesWithIndex(ctx, {
+            keyword: args.keyword,
+            sourceType: "Press Release",
+        });
 
         const articles = await q.collect();
 
@@ -627,13 +705,13 @@ export const getPressReleaseOnlineNewsReports = query({
         };
 
         // Sort by publishedDate desc
-        articles.sort((a, b) => {
+        articles.sort((a: Doc<"media_monitoring_articles">, b: Doc<"media_monitoring_articles">) => {
             const da = parseDate(a.publishedDate);
             const db = parseDate(b.publishedDate);
             return db - da;
         });
 
-        return articles.map((article, index) => ({
+        return articles.map((article: Doc<"media_monitoring_articles">, index: number) => ({
             No: index + 1,
             URL: article.url,
             "Published Date": article.publishedDate,
@@ -653,12 +731,10 @@ export const getPressReleaseOnlineNewsReports = query({
 export const getPressReleaseSocialMediaReports = query({
     args: { keyword: v.optional(v.string()) },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles")
-            .filter(q => q.eq(q.field("sourceType"), "Social Media"));
-
-        if (args.keyword) {
-            q = q.filter(q => q.eq(q.field("keyword"), args.keyword));
-        }
+        const q = queryArticlesWithIndex(ctx, {
+            keyword: args.keyword,
+            sourceType: "Social Media",
+        });
 
         const articles = await q.collect();
 
@@ -668,13 +744,13 @@ export const getPressReleaseSocialMediaReports = query({
         };
 
         // Sort by publishedDate desc
-        articles.sort((a, b) => {
+        articles.sort((a: Doc<"media_monitoring_articles">, b: Doc<"media_monitoring_articles">) => {
             const da = parseDate(a.publishedDate);
             const db = parseDate(b.publishedDate);
             return db - da;
         });
 
-        return articles.map((article, index) => ({
+        return articles.map((article: Doc<"media_monitoring_articles">, index: number) => ({
             No: index + 1,
             URL: article.url,
             "Published Date": article.publishedDate,
@@ -799,4 +875,121 @@ export const purgeOldData = mutation({
         return { success: true, deletedCount: totalDeleted };
     },
 });
+
+// 14. MUTATION: Acquire distributed scraper queue lock
+export const acquireQueueLock = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const state = await ctx.db
+            .query("scraper_queue_state")
+            .withIndex("by_type", (q) => q.eq("type", "global"))
+            .first();
+
+        const now = Date.now();
+        const LOCK_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+        if (state) {
+            if (state.lockExpiry && now < state.lockExpiry) {
+                return false; // Lock is currently held and active
+            }
+            await ctx.db.patch(state._id, {
+                lockAcquiredAt: now,
+                lockExpiry: now + LOCK_TIMEOUT,
+            });
+            return true;
+        } else {
+            await ctx.db.insert("scraper_queue_state", {
+                type: "global",
+                lockAcquiredAt: now,
+                lockExpiry: now + LOCK_TIMEOUT,
+            });
+            return true;
+        }
+    }
+});
+
+// 15. MUTATION: Release distributed scraper queue lock
+export const releaseQueueLock = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const state = await ctx.db
+            .query("scraper_queue_state")
+            .withIndex("by_type", (q) => q.eq("type", "global"))
+            .first();
+
+        if (state) {
+            await ctx.db.patch(state._id, {
+                lockAcquiredAt: undefined,
+                lockExpiry: undefined,
+            });
+        }
+    }
+});
+
+// 16. MUTATION: Get pending queue items and clean up stalled items
+export const getPendingQueueBatch = mutation({
+    args: { limit: v.number() },
+    handler: async (ctx, args) => {
+        // Reset timed-out processing items (older than 5 minutes)
+        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+        const processingItems = await ctx.db
+            .query("scraper_queue")
+            .withIndex("by_status_and_createdAt", (q) => q.eq("status", "processing"))
+            .collect();
+
+        for (const item of processingItems) {
+            if (item.updatedAt < fiveMinutesAgo) {
+                const newRetryCount = item.retryCount + 1;
+                const newStatus = newRetryCount >= 3 ? "failed" : "pending";
+                await ctx.db.patch(item._id, {
+                    status: newStatus,
+                    retryCount: newRetryCount,
+                    error: "Task timed out during processing (exceeded 5 minutes)",
+                    updatedAt: Date.now(),
+                });
+            }
+        }
+
+        // Fetch pending items
+        return await ctx.db
+            .query("scraper_queue")
+            .withIndex("by_status_and_createdAt", (q) => q.eq("status", "pending"))
+            .order("asc")
+            .take(args.limit);
+    }
+});
+
+// 17. MUTATION: Update the status of a queue item
+export const updateQueueItemStatus = mutation({
+    args: {
+        id: v.id("scraper_queue"),
+        status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed")),
+        retryCount: v.optional(v.number()),
+        error: v.optional(v.string())
+    },
+    handler: async (ctx, args) => {
+        const { id, ...fields } = args;
+        await ctx.db.patch(id, {
+            ...fields,
+            updatedAt: Date.now()
+        });
+    }
+});
+
+// QUERY: Retrieve articles created after a specific timestamp, sorted oldest to newest
+export const getArticlesSince = query({
+    args: {
+        since: v.number(),
+        limit: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const limit = args.limit ?? 50;
+        return await ctx.db
+            .query("media_monitoring_articles")
+            .withIndex("by_createdAt", (q) => q.gt("createdAt", args.since))
+            .order("asc")
+            .take(limit);
+    },
+});
+
 

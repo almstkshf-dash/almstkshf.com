@@ -9,6 +9,7 @@
 import Parser from 'rss-parser';
 import { FeedItem } from '@/types/rss';
 import { decodeHtmlBuffer, hasMojibake, tryRecoverMojibake } from '@/utils/encoding';
+import { isSafeUrl } from '@/utils/ssrf';
 
 /**
  * Spoofed browser User-Agent string.
@@ -162,6 +163,10 @@ export async function parseFeed(
   sourceName: string = 'RSS Feed',
   country?: string
 ): Promise<FeedItem[]> {
+  if (!(await isSafeUrl(url, { allowHttp: true }))) {
+    throw new Error(`Blocked unsafe URL: ${url}`);
+  }
+
   const premiumDomains = [
     'gulfnews.com', 'khaleejtimes.com', 'thenationalnews.com', 'gulftoday.ae', 
     'skynewsarabia.com', 'emirates247.com', 'middleeasteye.net', 'prnewswire.com', 
@@ -194,34 +199,53 @@ export async function parseFeed(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-    let response: Response;
+    let response: Response | null = null;
     try {
-      const fetchOptions: RequestInit = {
-        signal: controller.signal,
-        redirect: 'manual',
-        headers: {
-          'User-Agent': BROWSER_UA,
-          Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
-          'Accept-Language': 'ar,en;q=0.9',
-          Referer: new URL(url).origin + '/',
-        },
-        cache: 'no-store',
-      };
+      let currentUrl = url;
+      let redirectCount = 0;
+      const maxRedirects = 5;
 
-      response = await fetch(url, fetchOptions);
-
-      if (response.status >= 300 && response.status < 400) {
-        const location = response.headers.get('location');
-        if (location) {
-          const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
-          const redirectUrl = new URL(fixedLocation, url).toString();
-          console.log(`[RSS Engine] Following manual redirect: ${url} -> ${redirectUrl}`);
-          const nextResponse = await fetch(redirectUrl, {
-            ...fetchOptions,
-            redirect: 'follow',
-          });
-          response = nextResponse;
+      while (redirectCount <= maxRedirects) {
+        if (!(await isSafeUrl(currentUrl, { allowHttp: true }))) {
+          throw new Error(`Blocked unsafe URL in feed redirect chain: ${currentUrl}`);
         }
+
+        const fetchOptions: RequestInit = {
+          signal: controller.signal,
+          redirect: 'manual',
+          headers: {
+            'User-Agent': BROWSER_UA,
+            Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+            'Accept-Language': 'ar,en;q=0.9',
+            Referer: new URL(currentUrl).origin + '/',
+          },
+          cache: 'no-store',
+        };
+
+        const res = await fetch(currentUrl, fetchOptions);
+
+        if (res.status >= 300 && res.status < 400) {
+          const location = res.headers.get('location');
+          if (!location) {
+            response = res;
+            break;
+          }
+          const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
+          currentUrl = new URL(fixedLocation, currentUrl).toString();
+          redirectCount++;
+          continue;
+        }
+
+        response = res;
+        break;
+      }
+
+      if (redirectCount > maxRedirects) {
+        throw new Error(`Exceeded maximum redirect limit of ${maxRedirects} hops fetching feed.`);
+      }
+
+      if (!response) {
+        throw new Error(`Failed to establish connection to feed server at ${url}`);
       }
 
       if (!response.ok) {

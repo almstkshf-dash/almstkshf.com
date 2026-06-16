@@ -11,6 +11,7 @@
 import { stripe, formatAmountForStripe } from '@/lib/stripe';
 import { getStripeProduct } from '@/lib/stripe-products';
 import { auth } from '@clerk/nextjs/server';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 
 export type Product = ReturnType<typeof getStripeProduct>;
 
@@ -19,6 +20,12 @@ export type Product = ReturnType<typeof getStripeProduct>;
  * Returns the client secret for the checkout session
  */
 export async function startCheckoutSession(productId: string): Promise<string> {
+    const rlKey = await getRateLimitKey(null, 'action:stripe-checkout');
+    const limitResult = await rateLimit(rlKey, 15, 60);
+    if (!limitResult.allowed) {
+        throw new Error('Rate limit exceeded. Please try again in a minute.');
+    }
+
     try {
         // Get product details
         const product = getStripeProduct(productId);
@@ -67,6 +74,12 @@ export async function startCustomCheckoutSession(
     amount: number,
     currency: string = 'usd'
 ): Promise<string> {
+    const rlKey = await getRateLimitKey(null, 'action:stripe-custom-checkout');
+    const limitResult = await rateLimit(rlKey, 15, 60);
+    if (!limitResult.allowed) {
+        throw new Error('Rate limit exceeded. Please try again in a minute.');
+    }
+
     try {
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
@@ -108,6 +121,12 @@ export async function startCustomCheckoutSession(
  * Get the status of a checkout session
  */
 export async function getCheckoutSessionStatus(sessionId: string) {
+    const rlKey = await getRateLimitKey(null, 'action:stripe-status');
+    const limitResult = await rateLimit(rlKey, 30, 60);
+    if (!limitResult.allowed) {
+        throw new Error('Rate limit exceeded. Please try again in a minute.');
+    }
+
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 

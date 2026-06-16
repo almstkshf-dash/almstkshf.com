@@ -57,8 +57,9 @@ export async function resolveGeminiKey(): Promise<{ key: string | null; error?: 
         const systemKey = (dbSystemKey && dbSystemKey !== "None") ? dbSystemKey : envKey;
 
         // 1. BYOK (User's own key) FIRST (The Golden Rule)
-        if (userSettings?.geminiApiKey && userSettings.geminiApiKey !== "None") {
-            return { key: userSettings.geminiApiKey };
+        const userGeminiKey = userSettings?.apiKeys?.gemini || userSettings?.geminiApiKey;
+        if (userGeminiKey && userGeminiKey !== "None") {
+            return { key: userGeminiKey };
         }
 
         // 2. Admin / Dev Mode Bypass (System Key)

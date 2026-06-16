@@ -121,6 +121,7 @@ export const config = {
 | Cloudflare Web Analytics `/vitals` telemetry POST failures | Cloudflare Zaraz/Web Analytics proxies telemetry to subpaths ending in `/vitals`, triggering Clerk auth protection and causing 404/401 errors | Intercepted paths ending in `/vitals` early in middleware, returning a clean `204 No Content` response immediately |
 | Clerk Proxy 400 Errors on Vercel Preview | Clerk live keys reject custom domain proxying from Vercel preview domains (`*-projects.vercel.app`) | Intercepted Clerk proxy routes starting with `/__clerk` on Vercel preview domains if production keys are active, returning a clean `200 OK` with JSON to prevent `400 Bad Request` logging |
 | Lack of Rate Limiting in Edge Middleware | Sensitive API routes (`/api/search`, `/api/monitor`) unprotected at Edge level, causing risk of Gemini key and API credit exhaustion | Integrated `@upstash/redis` rate limiter directly inside middleware to intercept and block excessive requests before they reach Next.js route handlers |
+| `401 Unauthorized` in Convex during fast navigation | Discrepancy between Next.js Edge Middleware and Convex backend regarding Clerk domains / custom domains | Updated `auth.config.ts` to support both the custom production domain and the default accounts.dev domains as fallback providers, ensuring parity in JWT validation. |
 
 ---
 

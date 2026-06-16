@@ -139,6 +139,18 @@ export const seed = mutation({
             });
         }
 
+        // Seed/Update Global System Settings
+        const existingSysSettings = await ctx.db.query("system_settings").filter(q => q.eq(q.field("type"), "global")).first();
+        if (!existingSysSettings) {
+            await ctx.db.insert("system_settings", {
+                type: "global",
+                systemName: "AlMstkshf Media Monitor",
+                maintenanceMode: false,
+                allowedFileTypes: ["pdf", "csv", "xlsx"],
+                maxFileSize: 10,
+            });
+        }
+
         return "Database seeded successfully!";
     }
 });

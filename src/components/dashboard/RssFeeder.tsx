@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
-import { useQuery, useAction, useConvexAuth } from 'convex/react';
+import { useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
@@ -66,7 +66,6 @@ export default function RssFeeder({
 
   const lastSyncTimesRef = useRef<Record<string, number>>({});
   const [isSyncing, setIsSyncing] = useState(false);
-  const syncFeedAction = useAction(api.monitoringAction.syncSpecificRssFeed);
 
   // Filter and map articles to match the FeedItem interface
   useEffect(() => {
@@ -138,11 +137,7 @@ export default function RssFeeder({
       const result = await res.json();
       if (result?.success) {
         lastSyncTimesRef.current[activeUrl] = Date.now();
-        if (result.savedCount > 0) {
-          toast.success(`Synced ${result.savedCount} new articles!`);
-        } else {
-          toast.info('Feed is up to date.');
-        }
+        toast.info(result.message || 'Sync started in the background.');
       } else {
         toast.error(result?.error || 'Sync failed.');
       }

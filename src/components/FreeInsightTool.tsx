@@ -17,7 +17,7 @@ import Container from "./ui/Container";
 import Button from "./ui/Button";
 import { Link } from "@/i18n/routing";
 import clsx from "clsx";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function FreeInsightTool() {
@@ -37,7 +37,41 @@ export default function FreeInsightTool() {
         entities?: string[];
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [analysisId, setAnalysisId] = useState<any>(null);
     const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
+
+    const currentAnalysis = useQuery(api.analyses.getAnalysis, analysisId ? { id: analysisId } : "skip");
+
+    useEffect(() => {
+        if (!currentAnalysis || !isAnalyzing) return;
+
+        if (currentAnalysis.status === "completed") {
+            setResult({
+                sentiment: currentAnalysis.sentiment.toLowerCase(),
+                risk: currentAnalysis.risk.toLowerCase(),
+                riskScore: currentAnalysis.riskScore ?? 50,
+                score: currentAnalysis.score,
+                tone: currentAnalysis.tone,
+                recommendation: currentAnalysis.recommendation,
+                emotions: currentAnalysis.emotions,
+                topics: currentAnalysis.topics,
+                entities: currentAnalysis.entities
+            });
+            setIsAnalyzing(false);
+            setAnalysisId(null);
+        } else if (currentAnalysis.status === "failed") {
+            setIsAnalyzing(false);
+            setAnalysisId(null);
+            const isCapacity = currentAnalysis.error?.includes("CAPACITY") || currentAnalysis.error?.includes("exhausted");
+            if (isCapacity) {
+                const waitTime = 60;
+                setRetryCountdown(waitTime);
+                setError(t("ai_busy_wait", { seconds: waitTime }));
+            } else {
+                setError(currentAnalysis.error || "Analysis failed. Please try again.");
+            }
+        }
+    }, [currentAnalysis, isAnalyzing, t]);
 
     useEffect(() => {
         if (retryCountdown === null) return;
@@ -60,33 +94,19 @@ export default function FreeInsightTool() {
         setIsAnalyzing(true);
         setResult(null);
         setError(null);
+        setAnalysisId(null);
 
         try {
             const res = await analyzeMedia({ text: input });
-            if (res.success && res.data) {
-                const data = res.data;
-                setResult({
-                    sentiment: data.sentiment.toLowerCase(),
-                    risk: data.risk.toLowerCase(),
-                    riskScore: data.riskScore,
-                    score: data.score,
-                    tone: data.tone,
-                    recommendation: data.recommendation,
-                    emotions: data.emotions,
-                    topics: data.topics,
-                    entities: data.entities
-                });
-            } else if ((res as any).capacityExhausted) {
-                const waitTime = (res as any).retryAfter || 60;
-                setRetryCountdown(waitTime);
-                setError(t("ai_busy_wait", { seconds: waitTime }));
+            if (res.success && res.analysisId) {
+                setAnalysisId(res.analysisId);
             } else {
                 setError(res.error || "Analysis failed. Please try again.");
+                setIsAnalyzing(false);
             }
         } catch (err: unknown) {
             console.error("FreeInsightTool internal error:", err);
             setError("A system error occurred. Please try again later.");
-        } finally {
             setIsAnalyzing(false);
         }
     };

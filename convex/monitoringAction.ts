@@ -1449,35 +1449,9 @@ async function processArticle(
             return false;
         }
 
-        // ── GATE 4: Gemini Relevancy Score (Required: ${RELEVANCY_THRESHOLD}/100) ──────────
-        let relevancyScore = 100;
-        if (!isGeneralPressRelease) {
-            relevancyScore = await callGeminiRelevancyScore(
-                geminiKey,
-                item.title,
-                snippet,
-                keyword
-            );
-        }
-        if (relevancyScore < RELEVANCY_THRESHOLD) {
-            console.log(`⚠️ Low relevancy (${relevancyScore}/100) — discarded: "${item.title.substring(0, 60)}"`);
-            return false;
-        }
-
-        // ── RESOLVE: Spider ──────────────────────────────────────────────────
-        let resolvedUrl = item.link;
-        let imageUrl = item.imageUrl;
-        let sourceName = item.source || item.creator;
-
-        if (shouldResolve) {
-            console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
-            const resolved = await resolveUrl(item.link);
-            if (resolved) {
-                resolvedUrl = resolved.finalUrl;
-                imageUrl = resolved.imageUrl || imageUrl;
-                sourceName = resolved.source || sourceName;
-            }
-        }
+        const resolvedUrl = item.link;
+        const imageUrl = item.imageUrl;
+        const sourceName = item.source || item.creator;
 
         const parsedSourceType = sanitizeSourceType(forceSourceType);
         const d = pubDate || new Date();
@@ -1497,7 +1471,7 @@ async function processArticle(
             sentiment: "Neutral",
             sourceType: parsedSourceType,
             sourceCountry: country,
-            source: sourceName || new URL(resolvedUrl || item.link).hostname,
+            source: sourceName || new URL(item.link).hostname,
             tone: "Neutral",
             risk: "Low",
             reach: 50000,
@@ -1506,8 +1480,8 @@ async function processArticle(
             likes: item.likes,
             retweets: item.retweets,
             replies: item.replies,
-            relevancy_score: relevancyScore,
             analysisStatus: "pending",
+            ingestMethod: shouldResolve ? "rss" : "api",
         });
 
         return true;
@@ -1532,7 +1506,41 @@ export const analyzeArticleBackground = internalAction({
 
             const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
-            // Run full Gemini analysis
+            // 1. Resolve URL in background if ingestMethod is "rss"
+            let resolvedUrl = article.resolvedUrl || article.url;
+            let imageUrl = article.imageUrl;
+            let sourceName = article.source;
+
+            if (article.ingestMethod === "rss") {
+                console.log(`🕷️ [Background Resolve] Resolving URL: ${article.url}`);
+                const resolved = await resolveUrl(article.url);
+                if (resolved) {
+                    resolvedUrl = resolved.finalUrl;
+                    imageUrl = resolved.imageUrl || imageUrl;
+                    sourceName = resolved.source || sourceName;
+                }
+            }
+
+            // 2. Relevancy Check in background
+            const isGeneralPressRelease = article.keyword === "Press Release" || /^https?:\/\//i.test(article.keyword);
+            let relevancyScore = article.relevancy_score ?? 100;
+
+            if (!isGeneralPressRelease && article.relevancy_score === undefined) {
+                relevancyScore = await callGeminiRelevancyScore(
+                    geminiKey,
+                    article.title,
+                    article.content,
+                    article.keyword
+                );
+
+                if (relevancyScore < RELEVANCY_THRESHOLD) {
+                    console.log(`⚠️ [Background Filter] Low relevancy (${relevancyScore}/100) — deleting article: "${article.title.substring(0, 60)}"`);
+                    await ctx.runMutation(api.monitoring.deleteArticle, { id: articleId });
+                    return;
+                }
+            }
+
+            // 3. Run full Gemini analysis
             const aiData = await callGeminiForAnalysis(
                 geminiKey,
                 article.title,
@@ -1543,10 +1551,10 @@ export const analyzeArticleBackground = internalAction({
 
             const parsedSourceType = sanitizeSourceType(aiData.sourceType);
 
-            // SimilarWeb-based Reach lookup
+            // 4. SimilarWeb-based Reach lookup
             const reachResult = await getArticleReach(
                 ctx,
-                article.resolvedUrl || article.url,
+                resolvedUrl,
                 parsedSourceType,
                 aiData.reach_estimate
             );
@@ -1566,16 +1574,20 @@ export const analyzeArticleBackground = internalAction({
                 emotions: aiData.emotions,
                 content: aiData.summary || article.content,
                 depth: depth as "standard" | "deep",
+                resolvedUrl: resolvedUrl,
+                imageUrl: imageUrl,
+                source: sourceName,
+                relevancy_score: relevancyScore,
             });
 
-            // Deep Enrichment
+            // 5. Deep Enrichment
             if (depth === "deep") {
                 console.log(`🔍 [Background Deep Promotion] Article for "${article.keyword}" promoted.`);
                 ctx.runAction(api.osint.lookupNews, { query: article.keyword }).catch(console.error);
                 ctx.runAction(api.darkWeb.searchAhmia, { query: article.keyword }).catch(console.error);
             }
 
-            // Notifications for critical/press release
+            // 6. Notifications for critical/press release
             const isPressRelease = parsedSourceType === "Press Release";
             const isCritical = aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical" || aiData.sentiment === "Negative";
 
@@ -1609,7 +1621,7 @@ export const analyzeArticleBackground = internalAction({
                                         <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
                                         
                                         <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                                            <a href="${article.url}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
+                                            <a href="${resolvedUrl}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
                                         </div>
                                     </div>
                                 </div>
@@ -2485,6 +2497,86 @@ function normalizePublisherName(name: string): string {
     return n;
 }
 
+async function executeRssSync(
+    ctx: any,
+    args: {
+        feedUrl: string;
+        publisher: string;
+        country?: string;
+        lang?: string;
+        limit?: number;
+    }
+): Promise<{ success: boolean; savedCount: number; message: string }> {
+    try {
+        const url = args.feedUrl;
+        const publisher = args.publisher;
+        const country = args.country || "UAE";
+        const lang = args.lang || "ar";
+        const limit = args.limit ?? 10;
+
+        const parser = new Parser({
+            timeout: 10000,
+            customFields: {
+                item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
+            }
+        });
+
+        console.log(`📡 [executeRssSync] On-demand sync for publisher: ${publisher}, URL: ${url}`);
+
+        const xml = await fetchRobustRss(url);
+        const feedData = await parser.parseString(xml);
+        const rawItems = feedData.items.slice(0, limit);
+
+        let savedCount = 0;
+
+        for (const item of rawItems) {
+            if (!item.link || !item.title) continue;
+            const isSeen = await checkAndSetSeen(item.link, item.title);
+            if (isSeen) continue;
+
+            // Format publication date to DD/MM/YYYY
+            const pubDate = item.pubDate ? new Date(item.pubDate) : null;
+            const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
+            const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+
+            // Language detection
+            const snippet = item.contentSnippet || item.content || item.title || "";
+            const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+            const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
+
+            // Get image if available
+            const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
+
+            await ctx.runMutation(api.monitoring.saveRssArticle, {
+                url: item.link,
+                title: item.title,
+                content: snippet,
+                publishedDate: formattedDate,
+                language,
+                source: publisher || new URL(item.link).hostname,
+                sourceCountry: country,
+                imageUrl,
+            });
+            savedCount++;
+        }
+
+        return {
+            success: true,
+            savedCount,
+            message: `Successfully synced ${savedCount} new articles for ${publisher}.`
+        };
+
+    } catch (err) {
+        console.error(`❌ [executeRssSync] Failed:`, err);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        return {
+            success: false,
+            savedCount: 0,
+            message: errMsg
+        };
+    }
+}
+
 export const syncSpecificRssFeed = action({
     args: {
         feedUrl: v.string(),
@@ -2493,81 +2585,25 @@ export const syncSpecificRssFeed = action({
         lang: v.optional(v.string()),
         limit: v.optional(v.number()),
     },
-    handler: async (ctx, args): Promise<{ success: boolean; savedCount: number; message: string }> => {
-        try {
-            const identity = await ctx.auth.getUserIdentity();
-            if (!identity) {
-                throw new Error("Unauthenticated call");
-            }
-
-            const url = args.feedUrl;
-            const publisher = args.publisher;
-            const country = args.country || "UAE";
-            const lang = args.lang || "ar";
-            const limit = args.limit ?? 10;
-
-            const parser = new Parser({
-                timeout: 10000,
-                customFields: {
-                    item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
-                }
-            });
-
-            console.log(`📡 [syncSpecificRssFeed] On-demand sync for publisher: ${publisher}, URL: ${url}`);
-
-            const xml = await fetchRobustRss(url);
-            const feedData = await parser.parseString(xml);
-            const rawItems = feedData.items.slice(0, limit);
-
-            let savedCount = 0;
-            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-
-            for (const item of rawItems) {
-                if (!item.link || !item.title) continue;
-                const isSeen = await checkAndSetSeen(item.link, item.title);
-                if (isSeen) continue;
-
-                // Format publication date to DD/MM/YYYY
-                const pubDate = item.pubDate ? new Date(item.pubDate) : null;
-                const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
-                const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-
-                // Language detection
-                const snippet = item.contentSnippet || item.content || item.title || "";
-                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
-                const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
-
-                // Get image if available
-                const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
-
-                await ctx.runMutation(api.monitoring.saveRssArticle, {
-                    url: item.link,
-                    title: item.title,
-                    content: snippet,
-                    publishedDate: formattedDate,
-                    language,
-                    source: publisher || new URL(item.link).hostname,
-                    sourceCountry: country,
-                    imageUrl,
-                });
-                savedCount++;
-            }
-
-            return {
-                success: true,
-                savedCount,
-                message: `Successfully synced ${savedCount} new articles for ${publisher}.`
-            };
-
-        } catch (err) {
-            console.error(`❌ [syncSpecificRssFeed] Failed:`, err);
-            const errMsg = err instanceof Error ? err.message : String(err);
-            return {
-                success: false,
-                savedCount: 0,
-                message: errMsg
-            };
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new Error("Unauthenticated call");
         }
+        return await executeRssSync(ctx, args);
+    }
+});
+
+export const syncSpecificRssFeedBackground = internalAction({
+    args: {
+        feedUrl: v.string(),
+        publisher: v.string(),
+        country: v.optional(v.string()),
+        lang: v.optional(v.string()),
+        limit: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        return await executeRssSync(ctx, args);
     }
 });
 
@@ -2677,5 +2713,77 @@ function parseRelativeDate(dateStr: string | undefined): string {
 
     return now.toISOString();
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DISTRIBUTED SCRAPER QUEUE PROCESSOR
+// Processes tasks sequentially in batches of 5 with 5-second throttling.
+// ═══════════════════════════════════════════════════════════════════════════════
+export const processQueueBatch = internalAction({
+    args: {},
+    handler: async (ctx) => {
+        // 1. Try to acquire the lock. Only one instance of processQueueBatch should run.
+        const acquired = await ctx.runMutation(api.monitoring.acquireQueueLock);
+        if (!acquired) {
+            console.log("🔒 [processQueueBatch] Another queue processor is active. Exiting.");
+            return;
+        }
+
+        try {
+            // 2. Fetch next batch of pending queue tasks
+            const batch = await ctx.runMutation(api.monitoring.getPendingQueueBatch, { limit: 5 });
+            if (batch.length === 0) {
+                console.log("📭 [processQueueBatch] No pending queue items. Releasing lock.");
+                await ctx.runMutation(api.monitoring.releaseQueueLock);
+                return;
+            }
+
+            console.log(`📦 [processQueueBatch] Processing batch of ${batch.length} items.`);
+
+            // 3. Process each item sequentially to limit concurrent loads on external servers
+            for (const item of batch) {
+                // Mark item as processing in DB
+                await ctx.runMutation(api.monitoring.updateQueueItemStatus, {
+                    id: item._id,
+                    status: "processing"
+                });
+
+                try {
+                    // Call the background analysis action for the article
+                    await ctx.runAction(internal.monitoringAction.analyzeArticleBackground, {
+                        articleId: item.articleId
+                    });
+
+                    // Mark as completed
+                    await ctx.runMutation(api.monitoring.updateQueueItemStatus, {
+                        id: item._id,
+                        status: "completed"
+                    });
+                } catch (err) {
+                    console.error(`❌ [processQueueBatch] Error processing queue item ${item._id}:`, err);
+                    
+                    const newRetryCount = item.retryCount + 1;
+                    const status = newRetryCount >= 3 ? "failed" : "pending";
+                    
+                    await ctx.runMutation(api.monitoring.updateQueueItemStatus, {
+                        id: item._id,
+                        status,
+                        retryCount: newRetryCount,
+                        error: String(err)
+                    });
+                }
+            }
+
+            // 4. Release the lock before scheduling the next loop
+            await ctx.runMutation(api.monitoring.releaseQueueLock);
+
+            // 5. Schedule the next loop run in 5 seconds to drain remaining queue items at a constant rate
+            await ctx.scheduler.runAfter(5000, internal.monitoringAction.processQueueBatch, {});
+        } catch (error) {
+            console.error("🔥 [processQueueBatch] Critical processor failure:", error);
+            // Ensure lock is released on critical failures
+            await ctx.runMutation(api.monitoring.releaseQueueLock);
+        }
+    }
+});
 
 

@@ -20,10 +20,15 @@ export const getCrisisPlans = query({
 export const getMediaReports = query({
     args: { source: v.optional(v.string()) },
     handler: async (ctx, args) => {
-        let q = ctx.db.query("media_monitoring_articles");
-
+        let q;
         if (args.source && args.source !== "All") {
-            q = q.filter((q) => q.eq(q.field("sourceType"), args.source));
+            q = ctx.db.query("media_monitoring_articles")
+                .withIndex("by_sourceType_and_createdAt", (q) => q.eq("sourceType", args.source as any))
+                .order("desc");
+        } else {
+            q = ctx.db.query("media_monitoring_articles")
+                .withIndex("by_createdAt")
+                .order("desc");
         }
 
         const articles = await q.collect();

@@ -62,9 +62,7 @@ type Resource = {
 // â”€â”€â”€ Lookup type definition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type LookupType = OsintLookupType;
 
-interface HistoryItem extends Omit<OsintHistoryItem, '_id'> {
-  _id: Id<"osint_results">;
-}
+type HistoryItem = OsintHistoryItem;
 
 // â”€â”€â”€ Result Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const StatusBadge = ({ label, value, type = 'default' }: { label: string; value: string | boolean; type?: 'default' | 'success' | 'warning' | 'error' | 'info' }) => {
@@ -646,7 +644,7 @@ export default function OsintTab() {
   const history = useQuery(
     api.osintDb.getOsintResults,
     isAuthenticated ? { limit: 20 } : 'skip'
-  ) as HistoryItem[] | undefined;
+  );
   const settings = useQuery(api.settings.getSettings);
 
   // â”€â”€ Resource directory state â”€â”€

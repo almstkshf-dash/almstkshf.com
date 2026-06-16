@@ -33,8 +33,7 @@ interface AnalysisResult {
  */
 export const analyzeMedia = action({
     args: { text: v.string() },
-    handler: async (ctx, { text }): Promise<{ success: boolean; data?: AnalysisResult & { id: string; inputText: string }; error?: string; capacityExhausted?: boolean; retryAfter?: number }> => {
-        const identity = await ctx.auth.getUserIdentity();
+    handler: async (ctx, { text }): Promise<{ success: boolean; analysisId?: string; error?: string }> => {
         const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
 
         if (!apiKey) {
@@ -50,47 +49,14 @@ export const analyzeMedia = action({
             const analysisId = await ctx.runMutation(api.analyses.createAnalysisPending, { inputText: text });
             await ctx.scheduler.runAfter(0, internal.media.analyzeMediaBackground, { analysisId, text });
 
-            // Poll the database for completion (up to 50 seconds to gracefully stay under function timeouts)
-            const startTime = Date.now();
-            const timeoutMs = 50000;
-            while (Date.now() - startTime < timeoutMs) {
-                const analysis = await ctx.runQuery(api.analyses.getAnalysis, { id: analysisId });
-                if (analysis) {
-                    if (analysis.status === "completed") {
-                        return {
-                            success: true,
-                            data: {
-                                sentiment: analysis.sentiment as any,
-                                score: analysis.score,
-                                risk: analysis.risk as any,
-                                riskScore: analysis.riskScore ?? 50,
-                                tone: analysis.tone,
-                                emotions: analysis.emotions || {},
-                                topics: analysis.topics || [],
-                                entities: analysis.entities || [],
-                                recommendation: analysis.recommendation,
-                                inputText: analysis.inputText,
-                                id: analysisId,
-                            }
-                        };
-                    } else if (analysis.status === "failed") {
-                        return {
-                            success: false,
-                            error: analysis.error || "Analysis failed."
-                        };
-                    }
-                }
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
-
             return {
-                success: false,
-                error: "Analysis is taking longer than expected. It is running in the background."
+                success: true,
+                analysisId,
             };
 
         } catch (error: any) {
             console.error("ALMSTKSHF AI Engine Global Error:", error);
-            return { success: false, error: "Analysis failed due to a system error. Our team has been notified." };
+            return { success: false, error: "Analysis initiation failed due to a system error." };
         }
     },
 });

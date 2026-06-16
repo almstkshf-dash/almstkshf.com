@@ -148,15 +148,22 @@ export const updateApiKeys = mutation({
             ...args.keys
         };
 
+        const patchData: any = {
+            apiKeys: newApiKeys,
+            updatedAt: Date.now(),
+        };
+
+        if (args.keys.gemini !== undefined) {
+            patchData.geminiApiKey = args.keys.gemini;
+        }
+
         if (existing) {
-            await ctx.db.patch(existing._id, {
-                apiKeys: newApiKeys,
-                updatedAt: Date.now(),
-            });
+            await ctx.db.patch(existing._id, patchData);
         } else {
             await ctx.db.insert("userSettings", {
                 userId,
                 apiKeys: newApiKeys,
+                geminiApiKey: args.keys.gemini,
                 isTrialActive: false,
                 isSubscribed: false,
                 createdAt: Date.now(),

@@ -9,11 +9,17 @@
 'use server';
 
 import { resolveGeminiKey as resolve } from "@/lib/gemini-key-resolver";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 
 /**
  * Server Action to resolve the Gemini Key.
  * Useful for client-side components to check if they have access.
  */
 export async function resolveGeminiKey() {
+    const rlKey = await getRateLimitKey(null, 'action:resolve-gemini-key');
+    const limitResult = await rateLimit(rlKey, 30, 60); // 30 requests per 60 seconds
+    if (!limitResult.allowed) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+    }
     return await resolve();
 }

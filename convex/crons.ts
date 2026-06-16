@@ -7,9 +7,9 @@
  */
 
 import { cronJobs } from "convex/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
-// ===================================================================
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 // SCHEDULED JOBS - Deep Web Monitoring Auto-Ingestion
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -46,6 +46,15 @@ crons.interval(
     { hours: 4 },
     api.monitoringAction.fetchPressReleaseSources,
     { limit: 20 }
+);
+
+// ── Scraper Queue Processor Fallback ───────────────────────────────────────
+// Drains the scraper queue periodically in case the loop is broken.
+crons.interval(
+    "process-scraper-queue",
+    { minutes: 1 },
+    internal.monitoringAction.processQueueBatch,
+    {}
 );
 
 export default crons;

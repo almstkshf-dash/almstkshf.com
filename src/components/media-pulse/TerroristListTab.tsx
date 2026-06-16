@@ -61,7 +61,7 @@ export default function TerroristListTab() {
   const entries = useQuery(api.terroristList.search, {
     searchTerm: searchQuery,
     type: filterType === 'all' ? undefined : filterType
-  }) as TerroristListItem[] | undefined;
+  });
 
   const wipeAll = useMutation(api.terroristList.wipeAll);
   const addItems = useMutation(api.terroristList.addItems);
@@ -167,9 +167,9 @@ export default function TerroristListTab() {
               return {
                 nameArabic: nameAr,
                 nameLatin: nameEn,
-                type: typeRaw.includes('فرد') || typeRaw.includes('individual') || typeRaw.includes('person') ? 'individual' :
+                type: (typeRaw.includes('فرد') || typeRaw.includes('individual') || typeRaw.includes('person') ? 'individual' :
                   typeRaw.includes('منشأة') || typeRaw.includes('كيان') || typeRaw.includes('entity') || typeRaw.includes('company') ? 'entity' :
-                    typeRaw.includes('منظمة') || typeRaw.includes('org') || typeRaw.includes('organization') ? 'organization' : 'individual',
+                    typeRaw.includes('منظمة') || typeRaw.includes('org') || typeRaw.includes('organization') ? 'organization' : 'individual') as 'individual' | 'entity' | 'organization',
                 nationality: getVal(['الجنسية', 'الدولة', 'المواطنة', 'Nationality', 'Citizen', 'Country', 'State']),
                 category: getVal(['الفئة', 'المدرج', 'الحالة', 'Category', 'Status', 'Description', 'List Name']) || 'Designated',
                 documentNumber: getVal(['رقم الوثيقة', 'رقم الجواز', 'رقم الهوية', 'الرقم المدني', 'Document Number', 'ID', 'Passport', 'Identifiier', 'Doc #']),
@@ -181,7 +181,7 @@ export default function TerroristListTab() {
                 issueDate: getVal(['تاريخ الإصدار', 'تاريخ القرار', 'Issue Date', 'Decision Date']),
                 expiryDate: getVal(['تاريخ الانتهاء', 'تاريخ النفاذ حتى', 'Expiry Date', 'Expiration', 'Valid To']),
                 otherInfo: getVal(['معلومات أخرى', 'ملاحظات', 'الكنية', 'بيانات إضافية', 'Other Info', 'Notes', 'Remarks', 'البيانات المرفوعة', 'Metadata', 'Nickname', 'Alias']),
-              };
+              } as Partial<TerroristListItem>;
             });
 
             // Filter out empty rows

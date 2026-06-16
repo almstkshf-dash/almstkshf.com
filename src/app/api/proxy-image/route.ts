@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
-import { isSafePublicUrl } from '@/utils/ssrf';
+import { isSafeUrl } from '@/utils/ssrf';
 
 export async function GET(req: NextRequest) {
     try {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         }
 
         // SSRF Guard
-        if (!isSafePublicUrl(imageUrl)) {
+        if (!(await isSafeUrl(imageUrl))) {
             return new NextResponse('Invalid or forbidden URL', { status: 400 });
         }
 
@@ -50,7 +50,12 @@ export async function GET(req: NextRequest) {
 
         const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-        return new NextResponse(response.body, {
+        const { readable, writable } = new TransformStream();
+        response.body.pipeTo(writable).catch(err => {
+            console.error('Error piping image proxy stream:', err);
+        });
+
+        return new NextResponse(readable, {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=31536000, immutable'

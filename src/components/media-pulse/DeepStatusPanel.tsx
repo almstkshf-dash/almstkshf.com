@@ -19,6 +19,7 @@ import { useTranslations, useMessages } from 'next-intl';
 import { useState, useEffect, memo } from 'react';
 import { ReportGenerator } from '@/lib/report-generator';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
+import { DeepWebRun } from '@/types/reports';
 
 const DeepStatusPanel = memo(function DeepStatusPanel() {
     const t = useTranslations('DeepSources');
@@ -27,7 +28,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
     const runs = useQuery(
         api.deepSources.getDeepRuns,
         isAuthenticated ? { limit: 10 } : 'skip'
-    ) as any;
+    );
     const fetchDeep = useAction(api.deepSources.fetchDeepSources);
     const settings = useQuery(api.settings.getSettings);
 
@@ -48,7 +49,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
     const [isExporting, setIsExporting] = useState<'pdf' | 'excel' | null>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [runToSave, setRunToSave] = useState<any>(null);
+    const [runToSave, setRunToSave] = useState<DeepWebRun | null>(null);
 
     const handleExport = async (format: 'pdf' | 'excel') => {
         if (!runs || runs.length === 0) return;
@@ -263,7 +264,7 @@ const DeepStatusPanel = memo(function DeepStatusPanel() {
                     <p className="text-sm text-foreground/70 py-2">{t('no_runs')}</p>
                 )}
                 <div className="space-y-2">
-                    {runs?.map((run: any) => (
+                    {runs?.map((run) => (
                         <div
                             key={run._id}
                             className="flex flex-wrap items-center justify-between bg-muted/40 border border-border rounded-lg px-3 py-2 text-sm gap-2"

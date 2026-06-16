@@ -12,7 +12,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon, FolderPlus, ExternalLink } from "lucide-react";
 import Button from "./ui/Button";
@@ -24,6 +24,7 @@ import SaveToCollectionModal from "./ui/SaveToCollectionModal";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
+import { useSSEPersistence } from "@/hooks/useSSEPersistence";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
 type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
@@ -55,6 +56,27 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
     const settings = useQuery(api.settings.getSettings);
+    const locale = useLocale();
+    const isRTL = locale === "ar";
+
+    // Real-time Event Stream (SSE) Persistence with heartbeat & auto-reconnect
+    const { status: sseStatus, reconnect: sseReconnect } = useSSEPersistence({
+        onArticle: (article) => {
+            console.log("[SSE Client] Streamed new article:", article);
+            toast.info(
+                isRTL 
+                    ? `مقال جديد: ${article.title.substring(0, 40)}...` 
+                    : `New article: ${article.title.substring(0, 40)}...`,
+                {
+                    description: article.source,
+                    action: {
+                        label: isRTL ? "تحديث" : "Refresh",
+                        onClick: () => router.refresh()
+                    }
+                }
+            );
+        }
+    });
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -256,11 +278,47 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
 
             {/* Articles Grid */}
             <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-foreground flex items-center gap-2 transition-colors duration-300">
-                        <span className="w-1 h-8 bg-primary rounded-full block"></span>
-                        {tMedia('coverage_log') || "Coverage Log"}
-                    </h2>
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-bold text-foreground flex items-center gap-2 transition-colors duration-300">
+                            <span className="w-1 h-8 bg-primary rounded-full block"></span>
+                            {tMedia('coverage_log') || "Coverage Log"}
+                        </h2>
+                        {/* SSE Live Connection Status Indicator */}
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-background/50 backdrop-blur-sm shadow-sm text-xs font-semibold select-none transition-all duration-300">
+                            <span className="relative flex h-2 w-2">
+                                {sseStatus === "connected" && (
+                                    <>
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </>
+                                )}
+                                {(sseStatus === "connecting" || sseStatus === "reconnecting") && (
+                                    <>
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                    </>
+                                )}
+                                {sseStatus === "disconnected" && (
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                                )}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                                {sseStatus === "connected" && (isRTL ? "مباشر" : "Live")}
+                                {sseStatus === "connecting" && (isRTL ? "جاري الاتصال..." : "Connecting...")}
+                                {sseStatus === "reconnecting" && (isRTL ? "إعادة اتصال..." : "Reconnecting...")}
+                                {sseStatus === "disconnected" && (isRTL ? "منقطع" : "Offline")}
+                            </span>
+                            {sseStatus === "disconnected" && (
+                                <button
+                                    onClick={sseReconnect}
+                                    className="text-[9px] text-primary hover:underline font-bold ltr:ml-1 rtl:mr-1 uppercase tracking-tight focus:outline-none"
+                                >
+                                    {isRTL ? "اتصال" : "Connect"}
+                                </button>
+                            )}
+                        </div>
+                    </div>
                     <div className="flex items-center gap-3">
                         {reports && reports.length > 0 && (
                             <div className="flex items-center gap-2 me-2">
