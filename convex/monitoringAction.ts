@@ -25,8 +25,8 @@ import { decodeHtmlBuffer, hasMojibake, tryRecoverMojibake } from "./utils/encod
 // â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 // THE SPIDER â€” Inlined link resolver for Convex Node Runtime
 const SHORTENER_DOMAINS = new Set([
-    'bit.ly', 'bitly.com', 't.co', 'tinyurl.com', 'rebrand.ly', 'is.gd', 
-    'buff.ly', 'ow.ly', 'db.tt', 'git.io', 't.me', 'lnkd.in', 'fb.me', 
+    'bit.ly', 'bitly.com', 't.co', 'tinyurl.com', 'rebrand.ly', 'is.gd',
+    'buff.ly', 'ow.ly', 'db.tt', 'git.io', 't.me', 'lnkd.in', 'fb.me',
     'amzn.to', 'goo.gl', 'su.pr', 'wp.me', 'short.io', 'rb.gy', 'shorturl.at',
     'tiny.cc', 'qr.ae', 'adf.ly', 'b.link', 'sniply.io', 'clicky.me'
 ]);
@@ -79,69 +79,240 @@ function isShortenerUrl(urlStr: string): boolean {
     }
 }
 
+
+// --- SSRF protection helpers (private-IP blocking + DNS validation) ---
+
+/** IPv4 private / reserved ranges - RFC 1918, loopback, APIPA, CGNAT */
+const PRIVATE_IPV4_RANGES: RegExp[] = [
+    /^0\./,
+    /^10\./,
+    /^127\./,
+    /^169\.254\./,
+    /^172\.(1[6-9]|2\d|3[0-1])\./,
+    /^192\.168\./,
+    /^100\.(6[4-9]|[7-9]\d|1([01]\d|2[0-7]))\./,  // CGNAT 100.64/10
+    /^198\.5[12]\./,                                   // 198.51.100/24 & 198.18/15
+    /^203\.0\.113\./,                                 // TEST-NET-3
+];
+
+/** IPv6 non-routable prefixes */
+const PRIVATE_IPV6_PREFIXES: RegExp[] = [
+    /^::$/,
+    /^::1$/i,
+    /^fc[0-9a-f]{2}:/i,    // ULA fc00::/7
+    /^fd[0-9a-f]{2}:/i,    // ULA fd00::/8
+    /^fe[89ab][0-9a-f]:/i, // link-local fe80::/10
+    /^64:ff9b:/i,           // NAT64 well-known prefix
+];
+
+function isPrivateIp(ip: string): boolean {
+    if (ip.includes(':')) {
+        return PRIVATE_IPV6_PREFIXES.some((re) => re.test(ip));
+    }
+    return PRIVATE_IPV4_RANGES.some((re) => re.test(ip));
+}
+
+async function isUnsafeHostname(hostname: string): Promise<boolean> {
+    const { isIP } = await import('net');
+    const dns = await import('dns/promises');
+    const lowered = hostname.toLowerCase();
+    if (
+        lowered === 'localhost' ||
+        lowered.endsWith('.local') ||
+        lowered.endsWith('.internal') ||
+        lowered.endsWith('.localdomain')
+    ) {
+        return true;
+    }
+    if (isIP(hostname)) {
+        return isPrivateIp(hostname);
+    }
+    try {
+        const results = await (dns as any).lookup(hostname, { all: true });
+        return results.some((entry: { address: string }) => isPrivateIp(entry.address));
+    } catch {
+        return true; // fail-closed: unresolvable => unsafe
+    }
+}
+
 function getScraperUrl(): string {
     const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
     return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
 }
 
-async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imageUrl?: string, source: string } | null> {
+/**
+ * SSRF-hardened URL resolver for the Convex Node runtime.
+ *
+ * Security guarantees:
+ *  - Strict protocol whitelist: only http: and https: are permitted.
+ *  - Every redirect hop is intercepted (redirect:'manual') and the
+ *    destination hostname is DNS-resolved before following, blocking
+ *    SSRF via open redirects into private/internal networks.
+ *  - All resolved IP addresses are tested against private IPv4 and
+ *    IPv6 ranges (loopback, RFC-1918, link-local, ULA, CGNAT, etc.).
+ *  - Meta-refresh recursion is capped at 3 levels.
+ *  - HTTP redirect chain is limited to 5 hops.
+ *  - The Playwright scraper fallback also validates the URL before dispatch.
+ */
+async function resolveUrl(
+    originalUrl: string,
+    depth = 0
+): Promise<{ finalUrl: string, imageUrl?: string, source: string } | null> {
+    if (depth > 3) {
+        console.warn(`[resolveUrl] Exceeded maximum meta-refresh recursion depth for: ${originalUrl}`);
+        return null;
+    }
+
     try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-
-        const response = await fetch(originalUrl, {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5,ar;q=0.3',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-            },
-            redirect: 'follow',
-            signal: controller.signal,
-        });
-
-        clearTimeout(timeout);
-        if (!response.ok) {
-            throw new Error(`HTTP_${response.status}`);
+        // ── Gate 1: validate the entry-point URL ──────────────────────────
+        let currentUrl: string;
+        try {
+            currentUrl = new URL(originalUrl).toString();
+        } catch {
+            console.warn(`[resolveUrl] Malformed URL rejected: ${originalUrl}`);
+            return null;
         }
 
-        const finalUrl = response.url;
-        const buffer = await response.arrayBuffer();
-        const html = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
-        const $ = cheerio.load(html);
+        const entryParsed = new URL(currentUrl);
+        if (!['http:', 'https:'].includes(entryParsed.protocol)) {
+            console.warn(`[resolveUrl] Blocked unsafe protocol on entry: ${entryParsed.protocol}`);
+            return null;
+        }
+        if (await isUnsafeHostname(entryParsed.hostname)) {
+            console.warn(`[resolveUrl] Blocked unsafe hostname on entry: ${entryParsed.hostname}`);
+            return null;
+        }
 
-        const metaRefresh = $('meta[http-equiv="refresh"]').attr('content');
-        if (metaRefresh) {
-            const match = metaRefresh.match(/url=(.+)$/i);
-            if (match && match[1]) {
-                let redirectUrl = match[1].trim().replace(/['"]/g, '');
-                if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
-                    redirectUrl = new URL(redirectUrl, response.url).toString();
+        // ── Redirect-following loop (manual, re-validated at each hop) ────
+        let redirectCount = 0;
+        const maxRedirects = 5;
+        let response: Response | null = null;
+        let htmlContent = '';
+        let contentTypeHeader = '';
+        let standardFetchFailed = false;
+
+        while (redirectCount <= maxRedirects) {
+            const hopParsed = new URL(currentUrl);
+
+            // Protocol check at every hop
+            if (!['http:', 'https:'].includes(hopParsed.protocol)) {
+                console.warn(`[resolveUrl] Blocked unsafe protocol in redirect chain: ${hopParsed.protocol}`);
+                return null;
+            }
+            // SSRF check at every hop — resolves DNS and tests IP ranges
+            if (await isUnsafeHostname(hopParsed.hostname)) {
+                console.warn(`[resolveUrl] Blocked unsafe hostname in redirect chain: ${hopParsed.hostname}`);
+                return null;
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000);
+
+            try {
+                const res = await fetch(currentUrl, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5,ar;q=0.3',
+                        'Upgrade-Insecure-Requests': '1',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Sec-Fetch-User': '?1',
+                    },
+                    redirect: 'manual',   // ← intercept every redirect for SSRF validation
+                    signal: controller.signal,
+                });
+                clearTimeout(timeout);
+
+                if (res.status >= 300 && res.status < 400) {
+                    const location = res.headers.get('location');
+                    if (!location) { response = res; break; }
+                    // Resolve relative redirect location against current URL
+                    currentUrl = new URL(location, currentUrl).toString();
+                    redirectCount++;
+                    continue;
                 }
-                console.log(`[resolveUrl] Found meta-refresh redirect to: ${redirectUrl}. Resolving recursively...`);
-                return resolveUrl(redirectUrl);
+
+                if (!res.ok) {
+                    console.warn(`[resolveUrl] Standard fetch returned HTTP ${res.status} for ${currentUrl}`);
+                    standardFetchFailed = true;
+                    break;
+                }
+
+                response = res;
+                const buffer = await res.arrayBuffer();
+                contentTypeHeader = res.headers.get('content-type') || '';
+                htmlContent = decodeHtmlBuffer(buffer, contentTypeHeader);
+                break;
+            } catch (fetchErr) {
+                clearTimeout(timeout);
+                console.warn(`[resolveUrl] Fetch error for ${currentUrl}:`, fetchErr);
+                standardFetchFailed = true;
+                break;
             }
         }
 
-        if (isShortenerUrl(finalUrl)) {
-            console.warn(`[resolveUrl] Standard fetch resolved URL is still a shortener: ${finalUrl}. Bypassing to Playwright Scraper Fallback...`);
-            throw new Error("RESOLVED_URL_IS_SHORTENER");
+        if (redirectCount > maxRedirects) {
+            console.warn(`[resolveUrl] Exceeded maximum redirect limit of ${maxRedirects} hops.`);
+            standardFetchFailed = true;
         }
 
-        const imageUrl = $('meta[property="og:image"]').attr('content') ||
-            $('meta[name="twitter:image"]').attr('content');
-        const siteName = $('meta[property="og:site_name"]').attr('content') || new URL(finalUrl).hostname;
+        // ── Process successful fetch ───────────────────────────────────────
+        if (!standardFetchFailed && response && htmlContent) {
+            const finalUrl = currentUrl;
+            const $ = cheerio.load(htmlContent);
 
-        return { finalUrl: cleanUrl(finalUrl), imageUrl, source: siteName };
-    } catch (error: any) {
-        console.warn(`[resolveUrl] Direct resolution failed for ${originalUrl}: ${error.message || error}. Trying Playwright Scraper Service...`);
+            // Handle HTML meta-refresh (recursive, depth-limited)
+            const metaRefresh = $('meta[http-equiv="refresh"]').attr('content');
+            if (metaRefresh) {
+                const match = metaRefresh.match(/url=(.+)$/i);
+                if (match && match[1]) {
+                    let redirectUrl = match[1].trim().replace(/['"]/g, '');
+                    if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
+                        redirectUrl = new URL(redirectUrl, finalUrl).toString();
+                    }
+                    console.log(`[resolveUrl] Found meta-refresh redirect to: ${redirectUrl}. Resolving recursively (depth ${depth + 1})...`);
+                    return resolveUrl(redirectUrl, depth + 1);
+                }
+            }
+
+            if (isShortenerUrl(finalUrl)) {
+                console.warn(`[resolveUrl] Resolved URL is still a shortener: ${finalUrl}. Falling back to Playwright scraper...`);
+                standardFetchFailed = true;
+            } else {
+                // Final URL validation after all hops
+                const finalParsed = new URL(finalUrl);
+                if (!['http:', 'https:'].includes(finalParsed.protocol)) {
+                    console.warn(`[resolveUrl] Blocked unsafe final URL protocol: ${finalParsed.protocol}`);
+                    return null;
+                }
+                if (await isUnsafeHostname(finalParsed.hostname)) {
+                    console.warn(`[resolveUrl] Blocked unsafe final URL hostname: ${finalParsed.hostname}`);
+                    return null;
+                }
+
+                const imageUrl = $('meta[property="og:image"]').attr('content') ||
+                    $('meta[name="twitter:image"]').attr('content');
+                const siteName = $('meta[property="og:site_name"]').attr('content') || finalParsed.hostname;
+                return { finalUrl: cleanUrl(finalUrl), imageUrl, source: siteName };
+            }
+        }
+
+        // ── Playwright scraper fallback (also SSRF-validated) ─────────────
         try {
-            // Falls back to the Premium Playwright Scraper microservice on port 3002
+            const scraperParsed = new URL(originalUrl);
+            if (!['http:', 'https:'].includes(scraperParsed.protocol)) {
+                console.warn(`[resolveUrl] Blocked unsafe protocol before scraper invocation: ${scraperParsed.protocol}`);
+                return null;
+            }
+            if (await isUnsafeHostname(scraperParsed.hostname)) {
+                console.warn(`[resolveUrl] Blocked unsafe hostname before scraper invocation: ${scraperParsed.hostname}`);
+                return null;
+            }
+
+            console.log(`[resolveUrl] Invoking Playwright Scraper Service for: ${originalUrl}`);
             const scraperRes = await fetch(getScraperUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -150,17 +321,32 @@ async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imag
             if (scraperRes.ok) {
                 const scraperData = await scraperRes.json();
                 if (scraperData.success) {
+                    const resolvedUrl = scraperData.url || originalUrl;
+                    const resolvedParsed = new URL(resolvedUrl);
+                    if (!['http:', 'https:'].includes(resolvedParsed.protocol)) {
+                        console.warn(`[resolveUrl] Scraper resolved to unsafe protocol: ${resolvedParsed.protocol}`);
+                        return null;
+                    }
+                    if (await isUnsafeHostname(resolvedParsed.hostname)) {
+                        console.warn(`[resolveUrl] Scraper resolved to unsafe hostname: ${resolvedParsed.hostname}`);
+                        return null;
+                    }
                     console.log(`[resolveUrl] Playwright Scraper successfully resolved: ${originalUrl}`);
                     return {
-                        finalUrl: cleanUrl(scraperData.url || originalUrl),
+                        finalUrl: cleanUrl(resolvedUrl),
                         imageUrl: scraperData.imageUrl || undefined,
-                        source: scraperData.sourceName || new URL(scraperData.url || originalUrl).hostname
+                        source: scraperData.sourceName || resolvedParsed.hostname
                     };
                 }
+            } else {
+                console.error(`[resolveUrl] Playwright Scraper service returned status: ${scraperRes.status}`);
             }
         } catch (scraperErr: any) {
-            console.error(`[resolveUrl] Playwright Scraper fallback also failed for ${originalUrl}:`, scraperErr.message);
+            console.error(`[resolveUrl] Playwright Scraper fallback failed for ${originalUrl}:`, scraperErr.message);
         }
+        return null;
+    } catch (error: any) {
+        console.warn(`[resolveUrl] Failed to resolve: ${originalUrl}`, error);
         return null;
     }
 }
@@ -2387,22 +2573,22 @@ export const syncSpecificRssFeed = action({
 
 function parseRelativeDate(dateStr: string | undefined): string {
     if (!dateStr) return new Date().toISOString();
-    
+
     const now = new Date();
     const cleanStr = dateStr.toLowerCase().trim();
-    
+
     // Check if it's already a valid date string
     const parsed = Date.parse(cleanStr);
     if (!isNaN(parsed)) {
         return new Date(parsed).toISOString();
     }
-    
+
     // Relative times in English (e.g. "3 days ago", "1 hour ago")
     const numMatch = cleanStr.match(/^(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/);
     if (numMatch) {
         const value = parseInt(numMatch[1], 10);
         const unit = numMatch[2];
-        
+
         switch (unit) {
             case 'second':
                 now.setSeconds(now.getSeconds() - value);
@@ -2428,7 +2614,7 @@ function parseRelativeDate(dateStr: string | undefined): string {
         }
         return now.toISOString();
     }
-    
+
     // Relative times in Arabic (e.g. "قبل ٣ ساعة", "منذ 5 أيام")
     const arNumMatch = cleanStr.match(/(?:قبل|منذ)\s+([\d\u0660-\u0669]+)\s+(ثانية|دقيقة|ساعة|يوم|أسبوع|شهر|سنة|سنين|أيام|ساعات|دقائق)/);
     if (arNumMatch) {
@@ -2437,7 +2623,7 @@ function parseRelativeDate(dateStr: string | undefined): string {
         valueStr = valueStr.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 1632));
         const value = parseInt(valueStr, 10);
         const unit = arNumMatch[2];
-        
+
         if (unit.startsWith('ثاني')) now.setSeconds(now.getSeconds() - value);
         else if (unit.startsWith('دقيق')) now.setMinutes(now.getMinutes() - value);
         else if (unit.startsWith('ساع')) now.setHours(now.getHours() - value);
@@ -2445,10 +2631,10 @@ function parseRelativeDate(dateStr: string | undefined): string {
         else if (unit.startsWith('أسبوع')) now.setDate(now.getDate() - value * 7);
         else if (unit.startsWith('شهر')) now.setMonth(now.getMonth() - value);
         else if (unit.startsWith('سن') || unit === 'سنين') now.setFullYear(now.getFullYear() - value);
-        
+
         return now.toISOString();
     }
-    
+
     // Dual Arabic relative times
     if (cleanStr.includes('يومين')) {
         now.setDate(now.getDate() - 2);
@@ -2466,7 +2652,7 @@ function parseRelativeDate(dateStr: string | undefined): string {
         now.setMonth(now.getMonth() - 2);
         return now.toISOString();
     }
-    
+
     // Singular Arabic relative times
     if (cleanStr.includes('ساعة')) {
         now.setHours(now.getHours() - 1);
@@ -2488,7 +2674,7 @@ function parseRelativeDate(dateStr: string | undefined): string {
         now.setFullYear(now.getFullYear() - 1);
         return now.toISOString();
     }
-    
+
     return now.toISOString();
 }
 
