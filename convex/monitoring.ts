@@ -7,6 +7,7 @@
  */
 
 import { query, mutation } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { v, ConvexError } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
@@ -72,7 +73,9 @@ export const getArticles = query({
         const skip = args.skip ?? 0;
 
         const q = queryArticlesWithIndex(ctx, args);
-        const all = await q.collect();
+        // Optimize: Bounded read to avoid nearing transaction limits on large tables
+        const maxToFetch = Math.max(300, (limit + skip) * 2);
+        const all = await q.take(maxToFetch);
 
         const parseDate = (d: string) => {
             const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
@@ -107,49 +110,27 @@ export const checkDuplicate = query({
     },
 });
 
-// 1.6. QUERY: Get decoupled RSS live feed articles
+// 1.6. QUERY: Get decoupled RSS live feed articles (cursor-based pagination)
+// Uses Convex native pagination to read ONLY the requested page of documents,
+// preventing the "nearing documents read limit" issue on large tables.
 export const getRssArticles = query({
     args: {
-        limit: v.optional(v.number()),
-        skip: v.optional(v.number()),
+        paginationOpts: paginationOptsValidator,
         source: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
-        const limit = args.limit ?? 100;
-        const skip = args.skip ?? 0;
-
-        let queryBuilder;
         if (args.source) {
-            queryBuilder = ctx.db
+            return ctx.db
                 .query("rss_feed_articles")
                 .withIndex("by_source_and_createdAt", (q) => q.eq("source", args.source))
-                .order("desc");
-        } else {
-            queryBuilder = ctx.db
-                .query("rss_feed_articles")
-                .withIndex("by_createdAt")
-                .order("desc");
+                .order("desc")
+                .paginate(args.paginationOpts);
         }
-        const all = await queryBuilder.collect();
-
-        const parseDate = (d: string) => {
-            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
-            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
-        };
-
-        all.sort((a: Doc<"rss_feed_articles">, b: Doc<"rss_feed_articles">) => {
-            const da = parseDate(a.publishedDate);
-            const db = parseDate(b.publishedDate);
-            if (db !== da) return db - da;
-            return (b.createdAt || 0) - (a.createdAt || 0);
-        });
-
-        const slice = all.slice(skip, skip + limit);
-        return {
-            items: slice,
-            total: all.length,
-            nextSkip: skip + slice.length < all.length ? skip + slice.length : null,
-        };
+        return ctx.db
+            .query("rss_feed_articles")
+            .withIndex("by_createdAt")
+            .order("desc")
+            .paginate(args.paginationOpts);
     },
 });
 

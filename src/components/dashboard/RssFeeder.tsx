@@ -17,7 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
-import { useQuery, useConvexAuth } from 'convex/react';
+import { usePaginatedQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
@@ -56,12 +56,13 @@ export default function RssFeeder({
   const [items, setItems] = useState<FeedItem[]>([]);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   
-  const articlesQuery = useQuery(
+  const { results: articleResults, status: articlesStatus } = usePaginatedQuery(
     api.monitoring.getRssArticles,
-    isAuthenticated ? { limit: 100, source: activePublisher || undefined } : 'skip'
+    isAuthenticated ? { source: activePublisher || undefined } : 'skip',
+    { initialNumItems: maxItems }
   );
 
-  const isLoading = articlesQuery === undefined;
+  const isLoading = articlesStatus === 'LoadingFirstPage';
   const error = null;
 
   const lastSyncTimesRef = useRef<Record<string, number>>({});
@@ -69,11 +70,12 @@ export default function RssFeeder({
 
   // Filter and map articles to match the FeedItem interface
   useEffect(() => {
-    if (!articlesQuery?.items) return;
+    if (!articleResults) return;
 
-    let filtered = articlesQuery.items;
+    let filtered = articleResults;
     
-    // Filter by publisher/source name if active
+    // Filter by publisher/source name if active (server already filters by source,
+    // this narrows further by the specific feed name within the publisher)
     if (activeName) {
       filtered = filtered.filter(a => a.source === activeName || a.source === activePublisher);
     }
@@ -104,8 +106,8 @@ export default function RssFeeder({
     });
 
     setItems(mappedItems.slice(0, maxItems));
-    setLastSynced(new Date()); // Or use the latest createdAt from the items
-  }, [articlesQuery, activeName, activePublisher, maxItems]);
+    setLastSynced(new Date());
+  }, [articleResults, activeName, activePublisher, maxItems]);
 
   const triggerSync = useCallback(async (force = false) => {
     if (!isAuthenticated || !activeUrl || !activePublisher) return;
