@@ -10,7 +10,21 @@
  * resolved by the browser/Node.js module system directly.
  */
 
-export const Hands = undefined;
-export const HAND_CONNECTIONS = undefined;
-export const VERSION = undefined;
-export default {};
+export let Hands = undefined;
+export let HAND_CONNECTIONS = undefined;
+export let VERSION = undefined;
+
+export function updateGlobals() {
+  if (typeof window !== 'undefined') {
+    Hands = window.Hands;
+    HAND_CONNECTIONS = window.HAND_CONNECTIONS;
+    VERSION = window.VERSION;
+  }
+}
+
+export default {
+  get Hands() { return Hands; },
+  get HAND_CONNECTIONS() { return HAND_CONNECTIONS; },
+  get VERSION() { return VERSION; },
+  updateGlobals,
+};

@@ -10,12 +10,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getStripeProduct } from '@/lib/stripe-products';
-import { rateLimit } from '@/lib/rateLimit';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-        const limit = await rateLimit(`stripe:checkout:${ip}`, 20, 60);
+        const rlKey = await getRateLimitKey(request, 'stripe:checkout');
+        const limit = await rateLimit(rlKey, 20, 60);
         if (!limit.allowed) {
             return NextResponse.json(
                 { error: 'Rate limit exceeded' },

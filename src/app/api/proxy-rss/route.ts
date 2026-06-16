@@ -9,8 +9,10 @@
 import { NextResponse } from 'next/server';
 import { parseFeed } from '@/lib/rss-engine';
 import { FeedResponse } from '@/types/rss';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
+import { isSafePublicUrl } from '@/utils/ssrf';
 
-// Pin to Node.js runtime â€” rss-parser requires xml2js which is not Edge-compatible
+// Pin to Node.js runtime — rss-parser requires xml2js which is not Edge-compatible
 export const runtime = 'nodejs';
 
 /**
@@ -20,32 +22,17 @@ export const runtime = 'nodejs';
  */
 export const revalidate = 900;
 
-/**
- * SSRF guard: blocks requests to private/loopback networks.
- * Without this, an attacker could pass 169.254.169.254 (AWS/Vercel metadata)
- * or 10.x.x.x addresses to exfiltrate secrets from the server environment.
- */
-function isSafePublicUrl(rawUrl: string): boolean {
-  try {
-    const { hostname, protocol } = new URL(rawUrl);
-    if (protocol !== 'https:') return false;
-    // Block loopback, link-local, and RFC-1918 private ranges
-    const blocked = [
-      /^localhost$/i,
-      /^127\./,
-      /^10\./,
-      /^192\.168\./,
-      /^172\.(1[6-9]|2\d|3[01])\./,
-      /^169\.254\./,
-      /^::1$/,
-    ];
-    return !blocked.some((re) => re.test(hostname));
-  } catch {
-    return false;
-  }
-}
-
 export async function GET(request: Request) {
+  // Apply rate limit
+  const rlKey = await getRateLimitKey(request, 'proxy-rss');
+  const limitResult = await rateLimit(rlKey, 15, 60);
+  if (!limitResult.allowed) {
+    return NextResponse.json<FeedResponse>({
+      success: false,
+      error: 'Rate limit exceeded'
+    }, { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } });
+  }
+
   const { searchParams } = new URL(request.url);
   const feedUrl = searchParams.get('url');
   const sourceName = searchParams.get('source') || undefined;

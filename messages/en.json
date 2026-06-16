@@ -45,7 +45,8 @@
     "crisis_management_desc": "Strategic crisis response planning",
     "login": "Sign In",
     "signup": "Sign Up",
-    "settings": "Settings"
+    "settings": "Settings",
+    "view_source": "View Source"
   },
   "ArticleTable": {
     "no_articles": "No articles found. Start monitoring or add manually.",
@@ -213,7 +214,8 @@
     "soc2_alt": "SOC2 Type II Compliance - Enterprise Data Security Standard",
     "secure_alt": "Military-Grade Encryption & Secure Application Badge",
     "saas_awards_alt": "Global SaaS Awards - Winner for Innovative Enterprise AI",
-    "logo_alt": "ALMSTKSHF Official Logo - Advanced Media & Legal Solutions"
+    "logo_alt": "ALMSTKSHF Official Logo - Advanced Media & Legal Solutions",
+    "articles_count": "Articles"
   },
   "SearchOptimizer": {
     "button_tooltip": "Optimize Search with AI",
@@ -726,7 +728,8 @@
     "dashboard": {
       "no_reports": "No reports found for this category.",
       "visit_repository": "Visit Central Repository",
-      "reports_overview": "Reports Overview"
+      "reports_overview": "Reports Overview",
+      "coverage_log": "Coverage Log"
     }
   },
   "MediaPulseDetail": {

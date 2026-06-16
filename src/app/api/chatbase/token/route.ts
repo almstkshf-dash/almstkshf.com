@@ -9,13 +9,13 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { rateLimit } from '@/lib/rateLimit';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-        const limit = await rateLimit(`chatbase:token:${ip}`, 60, 60);
+        const rlKey = await getRateLimitKey(request, 'chatbase:token');
+        const limit = await rateLimit(rlKey, 60, 60);
         if (!limit.allowed) {
             return NextResponse.json(
                 { error: 'Rate limit exceeded' },

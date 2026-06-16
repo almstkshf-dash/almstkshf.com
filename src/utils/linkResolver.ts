@@ -12,6 +12,7 @@ import dns from 'dns/promises';
 import { decodeHtmlBuffer } from './encoding';
 
 const PRIVATE_IP_RANGES = [
+    /^0\./,
     /^10\./,
     /^127\./,
     /^169\.254\./,
@@ -20,6 +21,7 @@ const PRIVATE_IP_RANGES = [
 ];
 
 const PRIVATE_IPV6_PREFIXES = [
+    /^::$/,
     /^::1$/i,
     /^fc00:/i,
     /^fd00:/i,
@@ -112,69 +114,118 @@ interface ResolvedArticle {
     source: string;
 }
 
-export async function resolveUrl(originalUrl: string, country?: string): Promise<ResolvedArticle | null> {
+function getScraperUrl(): string {
+    const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+    return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
+}
+
+export async function resolveUrl(
+    originalUrl: string, 
+    country?: string, 
+    depth = 0
+): Promise<ResolvedArticle | null> {
+    if (depth > 3) {
+        console.warn(`[LinkResolver] Exceeded maximum meta-refresh recursion depth for: ${originalUrl}`);
+        return null;
+    }
+
     try {
-        const parsed = new URL(originalUrl);
-        if (!['http:', 'https:'].includes(parsed.protocol)) {
-            return null;
-        }
-
-        if (await isUnsafeHostname(parsed.hostname)) {
-            return null;
-        }
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-
-        let response;
+        let currentUrl = new URL(originalUrl).toString();
+        let redirectCount = 0;
+        const maxRedirects = 5;
+        let response: Response | null = null;
         let standardFetchFailed = false;
-        try {
-            response = await fetch(originalUrl, {
-                method: 'GET',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Accept-Language': 'en-US,en;q=0.5',
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    'Upgrade-Insecure-Requests': '1',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': 'none',
-                    'Sec-Fetch-User': '?1',
-                },
-                redirect: 'follow', // Ensures redirects are followed
-                signal: controller.signal,
-            });
-            clearTimeout(timeout);
+        let htmlContent = '';
+        let contentTypeHeader = '';
 
-            if (!response.ok) {
-                console.warn(`[LinkResolver] Standard fetch returned HTTP ${response.status}. Bypassing to Premium Playwright Scraper Fallback...`);
-                standardFetchFailed = true;
+        while (redirectCount <= maxRedirects) {
+            const parsed = new URL(currentUrl);
+            if (!['http:', 'https:'].includes(parsed.protocol)) {
+                console.warn(`[LinkResolver] Blocked unsafe protocol in redirect chain: ${parsed.protocol}`);
+                return null;
             }
-        } catch (fetchErr) {
-            clearTimeout(timeout);
-            console.warn(`[LinkResolver] Standard fetch threw error. Bypassing to Premium Playwright Scraper Fallback...`, fetchErr);
+
+            if (await isUnsafeHostname(parsed.hostname)) {
+                console.warn(`[LinkResolver] Blocked unsafe hostname in redirect chain: ${parsed.hostname}`);
+                return null;
+            }
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
+
+            try {
+                const res = await fetch(currentUrl, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'Upgrade-Insecure-Requests': '1',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Sec-Fetch-User': '?1',
+                    },
+                    redirect: 'manual',
+                    signal: controller.signal,
+                });
+                clearTimeout(timeout);
+
+                // Check for HTTP redirect
+                if (res.status >= 300 && res.status < 400) {
+                    const location = res.headers.get('location');
+                    if (!location) {
+                        response = res;
+                        break;
+                    }
+                    // Resolve relative redirect location against current URL
+                    const nextUrl = new URL(location, currentUrl).toString();
+                    currentUrl = nextUrl;
+                    redirectCount++;
+                    continue;
+                }
+
+                if (!res.ok) {
+                    console.warn(`[LinkResolver] Standard fetch returned HTTP ${res.status} for ${currentUrl}`);
+                    standardFetchFailed = true;
+                    response = res;
+                    break;
+                }
+
+                response = res;
+                const buffer = await res.arrayBuffer();
+                contentTypeHeader = res.headers.get('content-type') || '';
+                htmlContent = decodeHtmlBuffer(buffer, contentTypeHeader);
+                break;
+            } catch (fetchErr) {
+                clearTimeout(timeout);
+                console.warn(`[LinkResolver] Standard fetch threw error for ${currentUrl}:`, fetchErr);
+                standardFetchFailed = true;
+                break;
+            }
+        }
+
+        if (redirectCount > maxRedirects) {
+            console.warn(`[LinkResolver] Exceeded maximum redirect limit of ${maxRedirects} hops.`);
             standardFetchFailed = true;
         }
 
-        if (!standardFetchFailed && response) {
-            let finalUrl = response.url;
+        if (!standardFetchFailed && response && htmlContent) {
+            const finalUrl = currentUrl;
             
             // Check for HTML meta refresh redirect
-            const buffer = await response.arrayBuffer();
-            const html = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
-            const $ = cheerio.load(html);
-            
+            const $ = cheerio.load(htmlContent);
             const metaRefresh = $('meta[http-equiv="refresh"]').attr('content');
             if (metaRefresh) {
                 const match = metaRefresh.match(/url=(.+)$/i);
                 if (match && match[1]) {
                     let redirectUrl = match[1].trim().replace(/['"]/g, '');
                     if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
-                        redirectUrl = new URL(redirectUrl, response.url).toString();
+                        redirectUrl = new URL(redirectUrl, finalUrl).toString();
                     }
                     console.log(`[LinkResolver] Found meta-refresh redirect to: ${redirectUrl}. Resolving recursively...`);
-                    return resolveUrl(redirectUrl, country);
+                    return resolveUrl(redirectUrl, country, depth + 1);
                 }
             }
 
@@ -183,14 +234,19 @@ export async function resolveUrl(originalUrl: string, country?: string): Promise
                 standardFetchFailed = true;
             } else {
                 const finalParsed = new URL(finalUrl);
+                if (!['http:', 'https:'].includes(finalParsed.protocol)) {
+                    console.warn(`[LinkResolver] Blocked unsafe final URL protocol: ${finalParsed.protocol}`);
+                    return null;
+                }
                 if (await isUnsafeHostname(finalParsed.hostname)) {
+                    console.warn(`[LinkResolver] Blocked unsafe final URL hostname: ${finalParsed.hostname}`);
                     return null;
                 }
 
                 // Extract Image and Site Name
                 const imageUrl = $('meta[property="og:image"]').attr('content') ||
                     $('meta[name="twitter:image"]').attr('content');
-                const siteName = $('meta[property="og:site_name"]').attr('content') || new URL(finalUrl).hostname;
+                const siteName = $('meta[property="og:site_name"]').attr('content') || finalParsed.hostname;
 
                 return { finalUrl: cleanUrl(finalUrl), imageUrl, source: siteName };
             }
@@ -198,8 +254,18 @@ export async function resolveUrl(originalUrl: string, country?: string): Promise
 
         // --- PREMIUM FALLBACK: Premium Playwright Scraper Service ---
         try {
+            const scraperParsed = new URL(originalUrl);
+            if (!['http:', 'https:'].includes(scraperParsed.protocol)) {
+                console.warn(`[LinkResolver] Blocked unsafe protocol before scraper invocation: ${scraperParsed.protocol}`);
+                return null;
+            }
+            if (await isUnsafeHostname(scraperParsed.hostname)) {
+                console.warn(`[LinkResolver] Blocked unsafe hostname before scraper invocation: ${scraperParsed.hostname}`);
+                return null;
+            }
+
             console.log(`[LinkResolver] Invoking Premium Playwright Scraper Service for: ${originalUrl}`);
-            const scraperResponse = await fetch('http://localhost:3002/scrape', {
+            const scraperResponse = await fetch(getScraperUrl(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -213,11 +279,23 @@ export async function resolveUrl(originalUrl: string, country?: string): Promise
             if (scraperResponse.ok) {
                 const scraperData = await scraperResponse.json();
                 if (scraperData.success) {
+                    const resolvedUrl = scraperData.url || originalUrl;
+                    const resolvedParsed = new URL(resolvedUrl);
+
+                    if (!['http:', 'https:'].includes(resolvedParsed.protocol)) {
+                        console.warn(`[LinkResolver] Scraper resolved to unsafe protocol: ${resolvedParsed.protocol}`);
+                        return null;
+                    }
+                    if (await isUnsafeHostname(resolvedParsed.hostname)) {
+                        console.warn(`[LinkResolver] Scraper resolved to unsafe hostname: ${resolvedParsed.hostname}`);
+                        return null;
+                    }
+
                     console.log(`[LinkResolver] Premium Scraper resolved successfully: ${originalUrl}`);
                     return {
-                        finalUrl: cleanUrl(scraperData.url || originalUrl),
+                        finalUrl: cleanUrl(resolvedUrl),
                         imageUrl: scraperData.imageUrl,
-                        source: scraperData.sourceName || new URL(originalUrl).hostname,
+                        source: scraperData.sourceName || resolvedParsed.hostname,
                     };
                 }
             } else {

@@ -7,14 +7,28 @@ import { api } from '../../../../../convex/_generated/api';
 import { parseFeed } from '@/lib/rss-engine';
 import { ALL_SOURCES } from '@/config/rss-sources';
 import { uploadImageToBlob } from '@/lib/blob-storage';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(request: Request) {
     try {
-        // 1. Verify Vercel Cron Authorization (optional but recommended)
+        // Apply rate limit
+        const rlKey = await getRateLimitKey(request, 'cron-standard-sweep');
+        const limitResult = await rateLimit(rlKey, 5, 60);
+        if (!limitResult.allowed) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded' },
+                { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } }
+            );
+        }
+
+        // 1. Verify Vercel Cron Authorization
         const authHeader = request.headers.get('authorization');
-        if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        const isProd = process.env.NODE_ENV === 'production';
+        const cronSecret = process.env.CRON_SECRET;
+        
+        if (isProd && (!cronSecret || authHeader !== `Bearer ${cronSecret}`)) {
             console.warn('[Vercel Cron] Unauthorized attempt to trigger standard-sweep');
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

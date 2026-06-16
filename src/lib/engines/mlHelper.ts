@@ -12,10 +12,41 @@ import { createWorker } from 'tesseract.js';
 let faceModel: any = null;
 let handModel: any = null;
 
+// Map to track script loading status and prevent duplicate/overlapping requests
+const loadedScripts = new Map<string, Promise<void>>();
+
+/**
+ * Dynamically loads a script in the browser environment.
+ * Safe for server-side rendering (SSR) environments.
+ */
+function loadScript(src: string): Promise<void> {
+  if (typeof document === 'undefined') {
+    return Promise.resolve();
+  }
+  let promise = loadedScripts.get(src);
+  if (!promise) {
+    promise = new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.crossOrigin = 'anonymous';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+      document.head.appendChild(script);
+    });
+    loadedScripts.set(src, promise);
+  }
+  return promise;
+}
+
 /**
  * Loads the face and hand models if not already loaded.
- * Uses dynamic imports so Turbopack/webpack never statically resolves
- * the @mediapipe/* sub-dependency graph at build time.
+ * Uses dynamic imports and runtime CDN script loading so Turbopack/webpack
+ * resolve stubs at build time, but load real engines at runtime in the browser.
  */
 async function loadModels() {
   // Dynamic import keeps the TF/MediaPipe graph out of the static bundle.
@@ -23,6 +54,15 @@ async function loadModels() {
   await tf.ready();
 
   if (!faceModel) {
+    // Load MediaPipe FaceMesh from CDN to populate window.FaceMesh etc.
+    await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js');
+    
+    // Import the stub module and update its globals to bind to the CDN loaded variables
+    const faceMeshStub = await import('@mediapipe/face_mesh') as any;
+    if (typeof faceMeshStub.updateGlobals === 'function') {
+      faceMeshStub.updateGlobals();
+    }
+
     const faceLandmarksDetection = await import(
       '@tensorflow-models/face-landmarks-detection'
     );
@@ -33,6 +73,15 @@ async function loadModels() {
   }
 
   if (!handModel) {
+    // Load MediaPipe Hands from CDN to populate window.Hands etc.
+    await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js');
+
+    // Import the stub module and update its globals to bind to the CDN loaded variables
+    const handsStub = await import('@mediapipe/hands') as any;
+    if (typeof handsStub.updateGlobals === 'function') {
+      handsStub.updateGlobals();
+    }
+
     const handPoseDetection = await import(
       '@tensorflow-models/hand-pose-detection'
     );

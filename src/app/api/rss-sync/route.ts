@@ -10,11 +10,22 @@ import { NextResponse } from 'next/server';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../../../../convex/_generated/api';
 import { parseFeed } from '@/lib/rss-engine';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
+import { triggerOnDemandRevalidation } from '@/utils/revalidation';
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(request: Request) {
     try {
+        const rlKey = await getRateLimitKey(request, 'rss-sync');
+        const limitResult = await rateLimit(rlKey, 10, 60);
+        if (!limitResult.allowed) {
+            return NextResponse.json({
+                success: false,
+                error: 'Rate limit exceeded'
+            }, { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } });
+        }
+
         const { url, publisher, country, lang, limit = 15 } = await request.json();
 
         if (!url || !publisher) {
@@ -52,6 +63,10 @@ export async function POST(request: Request) {
         }
 
         console.log(`✅ [API RSS Sync] Successfully synced ${savedCount} new articles for ${publisher}`);
+
+        if (savedCount > 0) {
+            triggerOnDemandRevalidation();
+        }
 
         return NextResponse.json({
             success: true,

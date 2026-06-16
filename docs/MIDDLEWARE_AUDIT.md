@@ -8,10 +8,11 @@
 
 ## Current Implementation
 
-The middleware composes two concerns:
+The middleware composes three concerns:
 
-1. **Clerk Auth** (`clerkMiddleware`) — wraps everything, provides `auth` context
-2. **next-intl routing** (`createMiddleware`) — locale detection and path rewriting
+1. **Edge Rate Limiting** (`rateLimit` via Upstash Redis) — runs early on sensitive endpoints (`/api/search`, `/api/monitor`) before rewrites or Clerk auth to save API credits and prevent DDoS.
+2. **Clerk Auth** (`clerkMiddleware`) — wraps everything, provides `auth` context.
+3. **next-intl routing** (`createMiddleware`) — locale detection and path rewriting.
 
 ```typescript
 // src/middleware.ts
@@ -119,6 +120,7 @@ export const config = {
 | API routes getting locale prefix | Intl middleware running on `/api/*` | Added early return for `/api` paths |
 | Cloudflare Web Analytics `/vitals` telemetry POST failures | Cloudflare Zaraz/Web Analytics proxies telemetry to subpaths ending in `/vitals`, triggering Clerk auth protection and causing 404/401 errors | Intercepted paths ending in `/vitals` early in middleware, returning a clean `204 No Content` response immediately |
 | Clerk Proxy 400 Errors on Vercel Preview | Clerk live keys reject custom domain proxying from Vercel preview domains (`*-projects.vercel.app`) | Intercepted Clerk proxy routes starting with `/__clerk` on Vercel preview domains if production keys are active, returning a clean `200 OK` with JSON to prevent `400 Bad Request` logging |
+| Lack of Rate Limiting in Edge Middleware | Sensitive API routes (`/api/search`, `/api/monitor`) unprotected at Edge level, causing risk of Gemini key and API credit exhaustion | Integrated `@upstash/redis` rate limiter directly inside middleware to intercept and block excessive requests before they reach Next.js route handlers |
 
 ---
 

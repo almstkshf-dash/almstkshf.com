@@ -14,6 +14,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 
 interface CheckResult {
   endpoint: string;
@@ -64,7 +65,17 @@ async function checkEndpoint(
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Apply rate limit
+  const rlKey = await getRateLimitKey(request, 'test-x');
+  const limitResult = await rateLimit(rlKey, 5, 60);
+  if (!limitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded' },
+      { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } }
+    );
+  }
+
   const token = process.env.X_BEARER_TOKEN;
 
   if (!token) {

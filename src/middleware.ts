@@ -6,10 +6,11 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher, getAuth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
+import { rateLimit, getRateLimitKey } from "./lib/rateLimit";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -78,8 +79,81 @@ const clerk = clerkMiddleware(async (auth, req) => {
 export default async function middleware(req: any, event: any) {
     const pathname = req.nextUrl.pathname;
     const localeApiRegex = /^\/(ar|en)\/api\//;
+    let strippedPath = pathname;
     if (localeApiRegex.test(pathname)) {
-        const strippedPath = pathname.replace(/^\/(ar|en)/, "");
+        strippedPath = pathname.replace(/^\/(ar|en)/, "");
+    }
+
+    // Apply Rate Limiting to /api/search and /api/monitor
+    if (strippedPath === "/api/search" || strippedPath === "/api/monitor") {
+        try {
+            // Get Clerk auth to find userId if authenticated
+            let userId: string | null = null;
+            try {
+                const authData = getAuth(req);
+                userId = authData?.userId || null;
+            } catch (authError) {
+                // Ignore auth retrieval errors in middleware and fallback to IP-based rate limiting
+            }
+
+            const isSearch = strippedPath === "/api/search";
+            const method = req.method;
+            
+            let limitCount = 60;
+            let windowSeconds = 60;
+            let prefix = "";
+
+            if (isSearch) {
+                // /api/search only accepts POST requests
+                if (method === "POST") {
+                    limitCount = 30;
+                    windowSeconds = 60;
+                    prefix = "search";
+                } else {
+                    return new NextResponse(JSON.stringify({ error: "Method not allowed" }), {
+                        status: 405,
+                        headers: { "Content-Type": "application/json" }
+                    });
+                }
+            } else {
+                // /api/monitor has GET and POST
+                if (method === "POST") {
+                    limitCount = 15;
+                    windowSeconds = 60;
+                    prefix = "monitor:post";
+                } else if (method === "GET") {
+                    limitCount = 60;
+                    windowSeconds = 60;
+                    prefix = "monitor:get";
+                } else {
+                    return new NextResponse(JSON.stringify({ error: "Method not allowed" }), {
+                        status: 405,
+                        headers: { "Content-Type": "application/json" }
+                    });
+                }
+            }
+
+            const rlKey = await getRateLimitKey(req, prefix, userId);
+            const rlResult = await rateLimit(rlKey, limitCount, windowSeconds);
+
+            if (!rlResult.allowed) {
+                return new NextResponse(
+                    JSON.stringify({ error: "Rate limit exceeded" }),
+                    {
+                        status: 429,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Retry-After": String(rlResult.resetSeconds)
+                        }
+                    }
+                );
+            }
+        } catch (rlError) {
+            console.error("Middleware rate limiting error:", rlError);
+        }
+    }
+
+    if (localeApiRegex.test(pathname)) {
         const url = req.nextUrl.clone();
         url.pathname = strippedPath;
         return NextResponse.rewrite(url);

@@ -390,7 +390,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   // --- INDIA NEW FEEDS ---
   'The Times of India': [
-    { id: 'timesofindia-latest', name: 'Latest News', url: 'https://timesofindia.indiatimes.com/rss.cms', country: 'India' }
+    { id: 'timesofindia-latest', name: 'Latest News', url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms', country: 'India' }
   ],
   'Indian Express': [
     { id: 'indianexpress-latest', name: 'Latest News', url: 'https://indianexpress.com/feed', country: 'India' }
@@ -408,7 +408,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'telegraphindia-latest', name: 'Latest News', url: 'https://telegraphindia.com/feeds', country: 'India' }
   ],
   'The Economic Times': [
-    { id: 'economictimes-latest', name: 'Latest News', url: 'https://economictimes.indiatimes.com/rss.cms', country: 'India' }
+    { id: 'economictimes-latest', name: 'Latest News', url: 'https://economictimes.indiatimes.com/rssfeedstopstories.cms', country: 'India' }
   ],
   'Business Standard': [
     { id: 'businessstandard-latest', name: 'Latest News', url: 'https://business-standard.com/rss', country: 'India' }

@@ -12,14 +12,16 @@ import { resolveUrl } from "@/utils/linkResolver";
 import { calculateMetrics } from "@/lib/metrics";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { unstable_cache } from "next/cache";
+import { triggerOnDemandRevalidation } from "@/utils/revalidation";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: NextRequest) {
     try {
-        const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-        const limit = await rateLimit(`monitor:post:${ip}`, 15, 60);
+        const rlKey = await getRateLimitKey(req, 'monitor:post');
+        const limit = await rateLimit(rlKey, 15, 60);
         if (!limit.allowed) {
             return NextResponse.json(
                 { error: "Rate limit exceeded" },
@@ -123,8 +125,10 @@ export async function POST(req: NextRequest) {
 
         }
 
-        // @ts-expect-error - Using raw document payload before runtime validation
-        await convex.mutation(api.monitoring.saveArticle, articleData);
+        await convex.mutation(api.monitoring.saveArticle, articleData as any);
+
+        // Trigger cache revalidation on-demand
+        triggerOnDemandRevalidation();
 
         return NextResponse.json({ success: true, data: articleData });
 
@@ -136,8 +140,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    const rl = await rateLimit(`monitor:get:${ip}`, 60, 60);
+    const rlKey = await getRateLimitKey(req, 'monitor:get');
+    const rl = await rateLimit(rlKey, 60, 60);
     if (!rl.allowed) {
         return NextResponse.json(
             { error: "Rate limit exceeded" },
@@ -149,13 +153,43 @@ export async function GET(req: NextRequest) {
     const limit = Number(searchParams.get("limit")) || 50;
     const skip = Number(searchParams.get("skip")) || 0;
     const sourceType = searchParams.get("sourceType") || undefined;
+    const sourceCountry = searchParams.get("sourceCountry") || undefined;
+    const depth = searchParams.get("depth") || undefined;
 
     try {
-        const result = await convex.query(api.monitoring.getArticles, {
-            limit,
-            skip,
-            sourceType
-        }) as { items?: unknown[]; total?: number; nextSkip?: number | null };
+        const getCachedArticles = (
+            limit: number,
+            skip: number,
+            sourceType?: string,
+            sourceCountry?: string,
+            depth?: string
+        ) => {
+            return unstable_cache(
+                async () => {
+                    return await convex.query(api.monitoring.getArticles, {
+                        limit,
+                        skip,
+                        sourceType: sourceType === 'All' ? undefined : sourceType,
+                        sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
+                        depth: depth === 'All' ? undefined : depth,
+                    });
+                },
+                [
+                    "monitor-articles",
+                    String(limit),
+                    String(skip),
+                    sourceType || "all",
+                    sourceCountry || "all",
+                    depth || "all",
+                ],
+                {
+                    tags: ["monitor-articles"],
+                    revalidate: 60, // Fallback revalidation of 60 seconds
+                }
+            )();
+        };
+
+        const result = await getCachedArticles(limit, skip, sourceType, sourceCountry, depth) as { items?: unknown[]; total?: number; nextSkip?: number | null };
         return NextResponse.json({ success: true, count: result?.items?.length || 0, total: result?.total || 0, nextSkip: result?.nextSkip ?? null, data: result?.items || [] });
     } catch (error: unknown) {
         return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });

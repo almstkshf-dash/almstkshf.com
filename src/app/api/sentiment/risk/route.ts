@@ -10,15 +10,58 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
+import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { unstable_cache } from "next/cache";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
     try {
+        const rlKey = await getRateLimitKey(req, 'sentiment-risk');
+        const limitResult = await rateLimit(rlKey, 30, 60);
+        if (!limitResult.allowed) {
+            return NextResponse.json({
+                error: 'Rate limit exceeded'
+            }, { status: 429, headers: { 'Retry-After': String(limitResult.resetSeconds) } });
+        }
+
         const { searchParams } = new URL(req.url);
         const keyword = searchParams.get("keyword") || undefined;
+        const sourceType = searchParams.get("sourceType") || undefined;
+        const sourceCountry = searchParams.get("sourceCountry") || undefined;
+        const depth = searchParams.get("depth") || undefined;
 
-        const data = await convex.query(api.monitoring.getAnalyticsOverview, { keyword });
+        // Use unstable_cache to cache this query on-demand
+        const getCachedAnalyticsRisk = (
+            keyword?: string,
+            sourceType?: string,
+            sourceCountry?: string,
+            depth?: string
+        ) => {
+            return unstable_cache(
+                async () => {
+                    return await convex.query(api.monitoring.getAnalyticsOverview, {
+                        keyword,
+                        sourceType: sourceType === 'All' ? undefined : sourceType,
+                        sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
+                        depth: depth === 'All' ? undefined : depth,
+                    });
+                },
+                [
+                    "sentiment-risk",
+                    keyword || "all",
+                    sourceType || "all",
+                    sourceCountry || "all",
+                    depth || "all",
+                ],
+                {
+                    tags: ["sentiment-risk"],
+                    revalidate: 60, // Fallback revalidation of 60 seconds
+                }
+            )();
+        };
+
+        const data = await getCachedAnalyticsRisk(keyword, sourceType, sourceCountry, depth);
 
         return NextResponse.json({
             success: true,
@@ -27,7 +70,8 @@ export async function GET(req: NextRequest) {
             velocity: data.velocity,
             status: data.riskScore > 70 ? "High Risk" : data.riskScore > 40 ? "Elevated" : "Stable"
         });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        const err = error as Error;
+        return NextResponse.json({ error: err.message || String(error) }, { status: 500 });
     }
 }

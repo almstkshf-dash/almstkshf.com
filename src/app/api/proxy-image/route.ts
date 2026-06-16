@@ -1,14 +1,39 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
+import { isSafePublicUrl } from '@/utils/ssrf';
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    const imageUrl = searchParams.get('url');
-
-    if (!imageUrl) {
-        return new NextResponse('Missing url', { status: 400 });
-    }
-
     try {
+        // Apply rate limit
+        const rlKey = await getRateLimitKey(req, 'proxy-image');
+        const limitResult = await rateLimit(rlKey, 30, 60);
+        if (!limitResult.allowed) {
+            return new NextResponse('Rate limit exceeded', { 
+                status: 429, 
+                headers: { 'Retry-After': String(limitResult.resetSeconds) } 
+            });
+        }
+
+        const { searchParams } = new URL(req.url);
+        const imageUrl = searchParams.get('url');
+
+        if (!imageUrl) {
+            return new NextResponse('Missing url', { status: 400 });
+        }
+
+        // SSRF Guard
+        if (!isSafePublicUrl(imageUrl)) {
+            return new NextResponse('Invalid or forbidden URL', { status: 400 });
+        }
+
         const response = await fetch(imageUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'

@@ -79,6 +79,11 @@ function isShortenerUrl(urlStr: string): boolean {
     }
 }
 
+function getScraperUrl(): string {
+    const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+    return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
+}
+
 async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imageUrl?: string, source: string } | null> {
     try {
         const controller = new AbortController();
@@ -105,7 +110,7 @@ async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imag
             throw new Error(`HTTP_${response.status}`);
         }
 
-        let finalUrl = response.url;
+        const finalUrl = response.url;
         const buffer = await response.arrayBuffer();
         const html = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
         const $ = cheerio.load(html);
@@ -137,7 +142,7 @@ async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imag
         console.warn(`[resolveUrl] Direct resolution failed for ${originalUrl}: ${error.message || error}. Trying Playwright Scraper Service...`);
         try {
             // Falls back to the Premium Playwright Scraper microservice on port 3002
-            const scraperRes = await fetch('http://localhost:3002/scrape', {
+            const scraperRes = await fetch(getScraperUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: originalUrl, timeout: 12000, waitAfterLoad: 0 })
@@ -1516,16 +1521,31 @@ async function fetchRobustRss(url: string) {
         console.warn(`[fetchRobustRss] Direct fetch failed for ${url}: ${error.message || error}. Trying Playwright Scraper Service...`);
         try {
             // Falls back to the Premium Playwright Scraper microservice with Bright Data/Oxylabs proxy rotation!
-            const scraperRes = await fetch('http://localhost:3002/scrape', {
+            const scraperRes = await fetch(getScraperUrl(), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url, timeout: 12000, waitAfterLoad: 0 })
             });
             if (scraperRes.ok) {
                 const scraperData = await scraperRes.json();
-                if (scraperData.success && scraperData.rawContent) {
+                if (scraperData.success && (scraperData.rawContent || scraperData.rawContentBase64)) {
                     console.log(`[fetchRobustRss] Playwright Scraper successfully fetched RSS XML for: ${url}`);
-                    let xml = scraperData.rawContent;
+                    let xml = '';
+                    if (scraperData.rawContentBase64) {
+                        const buffer = Buffer.from(scraperData.rawContentBase64, 'base64');
+                        xml = decodeHtmlBuffer(buffer, scraperData.contentType || scraperData.headers?.['content-type']);
+                    } else {
+                        xml = scraperData.rawContent || '';
+                    }
+
+                    if (hasMojibake(xml)) {
+                        const recovered = tryRecoverMojibake(xml);
+                        if (recovered) {
+                            console.log(`[fetchRobustRss] Recovered mojibake in scraper XML for ${url}`);
+                            xml = recovered;
+                        }
+                    }
+
                     xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
                     return xml;
                 }

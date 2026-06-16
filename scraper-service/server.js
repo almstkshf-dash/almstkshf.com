@@ -275,18 +275,29 @@ app.post('/scrape', async (req, res) => {
       };
     });
 
-    const rawContent = await response.text();
+    let responseBody = Buffer.alloc(0);
+    try {
+      responseBody = await response.body();
+    } catch (bodyErr) {
+      console.warn(`[Scraper] Failed to get response body: ${bodyErr.message}`);
+    }
+
+    const rawContentBase64 = responseBody.toString('base64');
+    const contentType = response.headers()['content-type'] || '';
+    const rawContent = responseBody.toString('utf8');
 
     res.json({
       success: true,
       url: page.url(),
       status: responseStatus,
       rawContent,
+      rawContentBase64,
+      contentType,
+      headers: response.headers(),
       ...result
     });
 
   } catch (error) {
-    console.error(`[Scraper] Scrape failed for ${url}:`, error.message);
     if (isProxyOrNetworkError(error, null)) {
       recordProxyFailure(activeProxyType);
     }

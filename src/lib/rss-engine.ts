@@ -43,6 +43,7 @@ const parser = new Parser({
   // Disable the built-in fetch so we can use our own (with UA header + timeout)
   requestOptions: {
     // rss-parser passes these to Node's http.request â€” but we bypass parseURL entirely
+    // rss-parser passes these to Node's http.request — but we bypass parseURL entirely
     rejectUnauthorized: false,
   },
 });
@@ -53,16 +54,16 @@ const parser = new Parser({
 function extractImage(item: any): string | undefined {
   // 1. Check media:content (from rss-parser custom fields)
   if (item.media && item.media.$ && item.media.$.url) {
-    return item.media.$.url;
+    return coerceToString(item.media.$.url);
   }
   
   // 2. Check enclosures
   if (item.enclosure && item.enclosure.url) {
-    return item.enclosure.url;
+    return coerceToString(item.enclosure.url);
   }
   
   // 3. Extract from description or content (HTML)
-  const combined = (item.contentEncoded || '') + (item.description || '') + (item.content || '');
+  const combined = coerceToString(item.contentEncoded) + coerceToString(item.description) + coerceToString(item.content);
   const imgMatch = combined.match(/<img[^>]+src="([^">]+)"/i);
   if (imgMatch && imgMatch[1]) {
     // Some feeds use relative URLs which won't work
@@ -81,6 +82,78 @@ function isArabic(text: string): boolean {
 }
 
 /**
+ * Resolves the Playwright Scraper microservice endpoint.
+ */
+function getScraperUrl(): string {
+  const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+  return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
+}
+
+/**
+ * Attempts to fetch a URL using the Playwright Scraper microservice.
+ */
+async function tryScraper(url: string, country?: string): Promise<string | null> {
+  try {
+    const scraperRes = await fetch(getScraperUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, country: country || 'AE', timeout: 8000, waitAfterLoad: 0 })
+    });
+    if (scraperRes.ok) {
+      const scraperData = await scraperRes.json();
+      if (scraperData.success && (scraperData.rawContent || scraperData.rawContentBase64)) {
+        console.log(`[RSS Engine] Playwright Scraper fetched RSS XML successfully: ${url}`);
+        if (scraperData.rawContentBase64) {
+          const buffer = Buffer.from(scraperData.rawContentBase64, 'base64');
+          return decodeHtmlBuffer(buffer, scraperData.contentType || scraperData.headers?.['content-type']);
+        } else {
+          return scraperData.rawContent;
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error(`[RSS Engine] Playwright Scraper service call failed:`, err.message);
+  }
+  return null;
+}
+
+/**
+ * Coerces a parsed XML field into a clean string to prevent type errors.
+ */
+function coerceToString(value: any): string {
+  try {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (Array.isArray(value)) {
+      if (value.length === 0) return '';
+      return coerceToString(value[0]);
+    }
+    if (typeof value === 'object') {
+      if ('_' in value) {
+        return coerceToString(value._);
+      }
+      if ('text' in value) {
+        return coerceToString(value.text);
+      }
+      if ('#text' in value) {
+        return coerceToString(value['#text']);
+      }
+      if (typeof value.toString === 'function' && value.toString !== Object.prototype.toString) {
+        return value.toString();
+      }
+    }
+    return String(value);
+  } catch (err) {
+    console.error('[RSS Engine] Error coercing value to string:', err);
+    return '';
+  }
+}
+
+/**
  * Fetches a remote RSS/Atom feed as raw XML using a spoofed browser User-Agent,
  * then parses it server-side into a standardised FeedItem array.
  */
@@ -92,9 +165,12 @@ export async function parseFeed(
   const premiumDomains = [
     'gulfnews.com', 'khaleejtimes.com', 'thenationalnews.com', 'gulftoday.ae', 
     'skynewsarabia.com', 'emirates247.com', 'middleeasteye.net', 'prnewswire.com', 
-    'aetoswire.com', 'zawya.com', 'mydubainews.com',
-    'dubaichronicle.com', 'thearabianpost.com', 'saudigazette.com.sa', 
-    'arabnews.com', 'aljazeera.com', 'albiladpress.com', 'twentyfoursevennews.com'
+    'aetoswire.com', 'zawya.com', 'mydubainews.com', 'dubaichronicle.com', 
+    'thearabianpost.com', 'saudigazette.com.sa', 'arabnews.com', 'aljazeera.com', 
+    'albiladpress.com', 'twentyfoursevennews.com', 'thepeninsulaqatar.com', 
+    'al-sharq.com', 'aljarida.com', 'kuna.net.kw', 'dohanews.co', 'alwahdanews.ae', 
+    'dawn.com', 'pakistantoday.com.pk', 'telegraph.co.uk', 'bizbahrain.com', 
+    'bahrainthisweek.com', 'newvoragroup.com', 'wordpress.com'
   ];
 
   const parsedUrl = new URL(url);
@@ -103,29 +179,13 @@ export async function parseFeed(
   let rawXml: string = '';
 
   if (useScraperFallback) {
-    try {
-      console.log(`[RSS Engine] Premium/protected domain detected: ${parsedUrl.hostname}. Bypassing direct fetch and routing via Playwright Scraper Service...`);
-      const scraperRes = await fetch('http://localhost:3002/scrape', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, country: country || 'AE', timeout: 8000, waitAfterLoad: 0 })
-      });
-      if (scraperRes.ok) {
-        const scraperData = await scraperRes.json();
-        if (scraperData.success && scraperData.rawContent) {
-          console.log(`[RSS Engine] Playwright Scraper fetched RSS XML successfully for: ${url}`);
-          rawXml = scraperData.rawContent;
-          useScraperFallback = false; // We successfully fetched the feed!
-        } else {
-          throw new Error(scraperData.error || 'Scraper failed to return rawContent');
-        }
-      } else {
-        throw new Error(`Scraper microservice returned status ${scraperRes.status}`);
-      }
-    } catch (scraperErr: any) {
-      console.error(`[RSS Engine] Playwright Scraper fallback failed:`, scraperErr.message);
-      console.log(`[RSS Engine] Falling back to direct fetch for ${url}...`);
+    console.log(`[RSS Engine] Premium/protected domain detected: ${parsedUrl.hostname}. Bypassing direct fetch and routing via Playwright Scraper Service...`);
+    const scraped = await tryScraper(url, country);
+    if (scraped) {
+      rawXml = scraped;
       useScraperFallback = false;
+    } else {
+      console.log(`[RSS Engine] Premium scraper failed. Falling back to direct fetch for: ${url}`);
     }
   }
 
@@ -167,24 +227,10 @@ export async function parseFeed(
       if (!response.ok) {
         // Try the local scraper fallback if not already tried
         console.warn(`[RSS Engine] Direct fetch failed with HTTP ${response.status}. Trying Playwright Scraper Service as final fallback...`);
-        try {
-          const scraperRes = await fetch('http://localhost:3002/scrape', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, country: country || 'AE', timeout: 8000, waitAfterLoad: 0 })
-          });
-          if (scraperRes.ok) {
-            const scraperData = await scraperRes.json();
-            if (scraperData.success && scraperData.rawContent) {
-              console.log(`[RSS Engine] Playwright Scraper fetched RSS XML successfully as final fallback: ${url}`);
-              rawXml = scraperData.rawContent;
-            }
-          }
-        } catch (scraperErr: any) {
-          console.error(`[RSS Engine] Scraper final fallback failed:`, scraperErr.message);
-        }
-
-        if (!rawXml) {
+        const scraped = await tryScraper(url, country);
+        if (scraped) {
+          rawXml = scraped;
+        } else {
           const errorText = `Remote server responded with HTTP ${response.status} ${response.statusText} for ${url}`;
           console.warn(`[RSS Engine] ${errorText}`);
           throw new Error(errorText);
@@ -192,6 +238,23 @@ export async function parseFeed(
       } else {
         const buffer = await response.arrayBuffer();
         rawXml = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
+
+        // --- HTML Detection Check ---
+        const trimmedXml = rawXml.trim();
+        const isHtml = trimmedXml.startsWith('<!DOCTYPE html') || 
+                       trimmedXml.startsWith('<html') || 
+                       trimmedXml.startsWith('<!DOCTYPE HTML') || 
+                       trimmedXml.startsWith('<HTML');
+                       
+        if (isHtml) {
+          console.warn(`[RSS Engine] Direct fetch for ${url} returned HTML content (likely bot block/private page). Trying Playwright Scraper Service...`);
+          const scraped = await tryScraper(url, country);
+          if (scraped) {
+            rawXml = scraped;
+          } else {
+            throw new Error(`Access Denied: Server returned an HTML page (Cloudflare/recaptcha block or login page) instead of RSS XML.`);
+          }
+        }
       }
 
       if (!rawXml || rawXml.trim().length === 0) {
@@ -212,6 +275,15 @@ export async function parseFeed(
     }
   }
 
+  // ── 1.5. RECOVER mojibake in the raw XML string if detected ───────────────
+  if (hasMojibake(rawXml)) {
+    const recovered = tryRecoverMojibake(rawXml);
+    if (recovered) {
+      console.log(`[RSS Engine] Successfully recovered mojibake in rawXml string for: ${url}`);
+      rawXml = recovered;
+    }
+  }
+
   // ── 2. PARSE the raw XML string ───────────────────────────────────────────
   let feed;
   try {
@@ -222,13 +294,17 @@ export async function parseFeed(
     throw new Error(`Failed to parse RSS XML from ${url}: ${errorMessage}`);
   }
 
-  // â”€â”€ 3. NORMALISE into FeedItem[] â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── 3. NORMALISE into FeedItem[] ──────────────────────────────────────────
   const resolvedSource = sourceName || feed.title || new URL(url).hostname;
 
   return (feed.items ?? []).map((item): FeedItem => {
-    const description = item.description || item.contentSnippet || '';
-    const content = item.contentEncoded || item.content || description;
-    const title = (item.title || 'Untitled Article').trim();
+    const rawTitle = coerceToString(item.title) || 'Untitled Article';
+    const rawDescription = coerceToString(item.description || item.contentSnippet);
+    const rawContent = coerceToString(item.contentEncoded || item.content || rawDescription);
+
+    const title = rawTitle.trim();
+    const description = rawDescription.trim();
+    const content = rawContent.trim();
 
     const cleanTitle = hasMojibake(title) ? (tryRecoverMojibake(title) || title) : title;
     const cleanDescription = hasMojibake(description) ? (tryRecoverMojibake(description) || description) : description;

@@ -74,8 +74,8 @@ export function tryRecoverMojibake(text: string): string | null {
   }
 }
 
-export function decodeHtmlBuffer(buffer: ArrayBuffer, contentTypeHeader: string | null): string {
-  const bytes = new Uint8Array(buffer);
+export function decodeHtmlBuffer(buffer: ArrayBuffer | Uint8Array, contentTypeHeader: string | null): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
   
   // 1. Check Content-Type header for charset
   let charset = '';

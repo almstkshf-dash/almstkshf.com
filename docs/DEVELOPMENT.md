@@ -73,6 +73,16 @@ All of the following must be set in `.env.local` for local development and in **
 
 > ⚠️ **Important:** Variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. Never put secret keys in `NEXT_PUBLIC_` variables.
 
+> 🔒 **Security Warning:** Never write or commit scripts/utilities (such as `fix_env.js` or `verify_keys.js`) that programmatically update or verify environment variables or credentials using hardcoded tokens or API keys. Plaintext secrets in the repository represent a critical security vulnerability. All environment configurations must be managed out-of-band through:
+> 1. Local `.env.local` files (which are git-ignored).
+> 2. The **Vercel Dashboard** or **Convex Dashboard** settings panel.
+> 3. Standard interactive Vercel/Convex CLI commands while logged in securely.
+
+> 🧼 **Workspace Hygiene & Scripting Policy:**
+> - **No Temporary Scripts:** Do not write or commit temporary, one-off test, fix, or repair scripts (such as `fix_mojibake.js`, `fix_all_mojibake.js`, or `scratch/fix_encoding.js`) to the repository.
+> - **Clean Folders:** Keep the root directory, `scripts/`, and `scratch/` folders clean of test logs (`tsc_output.txt`, `eslint_report.json`), run outputs, and debug templates.
+> - **Standardized Utilities Only:** Only permanent, generic utility scripts (such as `scripts/download-font-data.js`) should be retained. All other one-off investigations should be run locally and excluded from git commits.
+
 ---
 
 ## 3. npm Scripts
@@ -471,6 +481,7 @@ To maintain high standards of code stability and a clean compiler profile:
 - **Watchlist & Sanitization Schema**: The `TerroristListItem` and its corresponding translations in `ReportTranslations` are strictly declared within `src/types/reports.ts`. Adding new columns/importers must be matched with explicit typings here to avoid falling back on `unknown` types which crash React 19 JSX renderings.
 - **Dynamic Models & TFJS Laziness**: In client-side ML processors (like `mlHelper.ts`), tensorflow/biometric models must be typed as `any` due to dynamic environment loading constraints, avoiding `unknown` restrictions on inference methods.
 - **Safe Dynamic ML Methods checking**: In `mlHelper.ts`, when invoking methods (like `estimateFaces`, `estimateHands`) on dynamically loaded TFJS models, we check if the models exist and the methods are valid functions (`typeof model.method === 'function'`) to prevent runtime errors on empty/uninitialized objects `{}`.
+- **MediaPipe Stub Dynamic Resolution**: Build-time stubs in `src/lib/engines/stubs/` satisfy Turbopack compilation constraints (which aliased `@mediapipe/face_mesh` and `@mediapipe/hands`). At runtime in the browser, `mlHelper.ts` dynamically loads the real MediaPipe libraries from jsDelivr CDN and updates the stub's live bindings using `updateGlobals()`, proxying access to the real classes and constants.
 - **Union Type Safety in AI Audits**: When displaying scores and metrics in `AiInspectorTab.tsx`, we avoid accessing properties directly on the union type of `TextAnalysisResult | ImageAnalysisReport | VideoAnalysisResult`. We instead query specific properties based on the active mode (e.g., `.score` for text, `.confidenceScore` for image, and `.overallScore` for video) in a type-safe manner.
 - **Video Results drawing function**: The callback passed to `.map` on `report.pixelLogicSignals` in `VideoResults.tsx` must be explicitly typed with the exact properties matching `ImageAnalysisReport["pixelLogicSignals"]` array elements, resolving parameter incompatibility errors where `detectedValue` or `threshold` can be either `string` or `number`.
 - **Convex Custom Identifiers**: Handlers dealing with DB entities (e.g. notifications dropdowns) should use flexible typings like `any` or explicit `Id<"table">` generics when mapping variables directly to Convex mutation interfaces, resolving strict schema validation errors.
@@ -763,6 +774,29 @@ The scraper fallback is fully integrated into the platform's link resolver (`src
 ```typescript
 const resolved = await resolveUrl(url, countryCode);
 ```
+
+---
+
+## 38. Unified Text Encoding & Mojibake Recovery Middleware
+
+To prevent Arabic text deformation (Mojibake) when fetching feeds or scraping articles, the platform employs a centralized, automated encoding and recovery pipeline:
+
+### 1. Scraper Base64 Ingestion
+- The Playwright scraper service (`scraper-service/server.js`) returns the raw response body as a Base64-encoded string (`rawContentBase64`) alongside the original `content-type` header.
+- This allows consumers (both the Next.js app and the Convex backend) to decode the binary data directly rather than relying on automatic string parsing (which is prone to encoding distortion).
+
+### 2. Centralized Decoding Middleware (`decodeHtmlBuffer`)
+- Fetched XML/HTML buffers are decoded using the helper `decodeHtmlBuffer` (located in both `src/utils/encoding.ts` and `convex/utils/encoding.ts`).
+- It extracts the charset from:
+  1. The `Content-Type` header (e.g. `charset=windows-1256`).
+  2. Inline XML encoding declarations (e.g. `<?xml version="1.0" encoding="windows-1256"?>`).
+  3. HTML meta tags (e.g. `<meta charset="windows-1256">`).
+- If no charset is specified, it runs a fast UTF-8 validation check (`isValidUtf8`). If valid, it decodes as `utf-8`; otherwise, it defaults to `windows-1256` (common for Arabic news).
+
+### 3. Self-Healing Mojibake Recovery
+- If the decoded text contains known mojibake signatures (e.g., UTF-8 Arabic text mistakenly decoded as Windows-1252/Latin1, yielding characters like `Ø` or `Ù` followed by control/Latin symbols), `tryRecoverMojibake` is invoked.
+- It reverse-maps the character codes to recover the original raw bytes, then decodes them as proper UTF-8, restoring the original Arabic text.
+
 
 
 

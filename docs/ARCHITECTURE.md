@@ -300,6 +300,15 @@ To prevent Vercel Serverless timeouts (60s limit) and handle long-running media 
 
 ---
 
+## 10.2 API Rate Limiting & SSRF Protections
+
+To secure endpoints from Denial of Service (DoS) and Server-Side Request Forgery (SSRF), the following security patterns are strictly enforced:
+1. **Rate Limiting Key Resolution**: Every rate-limited request resolves the client identity using `getRateLimitKey(req, prefix)`. This checks the Clerk User ID if authenticated, or falls back to resolving client IP securely checking multiple headers (`cf-connecting-ip`, `x-real-ip`, `x-forwarded-for`). This prevents rate limiting collisions on the generic `'unknown'` fallback.
+2. **In-Memory Fallback rate limiter**: If Upstash Redis is down or missing credentials (e.g. in local development or custom deployments), the system automatically engages an in-memory rate-limiter fallback (`runInMemoryRateLimit`) so that API endpoints never fail open or lack rate limits.
+3. **SSRF Guard Protection**: For proxy endpoints like `/api/proxy-rss` and `/api/proxy-image` that fetch resources from dynamic external URLs, the application enforces the `isSafePublicUrl` SSRF guard (found in `src/utils/ssrf.ts`). This checks that URLs use the `https` protocol and do not point to local loopbacks (`127.0.0.1`, `localhost`), link-local metadata ranges (`169.254.169.254`), or private RFC-1918 blocks, preventing attackers from probing internal server networks.
+
+---
+
 ## 11. Critical Patterns & Rules
 
 1. **Convex inside Client Components only** — never call Convex from middleware or server components directly.
