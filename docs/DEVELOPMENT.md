@@ -394,6 +394,13 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 | `Encountered two children with the same key` | Non-unique mapped array element keys (e.g., duplicated feed names or GUIDs) | Append the map loop index to the element key (e.g., `key={\`${f.name || f.feed}-${index}\`}`) |
 | `Error: Clerk was not loaded with Ui components` | Setting `prefetchUI={false}` on `<ClerkProvider>` but rendering standard Clerk UI components (e.g., `<UserButton />`) | Remove `prefetchUI={false}` or set to `true` (default) on `<ClerkProvider>` in `RootProviders.tsx` |
 | `You don't have access to the selected project` (Convex) | `npm run dev` running concurrently before the local repository is linked to your authenticated Convex account/team | Run `npx convex dev --configure` interactively in a separate terminal once to link the project to your Convex account/team, then run `npm run dev` |
+| `useSearchParams() should be wrapped in a suspense boundary` | Client component using `useSearchParams()` loaded in a static page/layout without a parent `<Suspense>` boundary | Wrap the component (e.g. `<Navbar />`) in a `<Suspense>` boundary inside the parent Server Component or Layout. |
+| `Warning: Next.js inferred your workspace root, but it may not be correct` | Accidental `package-lock.json` or `package.json` in parent directories (like `C:\Users\ceo`) | Delete the accidental lockfiles/package files from the user directory to restore correct workspace resolution. |
+| `CRITICAL: STRIPE_SECRET_KEY is missing` | Module-level initialization of Stripe server SDK throws error at import time during Next.js build | Use a default mock key fallback during build phase (`process.env.STRIPE_SECRET_KEY || 'sk_test...'`) and handle missing keys dynamically at request time. |
+| `Type 'string' is not assignable to type 'never' for className` on dynamic components | Typing Lucide icon props or other dynamic components with general types like `React.ComponentType<any>` or `React.ElementType` in React 19 | Specify the exact prop types expected by the component, e.g. `React.ComponentType<{ className?: string }>`, to allow custom properties. |
+| `Type 'string' is not assignable to type 'never'` in Stripe Webhook route for `sendSubscriptionEmail` arguments | TypeScript compiler or IDE server discrepancy with Convex generated action arguments | Cast the action reference and its arguments payload dynamically as `any` in `stripe/webhook/route.ts`. |
+| Stripe Webhook fails to send subscription email at runtime | `customer_email` or `email` fields do not exist on the Stripe subscription object | Retrieve the customer object dynamically using `stripe.customers.retrieve(subscription.customer as string)` to get their email address. |
+
 
 ---
 
@@ -463,6 +470,9 @@ To support adding all kinds of external links (including social media links such
 To maintain high standards of code stability and a clean compiler profile:
 - **Watchlist & Sanitization Schema**: The `TerroristListItem` and its corresponding translations in `ReportTranslations` are strictly declared within `src/types/reports.ts`. Adding new columns/importers must be matched with explicit typings here to avoid falling back on `unknown` types which crash React 19 JSX renderings.
 - **Dynamic Models & TFJS Laziness**: In client-side ML processors (like `mlHelper.ts`), tensorflow/biometric models must be typed as `any` due to dynamic environment loading constraints, avoiding `unknown` restrictions on inference methods.
+- **Safe Dynamic ML Methods checking**: In `mlHelper.ts`, when invoking methods (like `estimateFaces`, `estimateHands`) on dynamically loaded TFJS models, we check if the models exist and the methods are valid functions (`typeof model.method === 'function'`) to prevent runtime errors on empty/uninitialized objects `{}`.
+- **Union Type Safety in AI Audits**: When displaying scores and metrics in `AiInspectorTab.tsx`, we avoid accessing properties directly on the union type of `TextAnalysisResult | ImageAnalysisReport | VideoAnalysisResult`. We instead query specific properties based on the active mode (e.g., `.score` for text, `.confidenceScore` for image, and `.overallScore` for video) in a type-safe manner.
+- **Video Results drawing function**: The callback passed to `.map` on `report.pixelLogicSignals` in `VideoResults.tsx` must be explicitly typed with the exact properties matching `ImageAnalysisReport["pixelLogicSignals"]` array elements, resolving parameter incompatibility errors where `detectedValue` or `threshold` can be either `string` or `number`.
 - **Convex Custom Identifiers**: Handlers dealing with DB entities (e.g. notifications dropdowns) should use flexible typings like `any` or explicit `Id<"table">` generics when mapping variables directly to Convex mutation interfaces, resolving strict schema validation errors.
 
 ---
@@ -724,6 +734,35 @@ To guarantee absolute visual stability and console clean-room state for testing,
 
 ### 3. Content Security Policy upgrade-insecure-requests Warning
 - **Status**: The console warning `The Content Security Policy directive 'upgrade-insecure-requests' is ignored when delivered in a report-only policy.` originates from the third-party Chatbase iframe servers (`https://www.chatbase.co/...`) delivering a misconfigured `Content-Security-Policy-Report-Only` header. This is external to the codebase, completely non-blocking, and has zero impact on application behavior.
+
+---
+
+## 37. Premium Playwright Scraper Service & Proxy Integrations (Bright Data & Oxylabs)
+
+To ensure a reliable, 100% success rate when scraping dynamic news targets in the Gulf/Arab world that utilize strict anti-bot mechanisms (like Cloudflare or Akamai), the platform incorporates a dedicated **Custom Playwright Scraper Service** combined with high-reputation **Residential Proxies** (supporting both **Bright Data** and **Oxylabs**).
+
+### 1. Scraper Service Architecture
+- The scraper runs as an independent Express.js microservice located in the `/scraper-service` folder.
+- During local development, running `npm run dev` concurrently boots the Next.js frontend, Convex backend, and this Scraper Service on port `3002`.
+- When Next.js or Convex attempts to resolve a URL, it first tries a lightweight direct standard HTTP fetch (speed-optimized). If that fails (status != 200, 403 Forbidden, 404, or network timeout), the resolver automatically falls back to invoking the Playwright microservice.
+
+### 2. Dual Proxy Configuration (Bright Data & Oxylabs)
+The service features a robust, dual-strategy proxy configuration which automatically selects the best available residential proxy:
+
+- **Primary Strategy (Bright Data Residential Proxy)**:
+  - If `BRD_PROXY_USERNAME` and `BRD_PROXY_PASSWORD` are configured in `.env`, the scraper routes requests via Bright Data (`brd.superproxy.io:33335`).
+  - Utilizes dynamic IP session-rotation (`${username}-session-${random}`) and regional geo-targeting (`${username}-country-${country}`).
+  - Built-in `ignoreHTTPSErrors: true` ensures that proxy-level SSL/TLS interception doesn't trigger security crashes in Playwright.
+
+- **Secondary Strategy (Oxylabs Residential Proxy)**:
+  - If Bright Data credentials are missing but `OXY_PROXY_USERNAME` and `OXY_PROXY_PASSWORD` are defined, it automatically routes through Oxylabs (`pr.oxylabs.io:7777`).
+  - Implements Oxylabs session rotation (`${username}-session-${random}`) and country-specific targets (`${username}-cc-${country}`).
+
+### 3. Usage & Fallback Integration
+The scraper fallback is fully integrated into the platform's link resolver (`src/utils/linkResolver.ts`) and is consumed by all backend ingestion routes seamlessly:
+```typescript
+const resolved = await resolveUrl(url, countryCode);
+```
 
 
 

@@ -58,7 +58,7 @@ export default function RssFeeder({
   
   const articlesQuery = useQuery(
     api.monitoring.getRssArticles,
-    isAuthenticated ? { limit: 100 } : 'skip'
+    isAuthenticated ? { limit: 100, source: activePublisher || undefined } : 'skip'
   );
 
   const isLoading = articlesQuery === undefined;
@@ -111,13 +111,21 @@ export default function RssFeeder({
     if (!isAuthenticated || !activeUrl || !activePublisher) return;
     setIsSyncing(true);
     try {
-      const result = await syncFeedAction({
-        feedUrl: activeUrl,
-        publisher: activePublisher,
-        country: activeCountry,
-        lang: activeName?.toLowerCase().includes('ar') ? 'ar' : 'en',
-        limit: 10
+      const res = await fetch('/api/rss-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: activeUrl,
+          publisher: activePublisher,
+          country: activeCountry,
+          lang: activeName?.toLowerCase().includes('ar') ? 'ar' : 'en',
+          limit: 15
+        })
       });
+      if (!res.ok) {
+        throw new Error(`HTTP_${res.status}`);
+      }
+      const result = await res.json();
       if (result?.success) {
         if (result.savedCount > 0) {
           toast.success(`Synced ${result.savedCount} new articles!`);
@@ -125,7 +133,7 @@ export default function RssFeeder({
           toast.info('Feed is up to date.');
         }
       } else {
-        toast.error(result?.message || 'Sync failed.');
+        toast.error(result?.error || 'Sync failed.');
       }
     } catch (err) {
       console.error('RSS Sync error:', err);
@@ -133,7 +141,7 @@ export default function RssFeeder({
     } finally {
       setIsSyncing(false);
     }
-  }, [isAuthenticated, activeUrl, activePublisher, activeCountry, activeName, syncFeedAction]);
+  }, [isAuthenticated, activeUrl, activePublisher, activeCountry, activeName]);
 
   const fetchFeed = useCallback(async (silent = false) => {
     await triggerSync();

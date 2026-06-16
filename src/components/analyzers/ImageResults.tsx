@@ -252,8 +252,8 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                     {t("anatomy_consistency")}
                   </span>
                   <div className="flex flex-wrap gap-2">
-                    {rich.deepMl.biometrics.faceAnomalies.length > 0 || rich.deepMl.biometrics.handAnomalies.length > 0 ? (
-                      [...rich.deepMl.biometrics.faceAnomalies, ...rich.deepMl.biometrics.handAnomalies].map((anomaly, idx) => (
+                    {(rich.deepMl.biometrics?.faceAnomalies?.length ?? 0) > 0 || (rich.deepMl.biometrics?.handAnomalies?.length ?? 0) > 0 ? (
+                      ([...(rich.deepMl.biometrics?.faceAnomalies || []), ...(rich.deepMl.biometrics?.handAnomalies || [])] as any[]).map((anomaly, idx) => (
                         <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] font-bold text-rose-600 dark:text-rose-400">
                           <AlertTriangle className="w-3 h-3" />
                           {tCommon.has(`anomalies.${anomaly.id}`) ? tCommon(`anomalies.${anomaly.id}`) : anomaly.name}
@@ -277,19 +277,19 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                   <div className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[9px] font-bold text-muted-foreground uppercase">{t("pattern_match")}</span>
-                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${rich.deepMl.ocr.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
-                        {rich.deepMl.ocr.isGarbled ? t("status_suspicious") : t("status_clean")}
+                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded ${rich.deepMl.ocr?.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                        {rich.deepMl.ocr?.isGarbled ? t("status_suspicious") : t("status_clean")}
                       </span>
                     </div>
                     <p className="text-[10px] font-mono leading-relaxed truncate opacity-60">
-                      {rich.deepMl.ocr.text || t("no_text_detected")}
+                      {rich.deepMl.ocr?.text || t("no_text_detected")}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Watermarks */}
-              {rich.deepMl.watermarks.length > 0 && (
+              {(rich.deepMl.watermarks?.length ?? 0) > 0 && (
                 <div className="pt-2 border-t border-blue-500/5">
                   <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/5 border border-amber-500/10 rounded-xl">
                     <Layers className="w-3 h-3 text-amber-600" />
@@ -297,7 +297,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                       {t("detected_ai_signature")}{" "}
                       <span className="font-black italic">
                         {rich.deepMl.watermarks
-                          .map((w) => (tCommon.has(`watermarks.${w.id}`) ? tCommon(`watermarks.${w.id}`) : w.name))
+                          ?.map((w) => (tCommon.has(`watermarks.${w.id}`) ? tCommon(`watermarks.${w.id}`) : w.name))
                           .join(", ")}
                       </span>
                     </span>

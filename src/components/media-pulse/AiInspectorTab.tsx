@@ -63,10 +63,12 @@ export default function AiInspectorTab() {
 
       // Map to AiInspectorData interface
       const reportData: AiInspectorData = {
-        overallRisk: mode === 'text' ? (textResults?.score ?? 0 >= 70 ? 'high' : textResults?.score ?? 0 >= 30 ? 'medium' : 'low') : 
-                    mode === 'image' ? (imageResults?.overallRisk ?? 'low') : 
-                    (videoResults?.overallRisk ?? 'low'),
-        confidenceScore: (activeData as any).score ?? (activeData as any).confidenceScore ?? 0,
+        overallRisk: mode === 'text' ? (((textResults?.score ?? 0) >= 70) ? 'high' : ((textResults?.score ?? 0) >= 30) ? 'medium' : 'low') :
+          mode === 'image' ? (imageResults?.overallRisk ?? 'low') :
+            (videoResults?.overallRisk ?? 'low'),
+        confidenceScore: mode === 'text' ? (textResults?.score ?? 0) :
+          mode === 'image' ? (imageResults?.confidenceScore ?? 0) :
+            (videoResults?.overallScore ?? 0),
         sentenceBreakdown: textResults?.sentences?.map(s => ({
           text: s.text,
           flags: s.signals,
@@ -81,11 +83,11 @@ export default function AiInspectorTab() {
         })),
         deepMl: (imageResults?.richResult?.deepMl || videoResults?.deepMl) ? {
           biometrics: {
-            faceAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics.faceAnomalies,
-            handAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics.handAnomalies,
+            faceAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics?.faceAnomalies || [],
+            handAnomalies: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.biometrics?.handAnomalies || [],
           },
-          ocr: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.ocr,
-          watermarks: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.watermarks,
+          ocr: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.ocr || { text: "", isGarbled: false, confidence: 0 },
+          watermarks: (imageResults?.richResult?.deepMl || videoResults?.deepMl)?.watermarks || [],
         } : undefined,
         frameAnomalies: videoResults?.frames?.map(f => ({
           timestamp: String(f.timestamp),

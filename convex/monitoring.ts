@@ -8,6 +8,7 @@
 
 import { query, mutation } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
+import { internal } from "./_generated/api";
 
 function applyMonitoringFilters(q: any, args: { sourceType?: string; sourceCountry?: string; depth?: string }) {
     if (args.sourceType && args.sourceType !== "All") {
@@ -77,12 +78,17 @@ export const getRssArticles = query({
     args: {
         limit: v.optional(v.number()),
         skip: v.optional(v.number()),
+        source: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const limit = args.limit ?? 100;
         const skip = args.skip ?? 0;
 
-        const all = await ctx.db.query("rss_feed_articles").collect();
+        let queryBuilder = ctx.db.query("rss_feed_articles");
+        if (args.source) {
+            queryBuilder = queryBuilder.filter((q) => q.eq(q.field("source"), args.source));
+        }
+        const all = await queryBuilder.collect();
 
         const parseDate = (d: string) => {
             const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
@@ -180,34 +186,49 @@ export const saveArticle = mutation({
             surprise: v.number(),
             trust: v.number(),
         })),
+        analysisStatus: v.optional(v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"))),
     },
     handler: async (ctx, args) => {
         try {
             // Ensure sourceType matches schema validator
             const validSourceTypes = ["Online News", "Social Media", "Blog", "Print", "Press Release"];
 
-            // Check for duplicates before inserting: title AND url (or resolvedUrl)
-            const existing = await ctx.db
+            // Fast lookup by url / resolvedUrl to prevent OCC range contention
+            let existing = await ctx.db
                 .query("media_monitoring_articles")
-                .withIndex("by_date", (q) => q.eq("publishedDate", args.publishedDate))
-                .filter((q) =>
-                    q.and(
-                        q.eq(q.field("title"), args.title),
-                        q.or(
-                            q.eq(q.field("url"), args.url),
-                            q.eq(q.field("resolvedUrl"), args.url),
-                            q.eq(q.field("url"), args.resolvedUrl || args.url),
-                            q.eq(q.field("resolvedUrl"), args.resolvedUrl || args.url)
-                        )
-                    )
-                )
+                .withIndex("by_url", (q) => q.eq("url", args.url))
+                .filter((q) => q.eq(q.field("title"), args.title))
                 .first();
+
+            if (!existing && args.resolvedUrl) {
+                existing = await ctx.db
+                    .query("media_monitoring_articles")
+                    .withIndex("by_resolvedUrl", (q) => q.eq("resolvedUrl", args.resolvedUrl!))
+                    .filter((q) => q.eq(q.field("title"), args.title))
+                    .first();
+            }
+
+            if (!existing && args.resolvedUrl) {
+                existing = await ctx.db
+                    .query("media_monitoring_articles")
+                    .withIndex("by_url", (q) => q.eq("url", args.resolvedUrl!))
+                    .filter((q) => q.eq(q.field("title"), args.title))
+                    .first();
+            }
+
+            if (!existing) {
+                existing = await ctx.db
+                    .query("media_monitoring_articles")
+                    .withIndex("by_resolvedUrl", (q) => q.eq("resolvedUrl", args.url))
+                    .filter((q) => q.eq(q.field("title"), args.title))
+                    .first();
+            }
 
             if (existing) {
                 if (args.isManual) {
                     throw new ConvexError("DuplicateArticle: This article already exists in your monitoring feed.");
                 }
-                return;
+                return existing._id;
             }
 
             // 100% Data Validation: Ensure all literals are correct
@@ -215,7 +236,7 @@ export const saveArticle = mutation({
                 ? (args.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release")
                 : "Online News";
 
-            await ctx.db.insert("media_monitoring_articles", {
+            const id = await ctx.db.insert("media_monitoring_articles", {
                 ...args,
                 createdAt: Date.now(),
                 sourceType: finalSourceType,
@@ -227,11 +248,63 @@ export const saveArticle = mutation({
                 hashtags: args.hashtags,
                 emotions: args.emotions,
             });
+
+            if (args.analysisStatus === "pending") {
+                await ctx.scheduler.runAfter(0, internal.monitoringAction.analyzeArticleBackground, {
+                    articleId: id,
+                });
+            }
+            return id;
         } catch (error) {
             console.error("saveArticle failed. Args:", JSON.stringify(args));
             console.error("saveArticle error:", error);
             throw error;
         }
+    },
+});
+
+// MUTATION: Update article after background analysis completes
+export const updateArticleAfterAnalysis = mutation({
+    args: {
+        id: v.id("media_monitoring_articles"),
+        sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
+        analysisStatus: v.union(v.literal("completed"), v.literal("failed")),
+        tone: v.optional(v.string()),
+        risk: v.optional(v.string()),
+        reach: v.number(),
+        ave: v.number(),
+        relevancy_score: v.optional(v.number()),
+        emotions: v.optional(v.object({
+            joy: v.number(),
+            sadness: v.number(),
+            anger: v.number(),
+            fear: v.number(),
+            surprise: v.number(),
+            trust: v.number(),
+        })),
+        sourceCountry: v.optional(v.string()),
+        source: v.optional(v.string()),
+        resolvedUrl: v.optional(v.string()),
+        imageUrl: v.optional(v.string()),
+        content: v.optional(v.string()),
+        depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
+    },
+    handler: async (ctx, args) => {
+        const { id, ...fields } = args;
+        const existing = await ctx.db.get(id);
+        if (!existing) throw new Error("Article not found");
+        await ctx.db.patch(id, {
+            ...fields,
+            originalSentiment: existing.originalSentiment ?? fields.sentiment ?? existing.sentiment,
+        });
+    },
+});
+
+// QUERY: Retrieve a single article by ID
+export const getArticle = query({
+    args: { id: v.id("media_monitoring_articles") },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.id);
     },
 });
 
@@ -662,16 +735,19 @@ export const purgeOldData = mutation({
     handler: async (ctx) => {
         let totalDeleted = 0;
 
-        // 1. Purge old RSS feed articles (Keep only the latest 200)
-        const rssArticles = await ctx.db
+        // 1. Purge old RSS feed articles (Keep only the latest 2000)
+        const rssLimitCheck = await ctx.db
             .query("rss_feed_articles")
-            .collect();
+            .withIndex("by_createdAt")
+            .order("desc")
+            .take(2001);
         
-        if (rssArticles.length > 200) {
-            // Sort by createdAt descending
-            rssArticles.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            // Keep the first 200, delete the rest
-            const toDelete = rssArticles.slice(200);
+        if (rssLimitCheck.length > 2000) {
+            const cutoffTime = rssLimitCheck[2000].createdAt;
+            const toDelete = await ctx.db
+                .query("rss_feed_articles")
+                .withIndex("by_createdAt", (q) => q.lte("createdAt", cutoffTime))
+                .take(200); // Process in batches of 200 to avoid long transactions
             for (const doc of toDelete) {
                 await ctx.db.delete(doc._id);
                 totalDeleted++;
@@ -680,48 +756,44 @@ export const purgeOldData = mutation({
 
         // 2. Purge old OSINT results (older than 7 days)
         const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-        const osintResults = await ctx.db
+        const oldOsint = await ctx.db
             .query("osint_results")
-            .collect();
-        for (const doc of osintResults) {
-            if (doc.createdAt < sevenDaysAgo) {
-                await ctx.db.delete(doc._id);
-                totalDeleted++;
-            }
+            .withIndex("by_created_at", (q) => q.lt("createdAt", sevenDaysAgo))
+            .take(200);
+        for (const doc of oldOsint) {
+            await ctx.db.delete(doc._id);
+            totalDeleted++;
         }
 
         // 3. Purge old Dark Web results (older than 7 days)
-        const darkwebResults = await ctx.db
+        const oldDarkweb = await ctx.db
             .query("darkweb_results")
-            .collect();
-        for (const doc of darkwebResults) {
-            if (doc.discovered_at < sevenDaysAgo) {
-                await ctx.db.delete(doc._id);
-                totalDeleted++;
-            }
+            .withIndex("by_discovered_at", (q) => q.lt("discovered_at", sevenDaysAgo))
+            .take(200);
+        for (const doc of oldDarkweb) {
+            await ctx.db.delete(doc._id);
+            totalDeleted++;
         }
 
         // 4. Purge old free analyses (older than 7 days)
-        const freeAnalyses = await ctx.db
+        const oldAnalyses = await ctx.db
             .query("free_analyses")
-            .collect();
-        for (const doc of freeAnalyses) {
-            if (doc.timestamp < sevenDaysAgo) {
-                await ctx.db.delete(doc._id);
-                totalDeleted++;
-            }
+            .withIndex("by_timestamp", (q) => q.lt("timestamp", sevenDaysAgo))
+            .take(200);
+        for (const doc of oldAnalyses) {
+            await ctx.db.delete(doc._id);
+            totalDeleted++;
         }
 
         // 5. Purge old media monitoring articles (older than 30 days)
         const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-        const monitoringArticles = await ctx.db
+        const oldMonitoring = await ctx.db
             .query("media_monitoring_articles")
-            .collect();
-        for (const doc of monitoringArticles) {
-            if ((doc.createdAt || 0) < thirtyDaysAgo) {
-                await ctx.db.delete(doc._id);
-                totalDeleted++;
-            }
+            .withIndex("by_createdAt", (q) => q.lt("createdAt", thirtyDaysAgo))
+            .take(200);
+        for (const doc of oldMonitoring) {
+            await ctx.db.delete(doc._id);
+            totalDeleted++;
         }
 
         return { success: true, deletedCount: totalDeleted };

@@ -47,6 +47,7 @@ export interface ReportTranslations {
         entity_type?: string;
         relevance?: string;
         page?: string;
+        [key: string]: string | undefined;
     };
     DarkWeb?: {
         tab_label?: string;
@@ -263,5 +264,5 @@ export interface MonitoringArticle {
     manualSentimentOverride?: boolean;
     originalSentiment?: string;
     keyword?: string;
-    [key: string]: unknown;
+    [key: string]: any;
 }

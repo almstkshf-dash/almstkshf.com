@@ -8,6 +8,7 @@
 
 import Parser from 'rss-parser';
 import { FeedItem } from '@/types/rss';
+import { decodeHtmlBuffer, hasMojibake, tryRecoverMojibake } from '@/utils/encoding';
 
 /**
  * Spoofed browser User-Agent string.
@@ -23,7 +24,7 @@ const BROWSER_UA =
  * Timeout in milliseconds for each remote feed fetch.
  * Prevents a slow/unresponsive server from stalling the API route handler.
  */
-const FETCH_TIMEOUT_MS = 15_000;
+const FETCH_TIMEOUT_MS = 10_000;
 
 /**
  * Standard RSS Parser instance.
@@ -88,67 +89,130 @@ export async function parseFeed(
   sourceName: string = 'RSS Feed',
   country?: string
 ): Promise<FeedItem[]> {
-  // â”€â”€ 1. FETCH raw XML with spoofed headers + timeout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const premiumDomains = [
+    'gulfnews.com', 'khaleejtimes.com', 'thenationalnews.com', 'gulftoday.ae', 
+    'skynewsarabia.com', 'emirates247.com', 'middleeasteye.net', 'prnewswire.com', 
+    'aetoswire.com', 'zawya.com', 'mydubainews.com',
+    'dubaichronicle.com', 'thearabianpost.com', 'saudigazette.com.sa', 
+    'arabnews.com', 'aljazeera.com', 'albiladpress.com', 'twentyfoursevennews.com'
+  ];
 
-  let rawXml: string;
-  let response: Response;
-  try {
-    const fetchOptions: RequestInit = {
-      signal: controller.signal,
-      redirect: 'manual',
-      headers: {
-        'User-Agent': BROWSER_UA,
-        Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
-        'Accept-Language': 'ar,en;q=0.9',
-        Referer: new URL(url).origin + '/',
-      },
-      next: { revalidate: 900 },
-    };
+  const parsedUrl = new URL(url);
+  const isPremiumDomain = premiumDomains.some(domain => parsedUrl.hostname.toLowerCase().includes(domain));
+  let useScraperFallback = isPremiumDomain;
+  let rawXml: string = '';
 
-    response = await fetch(url, fetchOptions);
-
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get('location');
-      if (location) {
-        const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
-        const redirectUrl = new URL(fixedLocation, url).toString();
-        console.log(`[RSS Engine] Following manual redirect: ${url} -> ${redirectUrl}`);
-        const nextResponse = await fetch(redirectUrl, {
-          ...fetchOptions,
-          redirect: 'follow',
-        });
-        response = nextResponse;
+  if (useScraperFallback) {
+    try {
+      console.log(`[RSS Engine] Premium/protected domain detected: ${parsedUrl.hostname}. Bypassing direct fetch and routing via Playwright Scraper Service...`);
+      const scraperRes = await fetch('http://localhost:3002/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, country: country || 'AE', timeout: 8000, waitAfterLoad: 0 })
+      });
+      if (scraperRes.ok) {
+        const scraperData = await scraperRes.json();
+        if (scraperData.success && scraperData.rawContent) {
+          console.log(`[RSS Engine] Playwright Scraper fetched RSS XML successfully for: ${url}`);
+          rawXml = scraperData.rawContent;
+          useScraperFallback = false; // We successfully fetched the feed!
+        } else {
+          throw new Error(scraperData.error || 'Scraper failed to return rawContent');
+        }
+      } else {
+        throw new Error(`Scraper microservice returned status ${scraperRes.status}`);
       }
+    } catch (scraperErr: any) {
+      console.error(`[RSS Engine] Playwright Scraper fallback failed:`, scraperErr.message);
+      console.log(`[RSS Engine] Falling back to direct fetch for ${url}...`);
+      useScraperFallback = false;
     }
-
-    if (!response.ok) {
-      const errorText = `Remote server responded with HTTP ${response.status} ${response.statusText} for ${url}`;
-      console.warn(`[RSS Engine] ${errorText}`);
-      throw new Error(errorText);
-    }
-
-    rawXml = await response.text();
-    
-    if (!rawXml || rawXml.trim().length === 0) {
-      throw new Error(`The remote server for ${url} returned an empty response.`);
-    }
-  } catch (err: unknown) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
-    }
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    console.error(`[RSS Engine] Fetch failed for ${url}:`, errorMessage);
-    if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('ENOTFOUND')) {
-      throw new Error(`The feed server at ${url} is currently unreachable.`);
-    }
-    throw new Error(`Network error fetching feed from ${url}: ${errorMessage}`);
-  } finally {
-    clearTimeout(timeoutId);
   }
 
-  // â”€â”€ 2. PARSE the raw XML string â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  if (!rawXml) {
+    // ── 1. FETCH raw XML with spoofed headers + timeout ──────────────────────
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      const fetchOptions: RequestInit = {
+        signal: controller.signal,
+        redirect: 'manual',
+        headers: {
+          'User-Agent': BROWSER_UA,
+          Accept: 'application/rss+xml, application/atom+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7',
+          'Accept-Language': 'ar,en;q=0.9',
+          Referer: new URL(url).origin + '/',
+        },
+        cache: 'no-store',
+      };
+
+      response = await fetch(url, fetchOptions);
+
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get('location');
+        if (location) {
+          const fixedLocation = location.replace(/^https:\/\/([^/:]+):80(\/|$)/, 'https://$1$2');
+          const redirectUrl = new URL(fixedLocation, url).toString();
+          console.log(`[RSS Engine] Following manual redirect: ${url} -> ${redirectUrl}`);
+          const nextResponse = await fetch(redirectUrl, {
+            ...fetchOptions,
+            redirect: 'follow',
+          });
+          response = nextResponse;
+        }
+      }
+
+      if (!response.ok) {
+        // Try the local scraper fallback if not already tried
+        console.warn(`[RSS Engine] Direct fetch failed with HTTP ${response.status}. Trying Playwright Scraper Service as final fallback...`);
+        try {
+          const scraperRes = await fetch('http://localhost:3002/scrape', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url, country: country || 'AE', timeout: 8000, waitAfterLoad: 0 })
+          });
+          if (scraperRes.ok) {
+            const scraperData = await scraperRes.json();
+            if (scraperData.success && scraperData.rawContent) {
+              console.log(`[RSS Engine] Playwright Scraper fetched RSS XML successfully as final fallback: ${url}`);
+              rawXml = scraperData.rawContent;
+            }
+          }
+        } catch (scraperErr: any) {
+          console.error(`[RSS Engine] Scraper final fallback failed:`, scraperErr.message);
+        }
+
+        if (!rawXml) {
+          const errorText = `Remote server responded with HTTP ${response.status} ${response.statusText} for ${url}`;
+          console.warn(`[RSS Engine] ${errorText}`);
+          throw new Error(errorText);
+        }
+      } else {
+        const buffer = await response.arrayBuffer();
+        rawXml = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
+      }
+
+      if (!rawXml || rawXml.trim().length === 0) {
+        throw new Error(`The remote server for ${url} returned an empty response.`);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new Error(`Timeout fetching feed from ${url} (took more than ${FETCH_TIMEOUT_MS}ms)`);
+      }
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error(`[RSS Engine] Fetch failed for ${url}:`, errorMessage);
+      if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('ENOTFOUND')) {
+        throw new Error(`The feed server at ${url} is currently unreachable.`);
+      }
+      throw new Error(`Network error fetching feed from ${url}: ${errorMessage}`);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  // ── 2. PARSE the raw XML string ───────────────────────────────────────────
   let feed;
   try {
     feed = await parser.parseString(rawXml);
@@ -165,15 +229,20 @@ export async function parseFeed(
     const description = item.description || item.contentSnippet || '';
     const content = item.contentEncoded || item.content || description;
     const title = (item.title || 'Untitled Article').trim();
+
+    const cleanTitle = hasMojibake(title) ? (tryRecoverMojibake(title) || title) : title;
+    const cleanDescription = hasMojibake(description) ? (tryRecoverMojibake(description) || description) : description;
+    const cleanContent = hasMojibake(content) ? (tryRecoverMojibake(content) || content) : content;
+
     const image = extractImage(item);
-    const language = isArabic(title + description) ? 'AR' : 'EN';
+    const language = isArabic(cleanTitle + cleanDescription) ? 'AR' : 'EN';
 
     return {
-      title,
+      title: cleanTitle,
       link: item.link || '',
       pubDate: item.isoDate || item.pubDate || new Date().toISOString(),
-      description,
-      content,
+      description: cleanDescription,
+      content: cleanContent,
       source: resolvedSource,
       author: item.creator || (item as any).author || '',
       categories: item.categories || [],

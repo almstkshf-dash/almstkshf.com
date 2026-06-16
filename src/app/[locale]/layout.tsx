@@ -145,7 +145,31 @@ export default async function RootLayout({
     const dir = locale === "ar" ? "rtl" : "ltr";
 
     return (
-        <html lang={locale} dir={dir} className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning><head><link rel="preconnect" href="https://clerk.com" /><link rel="preconnect" href="https://img.clerk.com" /><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />{process.env.NEXT_PUBLIC_CONVEX_URL && (<link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />)}<script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} /><script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} /></head><body className={`${cairo.variable} antialiased font-sans bg-background text-foreground`}><RootProviders locale={locale} messages={messages}><Navbar /><Suspense fallback={<div className="flex h-screen items-center justify-center bg-background"><Loader2 className="w-10 h-10 text-primary animate-spin" /></div>}>{children}</Suspense><LazyLayoutParts /><Analytics /><SpeedInsights /></RootProviders><script
+        <html lang={locale} dir={dir} className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
+            <head>
+                <link rel="preconnect" href="https://clerk.com" />
+                <link rel="preconnect" href="https://img.clerk.com" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                {process.env.NEXT_PUBLIC_CONVEX_URL && (
+                    <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />
+                )}
+                <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} />
+                <script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} />
+            </head>
+            <body className={`${cairo.variable} antialiased font-sans bg-background text-foreground`}>
+                <RootProviders locale={locale} messages={messages}>
+                    <Suspense fallback={<div className="h-16 w-full bg-background border-b border-border" />}>
+                        <Navbar />
+                    </Suspense>
+                    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-background"><Loader2 className="w-10 h-10 text-primary animate-spin" /></div>}>
+                        {children}
+                    </Suspense>
+                    <LazyLayoutParts />
+                    <Analytics />
+                    <SpeedInsights />
+                </RootProviders>
+                <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
                 __html: JSON.stringify([

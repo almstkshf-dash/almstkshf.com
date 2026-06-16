@@ -55,7 +55,11 @@ export default defineSchema({
         })),
         publisherUsername: v.optional(v.string()),
         createdAt: v.number(),
-    }).index("by_date", ["publishedDate"]),
+        analysisStatus: v.optional(v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"))),
+    }).index("by_date", ["publishedDate"])
+      .index("by_url", ["url"])
+      .index("by_resolvedUrl", ["resolvedUrl"])
+      .index("by_createdAt", ["createdAt"]),
 
     rss_feed_articles: defineTable({
         url: v.string(),
@@ -67,7 +71,8 @@ export default defineSchema({
         sourceCountry: v.string(),
         imageUrl: v.optional(v.string()),
         createdAt: v.number(),
-    }).index("by_url", ["url"]),
+    }).index("by_url", ["url"])
+      .index("by_createdAt", ["createdAt"]),
 
     ingestion_runs_deep: defineTable({
         startedAt: v.number(),
@@ -154,7 +159,9 @@ export default defineSchema({
         entities: v.optional(v.array(v.string())),
         recommendation: v.string(),
         timestamp: v.number(),
-    }),
+        status: v.optional(v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"))),
+        error: v.optional(v.string()),
+    }).index("by_timestamp", ["timestamp"]),
 
     waitlist: defineTable({
         email: v.string(),

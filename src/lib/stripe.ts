@@ -10,12 +10,13 @@ import 'server-only';
 import Stripe from 'stripe';
 
 if (!process.env.STRIPE_SECRET_KEY) {
-    console.error('CRITICAL: STRIPE_SECRET_KEY is missing from environment variables.');
-    throw new Error('STRIPE_SECRET_KEY is not set. Please add it to your environment variables.');
+    console.warn('WARNING: STRIPE_SECRET_KEY is missing from environment variables. Using a fallback value for build/development.');
 }
 
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_mock_secret_key_during_build';
+
 // Initialize Stripe with a standard stable API version
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+export const stripe = new Stripe(stripeSecretKey, {
     // @ts-expect-error - using latest acacia version not in types
     apiVersion: '2025-01-27.acacia',
     typescript: true,

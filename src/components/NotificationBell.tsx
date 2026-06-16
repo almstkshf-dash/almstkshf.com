@@ -10,6 +10,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 import { Bell } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
@@ -38,7 +39,7 @@ export function NotificationBell() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleDismiss = async (id: any) => {
+    const handleDismiss = async (id: Id<"notifications">) => {
         await markAsRead({ id });
     };
 

@@ -60,7 +60,7 @@ export async function analyzeOCR(canvas: HTMLCanvasElement): Promise<{
   // 1. Words with rare character transitions
   // 2. High ratio of symbols to letters
   // 3. Very low OCR confidence on structured areas
-  const garbledWords = (words as { text?: string; confidence?: number }[]).filter((w: { text?: string; confidence?: number }) => {
+  const garbledWords = (words as any[]).filter((w: any) => {
     const wordText = w.text || '';
     const hasManyConsonants = /[^aeiou]{5,}/i.test(wordText);
     const hasSymbols = /[^a-z0-9]/i.test(wordText);
@@ -76,6 +76,7 @@ export async function analyzeOCR(canvas: HTMLCanvasElement): Promise<{
 export interface ForensicAnomaly {
   id: string;
   name: string;
+  confidence?: number;
 }
 
 /**
@@ -87,8 +88,12 @@ export async function detectBiometricAnomalies(canvas: HTMLCanvasElement): Promi
 }> {
   await loadModels();
 
-  const faces = await faceModel!.estimateFaces(canvas);
-  const hands = await handModel!.estimateHands(canvas);
+  const faces = (faceModel && typeof faceModel.estimateFaces === 'function')
+    ? await faceModel.estimateFaces(canvas)
+    : [];
+  const hands = (handModel && typeof handModel.estimateHands === 'function')
+    ? await handModel.estimateHands(canvas)
+    : [];
 
   const faceAnomalies: ForensicAnomaly[] = [];
   const handAnomalies: ForensicAnomaly[] = [];

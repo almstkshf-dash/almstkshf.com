@@ -10,6 +10,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '../../../../lib/stripe';
 import Stripe from 'stripe';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '../../../../../convex/_generated/api';
 
 // Stripe webhook secret (required in production)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -62,8 +64,6 @@ export async function POST(request: NextRequest) {
                 console.log('✅ Payment successful:', session.id);
 
                 // Initialize Convex Client
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
                 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
                 // Record the payment in Convex
@@ -85,8 +85,6 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('📋 Subscription updated:', subscription.id);
 
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
                 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
                 const userId = subscription.metadata?.userId;
@@ -111,13 +109,23 @@ export async function POST(request: NextRequest) {
                 // Trigger email notification via Convex Action
                 try {
                     if (subscription.status === 'active' || subscription.status === 'trialing') {
-                        await convex.action((api as any).emails.sendSubscriptionEmail as any, {
-                            to: (subscription as unknown as { customer_email?: string, email?: string }).customer_email || (subscription as unknown as { email?: string }).email || "",
+                        let customerEmail = "";
+                        try {
+                            const customer = await stripe.customers.retrieve(subscription.customer as string);
+                            if (customer && !customer.deleted) {
+                                customerEmail = customer.email || "";
+                            }
+                        } catch (err) {
+                            console.error("Failed to retrieve customer for email:", err);
+                        }
+
+                        await convex.action(api.emails.sendSubscriptionEmail as any, {
+                            to: customerEmail,
                             subject: subscription.status === 'trialing' ? "Welcome to your 15-day Free Trial!" : "Your Almstkshf Subscription is Active!",
-                            userName: subscription.metadata?.userName || "Subscriber",
-                            planName: subscription.metadata?.planName || "Selected Plan",
+                            userName: (subscription.metadata as any)?.userName || "Subscriber",
+                            planName: (subscription.metadata as any)?.planName || "Selected Plan",
                             type: "activation",
-                        });
+                        } as any);
                     }
                 } catch (emailErr) {
                     console.error("Failed to send subscription email:", emailErr);
@@ -130,8 +138,6 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('🗑️ Subscription cancelled:', subscription.id);
 
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
                 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
                 const userId = subscription.metadata?.userId;
@@ -154,8 +160,6 @@ export async function POST(request: NextRequest) {
                 const invoice = event.data.object as Stripe.Invoice;
                 console.log('❌ Invoice payment failed:', invoice.id);
 
-                const { ConvexHttpClient } = await import('convex/browser');
-                const { api } = await import('../../../../../convex/_generated/api');
                 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
                 let userId = invoice.metadata?.userId;

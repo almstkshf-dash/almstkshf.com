@@ -29,15 +29,29 @@ export async function GET(request: Request) {
         let totalRssSaved = 0;
         let totalApiSaved = 0;
 
-        // 3. Process each keyword
+        // 3. Pre-fetch all Premium RSS feeds in parallel (Once!)
+        console.log(`[Vercel Cron] Pre-fetching ${ALL_SOURCES.length} RSS feeds in parallel...`);
+        const feedPromises = ALL_SOURCES.map(async (source) => {
+            try {
+                const items = await parseFeed(source.url, source.publisher, source.country || 'ae');
+                return { source, items, success: true };
+            } catch (err) {
+                console.error(`[Vercel Cron] Pre-fetch failed for ${source.publisher}:`, err);
+                return { source, items: [], success: false };
+            }
+        });
+        const feedResults = await Promise.all(feedPromises);
+        const successfulFeeds = feedResults.filter(f => f.success);
+        console.log(`[Vercel Cron] Pre-fetched ${successfulFeeds.length}/${ALL_SOURCES.length} feeds successfully.`);
+
+        // 4. Process each keyword
         for (const keyword of keywords) {
             console.log(`[Vercel Cron] Processing keyword: ${keyword}`);
 
-            // --- A. Fetch Premium RSS Sources (Using Vercel Blob for images) ---
-            for (const source of ALL_SOURCES) {
+            // --- A. Process Pre-fetched RSS Sources ---
+            for (const feed of successfulFeeds) {
+                const { source, items } = feed;
                 try {
-                    const items = await parseFeed(source.url, source.publisher, source.country || 'ae');
-                    
                     for (const item of items.slice(0, 5)) { // Limit to 5 newest per feed
                         // Skip if it doesn't match the keyword (simple inclusion check)
                         const searchStr = `${item.title} ${item.description}`.toLowerCase();
@@ -50,33 +64,45 @@ export async function GET(request: Request) {
                         // Upload Image to Vercel Blob
                         let blobUrl = item.image;
                         if (item.image) {
-                            blobUrl = await uploadImageToBlob(item.image, 'rss-articles');
+                            try {
+                                blobUrl = await uploadImageToBlob(item.image, 'rss-articles');
+                            } catch (imgErr) {
+                                console.error(`[Vercel Cron] Image upload failed for ${item.link}:`, imgErr);
+                            }
                         }
 
                         // Send to /api/monitor to handle Gemini analysis and AVE calculations
                         // We use the existing API so we don't duplicate logic.
                         const baseUrl = new URL(request.url).origin;
-                        await fetch(`${baseUrl}/api/monitor`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                url: item.link,
-                                keyword: keyword,
-                                manualData: {
-                                    title: item.title,
-                                    content: item.description,
-                                    imageUrl: blobUrl,
-                                    date: item.pubDate,
-                                    source: source.publisher,
-                                    sourceCountry: source.country || 'AE',
-                                    sourceType: 'Press Release'
-                                }
-                            })
-                        });
-                        totalRssSaved++;
+                        try {
+                            const monRes = await fetch(`${baseUrl}/api/monitor`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    url: item.link,
+                                    keyword: keyword,
+                                    manualData: {
+                                        title: item.title,
+                                        content: item.description,
+                                        imageUrl: blobUrl,
+                                        date: item.pubDate,
+                                        source: source.publisher,
+                                        sourceCountry: source.country || 'AE',
+                                        sourceType: 'Press Release'
+                                    }
+                                })
+                            });
+                            if (!monRes.ok) {
+                                console.error(`[Vercel Cron] Monitor API failed with status ${monRes.status} for ${item.link}`);
+                            } else {
+                                totalRssSaved++;
+                            }
+                        } catch (monErr) {
+                            console.error(`[Vercel Cron] Monitor API call threw error for ${item.link}:`, monErr);
+                        }
                     }
                 } catch (feedErr) {
-                    console.error(`[Vercel Cron] RSS fetch failed for ${source.label}:`, feedErr);
+                    console.error(`[Vercel Cron] RSS process failed for ${source.publisher}:`, feedErr);
                 }
             }
 

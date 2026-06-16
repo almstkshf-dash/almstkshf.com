@@ -215,11 +215,12 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: (key: st
   );
 };
 
-const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; t: (key: string, values?: Record<string, string | number>) => string }) => {
-  if (!data) return null;
+const StructuredResultView = ({ type, data: rawData, t }: { type: LookupType; data: any; t: (key: string, values?: Record<string, string | number>) => string }) => {
+  if (!rawData) return null;
+  const data = rawData as any;
 
   // Helper to get nested values safely
-  const get = (obj: Record<string, unknown>, path: string): any => path.split('.').reduce<any>((acc, part) => (acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[part] : undefined), obj);
+  const get = (obj: any, path: string): any => path.split('.').reduce<any>((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -316,10 +317,10 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
               <StatusBadge label={t('result_view.fields.domain')} value={get(data, 'domain') || 'N/A'} />
               <StatusBadge label={t('result_view.fields.free_provider')} value={get(data, 'is_free') || false} />
               <StatusBadge label={t('result_view.fields.catch_all')} value={get(data, 'catch_all') || false} />
-              {get(data, 'mx_records') && (
+              {!!get(data, 'mx_records') && (
                 <StatusBadge label={t('result_view.fields.mx_check')} value={Array.isArray(get(data, 'mx_records')) ? get(data, 'mx_records').join(', ') : get(data, 'mx_records')} type="info" />
               )}
-              {get(data, 'gravatar') && (
+              {!!get(data, 'gravatar') && (
                 <StatusBadge label="Gravatar Profile" value={get(data, 'gravatar.displayName') || 'Found'} type="success" />
               )}
             </DataSection>
@@ -376,7 +377,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
               </div>
             </div>
 
-            {get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
+            {!!get(data, 'articles') && Array.isArray(get(data, 'articles')) && (
               <DataSection title={t('result_view.fields.articles_found')} icon={FileText}>
                 {(get(data, 'articles') as any[]).slice(0, 10).map((art, i: number) => (
                   <a
@@ -444,7 +445,7 @@ const StructuredResultView = ({ type, data, t }: { type: LookupType; data: any; 
           </div>
         )}
 
-        {type === 'wikipedia' && get(data, 'wiki') && (
+        {type === 'wikipedia' && !!get(data, 'wiki') && (
           <div className="space-y-6">
             <DataSection title={t('result_view.headers.provider')} icon={Info}>
               <a

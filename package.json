@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npx concurrently \"npm:next:dev\" \"npm:convex:dev\"",
+    "dev": "npx concurrently \"npm:next:dev\" \"npm:convex:dev\" \"npm:scraper:dev\"",
     "next:dev": "next dev --turbo -p 3001",
     "convex:dev": "convex dev",
+    "scraper:dev": "npm --prefix scraper-service run dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

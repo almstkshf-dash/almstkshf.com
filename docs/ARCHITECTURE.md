@@ -274,16 +274,29 @@ User clicks "Subscribe"
 ## 10. Monitoring Data Flow
 
 ```
-User sets keyword + countries + languages
-  → NewsGenerator component
-  → POST /api/monitor
-  → Calls monitoringAction (Convex Node.js Action)
+User sets keyword + countries + languages (or Sync Keyword in Press Release Panel)
+  → NewsGenerator / PressReleasePanel component
+  → Calls monitoringAction (Convex Node.js Action - fetchNews / fetchPressReleaseSources)
+  → For Keyword Synced Press Releases: Queries standard Web Search via Serper.dev (Google Web Search) and Bing Web Search restricted to the 48 agency domains (batched in chunks of 10), alongside Google News RSS restricted search and live feed loops.
+  → Bypasses Next.js API route caching loops by configuring custom live fetch headers without caching (`cache: 'no-store'`).
+  → Processes date parsing via custom Relative Date Parser supporting Arabic ("قبل يومين") and English ("3 hours ago").
   → Fetches from: NewsData.io, NewsAPI.org, GNews.io, World News API
   → Fetches from RSS Feeds: Premium regional publishers (Sky News Arabia, Al Arabiya, Asharq Al-Awsat, BBC Arabic, Gulf Today, Khaleej Times, Gulf News, Zawya, AETOSWire, etc.) via custom localized engine (`rss-engine.ts`)
   → RSS Engine features: Image extraction, redirect following, multilingual normalization (EN/AR), and country detection.
-  → For each article: dedup check → sentiment analysis (Gemini) → store in media_monitoring_articles
+  → For each article: dedup check → store in media_monitoring_articles with status "pending"
+  → SaveArticle mutation schedules analyzeArticleBackground internally
+  → Background job executes async Gemini sentiment + SimilarWeb reach estimation and updates database
   → Dashboard re-renders via Convex real-time subscription
 ```
+
+---
+
+## 10.1 Background Task Queue & AI Structured Outputs
+
+To prevent Vercel Serverless timeouts (60s limit) and handle long-running media analyses asynchronously, heavy AI tasks are moved to a Convex background queue:
+1. **Queued Execution**: Heavy AI operations in `fetchNews`, `analyzeMedia`, and `/api/monitor` are queued by saving records in a `"pending"` status. This schedules background actions asynchronously (`ctx.scheduler.runAfter`).
+2. **Polling / Async Updates**: Frontend-initiated tasks poll the database for completion (via a query like `getAnalysis` / `getArticle`), while background tasks process, update status to `"completed"` or `"failed"`, and record errors gracefully.
+3. **Structured Outputs**: All Gemini API integrations explicitly declare a native `responseSchema` (Gemini REST API) or configure `structuredOutputs: true` (Next.js server-side SDK) to enforce strict JSON shape constraints natively. This prevents parsing crashes and stabilizes UI rendering.
 
 ---
 

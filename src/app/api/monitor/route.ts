@@ -9,7 +9,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUrl } from "@/utils/linkResolver";
-import { analyzeContent } from "@/lib/gemini";
 import { calculateMetrics } from "@/lib/metrics";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
@@ -59,16 +58,18 @@ export async function POST(req: NextRequest) {
         // User prompt: "For every article, send Title + Snippet to Gemini".
         // If manual, user might provide sentiment.
 
-        let analysis;
+        let analysisStatus: "pending" | "completed";
+        let sentiment: "Positive" | "Neutral" | "Negative";
+        let sourceCountry: string;
+
         if (manualData?.sentiment && manualData?.sourceCountry) {
-            analysis = {
-                sentiment: manualData.sentiment,
-                brandName: keyword, // fallback
-                sourceCountry: manualData.sourceCountry
-            };
+            analysisStatus = "completed";
+            sentiment = manualData.sentiment;
+            sourceCountry = manualData.sourceCountry;
         } else {
-            console.log(`Analyzing content with Gemini...`);
-            analysis = await analyzeContent(content, title);
+            analysisStatus = "pending";
+            sentiment = "Neutral";
+            sourceCountry = manualData?.sourceCountry || "AE";
         }
 
         // 3. Metrics (Reach & AVE)
@@ -98,19 +99,16 @@ export async function POST(req: NextRequest) {
             // Let's format it as DD/MM/YYYY
             title: title,
             content: content,
-            language: (analysis.sourceCountry === 'AE' || analysis.sourceCountry === 'SA' || analysis.sourceCountry === 'EG') ? "AR" : "EN", // Simple heuristic or from extraction? 
-            // Gemini doesn't return language in my current prompt. I should add it or detect it.
-            // User schema: "Language (EN or AR)".
-            // Ill update Gemini prompt later or guess based on country/text char ranges (Unicode for Arabic).
-            // For now, heuristic:
-            sentiment: analysis.sentiment,
+            language: "EN",
+            sentiment: sentiment,
             sourceType: manualData?.sourceType || "Online News",
-            sourceCountry: analysis.sourceCountry,
+            sourceCountry: sourceCountry,
             source: publisherName,
             reach: metrics.reach,
             ave: metrics.ave,
             imageUrl: imageUrl || undefined,
             isManual: !!manualData,
+            analysisStatus: analysisStatus,
         };
 
         // Fix Language: Check for Arabic characters

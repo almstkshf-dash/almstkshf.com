@@ -7,9 +7,9 @@
  */
 
 "use node";
-import { action } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import Parser from 'rss-parser';
 import * as cheerio from 'cheerio';
 // @ts-expect-error
@@ -20,11 +20,66 @@ import { parseBooleanKeyword, matchesBooleanFilter, buildApiQuery } from "./util
 import { checkAndSetSeen } from "./utils/dedup";
 import { sendResendEmail } from "./utils/email";
 import { callWithAiRetry } from "./utils/aiRetry";
+import { decodeHtmlBuffer, hasMojibake, tryRecoverMojibake } from "./utils/encoding";
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
 // THE SPIDER â€” Inlined link resolver for Convex Node Runtime
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-async function resolveUrl(originalUrl: string) {
+const SHORTENER_DOMAINS = new Set([
+    'bit.ly', 'bitly.com', 't.co', 'tinyurl.com', 'rebrand.ly', 'is.gd', 
+    'buff.ly', 'ow.ly', 'db.tt', 'git.io', 't.me', 'lnkd.in', 'fb.me', 
+    'amzn.to', 'goo.gl', 'su.pr', 'wp.me', 'short.io', 'rb.gy', 'shorturl.at',
+    'tiny.cc', 'qr.ae', 'adf.ly', 'b.link', 'sniply.io', 'clicky.me'
+]);
+
+const TRACKING_PARAMS = [
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+    'utm_term',
+    'utm_content',
+    'fbclid',
+    'gclid',
+    'gclsrc',
+    'dclid',
+    'yclid',
+    'msclkid',
+    'mc_eid',
+    'mc_cid',
+    '_hsenc',
+    '_hsmi',
+    'mkt_tok',
+    'twclid'
+];
+
+function cleanUrl(urlStr: string): string {
+    try {
+        const url = new URL(urlStr);
+        for (const param of TRACKING_PARAMS) {
+            url.searchParams.delete(param);
+        }
+        if (url.hash && (url.hash.startsWith('#utm_') || url.hash === '#')) {
+            url.hash = '';
+        }
+        return url.toString();
+    } catch {
+        return urlStr;
+    }
+}
+
+function isShortenerUrl(urlStr: string): boolean {
+    try {
+        const url = new URL(urlStr);
+        let hostname = url.hostname.toLowerCase();
+        if (hostname.startsWith('www.')) {
+            hostname = hostname.substring(4);
+        }
+        return SHORTENER_DOMAINS.has(hostname);
+    } catch {
+        return false;
+    }
+}
+
+async function resolveUrl(originalUrl: string): Promise<{ finalUrl: string, imageUrl?: string, source: string } | null> {
     try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
@@ -46,19 +101,61 @@ async function resolveUrl(originalUrl: string) {
         });
 
         clearTimeout(timeout);
-        if (!response.ok) return null;
+        if (!response.ok) {
+            throw new Error(`HTTP_${response.status}`);
+        }
 
-        const html = await response.text();
-        const finalUrl = response.url;
+        let finalUrl = response.url;
+        const buffer = await response.arrayBuffer();
+        const html = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
         const $ = cheerio.load(html);
+
+        const metaRefresh = $('meta[http-equiv="refresh"]').attr('content');
+        if (metaRefresh) {
+            const match = metaRefresh.match(/url=(.+)$/i);
+            if (match && match[1]) {
+                let redirectUrl = match[1].trim().replace(/['"]/g, '');
+                if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
+                    redirectUrl = new URL(redirectUrl, response.url).toString();
+                }
+                console.log(`[resolveUrl] Found meta-refresh redirect to: ${redirectUrl}. Resolving recursively...`);
+                return resolveUrl(redirectUrl);
+            }
+        }
+
+        if (isShortenerUrl(finalUrl)) {
+            console.warn(`[resolveUrl] Standard fetch resolved URL is still a shortener: ${finalUrl}. Bypassing to Playwright Scraper Fallback...`);
+            throw new Error("RESOLVED_URL_IS_SHORTENER");
+        }
 
         const imageUrl = $('meta[property="og:image"]').attr('content') ||
             $('meta[name="twitter:image"]').attr('content');
         const siteName = $('meta[property="og:site_name"]').attr('content') || new URL(finalUrl).hostname;
 
-        return { finalUrl, imageUrl, source: siteName };
-    } catch (error) {
-        console.warn(`âš ï¸ Spider failed to resolve: ${originalUrl}`, error);
+        return { finalUrl: cleanUrl(finalUrl), imageUrl, source: siteName };
+    } catch (error: any) {
+        console.warn(`[resolveUrl] Direct resolution failed for ${originalUrl}: ${error.message || error}. Trying Playwright Scraper Service...`);
+        try {
+            // Falls back to the Premium Playwright Scraper microservice on port 3002
+            const scraperRes = await fetch('http://localhost:3002/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: originalUrl, timeout: 12000, waitAfterLoad: 0 })
+            });
+            if (scraperRes.ok) {
+                const scraperData = await scraperRes.json();
+                if (scraperData.success) {
+                    console.log(`[resolveUrl] Playwright Scraper successfully resolved: ${originalUrl}`);
+                    return {
+                        finalUrl: cleanUrl(scraperData.url || originalUrl),
+                        imageUrl: scraperData.imageUrl || undefined,
+                        source: scraperData.sourceName || new URL(scraperData.url || originalUrl).hostname
+                    };
+                }
+            }
+        } catch (scraperErr: any) {
+            console.error(`[resolveUrl] Playwright Scraper fallback also failed for ${originalUrl}:`, scraperErr.message);
+        }
         return null;
     }
 }
@@ -140,6 +237,31 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
                             generationConfig: {
                                 temperature: 0.3,
                                 responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        sentiment: { type: "STRING", enum: ["Positive", "Neutral", "Negative"] },
+                                        summary: { type: "STRING" },
+                                        sourceType: { type: "STRING", enum: ["Online News", "Blog", "Press Release", "Social Media", "Print"] },
+                                        reach_estimate: { type: "INTEGER" },
+                                        tone: { type: "STRING" },
+                                        risk: { type: "STRING", enum: ["Low", "Medium", "High", "Critical"] },
+                                        hashtags: { type: "ARRAY", items: { type: "STRING" } },
+                                        emotions: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                joy: { type: "INTEGER" },
+                                                sadness: { type: "INTEGER" },
+                                                anger: { type: "INTEGER" },
+                                                fear: { type: "INTEGER" },
+                                                surprise: { type: "INTEGER" },
+                                                trust: { type: "INTEGER" }
+                                            },
+                                            required: ["joy", "sadness", "anger", "fear", "surprise", "trust"]
+                                        }
+                                    },
+                                    required: ["sentiment", "summary", "sourceType", "reach_estimate", "tone", "risk", "hashtags", "emotions"]
+                                }
                             },
                         }),
                     }
@@ -272,6 +394,14 @@ Return valid JSON ONLY:
                             generationConfig: {
                                 temperature: 0.1,
                                 responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        relevancy_score: { type: "INTEGER" },
+                                        reason: { type: "STRING" }
+                                    },
+                                    required: ["relevancy_score", "reason"]
+                                }
                             },
                         }),
                     }
@@ -882,7 +1012,8 @@ async function extractWithDirectScraper(url: string, analyze: boolean = false) {
         clearTimeout(timeout);
         if (!response.ok) return null;
 
-        const html = await response.text();
+        const buffer = await response.arrayBuffer();
+        const html = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
         const $ = cheerio.load(html);
 
         // Extract title
@@ -1088,11 +1219,18 @@ async function processArticle(
 ) {
     if (typeof item.link !== "string" || typeof item.title !== "string") return false;
 
+    // Clean Mojibake early
+    item.title = hasMojibake(item.title) ? (tryRecoverMojibake(item.title) || item.title) : item.title;
+    if (item.contentSnippet) {
+        item.contentSnippet = hasMojibake(item.contentSnippet) ? (tryRecoverMojibake(item.contentSnippet) || item.contentSnippet) : item.contentSnippet;
+    }
+    if (item.content) {
+        item.content = hasMojibake(item.content) ? (tryRecoverMojibake(item.content) || item.content) : item.content;
+    }
+
     try {
-        // â”€â”€ GATE 1: Boolean Pre-Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        // Evaluates mandatory (+), excluded (-), and phrase terms BEFORE any
-        // API call. Zero cost â€” pure string matching.
-        const isGeneralPressRelease = keyword === "Press Release";
+        // ── GATE 1: Boolean Pre-Filter ──────────────────────────────────────
+        const isGeneralPressRelease = keyword === "Press Release" || /^https?:\/\//i.test(keyword);
         const boolExpr = parseBooleanKeyword(keyword);
         const snippet = item.contentSnippet || item.content || item.title;
         if (!isGeneralPressRelease && !matchesBooleanFilter(boolExpr, item.title, snippet)) {
@@ -1114,18 +1252,13 @@ async function processArticle(
         }
 
         // ── GATE 3: Redis Deduplication (24-hour hash cache) ──────────────────
-        // Prevents the same article from multiple providers (NewsData, GNews,
-        // RSS) being stored twice. Uses SHA-256(url+title) with 24h TTL.
         const isDuplicate = await checkAndSetSeen(item.link, item.title);
         if (isDuplicate) {
             console.log(`♻️ [Gate 3] Deduplication: Skipped duplicate link/title`);
-            return false; // Log already printed inside checkAndSetSeen
+            return false;
         }
 
         // ── GATE 4: Gemini Relevancy Score (Required: ${RELEVANCY_THRESHOLD}/100) ──────────
-        // Lightweight Gemini call to score how relevant the article is to the
-        // keyword. Articles scoring below threshold are discarded before the
-        // full analysis + DB write.
         let relevancyScore = 100;
         if (!isGeneralPressRelease) {
             relevancyScore = await callGeminiRelevancyScore(
@@ -1136,17 +1269,17 @@ async function processArticle(
             );
         }
         if (relevancyScore < RELEVANCY_THRESHOLD) {
-            console.log(`âš ï¸  Low relevancy (${relevancyScore}/100) â€” discarded: "${item.title.substring(0, 60)}"`);
+            console.log(`⚠️ Low relevancy (${relevancyScore}/100) — discarded: "${item.title.substring(0, 60)}"`);
             return false;
         }
 
-        // â”€â”€ RESOLVE: Spider â€” Resolve URL if needed (RSS redirects) â”€â”€â”€â”€â”€â”€â”€
+        // ── RESOLVE: Spider ──────────────────────────────────────────────────
         let resolvedUrl = item.link;
         let imageUrl = item.imageUrl;
         let sourceName = item.source || item.creator;
 
         if (shouldResolve) {
-            console.log(`ðŸ•·ï¸ Resolving: ${item.title.substring(0, 50)}...`);
+            console.log(`🕷️ Resolving: ${item.title.substring(0, 50)}...`);
             const resolved = await resolveUrl(item.link);
             if (resolved) {
                 resolvedUrl = resolved.finalUrl;
@@ -1155,34 +1288,12 @@ async function processArticle(
             }
         }
 
-        // â”€â”€ ANALYSE: Full Gemini Sentiment Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        const aiData = await callGeminiForAnalysis(
-            geminiKey,
-            item.title,
-            snippet,
-            keyword,
-            stList
-        );
-
-        const parsedSourceType = sanitizeSourceType(forceSourceType || aiData.sourceType);
-
-        // SimilarWeb-based Reach lookup
-        const reachResult = await getArticleReach(
-            ctx,
-            resolvedUrl || item.link,
-            parsedSourceType,
-            aiData.reach_estimate
-        );
-
-        const reach = reachResult.reach;
-        const ave = Math.round(reach * 0.02 * 5);
+        const parsedSourceType = sanitizeSourceType(forceSourceType);
         const d = pubDate || new Date();
         const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
         const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
         const language = isArabic ? "AR" : (lang === "ar" ? "AR" : "EN");
-
-        const depth = (aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical") ? "deep" : "standard";
 
         await ctx.runMutation(api.monitoring.saveArticle, {
             keyword,
@@ -1190,85 +1301,152 @@ async function processArticle(
             resolvedUrl: resolvedUrl,
             publishedDate: formattedDate,
             title: item.title,
-            content: aiData.summary || item.title,
+            content: snippet || item.title,
             language: language as "EN" | "AR",
-            sentiment: aiData.sentiment,
+            sentiment: "Neutral",
             sourceType: parsedSourceType,
             sourceCountry: country,
             source: sourceName || new URL(resolvedUrl || item.link).hostname,
-            tone: aiData.tone,
-            risk: aiData.risk,
-            reach: reach,
-            ave: ave,
+            tone: "Neutral",
+            risk: "Low",
+            reach: 50000,
+            ave: 5000,
             imageUrl: imageUrl,
             likes: item.likes,
             retweets: item.retweets,
             replies: item.replies,
             relevancy_score: relevancyScore,
-            hashtags: aiData.hashtags,
-            emotions: aiData.emotions,
-            depth,
+            analysisStatus: "pending",
         });
 
-        // --- Deep Enrichment ---
-        if (depth === "deep") {
-            console.log(`ðŸ” [Deep Promotion] Article for "${keyword}" promoted to Deep Analysis. Triggering enrichment...`);
-            // We trigger these in the background. Note: lookupNews/searchAhmia were updated to support identity-less calls.
-            ctx.runAction(api.osint.lookupNews, { query: keyword }).catch(console.error);
-            ctx.runAction(api.darkWeb.searchAhmia, { query: keyword }).catch(console.error);
-        }
-
-        const isPressRelease = forceSourceType === "Press Release" || aiData.sourceType === "Press Release";
-        const isCritical = aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical" || aiData.sentiment === "Negative";
-
-        if (isCritical || isPressRelease) {
-            try {
-                // Note: createNotification now derives userId from ctx.auth server-side.
-                // When called from background scheduler (no auth), it silently returns.
-                await ctx.runMutation(api.monitoring.createNotification, {
-                    title: isCritical ? "critical_mention" : "press_release_found",
-                    message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${keyword}": ${item.title.substring(0, 60)}...`,
-                    type: isCritical ? "alert" : "system"
-                });
-
-                if (isCritical) {
-                    const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
-                    await sendResendEmail({
-                        to: CONTACT_EMAIL,
-                        subject: `Urgent Alert: High Risk Mention for "${keyword}"`,
-                        html: `
-                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
-                                    <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
-                                        <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
-                                    </div>
-                                    <div style="padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
-                                        <p style="margin-top: 0;"><strong>Keyword:</strong> ${keyword}</p>
-                                        <p><strong>Risk Level:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.risk}</span></p>
-                                        <p><strong>Sentiment:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.sentiment}</span></p>
-                                        
-                                        <h3 style="margin-top: 20px;">Article Title</h3>
-                                        <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${item.title}</p>
-                                        
-                                        <h3>AI Summary</h3>
-                                        <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
-                                        
-                                        <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                                            <a href="${item.link}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            `
-                    });
-                }
-            } catch (emailErr) {
-                console.error("[Email Alert] Failed:", emailErr);
-            }
-        }
+        return true;
     } catch (error) {
         console.error(`❌ Article processing failed for "${item.link}":`, error);
         return false;
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BACKGROUND ARTICLE ANALYSIS — Async Gemini analysis for pending articles
+// ═══════════════════════════════════════════════════════════════════════════════
+export const analyzeArticleBackground = internalAction({
+    args: { articleId: v.id("media_monitoring_articles") },
+    handler: async (ctx, { articleId }) => {
+        try {
+            const article = await ctx.runQuery(api.monitoring.getArticle, { id: articleId });
+            if (!article) {
+                console.error(`[analyzeArticleBackground] Article ${articleId} not found.`);
+                return;
+            }
+
+            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+            // Run full Gemini analysis
+            const aiData = await callGeminiForAnalysis(
+                geminiKey,
+                article.title,
+                article.content,
+                article.keyword,
+                []
+            );
+
+            const parsedSourceType = sanitizeSourceType(aiData.sourceType);
+
+            // SimilarWeb-based Reach lookup
+            const reachResult = await getArticleReach(
+                ctx,
+                article.resolvedUrl || article.url,
+                parsedSourceType,
+                aiData.reach_estimate
+            );
+
+            const reach = reachResult.reach;
+            const ave = Math.round(reach * 0.02 * 5);
+            const depth = (aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical") ? "deep" : "standard";
+
+            await ctx.runMutation(api.monitoring.updateArticleAfterAnalysis, {
+                id: articleId,
+                sentiment: aiData.sentiment,
+                analysisStatus: "completed",
+                tone: aiData.tone,
+                risk: aiData.risk,
+                reach,
+                ave,
+                emotions: aiData.emotions,
+                content: aiData.summary || article.content,
+                depth: depth as "standard" | "deep",
+            });
+
+            // Deep Enrichment
+            if (depth === "deep") {
+                console.log(`🔍 [Background Deep Promotion] Article for "${article.keyword}" promoted.`);
+                ctx.runAction(api.osint.lookupNews, { query: article.keyword }).catch(console.error);
+                ctx.runAction(api.darkWeb.searchAhmia, { query: article.keyword }).catch(console.error);
+            }
+
+            // Notifications for critical/press release
+            const isPressRelease = parsedSourceType === "Press Release";
+            const isCritical = aiData.risk === "High" || aiData.risk === "Critical" || aiData.risk === "critical" || aiData.sentiment === "Negative";
+
+            if (isCritical || isPressRelease) {
+                try {
+                    await ctx.runMutation(api.monitoring.createNotification, {
+                        title: isCritical ? "critical_mention" : "press_release_found",
+                        message: `${isPressRelease ? "[Press Release] " : ""}Mention for "${article.keyword}": ${article.title.substring(0, 60)}...`,
+                        type: isCritical ? "alert" : "system"
+                    });
+
+                    if (isCritical) {
+                        const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "k.account@almstkshf.com";
+                        await sendResendEmail({
+                            to: CONTACT_EMAIL,
+                            subject: `Urgent Alert: High Risk Mention for "${article.keyword}"`,
+                            html: `
+                                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b;">
+                                    <div style="background-color: #ef4444; padding: 15px; border-radius: 8px 8px 0 0; color: white;">
+                                        <h2 style="margin: 0;">ALMSTKSHF Critical Alert</h2>
+                                    </div>
+                                    <div style="padding: 20px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+                                        <p style="margin-top: 0;"><strong>Keyword:</strong> ${article.keyword}</p>
+                                        <p><strong>Risk Level:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.risk}</span></p>
+                                        <p><strong>Sentiment:</strong> <span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px;">${aiData.sentiment}</span></p>
+                                        
+                                        <h3 style="margin-top: 20px;">Article Title</h3>
+                                        <p style="background: #f8fafc; padding: 10px; border-radius: 4px;">${article.title}</p>
+                                        
+                                        <h3>AI Summary</h3>
+                                        <p style="line-height: 1.5;">${aiData.summary || "No summary provided."}</p>
+                                        
+                                        <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                                            <a href="${article.url}" style="background-color: #0f172a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; display: inline-block;">View Full Article</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                        });
+                    }
+                } catch (err) {
+                    console.error("[analyzeArticleBackground] Notification/Email failed:", err);
+                }
+            }
+
+            console.log(`✅ [analyzeArticleBackground] Completed for article ${articleId}`);
+        } catch (error) {
+            console.error(`❌ [analyzeArticleBackground] Failed for article ${articleId}:`, error);
+            try {
+                await ctx.runMutation(api.monitoring.updateArticleAfterAnalysis, {
+                    id: articleId,
+                    sentiment: "Neutral",
+                    analysisStatus: "failed",
+                    reach: 50000,
+                    ave: 5000,
+                });
+            } catch (updateErr) {
+                console.error(`❌ [analyzeArticleBackground] Failed to update status for ${articleId}:`, updateErr);
+            }
+        }
+    }
+});
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
 // HISTORICAL SEARCH — NewsAPI.org for archives beyond RSS feed retention
@@ -1329,11 +1507,32 @@ async function fetchRobustRss(url: string) {
             throw new Error(`HTTP_${response.status}`);
         }
 
-        let xml = await response.text();
+        const buffer = await response.arrayBuffer();
+        let xml = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
         // Sanitization for AETOSWire and others with potential malformed XML
         xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
         return xml;
     } catch (error: any) {
+        console.warn(`[fetchRobustRss] Direct fetch failed for ${url}: ${error.message || error}. Trying Playwright Scraper Service...`);
+        try {
+            // Falls back to the Premium Playwright Scraper microservice with Bright Data/Oxylabs proxy rotation!
+            const scraperRes = await fetch('http://localhost:3002/scrape', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, timeout: 12000, waitAfterLoad: 0 })
+            });
+            if (scraperRes.ok) {
+                const scraperData = await scraperRes.json();
+                if (scraperData.success && scraperData.rawContent) {
+                    console.log(`[fetchRobustRss] Playwright Scraper successfully fetched RSS XML for: ${url}`);
+                    let xml = scraperData.rawContent;
+                    xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
+                    return xml;
+                }
+            }
+        } catch (scraperErr: any) {
+            console.error(`[fetchRobustRss] Playwright Scraper fallback also failed for ${url}:`, scraperErr.message);
+        }
         throw error;
     }
 }
@@ -1508,6 +1707,79 @@ export const fetchPressReleaseSources = action({
             }
 
             const fetchedKeyword = args.keyword?.trim() || "";
+
+            // --- DIRECT URL SYNC FALLBACK OPTION ---
+            if (fetchedKeyword && /^https?:\/\//i.test(fetchedKeyword)) {
+                console.log(`🔗 [API Press Release Sync] Direct URL Sync detected for: ${fetchedKeyword}`);
+
+                // 1. Extract content from direct URL
+                let extracted = await extractWithDirectScraper(fetchedKeyword, true);
+
+                if (!extracted) {
+                    const worldnewsKey = await resolveApiKey(ctx, "WORLDNEWS_API_KEY", "worldnews");
+                    if (worldnewsKey) {
+                        extracted = await extractWithWorldNews(fetchedKeyword, worldnewsKey, true);
+                    }
+                }
+
+                if (extracted) {
+                    // 2. Identify the correct news agency from PR_WIRE_FEEDS based on domain matching
+                    let matchedCountry = "AE";
+                    let matchedLang = "ar";
+                    let matchedPublisher = new URL(fetchedKeyword).hostname;
+
+                    try {
+                        const itemHost = new URL(fetchedKeyword).hostname.toLowerCase();
+                        const foundFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                        if (foundFeed) {
+                            matchedCountry = foundFeed.country;
+                            matchedLang = foundFeed.lang;
+                            matchedPublisher = foundFeed.name;
+                        }
+                    } catch { }
+
+                    // 3. Process and Save the Article (bypassing boolean filter since it is a direct URL sync)
+                    const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                    const processed = await processArticle(
+                        ctx,
+                        {
+                            title: extracted.title || "No Title",
+                            link: fetchedKeyword,
+                            pubDate: extracted.publish_date || new Date().toISOString(),
+                            contentSnippet: extracted.text || (extracted as any).description || "",
+                            imageUrl: extracted.image || undefined
+                        },
+                        matchedCountry,
+                        matchedLang,
+                        fetchedKeyword, // Passes URL as keyword which bypasses boolean filter in processArticle
+                        geminiKey,
+                        ["Press Release"],
+                        null,
+                        null,
+                        false, // shouldResolve: false (already resolved)
+                        "Press Release"
+                    );
+
+                    if (processed) {
+                        return {
+                            success: true,
+                            totalSaved: 1,
+                            totalErrors: 0,
+                            feedResults: [{ name: matchedPublisher, status: "Success", saved: 1, total: 1 }],
+                            message: `Direct URL Sync complete. Successfully ingested article from ${matchedPublisher}.`
+                        };
+                    }
+                }
+
+                return {
+                    success: false,
+                    totalSaved: 0,
+                    totalErrors: 1,
+                    feedResults: [{ name: new URL(fetchedKeyword).hostname, status: "Failed", error: "Extraction Failed" }],
+                    message: "Failed to extract article content from the provided URL."
+                };
+            }
+
             const booleanExpr = parseBooleanKeyword(fetchedKeyword);
             const keyword = fetchedKeyword || "Press Release";
             const itemLimit = args.limit ?? 30;
@@ -1522,10 +1794,299 @@ export const fetchPressReleaseSources = action({
             });
 
             const twitterBearer = (await resolveApiKey(ctx, "X_BEARER_TOKEN", "twitterBearer")) || process.env.BEARER_TOKEN || null;
+            const serperKey = await resolveApiKey(ctx, "SERPER_API_KEY", "serper");
+            const bingKey = await resolveApiKey(ctx, "BING_API_KEY", "bing");
 
             let totalSaved = 0;
             let totalErrors = 0;
             const feedResults: any[] = [];
+
+            // 1.5 Parallel Google News Search restricting to PR feed domains
+            if (fetchedKeyword) {
+                console.log(`🔍 [Press Release Search Engine] Keyword search detected: "${fetchedKeyword}". Launching Google News domain-restricted search...`);
+
+                // Extract clean domain names from PR_WIRE_FEEDS
+                const domains = PR_WIRE_FEEDS
+                    .map(feed => {
+                        try {
+                            if (feed.url.includes("twitter.com") || feed.url.includes("x.com") || feed.url.includes("feedburner.com")) {
+                                return null;
+                            }
+                            const u = new URL(feed.url);
+                            let host = u.hostname.toLowerCase();
+                            if (host.startsWith("www.")) host = host.substring(4);
+                            if (host.startsWith("feeds.")) host = host.substring(6);
+                            if (host.startsWith("rss.")) host = host.substring(4);
+                            return host;
+                        } catch {
+                            return null;
+                        }
+                    })
+                    .filter(Boolean) as string[];
+
+                // Remove duplicate domains if any
+                const uniqueDomains = Array.from(new Set(domains));
+
+                // Batch domains into chunks of 10 to avoid Google News query overflow limits
+                const batchSize = 10;
+                const batches: string[][] = [];
+                for (let i = 0; i < uniqueDomains.length; i += batchSize) {
+                    batches.push(uniqueDomains.slice(i, i + batchSize));
+                }
+
+                console.log(`📦 Domain-restricted search: Batched ${uniqueDomains.length} domains into ${batches.length} chunks`);
+
+                await Promise.all(
+                    batches.map(async (batch, batchIndex) => {
+                        try {
+                            const siteRestrictions = batch.map(d => `site:${d}`).join(" OR ");
+                            const cleanQuery = buildApiQuery(fetchedKeyword);
+                            const finalQuery = `"${cleanQuery}" (${siteRestrictions})`;
+
+                            const hl = "ar-AE";
+                            const gl = "AE";
+                            const ceid = "AE:ar";
+                            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(finalQuery)}&hl=${hl}&gl=${gl}&ceid=${ceid}`;
+
+                            console.log(`📡 [Press Release Search Engine] Batch ${batchIndex + 1}/${batches.length} fetching: ${rssUrl.substring(0, 100)}...`);
+
+                            const xml = await fetchRobustRss(rssUrl);
+                            const feedData = await parser.parseString(xml);
+                            console.log(`✅ [Press Release Search Engine] Batch ${batchIndex + 1} found ${feedData.items?.length || 0} indexed articles`);
+
+                            const rawItems = feedData.items.slice(0, 15);
+                            let savedCount = 0;
+
+                            const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+                            for (const item of rawItems) {
+                                if (!item.link || !item.title) continue;
+                                const isSeen = await checkAndSetSeen(item.link, item.title);
+                                if (isSeen) continue;
+
+                                let matchedCountry = "AE";
+                                let matchedLang = "ar";
+                                let matchedPublisher = new URL(item.link).hostname;
+
+                                try {
+                                    const itemHost = new URL(item.link).hostname.toLowerCase();
+                                    const foundFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                                    if (foundFeed) {
+                                        matchedCountry = foundFeed.country;
+                                        matchedLang = foundFeed.lang;
+                                        matchedPublisher = foundFeed.name;
+                                    }
+                                } catch { }
+
+                                const processed = await processArticle(
+                                    ctx,
+                                    {
+                                        ...item,
+                                        link: item.link,
+                                        pubDate: item.pubDate,
+                                        source: normalizePublisherName(matchedPublisher)
+                                    },
+                                    matchedCountry,
+                                    matchedLang,
+                                    keyword,
+                                    geminiKey,
+                                    ["Press Release"],
+                                    dateFromObj,
+                                    dateToObj,
+                                    true,
+                                    "Press Release"
+                                );
+
+                                if (processed) {
+                                    savedCount++;
+                                    totalSaved++;
+                                }
+                            }
+
+                            if (savedCount > 0) {
+                                feedResults.push({ name: `Search Engine (Batch ${batchIndex + 1})`, status: "Success", saved: savedCount, total: rawItems.length });
+                            }
+                        } catch (err: any) {
+                            console.error(`❌ [Press Release Search Engine] Batch ${batchIndex + 1} failed:`, err.message || err);
+                        }
+                    })
+                );
+
+                // 1.6 Parallel Serper Standard Web Search
+                if (serperKey) {
+                    console.log(`🧠 [Press Release Search Engine] Serper.dev Key found. Running standard Google Search in parallel for batches...`);
+                    await Promise.all(
+                        batches.map(async (batch, batchIndex) => {
+                            try {
+                                const siteRestrictions = batch.map(d => `site:${d}`).join(" OR ");
+                                const cleanQuery = buildApiQuery(fetchedKeyword);
+                                const finalQuery = `"${cleanQuery}" (${siteRestrictions})`;
+
+                                console.log(`📡 [Press Release Serper Web Search] Batch ${batchIndex + 1}/${batches.length} fetching...`);
+                                const serperRes = await fetch("https://google.serper.dev/search", {
+                                    method: "POST",
+                                    headers: {
+                                        "X-API-KEY": serperKey,
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        q: finalQuery,
+                                        gl: "ae",
+                                        hl: "ar",
+                                        num: 15
+                                    })
+                                });
+
+                                if (serperRes.ok) {
+                                    const serperData = await serperRes.json();
+                                    const organic = serperData.organic || [];
+                                    console.log(`✅ [Press Release Serper Web Search] Batch ${batchIndex + 1} found ${organic.length} indexed articles`);
+
+                                    let savedCount = 0;
+                                    const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+                                    for (const item of organic) {
+                                        if (!item.link || !item.title) continue;
+                                        const isSeen = await checkAndSetSeen(item.link, item.title);
+                                        if (isSeen) continue;
+
+                                        let matchedCountry = "AE";
+                                        let matchedLang = "ar";
+                                        let matchedPublisher = new URL(item.link).hostname;
+
+                                        try {
+                                            const itemHost = new URL(item.link).hostname.toLowerCase();
+                                            const foundFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                                            if (foundFeed) {
+                                                matchedCountry = foundFeed.country;
+                                                matchedLang = foundFeed.lang;
+                                                matchedPublisher = foundFeed.name;
+                                            }
+                                        } catch { }
+
+                                        const parsedDate = parseRelativeDate(item.date);
+
+                                        const processed = await processArticle(
+                                            ctx,
+                                            {
+                                                title: item.title,
+                                                link: item.link,
+                                                pubDate: parsedDate,
+                                                contentSnippet: item.snippet || item.title,
+                                                imageUrl: item.imageUrl || undefined,
+                                                source: normalizePublisherName(matchedPublisher)
+                                            },
+                                            matchedCountry,
+                                            matchedLang,
+                                            keyword,
+                                            geminiKey,
+                                            ["Press Release"],
+                                            dateFromObj,
+                                            dateToObj,
+                                            true,
+                                            "Press Release"
+                                        );
+
+                                        if (processed) {
+                                            savedCount++;
+                                            totalSaved++;
+                                        }
+                                    }
+
+                                    if (savedCount > 0) {
+                                        feedResults.push({ name: `Serper Web Search (Batch ${batchIndex + 1})`, status: "Success", saved: savedCount, total: organic.length });
+                                    }
+                                }
+                            } catch (err: any) {
+                                console.error(`❌ [Press Release Serper Search] Batch ${batchIndex + 1} failed:`, err.message || err);
+                            }
+                        })
+                    );
+                }
+
+                // 1.7 Parallel Bing Standard Web Search
+                if (bingKey) {
+                    console.log(`🧠 [Press Release Search Engine] Bing Key found. Running standard Bing Search in parallel for batches...`);
+                    await Promise.all(
+                        batches.map(async (batch, batchIndex) => {
+                            try {
+                                const siteRestrictions = batch.map(d => `site:${d}`).join(" OR ");
+                                const cleanQuery = buildApiQuery(fetchedKeyword);
+                                const finalQuery = `"${cleanQuery}" (${siteRestrictions})`;
+
+                                console.log(`📡 [Press Release Bing Search] Batch ${batchIndex + 1}/${batches.length} fetching...`);
+                                const bingRes = await fetch(`https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(finalQuery)}&count=15&mkt=ar-AE&safeSearch=Moderate`, {
+                                    headers: {
+                                        "Ocp-Apim-Subscription-Key": bingKey
+                                    }
+                                });
+
+                                if (bingRes.ok) {
+                                    const bingData = await bingRes.json();
+                                    const webPages = bingData.webPages?.value || [];
+                                    console.log(`✅ [Press Release Bing Search] Batch ${batchIndex + 1} found ${webPages.length} indexed articles`);
+
+                                    let savedCount = 0;
+                                    const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+
+                                    for (const item of webPages) {
+                                        if (!item.url || !item.name) continue;
+                                        const isSeen = await checkAndSetSeen(item.url, item.name);
+                                        if (isSeen) continue;
+
+                                        let matchedCountry = "AE";
+                                        let matchedLang = "ar";
+                                        let matchedPublisher = new URL(item.url).hostname;
+
+                                        try {
+                                            const itemHost = new URL(item.url).hostname.toLowerCase();
+                                            const foundFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                                            if (foundFeed) {
+                                                matchedCountry = foundFeed.country;
+                                                matchedLang = foundFeed.lang;
+                                                matchedPublisher = foundFeed.name;
+                                            }
+                                        } catch { }
+
+                                        const parsedDate = item.datePublished || item.dateLastCrawled || new Date().toISOString();
+
+                                        const processed = await processArticle(
+                                            ctx,
+                                            {
+                                                title: item.name,
+                                                link: item.url,
+                                                pubDate: parsedDate,
+                                                contentSnippet: item.snippet || item.name,
+                                                source: normalizePublisherName(matchedPublisher)
+                                            },
+                                            matchedCountry,
+                                            matchedLang,
+                                            keyword,
+                                            geminiKey,
+                                            ["Press Release"],
+                                            dateFromObj,
+                                            dateToObj,
+                                            true,
+                                            "Press Release"
+                                        );
+
+                                        if (processed) {
+                                            savedCount++;
+                                            totalSaved++;
+                                        }
+                                    }
+
+                                    if (savedCount > 0) {
+                                        feedResults.push({ name: `Bing Web Search (Batch ${batchIndex + 1})`, status: "Success", saved: savedCount, total: webPages.length });
+                                    }
+                                }
+                            } catch (err: any) {
+                                console.error(`❌ [Press Release Bing Search] Batch ${batchIndex + 1} failed:`, err.message || err);
+                            }
+                        })
+                    );
+                }
+            }
 
             // 1. Parallel RSS & Twitter Ingestion
             await Promise.all(
@@ -1803,4 +2364,112 @@ export const syncSpecificRssFeed = action({
         }
     }
 });
+
+function parseRelativeDate(dateStr: string | undefined): string {
+    if (!dateStr) return new Date().toISOString();
+    
+    const now = new Date();
+    const cleanStr = dateStr.toLowerCase().trim();
+    
+    // Check if it's already a valid date string
+    const parsed = Date.parse(cleanStr);
+    if (!isNaN(parsed)) {
+        return new Date(parsed).toISOString();
+    }
+    
+    // Relative times in English (e.g. "3 days ago", "1 hour ago")
+    const numMatch = cleanStr.match(/^(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/);
+    if (numMatch) {
+        const value = parseInt(numMatch[1], 10);
+        const unit = numMatch[2];
+        
+        switch (unit) {
+            case 'second':
+                now.setSeconds(now.getSeconds() - value);
+                break;
+            case 'minute':
+                now.setMinutes(now.getMinutes() - value);
+                break;
+            case 'hour':
+                now.setHours(now.getHours() - value);
+                break;
+            case 'day':
+                now.setDate(now.getDate() - value);
+                break;
+            case 'week':
+                now.setDate(now.getDate() - value * 7);
+                break;
+            case 'month':
+                now.setMonth(now.getMonth() - value);
+                break;
+            case 'year':
+                now.setFullYear(now.getFullYear() - value);
+                break;
+        }
+        return now.toISOString();
+    }
+    
+    // Relative times in Arabic (e.g. "قبل ٣ ساعة", "منذ 5 أيام")
+    const arNumMatch = cleanStr.match(/(?:قبل|منذ)\s+([\d\u0660-\u0669]+)\s+(ثانية|دقيقة|ساعة|يوم|أسبوع|شهر|سنة|سنين|أيام|ساعات|دقائق)/);
+    if (arNumMatch) {
+        let valueStr = arNumMatch[1];
+        // Convert Arabic numerals to English numerals
+        valueStr = valueStr.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 1632));
+        const value = parseInt(valueStr, 10);
+        const unit = arNumMatch[2];
+        
+        if (unit.startsWith('ثاني')) now.setSeconds(now.getSeconds() - value);
+        else if (unit.startsWith('دقيق')) now.setMinutes(now.getMinutes() - value);
+        else if (unit.startsWith('ساع')) now.setHours(now.getHours() - value);
+        else if (unit.startsWith('يوم') || unit === 'أيام') now.setDate(now.getDate() - value);
+        else if (unit.startsWith('أسبوع')) now.setDate(now.getDate() - value * 7);
+        else if (unit.startsWith('شهر')) now.setMonth(now.getMonth() - value);
+        else if (unit.startsWith('سن') || unit === 'سنين') now.setFullYear(now.getFullYear() - value);
+        
+        return now.toISOString();
+    }
+    
+    // Dual Arabic relative times
+    if (cleanStr.includes('يومين')) {
+        now.setDate(now.getDate() - 2);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('ساعتين')) {
+        now.setHours(now.getHours() - 2);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('أسبوعين')) {
+        now.setDate(now.getDate() - 14);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('شهرين')) {
+        now.setMonth(now.getMonth() - 2);
+        return now.toISOString();
+    }
+    
+    // Singular Arabic relative times
+    if (cleanStr.includes('ساعة')) {
+        now.setHours(now.getHours() - 1);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('يوم')) {
+        now.setDate(now.getDate() - 1);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('أسبوع')) {
+        now.setDate(now.getDate() - 7);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('شهر')) {
+        now.setMonth(now.getMonth() - 1);
+        return now.toISOString();
+    }
+    if (cleanStr.includes('سنة')) {
+        now.setFullYear(now.getFullYear() - 1);
+        return now.toISOString();
+    }
+    
+    return now.toISOString();
+}
+
 

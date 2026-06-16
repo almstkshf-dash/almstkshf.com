@@ -43,7 +43,7 @@ export interface ReportArticle {
     hashtags?: string[];
     content?: string;
     keyword?: string;
-    [key: string]: unknown;
+    [key: string]: any;
 }
 
 export interface DeepWebRun {
@@ -68,9 +68,9 @@ export interface OsintResult {
 // CONSTANTS & COLORS
 // -------------------------------------------------------------------------------------------------
 
-const BRAND_DARK = [31, 78, 120] as const;
-const BRAND_AMBER = [218, 165, 32] as const;
-const ACCENT_BG = [241, 245, 249] as const;
+const BRAND_DARK = [31, 78, 120] as [number, number, number];
+const BRAND_AMBER = [218, 165, 32] as [number, number, number];
+const ACCENT_BG = [241, 245, 249] as [number, number, number];
 
 // -------------------------------------------------------------------------------------------------
 // UTILITY: REPORT GENERATOR
@@ -91,7 +91,7 @@ export class ReportGenerator {
     public async generatePDF(): Promise<Blob> {
         const title = this.translations.Reports?.pr_title || 'Media Coverage Report';
         const result = await ReportGenerator.generatePressReleasePDF(this.articles, this.translations, title, true);
-        return result.doc.output('blob');
+        return (result as { doc: jsPDF }).doc.output('blob') as Blob;
     }
 
     /**
@@ -620,7 +620,7 @@ export class ReportGenerator {
     private static async generateAiInspectorPDF(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
         const { doc, pageWidth, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
-        const modeTrans = translations.AiInspector?.[`mode_${mode}` as keyof typeof translations.AiInspector] || mode.toUpperCase();
+        const modeTrans = (translations.AiInspector as Record<string, any> | undefined)?.[`mode_${mode}`] || mode.toUpperCase();
         this.addCoverPage(doc, `${title} - ${modeTrans}`, typeof data === 'object' ? Object.keys(data).length : 1, translations, logoBase64, fontLoaded);
 
         doc.addPage();
@@ -643,7 +643,7 @@ export class ReportGenerator {
         };
         const rColor = colorMap[(riskLevel || 'low').toLowerCase()] || BRAND_DARK;
 
-        const localizedRiskLevel = translations.AiInspector?.[`risk_${(riskLevel || 'low').toLowerCase()}` as keyof typeof translations.AiInspector] || riskLevel?.toUpperCase() || 'UNKNOWN';
+        const localizedRiskLevel = (translations.AiInspector as Record<string, any> | undefined)?.[`risk_${(riskLevel || 'low').toLowerCase()}`] || riskLevel?.toUpperCase() || 'UNKNOWN';
 
         this.drawMetricBoxes(doc, [
             { label: translations.AiInspector?.label_mode || 'MODE', value: modeTrans, color: BRAND_DARK },
@@ -684,7 +684,7 @@ export class ReportGenerator {
                 this.fixArabic(s.label || ''),
                 this.fixArabic(s.description || ''),
                 this.fixArabic(s.detectedValue || ''),
-                this.fixArabic(translations.AiInspector?.[`risk_${(s.risk || 'low').toLowerCase()}` as keyof typeof translations.AiInspector] || s.risk?.toUpperCase() || s.risk || '')
+                this.fixArabic((translations.AiInspector as Record<string, any> | undefined)?.[`risk_${(s.risk || 'low').toLowerCase()}`] || s.risk?.toUpperCase() || s.risk || '')
             ]) || [];
 
             await this.addAutoTable(doc, {
@@ -885,26 +885,48 @@ export class ReportGenerator {
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
     }
 
-    private static async addAutoTable(doc: jsPDF, options: { head: string[][]; body: (string | number | undefined)[][]; startY: number; fontLoaded: boolean; logoBase64: string | null; translations: ReportTranslations; didDrawPage?: (data: any) => void; didDrawCell?: (data: any) => void; columnStyles?: any }) {
+    private static async addAutoTable(doc: jsPDF, options: {
+        head: string[][];
+        body: any[];
+        startY: number;
+        fontLoaded: boolean;
+        logoBase64: string | null;
+        translations: ReportTranslations;
+        didDrawPage?: (data: any) => void;
+        didDrawCell?: (data: any) => void;
+        columnStyles?: any;
+    }) {
         const autoTable = (await import('jspdf-autotable')).default;
 
         // Process head and body cells to automatically apply fixArabic if they contain Arabic text
         const processedHead = options.head.map(row => row.map(cell => this.fixArabic(cell || '')));
-        const sanitizedBody = options.body.map(row => row.map(cell => {
-            if (typeof cell === 'string') {
-                return this.fixArabic(cell);
+        const sanitizedBody = (options.body || []).map((row: any) => {
+            if (Array.isArray(row)) {
+                return row.map((cell: any) => {
+                    if (typeof cell === 'string') {
+                        return this.fixArabic(cell);
+                    }
+                    return cell ?? '';
+                });
             }
-            return cell ?? '';
-        }));
+            return row;
+        });
+
+        const {
+            fontLoaded,
+            logoBase64,
+            translations,
+            ...autoTableOptions
+        } = options;
 
         return autoTable(doc, {
-            ...options,
+            ...autoTableOptions,
             head: processedHead,
             body: sanitizedBody as any,
             margin: { horizontal: 10 },
             styles: {
                 fontSize: 7.5,
-                font: options.fontLoaded ? 'Amiri' : 'helvetica',
+                font: fontLoaded ? 'Amiri' : 'helvetica',
                 cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
                 overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
                 cellWidth: 'auto',    // Allow columns to shrink/expand based on content
@@ -1680,7 +1702,7 @@ export class ReportGenerator {
         const sheet = workbook.addWorksheet('Forensic Report');
 
         const modeTrans = translations.AiInspector?.[`mode_${mode}`] || mode.toUpperCase();
-        const localizedRiskLevel = translations.AiInspector?.[`risk_${data.overallRisk?.toLowerCase()}`] || data.overallRisk?.toUpperCase() || 'LOW';
+        const localizedRiskLevel = (translations.AiInspector as Record<string, any> | undefined)?.[`risk_${data.overallRisk?.toLowerCase()}`] || data.overallRisk?.toUpperCase() || 'LOW';
 
         // Summary Section
         sheet.addRow([translations.AiInspector?.results_summary || 'Analysis Results']).font = { bold: true, size: 14 };

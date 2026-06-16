@@ -117,7 +117,16 @@ Content Snippet: ${text}
                         contents: [{ parts: [{ text: prompt }] }],
                         generationConfig: {
                             responseMimeType: "application/json",
-                            temperature: 0.1
+                            temperature: 0.1,
+                            responseSchema: {
+                                type: "OBJECT",
+                                properties: {
+                                    risk: { type: "STRING", enum: ["low", "medium", "high", "critical"] },
+                                    summary: { type: "STRING" },
+                                    tags: { type: "ARRAY", items: { type: "STRING" } }
+                                },
+                                required: ["risk", "summary", "tags"]
+                            }
                         },
                     }),
                 });
@@ -243,7 +252,27 @@ HTML: ${html.substring(0, 15000)}
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
                                     contents: [{ parts: [{ text: prompt }] }],
-                                    generationConfig: { responseMimeType: "application/json" },
+                                    generationConfig: {
+                                        responseMimeType: "application/json",
+                                        responseSchema: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                results: {
+                                                    type: "ARRAY",
+                                                    items: {
+                                                        type: "OBJECT",
+                                                        properties: {
+                                                            title: { type: "STRING" },
+                                                            url: { type: "STRING" },
+                                                            snippet: { type: "STRING" }
+                                                        },
+                                                        required: ["title", "url", "snippet"]
+                                                    }
+                                                }
+                                            },
+                                            required: ["results"]
+                                        }
+                                    },
                                 }),
                             });
                         }, { maxRetries: 1 });

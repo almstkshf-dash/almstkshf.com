@@ -21,7 +21,7 @@ interface KYCStep {
     title: string;
     description: string;
     status: StepStatus;
-    icon: React.ElementType;
+    icon: React.ComponentType<{ className?: string }>;
 }
 
 const initialSteps: KYCStep[] = [

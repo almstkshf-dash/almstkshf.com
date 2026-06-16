@@ -76,6 +76,15 @@ const clerk = clerkMiddleware(async (auth, req) => {
 });
 
 export default async function middleware(req: any, event: any) {
+    const pathname = req.nextUrl.pathname;
+    const localeApiRegex = /^\/(ar|en)\/api\//;
+    if (localeApiRegex.test(pathname)) {
+        const strippedPath = pathname.replace(/^\/(ar|en)/, "");
+        const url = req.nextUrl.clone();
+        url.pathname = strippedPath;
+        return NextResponse.rewrite(url);
+    }
+
     const host = req.headers.get("host") || "";
     const isVercelPreview = host.includes("vercel.app") && !host.includes("almstkshf.com");
     const isLiveKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_");

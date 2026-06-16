@@ -1,14 +1,6 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
- */
-
-import { action } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { resolveApiKey } from "./utils/keys";
 import { callWithAiRetry } from "./utils/aiRetry";
 
@@ -53,6 +45,75 @@ export const analyzeMedia = action({
             };
         }
 
+        try {
+            // Schedule background analysis
+            const analysisId = await ctx.runMutation(api.analyses.createAnalysisPending, { inputText: text });
+            await ctx.scheduler.runAfter(0, internal.media.analyzeMediaBackground, { analysisId, text });
+
+            // Poll the database for completion (up to 50 seconds to gracefully stay under function timeouts)
+            const startTime = Date.now();
+            const timeoutMs = 50000;
+            while (Date.now() - startTime < timeoutMs) {
+                const analysis = await ctx.runQuery(api.analyses.getAnalysis, { id: analysisId });
+                if (analysis) {
+                    if (analysis.status === "completed") {
+                        return {
+                            success: true,
+                            data: {
+                                sentiment: analysis.sentiment as any,
+                                score: analysis.score,
+                                risk: analysis.risk as any,
+                                riskScore: analysis.riskScore ?? 50,
+                                tone: analysis.tone,
+                                emotions: analysis.emotions || {},
+                                topics: analysis.topics || [],
+                                entities: analysis.entities || [],
+                                recommendation: analysis.recommendation,
+                                inputText: analysis.inputText,
+                                id: analysisId,
+                            }
+                        };
+                    } else if (analysis.status === "failed") {
+                        return {
+                            success: false,
+                            error: analysis.error || "Analysis failed."
+                        };
+                    }
+                }
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+
+            return {
+                success: false,
+                error: "Analysis is taking longer than expected. It is running in the background."
+            };
+
+        } catch (error: any) {
+            console.error("ALMSTKSHF AI Engine Global Error:", error);
+            return { success: false, error: "Analysis failed due to a system error. Our team has been notified." };
+        }
+    },
+});
+
+export const analyzeMediaBackground = internalAction({
+    args: { analysisId: v.id("free_analyses"), text: v.string() },
+    handler: async (ctx, { analysisId, text }) => {
+        const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+        if (!apiKey) {
+            await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
+                id: analysisId,
+                sentiment: "Neutral",
+                score: 50,
+                risk: "Medium",
+                riskScore: 50,
+                tone: "Analytical",
+                recommendation: "Error: The AI service is not configured.",
+                status: "failed",
+                error: "GEMINI_API_KEY missing from Convex configuration."
+            });
+            return;
+        }
+
         const prompt = `You are an expert Media & Reputation Risk analyst.
 Analyze the following text for sentiment, risk, emotions, and strategic impact.
 
@@ -94,6 +155,34 @@ Return valid JSON ONLY:
                                     generationConfig: {
                                         temperature: 0.7,
                                         responseMimeType: "application/json",
+                                        responseSchema: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                sentiment: { type: "STRING", enum: ["Positive", "Neutral", "Negative"] },
+                                                score: { type: "INTEGER" },
+                                                risk: { type: "STRING", enum: ["Low", "Medium", "High"] },
+                                                riskScore: { type: "INTEGER" },
+                                                tone: { type: "STRING" },
+                                                emotions: {
+                                                    type: "OBJECT",
+                                                    properties: {
+                                                        joy: { type: "NUMBER" },
+                                                        anger: { type: "NUMBER" },
+                                                        sadness: { type: "NUMBER" },
+                                                        fear: { type: "NUMBER" },
+                                                        disgust: { type: "NUMBER" },
+                                                        surprise: { type: "NUMBER" },
+                                                        trust: { type: "NUMBER" },
+                                                        anticipation: { type: "NUMBER" }
+                                                    },
+                                                    required: ["joy", "anger", "sadness", "fear", "disgust", "surprise", "trust", "anticipation"]
+                                                },
+                                                topics: { type: "ARRAY", items: { type: "STRING" } },
+                                                entities: { type: "ARRAY", items: { type: "STRING" } },
+                                                recommendation: { type: "STRING" }
+                                            },
+                                            required: ["sentiment", "score", "risk", "riskScore", "tone", "emotions", "topics", "entities", "recommendation"]
+                                        }
                                     },
                                 }),
                             }
@@ -120,28 +209,19 @@ Return valid JSON ONLY:
             }
 
             if (!finalResult) {
-                return {
-                    success: false,
-                    error: `The AI service is currently unavailable. Please ensure your API key and quota are active. ${lastError.substring(0, 50)}`
-                };
+                throw new Error(`The AI service is currently unavailable. ${lastError}`);
             }
 
             const responseText = finalResult?.candidates?.[0]?.content?.parts?.[0]?.text;
 
             if (!responseText) {
-                return { success: false, error: "Received an empty response from our analysis engine." };
+                throw new Error("Received an empty response from our analysis engine.");
             }
 
-            let analysis: any;
-            try {
-                analysis = JSON.parse(responseText.trim());
-            } catch (jsonError) {
-                console.error("JSON Parse Error:", jsonError, "Response Text:", responseText);
-                return { success: false, error: "Our analysis engine returned an unexpected format. Please try again." };
-            }
+            const analysis = JSON.parse(responseText.trim());
 
             // Validate and sanitize deeply to ensure type safety
-            const validated: AnalysisResult = {
+            const validated = {
                 sentiment: ["Positive", "Neutral", "Negative"].includes(analysis.sentiment)
                     ? analysis.sentiment
                     : "Neutral",
@@ -165,34 +245,26 @@ Return valid JSON ONLY:
                     : "Further analysis recommended.",
             };
 
-            // Save to database
-            const saved = await ctx.runMutation(api.analyses.saveAnalysis, {
-                inputText: text,
+            await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
+                id: analysisId,
                 ...validated,
+                status: "completed"
             });
-
-            return {
-                success: true,
-                data: {
-                    ...validated,
-                    inputText: text,
-                    id: (saved as any).id,
-                }
-            };
-
         } catch (error: any) {
-            if (error.message === "MODEL_CAPACITY_EXHAUSTED") {
-                return {
-                    success: false,
-                    error: "AI_CAPACITY_EXHAUSTED",
-                    capacityExhausted: true,
-                    retryAfter: error.retryAfter || 60
-                };
-            }
-            console.error("ALMSTKSHF AI Engine Global Error:", error);
-            return { success: false, error: "Analysis failed due to a system error. Our team has been notified." };
+            console.error("[analyzeMediaBackground] Error:", error);
+            await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
+                id: analysisId,
+                sentiment: "Neutral",
+                score: 50,
+                risk: "Medium",
+                riskScore: 50,
+                tone: "Analytical",
+                recommendation: "Analysis failed due to a system error.",
+                status: "failed",
+                error: error.message || String(error)
+            });
         }
-    },
+    }
 });
 
 /**

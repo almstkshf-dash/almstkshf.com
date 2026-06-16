@@ -689,8 +689,8 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 {t('anatomical_consistency')}
               </span>
               <div className="flex flex-wrap gap-2">
-                {result.deepMl.biometrics.faceAnomalies.length > 0 || result.deepMl.biometrics.handAnomalies.length > 0 ? (
-                  ([...result.deepMl.biometrics.faceAnomalies, ...result.deepMl.biometrics.handAnomalies] as ForensicAnomaly[]).map((anomaly: ForensicAnomaly, idx) => (
+                {(result.deepMl.biometrics?.faceAnomalies?.length ?? 0) > 0 || (result.deepMl.biometrics?.handAnomalies?.length ?? 0) > 0 ? (
+                  ([...(result.deepMl.biometrics?.faceAnomalies || []), ...(result.deepMl.biometrics?.handAnomalies || [])] as ForensicAnomaly[]).map((anomaly: ForensicAnomaly, idx) => (
                     <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-[11px] font-black text-rose-500 dark:text-rose-400 shadow-sm">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       {t.has(`anomaly_${anomaly.id}_name`) ? t(`anomaly_${anomaly.id}_name`) : anomaly.name}
@@ -714,19 +714,19 @@ export default function VideoResults({ result }: VideoResultsProps) {
               <div className="p-4 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-bold text-foreground/60 uppercase">{t('pixel_pattern_ocr')}</span>
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded ${result.deepMl.ocr.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
-                    {result.deepMl.ocr.isGarbled ? t('status_suspicious') : t('status_clean')}
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded ${result.deepMl.ocr?.isGarbled ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                    {result.deepMl.ocr?.isGarbled ? t('status_suspicious') : t('status_clean')}
                   </span>
                 </div>
                 <p className="text-xs font-mono leading-relaxed opacity-60">
-                  {result.deepMl.ocr.text || t('no_text_in_frame')}
+                  {result.deepMl.ocr?.text || t('no_text_in_frame')}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Watermarks */}
-          {result.deepMl.watermarks.length > 0 && (
+          {(result.deepMl.watermarks?.length ?? 0) > 0 && (
             <div className="pt-4 border-t border-blue-500/5">
               <div className="flex items-center gap-3 px-4 py-3 bg-amber-500/5 border border-amber-500/10 rounded-2xl">
                 <Layers className="w-4 h-4 text-amber-600" />

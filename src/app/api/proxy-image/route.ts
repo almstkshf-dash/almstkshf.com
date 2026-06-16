@@ -19,10 +19,13 @@ export async function GET(req: NextRequest) {
             throw new Error(`Failed to fetch image: ${response.statusText}`);
         }
 
-        const blob = await response.blob();
+        if (!response.body) {
+            throw new Error('Response body is null');
+        }
+
         const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-        return new NextResponse(blob, {
+        return new NextResponse(response.body, {
             headers: {
                 'Content-Type': contentType,
                 'Cache-Control': 'public, max-age=31536000, immutable'

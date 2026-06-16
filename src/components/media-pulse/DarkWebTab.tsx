@@ -458,7 +458,7 @@ export default function DarkWebTab() {
               )}
 
               <AnimatePresence mode="popLayout" initial={false}>
-                {results.map((entry) => (
+                {results.map((entry: any) => (
                   <motion.tr
                     key={entry._id}
                     layout
