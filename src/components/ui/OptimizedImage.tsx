@@ -47,6 +47,10 @@ export default function OptimizedImage({
         }
     }
 
+    // Determine if the URL is external
+    const isExternal = typeof src === "string" && (src.startsWith("http://") || src.startsWith("https://"));
+    const shouldBeUnoptimized = props.unoptimized ?? isExternal;
+
     return (
         <div 
             key={srcKey} 
@@ -74,6 +78,7 @@ export default function OptimizedImage({
                         setError(true);
                         setIsLoading(false);
                     }}
+                    unoptimized={shouldBeUnoptimized}
                     {...props}
                 />
             ) : (

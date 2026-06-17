@@ -57,8 +57,16 @@ const clerk = clerkMiddleware(async (auth, req) => {
     }
 
     // Handle vitals beacons gracefully with 204 No Content to avoid Clerk interception/Next.js overhead
+    // Include CORS headers to prevent preflight OPTIONS or telemetry POST fetch failures
     if (req.nextUrl.pathname.endsWith("/vitals")) {
-        return new NextResponse(null, { status: 204 });
+        return new NextResponse(null, {
+            status: 204,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            }
+        });
     }
 
     // 0. Skip localization for API routes

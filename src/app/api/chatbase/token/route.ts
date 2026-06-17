@@ -27,8 +27,13 @@ export async function GET(request: NextRequest) {
 
         if (!secret) {
             return NextResponse.json(
-                { error: 'Chatbot identity secret not configured' },
-                { status: 500 }
+                { token: null, error: 'Chatbot identity secret not configured', is_guest: true },
+                {
+                    status: 200,
+                    headers: {
+                        "Cache-Control": "private, max-age=0, must-revalidate",
+                    },
+                }
             );
         }
 

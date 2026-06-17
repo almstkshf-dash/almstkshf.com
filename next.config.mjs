@@ -6,6 +6,18 @@ const withBundleAnalyzer = BundleAnalyzer({ enabled: process.env.ANALYZE === 'tr
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '**',
+            },
+            {
+                protocol: 'http',
+                hostname: '**',
+            },
+        ],
+    },
     experimental: {
         /*
          * optimizeCss (using `critters`) is disabled because it converts blocking stylesheets into 
