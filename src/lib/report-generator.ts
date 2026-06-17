@@ -327,8 +327,8 @@ export class ReportGenerator {
             if (a.imageUrl.startsWith('data:')) return a;
 
             try {
-                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
-                const response = await fetch(proxyUrl);
+                const fetchUrl = this.getFetchUrl(a.imageUrl);
+                const response = await fetch(fetchUrl);
                 if (response.ok) {
                     const blob = await response.blob();
                     const reader = new FileReader();
@@ -1169,8 +1169,8 @@ export class ReportGenerator {
             if (a.imageUrl.startsWith('data:')) return a;
 
             try {
-                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
-                const response = await fetch(proxyUrl);
+                const fetchUrl = this.getFetchUrl(a.imageUrl);
+                const response = await fetch(fetchUrl);
                 if (response.ok) {
                     const blob = await response.blob();
                     const reader = new FileReader();
@@ -1671,8 +1671,8 @@ export class ReportGenerator {
             if (a.imageUrl.startsWith('data:')) return a;
 
             try {
-                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(a.imageUrl)}`;
-                const response = await fetch(proxyUrl);
+                const fetchUrl = this.getFetchUrl(a.imageUrl);
+                const response = await fetch(fetchUrl);
                 if (response.ok) {
                     const blob = await response.blob();
                     const reader = new FileReader();
@@ -1943,11 +1943,19 @@ export class ReportGenerator {
         return fixArabicForPDF(text);
     }
 
+    private static getFetchUrl(imageUrl: string): string {
+        if (imageUrl.startsWith('data:')) return imageUrl;
+        const formattedUrl = imageUrl.startsWith('//') ? `https:${imageUrl}` : imageUrl;
+        const isRelative = !formattedUrl.startsWith('http');
+        return isRelative ? formattedUrl : `/api/proxy-image?url=${encodeURIComponent(formattedUrl)}`;
+    }
+
     private static async loadLogo(logoUrl?: string): Promise<string | null> {
         try {
-            const urlToFetch = logoUrl
-                ? (logoUrl.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(logoUrl)}` : logoUrl)
-                : '/logo.png';
+            const urlToFetch = logoUrl ? this.getFetchUrl(logoUrl) : '/logo.png';
+            if (urlToFetch.startsWith('data:')) {
+                return urlToFetch.split(',')[1];
+            }
             const res = await fetch(urlToFetch);
             if (!res.ok) {
                 if (logoUrl) {

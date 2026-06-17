@@ -22,7 +22,7 @@ export const fixArabicForPDF = (text: string): string => {
     if (!text || !isArabic(text)) return text;
     
     // Shape characters using the reshaper to get correct connected glyph forms
-    const shaped = reshaper.reshape(text);
+    const shaped = reshaper.ArabicShaper.convertArabic(text);
     
     // Split by spaces (retaining whitespace) to keep alignment intact
     const words = shaped.split(/(\s+)/);

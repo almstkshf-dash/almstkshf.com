@@ -23,10 +23,14 @@ export async function GET(req: NextRequest) {
         }
 
         const { searchParams } = new URL(req.url);
-        const imageUrl = searchParams.get('url');
+        let imageUrl = searchParams.get('url');
 
         if (!imageUrl) {
             return new NextResponse('Missing url', { status: 400 });
+        }
+
+        if (imageUrl.startsWith('//')) {
+            imageUrl = `https:${imageUrl}`;
         }
 
         // SSRF Guard
