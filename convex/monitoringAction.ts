@@ -28,7 +28,8 @@ const SHORTENER_DOMAINS = new Set([
     'bit.ly', 'bitly.com', 't.co', 'tinyurl.com', 'rebrand.ly', 'is.gd',
     'buff.ly', 'ow.ly', 'db.tt', 'git.io', 't.me', 'lnkd.in', 'fb.me',
     'amzn.to', 'goo.gl', 'su.pr', 'wp.me', 'short.io', 'rb.gy', 'shorturl.at',
-    'tiny.cc', 'qr.ae', 'adf.ly', 'b.link', 'sniply.io', 'clicky.me'
+    'tiny.cc', 'qr.ae', 'adf.ly', 'b.link', 'sniply.io', 'clicky.me',
+    'news.google.com'
 ]);
 
 const TRACKING_PARAMS = [
@@ -136,7 +137,7 @@ async function isUnsafeHostname(hostname: string): Promise<boolean> {
 }
 
 function getScraperUrl(): string {
-    const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+    const base = process.env.SCRAPER_SERVICE_URL || 'http://127.0.0.1:3002';
     return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
 }
 
@@ -502,20 +503,20 @@ Note: The sum of emotions does not need to be 100, they are independent intensit
         }
     }
 
-    console.error("âŒ All Gemini models failed or key is missing. Using heuristic values.");
+    console.error("❌ All Gemini models failed or key is missing. Using heuristic values.");
 
-    // â”€â”€ HEURISTIC FALLBACK LOGIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── HEURISTIC FALLBACK LOGIC ──────────────────────────────────────
     const lowerText = (title + " " + snippet).toLowerCase();
     let sentiment: "Positive" | "Neutral" | "Negative" = "Neutral";
     let risk: "Low" | "Medium" | "High" = "Medium";
 
     // EN/AR Positive keywords
-    if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|Ù†Ø¬Ø§Ø­|Ø§Ø±Ø¨Ø§Ø­|ÙÙˆØ²|Ø§Ø²Ø¯Ù‡Ø§Ø±|Ù†Ù…Ùˆ|ØªØ·ÙˆØ±|Ø´Ø±Ø§ÙƒØ©|Ø§Ø·Ù„Ø§Ù‚|Ø§Ø¨ØªÙƒØ§Ø±)/i)) {
+    if (lowerText.match(/(growth|success|positive|profit|award|win|won|increase|expansion|partnership|launch|breakthrough|milestone|leader|innovative|نجاح|ارباح|فوز|ازدهار|نمو|تطور|شراكة|اطلاق|ابتكار)/i)) {
         sentiment = "Positive";
         risk = "Low";
     }
     // EN/AR Negative keywords (Colloquial + Formal + Harmful)
-    else if (lowerText.match(/(Ù†ØµØ¨|Ø®Ø±Ø§Ø¨|Ø²ÙØª|ÙØ¶ÙŠØ­Ø©|ÙˆØ±Ø·Ø©|ØªØ¹ÙŠØ³|ÙØ§Ø´Ù„|Ø­Ø´ÙŠØ´|Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§|ÙƒØ±ÙŠØ³ØªØ§Ù„|ÙƒÙˆÙƒ|ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„|Ù„Ø§Ø±ÙŠÙƒØ§|Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|Ø®Ø³Ø§Ø±Ø©|ØªØ±Ø§Ø¬Ø¹|ÙØ´Ù„|ÙØ¶ÙŠØ­Ø©|Ø§Ø®ØªØ±Ø§Ù‚|Ø¯Ø¹ÙˆÙ‰|Ø§Ù†ØªÙ‡Ø§Ùƒ|Ø§Ø­ØªÙŠØ§Ù„|Ø§Ø²Ù…Ø©|ØªØ­Ø°ÙŠØ±|Ø®Ø·Ø±)/i)) {
+    else if (lowerText.match(/(نصب|خراب|زفت|فضيحة|ورطة|تعيس|فاشل|حشيش|ماريجوانا|كريستال|كوك|ترامادول|لاريكا|سي بي دي|loss|decline|negative|drop|decrease|fail|scandal|breach|lawsuit|violation|fraud|crisis|warning|risk|hashish|weed|cocauine|teramadol|larica|massage in dubai|happy ending|cristal mith|escort girls|harm|harmfull|CBD OIL|خسارة|تراجع|فشل|فضيحة|اختراق|دعوى|انتهاك|احتيال|ازمة|تحذير|خطر)/i)) {
         sentiment = "Negative";
         risk = "High";
     }
@@ -676,7 +677,12 @@ export const fetchNews = action({
                 return { success: false, error: "Missing news provider API keys. Please configure at least one in Settings." };
             }
 
-            const parser = new Parser({ timeout: 10000 });
+            const parser = new Parser({
+                timeout: 10000,
+                customFields: {
+                    item: [['source', 'source']]
+                }
+            });
 
             // Parse multi-values
             const countryList = args.countries.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
@@ -1517,7 +1523,24 @@ export const analyzeArticleBackground = internalAction({
                 if (resolved) {
                     resolvedUrl = resolved.finalUrl;
                     imageUrl = resolved.imageUrl || imageUrl;
-                    sourceName = resolved.source || sourceName;
+                    
+                    const resolvedSourceLower = (resolved.source || "").toLowerCase();
+                    if (resolved.source && !resolvedSourceLower.includes("google") && !resolvedSourceLower.includes("news.google.com")) {
+                        sourceName = resolved.source;
+                    }
+                }
+            }
+
+            // Clean up sourceName if it is Google-related by extracting from the end of the title
+            const sourceLower = (sourceName || "").toLowerCase();
+            if (sourceLower.includes("google") || sourceLower === "news.google.com") {
+                const cleanTitle = article.title.replace(/\s*[-–|]\s*Google\s*(?:News)?\s*$/i, '').trim();
+                const titleParts = cleanTitle.split(/\s+[-|]\s+/);
+                if (titleParts.length > 1) {
+                    const potentialPub = titleParts[titleParts.length - 1].trim();
+                    if (potentialPub && !potentialPub.toLowerCase().includes("google")) {
+                        sourceName = potentialPub;
+                    }
                 }
             }
 
@@ -1714,6 +1737,14 @@ async function fetchRobustRss(url: string) {
         let xml = decodeHtmlBuffer(buffer, response.headers.get('content-type'));
         // Sanitization for AETOSWire and others with potential malformed XML
         xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
+
+        const trimmedXml = xml.trim().toLowerCase();
+        const isHtml = trimmedXml.startsWith('<!doctype html') || 
+                       trimmedXml.startsWith('<html') ||
+                       trimmedXml.startsWith('<doctype html');
+        if (isHtml) {
+            throw new Error("HTML_RESPONSE");
+        }
         return xml;
     } catch (error: any) {
         console.warn(`[fetchRobustRss] Direct fetch failed for ${url}: ${error.message || error}. Trying Playwright Scraper Service...`);
@@ -1745,11 +1776,22 @@ async function fetchRobustRss(url: string) {
                     }
 
                     xml = xml.replace(/[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/g, "");
+
+                    const trimmedXml = xml.trim().toLowerCase();
+                    const isHtml = trimmedXml.startsWith('<!doctype html') || 
+                                   trimmedXml.startsWith('<html') ||
+                                   trimmedXml.startsWith('<doctype html');
+                    if (isHtml) {
+                        throw new Error("HTML_RESPONSE");
+                    }
                     return xml;
                 }
             }
         } catch (scraperErr: any) {
             console.error(`[fetchRobustRss] Playwright Scraper fallback also failed for ${url}:`, scraperErr.message);
+            if (scraperErr.message === "HTML_RESPONSE") {
+                throw scraperErr;
+            }
         }
         throw error;
     }
@@ -1864,7 +1906,7 @@ const PR_WIRE_FEEDS = [
     { name: "Al Madar Magazine", url: "https://www.almadarmagazine.ae/feed/", country: "AE", lang: "ar" },
     { name: "First Avenue Magazine", url: "https://firstavenuemagazine.com/feed/", country: "AE", lang: "en" },
     { name: "Evision Worlds", url: "https://evisionworlds.com/?feed=rss2", country: "AE", lang: "en" },
-    { name: "Pan Time Arabia", url: "https://pantimearabia.com/rss/", country: "AE", lang: "ar" },
+    { name: "Pan Time Arabia", url: "https://pantimearabia.com/rss/", country: "AE", lang: "en" },
     { name: "Food Safety News", url: "https://www.foodsafetynews.com/rss/", country: "US", lang: "en" },
     { name: "Energy Intel", url: "https://www.energyintel.com/rss-feed.rss", country: "US", lang: "en" },
     { name: "Business Day", url: "https://www.businessday.co.za/arc/outboundfeeds/rss/", country: "ZA", lang: "en" },
@@ -2007,7 +2049,11 @@ export const fetchPressReleaseSources = action({
             const parser = new Parser({
                 timeout: 10000,
                 customFields: {
-                    item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
+                    item: [
+                        ['source', 'source'],
+                        ['media:content', 'mediaContent'],
+                        ['content:encoded', 'contentEncoded']
+                    ]
                 }
             });
 
@@ -2087,12 +2133,23 @@ export const fetchPressReleaseSources = action({
                                 let matchedPublisher = new URL(item.link).hostname;
 
                                 try {
-                                    const itemHost = new URL(item.link).hostname.toLowerCase();
-                                    const foundFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                                    const itemSource = (item.source || "").toLowerCase().trim();
+                                    const foundFeed = PR_WIRE_FEEDS.find(f => 
+                                        f.name.toLowerCase().includes(itemSource) || 
+                                        itemSource.includes(f.name.toLowerCase())
+                                    );
                                     if (foundFeed) {
                                         matchedCountry = foundFeed.country;
                                         matchedLang = foundFeed.lang;
                                         matchedPublisher = foundFeed.name;
+                                    } else {
+                                        const itemHost = new URL(item.link).hostname.toLowerCase();
+                                        const foundHostFeed = PR_WIRE_FEEDS.find(f => f.url.toLowerCase().includes(itemHost) || itemHost.includes(f.name.toLowerCase()));
+                                        if (foundHostFeed) {
+                                            matchedCountry = foundHostFeed.country;
+                                            matchedLang = foundHostFeed.lang;
+                                            matchedPublisher = foundHostFeed.name;
+                                        }
                                     }
                                 } catch { }
 
@@ -2306,122 +2363,134 @@ export const fetchPressReleaseSources = action({
                 }
             }
 
-            // 1. Parallel RSS & Twitter Ingestion
-            await Promise.all(
-                PR_WIRE_FEEDS.map(async (feed) => {
-                    let savedCount = 0;
-                    try {
-                        let candidates: any[] = [];
-                        const isTwitter = feed.url.includes("twitter.com") || feed.url.includes("x.com");
+            // 1. Parallel RSS & Twitter Ingestion with concurrency control (chunk size of 5)
+            // to avoid Cloudflare rate-limiting/403 blocks and local scraper service overload.
+            const chunkSize = 5;
+            for (let i = 0; i < PR_WIRE_FEEDS.length; i += chunkSize) {
+                const chunk = PR_WIRE_FEEDS.slice(i, i + chunkSize);
+                await Promise.all(
+                    chunk.map(async (feed) => {
+                        let savedCount = 0;
+                        try {
+                            let candidates: any[] = [];
+                            const isTwitter = feed.url.includes("twitter.com") || feed.url.includes("x.com");
 
-                        if (isTwitter) {
-                            let username = "";
-                            if (feed.url.includes("screen-name=")) {
-                                const match = feed.url.match(/screen-name=([^&]+)/);
-                                if (match) username = match[1];
+                            if (isTwitter) {
+                                let username = "";
+                                if (feed.url.includes("screen-name=")) {
+                                    const match = feed.url.match(/screen-name=([^&]+)/);
+                                    if (match) username = match[1];
+                                } else {
+                                    const match = feed.url.match(/(?:twitter|x)\.com\/([^\/\?]+)/);
+                                    if (match) username = match[1];
+                                }
+                                if (username) {
+                                    candidates = await fetchTwitterTweets(username, twitterBearer);
+                                }
                             } else {
-                                const match = feed.url.match(/(?:twitter|x)\.com\/([^\/\?]+)/);
-                                if (match) username = match[1];
+                                const xml = await fetchRobustRss(feed.url);
+                                const feedData = await parser.parseString(xml);
+                                candidates = feedData.items;
                             }
-                            if (username) {
-                                candidates = await fetchTwitterTweets(username, twitterBearer);
-                            }
-                        } else {
-                            const xml = await fetchRobustRss(feed.url);
-                            const feedData = await parser.parseString(xml);
-                            candidates = feedData.items;
-                        }
 
-                        const rawItems = candidates.slice(0, itemLimit);
+                            const rawItems = candidates.slice(0, itemLimit);
 
-                        const items = rawItems.filter((item) => {
-                            const title = item.title ?? "";
-                            const snippet = item.contentSnippet || item.content || "";
+                            const items = rawItems.filter((item) => {
+                                const title = item.title ?? "";
+                                const snippet = item.contentSnippet || item.content || "";
 
-                            // Keyword Filter
-                            if (fetchedKeyword && !matchesBooleanFilter(booleanExpr, title, snippet)) return false;
+                                // Keyword Filter
+                                if (fetchedKeyword && !matchesBooleanFilter(booleanExpr, title, snippet)) return false;
 
-                            // Date Filter
-                            if (dateFromObj || dateToObj) {
-                                if (!item.pubDate) return true;
-                                const pub = new Date(item.pubDate);
-                                if (isNaN(pub.getTime())) return true;
-                                if (dateFromObj && pub < dateFromObj) return false;
-                                if (dateToObj && pub > dateToObj) return false;
-                            }
-                            return true;
-                        });
-                        for (const item of items) {
-                            if (!item.link || !item.title) continue;
-                            const isSeen = await checkAndSetSeen(item.link, item.title);
-                            if (isSeen) continue;
+                                // Date Filter
+                                if (dateFromObj || dateToObj) {
+                                    if (!item.pubDate) return true;
+                                    const pub = new Date(item.pubDate);
+                                    if (isNaN(pub.getTime())) return true;
+                                    if (dateFromObj && pub < dateFromObj) return false;
+                                    if (dateToObj && pub > dateToObj) return false;
+                                }
+                                return true;
+                            });
+                            for (const item of items) {
+                                if (!item.link || !item.title) continue;
+                                const isSeen = await checkAndSetSeen(item.link, item.title);
+                                if (isSeen) continue;
 
-                            if (!fetchedKeyword) {
-                                // Background live feed sweep -> save to rss_feed_articles
-                                const pubDate = item.pubDate ? new Date(item.pubDate) : null;
-                                const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
-                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                                if (!fetchedKeyword) {
+                                    // Background live feed sweep -> save to rss_feed_articles
+                                    const pubDate = item.pubDate ? new Date(item.pubDate) : null;
+                                    const d = pubDate && !isNaN(pubDate.getTime()) ? pubDate : new Date();
+                                    const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 
-                                const snippet = item.contentSnippet || item.content || item.title || "";
-                                const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
-                                const language = isArabic ? "AR" : (feed.lang === "ar" ? "AR" : "EN");
+                                    const snippet = item.contentSnippet || item.content || item.title || "";
+                                    const isArabic = /[\u0600-\u06FF]/.test(item.title + snippet);
+                                    const language = isArabic ? "AR" : (feed.lang === "ar" ? "AR" : "EN");
 
-                                const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
+                                    const imageUrl = (item as any).image || (item as any).imageUrl || undefined;
 
-                                await ctx.runMutation(api.monitoring.saveRssArticle, {
-                                    url: item.link,
-                                    title: item.title,
-                                    content: snippet,
-                                    publishedDate: formattedDate,
-                                    language,
-                                    source: normalizePublisherName(feed.name) || new URL(item.link).hostname,
-                                    sourceCountry: feed.country,
-                                    imageUrl,
-                                });
-                                savedCount++;
-                                totalSaved++;
-                            } else {
-                                // Specific keyword sweep -> save to media_monitoring_articles
-                                const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
-                                const processed = await processArticle(
-                                    ctx,
-                                    {
-                                        ...item,
-                                        link: item.link,
-                                        pubDate: item.pubDate,
-                                        source: normalizePublisherName(feed.name)
-                                    },
-                                    feed.country,
-                                    feed.lang,
-                                    keyword,
-                                    geminiKey,
-                                    isTwitter ? ["Social Media"] : ["Press Release"],
-                                    dateFromObj,
-                                    dateToObj,
-                                    false,
-                                    isTwitter ? "Social Media" : "Press Release"
-                                );
-                                if (processed) {
+                                    await ctx.runMutation(api.monitoring.saveRssArticle, {
+                                        url: item.link,
+                                        title: item.title,
+                                        content: snippet,
+                                        publishedDate: formattedDate,
+                                        language,
+                                        source: normalizePublisherName(feed.name) || new URL(item.link).hostname,
+                                        sourceCountry: feed.country,
+                                        imageUrl,
+                                    });
                                     savedCount++;
                                     totalSaved++;
+                                } else {
+                                    // Specific keyword sweep -> save to media_monitoring_articles
+                                    const geminiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
+                                    const processed = await processArticle(
+                                        ctx,
+                                        {
+                                            ...item,
+                                            link: item.link,
+                                            pubDate: item.pubDate,
+                                            source: normalizePublisherName(feed.name)
+                                        },
+                                        feed.country,
+                                        feed.lang,
+                                        keyword,
+                                        geminiKey,
+                                        isTwitter ? ["Social Media"] : ["Press Release"],
+                                        dateFromObj,
+                                        dateToObj,
+                                        false,
+                                        isTwitter ? "Social Media" : "Press Release"
+                                    );
+                                    if (processed) {
+                                        savedCount++;
+                                        totalSaved++;
+                                    }
                                 }
                             }
+
+                            feedResults.push({ name: feed.name, status: "Success", saved: savedCount, total: items.length });
+                        } catch (err: any) {
+                            const message = err.message || String(err);
+                            console.error(`❌ Feed Failed: ${feed.name}`, message);
+                            let errorLabel = "Failed";
+                            if (message.includes("HTML_RESPONSE")) errorLabel = "Private Site (HTML)";
+                            else if (message.includes("HTTP_403")) errorLabel = "Access Denied (403)";
+                            else if (message.includes("HTTP_404")) errorLabel = "Not Found (404)";
+                            else if (message.includes("HTTP_429")) errorLabel = "Rate Limited (429)";
+                            else if (message.includes("HTTP_4")) errorLabel = `Client Error (${message.match(/HTTP_(\d+)/)?.[1] || '4xx'})`;
+                            else if (message.includes("HTTP_5")) errorLabel = `Server Error (${message.match(/HTTP_(\d+)/)?.[1] || '5xx'})`;
+                            else if (message.includes("HTTP_400")) errorLabel = "Bad Request (400)";
+                            else if (message.includes("timeout") || message.includes("Timeout")) errorLabel = "Timeout";
+                            else if (message.includes("parse") || message.includes("XML") || message.includes("Invalid")) errorLabel = "XML Parse Error";
+                            else if (message.includes("ENOTFOUND") || message.includes("ECONNREFUSED")) errorLabel = "DNS/Connection Error";
+
+                            feedResults.push({ name: feed.name, status: "Failed", error: errorLabel, saved: 0 });
+                            totalErrors++;
                         }
-
-                        feedResults.push({ name: feed.name, status: "Success", saved: savedCount, total: items.length });
-                    } catch (err: any) {
-                        const message = err.message || String(err);
-                        console.error(`❌ Feed Failed: ${feed.name}`, message);
-                        let errorLabel = "Failed";
-                        if (message.includes("HTTP_403")) errorLabel = "Access Denied (403)";
-                        else if (message.includes("HTTP_400")) errorLabel = "Bad Request (400)";
-                        else if (message.includes("timeout")) errorLabel = "Timeout";
-
-                        feedResults.push({ name: feed.name, status: "Failed", error: errorLabel, saved: 0 });
-                        totalErrors++;
-                    }
-                })
-            );
+                    })
+                );
+            }
 
             // 2. Historical Search
             if (fetchedKeyword && args.dateFrom && args.dateTo) {
@@ -2517,7 +2586,11 @@ async function executeRssSync(
         const parser = new Parser({
             timeout: 10000,
             customFields: {
-                item: [['media:content', 'mediaContent'], ['content:encoded', 'contentEncoded']]
+                item: [
+                    ['source', 'source'],
+                    ['media:content', 'mediaContent'],
+                    ['content:encoded', 'contentEncoded']
+                ]
             }
         });
 
@@ -2760,10 +2833,10 @@ export const processQueueBatch = internalAction({
                     });
                 } catch (err) {
                     console.error(`❌ [processQueueBatch] Error processing queue item ${item._id}:`, err);
-                    
+
                     const newRetryCount = item.retryCount + 1;
                     const status = newRetryCount >= 3 ? "failed" : "pending";
-                    
+
                     await ctx.runMutation(api.monitoring.updateQueueItemStatus, {
                         id: item._id,
                         status,

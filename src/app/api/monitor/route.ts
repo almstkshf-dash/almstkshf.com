@@ -75,7 +75,18 @@ export async function POST(req: NextRequest) {
         }
 
         // 3. Metrics (Reach & AVE)
-        const publisherName = manualData?.source || resolved?.source || new URL(finalUrl).hostname;
+        let publisherName = manualData?.source || resolved?.source || new URL(finalUrl).hostname;
+        const pubLower = publisherName.toLowerCase();
+        if (pubLower.includes("google") || pubLower === "news.google.com") {
+            const cleanTitle = title.replace(/\s*[-–|]\s*Google\s*(?:News)?\s*$/i, '').trim();
+            const titleParts = cleanTitle.split(/\s+[-|]\s+/);
+            if (titleParts.length > 1) {
+                const potentialPub = titleParts[titleParts.length - 1].trim();
+                if (potentialPub && !potentialPub.toLowerCase().includes("google")) {
+                    publisherName = potentialPub;
+                }
+            }
+        }
 
         // Fetch AVE Multiplier from Settings
         let aveMultiplier = 0.005;

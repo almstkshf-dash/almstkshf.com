@@ -45,8 +45,8 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "critical",
             keywords: [
                 "database dump", "private key", "passport", "credit card", "root access", "ssn", "national id",
-                "Ù‚Ø§Ø¹Ø¯Ø© Ø¨ÙŠØ§Ù†Ø§Øª", "Ù…Ù ØªØ§Ø­ Ø®Ø§Øµ", "Ø¬ÙˆØ§Ø² Ø³Ù Ø±", "Ø¨Ø·Ø§Ù‚Ø© Ø§Ø¦ØªÙ…Ø§Ù†", "Ø§Ø®ØªØ±Ø§Ù‚ ÙƒØ§Ù…Ù„",
-                "Ø­Ø´ÙŠØ´", "Ù…Ø§Ø±ÙŠØ¬ÙˆØ§Ù†Ø§", "ÙƒØ±ÙŠØ³ØªØ§Ù„", "ÙƒÙˆÙƒ", "Ø§ÙƒØ³ØªØ± Ø³ÙŠ", "ØªØ±Ø§Ù…Ø§Ø¯ÙˆÙ„", "Ù„Ø§Ø±ÙŠÙƒØ§", "Ø³ÙŠ Ø¨ÙŠ Ø¯ÙŠ",
+                "قاعدة بيانات", "مفتاح خاص", "جواز سفر", "بطاقة ائتمان", "اختراق كامل",
+                "حشيش", "ماريجوانا", "كريستال", "كوك", "اكستر سي", "ترامادول", "لاريكا", "سي بي دي",
                 "hashish", "weed", "cocauine", "extra c", "teramadol", "larica", "massage in dubai", "happy ending",
                 "cristal mith", "escort girls", "harm", "harmfull", "CBD OIL"
             ]
@@ -55,15 +55,15 @@ function performHeuristicAnalysis(title: string, snippet: string) {
             risk: "high",
             keywords: [
                 "leak", "exploit", "zeroday", "vulnerability", "malware", "ransomware", "backdoor", "hack",
-                "ØªØ³Ø±ÙŠØ¨", "Ø«ØºØ±Ø©", "Ø¨Ø±Ù…Ø¬ÙŠØ§Øª Ø®Ø¨ÙŠØ«Ø©", "Ù Ø¯ÙŠØ©", "Ø¨Ø§Ø¨ Ø®Ù„Ù ÙŠ", "Ø§Ø®ØªØ±Ø§Ù‚",
-                "Ù†ØµØ¨", "Ø®Ø±Ø§Ø¨", "Ø²Ù Øª", "Ù Ø¶ÙŠØ­Ø©", "ÙˆØ±Ø·Ø©", "ØªØ¹ÙŠØ³", "Ù Ø§Ø´Ù„"
+                "تسريب", "ثغرة", "برمجيات خبيثة", "فدية", "باب خلفي", "اختراق",
+                "نصب", "خراب", "زفت", "فضيحة", "ورطة", "تعيس", "فاشل"
             ]
         },
         {
             risk: "medium",
             keywords: [
                 "marketplace", "onion", "forum", "account", "login", "credentials", "tor",
-                "Ø³ÙˆÙ‚", "Ù…Ù†ØªØ¯Ù‰", "Ø­Ø³Ø§Ø¨", "Ø¯Ø®ÙˆÙ„", "Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ø¹ØªÙ…Ø§Ø¯"
+                "سوق", "منتدى", "حساب", "دخول", "بيانات اعتماد"
             ]
         }
     ];

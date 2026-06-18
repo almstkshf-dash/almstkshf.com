@@ -384,7 +384,7 @@ When generating reports using `jsPDF` or `ExcelJS` that include Arabic content:
 - **Arabic Glyph Shaping & Character Reversal**: Before passing text to jsPDF, the text is processed using `arabic-persian-reshaper` to shape disconnected Arabic characters into proper connected ligatures. Then, Arabic words are reversed at the character level while maintaining the LTR flow of English text and digits, and the overall sentence word order is reversed to support RTL text flow (see `src/utils/arabic-utils.ts`).
 - **Dynamic Bidi Coordinate Alignment**: Manual text rendering (`doc.text()`) dynamically adjusts coordinate origins. When Arabic/RTL is detected, the start coordinate `x` is mirrored (`pageWidth - x`) and aligned to the right (`{ align: 'right' }`).
 - **Table Cell Auto-Wrapping & Alignment**: Columns in `jspdf-autotable` are configured with `overflow: 'linebreak'` to prevent content overflow. Cells are parsed using `didParseCell` to check for both normal and shaped Arabic characters, dynamically setting `halign: 'right'` for Arabic/RTL text.
-- **Interactive Chart Capture**: Browser-rendered charts (`ReportsChart`, `EmotionRadarChart`, `SentimentDonutChart`, `ArticlesTrendChart`) are captured as PNG data URLs using `html2canvas` and dynamically embedded into the executive summary or visualizations pages of the PDF.
+- **Interactive Chart Capture**: Browser-rendered charts (`ReportsChart`, `EmotionRadarChart`, `SentimentDonutChart`, `ArticlesTrendChart`) are captured as PNG data URLs using `html2canvas-pro` and dynamically embedded into the executive summary or visualizations pages of the PDF.
 - **Dynamic Table Configurations & Column Widths**: Column widths are precisely defined (e.g., image: 10, title: 60, source: 22, etc.) to fit cleanly within standard landscape formats.
 - **RTL Mirroring & Column Orders**: When Arabic mode is detected, the table columns (`activeColumns`) are completely reversed to naturally present columns from right to left (RTL).
 - **Context-Aware Column Alignments**: Text alignments (`halign`) are dynamically evaluated (e.g., aligning titles and sources to the right in Arabic mode, and keeping numeric data like reach/AVE aligned to the left so that digits flow naturally).
@@ -711,7 +711,7 @@ The following requested feeds failed validation audits and are explicitly exclud
 - **The News Mirror** (`https://thenewsmirror.in/`): Standard `/feed/` path returns 404.
 - **Ya Watan** (`https://www.ya-watan.com/`): Strictly blocked by Cloudflare (returns `403 Forbidden` on crawls).
 - **PR Newswire** & **AETOSWire**: Strictly protected behind Cloudflare bot protections or user-agent verification walls, resulting in persistent `403 Forbidden` blocks when accessed via cloud serverless functions.
-- **Gulf News**, **Khaleej Times**, **Zawya**, **The National**, **Sky News Arabia** (RSS feed), **Gulf Today**, **Vice News**, **Newsweek**, **Politico**, and **UAE Interact**: These feeds suffer from persistent timeouts, DNS resolution blocks, SSL connection handshake failures in Vercel/Convex serverless environments, or empty XML structures. Removing them guarantees zero background scanner errors and keeps execution speeds within safe limits.
+- **Gulf News** (restored), **Khaleej Times** (restored), **The National** (restored), **Zawya**, **Sky News Arabia** (RSS feed), **Gulf Today**, **Vice News**, **Newsweek**, **Politico**, and **UAE Interact**: These feeds suffer from persistent timeouts, DNS resolution blocks, SSL connection handshake failures in Vercel/Convex serverless environments, or empty XML structures. Removing/commenting them out guarantees zero background scanner errors and keeps execution speeds within safe limits. (Note: **Gulf News** was successfully restored after correcting its configuration to use the active `https://gulfnews.com/feed` endpoint. **Khaleej Times**, **The National**, **Wall Street Journal**, **US News**, **Sky News UK**, **The Telegraph**, and various Middle Eastern, Indian, and Pakistani feeds were successfully restored by proxying them through Google News RSS queries and using the link resolver to automatically resolve `news.google.com` redirect links to their canonical targets via Playwright).
 
 ---
 
@@ -854,4 +854,20 @@ Implemented a unified query helper `queryArticlesWithIndex` in `convex/monitorin
 
 ### 3. Batched Mutation Deletion
 Refactored the `deleteAllArticles` mutation inside `convex/monitoring.ts` to delete documents in batches of 200 and automatically reschedule itself via `ctx.scheduler` for subsequent batches. This keeps the transaction footprint minimal, avoiding OCC write conflicts and timeouts on large tables.
+
+---
+
+## 42. HTML Response Detection & Private Site Error Classification
+
+To prevent RSS parser crashes and improve system error labeling, the ingestion pipeline detects non-XML responses (specifically HTML documents) returned under a `200 OK` HTTP status code:
+
+### 1. Root Cause
+WordPress private sites (such as `New Vora Group`) or feeds behind active bot-protection/login walls redirect standard requests to an HTML login or access-denied page, returning a `200 OK` status. Directly feeding this HTML content to `rss-parser` triggers unhandled XML parser exceptions (e.g., `Unexpected close tag`).
+
+### 2. Detection
+Within `fetchRobustRss` (in `convex/monitoringAction.ts`), both the direct fetch and the Playwright Scraper fallback check the retrieved content after decoding. If the trimmed text starts with HTML identifiers (`<!doctype html`, `<html`, or `<doctype html`), the method throws an `HTML_RESPONSE` exception.
+
+### 3. Classification
+Within the ingestion loop, `HTML_RESPONSE` exceptions are caught and classified as `"Private Site (HTML)"` instead of `"XML Parse Error"` or `"Failed"`. This gracefully updates the feed sync results and allows the system to continue running other active compliant feeds smoothly.
+
 

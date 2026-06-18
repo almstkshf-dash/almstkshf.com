@@ -33,7 +33,7 @@ const ArticlesTrendChart = dynamic(() => import("./ArticlesTrendChart"), {
 
 import { ReportGenerator } from "@/lib/report-generator";
 import Button from "@/components/ui/Button";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { useMessages } from "next-intl";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -86,7 +86,7 @@ const DashboardGrid = memo(({ articles, analytics, isLoading, aiSummary, isAiLoa
             if (format === 'pdf') {
                 // Capture charts
                 const chartImages: { sentimentDonut?: string; emotionRadar?: string; articlesTrend?: string } = {};
-                
+
                 const capture = async (id: string) => {
                     const el = document.getElementById(id);
                     if (!el) return undefined;

@@ -144,13 +144,13 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'arabnews-en', name: 'Latest News', url: 'https://www.arabnews.com/rss.xml', country: 'SA' }
   ],
   'Gulf News': [
-    { id: 'gulfnews-en', name: 'Latest News', url: 'https://gulfnews.com/rss', country: 'UAE' }
+    { id: 'gulfnews-en', name: 'Latest News', url: 'https://gulfnews.com/feed', country: 'UAE' }
   ],
   'Khaleej Times': [
-    { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://www.khaleejtimes.com/rss', country: 'UAE' }
+    { id: 'khaleejtimes-en', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:khaleejtimes.com&hl=en-AE&gl=AE&ceid=AE:en', country: 'UAE' }
   ],
   'The National': [
-    { id: 'thenational-en', name: 'Latest News', url: 'https://www.thenationalnews.com/rss', country: 'UAE' }
+    { id: 'thenational-en', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thenationalnews.com&hl=en-AE&gl=AE&ceid=AE:en', country: 'UAE' }
   ],
   'Middle East Eye': [
     { id: 'mee-en', name: 'Latest News', url: 'https://www.middleeasteye.net/rss', country: 'GB' }
@@ -244,20 +244,20 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   //   { id: 'vice-news', name: 'Latest News', url: 'https://news.vice.com/rss', country: 'US' },
   // ],
   'Wall Street Journal': [
-    { id: 'wsj-latest', name: 'Latest News', url: 'http://online.wsj.com/xml/rss/3_7085.xml', country: 'US' },
+    { id: 'wsj-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:wsj.com&hl=en-US&gl=US&ceid=US:en', country: 'US' },
   ],
   'Huffington Post': [
     { id: 'huffpost-world', name: 'World News', url: 'http://www.huffingtonpost.com/feeds/verticals/world/index.xml', country: 'US' },
     { id: 'huffpost-entertainment', name: 'Entertainment', url: 'https://www.huffpost.com/dept/entertainment/feed', country: 'US' },
   ],
   'US News': [
-    { id: 'usnews-latest', name: 'Latest News', url: 'http://www.usnews.com/rss/news', country: 'US' },
+    { id: 'usnews-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:usnews.com/news&hl=en-US&gl=US&ceid=US:en', country: 'US' },
   ],
   'Sky News UK': [
-    { id: 'skynews-uk', name: 'UK News', url: 'http://news.sky.com/feeds/rss/uk.xml', country: 'GB' },
+    { id: 'skynews-uk', name: 'UK News', url: 'https://news.google.com/rss/search?q=site:news.sky.com/uk&hl=en-GB&gl=GB&ceid=GB:en', country: 'GB' },
   ],
   'The Telegraph': [
-    { id: 'telegraph-uk', name: 'UK News', url: 'http://www.telegraph.co.uk/news/uknews/rss', country: 'GB' },
+    { id: 'telegraph-uk', name: 'UK News', url: 'https://news.google.com/rss/search?q=site:telegraph.co.uk/news&hl=en-GB&gl=GB&ceid=GB:en', country: 'GB' },
   ],
   'Deadline': [
     { id: 'deadline-entertainment', name: 'Entertainment', url: 'http://deadline.com/feed/', country: 'US' },
@@ -291,7 +291,7 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   // --- UAE NEW FEEDS ---
   'Arabian Post': [
-    { id: 'arabianpost-latest', name: 'Latest News', url: 'http://thearabianpost.com/feed', country: 'UAE' }
+    { id: 'arabianpost-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thearabianpost.com&hl=en-AE&gl=AE&ceid=AE:en', country: 'UAE' }
   ],
   'Dubai Chronicle': [
     { id: 'dubaichronicle-latest', name: 'Latest News', url: 'http://dubaichronicle.com/feed', country: 'UAE' }
@@ -301,13 +301,13 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   // --- KSA NEW FEEDS ---
   'Saudi Gazette': [
-    { id: 'saudigazette-latest', name: 'Latest News', url: 'https://saudigazette.com.sa/rss', country: 'KSA' }
+    { id: 'saudigazette-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:saudigazette.com.sa&hl=en-SA&gl=SA&ceid=SA:en', country: 'KSA' }
   ],
   'Al Arabiya English': [
-    { id: 'alarabiya-en', name: 'Latest News', url: 'https://english.alarabiya.net/tools/mrss', country: 'KSA' }
+    { id: 'alarabiya-en', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:english.alarabiya.net&hl=en-SA&gl=SA&ceid=SA:en', country: 'KSA' }
   ],
   'Asharq Al-Awsat English': [
-    { id: 'aawsat-en-news', name: 'Latest News', url: 'https://aawsat.com/english/home/rss', country: 'KSA' }
+    { id: 'aawsat-en-news', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:english.aawsat.com&hl=en-SA&gl=SA&ceid=SA:en', country: 'KSA' }
   ],
   // --- QATAR NEW FEEDS ---
   'Al Jazeera English': [
@@ -318,13 +318,13 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'gulftimes-intl', name: 'International', url: 'http://www.gulf-times.com/rssFeed/9', country: 'Qatar' }
   ],
   'Doha News': [
-    { id: 'dohanews-latest', name: 'Latest News', url: 'https://dohanews.co/feed', country: 'Qatar' }
+    { id: 'dohanews-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:dohanews.co&hl=en-QA&gl=QA&ceid=QA:en', country: 'Qatar' }
   ],
   'Al-Sharq Newspaper': [
-    { id: 'alsharq-latest', name: 'Latest News', url: 'https://al-sharq.com/rss', country: 'Qatar' }
+    { id: 'alsharq-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:al-sharq.com&hl=ar&gl=QA&ceid=QA:ar', country: 'Qatar' }
   ],
   'The Peninsula Qatar': [
-    { id: 'peninsulaqatar-latest', name: 'Latest News', url: 'http://thepeninsulaqatar.com/rss', country: 'Qatar' }
+    { id: 'peninsulaqatar-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thepeninsulaqatar.com&hl=en-QA&gl=QA&ceid=QA:en', country: 'Qatar' }
   ],
   'Al Raya': [
     { id: 'alraya-latest', name: 'Latest News', url: 'http://www.pressdisplay.com/pressdisplay/services/rss.ashx?cid=9ig9', country: 'Qatar' }
@@ -334,16 +334,16 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
   ],
   // --- BAHRAIN NEW FEEDS ---
   'Bahrain News Agency': [
-    { id: 'bna-latest', name: 'Latest News', url: 'http://www.bna.bh/portal/RSS-feed', country: 'Bahrain' }
+    { id: 'bna-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:bna.bh&hl=en-BH&gl=BH&ceid=BH:en', country: 'Bahrain' }
   ],
   'Biz Bahrain': [
-    { id: 'bizbahrain-latest', name: 'Latest News', url: 'http://bizbahrain.com/feed', country: 'Bahrain' }
+    { id: 'bizbahrain-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:bizbahrain.com&hl=en-BH&gl=BH&ceid=BH:en', country: 'Bahrain' }
   ],
   'Voice of Bahrain': [
     { id: 'vob-latest', name: 'Latest News', url: 'http://vob.org/?feed=rss2', country: 'Bahrain' }
   ],
   'Al-Bilad Newspaper': [
-    { id: 'albiladpress-latest', name: 'Latest News', url: 'http://albiladpress.com/rss', country: 'Bahrain' }
+    { id: 'albiladpress-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:albiladpress.com&hl=ar&gl=BH&ceid=BH:ar', country: 'Bahrain' }
   ],
   'Bahrain Mirror': [
     { id: 'bahrainmirror-latest', name: 'Latest News', url: 'http://bahrainmirror.com/rss.xml', country: 'Bahrain' }
@@ -352,14 +352,14 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'twentyfoursevennews-latest', name: 'Latest News', url: 'http://twentyfoursevennews.com/feed', country: 'Bahrain' }
   ],
   'Bahrain This Week': [
-    { id: 'bahrainthisweek-latest', name: 'Latest News', url: 'http://bahrainthisweek.com/feed', country: 'Bahrain' }
+    { id: 'bahrainthisweek-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:bahrainthisweek.com&hl=en-BH&gl=BH&ceid=BH:en', country: 'Bahrain' }
   ],
   'Al Ayam': [
-    { id: 'alayam-latest', name: 'Latest News', url: 'http://feeds.feedburner.com/alayam', country: 'Bahrain' }
+    { id: 'alayam-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:alayam.com&hl=ar&gl=BH&ceid=BH:ar', country: 'Bahrain' }
   ],
   // --- KUWAIT NEW FEEDS ---
   'Kuwait News Agency': [
-    { id: 'kuna-latest', name: 'Latest News', url: 'http://kuna.net.kw/Default.aspx', country: 'Kuwait' }
+    { id: 'kuna-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:kuna.net.kw&hl=en-KW&gl=KW&ceid=KW:en', country: 'Kuwait' }
   ],
   'Times Kuwait': [
     { id: 'timeskuwait-latest', name: 'Latest News', url: 'http://timeskuwait.com/feed', country: 'Kuwait' }
@@ -368,25 +368,25 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'kuwaitnews-latest', name: 'Latest News', url: 'http://kuwaitnews.com/feed', country: 'Kuwait' }
   ],
   'Al Messila': [
-    { id: 'almessila-latest', name: 'Latest News', url: 'http://masilanews.com/feed', country: 'Kuwait' }
+    { id: 'almessila-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:masilanews.com&hl=ar&gl=KW&ceid=KW:ar', country: 'Kuwait' }
   ],
   'SABR Online': [
-    { id: 'sabr-latest', name: 'Latest News', url: 'http://sabr.cc/feed', country: 'Kuwait' }
+    { id: 'sabr-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:sabr.cc&hl=ar&gl=KW&ceid=KW:ar', country: 'Kuwait' }
   ],
   'Kuwait Times': [
-    { id: 'kuwaittimes-latest', name: 'Latest News', url: 'https://kuwaittimes.com/feed', country: 'Kuwait' }
+    { id: 'kuwaittimes-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:kuwaittimes.com&hl=en-KW&gl=KW&ceid=KW:en', country: 'Kuwait' }
   ],
   'Al Jarida': [
-    { id: 'aljarida-latest', name: 'Latest News', url: 'https://www.aljarida.com/rss', country: 'Kuwait' }
+    { id: 'aljarida-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:aljarida.com&hl=ar&gl=KW&ceid=KW:ar', country: 'Kuwait' }
   ],
   'Al-Wasat Kuwait': [
-    { id: 'alwasat-kuwait-latest', name: 'Latest News', url: 'http://alwasat.com.kw/rss', country: 'Kuwait' }
+    { id: 'alwasat-kuwait-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:alwasat.com.kw&hl=ar&gl=KW&ceid=KW:ar', country: 'Kuwait' }
   ],
   'Al-Anbaa': [
-    { id: 'alanbaa-latest', name: 'Latest News', url: 'https://www.alanba.com.kw/rss/', country: 'Kuwait' }
+    { id: 'alanbaa-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:alanba.com.kw&hl=ar&gl=KW&ceid=KW:ar', country: 'Kuwait' }
   ],
   'Arab Times Kuwait': [
-    { id: 'arabtimesonline-latest', name: 'Latest News', url: 'https://www.arabtimesonline.com/feed/', country: 'Kuwait' }
+    { id: 'arabtimesonline-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:arabtimesonline.com&hl=en-KW&gl=KW&ceid=KW:en', country: 'Kuwait' }
   ],
   // --- INDIA NEW FEEDS ---
   'The Times of India': [
@@ -396,78 +396,78 @@ export const PREMIUM_SOURCES: Record<string, RSSCategory[]> = {
     { id: 'indianexpress-latest', name: 'Latest News', url: 'https://indianexpress.com/feed', country: 'India' }
   ],
   'Hindustan Times': [
-    { id: 'hindustantimes-latest', name: 'Latest News', url: 'https://hindustantimes.com/rss', country: 'India' }
+    { id: 'hindustantimes-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:hindustantimes.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'The Hindu': [
-    { id: 'thehindu-latest', name: 'Latest News', url: 'https://thehindu.com/rss/', country: 'India' }
+    { id: 'thehindu-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thehindu.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'Deccan Herald': [
-    { id: 'deccanherald-latest', name: 'Latest News', url: 'https://deccanherald.com/rss', country: 'India' }
+    { id: 'deccanherald-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:deccanherald.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'The Telegraph India': [
-    { id: 'telegraphindia-latest', name: 'Latest News', url: 'https://telegraphindia.com/feeds', country: 'India' }
+    { id: 'telegraphindia-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:telegraphindia.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'The Economic Times': [
     { id: 'economictimes-latest', name: 'Latest News', url: 'https://economictimes.indiatimes.com/rssfeedstopstories.cms', country: 'India' }
   ],
   'Business Standard': [
-    { id: 'businessstandard-latest', name: 'Latest News', url: 'https://business-standard.com/rss', country: 'India' }
+    { id: 'businessstandard-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:business-standard.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'Financial Express': [
-    { id: 'financialexpress-latest', name: 'Latest News', url: 'https://financialexpress.com/rss', country: 'India' }
+    { id: 'financialexpress-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:financialexpress.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'Mint': [
-    { id: 'mint-latest', name: 'Latest News', url: 'https://livemint.com/rss', country: 'India' }
+    { id: 'mint-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:livemint.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'DNA India': [
-    { id: 'dnaindia-latest', name: 'Latest News', url: 'https://dnaindia.com/feeds', country: 'India' }
+    { id: 'dnaindia-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:dnaindia.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'The Tribune': [
-    { id: 'tribuneindia-latest', name: 'Latest News', url: 'https://tribuneindia.com/rss', country: 'India' }
+    { id: 'tribuneindia-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:tribuneindia.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'The New Indian Express': [
-    { id: 'newindianexpress-latest', name: 'Latest News', url: 'https://newindianexpress.com/rss', country: 'India' }
+    { id: 'newindianexpress-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:newindianexpress.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'NDTV News': [
-    { id: 'ndtv-latest', name: 'Latest News', url: 'http://feeds.feedburner.com/NDTV', country: 'India' }
+    { id: 'ndtv-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:ndtv.com&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   'Scroll_in': [
     { id: 'scrollin-latest', name: 'Latest News', url: 'http://feeds.feedburner.com/Scrollin', country: 'India' }
   ],
   'The Wire': [
-    { id: 'thewire-latest', name: 'Latest News', url: 'https://thewire.in/rss', country: 'India' }
+    { id: 'thewire-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thewire.in&hl=en-IN&gl=IN&ceid=IN:en', country: 'India' }
   ],
   // --- PAKISTAN NEW FEEDS ---
   'Dawn News': [
-    { id: 'dawn-latest', name: 'Latest News', url: 'https://dawn.com/rss', country: 'Pakistan' }
+    { id: 'dawn-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:dawn.com&hl=en-PK&gl=PK&ceid=PK:en', country: 'Pakistan' }
   ],
   'The News International': [
-    { id: 'thenews-latest', name: 'Latest News', url: 'https://thenews.com.pk/rss', country: 'Pakistan' }
+    { id: 'thenews-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:thenews.com.pk&hl=en-PK&gl=PK&ceid=PK:en', country: 'Pakistan' }
   ],
   'Express Tribune': [
-    { id: 'expresstribune-latest', name: 'Latest News', url: 'https://tribune.com.pk/rss', country: 'Pakistan' }
+    { id: 'expresstribune-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:tribune.com.pk&hl=en-PK&gl=PK&ceid=PK:en', country: 'Pakistan' }
   ],
   'Business Recorder': [
-    { id: 'businessrecorder-latest', name: 'Latest News', url: 'https://brecorder.com/feeds/latest-news', country: 'Pakistan' }
+    { id: 'businessrecorder-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:brecorder.com&hl=en-PK&gl=PK&ceid=PK:en', country: 'Pakistan' }
   ],
   'The Nation Pakistan': [
     { id: 'nationpakistan-latest', name: 'Latest News', url: 'https://nation.com.pk/rss/newspaper', country: 'Pakistan' }
   ],
   'Pakistan Today': [
-    { id: 'pakistantoday-latest', name: 'Latest News', url: 'https://pakistantoday.com.pk/feed/', country: 'Pakistan' }
+    { id: 'pakistantoday-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:pakistantoday.com.pk&hl=en-PK&gl=PK&ceid=PK:en', country: 'Pakistan' }
   ],
   'Daily Jang': [
-    { id: 'dailyjang-latest', name: 'Latest News', url: 'https://jang.com.pk/rss', country: 'Pakistan' }
+    { id: 'dailyjang-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:jang.com.pk&hl=ur&gl=PK&ceid=PK:ur', country: 'Pakistan' }
   ],
   'Geo News Urdu': [
-    { id: 'geonews-latest', name: 'Latest News', url: 'https://urdu.geo.tv/rss', country: 'Pakistan' }
+    { id: 'geonews-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:urdu.geo.tv&hl=ur&gl=PK&ceid=PK:ur', country: 'Pakistan' }
   ],
   'ARY News': [
     { id: 'arynews-latest', name: 'Latest News', url: 'https://arynews.tv/feed', country: 'Pakistan' }
   ],
   // --- EGYPT NEW FEEDS ---
   'Al-Ahram English': [
-    { id: 'alahram-latest', name: 'Latest News', url: 'http://english.ahram.org.eg/rss', country: 'Egypt' }
+    { id: 'alahram-latest', name: 'Latest News', url: 'https://news.google.com/rss/search?q=site:english.ahram.org.eg&hl=en-EG&gl=EG&ceid=EG:en', country: 'Egypt' }
   ],
   'Al-Masry Al-Youm': [
     { id: 'almasry-latest', name: 'Latest News', url: 'http://egyptindependent.com/rss', country: 'Egypt' }

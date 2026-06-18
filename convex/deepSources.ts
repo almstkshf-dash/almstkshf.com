@@ -112,6 +112,7 @@ export const fetchDeepSources = action({
                         ingestMethod: "api",
                         imageUrl: art.urlToImage || undefined,
                         isManual: false,
+                        analysisStatus: "pending",
                     });
                     itemCount++;
                 }

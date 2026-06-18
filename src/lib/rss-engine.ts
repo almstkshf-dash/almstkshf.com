@@ -57,12 +57,12 @@ function extractImage(item: any): string | undefined {
   if (item.media && item.media.$ && item.media.$.url) {
     return coerceToString(item.media.$.url);
   }
-  
+
   // 2. Check enclosures
   if (item.enclosure && item.enclosure.url) {
     return coerceToString(item.enclosure.url);
   }
-  
+
   // 3. Extract from description or content (HTML)
   const combined = coerceToString(item.contentEncoded) + coerceToString(item.description) + coerceToString(item.content);
   const imgMatch = combined.match(/<img[^>]+src="([^">]+)"/i);
@@ -70,7 +70,7 @@ function extractImage(item: any): string | undefined {
     // Some feeds use relative URLs which won't work
     if (imgMatch[1].startsWith('http')) return imgMatch[1];
   }
-  
+
   return undefined;
 }
 
@@ -86,7 +86,7 @@ function isArabic(text: string): boolean {
  * Resolves the Playwright Scraper microservice endpoint.
  */
 function getScraperUrl(): string {
-  const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+  const base = process.env.SCRAPER_SERVICE_URL || 'http://127.0.0.1:3002';
   return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
 }
 
@@ -168,13 +168,13 @@ export async function parseFeed(
   }
 
   const premiumDomains = [
-    'gulfnews.com', 'khaleejtimes.com', 'thenationalnews.com', 'gulftoday.ae', 
-    'skynewsarabia.com', 'emirates247.com', 'middleeasteye.net', 'prnewswire.com', 
-    'aetoswire.com', 'zawya.com', 'mydubainews.com', 'dubaichronicle.com', 
-    'thearabianpost.com', 'saudigazette.com.sa', 'arabnews.com', 'aljazeera.com', 
-    'albiladpress.com', 'twentyfoursevennews.com', 'thepeninsulaqatar.com', 
-    'al-sharq.com', 'aljarida.com', 'kuna.net.kw', 'dohanews.co', 'alwahdanews.ae', 
-    'dawn.com', 'pakistantoday.com.pk', 'telegraph.co.uk', 'bizbahrain.com', 
+    'gulfnews.com', 'khaleejtimes.com', 'thenationalnews.com', 'gulftoday.ae',
+    'skynewsarabia.com', 'emirates247.com', 'middleeasteye.net', 'prnewswire.com',
+    'aetoswire.com', 'zawya.com', 'mydubainews.com', 'dubaichronicle.com',
+    'thearabianpost.com', 'saudigazette.com.sa', 'arabnews.com', 'aljazeera.com',
+    'albiladpress.com', 'twentyfoursevennews.com', 'thepeninsulaqatar.com',
+    'al-sharq.com', 'aljarida.com', 'kuna.net.kw', 'dohanews.co', 'alwahdanews.ae',
+    'dawn.com', 'pakistantoday.com.pk', 'telegraph.co.uk', 'bizbahrain.com',
     'bahrainthisweek.com', 'newvoragroup.com', 'wordpress.com'
   ];
 
@@ -265,11 +265,11 @@ export async function parseFeed(
 
         // --- HTML Detection Check ---
         const trimmedXml = rawXml.trim();
-        const isHtml = trimmedXml.startsWith('<!DOCTYPE html') || 
-                       trimmedXml.startsWith('<html') || 
-                       trimmedXml.startsWith('<!DOCTYPE HTML') || 
-                       trimmedXml.startsWith('<HTML');
-                       
+        const isHtml = trimmedXml.startsWith('<!DOCTYPE html') ||
+          trimmedXml.startsWith('<html') ||
+          trimmedXml.startsWith('<!DOCTYPE HTML') ||
+          trimmedXml.startsWith('<HTML');
+
         if (isHtml) {
           console.warn(`[RSS Engine] Direct fetch for ${url} returned HTML content (likely bot block/private page). Trying Playwright Scraper Service...`);
           const scraped = await tryScraper(url, country);
@@ -319,7 +319,14 @@ export async function parseFeed(
   }
 
   // ── 3. NORMALISE into FeedItem[] ──────────────────────────────────────────
-  const resolvedSource = sourceName || feed.title || new URL(url).hostname;
+  let resolvedSource = sourceName || feed.title || new URL(url).hostname;
+  const resSourceLower = resolvedSource.toLowerCase();
+  if (resSourceLower.includes("google news")) {
+    const cleaned = resolvedSource.replace(/\s*[-–]\s*Google\s*News\s*$/i, '').replace(/['"]/g, '').trim();
+    if (cleaned && !cleaned.toLowerCase().includes("google")) {
+      resolvedSource = cleaned;
+    }
+  }
 
   return (feed.items ?? []).map((item): FeedItem => {
     const rawTitle = coerceToString(item.title) || 'Untitled Article';
@@ -337,13 +344,25 @@ export async function parseFeed(
     const image = extractImage(item);
     const language = isArabic(cleanTitle + cleanDescription) ? 'AR' : 'EN';
 
+    let itemSource = resolvedSource;
+    const itemSourceLower = itemSource.toLowerCase();
+    if (itemSourceLower.includes("google") || itemSourceLower === "news.google.com") {
+      const titleParts = cleanTitle.split(/\s+[-|]\s+/);
+      if (titleParts.length > 1) {
+        const potentialPub = titleParts[titleParts.length - 1].trim();
+        if (potentialPub && !potentialPub.toLowerCase().includes("google")) {
+          itemSource = potentialPub;
+        }
+      }
+    }
+
     return {
       title: cleanTitle,
       link: item.link || '',
       pubDate: item.isoDate || item.pubDate || new Date().toISOString(),
       description: cleanDescription,
       content: cleanContent,
-      source: resolvedSource,
+      source: itemSource,
       author: item.creator || (item as any).author || '',
       categories: item.categories || [],
       guid: item.guid || item.link || '',

@@ -31,6 +31,7 @@ const SHORTENER_DOMAINS = new Set([
   'buff.ly', 'ow.ly', 'db.tt', 'git.io', 't.me', 'lnkd.in', 'fb.me',
   'amzn.to', 'goo.gl', 'su.pr', 'wp.me', 'short.io', 'rb.gy', 'shorturl.at',
   'tiny.cc', 'qr.ae', 'adf.ly', 'b.link', 'sniply.io', 'clicky.me',
+  'news.google.com',
 ]);
 
 const TRACKING_PARAMS = [
@@ -70,7 +71,7 @@ export function isShortenerUrl(urlStr: string): boolean {
 }
 
 function getScraperUrl(): string {
-  const base = process.env.SCRAPER_SERVICE_URL || 'http://localhost:3002';
+  const base = process.env.SCRAPER_SERVICE_URL || 'http://127.0.0.1:3002';
   return base.endsWith('/scrape') ? base : `${base.replace(/\/+$/, '')}/scrape`;
 }
 

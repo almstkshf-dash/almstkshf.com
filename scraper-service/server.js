@@ -177,6 +177,16 @@ app.post('/scrape', async (req, res) => {
 
     const page = await context.newPage();
 
+    // Block unnecessary resources (stylesheets, images, fonts, media) to speed up scraping and save memory/CPU
+    await page.route('**/*', (route) => {
+      const type = route.request().resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(type)) {
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+
     // Stealth measure: override webdriver property
     await page.addInitScript(() => {
       Object.defineProperty(navigator, 'webdriver', {

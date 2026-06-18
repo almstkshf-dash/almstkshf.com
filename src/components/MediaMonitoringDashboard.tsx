@@ -23,7 +23,7 @@ import ReportsChart from "./ReportsChart";
 import SaveToCollectionModal from "./ui/SaveToCollectionModal";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import { useSSEPersistence } from "@/hooks/useSSEPersistence";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
