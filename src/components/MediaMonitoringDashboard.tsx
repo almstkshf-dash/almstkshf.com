@@ -207,7 +207,9 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
                 exportTranslations as any,
                 format,
                 settings?.logoUrl || undefined,
-                chartImages
+                chartImages,
+                filter !== "All" ? filter : undefined,
+                filter !== "All" ? `${exportTranslations.report_title} - ${filter}` : undefined
             );
             toast.success(tCommon('success'), { id: 'export-dashboard' });
         } catch (error) {

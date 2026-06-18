@@ -418,14 +418,24 @@ export class ReportGenerator {
         // Article Table
         this.drawHeading(doc, translations.Reports?.coverage_details || 'Media Coverage Log', 14, y, fontLoaded);
 
-        const tableData = articlesWithImages.map(a => [
-            '', // Image Placeholder
-            a.publishedDate || '',
-            this.fixArabic(a.title),
-            a.source || '',
-            (a.reach || 0).toLocaleString(),
-            `$${(a.ave || 0).toLocaleString()}`
-        ]);
+        const tableData = articlesWithImages.map(a => {
+            const titleText = a.title ?? '';
+            let processedTitle = titleText;
+            if (isArabic(titleText)) {
+                doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+                doc.setFontSize(7.5);
+                const lines = doc.splitTextToSize(titleText, 85);
+                processedTitle = lines.join('\n');
+            }
+            return [
+                '', // Image Placeholder
+                a.publishedDate || '',
+                processedTitle,
+                a.source || '',
+                (a.reach || 0).toLocaleString(),
+                `$${(a.ave || 0).toLocaleString()}`
+            ];
+        });
 
         await this.addAutoTable(doc, {
             head: [[
@@ -979,7 +989,7 @@ export class ReportGenerator {
             headStyles: {
                 fillColor: [31, 78, 120], // BRAND_DARK
                 textColor: [255, 255, 255],
-                fontStyle: 'bold',
+                fontStyle: fontLoaded ? 'normal' : 'bold', // Avoid fallback when bold font is missing
                 fontSize: 8.5,
                 cellPadding: { top: 3.5, bottom: 3.5, left: 2.5, right: 2.5 },
                 valign: 'middle'
@@ -1046,12 +1056,14 @@ export class ReportGenerator {
         translations: ReportTranslations,
         type: 'excel' | 'pdf',
         logoUrl?: string,
-        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }
+        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string },
+        searchKeyword?: string,
+        customTitle?: string
     ) {
         if (type === 'excel') {
-            await this.generateMediaMonitoringExcel(articles, translations, translations.report_title || 'Media_Monitoring_Report');
+            await this.generateMediaMonitoringExcel(articles, translations, customTitle || translations.report_title || 'Media_Monitoring_Report');
         } else {
-            await this.generateMediaMonitoringPDF(articles, translations, logoUrl, translations.report_title, chartImages);
+            await this.generateMediaMonitoringPDF(articles, translations, logoUrl, customTitle || translations.report_title, chartImages, searchKeyword);
         }
     }
 
@@ -1128,7 +1140,8 @@ export class ReportGenerator {
         translations: ReportTranslations,
         logoUrl?: string,
         reportTitle?: string,
-        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string }
+        chartImages?: { reportsChart?: string; emotionRadar?: string; sentimentDonut?: string; articlesTrend?: string },
+        searchKeyword?: string
     ) {
         if (typeof window === 'undefined') throw new Error('PDF export is client-only');
 
@@ -1222,7 +1235,7 @@ export class ReportGenerator {
         addText(genText, pageWidth / 2, pageHeight / 2 + 15, { align: 'center' });
         addText(`${translations.total_articles || 'Total Articles'}: ${articles.length}`, pageWidth / 2, pageHeight / 2 + 24, { align: 'center' });
 
-        const keyword = articles[0]?.keyword || 'N/A';
+        const keyword = searchKeyword || articles[0]?.keyword || 'N/A';
         const countriesList = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
         const langs = 'EN / AR';
 
@@ -1327,12 +1340,32 @@ export class ReportGenerator {
         doc.roundedRect(14, y, pageWidth - 28, 20, 3, 3, 'S');
 
         doc.setFontSize(8);
+        const posRatio = articles.length ? pos / articles.length : 0;
+        const neuRatio = articles.length ? neu / articles.length : 0;
         const negRatio = articles.length ? neg / articles.length : 0;
-        const recommendation = negRatio > 0.5
-            ? (translations.rec_high_neg || 'High negative sentiment detected. Recommend activating crisis management protocols immediately.')
-            : negRatio > 0.3
-                ? (translations.rec_mod_neg || 'Moderate negative coverage. Monitor closely and prepare proactive messaging.')
-                : (translations.rec_healthy || 'Coverage sentiment is healthy. Continue current media strategy.');
+
+        let recommendation = '';
+        if (negRatio > 0.25) {
+            recommendation = translations.rec_high_neg || (isArabicMode 
+                ? 'تم رصد نسبة عالية من التغطية السلبية. نوصي بتفعيل بروتوكولات إدارة الأزمات فوراً.' 
+                : 'High negative sentiment detected. Recommend activating crisis management protocols immediately.');
+        } else if (negRatio > 0.1) {
+            recommendation = translations.rec_mod_neg || (isArabicMode 
+                ? 'تم رصد تغطية سلبية متوسطة. يوصى بالمتابعة الدقيقة وإعداد رسائل إعلامية استباقية.' 
+                : 'Moderate negative coverage. Monitor closely and prepare proactive messaging.');
+        } else if (posRatio > 0.35) {
+            recommendation = (translations.rec_positive as string | undefined) || (isArabicMode 
+                ? 'تم رصد اتجاه إيجابي قوي في التغطية. نوصي باستغلال هذا الزخم للإعلانات الاستراتيجية والتفاعل الإعلامي.' 
+                : 'Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.');
+        } else if (neuRatio > 0.6) {
+            recommendation = (translations.rec_neutral as string | undefined) || (isArabicMode 
+                ? 'التغطية الإعلامية محايدة في الغالب. يوصى بالاستمرار في رصد الأخبار لتحديد الاتجاهات الناشئة.' 
+                : 'Coverage is predominantly neutral. Continue current media monitoring to spot emerging trends.');
+        } else {
+            recommendation = translations.rec_healthy || (isArabicMode 
+                ? 'نبرة التغطية متوازنة وصحية. استمر في الاستراتيجية الإعلامية الحالية.' 
+                : 'Coverage sentiment is balanced and healthy. Continue current media strategy.');
+        }
 
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         const splitRec = doc.splitTextToSize(recommendation, pageWidth - 40);
@@ -1394,116 +1427,90 @@ export class ReportGenerator {
             addText(translations.coverage_log || 'Media Coverage Log', 14, 28);
         }
 
+        // Helper to get short Arabic header labels to prevent wrapping in narrow columns
+        const getShortHeader = (id: string, originalHeader: string) => {
+            if (!isArabicMode) return originalHeader;
+            const overrides: Record<string, string> = {
+                ave: "المكافئ ($)",
+                sentiment: "النبرة",
+                reach: "الوصول"
+            };
+            return overrides[id] || originalHeader;
+        };
+
         // Define columns dynamically to cleanly support dynamic sizing, custom alignments, and RTL mirroring
         const columnDefinitions = [
             {
                 id: 'image',
                 header: '',
                 width: 8,
-                halign: 'center',
+                halign: 'center' as const,
                 getValue: (a: ReportArticle) => ''
             },
             {
                 id: 'date',
-                header: translations.date || 'Date',
+                header: getShortHeader('date', translations.date || 'Date'),
                 width: 15,
-                halign: 'center',
+                halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.publishedDate ?? ''
             },
             {
                 id: 'title',
-                header: translations.title || 'Title',
+                header: getShortHeader('title', translations.title || 'Title'),
                 width: 'auto' as const,
-                halign: isArabicMode ? 'right' : 'left',
+                halign: isArabicMode ? 'right' : 'left' as const,
                 getValue: (a: ReportArticle) => {
                     const titleText = a.title ?? '';
                     const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
-                    return titleText + hashStr;
+                    const fullText = titleText + hashStr;
+                    
+                    if (isArabic(fullText)) {
+                        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+                        doc.setFontSize(7.5);
+                        const lines = doc.splitTextToSize(fullText, 170);
+                        return lines.join('\n');
+                    }
+                    return fullText;
                 }
             },
             {
                 id: 'type',
-                header: translations.type || 'Type',
+                header: getShortHeader('type', translations.type || 'Type'),
                 width: 14,
-                halign: 'center',
+                halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.sourceType ?? ''
             },
             {
                 id: 'source',
-                header: translations.source || 'Source',
-                width: 18,
-                halign: isArabicMode ? 'right' : 'left',
-                getValue: (a: ReportArticle) => a.source ?? ''
-            },
-            {
-                id: 'publisher_username',
-                header: translations.publisher_username || 'Publisher',
-                width: 18,
-                halign: isArabicMode ? 'right' : 'left',
-                getValue: (a: ReportArticle) => a.publisherUsername ?? '-'
-            },
-            {
-                id: 'country',
-                header: translations.country || 'Country',
-                width: 11,
-                halign: 'center',
-                getValue: (a: ReportArticle) => a.sourceCountry ?? ''
+                header: getShortHeader('source', translations.source || 'Source'),
+                width: 22,
+                halign: isArabicMode ? 'right' : 'left' as const,
+                getValue: (a: ReportArticle) => {
+                    const src = a.source ?? '';
+                    const username = a.publisherUsername;
+                    return username ? `${src} (@${username})` : src;
+                }
             },
             {
                 id: 'sentiment',
-                header: translations.sentiment || 'Sentiment',
+                header: getShortHeader('sentiment', translations.sentiment || 'Sentiment'),
                 width: 12,
-                halign: 'center',
+                halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.sentiment ?? ''
             },
             {
-                id: 'relevancy',
-                header: translations.relevancy || 'Relevancy',
-                width: 10,
-                halign: 'center',
-                getValue: (a: ReportArticle) => a.relevancy_score !== undefined ? `${a.relevancy_score}%` : '-'
-            },
-            {
                 id: 'reach',
-                header: translations.reach || 'Reach',
+                header: getShortHeader('reach', translations.reach || 'Reach'),
                 width: 14,
-                halign: isArabicMode ? 'left' : 'right', // Numbers are LTR so align opposite in RTL
+                halign: isArabicMode ? 'left' : 'right' as const,
                 getValue: (a: ReportArticle) => (a.reach ?? 0).toLocaleString()
             },
             {
-                id: 'likes',
-                header: translations.likes || 'Likes',
-                width: 9,
-                halign: isArabicMode ? 'left' : 'right',
-                getValue: (a: ReportArticle) => a.likes !== undefined && a.likes !== null ? a.likes.toLocaleString() : '-'
-            },
-            {
-                id: 'retweets',
-                header: translations.retweets || 'Retweets',
-                width: 9,
-                halign: isArabicMode ? 'left' : 'right',
-                getValue: (a: ReportArticle) => a.retweets !== undefined && a.retweets !== null ? a.retweets.toLocaleString() : '-'
-            },
-            {
-                id: 'replies',
-                header: translations.replies || 'Replies',
-                width: 9,
-                halign: isArabicMode ? 'left' : 'right',
-                getValue: (a: ReportArticle) => a.replies !== undefined && a.replies !== null ? a.replies.toLocaleString() : '-'
-            },
-            {
                 id: 'ave',
-                header: translations.ave || 'AVE ($)',
+                header: getShortHeader('ave', translations.ave || 'AVE ($)'),
                 width: 14,
-                halign: isArabicMode ? 'left' : 'right',
+                halign: isArabicMode ? 'left' : 'right' as const,
                 getValue: (a: ReportArticle) => `${(a.ave ?? 0).toLocaleString()}`
-            },
-            {
-                id: 'status',
-                header: translations.status || 'Status',
-                width: 14,
-                halign: 'center',
-                getValue: (a: ReportArticle) => a.status === 'in_progress' ? 'In Progress' : (a.status || 'Live')
             }
         ];
 

@@ -139,7 +139,10 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                 monitoringItems,
                 exportTranslations as any,
                 'pdf',
-                settings?.logoUrl || undefined
+                settings?.logoUrl || undefined,
+                undefined,
+                collection?.name || undefined,
+                collection?.name || undefined
             );
             toast.success(tCommon('success'), { id: 'download-collection' });
         } catch (error) {
@@ -169,7 +172,10 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                 monitoringItems,
                 exportTranslations as any,
                 'excel',
-                settings?.logoUrl || undefined
+                settings?.logoUrl || undefined,
+                undefined,
+                collection?.name || undefined,
+                collection?.name || undefined
             );
             toast.success(tCommon('success'), { id: 'download-collection-excel' });
         } catch (error) {

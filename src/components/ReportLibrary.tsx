@@ -109,7 +109,10 @@ export default function ReportLibrary() {
                 monitoringItems,
                 exportTranslations as any,
                 'pdf',
-                settings?.logoUrl || undefined
+                settings?.logoUrl || undefined,
+                undefined,
+                collection?.name || undefined,
+                collection?.name || undefined
             );
             toast.success(tCommon('success'), { id: 'download-report' });
         } catch (error) {

@@ -301,7 +301,10 @@ export default function DashboardPage() {
                     filteredArticles,
                     exportTranslations as any,
                     type,
-                    appSettings?.logoUrl
+                    appSettings?.logoUrl,
+                    undefined,
+                    searchQuery || undefined,
+                    searchQuery ? `${exportTranslations.report_title} - ${searchQuery}` : undefined
                 );
                 showToast('success', t('export_success'));
             } catch (e) {
