@@ -1148,20 +1148,13 @@ export class ReportGenerator {
         const finalReportTitle = reportTitle || translations.report_title || 'Media Coverage Report';
         const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '') || /[\u0600-\u06FF]/.test(finalReportTitle);
 
-        let JsPDF;
-        try {
-            const mod = await import('jspdf');
-            JsPDF = mod.jsPDF ?? mod.default;
-        } catch {
-            const mod = await import('jspdf/dist/jspdf.umd.min.js');
-            JsPDF = mod.jsPDF ?? mod.default;
-        }
+        const { jsPDF } = await import('jspdf');
 
         const autoTableMod = await import('jspdf-autotable');
         const autoTable = autoTableMod.default ?? autoTableMod;
 
         const useLandscape = true;
-        const doc = new JsPDF({ orientation: useLandscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
+        const doc = new jsPDF({ orientation: useLandscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
 
@@ -1239,19 +1232,36 @@ export class ReportGenerator {
         const countriesList = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
         const langs = 'EN / AR';
 
+        let infoLine = '';
+        if (isArabicMode) {
+            const rawLine = `${translations.keyword_label || 'Keyword'}: "${keyword}"  |  ${translations.region_label || 'Region'}: ${countriesList}  |  ${translations.langs_label || 'Languages'}: ${langs}`;
+            infoLine = this.fixArabic(rawLine);
+        } else {
+            const fixedKeyword = this.fixArabic(keyword);
+            const fixedCountries = this.fixArabic(countriesList);
+            infoLine = `${translations.keyword_label || 'Keyword'}: "${fixedKeyword}"  |  ${translations.region_label || 'Region'}: ${fixedCountries}  |  ${translations.langs_label || 'Languages'}: ${langs}`;
+        }
+
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(9);
-        addText(
-            `${translations.keyword_label || 'Keyword'}: "${keyword}"  |  ${translations.region_label || 'Region'}: ${countriesList}  |  ${translations.langs_label || 'Languages'}: ${langs}`,
-            pageWidth / 2,
-            pageHeight / 2 + 36,
-            { align: 'center' }
-        );
+        doc.text(infoLine, pageWidth / 2, pageHeight / 2 + 36, { align: 'center' });
 
         doc.setFillColor(...BRAND_DARK);
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
         doc.setFontSize(8);
         doc.setTextColor(200, 200, 200);
-        addText(`${translations.footer_url || 'www.almstkshf.com'}  |  ${translations.brand_name || 'المستكشف'}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+
+        let footerText = '';
+        if (isArabicMode) {
+            const rawFooter = `${translations.footer_url || 'www.almstkshf.com'}  |  ${translations.brand_name || 'المستكشف'}`;
+            footerText = this.fixArabic(rawFooter);
+        } else {
+            const fixedBrand = this.fixArabic(translations.brand_name || 'المستكشف');
+            footerText = `${translations.footer_url || 'www.almstkshf.com'}  |  ${fixedBrand}`;
+        }
+
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.text(footerText, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
         // PAGE 2
         doc.addPage();
