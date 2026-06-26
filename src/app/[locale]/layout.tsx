@@ -112,6 +112,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             images: ["/logo.png"],
         },
 
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com',
+                en: 'https://www.almstkshf.com/en',
+                ar: 'https://www.almstkshf.com/ar',
+            }
+        },
         icons: {
             icon: "/favicon.ico",
             shortcut: "/favicon.ico",

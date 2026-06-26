@@ -8,6 +8,10 @@
 
 import MediaPulseClient from "@/components/MediaPulseClient";
 import { Metadata } from "next";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/../convex/_generated/api";
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -29,6 +33,27 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function MediaPulsePage() {
-    return <MediaPulseClient />;
+export default async function MediaPulsePage() {
+    let initialArticles = null;
+    let initialAnalytics = null;
+    let initialEmotions = null;
+    let initialGeography = null;
+
+    try {
+        initialArticles = await fetchQuery(api.monitoring.getArticles, { limit: 50 });
+        initialAnalytics = await fetchQuery(api.monitoring.getAnalyticsOverview, {});
+        initialEmotions = await fetchQuery(api.monitoring.getEmotionAggregates, {});
+        initialGeography = await fetchQuery(api.monitoring.getGeographyAggregates, {});
+    } catch (err) {
+        console.error("Error pre-fetching MediaPulse data on server:", err);
+    }
+
+    return (
+        <MediaPulseClient
+            initialArticles={initialArticles}
+            initialAnalytics={initialAnalytics}
+            initialEmotions={initialEmotions}
+            initialGeography={initialGeography}
+        />
+    );
 }

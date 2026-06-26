@@ -6,8 +6,12 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { Metadata } from 'next';
+import { Metadata } from "next";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/../convex/_generated/api";
 import CentralMediaRepositoryClient from "@/components/CentralMediaRepositoryClient";
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -28,6 +32,21 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function CentralMediaRepositoryPage() {
-    return <CentralMediaRepositoryClient />;
+export default async function CentralMediaRepositoryPage() {
+    let initialCollections = undefined;
+    let initialSettings = undefined;
+
+    try {
+        initialCollections = await fetchQuery(api.collections.getCollections, {});
+        initialSettings = await fetchQuery(api.settings.getSettings, {});
+    } catch (err) {
+        console.error("Error pre-fetching CentralMediaRepository data on server:", err);
+    }
+
+    return (
+        <CentralMediaRepositoryClient
+            initialCollections={initialCollections}
+            initialSettings={initialSettings}
+        />
+    );
 }

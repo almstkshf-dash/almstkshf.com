@@ -15,7 +15,15 @@ import MediaMonitoringDashboard from "@/components/MediaMonitoringDashboard";
 import { motion } from "framer-motion";
 import { Globe, Bell, Scissors, Target, Radio, Monitor, Zap } from "lucide-react";
 
-export default function TvRadioClient() {
+export default function TvRadioClient({
+    initialReports,
+    initialSettings,
+    initialCrisisPlans,
+}: {
+    initialReports?: any[];
+    initialSettings?: any;
+    initialCrisisPlans?: any[];
+}) {
     const t = useTranslations("MediaMonitoring.tv_radio");
 
     const features = [
@@ -271,7 +279,12 @@ export default function TvRadioClient() {
                         <h2 className="text-3xl font-bold text-foreground mb-4 transition-colors">{t('console_title')}</h2>
                         <p className="text-foreground/70 transition-colors">{t('console_desc')}</p>
                     </div>
-                    <MediaMonitoringDashboard defaultFilter="TV" />
+                    <MediaMonitoringDashboard 
+                        defaultFilter="TV" 
+                        initialReports={initialReports}
+                        initialSettings={initialSettings}
+                        initialCrisisPlans={initialCrisisPlans}
+                    />
                 </Container>
             </section>
         </div>

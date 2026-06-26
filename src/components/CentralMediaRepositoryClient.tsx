@@ -29,7 +29,13 @@ import {
 import Button from "@/components/ui/Button";
 import ReportLibrary from "@/components/ReportLibrary";
 
-export default function CentralMediaRepositoryClient() {
+export default function CentralMediaRepositoryClient({
+    initialCollections,
+    initialSettings,
+}: {
+    initialCollections?: any[];
+    initialSettings?: any;
+}) {
     const t = useTranslations("MediaMonitoring.central_media_repository");
     const [activeTab, setActiveTab] = React.useState<"library" | "capabilities">("library");
 
@@ -162,7 +168,10 @@ export default function CentralMediaRepositoryClient() {
                     >
                         <Container>
                             <div className="bg-card/30 backdrop-blur-sm border border-border rounded-3xl p-6 md:p-8 shadow-sm">
-                                <ReportLibrary />
+                                <ReportLibrary 
+                                    initialCollections={initialCollections}
+                                    initialSettings={initialSettings}
+                                />
                             </div>
                         </Container>
                     </motion.section>

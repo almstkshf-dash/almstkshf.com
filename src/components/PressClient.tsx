@@ -15,7 +15,15 @@ import MediaMonitoringDashboard from "@/components/MediaMonitoringDashboard";
 import { motion } from "framer-motion";
 import { Newspaper, Bell, Send, BarChart, Globe, Layout, Search, Mail, Users, Clock } from "lucide-react";
 
-export default function PressClient() {
+export default function PressClient({
+    initialReports,
+    initialSettings,
+    initialCrisisPlans,
+}: {
+    initialReports?: any[];
+    initialSettings?: any;
+    initialCrisisPlans?: any[];
+}) {
     const t = useTranslations("MediaMonitoring.press");
 
     const features = [
@@ -200,7 +208,12 @@ export default function PressClient() {
                         <h2 className="text-3xl font-bold text-foreground mb-4 transition-colors">{t('console_title')}</h2>
                         <p className="text-foreground/80 transition-colors">{t('console_desc')}</p>
                     </div>
-                    <MediaMonitoringDashboard defaultFilter="Press" />
+                    <MediaMonitoringDashboard 
+                        defaultFilter="Press" 
+                        initialReports={initialReports}
+                        initialSettings={initialSettings}
+                        initialCrisisPlans={initialCrisisPlans}
+                    />
                 </Container>
             </section>
         </div>

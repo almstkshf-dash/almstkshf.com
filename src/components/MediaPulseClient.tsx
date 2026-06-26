@@ -17,11 +17,21 @@ import { AnalyticsStrategy } from "./media-pulse/AnalyticsStrategy";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
-export default function MediaPulseClient() {
+export default function MediaPulseClient({
+    initialArticles,
+    initialAnalytics,
+    initialEmotions,
+    initialGeography,
+}: {
+    initialArticles?: any;
+    initialAnalytics?: any;
+    initialEmotions?: any;
+    initialGeography?: any;
+}) {
     const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 });
-    const articles = articlesResult?.items || [];
+    const articles = articlesResult?.items || initialArticles?.items || [];
     const rawAnalytics = useQuery(api.monitoring.getAnalyticsOverview, {});
-    const analytics = rawAnalytics || {
+    const analytics = rawAnalytics || initialAnalytics || {
         nss: 0,
         riskScore: 0,
         velocity: 0,
@@ -30,10 +40,11 @@ export default function MediaPulseClient() {
         crisisProbability: 0,
     };
 
-    const emotions = useQuery(api.monitoring.getEmotionAggregates, {}) || {};
-    const geography = useQuery(api.monitoring.getGeographyAggregates, {}) || {};
+    const emotions = useQuery(api.monitoring.getEmotionAggregates, {}) || initialEmotions || {};
+    const geography = useQuery(api.monitoring.getGeographyAggregates, {}) || initialGeography || {};
 
-    const isLoading = articlesResult === undefined || rawAnalytics === undefined;
+    const isLoading = (articlesResult === undefined && !initialArticles) || 
+                      (rawAnalytics === undefined && !initialAnalytics);
 
     return (
         <main className="min-h-screen pt-32 pb-20 bg-background transition-colors">

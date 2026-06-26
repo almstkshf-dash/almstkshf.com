@@ -29,7 +29,15 @@ import {
 } from "lucide-react";
 import MediaMonitoringDashboard from "./MediaMonitoringDashboard";
 
-export default function CrisisManagementClient() {
+export default function CrisisManagementClient({
+    initialReports,
+    initialSettings,
+    initialCrisisPlans,
+}: {
+    initialReports?: any[];
+    initialSettings?: any;
+    initialCrisisPlans?: any[];
+}) {
     const t = useTranslations("CrisisManagementDetail");
 
     const coreFeatures = [
@@ -306,7 +314,12 @@ export default function CrisisManagementClient() {
                         </h2>
                         <p className="text-foreground/80 text-lg">{t("dashboard_section.subtitle")}</p>
                     </div>
-                    <MediaMonitoringDashboard defaultFilter="TV" />
+                    <MediaMonitoringDashboard 
+                        defaultFilter="TV" 
+                        initialReports={initialReports}
+                        initialSettings={initialSettings}
+                        initialCrisisPlans={initialCrisisPlans}
+                    />
                 </Container>
             </section>
         </div>

@@ -102,6 +102,10 @@ const nextConfig = {
                 source: '/:locale/sitemap.xml',
                 destination: '/sitemap.xml',
             },
+            {
+                source: '/:locale/robots.txt',
+                destination: '/robots.txt',
+            },
         ];
     },
 };

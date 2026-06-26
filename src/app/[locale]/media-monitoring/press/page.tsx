@@ -6,8 +6,12 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { Metadata } from 'next';
+import { Metadata } from "next";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/../convex/_generated/api";
 import PressClient from "@/components/PressClient";
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -28,6 +32,24 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function PressPage() {
-    return <PressClient />;
+export default async function PressPage() {
+    let initialReports = undefined;
+    let initialSettings = undefined;
+    let initialCrisisPlans = undefined;
+
+    try {
+        initialReports = await fetchQuery(api.queries.getMediaReports, { source: "Press Release" });
+        initialSettings = await fetchQuery(api.settings.getSettings, {});
+        initialCrisisPlans = await fetchQuery(api.queries.getCrisisPlans, {});
+    } catch (err) {
+        console.error("Error pre-fetching Press data on server:", err);
+    }
+
+    return (
+        <PressClient 
+            initialReports={initialReports}
+            initialSettings={initialSettings}
+            initialCrisisPlans={initialCrisisPlans}
+        />
+    );
 }

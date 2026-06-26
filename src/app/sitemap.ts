@@ -8,7 +8,7 @@
 
 import { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://almstkshf.com'
+const BASE_URL = 'https://www.almstkshf.com'
 
 // Public routes only — private/authenticated routes must never appear in the sitemap
 const routes = [

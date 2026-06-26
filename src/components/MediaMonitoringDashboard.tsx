@@ -33,6 +33,9 @@ type DashboardFilter = LegacyFilter | ArticleFilter;
 
 interface DashboardProps {
     defaultFilter?: DashboardFilter;
+    initialReports?: any[];
+    initialSettings?: any;
+    initialCrisisPlans?: any[];
 }
 
 interface FilterOption {
@@ -51,11 +54,16 @@ function normalizeFilter(filter?: DashboardFilter): ArticleFilter {
     return filter;
 }
 
-export default function MediaMonitoringDashboard({ defaultFilter }: DashboardProps) {
+export default function MediaMonitoringDashboard({ 
+    defaultFilter,
+    initialReports,
+    initialSettings,
+    initialCrisisPlans
+}: DashboardProps) {
     const t = useTranslations("Navigation");
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
-    const settings = useQuery(api.settings.getSettings);
+    const settings = useQuery(api.settings.getSettings) || initialSettings;
     const locale = useLocale();
     const isRTL = locale === "ar";
 
@@ -83,10 +91,8 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
     const pathname = usePathname();
     const [mounted, setMounted] = useState(false);
 
-    // Initialize filter from URL search parameters, falling back to normalized defaultFilter
-    const [filter, setFilter] = useState<ArticleFilter>(
-        (searchParams.get('mfilter') as ArticleFilter) || normalizeFilter(defaultFilter)
-    );
+    // Initialize filter with normalized defaultFilter first to avoid hydration mismatch
+    const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
     const [itemToSave, setItemToSave] = useState<any>(null);
 
     // Sync state with URL search parameters to handle back/forward navigation
@@ -108,8 +114,8 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         setMounted(true);
     }, []);
 
-    const reports = useQuery(api.queries.getMediaReports, { source: filter });
-    const crisisPlans = useQuery(api.queries.getCrisisPlans, {});
+    const reports = useQuery(api.queries.getMediaReports, { source: filter }) || initialReports;
+    const crisisPlans = useQuery(api.queries.getCrisisPlans, {}) || initialCrisisPlans;
 
     const filters = useMemo<FilterOption[]>(() => [
         { label: "All", value: "All", icon: Filter, href: "/media-monitoring/central-media-repository" },
@@ -218,29 +224,11 @@ export default function MediaMonitoringDashboard({ defaultFilter }: DashboardPro
         }
     };
 
-    if (!mounted) {
-        return (
-            <div className="space-y-8 animate-pulse">
-                <div className="h-64 bg-muted/20 rounded-3xl border border-border" />
-                <div className="flex gap-2">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="h-10 w-24 bg-muted/30 rounded-full" />
-                    ))}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-48 bg-muted/20 rounded-xl" />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-8">
             {/* Chart Section — maintains responsive aspect ratio to prevent layout shift */}
             <div className="w-full aspect-[4/3] md:aspect-[2.5/1] mb-8">
-                {chartData
+                {mounted && chartData
                     ? <ReportsChart data={chartData} />
                     : <div className="w-full h-full bg-muted/10 rounded-2xl border border-dashed border-border animate-pulse" aria-hidden="true" />}
             </div>

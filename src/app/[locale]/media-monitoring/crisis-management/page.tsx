@@ -6,8 +6,12 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { Metadata } from 'next';
+import { Metadata } from "next";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/../convex/_generated/api";
 import CrisisManagementClient from "@/components/CrisisManagementClient";
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -28,10 +32,26 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function CrisisManagementPage() {
+export default async function CrisisManagementPage() {
+    let initialReports = undefined;
+    let initialSettings = undefined;
+    let initialCrisisPlans = undefined;
+
+    try {
+        initialReports = await fetchQuery(api.queries.getMediaReports, { source: "All" });
+        initialSettings = await fetchQuery(api.settings.getSettings, {});
+        initialCrisisPlans = await fetchQuery(api.queries.getCrisisPlans, {});
+    } catch (err) {
+        console.error("Error pre-fetching CrisisManagement data on server:", err);
+    }
+
     return (
         <div className="pt-24 min-h-screen bg-slate-950">
-            <CrisisManagementClient />
+            <CrisisManagementClient 
+                initialReports={initialReports}
+                initialSettings={initialSettings}
+                initialCrisisPlans={initialCrisisPlans}
+            />
         </div>
     );
 }

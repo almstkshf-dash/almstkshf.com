@@ -21,12 +21,19 @@ import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
 import CollectionDetailsModal from "./ui/CollectionDetailsModal";
 
-export default function ReportLibrary() {
+export default function ReportLibrary({
+    initialCollections,
+    initialSettings,
+}: {
+    initialCollections?: any[];
+    initialSettings?: any;
+}) {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
     const [selectedCollectionId, setSelectedCollectionId] = useState<any>(null);
-    const collectionsResult = useQuery(api.collections.getCollections) ?? [];
-    const settings = useQuery(api.settings.getSettings);
+    const collectionsResult = useQuery(api.collections.getCollections);
+    const collections = collectionsResult || initialCollections;
+    const settings = useQuery(api.settings.getSettings) || initialSettings;
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
@@ -37,7 +44,7 @@ export default function ReportLibrary() {
         return () => clearTimeout(timer);
     }, [inputValue]);
 
-    const filteredCollections = collectionsResult?.filter((c: { _id: string; name: string; items?: any[]; [key: string]: any }) =>
+    const filteredCollections = collections?.filter((c: { _id: string; name: string; items?: any[]; [key: string]: any }) =>
         c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
         c.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
@@ -149,7 +156,7 @@ export default function ReportLibrary() {
             </div>
 
             <div className="space-y-3">
-                {!collectionsResult ? (
+                {collections === undefined ? (
                     Array.from({ length: 5 }).map((_, i) => (
                         <SkeletonReportRow key={i} />
                     ))

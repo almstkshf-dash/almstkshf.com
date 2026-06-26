@@ -55,6 +55,6 @@ export default function robots(): MetadataRoute.Robots {
                 allow: '/',
             },
         ],
-        sitemap: 'https://almstkshf.com/sitemap.xml',
+        sitemap: 'https://www.almstkshf.com/sitemap.xml',
     }
 }
