@@ -20,6 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             : "Almstkshf AI capabilities for on-demand content generation and communication strategy support.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/technical-solutions/smart-media-assistant`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/technical-solutions/smart-media-assistant',
+                en: 'https://www.almstkshf.com/en/technical-solutions/smart-media-assistant',
+                ar: 'https://www.almstkshf.com/ar/technical-solutions/smart-media-assistant',
+            }
         },
     };
 }

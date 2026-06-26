@@ -6,11 +6,33 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-"use client";
-
+import { Metadata } from 'next';
 import { Link } from '@/i18n/routing';
 import { XCircle } from 'lucide-react';
 import Container from '@/components/ui/Container';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+    return {
+        title: isAr ? "تم إلغاء الدفع | المستكشف" : "Payment Cancelled | ALMSTKSHF",
+        description: isAr
+            ? "تم إلغاء عملية الدفع الخاصة بك."
+            : "Your payment has been cancelled.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/payment/cancelled`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/payment/cancelled',
+                en: 'https://www.almstkshf.com/en/payment/cancelled',
+                ar: 'https://www.almstkshf.com/ar/payment/cancelled',
+            }
+        },
+        robots: {
+            index: false,
+            follow: false,
+        }
+    };
+}
 
 export default function PaymentCancelledPage() {
     return (

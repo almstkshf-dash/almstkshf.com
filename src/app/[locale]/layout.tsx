@@ -111,13 +111,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
                 : "Your strategic partner for intelligent media monitoring.",
             images: ["/logo.png"],
         },
-        alternates: {
-            languages: {
-                'x-default': 'https://www.almstkshf.com',
-                en: 'https://www.almstkshf.com/en',
-                ar: 'https://www.almstkshf.com/ar',
-            },
-        },
+
         icons: {
             icon: "/favicon.ico",
             shortcut: "/favicon.ico",

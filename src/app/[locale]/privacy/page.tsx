@@ -18,6 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: t('intro'),
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/privacy`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/privacy',
+                en: 'https://www.almstkshf.com/en/privacy',
+                ar: 'https://www.almstkshf.com/ar/privacy',
+            }
         },
     };
 }

@@ -52,10 +52,12 @@ Root-level audit files:
 
 ---
 
-## 🌍 Locales
+## 🌍 Locales & SEO Crawling
 
 - `ar` — Arabic (RTL, default)
 - `en` — English
+- **localeDetection**: Disabled (`localeDetection: false` in `src/i18n/config.ts`) to prevent automatic browser language redirects. This ensures search engine crawlers (such as Googlebot) requesting Arabic pages with English browser headers do not experience redirection loops or forced redirects to English pages.
+- **Alternates & Hreflang**: Page-specific canonical and alternate language links (`hreflang` metadata) are dynamically generated on all 16 public-facing pages via page-level `generateMetadata` functions, resolving duplicate content and indexing issues.
 
 ---
 

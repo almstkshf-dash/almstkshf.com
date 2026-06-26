@@ -6,7 +6,27 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
+import { Metadata } from 'next';
 import PressClient from "@/components/PressClient";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+    return {
+        title: isAr ? "رصد الصحافة والمطبوعات | المستكشف" : "Press & Publication Monitoring | ALMSTKSHF",
+        description: isAr
+            ? "رصد شامل للصحف والمجلات والبوابات الإخبارية الرقمية والمطبوعة."
+            : "Comprehensive monitoring of newspapers, magazines, and digital news portals.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/media-monitoring/press`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/media-monitoring/press',
+                en: 'https://www.almstkshf.com/en/media-monitoring/press',
+                ar: 'https://www.almstkshf.com/ar/media-monitoring/press',
+            }
+        },
+    };
+}
 
 export default function PressPage() {
     return <PressClient />;

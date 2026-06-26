@@ -20,6 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             : "Discover how Smart Styling Assistant revolutionizes digital shopping with AI.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/case-studies/styling-assistant`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/case-studies/styling-assistant',
+                en: 'https://www.almstkshf.com/en/case-studies/styling-assistant',
+                ar: 'https://www.almstkshf.com/ar/case-studies/styling-assistant',
+            }
         },
     };
 }

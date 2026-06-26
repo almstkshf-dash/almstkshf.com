@@ -22,6 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             : "ALMSTKSHF Home - Leader in strategic solutions, media analysis, and legal tech in the Gulf.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com',
+                en: 'https://www.almstkshf.com/en',
+                ar: 'https://www.almstkshf.com/ar',
+            }
         },
     };
 }

@@ -6,7 +6,27 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
+import { Metadata } from 'next';
 import CrisisManagementClient from "@/components/CrisisManagementClient";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+    return {
+        title: isAr ? "إدارة أزمات السمعة | المستكشف" : "Crisis & Reputation Management | ALMSTKSHF",
+        description: isAr
+            ? "بنية تحتية متطورة لرصد الأزمات والتحكم بالسمعة الإعلامية في الوقت الفعلي."
+            : "Advanced infrastructure for crisis monitoring and real-time reputational protection.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/media-monitoring/crisis-management`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/media-monitoring/crisis-management',
+                en: 'https://www.almstkshf.com/en/media-monitoring/crisis-management',
+                ar: 'https://www.almstkshf.com/ar/media-monitoring/crisis-management',
+            }
+        },
+    };
+}
 
 export default function CrisisManagementPage() {
     return (

@@ -20,6 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             : "Discover how LEXCORA transforms legal workflows for high-net-worth law firms with AI and automation.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/case-studies/lexcora`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/case-studies/lexcora',
+                en: 'https://www.almstkshf.com/en/case-studies/lexcora',
+                ar: 'https://www.almstkshf.com/ar/case-studies/lexcora',
+            }
         },
     };
 }

@@ -12,10 +12,24 @@ import ContactForm from "@/components/ContactForm";
 import { Mail, Phone, MapPin, Globe } from "lucide-react";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-    title: "Contact Us",
-    description: "Get in touch with ALMSTKSHF for advanced media and legal solutions.",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const isAr = locale === "ar";
+    return {
+        title: isAr ? "اتصل بنا | المستكشف" : "Contact Us | ALMSTKSHF",
+        description: isAr
+            ? "تواصل مع المستكشف للحصول على حلول إعلامية وقانونية متقدمة."
+            : "Get in touch with ALMSTKSHF for advanced media and legal solutions.",
+        alternates: {
+            canonical: `https://www.almstkshf.com/${locale}/contact`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/contact',
+                en: 'https://www.almstkshf.com/en/contact',
+                ar: 'https://www.almstkshf.com/ar/contact',
+            }
+        }
+    };
+}
 
 export default function ContactPage() {
     const t = useTranslations("Contact");

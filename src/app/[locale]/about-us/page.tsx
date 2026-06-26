@@ -19,6 +19,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         description: t('subtitle'),
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/about-us`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/about-us',
+                en: 'https://www.almstkshf.com/en/about-us',
+                ar: 'https://www.almstkshf.com/ar/about-us',
+            }
         },
     };
 }

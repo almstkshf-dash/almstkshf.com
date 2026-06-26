@@ -45,7 +45,7 @@ Browser → Vercel Edge (CDN) → Next.js Middleware
 Runs on **Vercel Edge Runtime**. Two concerns composed:
 
 1. **`clerkMiddleware`** — wraps everything to inject auth context.
-2. **`createMiddleware(routing)`** — next-intl locale detection & redirection.
+2. **`createMiddleware(routing)`** — next-intl locale prefixing & routing rewrites (browser language detection disabled to prevent search engine redirect loops).
 
 **Logic flow:**
 1. If path starts with `/api` → skip i18n, pass through.
@@ -63,8 +63,8 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 
 ```
 /[locale]/                     → Landing page (HomeClient.tsx)
-/[locale]/dashboard            → Main analytics dashboard (protected)
-  /dashboard/page.tsx          → Renders tabs: Standard | Deep | OSINT | Press
+/[locale]/dashboard            → Main analytics dashboard (Server Component wrapper rendering DashboardClient, noindex/nofollow)
+/[locale]/dashboard/settings   → Settings and API Keys configuration (Server Component wrappers rendering SettingsClient and ApiKeysClient)
 /[locale]/case-studies         → Case studies listing
 /[locale]/contact              → Contact form
 /[locale]/pricing              → Pricing & Stripe checkout
@@ -208,7 +208,7 @@ All dashboard-specific data visualisation and table components live here.
 - **Locales:** `ar` (Arabic, RTL, default), `en` (English)
 - **Routing:** All pages live under `/[locale]/…`
 - **Message files:** `messages/ar.json`, `messages/en.json`
-- **Config:** `src/i18n/config.ts` — defines supported locales + routing strategy
+- **Config:** `src/i18n/config.ts` — defines supported locales + routing strategy (with `localeDetection: false` to ensure search engine crawlers do not get redirected away from Arabic pages based on English Accept-Language headers)
 - **Namespaces in use:**
 
 | Namespace | Used By |

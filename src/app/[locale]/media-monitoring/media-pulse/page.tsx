@@ -20,6 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             : "Real-time tracking and analysis of public opinion and brand coverage across thousands of global sources.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/media-monitoring/media-pulse`,
+            languages: {
+                'x-default': 'https://www.almstkshf.com/media-monitoring/media-pulse',
+                en: 'https://www.almstkshf.com/en/media-monitoring/media-pulse',
+                ar: 'https://www.almstkshf.com/ar/media-monitoring/media-pulse',
+            }
         },
     };
 }
