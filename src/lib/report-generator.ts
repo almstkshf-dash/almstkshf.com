@@ -1088,7 +1088,12 @@ export class ReportGenerator {
             doc.setFontSize(7);
             doc.setTextColor(150);
 
-            const brandInfo = this.fixArabic(`${translations.brand_name || 'ALMSTKSHF'} | ${title}`);
+            const brandName = translations.brand_name || 'ALMSTKSHF';
+            const fixedTitle = this.fixArabic(title);
+            const fixedBrand = this.fixArabic(brandName);
+            const brandInfo = isArabicMode
+                ? `${fixedBrand} | ${fixedTitle}`
+                : `${brandName} | ${fixedTitle}`;
             const pageStr = translations.Reports?.page || 'Page';
             const pageInfo = this.fixArabic(`${pageStr} ${i} / ${pages}`);
 
@@ -1552,7 +1557,7 @@ export class ReportGenerator {
             {
                 id: 'date',
                 header: getShortHeader('date', translations.date || 'Date'),
-                width: 15,
+                width: 20,
                 halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.publishedDate ?? ''
             },
@@ -1569,7 +1574,9 @@ export class ReportGenerator {
                     if (isArabic(fullText)) {
                         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
                         doc.setFontSize(7.5);
-                        const lines = doc.splitTextToSize(fullText, 170);
+                        // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
+                        const shaped = fixArabicForPDF(fullText);
+                        const lines = doc.splitTextToSize(shaped, 165);
                         return lines.join('\n');
                     }
                     return fullText;
