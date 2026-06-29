@@ -10,7 +10,7 @@ import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
 import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem, DeepWebRun, OsintHistoryItem } from '@/types/reports';
 import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
-import { AMIRI_FONT_BASE64 } from '@/lib/fonts/amiri-font-base64';
+import { CAIRO_FONT_BASE64 } from './fonts/cairo-font-base64';
 // @ts-ignore
 import reshaper from 'arabic-persian-reshaper';
 
@@ -449,7 +449,7 @@ export class ReportGenerator {
                 // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
                 // Calling splitTextToSize on raw Unicode gives wrong line-break positions.
                 const shaped = fixArabicForPDF(titleText);
-                doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+                doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
                 doc.setFontSize(7.5);
                 const lines = doc.splitTextToSize(shaped, 85);
                 processedTitle = lines.join('\n');
@@ -629,7 +629,7 @@ export class ReportGenerator {
         this.drawHeading(doc, translations.Reports?.investigation_target || 'Investigation Target', 14, y, fontLoaded);
         y += 10;
 
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_AMBER);
         
@@ -915,11 +915,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
-            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            doc.addFileToVFS('Cairo-Regular.ttf', CAIRO_FONT_BASE64);
+            doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
             fontLoaded = true;
         } catch (e) {
-            console.warn('Amiri font loading failed from local bundle', e);
+            console.warn('Cairo font loading failed from local bundle', e);
         }
 
         const logoBase64 = await this.loadLogo(logoUrl);
@@ -941,7 +941,7 @@ export class ReportGenerator {
             try { doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 15, 15, 30, 30); } catch { /* */ }
         }
 
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
         doc.text(this.fixArabic(translations.brand_name || 'ALMSTKSHF'), pageWidth / 2, 53, { align: 'center' });
@@ -1043,7 +1043,7 @@ export class ReportGenerator {
             margin: { horizontal: 10 },
             styles: {
                 fontSize: 7.5,
-                font: fontLoaded ? 'Amiri' : 'helvetica',
+                font: fontLoaded ? 'Cairo' : 'helvetica',
                 cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
                 overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
                 cellWidth: 'auto',    // Allow columns to shrink/expand based on content
@@ -1084,24 +1084,25 @@ export class ReportGenerator {
 
         for (let i = 1; i <= pages; i++) {
             doc.setPage(i);
-            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(150);
 
             const brandName = translations.brand_name || 'ALMSTKSHF';
             const fixedTitle = this.fixArabic(title);
-            const fixedBrand = this.fixArabic(brandName);
-            const brandInfo = isArabicMode
-                ? `${fixedBrand} | ${fixedTitle}`
-                : `${brandName} | ${fixedTitle}`;
             const pageStr = translations.Reports?.page || 'Page';
             const pageInfo = this.fixArabic(`${pageStr} ${i} / ${pages}`);
 
             if (isArabicMode) {
-                doc.text(brandInfo, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                // Separate brand name and page info on the left, and title on the right.
+                // Since they are separate text elements, the PDF copy-paste/rendering engine
+                // cannot group them into a single string and reverse the English brand name.
                 doc.text(pageInfo, 14, pageHeight - 10, { align: 'left' });
+                doc.text(brandName, 45, pageHeight - 10, { align: 'left' });
+                doc.text(fixedTitle, pageWidth - 14, pageHeight - 10, { align: 'right' });
             } else {
-                doc.text(brandInfo, 14, pageHeight - 10);
+                // LTR: brand name + title on the left, page info on the right
+                doc.text(`${brandName} | ${title}`, 14, pageHeight - 10);
                 doc.text(pageInfo, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         }
@@ -1243,11 +1244,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
-            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            doc.addFileToVFS('Cairo-Regular.ttf', CAIRO_FONT_BASE64);
+            doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
             fontLoaded = true;
         } catch (e) {
-            console.warn('Amiri font loading failed from local bundle', e);
+            console.warn('Cairo font loading failed from local bundle', e);
         }
 
         // Use logo from translations (white-label setting) with logoUrl param as fallback.
@@ -1279,7 +1280,7 @@ export class ReportGenerator {
         }));
 
         const addText = (text: string, x: number, y: number, options: { align?: 'center' | 'right' | 'left' } = {}) => {
-            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
             const processedText = this.fixArabic(text);
             doc.text(processedText, x, y, options);
         };
@@ -1318,7 +1319,9 @@ export class ReportGenerator {
         const countriesList = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
         const langs = 'EN / AR';
 
-        let infoLine = '';
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFontSize(9.5);
+
         if (isArabicMode) {
             const fixedKeywordLabel = this.fixArabic(translations.keyword_label || 'الكلمة المفتاحية');
             const fixedRegionLabel = this.fixArabic(translations.region_label || 'المنطقة');
@@ -1327,21 +1330,16 @@ export class ReportGenerator {
             const fixedKeyword = this.fixArabic(keyword);
             const fixedCountries = this.fixArabic(countriesList);
 
-            // Structure sections in RTL reading order (Left-most drawn = Left segment: Languages)
-            const leftSec = `${langs} : ${fixedLangsLabel}`;
-            const middleSec = `${fixedCountries} : ${fixedRegionLabel}`;
-            const rightSec = `"${fixedKeyword}" : ${fixedKeywordLabel}`;
-
-            infoLine = `${leftSec}  |  ${middleSec}  |  ${rightSec}`;
+            // Clean, separate lines with correct RTL layout. Completely avoids
+            // any Bidi scrambling/quote splitting on a single mixed line.
+            doc.text(`${fixedKeyword} : ${fixedKeywordLabel}`, pageWidth / 2, pageHeight / 2 + 34, { align: 'center' });
+            doc.text(`${fixedCountries} : ${fixedRegionLabel}`, pageWidth / 2, pageHeight / 2 + 40, { align: 'center' });
+            doc.text(`${langs} : ${fixedLangsLabel}`, pageWidth / 2, pageHeight / 2 + 46, { align: 'center' });
         } else {
-            const fixedKeyword = this.fixArabic(keyword);
-            const fixedCountries = this.fixArabic(countriesList);
-            infoLine = `${translations.keyword_label || 'Keyword'}: "${fixedKeyword}"  |  ${translations.region_label || 'Region'}: ${fixedCountries}  |  ${translations.langs_label || 'Languages'}: ${langs}`;
+            doc.text(`${translations.keyword_label || 'Keyword'}: "${keyword}"`, pageWidth / 2, pageHeight / 2 + 34, { align: 'center' });
+            doc.text(`${translations.region_label || 'Region'}: ${countriesList}`, pageWidth / 2, pageHeight / 2 + 40, { align: 'center' });
+            doc.text(`${translations.langs_label || 'Languages'}: ${langs}`, pageWidth / 2, pageHeight / 2 + 46, { align: 'center' });
         }
-
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text(infoLine, pageWidth / 2, pageHeight / 2 + 36, { align: 'center' });
 
         doc.setFillColor(...BRAND_DARK);
         doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
@@ -1357,7 +1355,7 @@ export class ReportGenerator {
             footerText = `${footerUrl}  |  ${fixedBrand}`;
         }
 
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.text(footerText, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
         // PAGE 2
@@ -1474,14 +1472,23 @@ export class ReportGenerator {
                 : 'Coverage sentiment is balanced and healthy. Continue current media strategy.');
         }
 
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
-        const splitRec = doc.splitTextToSize(recommendation, pageWidth - 40);
-        const processedRec = splitRec.map((line: string) => this.fixArabic(line));
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.setTextColor(80);
+        doc.setFontSize(8.5);
+
+        const splitRec = doc.splitTextToSize(recommendation, pageWidth - 40);
+        let lineY = y + 8;
+
         if (isArabicMode) {
-            doc.text(processedRec, pageWidth - 20, y + 10, { align: 'right' });
+            splitRec.forEach((line: string) => {
+                doc.text(line, pageWidth - 20, lineY, { align: 'right' });
+                lineY += 6;
+            });
         } else {
-            doc.text(processedRec, 20, y + 10, { align: 'left' });
+            splitRec.forEach((line: string) => {
+                doc.text(line, 20, lineY, { align: 'left' });
+                lineY += 6;
+            });
         }
 
         // PAGE 3: Charts Page (only if chartImages are provided)
@@ -1557,7 +1564,7 @@ export class ReportGenerator {
             {
                 id: 'date',
                 header: getShortHeader('date', translations.date || 'Date'),
-                width: 20,
+                width: 24,
                 halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.publishedDate ?? ''
             },
@@ -1572,7 +1579,7 @@ export class ReportGenerator {
                     const fullText = titleText + hashStr;
                     
                     if (isArabic(fullText)) {
-                        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+                        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
                         doc.setFontSize(7.5);
                         // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
                         const shaped = fixArabicForPDF(fullText);
@@ -1603,21 +1610,21 @@ export class ReportGenerator {
             {
                 id: 'sentiment',
                 header: getShortHeader('sentiment', translations.sentiment || 'Sentiment'),
-                width: 12,
+                width: 16,
                 halign: 'center' as const,
                 getValue: (a: ReportArticle) => a.sentiment ?? ''
             },
             {
                 id: 'reach',
                 header: getShortHeader('reach', translations.reach || 'Reach'),
-                width: 14,
+                width: 18,
                 halign: isArabicMode ? 'left' : 'right' as const,
                 getValue: (a: ReportArticle) => (a.reach ?? 0).toLocaleString()
             },
             {
                 id: 'ave',
                 header: getShortHeader('ave', translations.ave || 'AVE ($)'),
-                width: 14,
+                width: 24,
                 halign: isArabicMode ? 'left' : 'right' as const,
                 getValue: (a: ReportArticle) => `${(a.ave ?? 0).toLocaleString()}`
             }
@@ -1680,7 +1687,7 @@ export class ReportGenerator {
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
     private static drawHeading(doc: jsPDF, text: string, x: number, y: number, fontLoaded: boolean) {
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_DARK);
         const processed = this.fixArabic(text);
@@ -1698,7 +1705,7 @@ export class ReportGenerator {
             const x = 14 + i * (boxW + 6);
             doc.setFillColor(...ACCENT_BG);
             doc.roundedRect(x, y, boxW, 25, 2, 2, 'F');
-            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(100);
             doc.text(this.fixArabic(box.label), x + boxW / 2, y + 8, { align: 'center' });
@@ -1721,7 +1728,7 @@ export class ReportGenerator {
             } catch { /* */ }
         }
         
-        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
         doc.setTextColor(255);
         doc.setFontSize(10);
         
@@ -2152,9 +2159,93 @@ export class ReportGenerator {
      * generateMediaMonitoringPDF that still call it.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private static overrideJsPDFText(_doc: jsPDF) {
-        // No-op: Arabic text is pre-processed by fixArabic() before reaching doc.text().
-        // Overriding doc.text() here causes double-processing of already-shaped glyphs.
+    private static overrideJsPDFText(doc: jsPDF) {
+        if ((doc as any).__arabicOverridden) return;
+        (doc as any).__arabicOverridden = true;
+
+        const originalText = doc.text;
+        const originalGetTextWidth = doc.getTextWidth;
+
+        doc.text = function(text: any, x: any, y: any, options: any) {
+            // Handle array of strings (multi-line text)
+            if (Array.isArray(text)) {
+                let currentY = y;
+                const lineHeight = options?.lineHeight || 1.15;
+                const fontSize = doc.getFontSize() / 72 * 25.4; // convert pt to mm
+                const spacing = fontSize * lineHeight;
+                
+                text.forEach((line: string) => {
+                    doc.text(line, x, currentY, options);
+                    currentY += spacing;
+                });
+                return doc;
+            }
+
+            const strText = String(text || '');
+            const hasArabic = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(strText);
+            
+            if (hasArabic) {
+                // Shape the Arabic text to connect ligatures correctly
+                const shaped = reshaper.ArabicShaper.convertArabic(strText);
+                
+                // Split into alternating Arabic and LTR segments
+                const parts = shaped.split(/([\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/);
+                
+                // Calculate total width of the shaped text to handle alignment
+                let totalWidth = 0;
+                parts.forEach((part: string) => {
+                    if (part) {
+                        totalWidth += originalGetTextWidth.call(doc, part);
+                    }
+                });
+                
+                // Determine starting X coordinate based on alignment
+                let currentX = x;
+                const align = options?.align || 'left';
+                if (align === 'center') {
+                    currentX = x + totalWidth / 2;
+                } else if (align === 'right') {
+                    currentX = x;
+                } else {
+                    currentX = x + totalWidth;
+                }
+                
+                // Draw parts from right to left (RTL flow)
+                for (let i = 0; i < parts.length; i++) {
+                    const part = parts[i];
+                    if (!part) continue;
+                    
+                    const isArabic = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(part);
+                    if (isArabic) {
+                        // Draw Arabic characters RTL character-by-character to force connection bearings
+                        for (let j = 0; j < part.length; j++) {
+                            const char = part[j];
+                            const charWidth = originalGetTextWidth.call(doc, char);
+                            currentX -= charWidth;
+                            originalText.call(doc, char, currentX, y, { ...options, align: 'left' });
+                        }
+                    } else {
+                        // Draw LTR segment normally, placed to the left of the previous part
+                        const partWidth = originalGetTextWidth.call(doc, part);
+                        currentX -= partWidth;
+                        originalText.call(doc, part, currentX, y, { ...options, align: 'left' });
+                    }
+                }
+                return doc;
+            }
+
+            return originalText.call(doc, text, x, y, options);
+        };
+
+        doc.getTextWidth = function(text: any) {
+            const strText = String(text || '');
+            const hasArabic = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(strText);
+            if (hasArabic) {
+                const shaped = reshaper.ArabicShaper.convertArabic(strText);
+                return originalGetTextWidth.call(doc, shaped);
+            }
+            return originalGetTextWidth.call(doc, text);
+        };
     }
 
     private static getFetchUrl(imageUrl: string): string {
