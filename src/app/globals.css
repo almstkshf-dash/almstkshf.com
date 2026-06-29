@@ -479,14 +479,20 @@
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── Layer 0: Base family + global resets ───────────────────────────────── */
-[dir="rtl"],
-[dir="rtl"] body {
+/* عند تحويل لغة التطبيق إلى العربية واختيار الرمز ar */
+html[lang="ar"], 
+[dir="rtl"] {
   --font-sans: var(--font-sans-ar);
-  font-family: var(--font-sans-ar);
+  font-family: var(--font-cairo), 'Cairo', sans-serif !important;
+}
+
+html[lang="en"], 
+[dir="ltr"] {
+  font-family: var(--font-inter), 'Inter', sans-serif;
 }
 
 [dir="rtl"] * {
-  font-family: var(--font-sans-ar);
+  font-family: var(--font-cairo), 'Cairo', sans-serif !important;
   letter-spacing: 0;     /* Arabic script ignores letter-spacing */
   text-transform: none;  /* No uppercase/lowercase in Arabic */
 }

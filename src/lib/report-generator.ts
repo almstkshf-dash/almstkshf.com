@@ -10,7 +10,7 @@ import ExcelJS from 'exceljs';
 import type { jsPDF } from 'jspdf';
 import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem, DeepWebRun, OsintHistoryItem } from '@/types/reports';
 import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
-import { CAIRO_FONT_BASE64 } from './fonts/cairo-font-base64';
+import { AMIRI_FONT_BASE64 } from '@/lib/fonts/amiri-font-base64';
 // @ts-ignore
 import reshaper from 'arabic-persian-reshaper';
 
@@ -449,7 +449,7 @@ export class ReportGenerator {
                 // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
                 // Calling splitTextToSize on raw Unicode gives wrong line-break positions.
                 const shaped = fixArabicForPDF(titleText);
-                doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+                doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
                 doc.setFontSize(7.5);
                 const lines = doc.splitTextToSize(shaped, 85);
                 processedTitle = lines.join('\n');
@@ -629,7 +629,7 @@ export class ReportGenerator {
         this.drawHeading(doc, translations.Reports?.investigation_target || 'Investigation Target', 14, y, fontLoaded);
         y += 10;
 
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_AMBER);
         
@@ -915,11 +915,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            doc.addFileToVFS('Cairo-Regular.ttf', CAIRO_FONT_BASE64);
-            doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
+            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
             fontLoaded = true;
         } catch (e) {
-            console.warn('Cairo font loading failed from local bundle', e);
+            console.warn('Amiri font loading failed from local bundle', e);
         }
 
         const logoBase64 = await this.loadLogo(logoUrl);
@@ -941,7 +941,7 @@ export class ReportGenerator {
             try { doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 15, 15, 30, 30); } catch { /* */ }
         }
 
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
         doc.text(this.fixArabic(translations.brand_name || 'ALMSTKSHF'), pageWidth / 2, 53, { align: 'center' });
@@ -1043,7 +1043,7 @@ export class ReportGenerator {
             margin: { horizontal: 10 },
             styles: {
                 fontSize: 7.5,
-                font: fontLoaded ? 'Cairo' : 'helvetica',
+                font: fontLoaded ? 'Amiri' : 'helvetica',
                 cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
                 overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
                 cellWidth: 'auto',    // Allow columns to shrink/expand based on content
@@ -1084,7 +1084,7 @@ export class ReportGenerator {
 
         for (let i = 1; i <= pages; i++) {
             doc.setPage(i);
-            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(150);
 
@@ -1244,11 +1244,11 @@ export class ReportGenerator {
 
         let fontLoaded = false;
         try {
-            doc.addFileToVFS('Cairo-Regular.ttf', CAIRO_FONT_BASE64);
-            doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
+            doc.addFileToVFS('Amiri-Regular.ttf', AMIRI_FONT_BASE64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
             fontLoaded = true;
         } catch (e) {
-            console.warn('Cairo font loading failed from local bundle', e);
+            console.warn('Amiri font loading failed from local bundle', e);
         }
 
         // Use logo from translations (white-label setting) with logoUrl param as fallback.
@@ -1280,7 +1280,7 @@ export class ReportGenerator {
         }));
 
         const addText = (text: string, x: number, y: number, options: { align?: 'center' | 'right' | 'left' } = {}) => {
-            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
             const processedText = this.fixArabic(text);
             doc.text(processedText, x, y, options);
         };
@@ -1319,7 +1319,7 @@ export class ReportGenerator {
         const countriesList = [...new Set(articles.map(a => a.sourceCountry))].join(', ');
         const langs = 'EN / AR';
 
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(9.5);
 
         if (isArabicMode) {
@@ -1355,7 +1355,7 @@ export class ReportGenerator {
             footerText = `${footerUrl}  |  ${fixedBrand}`;
         }
 
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.text(footerText, pageWidth / 2, pageHeight - 5, { align: 'center' });
 
         // PAGE 2
@@ -1472,7 +1472,7 @@ export class ReportGenerator {
                 : 'Coverage sentiment is balanced and healthy. Continue current media strategy.');
         }
 
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setTextColor(80);
         doc.setFontSize(8.5);
 
@@ -1579,7 +1579,7 @@ export class ReportGenerator {
                     const fullText = titleText + hashStr;
                     
                     if (isArabic(fullText)) {
-                        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+                        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
                         doc.setFontSize(7.5);
                         // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
                         const shaped = fixArabicForPDF(fullText);
@@ -1687,7 +1687,7 @@ export class ReportGenerator {
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
     private static drawHeading(doc: jsPDF, text: string, x: number, y: number, fontLoaded: boolean) {
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_DARK);
         const processed = this.fixArabic(text);
@@ -1705,7 +1705,7 @@ export class ReportGenerator {
             const x = 14 + i * (boxW + 6);
             doc.setFillColor(...ACCENT_BG);
             doc.roundedRect(x, y, boxW, 25, 2, 2, 'F');
-            doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+            doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
             doc.setFontSize(7);
             doc.setTextColor(100);
             doc.text(this.fixArabic(box.label), x + boxW / 2, y + 8, { align: 'center' });
@@ -1728,7 +1728,7 @@ export class ReportGenerator {
             } catch { /* */ }
         }
         
-        doc.setFont(fontLoaded ? 'Cairo' : 'helvetica', 'normal');
+        doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setTextColor(255);
         doc.setFontSize(10);
         
