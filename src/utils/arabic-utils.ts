@@ -15,61 +15,97 @@ export const isArabic = (text: string): boolean => {
 
 /**
  * Fixes Arabic text for PDF rendering in jsPDF.
- * Since jsPDF is LTR, we shape the Arabic characters and reverse them
- * to simulate RTL flow on a per-word basis for proper connectivity and direction.
+ *
+ * jsPDF is inherently LTR. To render Arabic correctly we must:
+ *   1. Shape characters (get contextual/connected glyph forms via arabic-persian-reshaper)
+ *   2. Reverse the visual order so that reading left-to-right produces correct RTL Arabic
+ *
+ * For MIXED lines (Arabic + English/numbers) we use a bidi-run approach:
+ *   - Split the line into alternating Arabic-word-runs and LTR-token-runs
+ *   - Reverse the run list so Arabic content appears before LTR content (RTL visual order)
+ *   - Within each Arabic run, shape the whole run then reverse characters
+ *   - LTR runs (numbers, English, punctuation) are kept intact
+ *
+ * This prevents the old bug where a wholesale word-reversal would put English
+ * words in the wrong position in mixed lines like "تحليل | Analysis".
  */
 export const fixArabicForPDF = (text: string): string => {
     if (!text || !isArabic(text)) return text;
-    
-    // If there are multiple lines, process each line individually to preserve line order
+
+    // Process each line independently to preserve explicit newlines
     if (text.includes('\n')) {
         return text.split('\n').map(line => fixArabicForPDF(line)).join('\n');
     }
-    
-    // Shape characters using the reshaper to get correct connected glyph forms
-    const shaped = reshaper.ArabicShaper.convertArabic(text);
-    
-    // Split by spaces (retaining whitespace) to keep alignment intact
-    const words = shaped.split(/(\s+)/);
-    
-    const processedWords = words.map((w: string) => {
-        // Only process words containing Arabic characters
-        if (!/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(w)) {
-            return w;
+
+    // ── Step 1: split the line into bidi token runs ────────────────────────────
+    // A token is either a whitespace sequence, an Arabic word, or an LTR token.
+    // We split on whitespace but keep the separators so we can reconstruct spacing.
+    const tokens = text.split(/(\s+)/);
+
+    // ── Step 2: group consecutive Arabic tokens into "Arabic runs" and keep
+    //           LTR tokens (English, numbers, punctuation) as standalone runs ──
+    type Run = { isArabic: boolean; tokens: string[] };
+    const runs: Run[] = [];
+
+    for (const token of tokens) {
+        const hasArabicChar = /[\u0600-\u06FF]/.test(token);
+        const isWhitespace = /^\s+$/.test(token);
+
+        if (runs.length === 0) {
+            runs.push({ isArabic: hasArabicChar, tokens: [token] });
+            continue;
         }
-        
-        // Split word into Arabic and non-Arabic segments to preserve numbers and English LTR
-        const segments = w.split(/([\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/);
-        const processedSegments = segments.map((seg) => {
-            if (/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(seg)) {
-                // Reverse characters for Arabic parts
-                return seg.split('').reverse().join('');
-            }
-            
-            // For non-Arabic segments (numbers, punctuation), swap brackets/parentheses
-            let cleanSeg = '';
-            for (let i = 0; i < seg.length; i++) {
-                const char = seg[i];
-                if (char === '(') cleanSeg += ')';
-                else if (char === ')') cleanSeg += '(';
-                else if (char === '[') cleanSeg += ']';
-                else if (char === ']') cleanSeg += '[';
-                else if (char === '{') cleanSeg += '}';
-                else if (char === '}') cleanSeg += '{';
-                else if (char === '<') cleanSeg += '>';
-                else if (char === '>') cleanSeg += '<';
-                else cleanSeg += char;
-            }
-            return cleanSeg;
-        });
-        
-        // Reverse segments to maintain correct RTL relative ordering
-        return processedSegments.reverse().join('');
+
+        const last = runs[runs.length - 1];
+
+        if (isWhitespace) {
+            // Attach whitespace to the previous run so gaps are preserved
+            last.tokens.push(token);
+        } else if (hasArabicChar === last.isArabic) {
+            last.tokens.push(token);
+        } else {
+            runs.push({ isArabic: hasArabicChar, tokens: [token] });
+        }
+    }
+
+    // ── Step 3: reverse the run order (RTL visual layout) ─────────────────────
+    runs.reverse();
+
+    // ── Step 4: process each run ───────────────────────────────────────────────
+    const processedRunStrings = runs.map(run => {
+        if (!run.isArabic) {
+            // LTR run — swap mirrored brackets for RTL context but keep order
+            return run.tokens.map(t => swapBrackets(t)).join('');
+        }
+
+        // Arabic run: shape the entire run as one string (context-sensitive shaping
+        // requires the full word, not isolated characters), then reverse characters.
+        const runText = run.tokens.join('');
+        const shaped = reshaper.ArabicShaper.convertArabic(runText);
+
+        // Reverse characters so the shaped Arabic reads correctly when rendered LTR
+        return shaped.split('').reverse().join('');
     });
-    
-    // Reverse word order to align sentences from Right-to-Left (RTL)
-    return processedWords.reverse().join('');
+
+    return processedRunStrings.join('');
 };
+
+/** Swaps mirrored bracket characters for RTL rendering context. */
+function swapBrackets(text: string): string {
+    let result = '';
+    for (const char of text) {
+        if (char === '(') result += ')';
+        else if (char === ')') result += '(';
+        else if (char === '[') result += ']';
+        else if (char === ']') result += '[';
+        else if (char === '{') result += '}';
+        else if (char === '}') result += '{';
+        else if (char === '<') result += '>';
+        else if (char === '>') result += '<';
+        else result += char;
+    }
+    return result;
+}
 
 /**
  * Detects if a string needs special PDF handling.

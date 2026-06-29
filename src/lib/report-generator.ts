@@ -11,6 +11,8 @@ import type { jsPDF } from 'jspdf';
 import { ReportTranslations, AiInspectorData, DarkWebResult, TerroristListItem, DeepWebRun, OsintHistoryItem } from '@/types/reports';
 import { fixArabicForPDF, isArabic } from '@/utils/arabic-utils';
 import { AMIRI_FONT_BASE64 } from '@/lib/fonts/amiri-font-base64';
+// @ts-ignore
+import reshaper from 'arabic-persian-reshaper';
 
 interface AutoTablejsPDF extends jsPDF {
     lastAutoTable: {
@@ -109,7 +111,9 @@ export class ReportGenerator {
         ]);
 
         const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        // UTF-8 BOM (\uFEFF) is required so Excel/Windows correctly detects UTF-8 encoding.
+        // Without it, Arabic text opens as Windows-1252 and appears as garbage (Ø§Ù„...).
+        return new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     }
 
     // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -227,6 +231,11 @@ export class ReportGenerator {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Watchlist');
 
+        const isArabicMode = this.isArabicReport(translations);
+        if (isArabicMode) {
+            sheet.views = [{ rightToLeft: true }];
+        }
+
         sheet.addRow([title]);
         sheet.addRow([translations.Reports?.generated_at || 'Generated At', new Date().toLocaleString()]);
         sheet.addRow([]);
@@ -250,6 +259,21 @@ export class ReportGenerator {
                 item.reasons
             ]);
         });
+
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    // Use Arial (cross-platform Arabic support) and spread existing font
+                    // properties so bold/color/size set on header rows are preserved.
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
 
         await this.downloadWorkbook(workbook, title);
     }
@@ -422,9 +446,12 @@ export class ReportGenerator {
             const titleText = a.title ?? '';
             let processedTitle = titleText;
             if (isArabic(titleText)) {
+                // Shape Arabic first so jsPDF can calculate correct glyph widths before splitting.
+                // Calling splitTextToSize on raw Unicode gives wrong line-break positions.
+                const shaped = fixArabicForPDF(titleText);
                 doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
                 doc.setFontSize(7.5);
-                const lines = doc.splitTextToSize(titleText, 85);
+                const lines = doc.splitTextToSize(shaped, 85);
                 processedTitle = lines.join('\n');
             }
             return [
@@ -897,6 +924,9 @@ export class ReportGenerator {
 
         const logoBase64 = await this.loadLogo(logoUrl);
 
+        // Apply RTL override for Arabic text
+        this.overrideJsPDFText(doc);
+
         return { doc, pageWidth, pageHeight, fontLoaded, logoBase64 };
     }
 
@@ -952,19 +982,52 @@ export class ReportGenerator {
     }) {
         const autoTable = (await import('jspdf-autotable')).default;
 
-        // Process head and body cells to automatically apply fixArabic if they contain Arabic text
-        const processedHead = options.head.map(row => row.map(cell => this.fixArabic(cell || '')));
-        const sanitizedBody = (options.body || []).map((row: any) => {
-            if (Array.isArray(row)) {
-                return row.map((cell: any) => {
-                    if (typeof cell === 'string') {
-                        return this.fixArabic(cell);
-                    }
-                    return cell ?? '';
-                });
-            }
-            return row;
+        const isArabicMode = this.isArabicReport(options.translations);
+
+        // Process head and body cells to apply fixArabic
+        // If in Arabic mode, reverse columns to get RTL layout
+        const processedHead = options.head.map(row => {
+            const processedRow = row.map(cell => this.fixArabic(cell || ''));
+            return isArabicMode ? [...processedRow].reverse() : processedRow;
         });
+
+        const sanitizedBody = (options.body || []).map((row: any) => {
+            const rawRow = Array.isArray(row) ? row : Object.values(row);
+            const processedRow = rawRow.map((cell: any) => {
+                if (typeof cell === 'string') {
+                    return this.fixArabic(cell);
+                }
+                return cell ?? '';
+            });
+            return isArabicMode ? [...processedRow].reverse() : processedRow;
+        });
+
+        // Reverse column styles if in Arabic mode
+        let columnStyles = options.columnStyles || {};
+        if (isArabicMode && options.columnStyles && options.head[0]) {
+            const totalCols = options.head[0].length;
+            columnStyles = {};
+            for (const key in options.columnStyles) {
+                const colIdx = parseInt(key, 10);
+                if (!isNaN(colIdx)) {
+                    columnStyles[totalCols - 1 - colIdx] = options.columnStyles[key];
+                } else {
+                    columnStyles[key] = options.columnStyles[key];
+                }
+            }
+        } else if (!options.columnStyles && isArabicMode) {
+            // Default Title column style, but mapped for RTL (originally 1, now total - 2)
+            if (options.head[0]) {
+                const totalCols = options.head[0].length;
+                columnStyles = {
+                    [totalCols - 2]: { cellWidth: 'auto', minCellWidth: 40 }
+                };
+            }
+        } else if (!options.columnStyles) {
+            columnStyles = {
+                1: { cellWidth: 'auto', minCellWidth: 40 }
+            };
+        }
 
         const {
             fontLoaded,
@@ -984,7 +1047,8 @@ export class ReportGenerator {
                 cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
                 overflow: 'linebreak', // Ensure long text wraps instead of pushing table width
                 cellWidth: 'auto',    // Allow columns to shrink/expand based on content
-                valign: 'middle'
+                valign: 'middle',
+                halign: isArabicMode ? 'right' : 'left' // default halign based on mode!
             },
             headStyles: {
                 fillColor: [31, 78, 120], // BRAND_DARK
@@ -992,25 +1056,19 @@ export class ReportGenerator {
                 fontStyle: fontLoaded ? 'normal' : 'bold', // Avoid fallback when bold font is missing
                 fontSize: 8.5,
                 cellPadding: { top: 3.5, bottom: 3.5, left: 2.5, right: 2.5 },
-                valign: 'middle'
+                valign: 'middle',
+                halign: isArabicMode ? 'right' : 'left'
             },
             alternateRowStyles: {
                 fillColor: [241, 245, 249] // Explicitly pass mutable array for ACCENT_BG
             },
-            columnStyles: options.columnStyles || {
-                // Default: Title columns often need more room, while numeric ones are small
-                1: { cellWidth: 'auto', minCellWidth: 40 }, // Usually the Title column
-            },
+            columnStyles: columnStyles,
             didDrawCell: options.didDrawCell,
             didDrawPage: options.didDrawPage,
             didParseCell: (data) => {
                 const text = String(data.cell.raw || '');
                 const hasArabic = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
-                if (data.section === 'body' && hasArabic) {
-                    data.cell.styles.halign = 'right';
-                }
-                // Also align headers for Arabic
-                if (data.section === 'head' && hasArabic) {
+                if (hasArabic) {
                     data.cell.styles.halign = 'right';
                 }
             }
@@ -1076,7 +1134,7 @@ export class ReportGenerator {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet(translations.sheet_name || 'Coverage Report');
 
-        const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '');
+        const isArabicMode = this.isArabicReport(translations);
         if (isArabicMode) {
             sheet.views = [{ rightToLeft: true }];
         }
@@ -1104,7 +1162,7 @@ export class ReportGenerator {
         const headerRow = sheet.getRow(1);
         headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
         headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
-        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.alignment = { vertical: 'middle', horizontal: isArabicMode ? 'right' : 'center' };
         headerRow.height = 25;
 
         articles.forEach(article => {
@@ -1132,6 +1190,19 @@ export class ReportGenerator {
         sheet.getColumn('reach').numFmt = '#,##0';
         sheet.getColumn('ave').numFmt = '"$"#,##0.00';
 
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
+
         await this.downloadWorkbook(workbook, reportName);
     }
 
@@ -1145,6 +1216,12 @@ export class ReportGenerator {
     ) {
         if (typeof window === 'undefined') throw new Error('PDF export is client-only');
 
+        // Brand identity — always prioritise the live settings values stored in translations.
+        // The logoUrl param is kept for backward compat but translations.logo_url wins.
+        const brandName   = (translations.brand_name as string | undefined)    || 'ALMSTKSHF';
+        const brandTagline = (translations.brand_tagline as string | undefined) || 'MEDIA MONITORING & DEVELOPMENT';
+        const footerUrl   = (translations.footer_url as string | undefined)     || 'www.almstkshf.com';
+
         const finalReportTitle = reportTitle || translations.report_title || 'Media Coverage Report';
         const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '') || /[\u0600-\u06FF]/.test(finalReportTitle);
 
@@ -1155,6 +1232,7 @@ export class ReportGenerator {
 
         const useLandscape = true;
         const doc = new jsPDF({ orientation: useLandscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4', hotfixes: ['px_line_height'] });
+        this.overrideJsPDFText(doc);
         const pageWidth = doc.internal.pageSize.width;
         const pageHeight = doc.internal.pageSize.height;
 
@@ -1167,7 +1245,10 @@ export class ReportGenerator {
             console.warn('Amiri font loading failed from local bundle', e);
         }
 
-        const logoBase64 = await this.loadLogo(logoUrl);
+        // Use logo from translations (white-label setting) with logoUrl param as fallback.
+        // translations.logo_url is always populated by callers from settings.logoUrl.
+        const effectiveLogoUrl = (translations.logo_url as string | undefined) || logoUrl;
+        const logoBase64 = await this.loadLogo(effectiveLogoUrl);
 
         // Pre-load images to base64 for up to top 50 articles using local CORS proxy
         const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
@@ -1208,10 +1289,10 @@ export class ReportGenerator {
 
         doc.setFontSize(12);
         doc.setTextColor(255, 255, 255);
-        addText(translations.brand_name || 'ALMSTKSHF', pageWidth / 2, 55, { align: 'center' });
+        addText(brandName, pageWidth / 2, 55, { align: 'center' });
         doc.setFontSize(8);
         doc.setTextColor(200, 220, 255);
-        addText((translations.brand_tagline || 'MEDIA MONITORING & DEVELOPMENT').toUpperCase(), pageWidth / 2, 62, { align: 'center' });
+        addText(brandTagline.toUpperCase(), pageWidth / 2, 62, { align: 'center' });
 
         doc.setFontSize(28);
         doc.setTextColor(...BRAND_DARK);
@@ -1253,11 +1334,11 @@ export class ReportGenerator {
 
         let footerText = '';
         if (isArabicMode) {
-            const rawFooter = `${translations.footer_url || 'www.almstkshf.com'}  |  ${translations.brand_name || 'المستكشف'}`;
+            const rawFooter = `${footerUrl}  |  ${brandName}`;
             footerText = this.fixArabic(rawFooter);
         } else {
-            const fixedBrand = this.fixArabic(translations.brand_name || 'المستكشف');
-            footerText = `${translations.footer_url || 'www.almstkshf.com'}  |  ${fixedBrand}`;
+            const fixedBrand = this.fixArabic(brandName);
+            footerText = `${footerUrl}  |  ${fixedBrand}`;
         }
 
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
@@ -1643,7 +1724,7 @@ export class ReportGenerator {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Dark Web Results');
 
-        const isArabicMode = /[\u0600-\u06FF]/.test(translations.DarkWeb?.tab_label || '');
+        const isArabicMode = this.isArabicReport(translations);
         if (isArabicMode) {
             sheet.views = [{ rightToLeft: true }];
         }
@@ -1673,6 +1754,19 @@ export class ReportGenerator {
                 tags: Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || '')
             });
         });
+
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
 
         await this.downloadWorkbook(workbook, title);
     }
@@ -1706,7 +1800,7 @@ export class ReportGenerator {
         }));
 
         // Detect if we should use RTL for the sheet
-        const isArabicMode = /[\u0600-\u06FF]/.test(translations.Reports?.pr_title || '');
+        const isArabicMode = this.isArabicReport(translations);
         if (isArabicMode) {
             sheet.views = [{ rightToLeft: true }];
         }
@@ -1776,6 +1870,19 @@ export class ReportGenerator {
             row.alignment = { vertical: 'middle', wrapText: true };
         });
 
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
+
         if (returnOnly) {
             const buffer = await workbook.xlsx.writeBuffer();
             return new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -1787,6 +1894,11 @@ export class ReportGenerator {
     private static async generateOsintHistoryExcel(items: OsintResult[], translations: ReportTranslations, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('OSINT History');
+
+        const isArabicMode = this.isArabicReport(translations);
+        if (isArabicMode) {
+            sheet.views = [{ rightToLeft: true }];
+        }
 
         sheet.columns = [
             { header: translations.Reports?.col_time || 'Timestamp', key: 'time', width: 25 },
@@ -1808,12 +1920,30 @@ export class ReportGenerator {
             });
         });
 
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
+
         await this.downloadWorkbook(workbook, title);
     }
 
     private static async generateAiInspectorExcel(mode: string, data: AiInspectorData, translations: ReportTranslations, title: string) {
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet('Forensic Report');
+
+        const isArabicMode = this.isArabicReport(translations);
+        if (isArabicMode) {
+            sheet.views = [{ rightToLeft: true }];
+        }
 
         const modeTrans = translations.AiInspector?.[`mode_${mode}`] || mode.toUpperCase();
         const localizedRiskLevel = (translations.AiInspector as Record<string, any> | undefined)?.[`risk_${data.overallRisk?.toLowerCase()}`] || data.overallRisk?.toUpperCase() || 'LOW';
@@ -1939,6 +2069,19 @@ export class ReportGenerator {
         sheet.getColumn(3).width = 15;
         if (mode === 'video') sheet.getColumn(4).width = 40;
 
+        if (isArabicMode) {
+            sheet.eachRow((row) => {
+                row.eachCell((cell) => {
+                    cell.alignment = {
+                        horizontal: 'right',
+                        vertical: 'middle',
+                        wrapText: cell.alignment?.wrapText
+                    };
+                    cell.font = { ...cell.font, name: 'Arial' };
+                });
+            });
+        }
+
         await this.downloadWorkbook(workbook, `${title}_${modeTrans}`);
     }
 
@@ -1956,8 +2099,44 @@ export class ReportGenerator {
     // SHARED UTILS (Arabic & Logo)
     // Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
+    /**
+     * Shapes Arabic text and reverses word/character order for correct RTL rendering
+     * in jsPDF (which is inherently LTR). Delegates to the shared utility so the
+     * same algorithm is used for both direct doc.text() calls and table cells.
+     */
     private static fixArabic(text: string): string {
         return fixArabicForPDF(text);
+    }
+
+    private static isArabicReport(translations: ReportTranslations): boolean {
+        const textToTest = [
+            translations.brand_name,
+            translations.report_title,
+            translations.sheet_name,
+            translations.Reports?.pr_title,
+            translations.date,
+            translations.title
+        ].join(' ');
+        return /[\u0600-\u06FF]/.test(textToTest);
+    }
+
+    /**
+     * Previously overrode doc.text() to handle Arabic RTL rendering character-by-character.
+     * This caused double-processing: fixArabic() shapes & reverses text first, then the
+     * override would attempt to reshape the already-shaped Arabic presentation-form glyphs,
+     * breaking ligatures and producing garbled output.
+     *
+     * The correct pipeline is:
+     *   1. fixArabic() pre-processes all text (shape + reverse) before it reaches doc.text()
+     *   2. doc.text() renders the pre-processed "visual" string as plain LTR — no override needed.
+     *
+     * This method is kept as a no-op to avoid breaking call sites in initPDF /
+     * generateMediaMonitoringPDF that still call it.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    private static overrideJsPDFText(_doc: jsPDF) {
+        // No-op: Arabic text is pre-processed by fixArabic() before reaching doc.text().
+        // Overriding doc.text() here causes double-processing of already-shaped glyphs.
     }
 
     private static getFetchUrl(imageUrl: string): string {
