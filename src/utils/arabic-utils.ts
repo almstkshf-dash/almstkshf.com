@@ -17,17 +17,19 @@ export const isArabic = (text: string): boolean => {
  * Fixes Arabic text for PDF rendering in jsPDF.
  *
  * jsPDF is inherently LTR. To render Arabic correctly we must:
- *   1. Shape characters (get contextual/connected glyph forms via arabic-persian-reshaper)
- *   2. Reverse the visual order so that reading left-to-right produces correct RTL Arabic
+ *   1. Shape the entire string (arabic-persian-reshaper gives contextual glyph forms)
+ *   2. Split into word+whitespace tokens
+ *   3. Within each token that contains Arabic: reverse the Arabic character runs and
+ *      swap mirrored brackets; leave LTR tokens (English, numbers) unchanged
+ *   4. Reverse the order of ALL tokens — this gives RTL word order for LTR rendering
+ *      while naturally preserving every space, because whitespace tokens are also
+ *      reversed in position (the space between word A and word B stays between them
+ *      even after A and B swap positions).
  *
- * For MIXED lines (Arabic + English/numbers) we use a bidi-run approach:
- *   - Split the line into alternating Arabic-word-runs and LTR-token-runs
- *   - Reverse the run list so Arabic content appears before LTR content (RTL visual order)
- *   - Within each Arabic run, shape the whole run then reverse characters
- *   - LTR runs (numbers, English, punctuation) are kept intact
- *
- * This prevents the old bug where a wholesale word-reversal would put English
- * words in the wrong position in mixed lines like "تحليل | Analysis".
+ * NOTE: Do NOT combine an entire mixed Arabic+LTR info-line into one fixArabicForPDF
+ * call when the LTR content has positional meaning (e.g. "اللغات: AR / EN").
+ * Instead, fix each Arabic label separately and assemble the line manually in RTL
+ * visual order — see generateMediaMonitoringPDF for the pattern.
  */
 export const fixArabicForPDF = (text: string): string => {
     if (!text || !isArabic(text)) return text;
@@ -37,57 +39,37 @@ export const fixArabicForPDF = (text: string): string => {
         return text.split('\n').map(line => fixArabicForPDF(line)).join('\n');
     }
 
-    // ── Step 1: split the line into bidi token runs ────────────────────────────
-    // A token is either a whitespace sequence, an Arabic word, or an LTR token.
-    // We split on whitespace but keep the separators so we can reconstruct spacing.
-    const tokens = text.split(/(\s+)/);
+    // Shape the entire string first — the reshaper is context-sensitive and
+    // correctly handles word boundaries (Arabic letters never connect across spaces).
+    const shaped = reshaper.ArabicShaper.convertArabic(text);
 
-    // ── Step 2: group consecutive Arabic tokens into "Arabic runs" and keep
-    //           LTR tokens (English, numbers, punctuation) as standalone runs ──
-    type Run = { isArabic: boolean; tokens: string[] };
-    const runs: Run[] = [];
+    // Split into alternating content-tokens and whitespace-tokens.
+    // Whitespace is captured as its own token so it survives the reversal intact.
+    const tokens = shaped.split(/(\s+)/);
 
-    for (const token of tokens) {
-        const hasArabicChar = /[\u0600-\u06FF]/.test(token);
-        const isWhitespace = /^\s+$/.test(token);
-
-        if (runs.length === 0) {
-            runs.push({ isArabic: hasArabicChar, tokens: [token] });
-            continue;
+    const processedTokens = tokens.map((token: string) => {
+        // Whitespace and pure-LTR tokens (English, numbers, punctuation) pass through,
+        // only swapping mirrored bracket characters for the RTL reading context.
+        if (!/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(token)) {
+            return swapBrackets(token);
         }
 
-        const last = runs[runs.length - 1];
-
-        if (isWhitespace) {
-            // Attach whitespace to the previous run so gaps are preserved
-            last.tokens.push(token);
-        } else if (hasArabicChar === last.isArabic) {
-            last.tokens.push(token);
-        } else {
-            runs.push({ isArabic: hasArabicChar, tokens: [token] });
-        }
-    }
-
-    // ── Step 3: reverse the run order (RTL visual layout) ─────────────────────
-    runs.reverse();
-
-    // ── Step 4: process each run ───────────────────────────────────────────────
-    const processedRunStrings = runs.map(run => {
-        if (!run.isArabic) {
-            // LTR run — swap mirrored brackets for RTL context but keep order
-            return run.tokens.map(t => swapBrackets(t)).join('');
-        }
-
-        // Arabic run: shape the entire run as one string (context-sensitive shaping
-        // requires the full word, not isolated characters), then reverse characters.
-        const runText = run.tokens.join('');
-        const shaped = reshaper.ArabicShaper.convertArabic(runText);
-
-        // Reverse characters so the shaped Arabic reads correctly when rendered LTR
-        return shaped.split('').reverse().join('');
+        // Token contains Arabic — split into Arabic-script segments and LTR segments.
+        // Reverse the characters within each Arabic segment, then reverse the segment
+        // order so the whole token reads correctly when rendered left-to-right.
+        const segments = token.split(/([\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/);
+        const processedSegments = segments.map((seg: string) => {
+            if (/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(seg)) {
+                return seg.split('').reverse().join('');
+            }
+            return swapBrackets(seg);
+        });
+        return processedSegments.reverse().join('');
     });
 
-    return processedRunStrings.join('');
+    // Reversing all tokens gives RTL word order.  Because whitespace tokens are
+    // included in the reversal, every gap remains between the same two words.
+    return processedTokens.reverse().join('');
 };
 
 /** Swaps mirrored bracket characters for RTL rendering context. */

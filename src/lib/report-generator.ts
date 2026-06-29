@@ -1315,8 +1315,19 @@ export class ReportGenerator {
 
         let infoLine = '';
         if (isArabicMode) {
-            const rawLine = `${translations.keyword_label || 'Keyword'}: "${keyword}"  |  ${translations.region_label || 'Region'}: ${countriesList}  |  ${translations.langs_label || 'Languages'}: ${langs}`;
-            infoLine = this.fixArabic(rawLine);
+            const fixedKeywordLabel = this.fixArabic(translations.keyword_label || 'الكلمة المفتاحية');
+            const fixedRegionLabel = this.fixArabic(translations.region_label || 'المنطقة');
+            const fixedLangsLabel = this.fixArabic(translations.langs_label || 'اللغات');
+
+            const fixedKeyword = this.fixArabic(keyword);
+            const fixedCountries = this.fixArabic(countriesList);
+
+            // Structure sections in RTL reading order (Left-most drawn = Left segment: Languages)
+            const leftSec = `${langs} : ${fixedLangsLabel}`;
+            const middleSec = `${fixedCountries} : ${fixedRegionLabel}`;
+            const rightSec = `"${fixedKeyword}" : ${fixedKeywordLabel}`;
+
+            infoLine = `${leftSec}  |  ${middleSec}  |  ${rightSec}`;
         } else {
             const fixedKeyword = this.fixArabic(keyword);
             const fixedCountries = this.fixArabic(countriesList);
