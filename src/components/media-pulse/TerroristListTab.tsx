@@ -13,13 +13,13 @@ import {
   Search, Shield, AlertTriangle, User, Users, Building2,
   FileText, Upload, Trash2, Clock, CheckCircle2, XCircle,
   ExternalLink, Info, Filter, Download, ChevronDown, ChevronUp, X,
-  ShieldCheck
+  ShieldCheck, Edit2, Plus
 } from 'lucide-react';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
+import { useQuery, useMutation, useConvexAuth, usePaginatedQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import ExcelJS from 'exceljs';
 import { ReportGenerator } from '@/lib/report-generator';
@@ -45,6 +45,13 @@ export default function TerroristListTab() {
   const [importLoading, setImportLoading] = useState(false);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
   const [importError, setImportError] = useState<string | null>(null);
+  const [importMode, setImportMode] = useState<'append' | 'replace'>('append');
+
+  // Record CRUD State
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<Partial<TerroristListItem> | null>(null);
+  const [recordFormLoading, setRecordFormLoading] = useState(false);
+  const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
 
   // Keyboard: close modal on Escape
   const handleImportModalKeyDown = useCallback((e: KeyboardEvent) => {
@@ -58,13 +65,24 @@ export default function TerroristListTab() {
   }, [isImportModalOpen, handleImportModalKeyDown]);
 
   // ─── Convex Operations ────────────────────────────────────────────────
-  const entries = useQuery(api.terroristList.search, {
-    searchTerm: searchQuery,
-    type: filterType === 'all' ? undefined : filterType
-  });
+  const {
+    results: entries,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.terroristList.searchPaginated,
+    {
+      searchTerm: searchQuery,
+      type: filterType === 'all' ? undefined : filterType
+    },
+    { initialNumItems: 50 }
+  );
 
   const wipeAll = useMutation(api.terroristList.wipeAll);
   const addItems = useMutation(api.terroristList.addItems);
+  const addSingleItem = useMutation(api.terroristList.addSingleItem);
+  const updateItem = useMutation(api.terroristList.updateItem);
+  const deleteItem = useMutation(api.terroristList.deleteItem);
   const settings = useQuery(api.settings.getSettings);
 
   const handleExport = async (format: 'pdf' | 'excel') => {
@@ -103,6 +121,68 @@ export default function TerroristListTab() {
       await ReportGenerator.exportTerroristListReport(entries, exportTranslations, format);
     } catch (err) {
       console.error('Watchlist export failed:', err);
+    }
+  };
+
+  // ─── CRUD Handlers ──────────────────────────────────────────────────────
+  const handleSaveRecord = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isAdmin) return;
+    setRecordFormLoading(true);
+    
+    try {
+      if (editingRecord?._id) {
+        await updateItem({
+          id: editingRecord._id as any,
+          type: editingRecord.type as any,
+          category: editingRecord.category,
+          nameArabic: editingRecord.nameArabic,
+          nameLatin: editingRecord.nameLatin,
+          nationality: editingRecord.nationality,
+          dob: editingRecord.dob,
+          pob: editingRecord.pob,
+          address: editingRecord.address,
+          documentNumber: editingRecord.documentNumber,
+          issuingAuthority: editingRecord.issuingAuthority,
+          issueDate: editingRecord.issueDate,
+          expiryDate: editingRecord.expiryDate,
+          otherInfo: editingRecord.otherInfo,
+          reasons: editingRecord.reasons,
+        });
+      } else {
+        await addSingleItem({
+          type: (editingRecord?.type as any) || 'individual',
+          category: editingRecord?.category || 'Designated',
+          nameArabic: editingRecord?.nameArabic || '',
+          nameLatin: editingRecord?.nameLatin || '',
+          nationality: editingRecord?.nationality,
+          dob: editingRecord?.dob,
+          pob: editingRecord?.pob,
+          address: editingRecord?.address,
+          documentNumber: editingRecord?.documentNumber,
+          issuingAuthority: editingRecord?.issuingAuthority,
+          issueDate: editingRecord?.issueDate,
+          expiryDate: editingRecord?.expiryDate,
+          otherInfo: editingRecord?.otherInfo,
+          reasons: editingRecord?.reasons,
+        });
+      }
+      setIsRecordModalOpen(false);
+      setEditingRecord(null);
+    } catch (err) {
+      console.error('Failed to save record:', err);
+    } finally {
+      setRecordFormLoading(false);
+    }
+  };
+
+  const handleDeleteRecord = async () => {
+    if (!deleteConfirmationId || !isAdmin) return;
+    try {
+      await deleteItem({ id: deleteConfirmationId as any });
+      setDeleteConfirmationId(null);
+    } catch (err) {
+      console.error('Failed to delete record:', err);
     }
   };
 
@@ -193,8 +273,10 @@ export default function TerroristListTab() {
             throw new Error("No valid data found in sheets");
           }
 
-          // Trigger Convex Mutation
-          await wipeAll({});
+          // Trigger Convex Mutation if replace mode
+          if (importMode === 'replace') {
+            await wipeAll({});
+          }
 
           const totalChunks = Math.ceil(allData.length / 200);
           setImportProgress({ current: 0, total: totalChunks });
@@ -240,15 +322,29 @@ export default function TerroristListTab() {
 
           <div className="flex items-center gap-2">
             {isAdmin && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsImportModalOpen(true)}
-                className="gap-2 font-bold text-[11px] uppercase tracking-widest border-destructive/20 hover:bg-destructive/5 hover:text-rose-600 dark:hover:text-rose-400"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                {t('import_data')}
-              </Button>
+              <>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    setEditingRecord({ type: 'individual' });
+                    setIsRecordModalOpen(true);
+                  }}
+                  className="gap-2 font-bold text-[11px] uppercase tracking-widest"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {t('add_record')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsImportModalOpen(true)}
+                  className="gap-2 font-bold text-[11px] uppercase tracking-widest border-destructive/20 hover:bg-destructive/5 hover:text-rose-600 dark:hover:text-rose-400"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  {t('import_data')}
+                </Button>
+              </>
             )}
             {entries && entries.length > 0 && (
               <div className="flex items-center gap-1.5 p-1 bg-muted/30 rounded-xl border border-border">
@@ -360,6 +456,11 @@ export default function TerroristListTab() {
                 <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[250px]">
                   {t('fields.other_info')}
                 </th>
+                {isAdmin && (
+                  <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center sticky right-0 bg-muted/40 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-border min-w-[100px]">
+                    {t('actions')}
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -425,6 +526,29 @@ export default function TerroristListTab() {
                     <td className="px-6 py-3 text-xs text-foreground/70 italic leading-relaxed">
                       {entry.otherInfo || '—'}
                     </td>
+                    {isAdmin && (
+                      <td className="px-4 py-3 text-center sticky right-0 bg-card group-hover:bg-muted/30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-border/60">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => {
+                              setEditingRecord(entry);
+                              setIsRecordModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-lg hover:bg-muted/80 text-foreground/60 hover:text-primary transition-colors"
+                            aria-label={t('edit_record')}
+                          >
+                            <Edit2 className="w-4 h-4" aria-hidden="true" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmationId(entry._id)}
+                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/60 hover:text-destructive transition-colors"
+                            aria-label={t('delete_record')}
+                          >
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </motion.tr>
                 ))}
               </AnimatePresence>
@@ -464,6 +588,18 @@ export default function TerroristListTab() {
                 </button>
               )}
             </div>
+          </div>
+        )}
+
+        {status === "CanLoadMore" && (
+          <div className="p-4 flex justify-center bg-card border-t border-border">
+            <Button
+              variant="outline"
+              onClick={() => loadMore(50)}
+              className="text-xs uppercase tracking-widest font-bold"
+            >
+              Load More
+            </Button>
           </div>
         )}
       </div>
@@ -544,14 +680,43 @@ export default function TerroristListTab() {
                     </div>
                   )}
 
-                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 underline">Critical Warning</span>
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-4 space-y-4">
+                    <div className="flex flex-col gap-3">
+                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                        <input
+                          type="radio"
+                          name="importMode"
+                          value="append"
+                          checked={importMode === 'append'}
+                          onChange={() => setImportMode('append')}
+                          className="text-primary focus:ring-primary h-4 w-4"
+                        />
+                        <span className="text-sm font-bold">Append to existing list (Recommended)</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-destructive/10 transition-colors">
+                        <input
+                          type="radio"
+                          name="importMode"
+                          value="replace"
+                          checked={importMode === 'replace'}
+                          onChange={() => setImportMode('replace')}
+                          className="text-destructive focus:ring-destructive h-4 w-4"
+                        />
+                        <span className="text-sm font-bold text-destructive">Replace existing list</span>
+                      </label>
                     </div>
-                    <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                      {t('import_modal.warning')}
-                    </p>
+
+                    {importMode === 'replace' && (
+                      <div className="space-y-2 mt-4 pt-4 border-t border-amber-500/20">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 underline">Critical Warning</span>
+                        </div>
+                        <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
+                          {t('import_modal.warning')}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -568,6 +733,248 @@ export default function TerroristListTab() {
               </motion.div>
             </div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Record CRUD Modal ─── */}
+      <AnimatePresence>
+        {isRecordModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !recordFormLoading && setIsRecordModalOpen(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              aria-hidden="true"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-thin bg-card border border-border rounded-3xl shadow-2xl p-8 space-y-6"
+            >
+              <div className="flex items-start justify-between gap-4 sticky top-0 bg-card z-10 pb-4 border-b border-border/50">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    {editingRecord?._id ? <Edit2 className="w-6 h-6 text-primary" /> : <Plus className="w-6 h-6 text-primary" />}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">{editingRecord?._id ? t('edit_record') : t('add_record')}</h3>
+                    <p className="text-xs text-foreground/70 font-medium">Fill in the details for the local watchlist.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => !recordFormLoading && setIsRecordModalOpen(false)}
+                  disabled={recordFormLoading}
+                  className="p-2 rounded-xl hover:bg-muted text-foreground/60 transition-all disabled:opacity-50"
+                  aria-label={tCommon('cancel')}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveRecord} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">Type</label>
+                    <select
+                      value={editingRecord?.type || 'individual'}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, type: e.target.value as any })}
+                      required
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    >
+                      <option value="individual">{t('types.individual')}</option>
+                      <option value="entity">{t('types.entity')}</option>
+                      <option value="organization">{t('types.organization')}</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.category')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.category || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, category: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_arabic')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.nameArabic || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, nameArabic: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-right"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_latin')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.nameLatin || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, nameLatin: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-left"
+                      dir="ltr"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.nationality')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.nationality || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, nationality: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.doc_number')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.documentNumber || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, documentNumber: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.dob')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.dob || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, dob: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.pob')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.pob || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, pob: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.address')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.address || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, address: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issuing_authority')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.issuingAuthority || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, issuingAuthority: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issue_date')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.issueDate || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, issueDate: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.expiry_date')}</label>
+                    <input
+                      type="text"
+                      value={editingRecord?.expiryDate || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, expiryDate: e.target.value })}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.reasons')}</label>
+                    <textarea
+                      value={editingRecord?.reasons || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, reasons: e.target.value })}
+                      rows={3}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.other_info')}</label>
+                    <textarea
+                      value={editingRecord?.otherInfo || ''}
+                      onChange={(e) => setEditingRecord({ ...editingRecord, otherInfo: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-border/50 sticky bottom-0 bg-card">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setIsRecordModalOpen(false)}
+                    disabled={recordFormLoading}
+                  >
+                    {tCommon('cancel')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    disabled={recordFormLoading}
+                    className="min-w-[120px]"
+                  >
+                    {recordFormLoading ? <Clock className="w-4 h-4 animate-spin" /> : t('save_changes')}
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Delete Confirmation Modal ─── */}
+      <AnimatePresence>
+        {deleteConfirmationId && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirmationId(null)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              aria-hidden="true"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-card border border-border rounded-3xl shadow-2xl p-6 text-center space-y-6"
+            >
+              <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto">
+                <Trash2 className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold">{t('confirm_delete_title')}</h3>
+                <p className="text-sm text-foreground/70">{t('confirm_delete_msg')}</p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="secondary" className="flex-1" onClick={() => setDeleteConfirmationId(null)}>
+                  {tCommon('cancel')}
+                </Button>
+                <Button variant="danger" className="flex-1" onClick={handleDeleteRecord}>
+                  {t('delete_record')}
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

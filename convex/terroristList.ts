@@ -8,6 +8,7 @@
 
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 
 /**
  * Searches the local terrorist list using the search index.
@@ -42,6 +43,40 @@ export const search = query({
       });
 
     return await searchQ.take(50);
+  },
+});
+
+/**
+ * Paginated version of search for UI table.
+ */
+export const searchPaginated = query({
+  args: {
+    searchTerm: v.string(),
+    type: v.optional(v.union(v.literal("individual"), v.literal("organization"), v.literal("entity"))),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    if (!args.searchTerm) {
+      if (args.type) {
+        return await ctx.db
+          .query("local_terrorist_list")
+          .filter((q) => q.eq(q.field("type"), args.type))
+          .paginate(args.paginationOpts);
+      }
+      return await ctx.db.query("local_terrorist_list").paginate(args.paginationOpts);
+    }
+
+    const searchQ = ctx.db
+      .query("local_terrorist_list")
+      .withSearchIndex("by_searchField", (q) => {
+        const base = q.search("searchField", args.searchTerm);
+        if (args.type) {
+          return (base as any).eq("type", args.type);
+        }
+        return base;
+      });
+
+    return await searchQ.paginate(args.paginationOpts);
   },
 });
 
@@ -106,5 +141,97 @@ export const getEntry = query({
   args: { id: v.id("local_terrorist_list") },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.id);
+  },
+});
+
+export const addSingleItem = mutation({
+  args: {
+    type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),
+    category: v.string(),
+    nameArabic: v.string(),
+    nameLatin: v.string(),
+    nationality: v.optional(v.string()),
+    dob: v.optional(v.string()),
+    pob: v.optional(v.string()),
+    address: v.optional(v.string()),
+    documentNumber: v.optional(v.string()),
+    issuingAuthority: v.optional(v.string()),
+    issueDate: v.optional(v.string()),
+    expiryDate: v.optional(v.string()),
+    otherInfo: v.optional(v.string()),
+    reasons: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const searchField = [
+      args.nameArabic,
+      args.nameLatin,
+      args.documentNumber || "",
+      args.nationality || "",
+      args.category,
+      args.pob || "",
+      args.dob || "",
+      args.issueDate || "",
+      args.expiryDate || "",
+      args.reasons || "",
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    return await ctx.db.insert("local_terrorist_list", {
+      ...args,
+      searchField,
+    });
+  },
+});
+
+export const updateItem = mutation({
+  args: {
+    id: v.id("local_terrorist_list"),
+    type: v.optional(v.union(v.literal("individual"), v.literal("organization"), v.literal("entity"))),
+    category: v.optional(v.string()),
+    nameArabic: v.optional(v.string()),
+    nameLatin: v.optional(v.string()),
+    nationality: v.optional(v.string()),
+    dob: v.optional(v.string()),
+    pob: v.optional(v.string()),
+    address: v.optional(v.string()),
+    documentNumber: v.optional(v.string()),
+    issuingAuthority: v.optional(v.string()),
+    issueDate: v.optional(v.string()),
+    expiryDate: v.optional(v.string()),
+    otherInfo: v.optional(v.string()),
+    reasons: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    const existing = await ctx.db.get(id);
+    if (!existing) {
+      throw new Error("Item not found");
+    }
+
+    const merged = { ...existing, ...updates };
+
+    const searchField = [
+      merged.nameArabic,
+      merged.nameLatin,
+      merged.documentNumber || "",
+      merged.nationality || "",
+      merged.category,
+      merged.pob || "",
+      merged.dob || "",
+      merged.issueDate || "",
+      merged.expiryDate || "",
+      merged.reasons || "",
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    await ctx.db.patch(id, {
+      ...updates,
+      searchField,
+    });
+  },
+});
+
+export const deleteItem = mutation({
+  args: { id: v.id("local_terrorist_list") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
