@@ -281,16 +281,23 @@ export default function TerroristListTab() {
           const totalChunks = Math.ceil(allData.length / 200);
           setImportProgress({ current: 0, total: totalChunks });
 
+          let totalAdded = 0;
+          let totalSkipped = 0;
+
           // Chunk the data to avoid size limits
           const chunkSize = 200;
           for (let i = 0; i < allData.length; i += chunkSize) {
             const chunk = allData.slice(i, i + chunkSize);
-            await addItems({ items: chunk as any });
+            const res = await addItems({ items: chunk as any });
+            if (res) {
+              totalAdded += res.added;
+              totalSkipped += res.skipped;
+            }
             setImportProgress(prev => ({ ...prev, current: prev.current + 1 }));
           }
 
           setIsImportModalOpen(false);
-          alert(`Successfully imported ${allData.length} records.`);
+          alert(`Import complete!\nAdded: ${totalAdded} new records.\nSkipped: ${totalSkipped} duplicates.`);
         } catch (err: unknown) {
           const msg = err instanceof Error ? err.message : "Failed to parse file";
           setImportError(msg);

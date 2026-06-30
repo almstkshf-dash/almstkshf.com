@@ -11,6 +11,15 @@ import { mutation, query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
 
 /**
+ * Helper to generate a unique fingerprint for a record to prevent duplication.
+ */
+function generateFingerprint(nameArabic: string, nameLatin: string, documentNumber?: string): string {
+  return [nameArabic, nameLatin, documentNumber || ""]
+    .map((s) => s.trim().toLowerCase())
+    .join("|");
+}
+
+/**
  * Searches the local terrorist list using the search index.
  * Concatenates fields into searchField for unified Arabic/Latin search.
  */
@@ -112,7 +121,23 @@ export const addItems = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    let added = 0;
+    let skipped = 0;
+
     for (const item of args.items) {
+      const fingerprint = generateFingerprint(item.nameArabic, item.nameLatin, item.documentNumber);
+
+      // Check for duplicates
+      const existing = await ctx.db
+        .query("local_terrorist_list")
+        .withIndex("by_fingerprint", (q) => q.eq("fingerprint", fingerprint))
+        .first();
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
       const searchField = [
         item.nameArabic,
         item.nameLatin,
@@ -129,8 +154,11 @@ export const addItems = mutation({
       await ctx.db.insert("local_terrorist_list", {
         ...item,
         searchField,
+        fingerprint,
       });
+      added++;
     }
+    return { added, skipped };
   },
 });
 
@@ -175,9 +203,12 @@ export const addSingleItem = mutation({
       args.reasons || "",
     ].filter(Boolean).join(" ").toLowerCase();
 
+    const fingerprint = generateFingerprint(args.nameArabic, args.nameLatin, args.documentNumber);
+
     return await ctx.db.insert("local_terrorist_list", {
       ...args,
       searchField,
+      fingerprint,
     });
   },
 });
@@ -222,9 +253,12 @@ export const updateItem = mutation({
       merged.reasons || "",
     ].filter(Boolean).join(" ").toLowerCase();
 
+    const fingerprint = generateFingerprint(merged.nameArabic, merged.nameLatin, merged.documentNumber);
+
     await ctx.db.patch(id, {
       ...updates,
       searchField,
+      fingerprint,
     });
   },
 });

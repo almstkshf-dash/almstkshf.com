@@ -300,7 +300,7 @@ export default defineSchema({
 
     local_terrorist_list: defineTable({
         type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),
-        category: v.string(), // e.g., "Ø´Ø®Øµ Ø¥Ø±Ù‡Ø§Ø¨ÙŠ", "ØªÙ†Ø¸ÙŠÙ… Ø¥Ø±Ù‡Ø§Ø¨ÙŠ"
+        category: v.string(), // e.g., "شخص إرهابي", "تنظيم إرهابي"
         nameArabic: v.string(),
         nameLatin: v.string(),
         nationality: v.optional(v.string()),
@@ -314,10 +314,11 @@ export default defineSchema({
         otherInfo: v.optional(v.string()),
         reasons: v.optional(v.string()),
         searchField: v.string(), // Concatenated string for built-in search
+        fingerprint: v.optional(v.string()), // Used for deduplication
     }).searchIndex("by_searchField", {
         searchField: "searchField",
         filterFields: ["type"],
-    }),
+    }).index("by_fingerprint", ["fingerprint"]),
 
     collections: defineTable({
         userId: v.string(),
