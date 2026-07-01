@@ -53,6 +53,13 @@ export default function TerroristListTab() {
   const [recordFormLoading, setRecordFormLoading] = useState(false);
   const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
 
+  // Multi-Selection State
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [collectionName, setCollectionName] = useState('');
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+
   // Keyboard: close modal on Escape
   const handleImportModalKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape' && !importLoading) setIsImportModalOpen(false);
@@ -83,10 +90,34 @@ export default function TerroristListTab() {
   const addSingleItem = useMutation(api.terroristList.addSingleItem);
   const updateItem = useMutation(api.terroristList.updateItem);
   const deleteItem = useMutation(api.terroristList.deleteItem);
+  const deleteItems = useMutation(api.terroristList.deleteItems);
+  const createCollection = useMutation(api.collections.createCollection);
+  const addMultipleToCollection = useMutation(api.collections.addMultipleToCollection);
   const settings = useQuery(api.settings.getSettings);
 
+  // ─── Multi-Select Handlers ──────────────────────────────────────────────
+  const toggleSelection = (id: string) => {
+    const newSet = new Set(selectedIds);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setSelectedIds(newSet);
+  };
+
+  const toggleAll = () => {
+    if (!entries) return;
+    if (selectedIds.size === entries.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(entries.map(e => e._id)));
+    }
+  };
+
   const handleExport = async (format: 'pdf' | 'excel') => {
-    if (!entries || entries.length === 0) return;
+    let dataToExport = entries;
+    if (selectedIds.size > 0) {
+      dataToExport = entries?.filter(e => selectedIds.has(e._id));
+    }
+    if (!dataToExport || dataToExport.length === 0) return;
     try {
       // Build export translations using correct media monitoring terminology
       const exportTranslations: ReportTranslations = {
@@ -118,7 +149,7 @@ export default function TerroristListTab() {
         }
       };
 
-      await ReportGenerator.exportTerroristListReport(entries, exportTranslations, format);
+      await ReportGenerator.exportTerroristListReport(dataToExport, exportTranslations, format);
     } catch (err) {
       console.error('Watchlist export failed:', err);
     }
@@ -129,7 +160,7 @@ export default function TerroristListTab() {
     e.preventDefault();
     if (!isAdmin) return;
     setRecordFormLoading(true);
-    
+
     try {
       if (editingRecord?._id) {
         await updateItem({
@@ -186,7 +217,47 @@ export default function TerroristListTab() {
     }
   };
 
-  // ─── Handlers ─────────────────────────────────────────────────────────
+  const handleBulkDelete = async () => {
+    if (!isAdmin || selectedIds.size === 0) return;
+    setBulkActionLoading(true);
+    try {
+      await deleteItems({ ids: Array.from(selectedIds) as any });
+      setSelectedIds(new Set());
+      setIsBulkDeleteModalOpen(false);
+    } catch (err) {
+      console.error('Failed to bulk delete:', err);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleSaveToCollection = async () => {
+    if (!collectionName.trim() || selectedIds.size === 0) return;
+    setBulkActionLoading(true);
+    try {
+      const selectedEntries = entries?.filter(e => selectedIds.has(e._id)) || [];
+      const collectionId = await createCollection({ name: collectionName.trim() });
+      await addMultipleToCollection({
+        collectionId,
+        items: selectedEntries.map(e => ({
+          id: e._id,
+          type: 'watchlist',
+          title: e.nameArabic || e.nameLatin || 'Unknown',
+          data: e
+        }))
+      });
+      setSelectedIds(new Set());
+      setIsCollectionModalOpen(false);
+      setCollectionName('');
+      alert('تم الحفظ في القائمة بنجاح!');
+    } catch (err) {
+      console.error('Failed to save to collection:', err);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  // ─── File Upload Handlers ──────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !isAdmin) return;
@@ -218,7 +289,12 @@ export default function TerroristListTab() {
               row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 const header = headers[colNumber];
                 if (header) {
-                  rowData[header] = cell.text || String(cell.value || "");
+                  let cellVal = cell.value;
+                  if (cellVal instanceof Date) {
+                    rowData[header] = cellVal.toISOString().split('T')[0];
+                  } else {
+                    rowData[header] = cell.text || String(cellVal || "");
+                  }
                 }
               });
               sheetRows.push(rowData);
@@ -252,15 +328,15 @@ export default function TerroristListTab() {
                     typeRaw.includes('منظمة') || typeRaw.includes('org') || typeRaw.includes('organization') ? 'organization' : 'individual') as 'individual' | 'entity' | 'organization',
                 nationality: getVal(['الجنسية', 'الدولة', 'المواطنة', 'Nationality', 'Citizen', 'Country', 'State']),
                 category: getVal(['الفئة', 'المدرج', 'الحالة', 'Category', 'Status', 'Description', 'List Name']) || 'Designated',
-                documentNumber: getVal(['رقم الوثيقة', 'رقم الجواز', 'رقم الهوية', 'الرقم المدني', 'Document Number', 'ID', 'Passport', 'Identifiier', 'Doc #']),
-                reasons: getVal(['الأسباب', 'سبب الإدراج', 'الأسس القانونية', 'التفاصيل', 'Reasons', 'Comments', 'Legal Grounds', 'Basis', 'Summary', 'أسباب الإدراج']),
+                documentNumber: getVal(['رقم القضية', 'رقم الوثيقة', 'رقم الجواز', 'رقم الهوية', 'الرقم المدني', 'Document Number', 'ID', 'Passport', 'Identifiier', 'Doc #']),
+                reasons: getVal(['رقم قرار ادراج الارهابيين', 'الأسباب', 'سبب الإدراج', 'الأسس القانونية', 'التفاصيل', 'Reasons', 'Comments', 'Legal Grounds', 'Basis', 'Summary', 'أسباب الإدراج']),
                 dob: getVal(['تاريخ الميلاد', 'تاريخ الميلاد/التأسيس', 'سنة الميلاد', 'DOB', 'Date of Birth', 'Birth Date']),
                 pob: getVal(['مكان الميلاد', 'بلد المنشأ', 'POB', 'Place of Birth', 'Address of Birth']),
                 address: getVal(['العنوان', 'المكان', 'مقر الإقامة', 'Address', 'Location', 'Residence']),
                 issuingAuthority: getVal(['جهة الإصدار', 'المصدر', 'الجهة المختصة', 'Issuing Authority', 'Issuer', 'Authority']),
-                issueDate: getVal(['تاريخ الإصدار', 'تاريخ القرار', 'Issue Date', 'Decision Date']),
+                issueDate: getVal(['تاريخ النشر', 'تاريخ الإصدار', 'تاريخ القرار', 'Issue Date', 'Decision Date']),
                 expiryDate: getVal(['تاريخ الانتهاء', 'تاريخ النفاذ حتى', 'Expiry Date', 'Expiration', 'Valid To']),
-                otherInfo: getVal(['معلومات أخرى', 'ملاحظات', 'الكنية', 'بيانات إضافية', 'Other Info', 'Notes', 'Remarks', 'البيانات المرفوعة', 'Metadata', 'Nickname', 'Alias']),
+                otherInfo: getVal(['عدد النشر', 'معلومات أخرى', 'ملاحظات', 'الكنية', 'بيانات إضافية', 'Other Info', 'Notes', 'Remarks', 'البيانات المرفوعة', 'Metadata', 'Nickname', 'Alias']),
               } as Partial<TerroristListItem>;
             });
 
@@ -415,16 +491,74 @@ export default function TerroristListTab() {
         </div>
       </div>
 
+      {/* ─── Bulk Actions Bar ─── */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between shadow-sm sticky top-4 z-20"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/20 text-primary font-bold">
+                {selectedIds.size}
+              </div>
+              <span className="text-sm font-bold text-foreground">
+                Selected {selectedIds.size === 1 ? 'Record' : 'Records'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedIds(new Set())}
+                className="text-[10px] uppercase tracking-widest font-bold"
+              >
+                Clear
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsCollectionModalOpen(true)}
+                className="text-[10px] uppercase tracking-widest font-bold bg-primary hover:bg-primary/90 text-primary-foreground border-none"
+              >
+                Save to Collection
+              </Button>
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsBulkDeleteModalOpen(true)}
+                  className="text-[10px] uppercase tracking-widest font-bold border-destructive/20 text-rose-600 hover:bg-destructive/10 dark:text-rose-400"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  Delete
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ─── Results Table ─── */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[1400px]">
             <thead>
               <tr className="bg-muted/40 border-b border-border">
-                <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center min-w-[80px] sticky left-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border">
+                <th scope="col" className="px-4 py-3 sticky left-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border z-10 w-[40px]">
+                  <input
+                    type="checkbox"
+                    checked={entries && entries.length > 0 && selectedIds.size === entries.length}
+                    onChange={toggleAll}
+                    className="rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                  />
+                </th>
+                <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center min-w-[80px] sticky left-[40px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border z-10">
                   {tCommon('status')}
                 </th>
-                <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 sticky left-16 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border min-w-[200px]">
+                <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 sticky left-[120px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border min-w-[200px] z-10">
                   {t('fields.name_arabic')}
                 </th>
                 <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[200px]">
@@ -481,7 +615,15 @@ export default function TerroristListTab() {
                     exit={{ opacity: 0 }}
                     className="group hover:bg-muted/30 transition-colors border-b border-border/40"
                   >
-                    <td className="px-4 py-3 text-center sticky left-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60">
+                    <td className="px-4 py-3 sticky left-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10 w-[40px]">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(entry._id)}
+                        onChange={() => toggleSelection(entry._id)}
+                        className="rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center sticky left-[40px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10">
                       <div className={clsx(
                         "inline-flex p-1.5 rounded-lg border",
                         entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400" :
@@ -492,7 +634,7 @@ export default function TerroristListTab() {
                           entry.type === 'entity' ? <Building2 className="w-3.5 h-3.5" aria-hidden="true" /> : <Users className="w-3.5 h-3.5" aria-hidden="true" />}
                       </div>
                     </td>
-                    <td className="px-6 py-3 font-bold text-foreground sticky left-16 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60">
+                    <td className="px-6 py-3 font-bold text-foreground sticky left-[120px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10">
                       {entry.nameArabic}
                     </td>
                     <td className="px-6 py-3 text-xs font-semibold text-foreground/70 italic border-r border-border/40">
@@ -978,6 +1120,112 @@ export default function TerroristListTab() {
                 </Button>
                 <Button variant="danger" className="flex-1" onClick={handleDeleteRecord}>
                   {t('delete_record')}
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Bulk Delete Modal ─── */}
+      <AnimatePresence>
+        {isBulkDeleteModalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !bulkActionLoading && setIsBulkDeleteModalOpen(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              aria-hidden="true"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-card border border-border rounded-3xl shadow-2xl p-6 text-center space-y-6"
+            >
+              <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto">
+                <Trash2 className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold">حذف المحدد</h3>
+                <p className="text-sm text-foreground/70">هل أنت متأكد من حذف {selectedIds.size} عنصر محدد؟ لا يمكن التراجع عن هذا الإجراء.</p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="secondary" className="flex-1" onClick={() => setIsBulkDeleteModalOpen(false)} disabled={bulkActionLoading}>
+                  {tCommon('cancel')}
+                </Button>
+                <Button variant="danger" className="flex-1" onClick={handleBulkDelete} isLoading={bulkActionLoading}>
+                  حذف
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Save to Collection Modal ─── */}
+      <AnimatePresence>
+        {isCollectionModalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !bulkActionLoading && setIsCollectionModalOpen(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              aria-hidden="true"
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-card border border-border rounded-3xl shadow-2xl p-6 space-y-6"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Filter className="w-6 h-6 text-primary" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">حفظ في قائمة مخصصة</h3>
+                    <p className="text-xs text-foreground/70 font-medium">سيتم حفظ {selectedIds.size} عنصر في القائمة.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => !bulkActionLoading && setIsCollectionModalOpen(false)}
+                  disabled={bulkActionLoading}
+                  className="p-2 rounded-xl hover:bg-muted text-foreground/60 transition-all disabled:opacity-50"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">اسم القائمة</label>
+                  <input
+                    type="text"
+                    value={collectionName}
+                    onChange={(e) => setCollectionName(e.target.value)}
+                    placeholder="مثال: قائمة الإرهاب المستهدفة 2026"
+                    className="w-full px-4 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+                <Button variant="secondary" onClick={() => setIsCollectionModalOpen(false)} disabled={bulkActionLoading}>
+                  {tCommon('cancel')}
+                </Button>
+                <Button variant="primary" onClick={handleSaveToCollection} disabled={!collectionName.trim()} isLoading={bulkActionLoading}>
+                  حفظ القائمة
                 </Button>
               </div>
             </motion.div>

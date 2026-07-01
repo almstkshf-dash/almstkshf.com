@@ -269,3 +269,12 @@ export const deleteItem = mutation({
     await ctx.db.delete(args.id);
   },
 });
+
+export const deleteItems = mutation({
+  args: { ids: v.array(v.id("local_terrorist_list")) },
+  handler: async (ctx, args) => {
+    for (const id of args.ids) {
+      await ctx.db.delete(id);
+    }
+  },
+});

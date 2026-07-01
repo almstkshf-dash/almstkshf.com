@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -863,17 +863,34 @@ export const lookupWatchlist = action({
             const osKey = await resolveApiKey(ctx, "OPENSANCTIONS_API_KEY", "opensanctions");
 
             try {
-                // OpenSanctions "Search" endpoint resolves against UN, OFAC, and more.
+                // 1. Search local database first
+                const localSearch = await ctx.runQuery(api.terroristList.search, { searchTerm: query });
+                const localMatches = localSearch.map((m: any) => ({
+                    id: m._id,
+                    caption: m.nameArabic || m.nameLatin || query,
+                    schema: m.type || 'Person',
+                    countries: m.nationality ? [m.nationality] : [],
+                    datasets: ["Local Terrorist List"],
+                    firstSeen: m.issueDate || m._creationTime,
+                    lastSeen: m.expiryDate,
+                    topics: [m.category || "Designated"],
+                    matchScore: 100, // Local matches are considered high confidence
+                    isLocal: true,
+                    reasons: m.reasons,
+                }));
+
+                // 2. OpenSanctions "Search" endpoint resolves against UN, OFAC, and more.
                 const url = `https://api.opensanctions.org/search/default?q=${encodeURIComponent(query)}&limit=10`;
                 const headers: Record<string, string> = { "Accept": "application/json" };
                 if (osKey) headers["Authorization"] = `ApiKey ${osKey}`;
 
                 const res = await fetch(url, { headers });
-
+                let osMatches: any[] = [];
+                
                 if (res.ok) {
                     const data = await res.json();
                     const results_list = data?.results || [];
-                    results.matches = results_list.map((m: any) => ({
+                    osMatches = results_list.map((m: any) => ({
                         id: m.id,
                         caption: m.caption,
                         schema: m.schema,
@@ -883,12 +900,16 @@ export const lookupWatchlist = action({
                         lastSeen: m.last_seen,
                         topics: m.properties?.topics,
                         matchScore: m.score,
+                        isLocal: false,
                     }));
-                    results.totalMatches = results.matches.length;
-                    results.isClean = results.totalMatches === 0;
                 } else {
                     results.error = `Watchlist API error: ${res.status}`;
                 }
+
+                // Combine results
+                results.matches = [...localMatches, ...osMatches];
+                results.totalMatches = results.matches.length;
+                results.isClean = results.totalMatches === 0;
             } catch (e: any) {
                 results.error = `Watchlist unavailable: ${e.message}`;
             }
