@@ -18,6 +18,8 @@ import {
   EyeOff,
   ShieldAlert,
   Trash2,
+  Edit2,
+  XCircle,
   Clock,
   Link as LinkIcon,
   SearchCode,
@@ -126,6 +128,10 @@ export default function DarkWebTab() {
   const stealthFetch = useAction(api.darkWeb.stealthFetch);
   const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
   const deleteById = useMutation(api.darkWebDb.deleteById);
+  const updateResult = useMutation(api.darkWebDb.updateDarkWebResult);
+
+  const [editingItem, setEditingItem] = useState<any>(null);
+
   const results = useQuery(
     api.darkWebDb.getByUserId,
     isAuthenticated ? { limit: 50 } : 'skip'
@@ -517,13 +523,22 @@ export default function DarkWebTab() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => deleteById({ id: entry._id })}
-                        aria-label={`${tCommon('delete')} ${entry.title}`}
-                        className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/40 hover:text-rose-600 dark:hover:text-rose-400 transition-colors group-hover:opacity-100 opacity-50"
-                      >
-                        <Trash2 className="w-4 h-4" aria-hidden="true" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => setEditingItem(entry)}
+                          aria-label={`${tCommon('edit')} ${entry.title}`}
+                          className="p-2 rounded-lg hover:bg-blue-500/10 text-foreground/60 hover:text-blue-500 transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => deleteById({ id: entry._id })}
+                          aria-label={`${tCommon('delete')} ${entry.title}`}
+                          className="p-2 rounded-lg hover:bg-destructive/10 text-foreground/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
+                        </button>
+                      </div>
                     </td>
                   </motion.tr>
                 ))}
@@ -557,6 +572,54 @@ export default function DarkWebTab() {
           </div>
         )}
       </div>
+      {/* Edit Dark Web Result Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="bg-card w-full max-w-lg rounded-2xl shadow-xl border border-border flex flex-col">
+            <div className="p-4 border-b border-border flex justify-between items-center">
+              <h3 className="font-bold text-lg text-foreground">Edit Result</h3>
+              <button onClick={() => setEditingItem(null)} className="text-foreground/50 hover:text-foreground">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-4">
+              <div>
+                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
+                  value={editingItem.title || ''}
+                  onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Snippet / Description</label>
+                <textarea
+                  className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground resize-y min-h-[100px]"
+                  value={editingItem.snippet || ''}
+                  onChange={(e) => setEditingItem({ ...editingItem, snippet: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setEditingItem(null)}>Cancel</Button>
+              <Button onClick={async () => {
+                try {
+                  await updateResult({
+                    id: editingItem._id,
+                    title: editingItem.title,
+                    snippet: editingItem.snippet,
+                  });
+                  setEditingItem(null);
+                } catch(e) {
+                  console.error(e);
+                  alert("Failed to update result.");
+                }
+              }}>Save Changes</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

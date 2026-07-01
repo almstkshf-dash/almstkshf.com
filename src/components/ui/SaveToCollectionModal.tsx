@@ -160,7 +160,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
         /* Overlay â€” no ARIA role, purely visual */
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-in fade-in"
             onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
         >
             {/* Dialog panel â€” where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
@@ -169,7 +169,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="save-collection-title"
-                className="bg-card w-full max-w-md rounded-[2rem] border border-border overflow-hidden shadow-2xl relative"
+                className="bg-card/90 backdrop-blur-md w-full max-w-md rounded-[2rem] border border-border/50 overflow-hidden shadow-2xl relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">

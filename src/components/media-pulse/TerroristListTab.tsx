@@ -60,6 +60,10 @@ export default function TerroristListTab() {
   const [collectionName, setCollectionName] = useState('');
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+
   // Keyboard: close modal on Escape
   const handleImportModalKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape' && !importLoading) setIsImportModalOpen(false);
@@ -311,7 +315,18 @@ export default function TerroristListTab() {
                     return normalizedRowKey === normalizedSearchKey ||
                       normalizedRowKey.includes(normalizedSearchKey);
                   });
-                  if (foundKey && String(row[foundKey]).trim()) return String(row[foundKey]).trim();
+                  if (foundKey && String(row[foundKey]).trim()) {
+                    let val = String(row[foundKey]).trim();
+                    // Fix ugly timezone string e.g. "Fri Jan 01 1965 04:00:00 GMT+0400 (Gulf Standard Time)"
+                    const dateMatch = val.match(/^[a-zA-Z]{3} ([a-zA-Z]{3} \d{2} \d{4}) \d{2}:\d{2}:\d{2} GMT/);
+                    if (dateMatch && dateMatch[1]) {
+                      const d = new Date(val);
+                      if (!isNaN(d.getTime())) {
+                        val = d.toISOString().split('T')[0];
+                      }
+                    }
+                    return val;
+                  }
                 }
                 return "";
               };
@@ -498,7 +513,7 @@ export default function TerroristListTab() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="bg-primary/10 border border-primary/20 rounded-xl p-3 flex items-center justify-between shadow-sm sticky top-4 z-20"
+            className="fixed bottom-4 left-4 right-4 md:sticky md:top-4 md:bottom-auto md:left-auto md:right-auto z-50 bg-background/95 backdrop-blur-md border border-primary/20 rounded-xl p-3 flex items-center justify-between shadow-lg shadow-primary/5"
           >
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/20 text-primary font-bold">
@@ -541,8 +556,8 @@ export default function TerroristListTab() {
         )}
       </AnimatePresence>
 
-      {/* ─── Results Table ─── */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+      {/* ─── Results Table (Desktop) ─── */}
+      <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[1400px]">
             <thead>
@@ -591,7 +606,7 @@ export default function TerroristListTab() {
                 <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
                   {t('fields.expiry_date')}
                 </th>
-                <th scope="col" className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[400px]">
+                <th scope="col" className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[300px]">
                   {t('fields.reasons')}
                 </th>
                 <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[250px]">
@@ -606,7 +621,7 @@ export default function TerroristListTab() {
             </thead>
             <tbody className="divide-y divide-border/50">
               <AnimatePresence mode="popLayout" initial={false}>
-                {entries?.map((entry) => (
+                {entries?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((entry) => (
                   <motion.tr
                     key={entry._id}
                     layout
@@ -689,9 +704,11 @@ export default function TerroristListTab() {
                             <Edit2 className="w-4 h-4" aria-hidden="true" />
                           </button>
                           <button
-                            onClick={() => setDeleteConfirmationId(entry._id)}
+                            onClick={() => {
+                              setDeleteConfirmationId(entry._id);
+                            }}
                             className="p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/60 hover:text-destructive transition-colors"
-                            aria-label={t('delete_record')}
+                            aria-label={t('delete')}
                           >
                             <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </button>
@@ -704,8 +721,108 @@ export default function TerroristListTab() {
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* ── Empty State ── */}
+      {/* ─── Results Cards (Mobile) ─── */}
+      <div className="md:hidden space-y-4">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {entries?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((entry) => (
+            <motion.div
+              key={entry._id}
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className={clsx(
+                "p-4 rounded-2xl border transition-all duration-200 relative overflow-hidden group shadow-sm bg-card",
+                selectedIds.has(entry._id) ? "border-primary ring-1 ring-primary/20 shadow-primary/10" : "border-border hover:border-primary/50"
+              )}
+            >
+              <div className="absolute top-4 right-4 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(entry._id)}
+                  onChange={() => toggleSelection(entry._id)}
+                  className="w-5 h-5 rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                />
+              </div>
+
+              <div className="flex items-start gap-3 mb-4">
+                <div className={clsx(
+                  "p-2 rounded-xl border flex-shrink-0 mt-1",
+                  entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400" :
+                    entry.type === 'entity' ? "bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400" :
+                      "bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-400"
+                )}>
+                  {entry.type === 'individual' ? <User className="w-5 h-5" aria-hidden="true" /> :
+                    entry.type === 'entity' ? <Building2 className="w-5 h-5" aria-hidden="true" /> : <Users className="w-5 h-5" aria-hidden="true" />}
+                </div>
+                <div>
+                  <h4 className="font-bold text-foreground pr-8 text-base">{entry.nameArabic}</h4>
+                  <p className="text-sm text-foreground/70 italic mb-1">{entry.nameLatin || '—'}</p>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tight bg-destructive/10 border border-destructive/20 text-red-700 dark:text-red-400 inline-block">
+                    {entry.category}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+                <div className="bg-muted/30 p-2 rounded-lg border border-border/50">
+                  <span className="block text-[10px] uppercase text-muted-foreground font-bold mb-1">{t('fields.nationality')}</span>
+                  <span className="font-medium text-foreground">{entry.nationality || '—'}</span>
+                </div>
+                <div className="bg-muted/30 p-2 rounded-lg border border-border/50">
+                  <span className="block text-[10px] uppercase text-muted-foreground font-bold mb-1">{t('fields.doc_number')}</span>
+                  <span className="font-mono text-foreground">{entry.documentNumber || '—'}</span>
+                </div>
+                {entry.dob && (
+                  <div className="bg-muted/30 p-2 rounded-lg border border-border/50 col-span-2">
+                    <span className="block text-[10px] uppercase text-muted-foreground font-bold mb-1">{t('fields.dob')}</span>
+                    <span className="text-foreground">{entry.dob}</span>
+                  </div>
+                )}
+              </div>
+
+              {entry.reasons && (
+                <div className="text-xs border-l-2 border-rose-500 pl-3 py-1 mb-4 bg-rose-500/5 rounded-r-lg pr-2">
+                  <span className="block text-[10px] uppercase text-rose-700/70 font-bold mb-1">{t('fields.reasons')}</span>
+                  <p className="text-rose-700 dark:text-rose-300 font-medium leading-relaxed">{entry.reasons}</p>
+                </div>
+              )}
+
+              {isAdmin && (
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-border mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-3 text-xs text-foreground/60 hover:text-primary"
+                    onClick={() => {
+                      setEditingRecord(entry);
+                      setIsRecordModalOpen(true);
+                    }}
+                  >
+                    <Edit2 className="w-3.5 h-3.5 mr-1" />
+                    {t('edit_record')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-3 text-xs text-foreground/60 hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => {
+                      setDeleteConfirmationId(entry._id);
+                    }}
+                  >
+                    <Trash2 className="w-3.5 h-3.5 mr-1" />
+                    {t('delete')}
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* ── Empty State ── */}
         {entries?.length === 0 && (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-5 relative overflow-hidden rounded-2xl border border-dashed border-emerald-500/20 bg-emerald-500/[0.02] dark:bg-emerald-500/[0.01]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)] pointer-events-none" />
@@ -751,7 +868,6 @@ export default function TerroristListTab() {
             </Button>
           </div>
         )}
-      </div>
 
       {/* ─── Import Modal ─── */}
       <AnimatePresence>

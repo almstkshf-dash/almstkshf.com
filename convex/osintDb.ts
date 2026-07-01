@@ -101,3 +101,13 @@ export const deleteOsintResult = mutation({
         await ctx.db.delete(args.id);
     },
 });
+
+// â”€â”€â”€ Update a single OSINT result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+export const updateOsintResult = mutation({
+    args: { id: v.id("osint_results"), result: v.any() },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new ConvexError("Not authenticated");
+        await ctx.db.patch(args.id, { result: args.result });
+    },
+});

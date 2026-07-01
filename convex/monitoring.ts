@@ -400,6 +400,14 @@ export const updateArticle = mutation({
         const { id, ...fields } = args;
         const existing = await ctx.db.get(id);
         if (!existing) throw new Error("Article not found");
+
+        if (fields.sentiment !== undefined && fields.sentiment !== existing.sentiment) {
+            (fields as any).manualSentimentOverride = true;
+            (fields as any).originalSentiment = existing.manualSentimentOverride 
+                ? (existing.originalSentiment ?? existing.sentiment) 
+                : existing.sentiment;
+        }
+
         await ctx.db.patch(id, fields);
     },
 });
@@ -499,6 +507,7 @@ export const deleteArticles = mutation({
         return { deleted: args.ids.length };
     },
 });
+
 
 // 5.5 MUTATION: Update article sentiment (manual override)
 export const updateSentiment = mutation({

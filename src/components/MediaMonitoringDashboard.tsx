@@ -9,12 +9,12 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon, FolderPlus, ExternalLink } from "lucide-react";
+import { Filter, Globe, Newspaper, FileText, Download, type LucideIcon, FolderPlus, ExternalLink, Trash2, Edit2, XCircle } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
 import CrisisPlanCard from "./CrisisPlanCard";
@@ -48,10 +48,10 @@ interface FilterOption {
 function normalizeFilter(filter?: DashboardFilter): ArticleFilter {
     if (!filter) return "All";
 
-    if (filter === "Press") return "Press Release";
     if (filter === "TV" || filter === "Radio") return "All";
+    if (filter === "Press") return "Online News";
 
-    return filter;
+    return filter as ArticleFilter;
 }
 
 export default function MediaMonitoringDashboard({ 
@@ -63,9 +63,20 @@ export default function MediaMonitoringDashboard({
     const t = useTranslations("Navigation");
     const tMedia = useTranslations("MediaMonitoring.dashboard");
     const tCommon = useTranslations("Common");
-    const settings = useQuery(api.settings.getSettings) || initialSettings;
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const locale = useLocale();
-    const isRTL = locale === "ar";
+    const isRTL = locale === 'ar';
+
+    const [mounted, setMounted] = useState(false);
+    const [itemToSave, setItemToSave] = useState<any>(null);
+    const [editingItem, setEditingItem] = useState<any>(null);
+    const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
+
+    const deleteArticle = useMutation(api.monitoring.deleteArticle);
+    const updateArticle = useMutation(api.monitoring.updateArticle);
+    const settings = useQuery(api.settings.getSettings) || initialSettings;
 
     // Real-time Event Stream (SSE) Persistence with heartbeat & auto-reconnect
     const { status: sseStatus, reconnect: sseReconnect } = useSSEPersistence({
@@ -86,14 +97,8 @@ export default function MediaMonitoringDashboard({
         }
     });
 
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const pathname = usePathname();
-    const [mounted, setMounted] = useState(false);
-
     // Initialize filter with normalized defaultFilter first to avoid hydration mismatch
     const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
-    const [itemToSave, setItemToSave] = useState<any>(null);
 
     // Sync state with URL search parameters to handle back/forward navigation
     useEffect(() => {
@@ -253,17 +258,125 @@ export default function MediaMonitoringDashboard({
                 ))}
             </div>
 
-            {itemToSave && (
-                <SaveToCollectionModal 
-                    isOpen={!!itemToSave} 
-                    onClose={() => setItemToSave(null)}
-                    item={{
-                        id: itemToSave._id,
-                        type: "media_monitoring",
-                        title: itemToSave.reportName || itemToSave.title,
-                        data: itemToSave
-                    }}
-                />
+            <SaveToCollectionModal 
+                isOpen={!!itemToSave} 
+                onClose={() => setItemToSave(null)}
+                item={{
+                    id: itemToSave?._id,
+                    type: "media_monitoring",
+                    title: itemToSave?.reportName || itemToSave?.title || "",
+                    data: itemToSave
+                }}
+            />
+
+            {/* Edit Modal */}
+            {editingItem && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm">
+                    <div className="bg-card/90 backdrop-blur-md w-full max-w-2xl rounded-2xl shadow-2xl border border-border/50 flex flex-col max-h-[90vh]">
+                        <div className="p-4 border-b border-border flex justify-between items-center">
+                            <h3 className="font-bold text-lg text-foreground">{tCommon('edit') || 'Edit Article'}</h3>
+                            <button onClick={() => setEditingItem(null)} className="text-foreground/50 hover:text-foreground">
+                                <XCircle className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+                            <div>
+                                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
+                                    value={editingItem.title || ''}
+                                    onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Content</label>
+                                <textarea
+                                    className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground resize-y min-h-[150px]"
+                                    value={editingItem.content || ''}
+                                    onChange={(e) => setEditingItem({ ...editingItem, content: e.target.value })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Source</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
+                                        value={editingItem.source || ''}
+                                        onChange={(e) => setEditingItem({ ...editingItem, source: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Sentiment</label>
+                                    <select
+                                        className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
+                                        value={editingItem.sentiment || 'Neutral'}
+                                        onChange={(e) => setEditingItem({ ...editingItem, sentiment: e.target.value })}
+                                    >
+                                        <option value="Positive">Positive</option>
+                                        <option value="Neutral">Neutral</option>
+                                        <option value="Negative">Negative</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-border flex justify-end gap-3">
+                            <Button variant="ghost" onClick={() => setEditingItem(null)}>{tCommon('cancel') || 'Cancel'}</Button>
+                            <Button onClick={async () => {
+                                try {
+                                    await updateArticle({
+                                        id: editingItem._id,
+                                        title: editingItem.title,
+                                        content: editingItem.content,
+                                        source: editingItem.source,
+                                        sentiment: editingItem.sentiment,
+                                    });
+                                    setEditingItem(null);
+                                    toast.success('Article updated successfully');
+                                } catch(e) {
+                                    console.error(e);
+                                    toast.error("Failed to update article.");
+                                }
+                            }}>{tCommon('save') || 'Save Changes'}</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {deleteConfirmationId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm">
+                    <div className="bg-card/90 backdrop-blur-md w-full max-w-md rounded-2xl shadow-2xl border border-border/50 flex flex-col p-6 text-center">
+                        <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
+                            <Trash2 className="w-8 h-8" />
+                        </div>
+                        <h3 className="font-bold text-xl mb-2">{tCommon('delete_confirm') || 'Are you sure?'}</h3>
+                        <p className="text-foreground/70 text-sm mb-6">
+                            This action cannot be undone. This article will be permanently removed from the monitoring database.
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            <Button variant="outline" className="flex-1" onClick={() => setDeleteConfirmationId(null)}>
+                                {tCommon('cancel') || 'Cancel'}
+                            </Button>
+                            <Button 
+                                className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                                onClick={async () => {
+                                    try {
+                                        await deleteArticle({ id: deleteConfirmationId as any });
+                                        setDeleteConfirmationId(null);
+                                        toast.success('Article deleted successfully');
+                                    } catch(e) {
+                                        console.error(e);
+                                        toast.error("Failed to delete article.");
+                                    }
+                                }}
+                            >
+                                {tCommon('delete') || 'Delete'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Articles Grid */}
@@ -367,7 +480,7 @@ export default function MediaMonitoringDashboard({
                         {reports.map((article: any) => (
                             <div 
                                 key={article._id}
-                                className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full min-h-[260px]"
+                                className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full min-h-[260px] hover:-translate-y-1"
                             >
                                 <div className="p-5 flex-1 space-y-4">
                                     <div className="flex justify-between items-start gap-3">
@@ -384,13 +497,29 @@ export default function MediaMonitoringDashboard({
                                                 {article.sentiment}
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => setItemToSave(article)}
-                                            className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm"
-                                            title={tCommon('save_to_collection')}
-                                        >
-                                            <FolderPlus className="w-4 h-4" />
-                                        </button>
+                                        <div className="flex items-center gap-1.5">
+                                            <button 
+                                                onClick={() => setEditingItem(article)}
+                                                className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-sm"
+                                                title={tCommon('edit') || 'Edit'}
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => setDeleteConfirmationId(article._id)}
+                                                className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-sm"
+                                                title={tCommon('delete') || 'Delete'}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                            <button 
+                                                onClick={() => setItemToSave(article)}
+                                                className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm"
+                                                title={tCommon('save_to_collection')}
+                                            >
+                                                <FolderPlus className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div>

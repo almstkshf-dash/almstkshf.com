@@ -94,7 +94,8 @@ export const lookupEmail = action({
             } catch (_) { /* DNS check failed */ }
 
             // Save result to DB
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "email",
                 query: email,
                 result: results,
@@ -241,7 +242,8 @@ export const lookupDomain = action({
                 }
             } catch (_) { /* Wayback unavailable */ }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "domain",
                 query: domain,
                 result: results,
@@ -338,7 +340,8 @@ export const lookupIp = action({
                 }
             } catch (_) { /* Reverse DNS failed */ }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "ip",
                 query: ip,
                 result: results,
@@ -453,7 +456,8 @@ export const lookupUsername = action({
                 unknownOn: platformResults.filter((p) => p.found === null).map((p) => p.platform),
             };
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "username",
                 query: username,
                 result: results,
@@ -525,7 +529,8 @@ export const lookupPhone = action({
                 results.validationNote = `Phone lookup failed: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "phone",
                 query: phone,
                 result: results,
@@ -604,7 +609,8 @@ export const lookupNews = action({
                 return { success: false, error: "Failed to connect to the news provider." };
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "news",
                 query: query,
                 result: results,
@@ -658,7 +664,8 @@ export const lookupCorporate = action({
                 results.error = `OpenCorporates unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "corporate",
                 query: query,
                 result: results,
@@ -712,7 +719,8 @@ export const lookupLocation = action({
                 results.error = `Nominatim unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "location",
                 query: query,
                 result: results,
@@ -774,7 +782,8 @@ export const lookupWikipedia = action({
                 results.error = `Wikipedia unavailable: ${err instanceof Error ? err.message : String(err)}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "wikipedia",
                 query: query,
                 result: results,
@@ -798,6 +807,7 @@ export const lookupWikipedia = action({
 });
 
 // â”€â”€â”€ GLEIF Intelligence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ——————————————————————————————————————————————————————————————————————————————
 export const lookupGleif = action({
     args: { companyName: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -827,7 +837,8 @@ export const lookupGleif = action({
                 results.error = `GLEIF unavailable: ${e.message}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "gleif",
                 query: query,
                 result: results,
@@ -850,7 +861,17 @@ export const lookupGleif = action({
     }
 });
 
-// â”€â”€â”€ Watchlist Intelligence (UN/OFAC) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// —————————————————————————————————————————————————————————————————————————————
+// Helper to normalize Arabic text (strip hamzas, tashkeel, normalize taa marbuta/alef maksura)
+const normalizeArabic = (text: string) => {
+    if (!text) return "";
+    return text
+        .replace(/[أإآ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي')
+        .replace(/[\u064B-\u065F]/g, ''); // Remove tashkeel
+};
+
 export const lookupWatchlist = action({
     args: { query: v.string() },
     handler: async (ctx, args): Promise<{ success: boolean; data?: Record<string, any>; recordId?: string; error?: string }> => {
@@ -865,7 +886,19 @@ export const lookupWatchlist = action({
             try {
                 // 1. Search local database first
                 const localSearch = await ctx.runQuery(api.terroristList.search, { searchTerm: query });
-                const localMatches = localSearch.map((m: any) => ({
+
+                // EXACT or STRICT CONTAINS match only for local results with Arabic normalization
+                const qLower = normalizeArabic(query.toLowerCase().trim());
+                const strictLocalSearch = localSearch.filter((m: any) => {
+                    const nameAr = normalizeArabic((m.nameArabic || '').toLowerCase().trim());
+                    const nameEn = (m.nameLatin || '').toLowerCase().trim();
+                    const docNum = (m.documentNumber || '').toLowerCase().trim();
+
+                    return nameAr === qLower || nameEn === qLower || docNum === qLower ||
+                        nameAr.includes(qLower) || nameEn.includes(qLower);
+                });
+
+                const localMatches = strictLocalSearch.map((m: any) => ({
                     id: m._id,
                     caption: m.nameArabic || m.nameLatin || query,
                     schema: m.type || 'Person',
@@ -886,11 +919,18 @@ export const lookupWatchlist = action({
 
                 const res = await fetch(url, { headers });
                 let osMatches: any[] = [];
-                
+
                 if (res.ok) {
                     const data = await res.json();
                     const results_list = data?.results || [];
-                    osMatches = results_list.map((m: any) => ({
+
+                    // Filter OpenSanctions to ONLY include exact/strict matches after normalization
+                    const strictOsMatches = results_list.filter((m: any) => {
+                        const caption = normalizeArabic((m.caption || '').toLowerCase().trim());
+                        return caption === qLower || caption.includes(qLower) || m.score > 0.9;
+                    });
+
+                    osMatches = strictOsMatches.map((m: any) => ({
                         id: m.id,
                         caption: m.caption,
                         schema: m.schema,
@@ -914,7 +954,8 @@ export const lookupWatchlist = action({
                 results.error = `Watchlist unavailable: ${e.message}`;
             }
 
-            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, { userId: (await ctx.auth.getUserIdentity())?.subject || "system",
+            const recordId = await ctx.runMutation(internal.osintDb.saveOsintResultInternal, {
+                userId: (await ctx.auth.getUserIdentity())?.subject || "system",
                 type: "watchlist",
                 query: query,
                 result: results,
@@ -1247,12 +1288,12 @@ async function emailToMd5(email: string): Promise<string> {
         0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
         0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
     ];
-    
+
     const r = [
-        7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
-        5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
-        4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
-        6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
+        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
     ];
 
     const s = new TextEncoder().encode(email.toLowerCase().trim());

@@ -213,7 +213,7 @@ const SocialPresenceGrid = ({ data, t }: { data: SocialPresenceData; t: (key: st
   );
 };
 
-const StructuredResultView = ({ type, data: rawData, t }: { type: LookupType; data: any; t: (key: string, values?: Record<string, string | number>) => string }) => {
+const StructuredResultView = ({ type, data: rawData, t, selectedMatches, onToggleMatch, onSaveSelected }: { type: LookupType; data: any; t: (key: string, values?: Record<string, string | number>) => string; selectedMatches?: Set<string>; onToggleMatch?: (id: string) => void; onSaveSelected?: () => void }) => {
   if (!rawData) return null;
   const data = rawData as any;
 
@@ -482,24 +482,48 @@ const StructuredResultView = ({ type, data: rawData, t }: { type: LookupType; da
         {type === 'watchlist' && (
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
-              {(get(data, 'matches') as any[] | undefined)?.map((m, i: number) => (
-                <div
-                  key={i}
-                  className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50"
-                >
-                  <div className="flex items-center justify-between">
-                    <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
-                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">
-                      {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
-                    </span>
+              <div className="col-span-1 sm:col-span-2 flex justify-between items-center mb-2">
+                <span className="text-xs text-muted-foreground">{t('result_view.sections.sanctions_matches')}</span>
+                {selectedMatches && selectedMatches.size > 0 && onSaveSelected && (
+                  <Button variant="primary" onClick={onSaveSelected} className="px-3 py-1.5 text-xs h-auto bg-emerald-600 hover:bg-emerald-700">
+                    <FolderPlus className="w-3.5 h-3.5 mr-1" />
+                    {t('result_view.fields.save_selected')} ({selectedMatches.size})
+                  </Button>
+                )}
+              </div>
+              {(get(data, 'matches') as any[] | undefined)?.map((m, i: number) => {
+                const isSelected = selectedMatches?.has(m.id || m.caption);
+                return (
+                  <div
+                    key={i}
+                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50 flex gap-3"
+                  >
+                    {onToggleMatch && (
+                      <div className="pt-1">
+                        <input
+                          type="checkbox"
+                          checked={isSelected || false}
+                          onChange={() => onToggleMatch(m.id || m.caption)}
+                          className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h5 className="text-xs font-bold text-foreground uppercase tracking-tight">{m.caption}</h5>
+                        <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">
+                          {t('result_view.fields.match_percent', { count: Math.round(m.matchScore * 100) })}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <StatusBadge label={t('result_view.headers.schema')} value={m.schema || 'N/A'} type="info" />
+                        <StatusBadge label={t('result_view.headers.datasets')} value={m.datasets?.join(', ') || 'N/A'} type="default" />
+                        <StatusBadge label={t('result_view.headers.topics')} value={m.topics?.join(', ') || 'None'} type="default" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <StatusBadge label={t('result_view.headers.schema')} value={m.schema || 'N/A'} type="info" />
-                    <StatusBadge label={t('result_view.headers.datasets')} value={m.datasets?.join(', ') || 'N/A'} type="default" />
-                    <StatusBadge label={t('result_view.headers.topics')} value={m.topics?.join(', ') || 'None'} type="default" />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               {!get(data, 'matches')?.length && (
                 <div className="col-span-1 sm:col-span-2 p-4 text-center border border-emerald-500/20 bg-emerald-500/5 rounded-xl">
                   <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-50" />
@@ -606,6 +630,17 @@ export default function OsintTab() {
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
   const [historyItemToSave, setHistoryItemToSave] = useState<HistoryItem | null>(null);
+  
+  // Bulk Matches Selection State
+  const [selectedMatches, setSelectedMatches] = useState<Set<string>>(new Set());
+  const [isBulkCollectionModalOpen, setIsBulkCollectionModalOpen] = useState(false);
+
+  const toggleMatchSelection = (matchId: string) => {
+    const newSet = new Set(selectedMatches);
+    if (newSet.has(matchId)) newSet.delete(matchId);
+    else newSet.add(matchId);
+    setSelectedMatches(newSet);
+  };
 
   const handleExport = async (format: 'pdf' | 'excel') => {
     if (!history || history.length === 0) return;
@@ -641,11 +676,15 @@ export default function OsintTab() {
   const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
   // â”€â”€ DB operations (default runtime â€” osintDb.ts) â”€â”€
   const deleteResult = useMutation(api.osintDb.deleteOsintResult);
+  const updateResult = useMutation(api.osintDb.updateOsintResult);
   const history = useQuery(
     api.osintDb.getOsintResults,
     isAuthenticated ? { limit: 20 } : 'skip'
   );
   const settings = useQuery(api.settings.getSettings);
+
+  const [historyItemToEdit, setHistoryItemToEdit] = useState<HistoryItem | null>(null);
+  const [editJsonStr, setEditJsonStr] = useState<string>('');
 
   // â”€â”€ Resource directory state â”€â”€
   const [search, setSearch] = useState('');
@@ -779,17 +818,17 @@ export default function OsintTab() {
           </div>
 
           {/* Type Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          <div className="flex overflow-x-auto pb-4 pt-2 -mx-2 px-2 snap-x snap-mandatory gap-3 hide-scrollbar md:grid md:grid-cols-4 lg:grid-cols-5 md:overflow-visible md:pb-0 md:pt-0 md:mx-0 md:px-0 md:gap-2">
             {LOOKUP_TYPES.map(lt => (
               <button
                 key={lt.type}
                 onClick={() => { handleTypeChange(lt.type); setQuery(''); setResult(null); setError(''); }}
                 aria-pressed={activeType === lt.type}
                 className={clsx(
-                  'flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all',
+                  'flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all min-w-[100px] shrink-0 snap-center md:min-w-0 md:shrink-auto',
                   activeType === lt.type
-                    ? 'bg-primary/5 border-primary text-primary shadow-sm'
-                    : 'border-border/60 bg-muted/20 hover:border-primary/30 text-foreground/60'
+                    ? 'bg-primary/5 border-primary text-primary shadow-sm scale-105 md:scale-100'
+                    : 'border-border/60 bg-muted/20 hover:border-primary/30 text-foreground/60 hover:scale-[1.02]'
                 )}
               >
                 <div className={clsx(
@@ -798,7 +837,7 @@ export default function OsintTab() {
                 )}>
                   {lt.icon}
                 </div>
-                <span className="text-xs font-bold uppercase tracking-tight">{lt.label}</span>
+                <span className="text-xs font-bold uppercase tracking-tight text-center">{lt.label}</span>
               </button>
             ))}
           </div>
@@ -877,6 +916,19 @@ export default function OsintTab() {
           )}
 
           {/* Result Area */}
+          {!result && !error && !loading && (
+            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4 border border-dashed border-border rounded-xl bg-muted/5">
+              <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center">
+                <Search className="w-8 h-8 text-foreground/30" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">Ready to Investigate</h3>
+                <p className="text-xs text-foreground/60 max-w-sm mt-1">
+                  Select an OSINT tool above, enter your target query, and click analyze to begin gathering intelligence.
+                </p>
+              </div>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             {error && (
               <motion.div
@@ -925,7 +977,14 @@ export default function OsintTab() {
                   }}
                 />
 
-                <StructuredResultView type={activeType} data={result} t={t} />
+                <StructuredResultView 
+                  type={activeType} 
+                  data={result} 
+                  t={t} 
+                  selectedMatches={selectedMatches} 
+                  onToggleMatch={toggleMatchSelection} 
+                  onSaveSelected={() => setIsBulkCollectionModalOpen(true)}
+                />
               </div>
             )}
           </AnimatePresence>
@@ -996,15 +1055,26 @@ export default function OsintTab() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
+                        onClick={(e) => { 
+                           e.stopPropagation(); 
+                           setHistoryItemToEdit(item); 
+                           setEditJsonStr(JSON.stringify(item.result, null, 2)); 
+                        }}
+                        className="p-1.5 rounded-lg opacity-100 hover:bg-blue-500/10 text-foreground/60 hover:text-blue-500 transition-all"
+                        aria-label={tCommon('edit')}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </button>
+                      <button
                         onClick={async (e) => { e.stopPropagation(); await deleteResult({ id: item._id as Id<"osint_results"> }); }}
-                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-rose-600 dark:hover:text-rose-400 transition-all"
+                        className="p-1.5 rounded-lg opacity-100 hover:bg-destructive/10 text-foreground/60 hover:text-rose-600 dark:hover:text-rose-400 transition-all"
                         aria-label={tCommon('delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); setHistoryItemToSave(item); }}
-                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-emerald-500/10 text-foreground/60 hover:text-emerald-500 transition-all"
+                        className="p-1.5 rounded-lg opacity-100 hover:bg-emerald-500/10 text-foreground/60 hover:text-emerald-500 transition-all"
                         aria-label={t('result_view.fields.save_collection')}
                       >
                         <FolderPlus className="w-3.5 h-3.5" aria-hidden="true" />
@@ -1016,12 +1086,56 @@ export default function OsintTab() {
                   </div>
                   {expandedHistory === item._id && (
                     <div className="border-t border-border bg-background/30 p-6">
-                      <StructuredResultView type={item.type} data={item.result} t={t} />
+                      <StructuredResultView 
+                        type={item.type} 
+                        data={item.result} 
+                        t={t} 
+                        selectedMatches={selectedMatches} 
+                        onToggleMatch={toggleMatchSelection} 
+                        onSaveSelected={() => setIsBulkCollectionModalOpen(true)}
+                      />
                     </div>
                   )}
                 </div>
               ))}
             </div>
+
+            {/* Edit Result Modal */}
+            {historyItemToEdit && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+                <div className="bg-card w-full max-w-2xl rounded-2xl shadow-xl border border-border flex flex-col max-h-[90vh]">
+                  <div className="p-4 border-b border-border flex justify-between items-center">
+                    <h3 className="font-bold text-lg text-foreground">Edit Result Data</h3>
+                    <button onClick={() => setHistoryItemToEdit(null)} className="text-foreground/50 hover:text-foreground">
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="p-4 flex-1 overflow-hidden flex flex-col">
+                    <p className="text-xs text-foreground/60 mb-2">
+                      You can manually modify the JSON data below (e.g., removing unwanted array items like false positive Watchlist matches).
+                    </p>
+                    <textarea 
+                      className="w-full flex-1 bg-muted/20 border border-border rounded-lg p-4 font-mono text-xs focus:ring-1 focus:ring-primary outline-none resize-none text-foreground"
+                      value={editJsonStr}
+                      onChange={(e) => setEditJsonStr(e.target.value)}
+                    />
+                  </div>
+                  <div className="p-4 border-t border-border flex justify-end gap-3">
+                    <Button variant="ghost" onClick={() => setHistoryItemToEdit(null)}>Cancel</Button>
+                    <Button onClick={async () => {
+                      try {
+                        const parsed = JSON.parse(editJsonStr);
+                        await updateResult({ id: historyItemToEdit._id as Id<"osint_results">, result: parsed });
+                        setHistoryItemToEdit(null);
+                      } catch(e) {
+                        alert("Invalid JSON format. Please make sure the structure is correct.");
+                      }
+                    }}>Save Changes</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {historyItemToSave && (
               <SaveToCollectionModal
                 isOpen={!!historyItemToSave}
@@ -1031,6 +1145,25 @@ export default function OsintTab() {
                   type: "osint",
                   title: `OSINT: ${historyItemToSave.type} lookup for ${historyItemToSave.query}`,
                   data: historyItemToSave.result
+                }}
+              />
+            )}
+
+            {isBulkCollectionModalOpen && selectedMatches.size > 0 && (
+              <SaveToCollectionModal
+                isOpen={isBulkCollectionModalOpen}
+                onClose={() => {
+                  setIsBulkCollectionModalOpen(false);
+                  setSelectedMatches(new Set());
+                }}
+                item={{
+                  id: `bulk_osint_watchlist_${Date.now()}`,
+                  type: "osint",
+                  title: `OSINT: Watchlist Selected Matches (${selectedMatches.size})`,
+                  data: {
+                    type: "watchlist",
+                    matches: (expandedHistory ? history?.find(h => h._id === expandedHistory)?.result?.matches : result?.matches || []).filter((m: any) => selectedMatches.has(m.id || m.caption))
+                  }
                 }}
               />
             )}
