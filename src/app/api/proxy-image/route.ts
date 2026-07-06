@@ -38,25 +38,36 @@ export async function GET(req: NextRequest) {
             return new NextResponse('Invalid or forbidden URL', { status: 400 });
         }
 
-        const response = await fetch(imageUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-        });
+        let response;
+        try {
+            response = await fetch(imageUrl, {
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                },
+                signal: AbortSignal.timeout(10000)
+            });
+        } catch (fetchErr) {
+            console.warn(`Proxy image network/timeout error for URL ${imageUrl}:`, fetchErr);
+            return new NextResponse('Failed to connect to remote image host', { status: 502 });
+        }
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch image: ${response.statusText}`);
+            console.warn(`Failed to fetch remote image ${imageUrl} - Status: ${response.status} ${response.statusText}`);
+            return new NextResponse(`Failed to fetch image: remote server returned status ${response.status}`, { 
+                status: response.status === 404 ? 404 : 502 
+            });
         }
 
         if (!response.body) {
-            throw new Error('Response body is null');
+            console.warn(`Null response body when fetching remote image ${imageUrl}`);
+            return new NextResponse('Empty image response', { status: 502 });
         }
 
         const contentType = response.headers.get('content-type') || 'image/jpeg';
 
         const { readable, writable } = new TransformStream();
         response.body.pipeTo(writable).catch(err => {
-            console.error('Error piping image proxy stream:', err);
+            console.warn('Error piping image proxy stream:', err);
         });
 
         return new NextResponse(readable, {
@@ -66,7 +77,7 @@ export async function GET(req: NextRequest) {
             }
         });
     } catch (error) {
-        console.error('Proxy image error:', error);
-        return new NextResponse('Error fetching image', { status: 500 });
+        console.warn('Unexpected proxy image error:', error);
+        return new NextResponse('Error fetching image', { status: 502 });
     }
 }

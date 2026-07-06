@@ -23,7 +23,7 @@ import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation, useQuery, useConvex } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { ALL_COUNTRIES } from '@/lib/countries';
 import { ReportGenerator } from '@/lib/report-generator';
@@ -144,6 +144,7 @@ export default function DashboardClient() {
 
     // ── Convex data ───────────────────────────────────────────────────────────
     const appSettings = useQuery(api.settings.getSettings);
+    const convex = useConvex();
 
     const result = useQuery(api.monitoring.getArticles, {
         limit: 50,
@@ -297,9 +298,34 @@ export default function DashboardClient() {
         setIsExporting(true);
         setTimeout(async () => {
             try {
+                // Fetch all matching articles from the database (up to 5000) for the current filters
+                const allResult = await convex.query(api.monitoring.getArticles, {
+                    limit: 5000,
+                    sourceType: selectedType === 'All' ? undefined : selectedType,
+                    sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
+                    depth: depthFilter,
+                });
+
+                let articlesToExport = allResult?.items || [];
+
+                // Filter by keyword locally if search query exists
+                const query = searchQuery.toLowerCase().trim();
+                if (query) {
+                    articlesToExport = articlesToExport.filter((a: ArticleItem) =>
+                        a.title.toLowerCase().includes(query) ||
+                        (a.keyword && a.keyword.toLowerCase().includes(query)) ||
+                        (a.sourceType && a.sourceType.toLowerCase().includes(query))
+                    );
+                }
+
+                if (articlesToExport.length === 0) {
+                    showToast('error', t('export_empty'));
+                    return;
+                }
+
                 // Pass format as the third argument to the new unified generator
                 await ReportGenerator.exportMediaMonitoringReport(
-                    filteredArticles,
+                    articlesToExport,
                     exportTranslations as any,
                     type,
                     appSettings?.logoUrl,

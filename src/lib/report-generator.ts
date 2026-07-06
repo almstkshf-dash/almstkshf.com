@@ -345,8 +345,8 @@ export class ReportGenerator {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
         // Pre-load images to base64 using local CORS-bypassing proxy (limit image loading to top 50 to prevent memory crashes)
-        const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
-            if (idx >= 50 || !a.imageUrl) return a;
+        const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
+            if (!a.imageUrl) return a;
             // If it's already base64, keep it
             if (a.imageUrl.startsWith('data:')) return a;
 
@@ -368,8 +368,10 @@ export class ReportGenerator {
             return a;
         }));
 
+        const allArticles = [...articlesWithImages, ...articles.slice(50)];
+
         // Cover Page
-        this.addCoverPage(doc, title, articles.length, translations, logoBase64, fontLoaded);
+        this.addCoverPage(doc, title, allArticles.length, translations, logoBase64, fontLoaded);
 
         // Summary Page with Reach/AVE charts
         doc.addPage();
@@ -442,7 +444,7 @@ export class ReportGenerator {
         // Article Table
         this.drawHeading(doc, translations.Reports?.coverage_details || 'Media Coverage Log', 14, y, fontLoaded);
 
-        const tableData = articlesWithImages.map(a => {
+        const tableData = allArticles.map(a => {
             const titleText = a.title ?? '';
             let processedTitle = titleText;
             if (isArabic(titleText)) {
@@ -487,8 +489,11 @@ export class ReportGenerator {
                 5: { cellWidth: 20, halign: 'center' }
             },
             didDrawCell: (data: any) => {
-                if (data.column.index === 0 && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
-                    const img = articlesWithImages[data.row.index].imageUrl;
+                const isArabicMode = ReportGenerator.isArabicReport(translations);
+                // In Arabic mode, columns are reversed inside addAutoTable, placing the image column (index 0) at the end (index 5)
+                const targetColIndex = isArabicMode ? 5 : 0;
+                if (data.column.index === targetColIndex && data.cell.section === 'body' && allArticles[data.row.index]?.imageUrl) {
+                    const img = allArticles[data.row.index].imageUrl;
                     if (img && img.startsWith('data:')) {
                         try {
                             const matches = img.match(/^data:image\/([a-zA-Z+]+);base64,/);
@@ -1256,9 +1261,9 @@ export class ReportGenerator {
         const effectiveLogoUrl = (translations.logo_url as string | undefined) || logoUrl;
         const logoBase64 = await this.loadLogo(effectiveLogoUrl);
 
-        // Pre-load images to base64 for up to top 50 articles using local CORS proxy
-        const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
-            if (idx >= 50 || !a.imageUrl) return a;
+        // Pre-load images to base64 for up to top 50 articles using local CORS proxy (prevent memory crashes)
+        const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
+            if (!a.imageUrl) return a;
             if (a.imageUrl.startsWith('data:')) return a;
 
             try {
@@ -1278,6 +1283,8 @@ export class ReportGenerator {
             }
             return a;
         }));
+
+        const allArticles = [...articlesWithImages, ...articles.slice(50)];
 
         const addText = (text: string, x: number, y: number, options: { align?: 'center' | 'right' | 'left' } = {}) => {
             doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
@@ -1633,7 +1640,7 @@ export class ReportGenerator {
         const activeColumns = isArabicMode ? [...columnDefinitions].reverse() : columnDefinitions;
 
         const tableHead = [activeColumns.map(col => col.header)];
-        const tableBody = articlesWithImages.map(a => activeColumns.map(col => col.getValue(a)));
+        const tableBody = allArticles.map(a => activeColumns.map(col => col.getValue(a)));
 
         const columnStyles: Record<number, { cellWidth: number | 'auto'; halign: string }> = {};
         activeColumns.forEach((col, idx) => {
@@ -1655,9 +1662,12 @@ export class ReportGenerator {
             },
             columnStyles,
             didDrawCell: (data: any) => {
-                const imageColIndex = activeColumns.findIndex(col => col.id === 'image');
-                if (data.column.index === imageColIndex && data.cell.section === 'body' && articlesWithImages[data.row.index]?.imageUrl) {
-                    const img = articlesWithImages[data.row.index].imageUrl;
+                const isArabicMode = ReportGenerator.isArabicReport(translations);
+                // Due to double-reversal of columns and body rows in RTL mode,
+                // the image column is always rendered at index 0 in the final table layout.
+                const targetColIndex = isArabicMode ? 0 : 0;
+                if (data.column.index === targetColIndex && data.cell.section === 'body' && allArticles[data.row.index]?.imageUrl) {
+                    const img = allArticles[data.row.index].imageUrl;
                     if (img && img.startsWith('data:')) {
                         try {
                             const matches = img.match(/^data:image\/([a-zA-Z+]+);base64,/);
