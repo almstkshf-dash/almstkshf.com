@@ -6,7 +6,7 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 export const getCollections = query({
@@ -54,7 +54,7 @@ export const createCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
         const collectionId = await ctx.db.insert("collections", {
@@ -77,12 +77,12 @@ export const deleteCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
         const collection = await ctx.db.get(args.id);
         if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Unauthorized");
+            throw new ConvexError("Unauthorized");
         }
 
         await ctx.db.delete(args.id);
@@ -110,20 +110,21 @@ export const addToCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
         const collection = await ctx.db.get(args.collectionId);
         if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Unauthorized");
+            throw new ConvexError("Unauthorized");
         }
 
+        const items = collection.items ?? [];
         // Avoid exact duplicates
-        if (collection.items.find(i => i.id === args.item.id)) {
+        if (items.find(i => i.id === args.item.id)) {
             return { collectionId: collection._id, isDuplicate: true };
         }
 
-        const updatedItems = [...collection.items, { ...args.item, addedAt: Date.now() }];
+        const updatedItems = [...items, { ...args.item, addedAt: Date.now() }];
 
         await ctx.db.patch(args.collectionId, {
             items: updatedItems,
@@ -142,15 +143,16 @@ export const removeFromCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
         const collection = await ctx.db.get(args.collectionId);
         if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Unauthorized");
+            throw new ConvexError("Unauthorized");
         }
 
-        const updatedItems = collection.items.filter(i => i.id !== args.itemId);
+        const items = collection.items ?? [];
+        const updatedItems = items.filter(i => i.id !== args.itemId);
 
         await ctx.db.patch(args.collectionId, {
             items: updatedItems,
@@ -184,17 +186,17 @@ export const addMultipleToCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
         const collection = await ctx.db.get(args.collectionId);
         if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Unauthorized");
+            throw new ConvexError("Unauthorized");
         }
 
         let addedCount = 0;
         let duplicateCount = 0;
-        const currentItems = [...collection.items];
+        const currentItems = collection.items ? [...collection.items] : [];
 
         for (const item of args.items) {
             if (currentItems.find(i => i.id === item.id)) {

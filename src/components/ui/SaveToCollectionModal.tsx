@@ -11,6 +11,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { ConvexError } from "convex/values";
 import { Id } from "../../../convex/_generated/dataModel";
 import { X, Plus, FolderPlus, Loader2, Check } from "lucide-react";
 import Button from "./Button";
@@ -102,7 +103,17 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
             }
         } catch (e) {
             console.error(e);
-            setStatus({ type: 'error', text: 'Unable to save items. Please try again.' });
+            let errorText = 'Unable to save items. Please try again.';
+            if (e instanceof ConvexError) {
+                if (e.data === 'Unauthenticated') {
+                    errorText = 'You must be signed in to perform this action.';
+                } else if (e.data === 'Unauthorized') {
+                    errorText = 'You do not have permission to modify this collection.';
+                } else if (typeof e.data === 'string') {
+                    errorText = e.data;
+                }
+            }
+            setStatus({ type: 'error', text: errorText });
         } finally {
             setLoading(false);
         }
@@ -150,7 +161,17 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
             }
         } catch (e) {
             console.error(e);
-            setStatus({ type: 'error', text: 'Unable to create collection. Please try again.' });
+            let errorText = 'Unable to create collection. Please try again.';
+            if (e instanceof ConvexError) {
+                if (e.data === 'Unauthenticated') {
+                    errorText = 'You must be signed in to perform this action.';
+                } else if (e.data === 'Unauthorized') {
+                    errorText = 'You do not have permission to modify this collection.';
+                } else if (typeof e.data === 'string') {
+                    errorText = e.data;
+                }
+            }
+            setStatus({ type: 'error', text: errorText });
         } finally {
             setLoading(false);
         }
