@@ -281,8 +281,9 @@ export default function MediaMonitoringDashboard({
                         </div>
                         <div className="p-4 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
                             <div>
-                                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
+                                <label htmlFor="edit-title" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
                                 <input
+                                    id="edit-title"
                                     type="text"
                                     className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                                     value={editingItem.title || ''}
@@ -290,8 +291,9 @@ export default function MediaMonitoringDashboard({
                                 />
                             </div>
                             <div>
-                                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Content</label>
+                                <label htmlFor="edit-content" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Content</label>
                                 <textarea
+                                    id="edit-content"
                                     className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground resize-y min-h-[150px]"
                                     value={editingItem.content || ''}
                                     onChange={(e) => setEditingItem({ ...editingItem, content: e.target.value })}
@@ -299,8 +301,9 @@ export default function MediaMonitoringDashboard({
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Source</label>
+                                    <label htmlFor="edit-source" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Source</label>
                                     <input
+                                        id="edit-source"
                                         type="text"
                                         className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                                         value={editingItem.source || ''}
@@ -308,8 +311,9 @@ export default function MediaMonitoringDashboard({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Sentiment</label>
+                                    <label htmlFor="edit-sentiment" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Sentiment</label>
                                     <select
+                                        id="edit-sentiment"
                                         className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                                         value={editingItem.sentiment || 'Neutral'}
                                         onChange={(e) => setEditingItem({ ...editingItem, sentiment: e.target.value })}

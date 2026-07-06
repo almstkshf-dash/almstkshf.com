@@ -2158,7 +2158,6 @@ export class ReportGenerator {
      * This method is kept as a no-op to avoid breaking call sites in initPDF /
      * generateMediaMonitoringPDF that still call it.
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private static overrideJsPDFText(doc: jsPDF) {
         if ((doc as any).__arabicOverridden) return;
         (doc as any).__arabicOverridden = true;

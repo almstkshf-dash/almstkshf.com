@@ -6,7 +6,6 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useTranslations } from 'next-intl';

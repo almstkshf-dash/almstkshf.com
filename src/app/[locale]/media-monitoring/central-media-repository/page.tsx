@@ -11,6 +11,8 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/../convex/_generated/api";
 import CentralMediaRepositoryClient from "@/components/CentralMediaRepositoryClient";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
     const isAr = locale === "ar";

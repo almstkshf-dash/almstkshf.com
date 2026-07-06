@@ -12,7 +12,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/../convex/_generated/api';
 import PricingClient from '@/components/PricingClient';
 
-export const revalidate = 86400; // Revalidate every 24 hours
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;

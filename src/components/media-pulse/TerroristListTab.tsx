@@ -293,7 +293,7 @@ export default function TerroristListTab() {
               row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 const header = headers[colNumber];
                 if (header) {
-                  let cellVal = cell.value;
+                  const cellVal = cell.value;
                   if (cellVal instanceof Date) {
                     rowData[header] = cellVal.toISOString().split('T')[0];
                   } else {
@@ -1044,8 +1044,9 @@ export default function TerroristListTab() {
               <form onSubmit={handleSaveRecord} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">Type</label>
+                    <label htmlFor="edit-record-type" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">Type</label>
                     <select
+                      id="edit-record-type"
                       value={editingRecord?.type || 'individual'}
                       onChange={(e) => setEditingRecord({ ...editingRecord, type: e.target.value as any })}
                       required
@@ -1057,8 +1058,9 @@ export default function TerroristListTab() {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.category')}</label>
+                    <label htmlFor="edit-record-category" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.category')}</label>
                     <input
+                      id="edit-record-category"
                       type="text"
                       value={editingRecord?.category || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, category: e.target.value })}
@@ -1067,8 +1069,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_arabic')}</label>
+                    <label htmlFor="edit-record-name-arabic" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_arabic')}</label>
                     <input
+                      id="edit-record-name-arabic"
                       type="text"
                       value={editingRecord?.nameArabic || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, nameArabic: e.target.value })}
@@ -1078,8 +1081,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_latin')}</label>
+                    <label htmlFor="edit-record-name-latin" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.name_latin')}</label>
                     <input
+                      id="edit-record-name-latin"
                       type="text"
                       value={editingRecord?.nameLatin || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, nameLatin: e.target.value })}
@@ -1088,8 +1092,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.nationality')}</label>
+                    <label htmlFor="edit-record-nationality" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.nationality')}</label>
                     <input
+                      id="edit-record-nationality"
                       type="text"
                       value={editingRecord?.nationality || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, nationality: e.target.value })}
@@ -1097,8 +1102,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.doc_number')}</label>
+                    <label htmlFor="edit-record-document-number" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.doc_number')}</label>
                     <input
+                      id="edit-record-document-number"
                       type="text"
                       value={editingRecord?.documentNumber || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, documentNumber: e.target.value })}
@@ -1106,8 +1112,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.dob')}</label>
+                    <label htmlFor="edit-record-dob" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.dob')}</label>
                     <input
+                      id="edit-record-dob"
                       type="text"
                       value={editingRecord?.dob || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, dob: e.target.value })}
@@ -1115,8 +1122,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.pob')}</label>
+                    <label htmlFor="edit-record-pob" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.pob')}</label>
                     <input
+                      id="edit-record-pob"
                       type="text"
                       value={editingRecord?.pob || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, pob: e.target.value })}
@@ -1124,8 +1132,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.address')}</label>
+                    <label htmlFor="edit-record-address" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.address')}</label>
                     <input
+                      id="edit-record-address"
                       type="text"
                       value={editingRecord?.address || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, address: e.target.value })}
@@ -1133,8 +1142,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issuing_authority')}</label>
+                    <label htmlFor="edit-record-issuing-authority" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issuing_authority')}</label>
                     <input
+                      id="edit-record-issuing-authority"
                       type="text"
                       value={editingRecord?.issuingAuthority || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, issuingAuthority: e.target.value })}
@@ -1142,8 +1152,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issue_date')}</label>
+                    <label htmlFor="edit-record-issue-date" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.issue_date')}</label>
                     <input
+                      id="edit-record-issue-date"
                       type="text"
                       value={editingRecord?.issueDate || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, issueDate: e.target.value })}
@@ -1151,8 +1162,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.expiry_date')}</label>
+                    <label htmlFor="edit-record-expiry-date" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.expiry_date')}</label>
                     <input
+                      id="edit-record-expiry-date"
                       type="text"
                       value={editingRecord?.expiryDate || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, expiryDate: e.target.value })}
@@ -1160,8 +1172,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.reasons')}</label>
+                    <label htmlFor="edit-record-reasons" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.reasons')}</label>
                     <textarea
+                      id="edit-record-reasons"
                       value={editingRecord?.reasons || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, reasons: e.target.value })}
                       rows={3}
@@ -1169,8 +1182,9 @@ export default function TerroristListTab() {
                     />
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.other_info')}</label>
+                    <label htmlFor="edit-record-other-info" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">{t('fields.other_info')}</label>
                     <textarea
+                      id="edit-record-other-info"
                       value={editingRecord?.otherInfo || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, otherInfo: e.target.value })}
                       rows={2}
@@ -1324,14 +1338,14 @@ export default function TerroristListTab() {
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70">اسم القائمة</label>
+                  <label htmlFor="collection-name-input" className="text-[11px] font-black uppercase tracking-widest text-foreground/70">اسم القائمة</label>
                   <input
+                    id="collection-name-input"
                     type="text"
                     value={collectionName}
                     onChange={(e) => setCollectionName(e.target.value)}
                     placeholder="مثال: قائمة الإرهاب المستهدفة 2026"
                     className="w-full px-4 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
-                    autoFocus
                   />
                 </div>
               </div>

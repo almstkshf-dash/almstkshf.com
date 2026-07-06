@@ -584,8 +584,9 @@ export default function DarkWebTab() {
             </div>
             <div className="p-4 flex flex-col gap-4">
               <div>
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
+                <label htmlFor="edit-darkweb-title" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Title</label>
                 <input
+                  id="edit-darkweb-title"
                   type="text"
                   className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground"
                   value={editingItem.title || ''}
@@ -593,8 +594,9 @@ export default function DarkWebTab() {
                 />
               </div>
               <div>
-                <label className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Snippet / Description</label>
+                <label htmlFor="edit-darkweb-snippet" className="text-[11px] font-black uppercase tracking-widest text-foreground/70 mb-1 block">Snippet / Description</label>
                 <textarea
+                  id="edit-darkweb-snippet"
                   className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none text-foreground resize-y min-h-[100px]"
                   value={editingItem.snippet || ''}
                   onChange={(e) => setEditingItem({ ...editingItem, snippet: e.target.value })}
