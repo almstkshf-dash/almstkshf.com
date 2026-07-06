@@ -156,7 +156,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
     selectedSentence !== null ? (result.sentences[selectedSentence] ?? null) : null;
 
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+    <div className="space-y-10 animate-slide-in-from-bottom duration-700">
 
       {/* â”€â”€ Row 1 : Score + 6 aggregate metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

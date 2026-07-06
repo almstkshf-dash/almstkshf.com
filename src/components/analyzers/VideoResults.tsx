@@ -146,7 +146,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
   const currentStats: FramePixelStats | undefined = currentFrame?.stats;
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+    <div className="space-y-12 animate-slide-in-from-bottom duration-700">
 
       {/* â”€â”€ Row 1 : Score + 4 aggregate metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -83,7 +83,7 @@ export default function OptimizedImage({
                 />
             ) : (
                 <div className="absolute inset-0 bg-muted flex flex-col items-center justify-center p-4 text-center border border-border/10 rounded-lg">
-                    <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center mb-2 border border-border/50 shadow-sm animate-in fade-in duration-300">
+                    <div className="w-12 h-12 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center mb-2 border border-border/50 shadow-sm animate-fade-in duration-300">
                         <ImageOff className="w-5 h-5 text-foreground/60" aria-hidden="true" />
                     </div>
                     <p className="text-[10px] text-foreground/70 uppercase tracking-widest font-bold px-1 line-clamp-2 leading-normal">

@@ -10,6 +10,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import { cn } from '@/utils/cn';
 
 export const metadata: Metadata = {
     robots: {
@@ -23,6 +24,46 @@ export const metadata: Metadata = {
         },
     },
 };
+
+/**
+ * SidebarSkeleton
+ * ───────────────
+ * Responsive skeleton loader for the dashboard sidebar.
+ * Prevents Cumulative Layout Shift (CLS) by mirroring the sidebar layout.
+ */
+function SidebarSkeleton() {
+    return (
+        <>
+            {/* Desktop Skeleton (lg+) */}
+            <div className="hidden lg:flex flex-col fixed top-0 bottom-0 z-50 w-60 ltr:left-0 rtl:right-0 bg-background/95 backdrop-blur-xl border-border/60 ltr:border-r rtl:border-l pt-20 pb-6 px-4">
+                <div className="flex flex-col gap-4 flex-1">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="w-full h-11 rounded-2xl bg-muted/40 animate-pulse" />
+                    ))}
+                </div>
+                <div className="my-4 h-px bg-border/40" />
+                <div className="w-full h-11 rounded-2xl bg-muted/40 animate-pulse" />
+                <div className="mt-4 p-3 rounded-2xl bg-muted/20 border border-border/40 h-16 animate-pulse" />
+            </div>
+
+            {/* Tablet Skeleton (md to lg) */}
+            <div className="hidden md:flex lg:hidden flex-col items-center gap-4 fixed top-0 bottom-0 z-50 w-16 ltr:left-0 rtl:right-0 bg-background/95 backdrop-blur-xl ltr:border-r rtl:border-l border-border/60 pt-20 pb-6">
+                {[...Array(6)].map((_, i) => (
+                    <div key={i} className="w-10 h-10 rounded-2xl bg-muted/40 animate-pulse" />
+                ))}
+                <div className="my-2 w-8 h-px bg-border/40" />
+                <div className="w-10 h-10 rounded-2xl bg-muted/40 animate-pulse" />
+            </div>
+
+            {/* Mobile Skeleton (< md) */}
+            <div className="md:hidden fixed bottom-0 inset-x-0 z-50 h-16 bg-background/95 backdrop-blur-xl border-t border-border/60 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] flex items-center justify-around px-4">
+                {[...Array(7)].map((_, i) => (
+                    <div key={i} className="w-10 h-10 rounded-xl bg-muted/40 animate-pulse" />
+                ))}
+            </div>
+        </>
+    );
+}
 
 /**
  * DashboardLayout
@@ -42,49 +83,50 @@ export const metadata: Metadata = {
  */
 export default function DashboardLayout({
     children,
-}: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="min-h-screen bg-background/50 text-foreground relative overflow-hidden">
-            {/* Ambient background glows */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse [animation-delay:2s]" />
-            </div>
+    }: {
+        children: React.ReactNode;
+    }) {
+        return (
+            <div className="min-h-screen bg-background/50 text-foreground relative overflow-hidden">
+                {/* Ambient background glows with GPU acceleration */}
+                <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse transform-gpu will-change-[transform,opacity]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse [animation-delay:2s] transform-gpu will-change-[transform,opacity]" />
+                </div>
 
-            {/* Sidebar — needs Suspense because it uses useSearchParams() */}
-            <Suspense fallback={null}>
-                <DashboardSidebar />
-            </Suspense>
-
-            {/*
-             * Main content area
-             * ltr:pl-0 → ltr:pl-16 (lg) → ltr:pl-60 (xl)
-             * rtl mirrors via ltr:/rtl: variants
-             * pb-20 on mobile reserves space for the bottom nav bar
-             */}
-            <main
-                className={[
-                    'min-h-screen',
-                    // LTR offsets
-                    'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
-                    // RTL offsets (sidebar is on the right)
-                    'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
-                    // Bottom space for mobile nav bar
-                    'pb-20 md:pb-0',
-                ].join(' ')}
-            >
-                <Suspense
-                    fallback={
-                        <div className="flex h-[80vh] items-center justify-center">
-                            <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                        </div>
-                    }
-                >
-                    {children}
+                {/* Sidebar — needs Suspense because it uses useSearchParams() */}
+                <Suspense fallback={<SidebarSkeleton />}>
+                    <DashboardSidebar />
                 </Suspense>
-            </main>
-        </div>
-    );
-}
+
+                {/*
+                 * Main content area
+                 * ltr:pl-0 → ltr:pl-16 (lg) → ltr:pl-60 (xl)
+                 * rtl mirrors via ltr:/rtl: variants
+                 * pb-20 on mobile reserves space for the bottom nav bar
+                 */}
+                <main
+                    className={cn(
+                        'min-h-screen',
+                        // LTR offsets
+                        'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
+                        // RTL offsets (sidebar is on the right)
+                        'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
+                        // Bottom space for mobile nav bar
+                        'pb-20 md:pb-0'
+                    )}
+                >
+                    <Suspense
+                        fallback={
+                            <div className="flex h-[80vh] items-center justify-center">
+                                <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                            </div>
+                        }
+                    >
+                        {children}
+                    </Suspense>
+                </main>
+            </div>
+        );
+    }
+

@@ -33,25 +33,31 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function CrisisManagementPage() {
-    let initialReports = undefined;
-    let initialSettings = undefined;
-    let initialCrisisPlans = undefined;
+    let initialReports: any[] = [];
+    let initialSettings: any = {};
+    let initialCrisisPlans: any[] = [];
 
     try {
-        initialReports = await fetchQuery(api.queries.getMediaReports, { source: "All" });
-        initialSettings = await fetchQuery(api.settings.getSettings, {});
-        initialCrisisPlans = await fetchQuery(api.queries.getCrisisPlans, {});
+        const [reports, settings, crisisPlans] = await Promise.all([
+            fetchQuery(api.queries.getMediaReports, { source: "All" }),
+            fetchQuery(api.settings.getSettings, {}),
+            fetchQuery(api.queries.getCrisisPlans, {})
+        ]);
+        initialReports = reports ?? [];
+        initialSettings = settings ?? {};
+        initialCrisisPlans = crisisPlans ?? [];
     } catch (err) {
         console.error("Error pre-fetching CrisisManagement data on server:", err);
+        initialReports = [];
+        initialSettings = {};
+        initialCrisisPlans = [];
     }
 
     return (
-        <div className="pt-24 min-h-screen bg-slate-950">
-            <CrisisManagementClient 
-                initialReports={initialReports}
-                initialSettings={initialSettings}
-                initialCrisisPlans={initialCrisisPlans}
-            />
-        </div>
+        <CrisisManagementClient 
+            initialReports={initialReports}
+            initialSettings={initialSettings}
+            initialCrisisPlans={initialCrisisPlans}
+        />
     );
 }

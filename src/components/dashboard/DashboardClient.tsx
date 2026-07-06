@@ -390,11 +390,10 @@ export default function DashboardClient() {
     const articleListBody = (
         <div className="bg-background/30 backdrop-blur-md">
             {(filteredArticles.length > 0 || isArticlesLoading) ? (
-                <div className="animate-in fade-in duration-1000">
+                <div className="animate-fade-in duration-1000">
                     <ArticleTable
                         articles={filteredArticles}
                         isLoading={isArticlesLoading}
-                        limit={50}
                         onEditClick={(article) => {
                             setEditingArticle(article);
                             setManualModalOpen(true);
@@ -682,7 +681,7 @@ export default function DashboardClient() {
                     <div
                         role="status"
                         className={clsx(
-                            'fixed bottom-8 ltr:right-8 rtl:left-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-5 duration-500 border flex items-center gap-4 transition-all',
+                            'fixed bottom-8 ltr:right-8 rtl:left-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-slide-in-from-bottom duration-500 border flex items-center gap-4 transition-all',
                             tst.type === 'success'
                                 ? 'bg-status-success-bg/90 text-status-success-fg border-status-success-fg/20'
                                 : 'bg-status-error-bg/90 text-status-error-fg border-status-error-fg/20'

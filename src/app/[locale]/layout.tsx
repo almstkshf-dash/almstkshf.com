@@ -9,11 +9,12 @@
 import type { Metadata } from "next";
 import { Cairo, Inter } from "next/font/google";
 import "../globals.css";
-import { routing } from '@/i18n/config';
+import { routing, Locale } from '@/i18n/config';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
 import Navbar from '@/components/Navbar';
+import CompanySchema from '@/components/CompanySchema';
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -151,28 +152,36 @@ export default async function RootLayout({
 
     // Validate that the incoming `locale` parameter is valid
      
-    if (!routing.locales.includes(locale as any)) {
+    if (!routing.locales.includes(locale as Locale)) {
         notFound();
     }
 
     setRequestLocale(locale);
     const messages = await getMessages();
     const dir = locale === "ar" ? "rtl" : "ltr";
+    const fontClass = locale === "ar" ? cairo.variable : `${cairo.variable} ${inter.variable}`;
 
     return (
         <html lang={locale} dir={dir} className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
             <head>
-                <link rel="preconnect" href="https://clerk.com" />
-                <link rel="preconnect" href="https://img.clerk.com" />
+                {/* 1. Theme and Transition scripts at the absolute top of the head to prevent visual flicker */}
+                <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} />
+                <script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} />
+
+                {/* 2. Preconnect hints */}
+                {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
+                    <>
+                        <link rel="preconnect" href="https://clerk.com" />
+                        <link rel="preconnect" href="https://img.clerk.com" />
+                    </>
+                )}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 {process.env.NEXT_PUBLIC_CONVEX_URL && (
                     <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />
                 )}
-                <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} />
-                <script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} />
             </head>
-            <body className={`${cairo.variable} ${inter.variable} antialiased font-sans bg-background text-foreground`}>
+            <body className={`${fontClass} antialiased font-sans bg-background text-foreground`}>
                 <RootProviders locale={locale} messages={messages}>
                     <Suspense fallback={<div className="h-16 w-full bg-background border-b border-border" />}>
                         <Navbar />
@@ -184,82 +193,8 @@ export default async function RootLayout({
                     <Analytics />
                     <SpeedInsights />
                 </RootProviders>
-                <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-                __html: JSON.stringify([
-                    {
-                        "@context": "https://schema.org",
-                        "@type": "Organization",
-                        "@id": "https://www.almstkshf.com/#organization",
-                        "name": "ALMSTKSHF",
-                        "url": "https://www.almstkshf.com",
-                        "logo": {
-                            "@type": "ImageObject",
-                            "url": "https://www.almstkshf.com/logo.png",
-                            "width": 1200,
-                            "height": 630
-                        },
-                        "sameAs": [
-                            "https://twitter.com/almstkshf",
-                            "https://linkedin.com/company/almstkshf",
-                            "https://facebook.com/almstkshf"
-                        ],
-                        "contactPoint": {
-                            "@type": "ContactPoint",
-                            "telephone": "+971-58-59-52-035",
-                            "contactType": "customer service",
-                            "areaServed": ["AE", "SA"],
-                            "availableLanguage": ["Arabic", "English"]
-                        }
-                    },
-                    {
-                        "@context": "https://schema.org",
-                        "@type": "WebSite",
-                        "@id": "https://www.almstkshf.com/#website",
-                        "url": "https://www.almstkshf.com",
-                        "name": "ALMSTKSHF",
-                        "publisher": { "@id": "https://www.almstkshf.com/#organization" },
-                        "potentialAction": {
-                            "@type": "SearchAction",
-                            "target": "https://www.almstkshf.com/search?q={search_term_string}",
-                            "query-input": "required name=search_term_string"
-                        }
-                    },
-                    {
-                        "@context": "https://schema.org",
-                        "@type": "LocalBusiness",
-                        "name": "ALMSTKSHF Dubai",
-                        "image": "https://www.almstkshf.com/logo.png",
-                        "@id": "https://www.almstkshf.com/dubai",
-                        "url": "https://www.almstkshf.com",
-                        "telephone": "+971-58-59-52-035",
-                        "address": {
-                            "@type": "PostalAddress",
-                            "streetAddress": "One Central 9th Floor - Trade Center",
-                            "addressLocality": "Dubai",
-                            "addressCountry": "AE"
-                        },
-                        "geo": {
-                            "@type": "GeoCoordinates",
-                            "latitude": 25.2267,
-                            "longitude": 55.2831
-                        }
-                    },
-                    {
-                        "@context": "https://schema.org",
-                        "@type": "Person",
-                        "name": "Tamer Younes",
-                        "jobTitle": "Founder",
-                        "affiliation": { "@id": "https://www.almstkshf.com/#organization" },
-                        "sameAs": [
-                            "https://linkedin.com/in/tameryounes"
-                        ]
-                    }
-                ])
-            }}
-        />
-        </body>
+                <CompanySchema />
+            </body>
         </html>
     );
 }

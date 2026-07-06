@@ -1,6 +1,6 @@
 # System Architecture — almstkshf.com
 
-> **Last updated:** April 2026  
+> **Last updated:** July 2026  
 > **Stack:** Next.js 15 · Convex · Clerk · Stripe · next-intl · Tailwind CSS v4 · Google Gemini · Chatbase · Resend · Upstash Redis
 
 ---
@@ -74,10 +74,10 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
   /press                       → Press publication monitoring
   /central-media-repository    → Digital asset library
   /media-pulse                 → Analytics detail page
+  /crisis-management           → Crisis management plans
 /[locale]/technical-solutions/ → KYC, API Integration hub pages
   /kyc-compliance              → KYC verification UI
   /integration-hub             → API integration docs
-  /crisis-management           → Crisis management plans
 /[locale]/behind-the-scene     → Team page
 /[locale]/privacy              → Privacy policy
 /[locale]/terms                → Terms of service
@@ -159,7 +159,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `StylingAssistantClient.tsx` | `/case-studies/styling-assistant` | VA showcase + waitlist |
 | `SmartMediaAssistantClient.tsx` | Media monitoring pages | Smart assistant embed |
 | `RssFeeder.tsx` | Dashboard (Live Feed) | Premium RSS monitor with modal details and direct ingestion |
-| `CrisisManagementClient.tsx` | `/technical-solutions/crisis-management` | Crisis plan cards |
+| `CrisisManagementClient.tsx` | `/media-monitoring/crisis-management` | Crisis plan cards |
 | `KYCVerification.tsx` | `/technical-solutions/kyc-compliance` | KYC upload UI |
 | `IntegrationHub.tsx` | `/technical-solutions/integration-hub` | API integration docs |
 | `ChatbaseWidget.tsx` | Layout | Embedded Chatbase chatbot |
@@ -321,6 +321,7 @@ To secure endpoints from Denial of Service (DoS) and Server-Side Request Forgery
 6. **Deep web & OSINT** — these run as Convex `action` (Node.js runtime), not queries/mutations.
 7. **Chart color resolution** — do NOT use `hsl(var(--token))` in Recharts or SVG attributes. CSS variables in this project store hex values (e.g. `#2563EB`), so `hsl(#hex)` is invalid. Always call `getComputedStyle(document.documentElement).getPropertyValue('--token').trim()` at component mount time and pass the resolved string to chart props. Status tokens (`--status-success`, etc.) store bare HSL components (e.g. `158 64% 52%`) and must be wrapped: `` `hsl(${resolvedValue})` ``.
 8. **Button system in `dashboard/page.tsx`** — this file uses native `<button>` elements exclusively (the `Button` component import was removed). All buttons share `h-9` height, `text-xs font-semibold`, `rounded-lg`, and `border border-border`. Do not re-introduce the `Button` component import; maintain the native system for consistency.
+9. **Layout & Speed Optimizations** — Static JSON-LD schemas are isolated in [CompanySchema.tsx](file:///c:/projects/almstkshf.com/src/components/CompanySchema.tsx) for general branding. Page-specific official document schemas (like the Privacy page) leverage structured JSON-LD `AboutPage` data injected locally in the page component. To optimize page performance, static pages (such as the Privacy page) are fully compiled statically during build time via `generateStaticParams()` and utilize Incremental Static Regeneration (ISR) with `export const revalidate = 86400; // 24 hours` to minimize TTFB and server-side CPU utilization. Inside the root layout, inline dark-mode transition scripts are placed at the absolute top of `<head>` to prevent light-theme visual flicker before painting. Inter font variables are applied to the body class conditionally depending on the active locale to prevent unused font fetches. Preconnect links to third-party domains (like Clerk) are checked against their respective environment variables before rendering.
 
 ---
 

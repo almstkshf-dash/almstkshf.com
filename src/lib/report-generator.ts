@@ -344,9 +344,9 @@ export class ReportGenerator {
     ) {
         const { doc, pageWidth, pageHeight, fontLoaded, logoBase64 } = await this.initPDF(translations.logo_url);
 
-        // Pre-load images to base64 using local CORS-bypassing proxy
-        const articlesWithImages = await Promise.all(articles.slice(0, 50).map(async (a) => {
-            if (!a.imageUrl) return a;
+        // Pre-load images to base64 using local CORS-bypassing proxy (limit image loading to top 50 to prevent memory crashes)
+        const articlesWithImages = await Promise.all(articles.map(async (a, idx) => {
+            if (idx >= 50 || !a.imageUrl) return a;
             // If it's already base64, keep it
             if (a.imageUrl.startsWith('data:')) return a;
 

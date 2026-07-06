@@ -213,7 +213,7 @@ const ArticleRow = memo(({
                     </button>
 
                     {/* Simple Sentiment Dropdown */}
-                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-zoom-in-95 duration-200">
                         {(['Positive', 'Neutral', 'Negative'] as const).map((s) => (
                             <button
                                 key={s}
@@ -400,7 +400,7 @@ const ArticleRowSkeleton = () => {
 const ArticleTable = memo(function ArticleTable({
     articles,
     isLoading,
-    limit = 50,
+    limit,
     onEditClick
 }: {
     articles: MonitoringArticle[],
@@ -439,7 +439,10 @@ const ArticleTable = memo(function ArticleTable({
         data: article as unknown as Record<string, unknown>
     }), []);
 
-    const displayedArticles = useMemo(() => (articles ?? []).slice(0, limit), [articles, limit]);
+    const displayedArticles = useMemo(() => {
+        if (limit === undefined) return articles ?? [];
+        return (articles ?? []).slice(0, limit);
+    }, [articles, limit]);
 
     const toggleSelectAll = useCallback(() => {
         if (selectedIds.size === displayedArticles.length) {
@@ -550,7 +553,7 @@ const ArticleTable = memo(function ArticleTable({
         <div className="space-y-4">
             {/* Batch Actions Bar */}
             {selectedIds.size > 0 && (
-                <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border-y border-primary/20 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border-y border-primary/20 backdrop-blur-md animate-slide-in-from-top duration-300">
                     <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-blue-800 dark:text-blue-300">
                             {t('items_selected', { count: selectedIds.size })}

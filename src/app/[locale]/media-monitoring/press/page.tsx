@@ -10,17 +10,16 @@ import { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/../convex/_generated/api";
 import PressClient from "@/components/PressClient";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
-    const isAr = locale === "ar";
+    const t = await getTranslations({ locale, namespace: 'PressPage' });
     return {
-        title: isAr ? "رصد الصحافة والمطبوعات | المستكشف" : "Press & Publication Monitoring | ALMSTKSHF",
-        description: isAr
-            ? "رصد شامل للصحف والمجلات والبوابات الإخبارية الرقمية والمطبوعة."
-            : "Comprehensive monitoring of newspapers, magazines, and digital news portals.",
+        title: t('title'),
+        description: t('description'),
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/media-monitoring/press`,
             languages: {
@@ -33,16 +32,24 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function PressPage() {
-    let initialReports = undefined;
-    let initialSettings = undefined;
-    let initialCrisisPlans = undefined;
+    let initialReports: any = [];
+    let initialSettings: any = {};
+    let initialCrisisPlans: any = [];
 
     try {
-        initialReports = await fetchQuery(api.queries.getMediaReports, { source: "Press Release" });
-        initialSettings = await fetchQuery(api.settings.getSettings, {});
-        initialCrisisPlans = await fetchQuery(api.queries.getCrisisPlans, {});
+        const [reports, settings, crisisPlans] = await Promise.all([
+            fetchQuery(api.queries.getMediaReports, { source: "Press Release" }),
+            fetchQuery(api.settings.getSettings, {}),
+            fetchQuery(api.queries.getCrisisPlans, {})
+        ]);
+        initialReports = reports ?? [];
+        initialSettings = settings ?? {};
+        initialCrisisPlans = crisisPlans ?? [];
     } catch (err) {
         console.error("Error pre-fetching Press data on server:", err);
+        initialReports = [];
+        initialSettings = {};
+        initialCrisisPlans = [];
     }
 
     return (

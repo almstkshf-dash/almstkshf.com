@@ -187,7 +187,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
     return (
         <div 
             role="presentation"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
             onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         >
@@ -197,7 +197,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                 aria-modal="true"
                 aria-labelledby="collection-modal-title"
                 tabIndex={-1}
-                className="bg-card w-full max-w-2xl rounded-[2rem] border border-border overflow-hidden shadow-2xl relative flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200"
+                className="bg-card w-full max-w-2xl rounded-[2rem] border border-border overflow-hidden shadow-2xl relative flex flex-col max-h-[85vh] animate-zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
             >
@@ -262,7 +262,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                             </Button>
                             
                             {confirmDelete ? (
-                                <div className="flex gap-1 animate-in fade-in">
+                                <div className="flex gap-1 animate-fade-in">
                                     <Button 
                                         variant="outline" 
                                         size="sm" 

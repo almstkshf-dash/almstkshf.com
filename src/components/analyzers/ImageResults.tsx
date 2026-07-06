@@ -86,7 +86,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
     : [];
 
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
+    <div className="space-y-10 animate-slide-in-from-bottom duration-700">
 
       {/* â”€â”€ Top row: Score + (if rich) verdict â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

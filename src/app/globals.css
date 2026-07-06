@@ -79,6 +79,13 @@
   --animate-fade-in-up: fade-in-up 0.5s ease-out forwards;
   --animate-blob: blob 7s infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-fade-in: fadeIn 200ms ease-out forwards;
+  --animate-slide-in-from-top: slideInFromTop 200ms ease-out forwards;
+  --animate-slide-in-from-bottom: slideInFromBottom 200ms ease-out forwards;
+  --animate-slide-in-from-left: slideInFromLeft 200ms ease-out forwards;
+  --animate-slide-in-from-right: slideInFromRight 200ms ease-out forwards;
+  --animate-slide-in-from-end: slideInFromRight 200ms ease-out forwards;
+  --animate-zoom-in-95: zoomIn 200ms ease-out forwards;
 
   @keyframes accordion-down {
     from {
@@ -127,6 +134,70 @@
 
     100% {
       transform: translate(0, 0) scale(1)
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 }
@@ -376,8 +447,6 @@
     color: var(--foreground);
     @apply antialiased;
     text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -483,7 +552,8 @@
 html[lang="ar"], 
 [dir="rtl"] {
   --font-sans: var(--font-sans-ar);
-  font-family: var(--font-cairo), 'Cairo', sans-serif !important;
+  font-family: var(--font-sans-ar);
+  --animate-slide-in-from-end: slideInFromLeft 200ms ease-out forwards;
 }
 
 html[lang="en"], 
@@ -492,7 +562,6 @@ html[lang="en"],
 }
 
 [dir="rtl"] * {
-  font-family: var(--font-cairo), 'Cairo', sans-serif !important;
   letter-spacing: 0;     /* Arabic script ignores letter-spacing */
   text-transform: none;  /* No uppercase/lowercase in Arabic */
 }
@@ -607,8 +676,6 @@ html[lang="en"],
 .font-sans-ar {
   font-family: var(--font-sans-ar);
   font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -638,86 +705,7 @@ svg.lucide-moon {
   padding-inline-end: 3rem;      /* room for an end-side action button  */
 }
 
-/* ─── Navbar dropdown animations ────────────────────────────────────────── */
-.animate-in {
-  animation-duration: 200ms;
-  animation-fill-mode: forwards;
-}
 
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.slide-in-from-top-2 {
-  --tw-translate-y: -0.5rem;
-  animation-name: slideInFromTop;
-}
-
-.slide-in-from-right {
-  --tw-translate-x: 1rem;
-  animation-name: slideInFromRight;
-}
-
-.slide-in-from-left {
-  --tw-translate-x: -1rem;
-  animation-name: slideInFromLeft;
-}
-
-[dir="rtl"] .slide-in-from-end {
-  --tw-translate-x: -1rem;
-  animation-name: slideInFromLeft;
-}
-
-[dir="ltr"] .slide-in-from-end {
-  --tw-translate-x: 1rem;
-  animation-name: slideInFromRight;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0
-  }
-
-  to {
-    opacity: 1
-  }
-}
-
-@keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-0.5rem)
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0)
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(1rem)
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0)
-  }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-1rem)
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0)
-  }
-}
 
 /* ─── Scrollbar utilities ───────────────────────────────────────────────── */
 .scrollbar-thin {

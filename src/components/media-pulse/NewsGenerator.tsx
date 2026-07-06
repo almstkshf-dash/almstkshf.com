@@ -241,7 +241,7 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                     </div>
 
                     {optimizationInfo && (
-                        <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-slide-in-from-top duration-300">
                             <Sparkles className="w-4 h-4 text-primary mt-0.5" aria-hidden="true" />
                             <div className="flex-1">
                                 <p className="text-[11px] font-bold text-primary uppercase tracking-tight">
@@ -369,13 +369,13 @@ export default function NewsGenerator({ defaultSourceType }: { defaultSourceType
                 <div className="pt-4 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex-1">
                         {errorMsg && (
-                            <div className="text-destructive text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
+                            <div className="text-destructive text-xs flex items-center gap-2 animate-slide-in-from-left transition-all">
                                 <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
                                 {errorMsg}
                             </div>
                         )}
                         {result && (
-                            <div className="text-emerald-500 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-left-2 transition-all">
+                            <div className="text-emerald-500 text-xs flex items-center gap-2 animate-slide-in-from-left transition-all">
                                 <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                                 {t('result_success', { count: result.count ?? 0, skipped: result.skipped ?? 0, feeds: result.feeds ?? 0 })}
                             </div>

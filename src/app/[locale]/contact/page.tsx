@@ -9,8 +9,58 @@
 import { useTranslations } from "next-intl";
 import Container from "@/components/ui/Container";
 import ContactForm from "@/components/ContactForm";
-import { Mail, Phone, MapPin, Globe } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import { Metadata } from "next";
+import dynamic from "next/dynamic";
+
+const InteractiveMap = dynamic(() => import("@/components/InteractiveMap"), {
+    loading: () => (
+        <div className="aspect-video w-full rounded-3xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center p-8 text-center gap-4 overflow-hidden relative group">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent opacity-50"></div>
+            <MapPin className="w-8 h-8 text-slate-700 animate-pulse" />
+            <div className="h-4 w-24 bg-slate-800 rounded animate-pulse"></div>
+        </div>
+    )
+});
+
+const CONTACT_CHANNELS = [
+    {
+        icon: MapPin,
+        labelKey: "channels.dubai_office_label",
+        valueKey: "channels.dubai_office_value",
+        color: "text-blue-400"
+    },
+    {
+        icon: MapPin,
+        labelKey: "channels.abudhabi_office_label",
+        valueKey: "channels.abudhabi_office_value",
+        color: "text-indigo-400"
+    },
+    {
+        icon: Phone,
+        labelKey: "channels.general_support_label",
+        value: "+971 58 59 52 035",
+        color: "text-emerald-400"
+    },
+    {
+        icon: Phone,
+        labelKey: "channels.lexcora_sales_label",
+        value: "+971 58 59 55 893",
+        color: "text-amber-400"
+    },
+    {
+        icon: Mail,
+        labelKey: "channels.accounts_sales_label",
+        value: "k.account@almstkshf.com",
+        color: "text-cyan-400"
+    },
+    {
+        icon: Mail,
+        labelKey: "channels.tech_support_label",
+        value: "rased@almstkshf.com",
+        color: "text-rose-400"
+    }
+] as const;
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -50,62 +100,25 @@ export default function ContactPage() {
                         </div>
 
                         <div className="grid grid-cols-1 gap-6">
-                            {[
-                                {
-                                    icon: MapPin,
-                                    label: "Head Office (Dubai)",
-                                    value: "One Central 9th Floor - Trade Center, Dubai, UAE",
-                                    color: "text-blue-400"
-                                },
-                                {
-                                    icon: MapPin,
-                                    label: "Abu Dhabi Office",
-                                    value: "16th Al Khatem Tower, Al Maryah Island, Abu Dhabi Global Market Square",
-                                    color: "text-indigo-400"
-                                },
-                                {
-                                    icon: Phone,
-                                    label: "General & Support",
-                                    value: "+971 58 59 52 035",
-                                    color: "text-emerald-400"
-                                },
-                                {
-                                    icon: Phone,
-                                    label: "LEXCORA Sales",
-                                    value: "+971 58 59 55 893",
-                                    color: "text-amber-400"
-                                },
-                                {
-                                    icon: Mail,
-                                    label: "Accounts & Sales",
-                                    value: "k.account@almstkshf.com",
-                                    color: "text-cyan-400"
-                                },
-                                {
-                                    icon: Mail,
-                                    label: "Technical Support",
-                                    value: "rased@almstkshf.com",
-                                    color: "text-rose-400"
-                                },
-                            ].map((item, idx) => (
+                            {CONTACT_CHANNELS.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-5 group">
                                     <div className={`w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center transition-all group-hover:border-slate-600 ${item.color}`}>
                                         <item.icon className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{item.label}</p>
-                                        <p className="text-white font-medium text-sm">{item.value}</p>
+                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                            {t(item.labelKey)}
+                                        </p>
+                                        <p className="text-white font-medium text-sm">
+                                            {"value" in item ? item.value : t(item.valueKey)}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Location Preview Placeholder */}
-                        <div className="aspect-video w-full rounded-3xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center p-8 text-center gap-4 overflow-hidden relative group">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent opacity-50"></div>
-                            <MapPin className="w-8 h-8 text-slate-700 mb-2 group-hover:text-blue-500 transition-colors" />
-                            <h4 className="text-slate-500 font-bold uppercase tracking-widest text-xs relative z-10">Our Locations</h4>
-                        </div>
+                        {/* Lazy Loaded Interactive Map */}
+                        <InteractiveMap />
                     </div>
 
                     {/* Form Side */}

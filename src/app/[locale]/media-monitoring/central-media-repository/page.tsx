@@ -11,8 +11,6 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/../convex/_generated/api";
 import CentralMediaRepositoryClient from "@/components/CentralMediaRepositoryClient";
 
-export const dynamic = 'force-dynamic';
-
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
     const isAr = locale === "ar";
@@ -33,14 +31,20 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function CentralMediaRepositoryPage() {
-    let initialCollections = undefined;
-    let initialSettings = undefined;
+    let initialCollections: any[] = [];
+    let initialSettings: any = {};
 
     try {
-        initialCollections = await fetchQuery(api.collections.getCollections, {});
-        initialSettings = await fetchQuery(api.settings.getSettings, {});
+        const [collections, settings] = await Promise.all([
+            fetchQuery(api.collections.getCollections, {}),
+            fetchQuery(api.settings.getSettings, {})
+        ]);
+        initialCollections = collections ?? [];
+        initialSettings = settings ?? {};
     } catch (err) {
         console.error("Error pre-fetching CentralMediaRepository data on server:", err);
+        initialCollections = [];
+        initialSettings = {};
     }
 
     return (

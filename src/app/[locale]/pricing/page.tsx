@@ -8,7 +8,11 @@
 
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { fetchQuery } from 'convex/nextjs';
+import { api } from '@/../convex/_generated/api';
 import PricingClient from '@/components/PricingClient';
+
+export const revalidate = 86400; // Revalidate every 24 hours
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -27,6 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function PricingPage() {
-    return <PricingClient />;
+export default async function PricingPage() {
+    let initialPlans = null;
+    try {
+        initialPlans = await fetchQuery(api.queries.getPlans, {});
+    } catch (err) {
+        console.error("Error pre-fetching pricing plans on server:", err);
+    }
+    return <PricingClient initialPlans={initialPlans ?? undefined} />;
 }
+

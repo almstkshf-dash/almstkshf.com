@@ -7,8 +7,15 @@
  */
 
 import { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Container from '@/components/ui/Container';
+import { routing } from '@/i18n/config';
+
+export const revalidate = 86400; // Revalidate every 24 hours (ISR)
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -29,10 +36,30 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function PrivacyPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
+    setRequestLocale(locale);
     const t = await getTranslations({ locale, namespace: 'Legal.Privacy' });
+
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        '@id': `https://www.almstkshf.com/${locale}/privacy/#aboutpage`,
+        url: `https://www.almstkshf.com/${locale}/privacy`,
+        name: t('title'),
+        description: t('intro'),
+        publisher: {
+            '@type': 'Organization',
+            name: locale === 'ar' ? 'المستكشف' : 'ALMSTKSHF',
+            url: `https://www.almstkshf.com/${locale}`,
+        },
+        inLanguage: locale,
+    };
 
     return (
         <main className="bg-background min-h-screen py-20 text-foreground">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <Container>
                 <div className="max-w-3xl mx-auto space-y-12">
                     {/* Header */}
@@ -63,7 +90,7 @@ function Section({ title, content }: { title: string; content: string }) {
     return (
         <section className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors">
             <h2 className="text-xl font-semibold text-foreground mb-4">{title}</h2>
-            <p className="leading-relaxed text-muted-foreground">{content}</p>
+            <p className="leading-relaxed text-muted-foreground whitespace-pre-line">{content}</p>
         </section>
     );
 }

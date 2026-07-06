@@ -471,7 +471,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     </div>
 
                     {formData.sourceType === 'Social Media' && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="animate-slide-in-from-top duration-300">
                             <label htmlFor="publisher_username" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">
                                 {t('publisher_username')}
                             </label>

@@ -8,7 +8,11 @@
 
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { fetchQuery } from 'convex/nextjs';
+import { api } from '@/../convex/_generated/api';
 import IntegrationClient from '@/components/IntegrationClient';
+
+export const revalidate = 86400; // Revalidate every 24 hours
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
@@ -27,6 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     };
 }
 
-export default function IntegrationPage() {
-    return <IntegrationClient />;
+export default async function IntegrationPage() {
+    let initialIntegrations = null;
+    try {
+        initialIntegrations = await fetchQuery(api.integrations.getAvailable, {});
+    } catch (err) {
+        console.error("Error pre-fetching available integrations on server:", err);
+    }
+    return <IntegrationClient initialIntegrations={initialIntegrations ?? undefined} />;
 }

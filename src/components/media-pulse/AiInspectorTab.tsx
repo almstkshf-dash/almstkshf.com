@@ -227,7 +227,7 @@ export default function AiInspectorTab() {
   };
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20">
+    <div className="space-y-12 animate-slide-in-from-bottom duration-700 pb-20">
 
       {/* Header Info Banner */}
       <section className="glass-card p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10 relative overflow-hidden group">

@@ -122,7 +122,7 @@ export default function ContactForm() {
                             errors.name ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
                         )}
                     />
-                    {errors.name && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.name}</p>}
+                    {errors.name && <p className="text-xs font-bold text-rose-500 px-1 animate-slide-in-from-top">{errors.name}</p>}
                 </div>
                 <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-bold text-foreground/60 uppercase tracking-widest px-1">
@@ -141,7 +141,7 @@ export default function ContactForm() {
                             errors.email ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
                         )}
                     />
-                    {errors.email && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.email}</p>}
+                    {errors.email && <p className="text-xs font-bold text-rose-500 px-1 animate-slide-in-from-top">{errors.email}</p>}
                 </div>
             </div>
 
@@ -162,7 +162,7 @@ export default function ContactForm() {
                         errors.subject ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
                     )}
                 />
-                {errors.subject && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.subject}</p>}
+                {errors.subject && <p className="text-xs font-bold text-rose-500 px-1 animate-slide-in-from-top">{errors.subject}</p>}
             </div>
 
             <div className="space-y-2">
@@ -182,11 +182,11 @@ export default function ContactForm() {
                         errors.message ? "border-rose-500 ring-1 ring-rose-500/20" : "border-border focus:border-primary"
                     )}
                 />
-                {errors.message && <p className="text-xs font-bold text-rose-500 px-1 animate-in fade-in slide-in-from-top-1">{errors.message}</p>}
+                {errors.message && <p className="text-xs font-bold text-rose-500 px-1 animate-slide-in-from-top">{errors.message}</p>}
             </div>
 
             {status === "error" && (
-                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-500 text-sm animate-in zoom-in-95 duration-200">
+                <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center gap-3 text-rose-500 text-sm animate-zoom-in-95 duration-200">
                     <AlertCircle className="w-5 h-5" />
                     {t("error")}
                 </div>

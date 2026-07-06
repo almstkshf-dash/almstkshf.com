@@ -160,7 +160,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
         /* Overlay â€” no ARIA role, purely visual */
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-in fade-in"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-fade-in"
             onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}
         >
             {/* Dialog panel â€” where role/aria-modal/aria-labelledby live (WAI-ARIA APG) */}
@@ -208,7 +208,7 @@ export default function SaveToCollectionModal({ isOpen, onClose, item, items }: 
                                 </div>
                             )}
                             {isCreating ? (
-                                <div className="space-y-4 animate-in slide-in-from-end">
+                                <div className="space-y-4 animate-slide-in-from-end">
                                     <div className="space-y-2">
                                         <label htmlFor="collection-name" className="text-sm font-medium text-foreground">Collection Name</label>
                                         <input

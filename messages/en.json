@@ -161,10 +161,15 @@
     "story_desc": "Founded in the United Arab Emirates, Almstkshf has emerged as the premier localized firm specialized in building intelligent ecosystems for high-profile institutions, military-grade legal compliance, and real-time broadcast and digital media analysis.",
     "stats": {
       "channels": "1,200+ Channels Tracked",
+      "channels_desc": "Continuous tracking across broadcast channels",
       "countries": "Gulf & International Reach",
-      "accuracy": "99.4% AI Accuracy"
+      "countries_desc": "Comprehensive local and international coverage",
+      "accuracy": "99.4% AI Accuracy",
+      "accuracy_desc": "Precise sentiment and tone intelligence"
     },
+    "story_footer": "Proudly Engineered in the UAE",
     "features_title": "Core Strategic Capabilities",
+    "features_desc": "Comprehensive suite of modules ensuring prompt response, strategic decision support, and absolute regulatory compliance.",
     "features": {
       "monitoring": "Enterprise Media Monitoring",
       "monitoring_desc": "Real-time, cross-channel tracking of TV, Radio, Print, and Digital Media.",
@@ -423,6 +428,19 @@
       "email": "john@example.com",
       "subject": "Inquiry about Media Monitoring",
       "message": "How can we help you represent your brand?"
+    },
+    "channels": {
+      "dubai_office_label": "Head Office (Dubai)",
+      "dubai_office_value": "One Central 9th Floor - Trade Center, Dubai, UAE",
+      "abudhabi_office_label": "Abu Dhabi Office",
+      "abudhabi_office_value": "16th Al Khatem Tower, Al Maryah Island, Abu Dhabi Global Market Square",
+      "general_support_label": "General & Support",
+      "lexcora_sales_label": "LEXCORA Sales",
+      "accounts_sales_label": "Accounts & Sales",
+      "tech_support_label": "Technical Support",
+      "our_locations": "Our Locations",
+      "map_dubai_tab": "Dubai (One Central)",
+      "map_abudhabi_tab": "Abu Dhabi (Al Khatem Tower)"
     }
   },
   "WhyChooseUs": {
@@ -732,6 +750,14 @@
       "reports_overview": "Reports Overview",
       "coverage_log": "Coverage Log"
     }
+  },
+  "MediaPulsePage": {
+    "title": "Media Pulse - Real-time Brand Tracking",
+    "description": "Real-time tracking and analysis of public opinion and brand coverage across thousands of global sources."
+  },
+  "PressPage": {
+    "title": "Press & Publication Monitoring | ALMSTKSHF",
+    "description": "Comprehensive monitoring of newspapers, magazines, and digital news portals."
   },
   "MediaPulseDetail": {
     "intro": {
@@ -1081,7 +1107,9 @@
         }
       },
       "cta_docs": "Read API Documentation",
-      "cta_contact": "Start Integration"
+      "cta_contact": "Start Integration",
+      "ecosystem_title": "Integrations Ecosystem",
+      "ecosystem_subtitle": "Connect ALMSTKSHF with the tools and workflows you already use."
     }
   },
   "Legal": {
@@ -1514,7 +1542,9 @@
   "Error": {
     "title": "System Alert: Page Loading Failed",
     "description": "We were unable to load the required dashboard components due to a connectivity or authorization issue. Please refresh the page. If the issue persists, contact technical support.",
-    "retry": "Refresh Page"
+    "retry": "Refresh Page",
+    "go_home": "Go back home",
+    "digest": "Error code: {digest}"
   },
   "NotFound": {
     "title": "Page not found",

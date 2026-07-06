@@ -10,14 +10,86 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import Container from "@/components/ui/Container";
-import { Key, Database, Zap, ArrowRight, Server, Globe } from "lucide-react";
+import { Key, Database, Zap, ArrowRight, Server, Globe, Slack, Webhook, Users, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from '@/i18n/routing';
 
-export default function IntegrationClient() {
+const iconMap: Record<string, React.ComponentType<any>> = {
+    Slack,
+    Webhook,
+    Database,
+    Users,
+    Mail,
+};
+
+export default function IntegrationClient({
+    initialIntegrations,
+}: {
+    initialIntegrations?: any[];
+}) {
     const t = useTranslations("TechnicalSolutions.integration");
     const tNav = useTranslations("Navigation");
     const locale = useLocale();
+
+    const defaultIntegrations = [
+        {
+            id: "slack",
+            nameEn: "Slack",
+            nameAr: "سلاك",
+            descEn: "Receive real-time sentiment alerts and crisis notifications directly in your team's Slack channels.",
+            descAr: "تلقي تنبيهات المشاعر الفورية وإشعارات الأزمات مباشرة في قنوات Slack الخاصة بفريقك.",
+            categoryEn: "Messaging",
+            categoryAr: "المراسلة",
+            icon: "Slack",
+            active: true,
+        },
+        {
+            id: "webhooks",
+            nameEn: "Custom Webhooks",
+            nameAr: "خطافات الويب (Webhooks)",
+            descEn: "Trigger custom HTTP callbacks to your own systems whenever new media articles are analyzed.",
+            descAr: "قم بتشغيل استدعاءات HTTP مخصصة لأنظمتك الخاصة فور تحليل مقالات إعلامية جديدة.",
+            categoryEn: "Developer Tools",
+            categoryAr: "أدوات المطورين",
+            icon: "Webhook",
+            active: true,
+        },
+        {
+            id: "crm",
+            nameEn: "CRM Systems",
+            nameAr: "أنظمة إدارة العملاء (CRM)",
+            descEn: "Sync media insights and corporate reputation profiles directly with Salesforce, HubSpot, or Microsoft Dynamics.",
+            descAr: "مزامنة رؤى وسائل الإعلام وملفات السمعة المؤسسية مباشرة مع Salesforce أو HubSpot أو Microsoft Dynamics.",
+            categoryEn: "CRM & Sales",
+            categoryAr: "إدارة العملاء والمبيعات",
+            icon: "Database",
+            active: true,
+        },
+        {
+            id: "teams",
+            nameEn: "Microsoft Teams",
+            nameAr: "مايكروسوفت تيمز",
+            descEn: "Share automated media summary reports and broadcast intelligence inside Microsoft Teams spaces.",
+            descAr: "مشاركة تقارير ملخصات الإعلام التلقائية واستخبارات البث داخل مساحات Microsoft Teams.",
+            categoryEn: "Messaging",
+            categoryAr: "المراسلة",
+            icon: "Users",
+            active: true,
+        },
+        {
+            id: "email",
+            nameEn: "Email Digests",
+            nameAr: "ملخصات البريد الإلكتروني",
+            descEn: "Configure periodic custom digests and instant emergency notifications sent to your inbox.",
+            descAr: "تكوين ملخصات مخصصة دورية وإشعارات طوارئ فورية يتم إرسالها إلى بريدك الإلكتروني.",
+            categoryEn: "Notifications",
+            categoryAr: "الإشعارات",
+            icon: "Mail",
+            active: true,
+        }
+    ];
+
+    const integrations = initialIntegrations || defaultIntegrations;
 
     const codeSnippet = `const almstkshf = require('almstkshf-sdk');
 
@@ -133,6 +205,70 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                             </p>
                         </motion.div>
                     ))}
+                </div>
+
+                {/* Ecosystem Section */}
+                <div className="mt-28 space-y-12">
+                    <div className="text-center space-y-4">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-4xl font-bold text-foreground tracking-tight"
+                        >
+                            {t("ecosystem_title")}
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-lg text-muted-foreground max-w-2xl mx-auto"
+                        >
+                            {t("ecosystem_subtitle")}
+                        </motion.p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {integrations.map((item: any, idx: number) => {
+                            const IconComponent = iconMap[item.icon] || Globe;
+                            const name = locale === "ar" ? item.nameAr : item.nameEn;
+                            const desc = locale === "ar" ? item.descAr : item.descEn;
+                            const category = locale === "ar" ? item.categoryAr : item.categoryEn;
+
+                            return (
+                                <motion.div
+                                    key={item.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.1 * idx }}
+                                    className="relative p-8 bg-card/50 backdrop-blur-sm border border-border/80 rounded-3xl hover:bg-card hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 flex flex-col justify-between group"
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                                <IconComponent className="w-6 h-6 text-primary" />
+                                            </div>
+                                            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-muted border border-border text-muted-foreground">
+                                                {category}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-foreground mb-3">
+                                            {name}
+                                        </h3>
+                                        <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                                            {desc}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-primary font-semibold text-sm cursor-pointer group-hover:underline">
+                                        <span>{locale === "ar" ? "تفاصيل الربط" : "Integration details"}</span>
+                                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Architecture Diagram */}

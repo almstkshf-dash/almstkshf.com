@@ -221,7 +221,7 @@ const StructuredResultView = ({ type, data: rawData, t, selectedMatches, onToggl
   const get = (obj: any, path: string): any => path.split('.').reduce<any>((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="space-y-6 animate-slide-in-from-bottom duration-500">
       {/* Header/Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {type === 'email' && (
@@ -893,7 +893,7 @@ export default function OsintTab() {
           </div>
 
           {optimizationInfo && (
-            <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="mt-2 flex items-start gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-xl animate-slide-in-from-top duration-300">
               <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
               <div className="flex-1">
                 <p className="text-[10px] font-bold text-primary uppercase tracking-tight">
@@ -1225,7 +1225,7 @@ export default function OsintTab() {
       {/* â•â• FULL DIRECTORY MODAL (reusing directory UI) â•â•â•â•â•â•â•â•â•â•â•â• */}
       {dirOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm animate-fade-in duration-300"
           role="dialog"
           aria-modal="true"
           aria-labelledby="osint-directory-title"

@@ -10,18 +10,17 @@ import MediaPulseClient from "@/components/MediaPulseClient";
 import { Metadata } from "next";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/../convex/_generated/api";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
-    const isAr = locale === "ar";
+    const t = await getTranslations({ locale, namespace: 'MediaPulsePage' });
 
     return {
-        title: isAr ? "نبض الإعلام - رصد فوري للعلامة التجارية" : "Media Pulse - Real-time Brand Tracking",
-        description: isAr
-            ? "رصد وتحليل فوري للرأي العام وتغطية العلامة التجارية عبر آلاف المصادر العالمية."
-            : "Real-time tracking and analysis of public opinion and brand coverage across thousands of global sources.",
+        title: t('title'),
+        description: t('description'),
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/media-monitoring/media-pulse`,
             languages: {
@@ -34,18 +33,28 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function MediaPulsePage() {
-    let initialArticles = null;
-    let initialAnalytics = null;
-    let initialEmotions = null;
-    let initialGeography = null;
+    let initialArticles: any = [];
+    let initialAnalytics: any = {};
+    let initialEmotions: any = {};
+    let initialGeography: any = [];
 
     try {
-        initialArticles = await fetchQuery(api.monitoring.getArticles, { limit: 50 });
-        initialAnalytics = await fetchQuery(api.monitoring.getAnalyticsOverview, {});
-        initialEmotions = await fetchQuery(api.monitoring.getEmotionAggregates, {});
-        initialGeography = await fetchQuery(api.monitoring.getGeographyAggregates, {});
+        const [articles, analytics, emotions, geography] = await Promise.all([
+            fetchQuery(api.monitoring.getArticles, { limit: 50 }),
+            fetchQuery(api.monitoring.getAnalyticsOverview, {}),
+            fetchQuery(api.monitoring.getEmotionAggregates, {}),
+            fetchQuery(api.monitoring.getGeographyAggregates, {})
+        ]);
+        initialArticles = articles ?? [];
+        initialAnalytics = analytics ?? {};
+        initialEmotions = emotions ?? {};
+        initialGeography = geography ?? [];
     } catch (err) {
         console.error("Error pre-fetching MediaPulse data on server:", err);
+        initialArticles = [];
+        initialAnalytics = {};
+        initialEmotions = {};
+        initialGeography = [];
     }
 
     return (

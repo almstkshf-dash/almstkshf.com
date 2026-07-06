@@ -297,7 +297,7 @@ export default function SettingsClient() {
 
             {message?.type === 'success' && (
                 <div className={clsx(
-                    "p-4 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300",
+                    "p-4 rounded-xl border flex items-center gap-3 animate-slide-in-from-top duration-300",
                     "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400"
                 )}>
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -327,7 +327,7 @@ export default function SettingsClient() {
                 </nav>
 
                 {/* Main Content Area */}
-                <div className="flex-1 space-y-8 animate-in fade-in duration-500">
+                <div className="flex-1 space-y-8 animate-fade-in duration-500">
                     {activeTab === 'general' && (
                         <div className="space-y-8">
                             <section className="bg-card p-8 rounded-2xl border border-border shadow-sm">
@@ -361,12 +361,12 @@ export default function SettingsClient() {
                                     <div className="flex-1 space-y-2">
                                         <p className="font-medium text-foreground">{t('logo_desc')}</p>
                                         <p className="text-sm text-muted-foreground">{t('logo_size_hint')}</p>
-                                        {errors.logo && <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-left-2">{errors.logo}</p>}
+                                        {errors.logo && <p className="text-xs font-bold text-rose-500 animate-slide-in-from-left">{errors.logo}</p>}
                                     </div>
                                 </div>
                             </section>
 
-                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
+                            <section className="bg-card p-8 rounded-2xl border border-border shadow-sm animate-slide-in-from-bottom duration-300">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                     <Shield className="h-5 w-5 text-blue-500 animate-pulse" />
                                     {t('white_label_branding')}
@@ -469,7 +469,7 @@ export default function SettingsClient() {
                                         />
                                         <div className="min-h-[1.25rem]">
                                         {errors.aveMultiplier ? (
-                                            <p className="text-xs font-bold text-rose-500 animate-in fade-in slide-in-from-top-1">{errors.aveMultiplier}</p>
+                                            <p className="text-xs font-bold text-rose-500 animate-slide-in-from-top">{errors.aveMultiplier}</p>
                                         ) : (
                                             <p className="text-sm text-muted-foreground">{t('default_value')}: 0.005</p>
                                         )}

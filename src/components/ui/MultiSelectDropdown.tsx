@@ -164,14 +164,14 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
 
             {/* Error Message */}
             {error && (
-                <p className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-in fade-in duration-300">
+                <p className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-fade-in duration-300">
                     <AlertTriangle className="w-3 h-3" aria-hidden="true" /> {error}
                 </p>
             )}
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute z-[90] mt-2 w-full bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 ring-1 ring-black/5">
+                <div className="absolute z-[90] mt-2 w-full bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden animate-slide-in-from-top duration-300 ring-1 ring-black/5">
 
                     {/* Items List */}
                     <div

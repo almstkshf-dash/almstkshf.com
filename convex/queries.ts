@@ -50,3 +50,27 @@ export const getMediaReports = query({
         }));
     },
 });
+
+export const getPlans = query({
+    args: {},
+    handler: async (ctx) => {
+        return [
+            {
+                productId: "standard",
+                price: 199,
+                highlight: false,
+            },
+            {
+                productId: "professional",
+                price: 299,
+                highlight: true,
+            },
+            {
+                productId: "enterprise",
+                price: 399,
+                highlight: false,
+            },
+        ];
+    },
+});
+

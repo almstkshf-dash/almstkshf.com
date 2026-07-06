@@ -16,25 +16,35 @@ import { Link } from "@/i18n/routing";
 import CheckoutButton from "@/components/CheckoutButton";
 import { motion, AnimatePresence } from "framer-motion";
 
-const plans = [
-    {
-        productId: "standard",
-        price: 199,
-        highlight: false,
-    },
-    {
-        productId: "professional",
-        price: 299,
-        highlight: true,
-    },
-    {
-        productId: "enterprise",
-        price: 399,
-        highlight: false,
-    },
-];
+interface PricingPlan {
+    productId: string;
+    price: number;
+    highlight: boolean;
+}
 
-export default function PricingClient() {
+interface PricingClientProps {
+    initialPlans?: PricingPlan[];
+}
+
+export default function PricingClient({ initialPlans }: PricingClientProps) {
+    const plans = initialPlans && initialPlans.length > 0 ? initialPlans : [
+        {
+            productId: "standard",
+            price: 199,
+            highlight: false,
+        },
+        {
+            productId: "professional",
+            price: 299,
+            highlight: true,
+        },
+        {
+            productId: "enterprise",
+            price: 399,
+            highlight: false,
+        },
+    ];
+
     const t = useTranslations("Pricing");
     const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
     const [showExitModal, setShowExitModal] = useState(false);

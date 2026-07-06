@@ -92,7 +92,7 @@ export function CommandMenu() {
         <>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-            className="fixed inset-0 z-[999] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 sm:p-6 md:p-20 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[999] bg-background/80 backdrop-blur-sm flex items-start justify-center p-4 sm:p-6 md:p-20 animate-fade-in duration-200"
             onClick={() => setOpen(false)}
         >
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
@@ -100,7 +100,7 @@ export function CommandMenu() {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="command-search-title"
-                className="w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden border border-border bg-popover animate-in slide-in-from-top-4 duration-300 relative"
+                className="w-full max-w-2xl shadow-2xl rounded-2xl overflow-hidden border border-border bg-popover animate-slide-in-from-top duration-300 relative"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* WAI-ARIA Screen Reader Title */}

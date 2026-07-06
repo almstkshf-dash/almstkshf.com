@@ -9,8 +9,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
+import { Link } from '@/i18n/routing';
 
 export default function Error({
     error,
@@ -20,10 +21,20 @@ export default function Error({
     reset: () => void;
 }) {
     const t = useTranslations('Error');
+    const [isRetrying, setIsRetrying] = useState(false);
 
     useEffect(() => {
         console.error(error);
     }, [error]);
+
+    const handleRetry = () => {
+        setIsRetrying(true);
+        reset();
+        // Reset loading state after 2 seconds in case retry fails and no unmount occurs
+        setTimeout(() => {
+            setIsRetrying(false);
+        }, 2000);
+    };
 
     return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
@@ -49,20 +60,33 @@ export default function Error({
                     {t('title')}
                 </h2>
 
-                <p className="text-foreground/60">
+                <p className="text-foreground/60 text-sm sm:text-base">
                     {t('description')}
                 </p>
 
-                <div className="flex justify-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <Button
-                        onClick={() => reset()}
+                        onClick={handleRetry}
+                        isLoading={isRetrying}
                         variant="primary"
                         size="lg"
                         className="shadow-sm transition-all hover:shadow-md h-auto"
                     >
                         {t('retry')}
                     </Button>
+                    <Link
+                        href="/"
+                        className="inline-flex items-center justify-center rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border px-8 py-3.5 text-base shadow-sm hover:shadow-md active:scale-95"
+                    >
+                        {t('go_home')}
+                    </Link>
                 </div>
+
+                {process.env.NODE_ENV === 'production' && error.digest && (
+                    <p className="text-xs text-foreground/40 italic mt-8">
+                        {t('digest', { digest: error.digest })}
+                    </p>
+                )}
             </div>
         </div>
     );
