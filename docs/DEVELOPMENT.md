@@ -104,7 +104,8 @@ All of the following must be set in `.env.local` for local development and in **
 almstkshf.com/
 ├── convex/                 # Convex backend
 │   ├── schema.ts           # Database schema (12 tables)
-│   ├── monitoring.ts       # Media articles queries/mutations
+│   ├── monitoring.ts       # Re-exports all sub-domain queries/mutations
+│   ├── monitoring/         # Modular nested monitoring functions (articles, rss, analytics, etc.)
 │   ├── monitoringAction.ts # Node.js action: fetches from news APIs
 │   ├── deepSources.ts      # Deep web scanning actions
 │   ├── osint.ts            # OSINT lookups (email, domain, IP, username, phone)
@@ -136,15 +137,18 @@ almstkshf.com/
 │   │   │   └── search/     # Upstash search
 │   │   └── globals.css     # Global styles + CSS variables
 │   │
+│   ├── hooks/
+│   │   └── useReportExport.ts  # Unified report export hook (PDF, Excel, CSV)
+│   │
 │   ├── components/
 │   │   ├── media-pulse/    # Dashboard-specific components
 │   │   │   ├── DashboardGrid.tsx       # KPI card orchestrator + geographic reach
 │   │   │   ├── ArticleTable.tsx        # Coverage log table
+│   │   │   ├── ArticleRow.tsx          # Memoized single coverage article row
 │   │   │   ├── ManualEntryModal.tsx    # Manual article form
 │   │   │   ├── ArticlesTrendChart.tsx  # Area chart (runtime CSS var resolution)
 │   │   │   ├── SentimentDonutChart.tsx # Half-donut NSS gauge
 │   │   │   ├── EmotionRadarChart.tsx   # Emotion radar chart
-│   │   │   ├── DeepStatusPanel.tsx     # Deep web scan UI
 │   │   │   ├── NewsGenerator.tsx       # Monitoring form
 │   │   │   ├── OsintTab.tsx            # OSINT engine
 │   │   │   └── PressReleasePanel.tsx   # PR wire sync
@@ -567,7 +571,7 @@ To bring high-fidelity traffic-based reach estimations for digital news media so
 To enable premium brand styling and reports customization across exported PDF and Excel reports:
 - **Database Schema**: Added `brandName`, `brandTagline`, and `footerUrl` optionally to `settings` in `convex/schema.ts`.
 - **General Settings**: The settings management page (`/dashboard/settings`) contains a dedicated **White Label & Custom Branding** grid panel allowing standard and professional tier users to save their brand logo, name, tagline, and custom footer domain.
-- **Export Integration**: Dynamic branding values are resolved in `src/lib/report-generator.ts` which loads custom logos (with clean fallback to system assets), custom taglines on report cover pages, and custom footer domains on page numbers. All tabs and dashboard elements — including `TerroristListTab.tsx`, `DarkWebTab.tsx`, `DeepStatusPanel.tsx`, `OsintTab.tsx`, `AiInspectorTab.tsx`, and `DashboardGrid.tsx` (the main media monitoring dashboard) — retrieve the custom settings database configuration via `useQuery(api.settings.getSettings)` and pass branding parameters automatically. This guarantees that custom logos and institutional metadata are fully rendered on every exported report.
+- **Export Integration**: Dynamic branding values are resolved in `src/lib/report-generator.ts` which loads custom logos (with clean fallback to system assets), custom taglines on report cover pages, and custom footer domains on page numbers. All tabs and dashboard elements — including `TerroristListTab.tsx`, `DarkWebTab.tsx`, `OsintTab.tsx`, `AiInspectorTab.tsx`, and `DashboardGrid.tsx` (the main media monitoring dashboard) — retrieve the custom settings database configuration via `useQuery(api.settings.getSettings)` and pass branding parameters automatically. This guarantees that custom logos and institutional metadata are fully rendered on every exported report.
 
 ---
 
@@ -619,9 +623,14 @@ This keeps backend code ultra-portable, dramatically improves execution speed, a
 To provide enterprise-grade capabilities for public relations and media agencies, the Press Monitor (PR Wire Monitoring panel) includes a complete, interactive **Monitored Keyword Collections** system:
 
 ### Keyword Collections Architecture & Schema
-- **Database Schema**: Managed via the `keyword_collections` table, storing `{ name: string, keywords: string[] }` entries.
+- **Database Schema**: Managed via the `keyword_collections` table, storing `{ name: string, keywords: string[] }` entries. Compound index `by_userId_updatedAt` is used to fetch user collections sorted by `updatedAt` in descending order, avoiding slow in-memory sorting.
+- **SaaS Limit Constraints**:
+  - Max collection name length: 100 characters (non-empty, unique per user).
+  - Max keywords per collection: 500 keywords.
+  - Max keyword length: 100 characters.
+  - Case-insensitive duplicates checking.
 - **CRUD Operations**: Handlers are defined in `convex/keywordCollections.ts` and exported as queries/mutations:
-  - `getKeywordCollections`: Lists all registered collections.
+  - `getKeywordCollections`: Lists all registered collections ordered by last modified date.
   - `createKeywordCollection`: Creates a new collection with an empty keyword array.
   - `deleteKeywordCollection`: Deletes a collection by its identifier.
   - `addKeyword`: Appends a keyword to a collection's `keywords` array, avoiding duplicates.
@@ -859,10 +868,10 @@ Added targeted indexes inside `convex/schema.ts` to restrict transaction read se
   - `by_monitor_id`: `["monitor_id"]`
 
 ### 2. Query Index Selection Helper
-Implemented a unified query helper `queryArticlesWithIndex` in `convex/monitoring.ts`. The helper dynamically resolves and selects the most specific index based on the active query filters (keyword, sourceType, sourceCountry, depth). This isolates read locks and eliminates full table scans.
+Implemented a unified query helper `queryArticlesWithIndex` in `convex/monitoring/helpers.ts`. The helper dynamically resolves and selects the most specific index based on the active query filters (keyword, sourceType, sourceCountry, depth). This isolates read locks and eliminates full table scans.
 
 ### 3. Batched Mutation Deletion
-Refactored the `deleteAllArticles` mutation inside `convex/monitoring.ts` to delete documents in batches of 200 and automatically reschedule itself via `ctx.scheduler` for subsequent batches. This keeps the transaction footprint minimal, avoiding OCC write conflicts and timeouts on large tables.
+Refactored the `deleteAllArticles` mutation inside `convex/monitoring/articles.ts` (re-exported by `convex/monitoring.ts`) to delete documents in batches of 200 and automatically reschedule itself via `ctx.scheduler` for subsequent batches. This keeps the transaction footprint minimal, avoiding OCC write conflicts and timeouts on large tables.
 
 ---
 

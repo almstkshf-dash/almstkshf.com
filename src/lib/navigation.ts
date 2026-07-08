@@ -21,11 +21,14 @@ import {
   CreditCard,
   Tv,
   Database,
-  Search,
 } from "lucide-react";
 
+import en from "../../messages/en.json";
+
+export type NavigationKey = keyof typeof en.Navigation;
+
 export type NavigationItem = {
-  label: string;
+  label: NavigationKey;
   href?: string;
   icon?: React.ComponentType<{ className?: string }>;
   children?: NavigationItem[];
@@ -60,12 +63,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     label: "technical_solutions",
     icon: Microscope,
     children: [
-      {
-        label: "smart_media_assistant",
-        href: "/technical-solutions/smart-media-assistant",
-        icon: Search,
-        description: "Advanced media analysis tools"
-      },
       {
         label: "kyc_compliance",
         href: "/technical-solutions/kyc",

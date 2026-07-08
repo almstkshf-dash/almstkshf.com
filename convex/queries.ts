@@ -8,6 +8,7 @@
 
 import { query } from "./_generated/server";
 import { v } from "convex/values";
+import { parsePublishedDate } from "./utils/date";
 
 
 export const getCrisisPlans = query({
@@ -34,8 +35,8 @@ export const getMediaReports = query({
         const articles = await q.collect();
 
         const parseDate = (d: string) => {
-            const [dd, mm, yyyy] = d.split("/").map((n) => parseInt(n, 10));
-            return new Date(yyyy || 0, (mm || 1) - 1, dd || 1).getTime();
+            const parsed = parsePublishedDate(d);
+            return parsed ? parsed.getTime() : 0;
         };
 
         // Sort by publishedDate desc, then createdAt desc

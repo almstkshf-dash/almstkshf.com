@@ -17,6 +17,7 @@ import { clsx } from 'clsx';
 import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
+import { MEDIA_SOURCES } from '@/config/media-sources';
 import { usePaginatedQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
@@ -56,9 +57,14 @@ export default function RssFeeder({
   const [items, setItems] = useState<FeedItem[]>([]);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   
+  const activeSourceId = MEDIA_SOURCES.find(s => s.name === activePublisher)?.id;
+
   const { results: articleResults, status: articlesStatus } = usePaginatedQuery(
     api.monitoring.getRssArticles,
-    isAuthenticated ? { source: activePublisher || undefined } : 'skip',
+    isAuthenticated ? {
+      sourceId: activeSourceId || undefined,
+      source: activeSourceId ? undefined : (activePublisher || undefined)
+    } : 'skip',
     { initialNumItems: maxItems }
   );
 
@@ -164,12 +170,12 @@ export default function RssFeeder({
     if (!name) return t('title');
     try {
       const sanitizedKey = name.replace(/\./g, '_');
-      if (tSources.has(sanitizedKey)) {
-        return tSources(sanitizedKey);
+      if ((tSources as any).has(sanitizedKey)) {
+        return (tSources as any)(sanitizedKey);
       }
       const lowerKey = sanitizedKey.toLowerCase();
-      if (tSources.has(lowerKey)) {
-        return tSources(lowerKey);
+      if ((tSources as any).has(lowerKey)) {
+        return (tSources as any)(lowerKey);
       }
       return name;
     } catch {
@@ -437,7 +443,7 @@ export default function RssFeeder({
                       <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
                         {selectedItem.image && (
                           <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-border bg-muted">
-                            <Image src={selectedItem.image} alt="" fill className="object-cover" unoptimized />
+                            <Image src={selectedItem.image} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" unoptimized />
                           </div>
                         )}
                         

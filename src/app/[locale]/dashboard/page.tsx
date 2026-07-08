@@ -7,16 +7,40 @@
  */
 
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import DashboardClient from '@/components/dashboard/DashboardClient';
+import DashboardLoading from './loading';
 
-export const metadata: Metadata = {
-    title: 'Dashboard | Almstkshf',
-    robots: {
-        index: false,
-        follow: false,
-    },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: 'Navigation' });
+    return {
+        title: `${t('dashboard')} | Almstkshf`,
+        robots: {
+            index: false,
+            follow: false,
+            googleBot: {
+                index: false,
+                follow: false,
+            },
+        },
+    };
+}
 
-export default function DashboardPage() {
-    return <DashboardClient />;
+export default async function DashboardPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { userId } = await auth();
+    const { locale } = await params;
+
+    if (!userId) {
+        redirect(`/${locale}/sign-in`);
+    }
+
+    return (
+        <Suspense fallback={<DashboardLoading />}>
+            <DashboardClient />
+        </Suspense>
+    );
 }

@@ -84,12 +84,12 @@ export default memo(function HomeClient() {
                         {/* Double the items for seamless loop */}
                         {[...Array(2)].map((_, outerIdx) => (
                             <div key={outerIdx} className="flex gap-12 items-center">
-                                {Object.keys(t.raw('Clients.list')).map((key) => (
+                                {Object.keys(t.raw('Clients.list' as any) as Record<string, string>).map((key) => (
                                     <span
                                         key={`${outerIdx}-${key}`}
                                         className="text-2xl md:text-3xl font-bold text-foreground/70 hover:text-primary transition-colors cursor-default select-none tracking-tight"
                                     >
-                                        {t(`Clients.list.${key}`)}
+                                        {t(`Clients.list.${key}` as any)}
                                     </span>
                                 ))}
                             </div>
@@ -109,14 +109,14 @@ export default memo(function HomeClient() {
             >
                 <Container>
                     <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24">
-                        {/* Use <img> for decorative trust badges â€” they are below fold, lazy by default */}
+                        {/* Use <img>/Image for decorative trust badges — they are below fold, lazy by default */}
                         <div className="relative w-32 h-12">
                             <Image
                                 src="/tdra.webp"
                                 alt={tCommon('tdra_alt')}
                                 width={128}
                                 height={48}
-                                loading="eager"
+                                loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -128,7 +128,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('soc2_alt')}
                                 width={64}
                                 height={64}
-                                loading="eager"
+                                loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -140,7 +140,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('secure_alt')}
                                 width={128}
                                 height={48}
-                                loading="eager"
+                                loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -152,7 +152,7 @@ export default memo(function HomeClient() {
                                 alt={tCommon('saas_awards_alt')}
                                 width={128}
                                 height={48}
-                                loading="eager"
+                                loading="lazy"
                                 decoding="async"
                                 crossOrigin="anonymous"
                                 className="object-contain w-full h-full dark:brightness-110"
@@ -206,11 +206,11 @@ export default memo(function HomeClient() {
                                 </div>
 
                                 <h3 className="text-2xl font-bold text-foreground mb-6 tracking-tight">
-                                    {t(`WhyChooseUs.${feature.id}.title`)}
+                                    {t(`WhyChooseUs.${feature.id}.title` as any)}
                                 </h3>
 
                                 <p className="text-foreground/80 leading-relaxed font-light text-lg">
-                                    {t(`WhyChooseUs.${feature.id}.desc`)}
+                                    {t(`WhyChooseUs.${feature.id}.desc` as any)}
                                 </p>
 
                                 {/* Mock Action/Visual per feature */}

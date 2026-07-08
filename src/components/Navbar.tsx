@@ -18,6 +18,7 @@ import { Menu, X, Globe, ChevronDown, Search } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
 import Container from "@/components/ui/Container";
 import Image from "next/image";
+import { useMounted } from "@/hooks/useMounted";
 import clsx from "clsx";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
@@ -44,11 +45,7 @@ const NavbarContent = memo(function NavbarContent() {
     const searchParams = useSearchParams();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useMounted();
 
     const loginLabel = (t as any).has?.('login') ? t('login' as any) : "Sign In";
 
@@ -232,7 +229,15 @@ const NavbarContent = memo(function NavbarContent() {
 
                             <button
                                 className={clsx(ACTION_BTN, "text-foreground")}
-                                onClick={() => setMobileMenuOpen(true)}
+                                onClick={() => {
+                                    // Blur any focused element (e.g. Clerk UserButton)
+                                    // before the mobile menu opens, preventing the
+                                    // aria-hidden focus-trap a11y violation.
+                                    if (document.activeElement instanceof HTMLElement) {
+                                        document.activeElement.blur();
+                                    }
+                                    setMobileMenuOpen(true);
+                                }}
                                 aria-label={tCommon('open_menu')}
                             >
                                 <Menu className={ICON_LG} aria-hidden="true" />

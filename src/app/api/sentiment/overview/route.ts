@@ -11,13 +11,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { checkApiAuth } from "@/lib/api-auth";
 import { unstable_cache } from "next/cache";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
     try {
-        const rlKey = await getRateLimitKey(req, 'sentiment-overview');
+        const auth = await checkApiAuth();
+        if (!auth.authorized) {
+            return auth.errorResponse!;
+        }
+
+        const rlKey = await getRateLimitKey(req, 'sentiment-overview', auth.userId);
         const limitResult = await rateLimit(rlKey, 30, 60);
         if (!limitResult.allowed) {
             return NextResponse.json({

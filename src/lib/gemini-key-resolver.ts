@@ -16,7 +16,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
  * Returns an authenticated ConvexHttpClient for the current user session.
  * Uses Clerk JWT with the "convex" template for Convex auth.
  */
-async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
+export async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
     try {
         const { getToken } = await auth();
         const token = await getToken({ template: "convex" });
@@ -24,7 +24,7 @@ async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
             convex.setAuth(token);
         }
     } catch {
-        // Auth token unavailable â€” proceed as anonymous (read-only queries may still work)
+        // Auth token unavailable — proceed as anonymous (read-only queries may still work)
     }
     return convex;
 }

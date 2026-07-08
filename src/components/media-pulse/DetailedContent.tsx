@@ -13,6 +13,19 @@ import { Globe, Zap, AlertCircle, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
+const TEXT_MUTED = "text-foreground/85 dark:text-slate-400";
+
+const fadeInUpProps = {
+    initial: { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true }
+};
+
+const fadeInProps = {
+    initial: { opacity: 0 },
+    whileInView: { opacity: 1 }
+};
+
 export function DetailedContent() {
     const t = useTranslations("MediaPulseDetail");
 
@@ -26,12 +39,12 @@ export function DetailedContent() {
     return (
         <>
             {/* Intro & Core Features */}
-            <section className="space-y-16">
+            <section className="space-y-16" aria-labelledby="intro-title">
                 <div className="max-w-4xl space-y-6">
-                    <h2 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
+                    <h2 id="intro-title" className="text-3xl md:text-5xl font-bold text-foreground tracking-tight transition-colors">
                         {t("intro.title")}
                     </h2>
-                    <p className="text-foreground/85 dark:text-slate-400 text-lg leading-relaxed transition-colors">
+                    <p className={`${TEXT_MUTED} text-lg leading-relaxed transition-colors`}>
                         {t("intro.description")}
                     </p>
                 </div>
@@ -40,9 +53,7 @@ export function DetailedContent() {
                     {features.map((f) => (
                         <motion.div
                             key={f.key}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            {...fadeInUpProps}
                             className="p-8 rounded-[2rem] bg-card border border-border hover:border-primary/30 transition-all group shadow-sm"
                         >
                             <div className="flex gap-6">
@@ -53,7 +64,7 @@ export function DetailedContent() {
                                     <h3 className="text-xl font-bold text-foreground uppercase tracking-wider text-sm transition-colors">
                                         {t(`features.${f.key}.title`)}
                                     </h3>
-                                    <p className="text-foreground/85 dark:text-slate-400 text-sm leading-relaxed transition-colors">
+                                    <p className={`${TEXT_MUTED} text-sm leading-relaxed transition-colors`}>
                                         {t(`features.${f.key}.description`)}
                                     </p>
                                 </div>
@@ -63,8 +74,7 @@ export function DetailedContent() {
                 </div>
 
                 <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
+                    {...fadeInProps}
                     className="p-8 rounded-3xl bg-primary/5 border border-primary/10 text-center text-foreground italic transition-colors"
                 >
                     {t("conclusion")}
@@ -72,12 +82,12 @@ export function DetailedContent() {
             </section>
 
             {/* Services Sections */}
-            <section className="space-y-24">
+            <section className="space-y-24" aria-labelledby="services-title">
                 <div className="space-y-6">
                     <div className="inline-block px-4 py-1 rounded-full bg-primary/15 border border-primary/20 text-primary dark:text-blue-300 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors">
                         {t("dashboard_grid.specialized_services")}
                     </div>
-                    <h2 className="text-4xl font-bold text-foreground transition-colors">{t("dashboard_grid.advanced_solutions")}</h2>
+                    <h2 id="services-title" className="text-4xl font-bold text-foreground transition-colors">{t("dashboard_grid.advanced_solutions")}</h2>
                 </div>
 
                 {/* Media Monitoring & Social Listening */}
@@ -86,7 +96,7 @@ export function DetailedContent() {
                         <h3 className="text-2xl font-bold text-foreground border-l-4 border-primary pl-4 transition-all">
                             {t("services.monitoring.title")}
                         </h3>
-                        <p className="text-foreground/85 dark:text-slate-400 leading-relaxed text-sm transition-colors">
+                        <p className={`${TEXT_MUTED} leading-relaxed text-sm transition-colors`}>
                             {t("services.monitoring.description")}
                         </p>
                     </div>
@@ -94,7 +104,7 @@ export function DetailedContent() {
                         <h3 className="text-2xl font-bold text-foreground border-l-4 border-emerald-500 pl-4 transition-all">
                             {t("services.listening.title")}
                         </h3>
-                        <p className="text-foreground/85 dark:text-slate-400 leading-relaxed text-sm transition-colors">
+                        <p className={`${TEXT_MUTED} leading-relaxed text-sm transition-colors`}>
                             {t("services.listening.description")}
                         </p>
                     </div>
@@ -104,7 +114,7 @@ export function DetailedContent() {
                 <div className="p-12 rounded-[3rem] bg-card border border-border space-y-12 shadow-lg transition-all">
                     <div className="max-w-3xl space-y-6">
                         <h3 className="text-3xl font-bold text-foreground transition-colors">{t("services.web.title")}</h3>
-                        <p className="text-foreground/85 dark:text-slate-400 leading-relaxed transition-colors">
+                        <p className={`${TEXT_MUTED} leading-relaxed transition-colors`}>
                             {t("services.web.description")}
                         </p>
                     </div>
@@ -115,7 +125,7 @@ export function DetailedContent() {
                                 <h4 className="font-bold text-primary uppercase tracking-widest text-[10px] transition-colors">
                                     {t(`services.web.features.${fKey}.title`)}
                                 </h4>
-                                <p className="text-foreground/85 dark:text-slate-400 text-xs leading-relaxed transition-colors">
+                                <p className={`${TEXT_MUTED} text-xs leading-relaxed transition-colors`}>
                                     {t(`services.web.features.${fKey}.description`)}
                                 </p>
                             </div>

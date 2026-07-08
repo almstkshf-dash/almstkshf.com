@@ -11,12 +11,18 @@ import { NextRequest } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { checkApiAuth } from "@/lib/api-auth";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
+    const auth = await checkApiAuth();
+    if (!auth.authorized) {
+        return auth.errorResponse!;
+    }
+
     // 1. Rate Limiting
-    const rlKey = await getRateLimitKey(req, 'monitor:stream');
+    const rlKey = await getRateLimitKey(req, 'monitor:stream', auth.userId);
     const limitResult = await rateLimit(rlKey, 30, 60); // 30 requests per minute
     if (!limitResult.allowed) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {

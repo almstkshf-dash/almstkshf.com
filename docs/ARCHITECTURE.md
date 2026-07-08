@@ -120,7 +120,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 
 | File | Runtime | Exports |
 |---|---|---|
-| `monitoring.ts` | Default | Queries/mutations for `media_monitoring_articles` |
+| `monitoring.ts` | Default | Re-exports all nested queries/mutations under `monitoring/` |
 | `monitoringAction.ts` | Node.js Action | Fetches from NewsData, NewsAPI, GNews, RSS, headless |
 | `deepSources.ts` | Node.js Action | Deep web / World News API scanning |
 | `osint.ts` | Node.js Action | Email, domain, IP, username, phone lookups |
@@ -132,7 +132,7 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `waitlist.ts` | Default | Waitlist entries |
 | `analyses.ts` | Default | Free sentiment analysis results |
 | `case_studies.ts` | Default | Case study data |
-| `media.ts` | Default | Media monitoring helper queries |
+| `media.ts` | Default | Free text reputation and risk analysis queries/actions |
 | `init.ts` | Default | Database seeding / initialization |
 | `crons.ts` | Scheduler | Cron jobs (e.g. auto-sync of press wires) |
 | `queries.ts` | Default | Shared general queries |
@@ -153,11 +153,9 @@ Runs on **Vercel Edge Runtime**. Two concerns composed:
 | `SentimentTracker.tsx` | Dashboard | Live sentiment chart |
 | `NewsGenerator.tsx` | Dashboard | Monitoring form UI |
 | `OsintTab.tsx` | Dashboard | OSINT engine + external resource directory |
-| `DeepStatusPanel.tsx` | Dashboard | Deep web scan config + run history |
 | `PressReleasePanel.tsx` | Dashboard | PR wire sync |
 | `LexcoraClient.tsx` | `/case-studies/lexcora` | Lexcora ERP showcase |
 | `StylingAssistantClient.tsx` | `/case-studies/styling-assistant` | VA showcase + waitlist |
-| `SmartMediaAssistantClient.tsx` | Media monitoring pages | Smart assistant embed |
 | `RssFeeder.tsx` | Dashboard (Live Feed) | Premium RSS monitor with modal details and direct ingestion |
 | `CrisisManagementClient.tsx` | `/media-monitoring/crisis-management` | Crisis plan cards |
 | `KYCVerification.tsx` | `/technical-solutions/kyc-compliance` | KYC upload UI |
@@ -218,7 +216,6 @@ All dashboard-specific data visualisation and table components live here.
 | `Dashboard` | Dashboard page and filter UI |
 | `ArticleTable` | `ArticleTable.tsx` |
 | `ManualEntry` | `ManualEntryModal.tsx` |
-| `DeepSources` | `DeepStatusPanel.tsx` |
 | `SentimentTracker` | `SentimentTracker.tsx` |
 | `NewsGenerator` | `NewsGenerator.tsx` |
 | `OsintTab` | `OsintTab.tsx` |

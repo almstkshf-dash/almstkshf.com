@@ -166,8 +166,10 @@ export const analyzeImageCanvasDeep = async (canvas: HTMLCanvasElement): Promise
   return finalizeReport(richResult);
 };
 
+export type ImageStats = PixelStats;
+
 // Helper to consolidate scoring logic
-export function finalizeReport(richResult: ImageAnalysisResult): ImageAnalysisReport {
+export function finalizeReport(richResult: ImageAnalysisResult, stats?: ImageStats): ImageAnalysisReport {
   const riskScore = richResult.overallScore;
   const signals: ImageAnalysisReport["pixelLogicSignals"] = [];
 

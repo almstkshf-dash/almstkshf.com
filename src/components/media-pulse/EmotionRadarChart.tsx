@@ -9,7 +9,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo, memo } from "react";
+import { useMemo, memo, forwardRef } from "react";
 import {
     PolarAngleAxis,
     PolarGrid,
@@ -17,8 +17,6 @@ import {
     RadarChart,
     ResponsiveContainer,
 } from "recharts";
-
-import { ChartSkeleton } from "@/components/ui/Skeleton";
 
 interface EmotionRadarChartProps {
     data: {
@@ -28,56 +26,53 @@ interface EmotionRadarChartProps {
     }[];
 }
 
-const EmotionRadarChart = memo(function EmotionRadarChart({ data }: EmotionRadarChartProps) {
-    const t = useTranslations("FreeTool.emotions");
-    const [mounted, setMounted] = useState(false);
+const TICK_STYLE = { fill: "var(--foreground)", fontSize: 10, fontWeight: 500 };
+const INITIAL_DIMENSION = { width: 10, height: 300 };
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+const EmotionRadarChart = memo(
+    forwardRef<HTMLDivElement, EmotionRadarChartProps>(
+        function EmotionRadarChart({ data }, ref) {
+            const t = useTranslations("FreeTool.emotions");
 
-    const translatedData = useMemo(() => data.map((item) => {
-        // Handle potential case mismatches by checking both capitalized and lowercase
-        const label = t(item.subject) || t(item.subject.charAt(0).toUpperCase() + item.subject.slice(1).toLowerCase()) || item.subject;
-        return {
-            ...item,
-            subject: label,
-        };
-    }), [data, t]);
+            const translatedData = useMemo(() => data.map((item) => {
+                const label = t(item.subject.toLowerCase()) || item.subject;
+                return {
+                    ...item,
+                    subject: label,
+                };
+            }), [data, t]);
 
-    if (!mounted) return <ChartSkeleton className="w-full aspect-[4/3]" />;
-
-    return (
-        <div id="emotion-radar-chart-container" className="relative w-full aspect-[4/3] flex items-center justify-center">
-            {mounted && (
-                <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100} initialDimension={{ width: 10, height: 300 }}>
-                    <RadarChart 
-                        cx="50%" 
-                        cy="50%" 
-                        outerRadius="80%" 
-                        data={translatedData}
-                        role="img"
-                        aria-label="Emotional intensity radar chart"
-                    >
-                        <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
-                        <PolarAngleAxis 
-                            dataKey="subject" 
-                            tick={{ fill: "var(--foreground)", fontSize: 10, fontWeight: 500 }}
-                            tickLine={false}
-                        />
-                        <Radar
-                            name="Emotion"
-                            dataKey="value"
-                            stroke="var(--primary)"
-                            fill="var(--primary)"
-                            fillOpacity={0.4}
-                            strokeWidth={2}
-                        />
-                    </RadarChart>
-                </ResponsiveContainer>
-            )}
-        </div>
-    );
-});
+            return (
+                <div ref={ref} className="relative w-full aspect-[4/3] flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100} initialDimension={INITIAL_DIMENSION}>
+                        <RadarChart
+                            cx="50%"
+                            cy="50%"
+                            outerRadius="80%"
+                            data={translatedData}
+                            role="img"
+                            aria-label={t("accessibility_label", { defaultValue: "Emotional intensity radar chart" })}
+                        >
+                            <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
+                            <PolarAngleAxis
+                                dataKey="subject"
+                                tick={TICK_STYLE}
+                                tickLine={false}
+                            />
+                            <Radar
+                                name={t("radar_name", { defaultValue: "Emotion" })}
+                                dataKey="value"
+                                stroke="var(--primary)"
+                                fill="var(--primary)"
+                                fillOpacity={0.4}
+                                strokeWidth={2}
+                            />
+                        </RadarChart>
+                    </ResponsiveContainer>
+                </div>
+            );
+        }
+    )
+);
 
 export default EmotionRadarChart;

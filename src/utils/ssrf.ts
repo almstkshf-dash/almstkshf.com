@@ -21,9 +21,6 @@
  * to prevent rebinding across hops.
  */
 
-import { isIP } from 'net';
-import dns from 'dns/promises';
-
 // ---------------------------------------------------------------------------
 // IPv4 blocked ranges (RFC 1918, RFC 5737, RFC 6598, and others)
 // ---------------------------------------------------------------------------
@@ -100,14 +97,25 @@ function isBlockedHostname(hostname: string): boolean {
  * conservatively.
  */
 async function isDnsResolutionBlocked(hostname: string): Promise<boolean> {
-  // If the hostname itself is a literal IP we can skip DNS.
-  if (isIP(hostname)) {
-    return isBlockedIp(hostname);
+  if (typeof window !== 'undefined') {
+    // SSRF protection is a server-side concern.
+    return false;
   }
 
   try {
+    const net = eval('require')('net');
+    // If the hostname itself is a literal IP we can skip DNS.
+    if (net.isIP(hostname)) {
+      return isBlockedIp(hostname);
+    }
+  } catch {
+    // Fallback if net module fails
+  }
+
+  try {
+    const dns = eval('require')('dns/promises');
     const results = await dns.lookup(hostname, { all: true });
-    return results.some((entry) => isBlockedIp(entry.address));
+    return results.some((entry: { address: string }) => isBlockedIp(entry.address));
   } catch {
     // Conservative: block on resolution failure (NXDOMAIN, timeout, etc.)
     return true;
@@ -184,9 +192,18 @@ export function isSafePublicUrl(rawUrl: string): boolean {
     if (protocol !== 'https:') return false;
     if (isBlockedHostname(hostname)) return false;
 
-    // Only reliable for literal IPs; for hostnames this is best-effort.
-    if (isIP(hostname)) {
-      return !isBlockedIp(hostname);
+    if (typeof window !== 'undefined') {
+      return true;
+    }
+
+    try {
+      const net = eval('require')('net');
+      // Only reliable for literal IPs; for hostnames this is best-effort.
+      if (net.isIP(hostname)) {
+        return !isBlockedIp(hostname);
+      }
+    } catch {
+      // Ignore
     }
 
     return true;

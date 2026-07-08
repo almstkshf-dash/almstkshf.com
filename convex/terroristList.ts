@@ -278,3 +278,146 @@ export const deleteItems = mutation({
     }
   },
 });
+
+export const searchAll = query({
+  args: {
+    searchTerm: v.string(),
+    type: v.optional(v.union(v.literal("individual"), v.literal("organization"), v.literal("entity"))),
+  },
+  handler: async (ctx, args) => {
+    if (!args.searchTerm) {
+      if (args.type) {
+        return await ctx.db
+          .query("local_terrorist_list")
+          .filter((q) => q.eq(q.field("type"), args.type))
+          .collect();
+      }
+      return await ctx.db.query("local_terrorist_list").collect();
+    }
+
+    const searchQ = ctx.db
+      .query("local_terrorist_list")
+      .withSearchIndex("by_searchField", (q) => {
+        const base = q.search("searchField", args.searchTerm);
+        if (args.type) {
+          return (base as any).eq("type", args.type);
+        }
+        return base;
+      });
+
+    return await searchQ.collect();
+  },
+});
+
+export const deleteMatching = mutation({
+  args: {
+    searchTerm: v.string(),
+    type: v.optional(v.union(v.literal("individual"), v.literal("organization"), v.literal("entity"))),
+    excludedIds: v.array(v.id("local_terrorist_list")),
+  },
+  handler: async (ctx, args) => {
+    let matching = [];
+    if (!args.searchTerm) {
+      if (args.type) {
+        matching = await ctx.db
+          .query("local_terrorist_list")
+          .filter((q) => q.eq(q.field("type"), args.type))
+          .collect();
+      } else {
+        matching = await ctx.db.query("local_terrorist_list").collect();
+      }
+    } else {
+      matching = await ctx.db
+        .query("local_terrorist_list")
+        .withSearchIndex("by_searchField", (q) => {
+          const base = q.search("searchField", args.searchTerm);
+          if (args.type) {
+            return (base as any).eq("type", args.type);
+          }
+          return base;
+        })
+        .collect();
+    }
+
+    const excludedSet = new Set(args.excludedIds);
+    for (const doc of matching) {
+      if (!excludedSet.has(doc._id)) {
+        await ctx.db.delete(doc._id);
+      }
+    }
+  },
+});
+
+export const addMatchingToCollection = mutation({
+  args: {
+    collectionId: v.id("collections"),
+    searchTerm: v.string(),
+    type: v.optional(v.union(v.literal("individual"), v.literal("organization"), v.literal("entity"))),
+    excludedIds: v.array(v.id("local_terrorist_list")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated");
+    }
+
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection || collection.userId !== identity.subject) {
+      throw new Error("Unauthorized");
+    }
+
+    let matching = [];
+    if (!args.searchTerm) {
+      if (args.type) {
+        matching = await ctx.db
+          .query("local_terrorist_list")
+          .filter((q) => q.eq(q.field("type"), args.type))
+          .collect();
+      } else {
+        matching = await ctx.db.query("local_terrorist_list").collect();
+      }
+    } else {
+      matching = await ctx.db
+        .query("local_terrorist_list")
+        .withSearchIndex("by_searchField", (q) => {
+          const base = q.search("searchField", args.searchTerm);
+          if (args.type) {
+            return (base as any).eq("type", args.type);
+          }
+          return base;
+        })
+        .collect();
+    }
+
+    const excludedSet = new Set(args.excludedIds);
+    const currentItems = collection.items ? [...collection.items] : [];
+    let addedCount = 0;
+    let duplicateCount = 0;
+
+    for (const doc of matching) {
+      if (!excludedSet.has(doc._id)) {
+        if (currentItems.find(i => i.id === doc._id)) {
+          duplicateCount++;
+        } else {
+          currentItems.push({
+            id: doc._id,
+            type: "watchlist",
+            title: doc.nameArabic || doc.nameLatin || "Unknown",
+            data: doc,
+            addedAt: Date.now(),
+          });
+          addedCount++;
+        }
+      }
+    }
+
+    if (addedCount > 0) {
+      await ctx.db.patch(args.collectionId, {
+        items: currentItems,
+        updatedAt: Date.now(),
+      });
+    }
+
+    return { collectionId: collection._id, addedCount, duplicateCount };
+  },
+});

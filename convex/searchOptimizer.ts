@@ -192,7 +192,7 @@ Return valid JSON ONLY with these exact fields:
   "explanation": "one short sentence explaining what was added"
 }`;
 
-    const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+    const models = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-3.5-flash"];
 
     for (const model of models) {
       try {

@@ -96,6 +96,9 @@ export default async function middleware(req: any, event: any) {
         strippedPath = pathname.replace(/^\/(ar|en)/, "");
     }
 
+    let rlResult: any = null;
+    let limitCount = 0;
+
     // Apply Rate Limiting to /api/search and /api/monitor
     if (strippedPath === "/api/search" || strippedPath === "/api/monitor") {
         try {
@@ -111,7 +114,7 @@ export default async function middleware(req: any, event: any) {
             const isSearch = strippedPath === "/api/search";
             const method = req.method;
             
-            let limitCount = 60;
+            limitCount = 60;
             let windowSeconds = 60;
             let prefix = "";
 
@@ -146,7 +149,7 @@ export default async function middleware(req: any, event: any) {
             }
 
             const rlKey = await getRateLimitKey(req, prefix, userId);
-            const rlResult = await rateLimit(rlKey, limitCount, windowSeconds);
+            rlResult = await rateLimit(rlKey, limitCount, windowSeconds);
 
             if (!rlResult.allowed) {
                 return new NextResponse(
@@ -155,6 +158,8 @@ export default async function middleware(req: any, event: any) {
                         status: 429,
                         headers: {
                             "Content-Type": "application/json",
+                            "X-RateLimit-Limit": String(limitCount),
+                            "X-RateLimit-Remaining": String(rlResult.remaining),
                             "Retry-After": String(rlResult.resetSeconds)
                         }
                     }
@@ -165,31 +170,42 @@ export default async function middleware(req: any, event: any) {
         }
     }
 
+    let response: any;
+
     if (localeApiRegex.test(pathname)) {
         const url = req.nextUrl.clone();
         url.pathname = strippedPath;
-        return NextResponse.rewrite(url);
+        response = NextResponse.rewrite(url);
+    } else {
+        const host = req.headers.get("host") || "";
+        const isVercelPreview = host.includes("vercel.app") && !host.includes("almstkshf.com");
+        const isLiveKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_");
+
+        // Intercept Clerk proxy requests on Vercel preview/deployment domains to prevent them from hitting Clerk servers and returning 400
+        if (req.nextUrl.pathname.startsWith("/__clerk") && isVercelPreview && isLiveKey) {
+            response = new NextResponse(JSON.stringify({ 
+                error: "clerk_proxy_disabled_on_preview",
+                message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys." 
+            }), {
+                status: 200,
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store" 
+                }
+            });
+        } else {
+            response = await clerk(req, event);
+        }
     }
 
-    const host = req.headers.get("host") || "";
-    const isVercelPreview = host.includes("vercel.app") && !host.includes("almstkshf.com");
-    const isLiveKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_live_");
-
-    // Intercept Clerk proxy requests on Vercel preview/deployment domains to prevent them from hitting Clerk servers and returning 400
-    if (req.nextUrl.pathname.startsWith("/__clerk") && isVercelPreview && isLiveKey) {
-        return new NextResponse(JSON.stringify({ 
-            error: "clerk_proxy_disabled_on_preview",
-            message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys." 
-        }), {
-            status: 200,
-            headers: { 
-                "Content-Type": "application/json",
-                "Cache-Control": "no-store" 
-            }
-        });
+    // Attach rate limit headers to successful responses if rate limiting was evaluated
+    if (rlResult && response) {
+        response.headers.set("X-RateLimit-Limit", String(limitCount));
+        response.headers.set("X-RateLimit-Remaining", String(rlResult.remaining));
+        response.headers.set("X-RateLimit-Reset", String(rlResult.resetSeconds));
     }
 
-    return clerk(req, event);
+    return response;
 }
 
 export const config = {

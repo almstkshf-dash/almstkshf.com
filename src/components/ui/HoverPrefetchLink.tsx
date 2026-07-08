@@ -8,48 +8,96 @@
 
 'use client';
 
-import { Link } from '@/i18n/routing';
-import { useState, useRef, useEffect, ComponentPropsWithoutRef } from 'react';
+import { Link, useRouter } from '@/i18n/routing';
+import React, { useRef, useEffect, ComponentPropsWithoutRef } from 'react';
 
 type HoverPrefetchLinkProps = ComponentPropsWithoutRef<typeof Link>;
 
+// Helper to resolve string or object based href properties to a string
+const resolveHrefToString = (href: HoverPrefetchLinkProps['href']): string => {
+    if (typeof href === 'string') {
+        return href;
+    }
+    if (href && typeof href === 'object') {
+        let path = href.pathname || '';
+        const query = href.query;
+        if (query) {
+            const params = new URLSearchParams();
+            Object.entries(query).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    if (Array.isArray(value)) {
+                        value.forEach(v => params.append(key, String(v)));
+                    } else {
+                        params.append(key, String(value));
+                    }
+                }
+            });
+            const search = params.toString();
+            if (search) {
+                path += `?${search}`;
+            }
+        }
+        if (href.hash) {
+            path += href.hash.startsWith('#') ? href.hash : `#${href.hash}`;
+        }
+        return path;
+    }
+    return '';
+};
+
 export function HoverPrefetchLink({
     children,
-    prefetch: prefetchProp,
+    prefetch,
+    onPointerEnter,
+    onPointerLeave,
     onMouseEnter,
     onMouseLeave,
-    onFocus,
     onTouchStart,
+    onFocus,
     ...props
 }: HoverPrefetchLinkProps) {
-    const [shouldPrefetch, setShouldPrefetch] = useState(false);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const router = useRouter();
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        if (!shouldPrefetch) {
-            // 80ms delay to make sure the hover is intentional (reduces unnecessary fetching on sweep)
-            timeoutRef.current = setTimeout(() => {
-                setShouldPrefetch(true);
-            }, 80);
+    const handlePointerEnter = (e: React.PointerEvent<HTMLAnchorElement>) => {
+        if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
+            const pathStr = resolveHrefToString(props.href);
+            if (pathStr && !timeoutRef.current) {
+                timeoutRef.current = setTimeout(() => {
+                    router.prefetch(pathStr);
+                }, 80);
+            }
         }
-        onMouseEnter?.(e);
+        onPointerEnter?.(e);
+        if (onMouseEnter) {
+            onMouseEnter(e as unknown as React.MouseEvent<HTMLAnchorElement>);
+        }
     };
 
-    const handleMouseLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handlePointerLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
             timeoutRef.current = null;
         }
-        onMouseLeave?.(e);
+        onPointerLeave?.(e);
+        if (onMouseLeave) {
+            onMouseLeave(e as unknown as React.MouseEvent<HTMLAnchorElement>);
+        }
     };
 
     const handleFocus = (e: React.FocusEvent<HTMLAnchorElement>) => {
-        setShouldPrefetch(true);
+        const pathStr = resolveHrefToString(props.href);
+        if (pathStr) {
+            router.prefetch(pathStr);
+        }
         onFocus?.(e);
     };
 
     const handleTouchStart = (e: React.TouchEvent<HTMLAnchorElement>) => {
-        setShouldPrefetch(true);
+        const pathStr = resolveHrefToString(props.href);
+        if (pathStr) {
+            router.prefetch(pathStr);
+        }
         onTouchStart?.(e);
     };
 
@@ -64,9 +112,9 @@ export function HoverPrefetchLink({
     return (
         <Link
             {...props}
-            prefetch={shouldPrefetch ? (prefetchProp === undefined ? true : prefetchProp) : false}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            prefetch={false}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
             onFocus={handleFocus}
             onTouchStart={handleTouchStart}
         >

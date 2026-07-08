@@ -7,27 +7,27 @@
  */
 
 /**
- * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
- * DEDUPLICATION ENGINE â€” Upstash Redis
+ * ═════════════════════════════════════════════════════════════════════
+ * DEDUPLICATION ENGINE — Upstash Redis
  * Convex Actions run in Node.js runtime ("use node").
- * This module uses @upstash/redis directly from process.env.
+ * This module uses the Upstash REST API directly via fetch().
  *
  * Strategy:
  *  - Hash = SHA-256 of (normalized_url + normalized_title)
  *  - SET key in Redis with EX=86400 (24 hours)
- *  - If key already exists â†’ article is a duplicate â†’ SKIP
- *  - If key is new â†’ article is fresh â†’ PROCEED
+ *  - If key already exists → article is a duplicate → SKIP
+ *  - If key is new → article is fresh → PROCEED
  *
  * Redis credentials consumed from environment:
  *   UPSTASH_REDIS_REST_URL
  *   UPSTASH_REDIS_REST_TOKEN
- * â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• â• 
+ * ═════════════════════════════════════════════════════════════════════
  */
 
-const DEDUP_TTL_SECONDS = 86400; // 24 hours
-const DEDUP_KEY_PREFIX = "monitoring:dedup:";
+export const DEDUP_TTL_SECONDS = 86400; // 24 hours
+export const DEDUP_KEY_PREFIX = "monitoring:dedup:";
 
-// â”€â”€ Lazy Redis client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// —— Lazy Redis client ————————————————————————————————
 // We construct the client lazily to avoid failures at module-load time
 // when env vars might not yet be resolved.
 function getRedisClient() {
@@ -46,7 +46,7 @@ function getRedisClient() {
  * Normalises the URL (lowercase, strip trailing slash & query params for
  * canonical comparison) before hashing.
  */
-async function buildDedupHash(url: string, title: string): Promise<string> {
+export async function buildDedupHash(url: string, title: string): Promise<string> {
   const normalizedUrl = url.toLowerCase().split("?")[0].replace(/\/$/, "");
   const normalizedTitle = title.toLowerCase().trim();
   const raw = `${normalizedUrl}::${normalizedTitle}`;
@@ -59,8 +59,8 @@ async function buildDedupHash(url: string, title: string): Promise<string> {
 /**
  * Performs a Redis SET NX (Set if Not eXists) with a 24-hour TTL.
  *
- * @returns `true`  â†’ article was already seen (DUPLICATE â€” skip it)
- * @returns `false` â†’ article is new (proceed with ingestion)
+ * @returns `true`  → article was already seen (DUPLICATE — skip it)
+ * @returns `false` → article is new (proceed with ingestion)
  */
 let hasWarnedMissingRedis = false;
 
@@ -68,9 +68,9 @@ export async function checkAndSetSeen(url: string, title: string): Promise<boole
   const client = getRedisClient();
 
   if (!client) {
-    // Redis not configured â€” allow all articles through (no dedup)
+    // Redis not configured — allow all articles through (no dedup)
     if (!hasWarnedMissingRedis) {
-      console.warn("âš ï¸ Dedup: UPSTASH_REDIS_REST_URL/TOKEN not set. Deduplication disabled.");
+      console.warn("⚠️ Dedup: UPSTASH_REDIS_REST_URL/TOKEN not set. Deduplication disabled.");
       hasWarnedMissingRedis = true;
     }
     return false;
@@ -80,7 +80,7 @@ export async function checkAndSetSeen(url: string, title: string): Promise<boole
   const key = `${DEDUP_KEY_PREFIX}${hash}`;
 
   try {
-    // Upstash REST API â€” SET key value NX EX ttl
+    // Upstash REST API — SET key value NX EX ttl
     // Returns "OK" if set (new), null if already exists (duplicate)
     const res = await fetch(`${client.url}/set/${encodeURIComponent(key)}/1/NX/EX/${DEDUP_TTL_SECONDS}`, {
       method: "GET",
@@ -90,7 +90,7 @@ export async function checkAndSetSeen(url: string, title: string): Promise<boole
     });
 
     if (!res.ok) {
-      console.warn(`âš ï¸ Dedup Redis error: HTTP ${res.status}`);
+      console.warn(`⚠️ Dedup Redis error: HTTP ${res.status}`);
       return false; // Fail-open: allow articles through on Redis errors
     }
 
@@ -98,28 +98,75 @@ export async function checkAndSetSeen(url: string, title: string): Promise<boole
     const isNew = data.result === "OK";
 
     if (!isNew) {
-      console.log(`ðŸ—‘ï¸ Dedup skip: "${title.substring(0, 60)}..." (seen within 24h)`);
+      console.log(`🗑️ Dedup skip: "${title.substring(0, 60)}..." (seen within 24h)`);
     }
 
-    return !isNew; // Return true â†’ duplicate (skip), false â†’ new (proceed)
+    return !isNew; // Return true → duplicate (skip), false → new (proceed)
   } catch (error) {
-    console.warn("âš ï¸ Dedup Redis request failed:", error);
+    console.warn("⚠️ Dedup Redis request failed:", error);
     return false; // Fail-open on network errors
   }
 }
 
 /**
- * Batch-check: returns a Set of indices that are duplicates.
- * Useful for future batch optimisation (not used in current pipeline).
+ * Batch-check using the Upstash REST `/pipeline` endpoint.
+ * Sends all SET NX commands in a single HTTP request instead of N round-trips.
+ *
+ * @returns A Set of indices that are duplicates (already seen within 24h).
  */
 export async function batchCheckSeen(
   items: Array<{ url: string; title: string }>
 ): Promise<Set<number>> {
   const duplicateIndices = new Set<number>();
-  // Sequential for now â€” could be optimised with Redis pipeline/MGET
-  for (let i = 0; i < items.length; i++) {
-    const isDuplicate = await checkAndSetSeen(items[i].url, items[i].title);
-    if (isDuplicate) duplicateIndices.add(i);
+  if (items.length === 0) return duplicateIndices;
+
+  const client = getRedisClient();
+  if (!client) {
+    if (!hasWarnedMissingRedis) {
+      console.warn("⚠️ Dedup: UPSTASH_REDIS_REST_URL/TOKEN not set. Deduplication disabled.");
+      hasWarnedMissingRedis = true;
+    }
+    return duplicateIndices;
   }
+
+  // Pre-compute all hashes in parallel
+  const hashes = await Promise.all(
+    items.map(item => buildDedupHash(item.url, item.title))
+  );
+
+  // Build pipeline: one SET key 1 NX EX 86400 per item
+  const pipeline = hashes.map(hash => [
+    "SET", `${DEDUP_KEY_PREFIX}${hash}`, "1", "NX", "EX", String(DEDUP_TTL_SECONDS)
+  ]);
+
+  try {
+    const res = await fetch(`${client.url}/pipeline`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${client.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(pipeline),
+    });
+
+    if (!res.ok) {
+      console.warn(`⚠️ Dedup pipeline Redis error: HTTP ${res.status}`);
+      return duplicateIndices; // Fail-open
+    }
+
+    // Each result is { result: "OK" } for new or { result: null } for duplicate
+    const results = await res.json() as Array<{ result: string | null; error?: string }>;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].result !== "OK") {
+        duplicateIndices.add(i);
+        const title = items[i].title;
+        console.log(`🗑️ Dedup skip: "${title.substring(0, 60)}..." (seen within 24h)`);
+      }
+    }
+  } catch (error) {
+    console.warn("⚠️ Dedup pipeline request failed:", error);
+    // Fail-open: return empty set (allow all through)
+  }
+
   return duplicateIndices;
 }

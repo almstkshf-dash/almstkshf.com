@@ -1,32 +1,26 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
+ */
+
 import { action, internalAction } from "./_generated/server";
 import { v, ConvexError } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { resolveApiKey } from "./utils/keys";
-import { callWithAiRetry } from "./utils/aiRetry";
+import { requireAdmin } from "./utils/auth";
+import { callGeminiForFreeAnalysis } from "./utils/gemini";
 
-// Define the expected structure from Gemini API
-interface GeminiResponse {
-    candidates?: {
-        content?: {
-            parts?: {
-                text?: string;
-            }[];
-        };
-    }[];
-}
-
-// Define the expected analysis structure
-interface AnalysisResult {
-    sentiment: "Positive" | "Neutral" | "Negative";
-    score: number;
-    risk: "Low" | "Medium" | "High";
-    riskScore: number; // 0-100
-    tone: string;
-    emotions: Record<string, number>; // e.g. { joy: 0.1, anger: 0.8 }
-    topics: string[];
-    entities: string[];
-    recommendation: string;
-}
+// Central default values for failed/pending analysis states
+const DEFAULT_ANALYSIS = {
+    sentiment: "Neutral" as const,
+    score: 50,
+    risk: "Medium" as const,
+    riskScore: 50,
+    tone: "Analytical",
+};
 
 /**
  * Expert Media & Reputation Intelligence Action
@@ -44,19 +38,40 @@ export const analyzeMedia = action({
             };
         }
 
+        // Input validation: reject empty, excessive, or malformed inputs
+        const trimmed = text.trim();
+        if (trimmed.length === 0) {
+            return { success: false, error: "Input text cannot be empty." };
+        }
+        if (trimmed.length > 100000) {
+            return { success: false, error: "Input text is too long (maximum 100,000 characters)." };
+        }
+
         try {
+            // Limit processed text size to protect against cost and latency explosion
+            const processedText = trimmed.length > 25000 
+                ? trimmed.substring(0, 25000) + "\n[Text truncated for analysis length limits]" 
+                : trimmed;
+
             // Schedule background analysis
-            const analysisId = await ctx.runMutation(api.analyses.createAnalysisPending, { inputText: text });
-            await ctx.scheduler.runAfter(0, internal.media.analyzeMediaBackground, { analysisId, text });
+            const analysisId = await ctx.runMutation(api.analyses.createAnalysisPending, { inputText: trimmed });
+            await ctx.scheduler.runAfter(0, internal.media.analyzeMediaBackground, { 
+                analysisId, 
+                text: processedText 
+            });
 
             return {
                 success: true,
                 analysisId,
             };
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("ALMSTKSHF AI Engine Global Error:", error);
-            return { success: false, error: "Analysis initiation failed due to a system error." };
+            const errDetails = error instanceof Error ? error.message : String(error);
+            return { 
+                success: false, 
+                error: `Analysis initiation failed due to a system error. Details: ${errDetails}` 
+            };
         }
     },
 });
@@ -68,11 +83,7 @@ export const analyzeMediaBackground = internalAction({
         if (!apiKey) {
             await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
                 id: analysisId,
-                sentiment: "Neutral",
-                score: 50,
-                risk: "Medium",
-                riskScore: 50,
-                tone: "Analytical",
+                ...DEFAULT_ANALYSIS,
                 recommendation: "Error: The AI service is not configured.",
                 status: "failed",
                 error: "GEMINI_API_KEY missing from Convex configuration."
@@ -80,154 +91,46 @@ export const analyzeMediaBackground = internalAction({
             return;
         }
 
-        const prompt = `You are an expert Media & Reputation Risk analyst.
-Analyze the following text for sentiment, risk, emotions, and strategic impact.
-
-IMPORTANT: Your response (especially "tone", "topics", "entities", and "recommendation") MUST be in the same language as the provided TEXT. If the TEXT is in Arabic, all descriptive fields in the JSON MUST be in Arabic.
-
-TEXT:
-"""
-${text}
-"""
-
-Return valid JSON ONLY:
-{
-  "sentiment": "Positive" | "Neutral" | "Negative",
-  "score": number (0-100, 100=most positive),
-  "risk": "Low" | "Medium" | "High",
-  "riskScore": number (0-100, 100=extreme risk),
-  "tone": "short phrase describing tone in input language",
-  "emotions": { "joy": 0.x, "anger": 0.x, "sadness": 0.x, "fear": 0.x, "disgust": 0.x, "surprise": 0.x, "trust": 0.x, "anticipation": 0.x },
-  "topics": ["topic1", "topic2"],
-  "entities": ["entity1", "entity2"],
-  "recommendation": "strategic advice (2 sentences) in input language"
-}`;
+        const startTime = Date.now();
 
         try {
-            const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
-            let finalResult: any = null;
-            let lastError = "";
-
-            for (const model of models) {
-                try {
-                    const result = await callWithAiRetry<any>(async () => {
-                        return await fetch(
-                            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-                            {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    contents: [{ parts: [{ text: prompt }] }],
-                                    generationConfig: {
-                                        temperature: 0.7,
-                                        responseMimeType: "application/json",
-                                        responseSchema: {
-                                            type: "OBJECT",
-                                            properties: {
-                                                sentiment: { type: "STRING", enum: ["Positive", "Neutral", "Negative"] },
-                                                score: { type: "INTEGER" },
-                                                risk: { type: "STRING", enum: ["Low", "Medium", "High"] },
-                                                riskScore: { type: "INTEGER" },
-                                                tone: { type: "STRING" },
-                                                emotions: {
-                                                    type: "OBJECT",
-                                                    properties: {
-                                                        joy: { type: "NUMBER" },
-                                                        anger: { type: "NUMBER" },
-                                                        sadness: { type: "NUMBER" },
-                                                        fear: { type: "NUMBER" },
-                                                        disgust: { type: "NUMBER" },
-                                                        surprise: { type: "NUMBER" },
-                                                        trust: { type: "NUMBER" },
-                                                        anticipation: { type: "NUMBER" }
-                                                    },
-                                                    required: ["joy", "anger", "sadness", "fear", "disgust", "surprise", "trust", "anticipation"]
-                                                },
-                                                topics: { type: "ARRAY", items: { type: "STRING" } },
-                                                entities: { type: "ARRAY", items: { type: "STRING" } },
-                                                recommendation: { type: "STRING" }
-                                            },
-                                            required: ["sentiment", "score", "risk", "riskScore", "tone", "emotions", "topics", "entities", "recommendation"]
-                                        }
-                                    },
-                                }),
-                            }
-                        );
-                    }, { maxRetries: 2 });
-
-                    if (result.capacityExhausted) {
-                        const err = new Error("MODEL_CAPACITY_EXHAUSTED");
-                        (err as any).retryAfter = result.retryAfter;
-                        throw err;
-                    }
-
-                    if (result.success && result.data) {
-                        finalResult = result.data;
-                        break;
-                    } else {
-                        lastError = `Model ${model} failed to return data.`;
-                    }
-                } catch (e: any) {
-                    if (e.message === "MODEL_CAPACITY_EXHAUSTED") throw e;
-                    lastError = `Fetch failed for ${model}: ${e.message}`;
-                    continue;
-                }
-            }
-
-            if (!finalResult) {
-                throw new Error(`The AI service is currently unavailable. ${lastError}`);
-            }
-
-            const responseText = finalResult?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (!responseText) {
-                throw new Error("Received an empty response from our analysis engine.");
-            }
-
-            const analysis = JSON.parse(responseText.trim());
-
-            // Validate and sanitize deeply to ensure type safety
-            const validated = {
-                sentiment: ["Positive", "Neutral", "Negative"].includes(analysis.sentiment)
-                    ? analysis.sentiment
-                    : "Neutral",
-                score: typeof analysis.score === "number"
-                    ? Math.max(0, Math.min(100, Math.round(analysis.score)))
-                    : 50,
-                risk: ["Low", "Medium", "High"].includes(analysis.risk)
-                    ? analysis.risk
-                    : "Medium",
-                riskScore: typeof analysis.riskScore === "number"
-                    ? Math.max(0, Math.min(100, Math.round(analysis.riskScore)))
-                    : 50,
-                tone: typeof analysis.tone === "string" && analysis.tone.length > 0
-                    ? analysis.tone
-                    : "Analytical",
-                emotions: typeof analysis.emotions === "object" ? analysis.emotions : {},
-                topics: Array.isArray(analysis.topics) ? analysis.topics : [],
-                entities: Array.isArray(analysis.entities) ? analysis.entities : [],
-                recommendation: typeof analysis.recommendation === "string" && analysis.recommendation.length > 0
-                    ? analysis.recommendation
-                    : "Further analysis recommended.",
-            };
+            // Invoke structured analysis via central Gemini client utility
+            const analysis = await callGeminiForFreeAnalysis(apiKey, text);
+            const elapsed = Date.now() - startTime;
+            
+            console.log(`[analyzeMediaBackground] Success. ID: ${analysisId}, Input length: ${text.length}, Time: ${elapsed}ms`);
 
             await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
                 id: analysisId,
-                ...validated,
+                ...analysis,
                 status: "completed"
             });
-        } catch (error: any) {
-            console.error("[analyzeMediaBackground] Error:", error);
+        } catch (error: unknown) {
+            const elapsed = Date.now() - startTime;
+            console.error(`[analyzeMediaBackground] Error after ${elapsed}ms:`, error);
+            
+            let errorMessage = "Analysis failed due to a system error.";
+            let statusError = "";
+
+            if (error instanceof Error) {
+                statusError = error.message;
+                // Preserve specific retry advice if models are rate-limited / capacity-exhausted
+                if (error.message === "MODEL_CAPACITY_EXHAUSTED" && ("retryAfter" in error)) {
+                    errorMessage = `The AI service is temporarily overloaded. Please try again after ${String((error as any).retryAfter)} seconds.`;
+                } else {
+                    errorMessage = error.message;
+                }
+            } else {
+                statusError = String(error);
+                errorMessage = String(error);
+            }
+
             await ctx.runMutation(api.analyses.updateAnalysisAfterAnalysis, {
                 id: analysisId,
-                sentiment: "Neutral",
-                score: 50,
-                risk: "Medium",
-                riskScore: 50,
-                tone: "Analytical",
-                recommendation: "Analysis failed due to a system error.",
+                ...DEFAULT_ANALYSIS,
+                recommendation: errorMessage,
                 status: "failed",
-                error: error.message || String(error)
+                error: statusError
             });
         }
     }
@@ -235,14 +138,17 @@ Return valid JSON ONLY:
 
 /**
  * Debug Action: List all available Gemini models for the current API Key.
- * Run this to verify which models are accessible.
+ * Run this to verify which models are accessible. Secured for admin use only.
  */
 export const listModels = action({
     args: {},
     handler: async (ctx) => {
-        const apiKey = process.env.GEMINI_API_KEY?.trim();
+        // Security: Restrict endpoint to admin users only
+        await requireAdmin(ctx.auth);
+        
+        const apiKey = await resolveApiKey(ctx, "GEMINI_API_KEY", "gemini");
         if (!apiKey) {
-            throw new ConvexError("GEMINI_API_KEY is missing via process.env");
+            throw new ConvexError("GEMINI_API_KEY is missing from configuration.");
         }
 
         console.log("Listing available Gemini models...");

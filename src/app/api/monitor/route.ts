@@ -13,6 +13,7 @@ import { calculateMetrics } from "@/lib/metrics";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
+import { checkApiAuth } from "@/lib/api-auth";
 import { unstable_cache } from "next/cache";
 import { triggerOnDemandRevalidation } from "@/utils/revalidation";
 
@@ -20,7 +21,12 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: NextRequest) {
     try {
-        const rlKey = await getRateLimitKey(req, 'monitor:post');
+        const auth = await checkApiAuth();
+        if (!auth.authorized) {
+            return auth.errorResponse!;
+        }
+
+        const rlKey = await getRateLimitKey(req, 'monitor:post', auth.userId);
         const limit = await rateLimit(rlKey, 15, 60);
         if (!limit.allowed) {
             return NextResponse.json(
@@ -151,7 +157,12 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const rlKey = await getRateLimitKey(req, 'monitor:get');
+    const auth = await checkApiAuth();
+    if (!auth.authorized) {
+        return auth.errorResponse!;
+    }
+
+    const rlKey = await getRateLimitKey(req, 'monitor:get', auth.userId);
     const rl = await rateLimit(rlKey, 60, 60);
     if (!rl.allowed) {
         return NextResponse.json(

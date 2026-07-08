@@ -11,14 +11,11 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useMounted } from "@/hooks/useMounted";
 
 export function ThemeToggle() {
-    const [mounted, setMounted] = React.useState(false);
+    const mounted = useMounted();
     const { theme, setTheme } = useTheme();
-
-    React.useEffect(() => {
-        setMounted(true);
-    }, []);
 
     if (!mounted) {
         return <div className="w-9 h-9 rounded-full border border-border bg-background animate-pulse" />;

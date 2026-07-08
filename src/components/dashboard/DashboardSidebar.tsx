@@ -29,7 +29,7 @@ import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 
-type ViewId = 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb';
+type ViewId = 'standard' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb';
 
 interface NavItem {
     id: ViewId;
@@ -40,7 +40,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
     { id: 'standard', labelKey: 'sidebar.standard', icon: Globe, adminOnly: false },
-    { id: 'deep', labelKey: 'sidebar.deep', icon: Search, adminOnly: false },
     { id: 'osint', labelKey: 'sidebar.osint', icon: ShieldCheck, adminOnly: false },
     { id: 'inspect', labelKey: 'sidebar.inspect', icon: InspectIcon, adminOnly: false },
     { id: 'darkweb', labelKey: 'sidebar.darkweb', icon: GlobeLock, adminOnly: false },

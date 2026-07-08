@@ -8,7 +8,6 @@
     "lexcora": "LEXCORA",
     "styling_assistant": "Smart Styling Assistant",
     "technical_solutions": "Technical Solutions",
-    "smart_media_assistant": "Smart Media Assistant",
     "kyc_compliance": "KYC Compliance",
     "integration_hub": "Integration Hub",
     "api_key": "API Key",
@@ -19,6 +18,7 @@
     "central_media_repository": "Central Media Repository",
     "media_pulse": "Media Pulse",
     "system_status": "System Status",
+    "active_safeguard": "Active Safeguard",
     "crisis_management": "Crisis Management Plans",
     "all": "All",
     "tv": "TV",
@@ -27,15 +27,9 @@
     "get_started": "Get Started",
     "contact": "Contact Us",
     "pricing": "Pricing",
-    "smart_assistant_input_placeholder": "Generate a press response...",
-    "whatsapp": "WHATSAPP",
-    "teams": "TEAMS",
-    "slack": "SLACK",
-    "outlook": "OUTLOOK",
     "faq": "FAQ",
     "lexcora_desc": "Premier ERP suite for high-net-worth law firms",
     "styling_assistant_desc": "Smart fashion and styling recommendations",
-    "smart_media_assistant_desc": "Advanced media analysis tools",
     "kyc_compliance_desc": "Automated identity verification",
     "integration_hub_desc": "Seamless API integrations",
     "tv_radio_monitoring_desc": "Real-time broadcast tracking",
@@ -180,6 +174,9 @@
     }
   },
   "Common": {
+    "theme_light": "Light Theme",
+    "theme_dark": "Dark Theme",
+    "theme_system": "System Theme",
     "confirm": "Confirm",
     "close": "Close",
     "cancel": "Cancel",
@@ -221,7 +218,32 @@
     "secure_alt": "Military-Grade Encryption & Secure Application Badge",
     "saas_awards_alt": "Global SaaS Awards - Winner for Innovative Enterprise AI",
     "logo_alt": "ALMSTKSHF Official Logo - Advanced Media & Legal Solutions",
-    "articles_count": "Articles"
+    "articles_count": "Articles",
+    "collection_name": "Collection Name",
+    "create_and_save": "Create & Save",
+    "create_new_collection": "Create New Collection",
+    "existing_collections": "Existing Collections",
+    "no_collections_yet": "No collections yet.",
+    "no_items_selected": "No items selected to save.",
+    "saved_items_successfully": "Saved {count} items successfully!",
+    "already_in_collection": "({count} were already in collection)",
+    "all_already_in_collection": "All items are already in the selected collection.",
+    "created_and_saved": "Created collection and saved {count} items successfully!",
+    "all_already_in_created": "All items are already in the created collection.",
+    "unable_to_save": "Unable to save items. Please try again.",
+    "unable_to_create": "Unable to create collection. Please try again.",
+    "must_be_signed_in": "You must be signed in to perform this action.",
+    "no_permission": "You do not have permission to modify this collection.",
+    "start_new_collection": "Start a new report collection",
+    "collection_name_placeholder": "e.g. Investigation Q3",
+    "save_modal_description": "Choose a collection or create a new one.",
+    "added_new_items": "Added {count} new items.",
+    "items_already_present": "{count} items were already present.",
+    "saving": "Saving...",
+    "no_data": "No data available to export",
+    "exporting": "Exporting report...",
+    "edit": "Edit",
+    "delete_confirm": "Are you sure?"
   },
   "SearchOptimizer": {
     "button_tooltip": "Optimize Search with AI",
@@ -440,7 +462,8 @@
       "tech_support_label": "Technical Support",
       "our_locations": "Our Locations",
       "map_dubai_tab": "Dubai (One Central)",
-      "map_abudhabi_tab": "Abu Dhabi (Al Khatem Tower)"
+      "map_abudhabi_tab": "Abu Dhabi (Al Khatem Tower)",
+      "map_title": "Office Location Map"
     }
   },
   "WhyChooseUs": {
@@ -474,47 +497,6 @@
     }
   },
   "Services": {},
-  "AI": {
-    "badge": "Gemini OSINT Engine",
-    "deploy": "Deploy Analysis",
-    "view_caps": "View Capabilities",
-    "status": "System Status",
-    "instruction": "Describe the narrative or crisis to analyze...",
-    "prompt": "Intelligence Prompt",
-    "response": "AI Response",
-    "ai_busy_wait": "Model at capacity. Retrying in {seconds}s...",
-    "capabilities": {
-      "title": "Quantum Intelligence Capabilities",
-      "subtitle": "Beyond Conventional Monitoring",
-      "s1": {
-        "title": "Narrative Synthesis",
-        "desc": "Converts thousands of articles into a single coherent narrative summary."
-      },
-      "s2": {
-        "title": "Crisis Prediction",
-        "desc": "Identifies early warning signs of reputational damage before they peak."
-      },
-      "s3": {
-        "title": "Strategic Recommendations",
-        "desc": "Provides actionable counter-narratives and response strategies."
-      },
-      "s4": {
-        "title": "Sentiment Deep-Dive",
-        "desc": "Multi-layered emotion detection across diverse cultural contexts."
-      }
-    },
-    "integration": {
-      "title": "Seamless Intelligence Integration",
-      "desc": "Deploy your AI assistant across your existing leadership communication channels."
-    },
-    "analysis_complete": "Strategic analysis complete",
-    "analysis_empty": "No data extracted from the prompt.",
-    "analysis_error": "Strategic analysis failed due to system error.",
-    "risk_label": "Risk",
-    "sentiment_label": "Sentiment",
-    "awaiting_instruction": "Awaiting instruction...",
-    "processing_input": "Processing input..."
-  },
   "Clients": {
     "title": "Trusted by Leaders",
     "list": {
@@ -534,6 +516,7 @@
     }
   },
   "FreeTool": {
+    "badge": "Free Service",
     "title": "AI Media Pulse",
     "subtitle": "Analyze sentiment and risk in real-time. Paste a headline or statement below.",
     "placeholder": "e.g., Brand X receives major environmental award in Dubai...",
@@ -561,14 +544,16 @@
       "negative": "Negative"
     },
     "emotions": {
-      "Joy": "Joy",
-      "Anger": "Anger",
-      "Fear": "Fear",
-      "Sadness": "Sadness",
-      "Surprise": "Surprise",
-      "Disgust": "Disgust",
-      "Neutral": "Neutral",
-      "Analytical": "Analytical"
+      "joy": "Joy",
+      "anger": "Anger",
+      "fear": "Fear",
+      "sadness": "Sadness",
+      "surprise": "Surprise",
+      "disgust": "Disgust",
+      "neutral": "Neutral",
+      "analytical": "Analytical",
+      "radar_name": "Emotion",
+      "accessibility_label": "Emotional intensity radar chart"
     }
   },
   "MediaMonitoring": {
@@ -1057,7 +1042,10 @@
     },
     "card": {
       "priority": "Priority",
-      "action_protocol": "Action Protocol"
+      "action_protocol": "Action Protocol",
+      "priority_low": "Low Priority",
+      "priority_medium": "Medium Priority",
+      "priority_high": "High Priority"
     }
   },
   "TechnicalSolutions": {
@@ -1109,7 +1097,35 @@
       "cta_docs": "Read API Documentation",
       "cta_contact": "Start Integration",
       "ecosystem_title": "Integrations Ecosystem",
-      "ecosystem_subtitle": "Connect ALMSTKSHF with the tools and workflows you already use."
+      "ecosystem_subtitle": "Connect ALMSTKSHF with the tools and workflows you already use.",
+      "details": "Integration details",
+      "list": {
+        "slack": {
+          "name": "Slack",
+          "desc": "Receive real-time sentiment alerts and crisis notifications directly in your team's Slack channels.",
+          "category": "Messaging"
+        },
+        "webhooks": {
+          "name": "Custom Webhooks",
+          "desc": "Trigger custom HTTP callbacks to your own systems whenever new media articles are analyzed.",
+          "category": "Developer Tools"
+        },
+        "crm": {
+          "name": "CRM Systems",
+          "desc": "Sync media insights and corporate reputation profiles directly with Salesforce, HubSpot, or Microsoft Dynamics.",
+          "category": "CRM & Sales"
+        },
+        "teams": {
+          "name": "Microsoft Teams",
+          "desc": "Share automated media summary reports and broadcast intelligence inside Microsoft Teams spaces.",
+          "category": "Messaging"
+        },
+        "email": {
+          "name": "Email Digests",
+          "desc": "Configure periodic custom digests and instant emergency notifications sent to your inbox.",
+          "category": "Notifications"
+        }
+      }
     }
   },
   "Legal": {
@@ -1441,6 +1457,8 @@
     "error_language_required": "Select at least one content language.",
     "no_results": "No results found",
     "selected": "selected",
+    "all_selected": "All Selected",
+    "select_all": "Select All",
     "sources_selected": "items selected",
     "source_types": "Source Types",
     "source_types_list": {
@@ -1455,7 +1473,10 @@
     "clear_all": "Clear All",
     "remove": "Remove",
     "not_authenticated": "Not authenticated. Please sign in first.",
-    "ai_busy_wait": "The AI service is currently at maximum capacity. Please wait {seconds} seconds before your next request."
+    "ai_busy_wait": "The AI service is currently at maximum capacity. Please wait {seconds} seconds before your next request.",
+    "error_date_range_invalid": "Start date must be before or equal to end date.",
+    "error_keyword_too_long": "Keyword cannot exceed 300 characters.",
+    "ready_to_retry": "Ready to retry."
   },
   "DeepSources": {
     "title": "Deep Web Monitoring",
@@ -1537,7 +1558,13 @@
     "existing_keyword_matches": "All {count} matching articles for \"{keyword}\" are already saved in your database.",
     "sync_success_already_ingested": "Sync complete. All {count} matching articles were already saved in your database.",
     "feed_saved_only": "+{saved}",
-    "feed_saved_with_total": "+{saved} ({total} found)"
+    "feed_saved_with_total": "+{saved} ({total} found)",
+    "confirm_delete_collection": "Are you sure you want to delete this collection?",
+    "collection_deleted": "Collection deleted successfully!",
+    "syncing_progress": "Syncing... {completed}/{total} sources completed",
+    "syncing_stats": "Saved: {saved} articles | Failed: {failed} feeds",
+    "sync_running": "Sync in progress...",
+    "sync_pending": "Preparing sync..."
   },
   "Error": {
     "title": "System Alert: Page Loading Failed",
@@ -1668,7 +1695,7 @@
         "found": "Found",
         "clear": "Clear",
         "unknown": "Unknown",
-        "digital_exposure": "Digital Exposure Score",
+        "digital_exposure": "Observed online presence",
         "exposure_score": "Digital Exposure Score",
         "platforms_found": "Platforms Found",
         "found_on": "Found On",
@@ -1715,7 +1742,7 @@
         "match_count": "Direct Matches",
         "platforms_checked": "Platforms Checked",
         "platforms_found": "Accounts Found",
-        "digital_exposure": "Digital Exposure Score",
+        "digital_exposure": "Observed online presence",
         "platform_found": "Account Found",
         "platform_clear": "Not Registered",
         "platform_unknown": "Unknown / Blocked",
@@ -1730,6 +1757,14 @@
         "data_feeds": "Data Feeds",
         "toggle_raw": "Toggle Developer Raw Data"
       }
+    },
+    "validation": {
+      "empty": "Search query cannot be empty",
+      "invalid_email": "Please enter a valid email address",
+      "invalid_ip": "Please enter a valid IP address (IPv4 or IPv6)",
+      "invalid_domain": "Please enter a valid domain name",
+      "invalid_phone": "Please enter a valid phone number",
+      "too_short": "Query is too short (minimum 2 characters)"
     },
     "admin_only": "Advanced OSINT searches are restricted to admin accounts. Please contact administrator for access.",
     "export_history": "Export Investigation History",
@@ -1943,7 +1978,10 @@
       "uploading": "Processing Data...",
       "drop_file": "Click or Drag File to Upload",
       "warning": "CRITICAL: This action will permanently PERGE the current terrorist list and replace it with the new file contents. This cannot be undone."
-    }
+    },
+    "load_more": "Load More",
+    "import_success": "Import complete! Added: {added} new records. Skipped: {skipped} duplicates.",
+    "save_success": "Saved to collection successfully!"
   },
   "AiInspector": {
     "title": "AI Content Inspector",
@@ -2227,6 +2265,9 @@
     "forensic_extraction": "Forensic Extraction",
     "text_validation_error": "Please provide at least 50 characters for an accurate forensic analysis.",
     "file_validation_error": "File exceeds 50MB maximum size limit.",
+    "image_too_large": "Image file size exceeds the 20MB limit.",
+    "video_too_large": "Video file size exceeds the 200MB limit.",
+    "reset": "Reset analysis",
     "export": {
       "label_mode": "MODE",
       "label_risk": "RISK LEVEL",
@@ -2247,7 +2288,16 @@
       "frame_analysis": "Video Frame Analysis",
       "col_time": "Timestamp",
       "col_anomaly": "Anomaly Type",
-      "col_severity": "Severity"
+      "col_severity": "Severity",
+      "anatomy_consistency": "Anatomy Consistency",
+      "anomaly_detected": "Anomaly Detected",
+      "anomaly_low_risk": "No Anomalies",
+      "ocr_detect": "OCR Text Layer",
+      "detected_ai_signature": "AI Watermark",
+      "biometric_scouts": "Biometric & Deep ML Signals",
+      "col_feature": "Feature",
+      "col_detail": "Detail",
+      "col_status": "Status"
     }
   },
   "DarkWeb": {

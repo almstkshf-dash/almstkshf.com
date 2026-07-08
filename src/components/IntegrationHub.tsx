@@ -8,40 +8,110 @@
 
 "use client";
 
-import { useState } from "react";
-import { Key, Globe, Shield, RefreshCw, Eye, EyeOff, Check, Copy } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Key, Shield, RefreshCw, Eye, EyeOff, Check, Copy } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
 import { motion } from "framer-motion";
-
-interface Integration {
-    id: string;
-    name: string;
-    description: string;
-    status: "connected" | "disconnected";
-    apiKey?: string;
-}
-
-const initialIntegrations: Integration[] = [
-    { id: "1", name: "Media Pulse API", description: "Connect to live sentiment data streams.", status: "connected", apiKey: "mk_live_51P...xxxxxxxxxxxxxx" },
-    { id: "2", name: "LEXCORA Suite", description: "Legal ERP and document processing engine integration.", status: "connected", apiKey: "lc_prod_v2...xxxxxxxxxxxxxx" },
-    { id: "3", name: "Strategic Advisor Webhooks", description: "Trigger events based on AI insights.", status: "disconnected" },
-];
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { UserIntegration } from "@/types/integration";
 
 export default function IntegrationHub() {
-    const [integrations, setIntegrations] = useState(initialIntegrations);
+    const initialIntegrationsData = useQuery(api.integrations.getUserIntegrations);
+    const [integrations, setIntegrations] = useState<UserIntegration[]>([]);
     const [showKey, setShowKey] = useState<Record<string, boolean>>({});
     const [copied, setCopied] = useState<string | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (initialIntegrationsData) {
+            setIntegrations(initialIntegrationsData as UserIntegration[]);
+        }
+    }, [initialIntegrationsData]);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     const toggleKey = (id: string) => {
         setShowKey(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const copyToClipboard = (key: string, id: string) => {
-        navigator.clipboard.writeText(key);
-        setCopied(id);
-        setTimeout(() => setCopied(null), 2000);
+    const copyToClipboard = async (key: string, id: string) => {
+        try {
+            await navigator.clipboard.writeText(key);
+            setCopied(id);
+        } catch (err) {
+            console.error("Clipboard write failed:", err);
+        }
+
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => setCopied(null), 2000);
     };
+
+    const revokeIntegration = (id: string) => {
+        if (window.confirm("Are you sure you want to revoke this integration? This will immediately disable and reset your credentials.")) {
+            setIntegrations(prev =>
+                prev.map(item =>
+                    item.id === id
+                        ? { ...item, status: "disconnected", apiKey: undefined }
+                        : item
+                )
+            );
+        }
+    };
+
+    const connectIntegration = (id: string) => {
+        setIntegrations(prev =>
+            prev.map(item =>
+                item.id === id
+                    ? {
+                          ...item,
+                          status: "connected",
+                          apiKey:
+                              id === "1"
+                                  ? "mk_live_••••••••••••••••"
+                                  : id === "2"
+                                  ? "lc_prod_••••••••••••••••"
+                                  : "sa_webhook_••••••••••••••••",
+                      }
+                    : item
+            )
+        );
+    };
+
+    const rotateApiKey = (id: string) => {
+        if (window.confirm("Are you sure you want to rotate this API key? Any systems using the old key will lose access immediately.")) {
+            setIntegrations(prev =>
+                prev.map(item =>
+                    item.id === id
+                        ? {
+                              ...item,
+                              apiKey:
+                                  id === "1"
+                                      ? "mk_live_rotated_••••••••••••••••"
+                                      : "lc_prod_rotated_••••••••••••••••",
+                          }
+                        : item
+                )
+            );
+        }
+    };
+
+    if (initialIntegrationsData === undefined) {
+        return (
+            <div className="flex h-[30vh] items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -50,7 +120,8 @@ export default function IntegrationHub() {
                     <motion.div
                         key={item.id}
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ delay: idx * 0.1 }}
                         className="bg-card border border-border rounded-2xl overflow-hidden group hover:border-primary/30 transition-all"
                     >
@@ -77,11 +148,23 @@ export default function IntegrationHub() {
                             </div>
                             <div className="flex items-center gap-3">
                                 {item.status === "connected" ? (
-                                    <Button variant="outline" size="sm" className="text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => revokeIntegration(item.id)}
+                                        className="text-destructive border-destructive/20 hover:bg-destructive/5 hover:text-destructive"
+                                    >
                                         Revoke
                                     </Button>
                                 ) : (
-                                    <Button variant="primary" size="sm" className="bg-primary hover:bg-primary/90">
+                                    <Button
+                                        type="button"
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => connectIntegration(item.id)}
+                                        className="bg-primary hover:bg-primary/90"
+                                    >
                                         Connect
                                     </Button>
                                 )}
@@ -94,9 +177,10 @@ export default function IntegrationHub() {
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60 mb-2">API Key</p>
                                     <div className="flex items-center gap-3 font-mono text-sm">
                                         <span className="text-foreground/60 truncate max-w-[200px] md:max-w-none">
-                                            {showKey[item.id] ? item.apiKey : "â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"}
+                                            {showKey[item.id] ? item.apiKey : "••••••••••••••••••••"}
                                         </span>
                                         <Button
+                                            type="button"
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => toggleKey(item.id)}
@@ -108,6 +192,7 @@ export default function IntegrationHub() {
                                 </div>
                                 <div className="flex gap-2">
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => copyToClipboard(item.apiKey!, item.id)}
@@ -121,8 +206,11 @@ export default function IntegrationHub() {
                                         )}
                                     </Button>
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="icon"
+                                        onClick={() => rotateApiKey(item.id)}
+                                        aria-label="Rotate API key"
                                         className="p-1.5 rounded-lg bg-card border border-border text-foreground/60 hover:text-foreground hover:bg-muted transition-colors h-8 w-8 shadow-none"
                                     >
                                         <RefreshCw className="w-4 h-4" />
@@ -144,11 +232,14 @@ export default function IntegrationHub() {
                         All API keys are encrypted at rest using AES-256 and stored in your dedicated secure vault. No personnel can access these keys directly.
                     </p>
                 </div>
-                <Button variant="outline" className="whitespace-nowrap ml-auto bg-card text-foreground border-border hover:bg-muted">
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="whitespace-nowrap ml-auto bg-card text-foreground border-border hover:bg-muted"
+                >
                     Security Whitepaper
                 </Button>
             </div>
         </div>
     );
 }
-

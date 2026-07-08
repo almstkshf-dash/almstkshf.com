@@ -8,7 +8,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -17,6 +17,8 @@ import Button from "./Button";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ReportGenerator } from "@/lib/report-generator";
+import { ReportTranslations } from "@/types/reports";
+import { useInertBackground } from "@/hooks/useInertBackground";
 
 interface CollectionDetailsModalProps {
     isOpen: boolean;
@@ -38,6 +40,10 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
     const [removingItemId, setRemovingItemId] = useState<string | null>(null);
     const [isDeletingCollection, setIsDeletingCollection] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const overlayRef = useRef<HTMLDivElement>(null);
+
+    // Apply `inert` to background content when modal is open
+    useInertBackground(isOpen, overlayRef);
 
     if (!isOpen) return null;
 
@@ -74,7 +80,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
     };
 
     // Prepare translation data for reporting
-    const exportTranslations = {
+    const exportTranslations: ReportTranslations = {
         sheet_name: tExport('sheet_name'),
         date: tExport('date'),
         title: tExport('title'),
@@ -137,7 +143,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
             toast.loading(tCommon('downloading'), { id: 'download-collection' });
             await ReportGenerator.exportMediaMonitoringReport(
                 monitoringItems,
-                exportTranslations as any,
+                exportTranslations,
                 'pdf',
                 settings?.logoUrl || undefined,
                 undefined,
@@ -170,7 +176,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
             toast.loading(tCommon('downloading'), { id: 'download-collection-excel' });
             await ReportGenerator.exportMediaMonitoringReport(
                 monitoringItems,
-                exportTranslations as any,
+                exportTranslations,
                 'excel',
                 settings?.logoUrl || undefined,
                 undefined,
@@ -186,6 +192,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
 
     return (
         <div 
+            ref={overlayRef}
             role="presentation"
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in"
             onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}

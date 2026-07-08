@@ -36,6 +36,7 @@ import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
+import { toast } from 'sonner';
 
 // Types
 import { DarkWebResult, ReportTranslations } from '@/types/reports';
@@ -615,7 +616,7 @@ export default function DarkWebTab() {
                   setEditingItem(null);
                 } catch(e) {
                   console.error(e);
-                  alert("Failed to update result.");
+                  toast.error("Failed to update result.");
                 }
               }}>Save Changes</Button>
             </div>

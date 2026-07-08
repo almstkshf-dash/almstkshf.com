@@ -22,6 +22,7 @@ import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { FolderPlus } from "lucide-react";
+import { toast } from 'sonner';
 
 // Components
 import TextResults from "@/components/analyzers/TextResults";
@@ -166,7 +167,7 @@ export default function AiInspectorTab() {
     if (!textInput.trim()) return;
 
     if (textInput.trim().length < 50) {
-      alert(t("text_validation_error") || "Please provide at least 50 characters for an accurate forensic analysis.");
+      toast.warning(t("text_validation_error") || "Please provide at least 50 characters for an accurate forensic analysis.");
       return;
     }
 
@@ -185,7 +186,7 @@ export default function AiInspectorTab() {
     // Data validation: Max file size 50MB
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(t("file_validation_error") || "File exceeds 50MB maximum size limit.");
+      toast.warning(t("file_validation_error") || "File exceeds 50MB maximum size limit.");
       return;
     }
 
@@ -417,7 +418,7 @@ export default function AiInspectorTab() {
                   <div className="lg:col-span-4 lg:sticky lg:top-8">
                     <div className="space-y-6">
                       <div className="aspect-square rounded-[2.5rem] overflow-hidden border border-border shadow-2xl bg-card relative">
-                        <OptimizedImage src={previewUrl!} className="object-cover" fill unoptimized alt="Source" />
+                        <OptimizedImage src={previewUrl!} className="object-cover" fill sizes="(max-width: 1024px) 100vw, 33vw" unoptimized alt="Source" />
                       </div>
                       <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
                         <p className="text-[10px] text-foreground/80 uppercase font-black tracking-widest mb-3 opacity-60 italic">{t("file_info")}</p>

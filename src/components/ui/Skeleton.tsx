@@ -6,26 +6,27 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import clsx from "clsx";
+import type { HTMLAttributes, CSSProperties } from "react";
+import { cn } from "@/utils/cn";
 
-interface SkeletonProps {
-    className?: string;
-}
+export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {}
 
-export default function Skeleton({ className }: SkeletonProps) {
+export default function Skeleton({ className, ...props }: SkeletonProps) {
     return (
         <div
-            className={clsx(
-                "animate-pulse rounded-md bg-muted",
+            aria-hidden="true"
+            className={cn(
+                "motion-safe:animate-pulse rounded-md bg-muted",
                 className
             )}
+            {...props}
         />
     );
 }
 
 export function SkeletonCard() {
     return (
-        <div className="p-6 bg-card border border-border rounded-2xl space-y-4 transition-colors duration-300">
+        <div className="p-6 bg-card border border-border rounded-2xl space-y-4">
             <Skeleton className="h-4 w-1/4" />
             <Skeleton className="h-6 w-3/4" />
             <div className="space-y-2">
@@ -42,7 +43,7 @@ export function SkeletonCard() {
 
 export function SkeletonReportRow() {
     return (
-        <div className="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl transition-colors duration-300">
+        <div className="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl">
             <div className="flex items-center gap-4 flex-1">
                 <Skeleton className="w-10 h-10 rounded-lg" />
                 <div className="space-y-2 flex-1">
@@ -58,19 +59,41 @@ export function SkeletonReportRow() {
     );
 }
 
+export interface ChartSkeletonProps extends HTMLAttributes<HTMLDivElement> {
+    height?: CSSProperties["height"];
+}
+
 /**
  * Specialized skeleton for charts to maintain consistent layout during lazy loading
  */
-export function ChartSkeleton({ height = "300px", className }: { height?: string; className?: string }) {
+export function ChartSkeleton({
+    height = "300px",
+    className,
+    ...props
+}: ChartSkeletonProps) {
+    const hasHeightClass = className?.split(" ").some(
+        (c) => c.startsWith("h-") || c.startsWith("max-h-") || c.startsWith("min-h-")
+    );
+
     return (
         <div
-            style={className ? undefined : { height }}
-            className={clsx(
-                "w-full bg-muted/10 rounded-2xl animate-pulse flex items-center justify-center border border-border/50",
+            aria-hidden="true"
+            style={hasHeightClass ? undefined : { height }}
+            className={cn(
+                "w-full bg-muted/10 rounded-2xl motion-safe:animate-pulse flex items-center justify-center border border-border/50 p-6",
                 className
             )}
+            {...props}
         >
-            <div className="w-12 h-12 bg-primary/5 rounded-full" />
+            <div className="flex items-end gap-2 w-full max-w-[200px] h-24 px-2 border-b border-border/30">
+                <div className="w-full h-[40%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[75%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[50%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[90%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[35%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[60%] bg-muted/40 rounded-t-sm" />
+                <div className="w-full h-[45%] bg-muted/40 rounded-t-sm" />
+            </div>
         </div>
     );
 }

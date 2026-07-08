@@ -9,6 +9,7 @@
 import { Redis } from '@upstash/redis';
 
 let cachedRedis: Redis | null = null;
+let warned = false;
 
 function getRedisClient(): Redis | null {
     if (cachedRedis) return cachedRedis;
@@ -17,7 +18,10 @@ function getRedisClient(): Redis | null {
     const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
     if (!url || !token) {
-        console.warn('Upstash Redis is not configured. Rate limiting will be disabled.');
+        if (!warned) {
+            console.warn('Upstash Redis is not configured. Rate limiting will be disabled.');
+            warned = true;
+        }
         return null;
     }
 

@@ -19,14 +19,16 @@ import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
+import { ReportTranslations } from "@/types/reports";
 import CollectionDetailsModal from "./ui/CollectionDetailsModal";
+import { Doc } from "@/../convex/_generated/dataModel";
 
 export default function ReportLibrary({
     initialCollections,
     initialSettings,
 }: {
-    initialCollections?: any[];
-    initialSettings?: any;
+    initialCollections?: Doc<"collections">[];
+    initialSettings?: Doc<"app_settings"> | null;
 }) {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
@@ -51,7 +53,7 @@ export default function ReportLibrary({
 
     const tExport = useTranslations("Export");
 
-    const exportTranslations = {
+    const exportTranslations: ReportTranslations = {
         sheet_name: tExport('sheet_name'),
         date: tExport('date'),
         title: tExport('title'),
@@ -114,7 +116,7 @@ export default function ReportLibrary({
             toast.loading(tCommon('downloading'), { id: 'download-report' });
             await ReportGenerator.exportMediaMonitoringReport(
                 monitoringItems,
-                exportTranslations as any,
+                exportTranslations,
                 'pdf',
                 settings?.logoUrl || undefined,
                 undefined,

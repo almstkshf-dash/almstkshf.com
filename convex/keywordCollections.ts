@@ -6,9 +6,46 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { v, ConvexError } from "convex/values";
+import { mutation, query, MutationCtx, QueryCtx } from "./_generated/server";
+import { Doc, Id } from "./_generated/dataModel";
 
+// Central SaaS validation limit constants
+const MAX_KEYWORD_LENGTH = 100;
+const MAX_COLLECTION_NAME = 100;
+const MAX_KEYWORDS = 500;
+
+/**
+ * Shared helper to verify collection existence and authorize ownership.
+ * Throws structured ConvexError if unauthorized.
+ */
+async function getOwnedCollection(
+    ctx: MutationCtx | QueryCtx,
+    collectionId: Id<"keyword_collections">,
+    userId: string
+): Promise<Doc<"keyword_collections">> {
+    const collection = await ctx.db.get(collectionId);
+    if (!collection || collection.userId !== userId) {
+        throw new ConvexError("CollectionNotFound: Collection not found or access denied.");
+    }
+    return collection;
+}
+
+/**
+ * Trims and collapses multiple spaces, verifying length limits.
+ */
+function normalizeKeyword(keyword: string): string {
+    const normalized = keyword.trim().replace(/\s+/g, " ");
+    if (normalized.length === 0) {
+        throw new ConvexError("InvalidKeyword: Keyword cannot be empty.");
+    }
+    if (normalized.length > MAX_KEYWORD_LENGTH) {
+        throw new ConvexError(`InvalidKeyword: Keyword exceeds maximum length of ${MAX_KEYWORD_LENGTH} characters.`);
+    }
+    return normalized;
+}
+
+// 1. QUERY: Get all keyword collections, sorted by updatedAt descending
 export const getKeywordCollections = query({
     args: {},
     handler: async (ctx) => {
@@ -17,15 +54,16 @@ export const getKeywordCollections = query({
             return [];
         }
 
-        const collections = await ctx.db
+        // Optimize: Use compound index by_userId_updatedAt to fetch pre-sorted results directly
+        return await ctx.db
             .query("keyword_collections")
-            .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+            .withIndex("by_userId_updatedAt", (q) => q.eq("userId", identity.subject))
+            .order("desc")
             .collect();
-
-        return collections.sort((a, b) => b.updatedAt - a.updatedAt);
     },
 });
 
+// 2. MUTATION: Create a new empty keyword collection
 export const createKeywordCollection = mutation({
     args: {
         name: v.string(),
@@ -33,21 +71,41 @@ export const createKeywordCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
+        const normalizedName = args.name.trim();
+        if (!normalizedName) {
+            throw new ConvexError("InvalidName: Collection name cannot be empty.");
+        }
+        if (normalizedName.length > MAX_COLLECTION_NAME) {
+            throw new ConvexError(`InvalidName: Collection name exceeds maximum length of ${MAX_COLLECTION_NAME} characters.`);
+        }
+
+        // Ensure unique collection name per user (case-insensitive lookup)
+        const existing = await ctx.db
+            .query("keyword_collections")
+            .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+            .collect();
+        
+        if (existing.some(c => c.name.toLowerCase() === normalizedName.toLowerCase())) {
+            throw new ConvexError("DuplicateCollectionName: A keyword collection with this name already exists.");
+        }
+
+        const now = Date.now();
         const collectionId = await ctx.db.insert("keyword_collections", {
             userId: identity.subject,
-            name: args.name,
+            name: normalizedName,
             keywords: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
+            createdAt: now,
+            updatedAt: now,
         });
 
         return collectionId;
     },
 });
 
+// 3. MUTATION: Delete a keyword collection
 export const deleteKeywordCollection = mutation({
     args: {
         id: v.id("keyword_collections"),
@@ -55,19 +113,17 @@ export const deleteKeywordCollection = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
-        const collection = await ctx.db.get(args.id);
-        if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Collection not found or unauthorized");
-        }
+        await getOwnedCollection(ctx, args.id, identity.subject);
 
         await ctx.db.delete(args.id);
         return args.id;
     },
 });
 
+// 4. MUTATION: Add keyword to a collection
 export const addKeyword = mutation({
     args: {
         collectionId: v.id("keyword_collections"),
@@ -76,33 +132,44 @@ export const addKeyword = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
-        const collection = await ctx.db.get(args.collectionId);
-        if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Collection not found or unauthorized");
-        }
+        const collection = await getOwnedCollection(ctx, args.collectionId, identity.subject);
+        const newKeyword = normalizeKeyword(args.keyword);
 
-        const newKeyword = args.keyword.trim();
-        if (!newKeyword) {
-            throw new Error("Keyword cannot be empty");
-        }
+        // Prevent duplicate keywords in a case-insensitive manner
+        const lowerKeyword = newKeyword.toLowerCase();
+        const alreadyExists = collection.keywords.some(
+            (kw) => kw.toLowerCase() === lowerKeyword
+        );
 
-        if (collection.keywords.includes(newKeyword)) {
+        if (alreadyExists) {
             return collection;
         }
 
-        const updatedKeywords = [...collection.keywords, newKeyword];
+        // Enforce maximum keyword limits per collection
+        if (collection.keywords.length >= MAX_KEYWORDS) {
+            throw new ConvexError(`QuotaExceeded: Maximum keyword limit of ${MAX_KEYWORDS} reached for this collection.`);
+        }
+
+        const now = Date.now();
+        const updatedKeywords: string[] = [...collection.keywords, newKeyword];
         await ctx.db.patch(args.collectionId, {
             keywords: updatedKeywords,
-            updatedAt: Date.now(),
+            updatedAt: now,
         });
 
-        return await ctx.db.get(args.collectionId);
+        // Optimize return payload to avoid redundant read-after-write query
+        return {
+            ...collection,
+            keywords: updatedKeywords,
+            updatedAt: now,
+        };
     },
 });
 
+// 5. MUTATION: Delete keyword from a collection
 export const deleteKeyword = mutation({
     args: {
         collectionId: v.id("keyword_collections"),
@@ -111,23 +178,32 @@ export const deleteKeyword = mutation({
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) {
-            throw new Error("Unauthenticated");
+            throw new ConvexError("Unauthenticated");
         }
 
-        const collection = await ctx.db.get(args.collectionId);
-        if (!collection || collection.userId !== identity.subject) {
-            throw new Error("Collection not found or unauthorized");
-        }
+        const collection = await getOwnedCollection(ctx, args.collectionId, identity.subject);
+        const keywordToRemove = args.keyword.trim().toLowerCase();
 
         const updatedKeywords = collection.keywords.filter(
-            (kw) => kw !== args.keyword
+            (kw) => kw.trim().toLowerCase() !== keywordToRemove
         );
 
+        // If the keyword doesn't exist, return original collection structure
+        if (updatedKeywords.length === collection.keywords.length) {
+            return collection;
+        }
+
+        const now = Date.now();
         await ctx.db.patch(args.collectionId, {
             keywords: updatedKeywords,
-            updatedAt: Date.now(),
+            updatedAt: now,
         });
 
-        return await ctx.db.get(args.collectionId);
+        // Optimize return payload to avoid redundant read-after-write query
+        return {
+            ...collection,
+            keywords: updatedKeywords,
+            updatedAt: now,
+        };
     },
 });

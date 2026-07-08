@@ -341,7 +341,7 @@ export default function SettingsClient() {
                                         errors.logo ? "border-rose-500 shadow-[0_0_0_1px_rgba(244,63,94,0.1)]" : "border-border"
                                     )}>
                                         {logoUrl ? (
-                                            <Image src={logoUrl} alt={t('logo_alt')} fill className="object-contain p-4 transition-transform group-hover:scale-105" />
+                                            <Image src={logoUrl} alt={t('logo_alt')} fill sizes="160px" className="object-contain p-4 transition-transform group-hover:scale-105" />
                                         ) : (
                                             <Upload className="h-10 w-10 text-muted-foreground/30" />
                                         )}

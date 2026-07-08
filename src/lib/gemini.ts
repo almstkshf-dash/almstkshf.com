@@ -34,7 +34,7 @@ export async function analyzeContent(text: string, title?: string): Promise<Medi
         const google = createGoogleGenerativeAI({ apiKey });
         
         const { object } = await generateObject({
-            model: google('gemini-1.5-flash'),
+            model: google('gemini-2.5-flash'),
             schema: z.object({
                 sentiment: z.enum(['Positive', 'Neutral', 'Negative']),
                 brandName: z.string(),

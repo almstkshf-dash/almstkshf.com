@@ -8,13 +8,16 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { useTranslations } from 'next-intl';
 import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { X, Plus, Wand2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { toast } from 'sonner';
+import { useMounted } from '@/hooks/useMounted';
+import { MEDIA_SOURCES } from '@/config/media-sources';
 
 interface ManualEntryModalProps {
     isOpen: boolean;
@@ -41,54 +44,146 @@ const sanitizeUrl = (inputUrl: string): string => {
         }
     }
 
-    return cleaned;
+    try {
+        new URL(cleaned);
+        return cleaned;
+    } catch {
+        return '';
+    }
 };
+
+const SOCIALS = [
+    { match: ['tiktok.com', 'vt.tiktok.com'], source: 'TikTok', sourceType: 'Social Media' },
+    { match: ['instagram.com'], source: 'Instagram', sourceType: 'Social Media' },
+    { match: ['facebook.com', 'fb.watch', 'fb.com'], source: 'Facebook', sourceType: 'Social Media' },
+    { match: ['twitter.com', 'x.com'], source: 'Twitter/X', sourceType: 'Social Media' },
+    { match: ['youtube.com', 'youtu.be'], source: 'YouTube', sourceType: 'Social Media' },
+    { match: ['linkedin.com'], source: 'LinkedIn', sourceType: 'Social Media' },
+    { match: ['pinterest.com', 'pintrest.com', 'pin.it'], source: 'Pinterest', sourceType: 'Social Media' },
+    { match: ['snapchat.com', 'snap.com'], source: 'Snapchat', sourceType: 'Social Media' },
+    { match: ['reddit.com', 'redd.it'], source: 'Reddit', sourceType: 'Social Media' },
+    { match: ['threads.net'], source: 'Threads', sourceType: 'Social Media' },
+    { match: ['telegram.org', 't.me'], source: 'Telegram', sourceType: 'Social Media' },
+    { match: ['whatsapp.com', 'wa.me'], source: 'WhatsApp', sourceType: 'Social Media' },
+    { match: ['twitch.tv'], source: 'Twitch', sourceType: 'Social Media' },
+    { match: ['radiant', 'radiant.social'], source: 'Radiant', sourceType: 'Social Media' },
+];
 
 const detectSocialMedia = (url: string) => {
     const lowercaseUrl = url.toLowerCase();
-    if (lowercaseUrl.includes('tiktok.com') || lowercaseUrl.includes('vt.tiktok.com')) {
-        return { sourceType: 'Social Media', source: 'TikTok' };
-    }
-    if (lowercaseUrl.includes('instagram.com')) {
-        return { sourceType: 'Social Media', source: 'Instagram' };
-    }
-    if (lowercaseUrl.includes('facebook.com') || lowercaseUrl.includes('fb.watch') || lowercaseUrl.includes('fb.com')) {
-        return { sourceType: 'Social Media', source: 'Facebook' };
-    }
-    if (lowercaseUrl.includes('twitter.com') || lowercaseUrl.includes('x.com')) {
-        return { sourceType: 'Social Media', source: 'Twitter/X' };
-    }
-    if (lowercaseUrl.includes('youtube.com') || lowercaseUrl.includes('youtu.be')) {
-        return { sourceType: 'Social Media', source: 'YouTube' };
-    }
-    if (lowercaseUrl.includes('linkedin.com')) {
-        return { sourceType: 'Social Media', source: 'LinkedIn' };
-    }
-    if (lowercaseUrl.includes('pinterest.com') || lowercaseUrl.includes('pintrest.com') || lowercaseUrl.includes('pin.it')) {
-        return { sourceType: 'Social Media', source: 'Pinterest' };
-    }
-    if (lowercaseUrl.includes('snapchat.com') || lowercaseUrl.includes('snap.com')) {
-        return { sourceType: 'Social Media', source: 'Snapchat' };
-    }
-    if (lowercaseUrl.includes('reddit.com') || lowercaseUrl.includes('redd.it')) {
-        return { sourceType: 'Social Media', source: 'Reddit' };
-    }
-    if (lowercaseUrl.includes('threads.net')) {
-        return { sourceType: 'Social Media', source: 'Threads' };
-    }
-    if (lowercaseUrl.includes('telegram.org') || lowercaseUrl.includes('t.me')) {
-        return { sourceType: 'Social Media', source: 'Telegram' };
-    }
-    if (lowercaseUrl.includes('whatsapp.com') || lowercaseUrl.includes('wa.me')) {
-        return { sourceType: 'Social Media', source: 'WhatsApp' };
-    }
-    if (lowercaseUrl.includes('twitch.tv')) {
-        return { sourceType: 'Social Media', source: 'Twitch' };
-    }
-    if (lowercaseUrl.includes('radiant') || lowercaseUrl.includes('radiant.social')) {
-        return { sourceType: 'Social Media', source: 'Radiant' };
+    for (const social of SOCIALS) {
+        if (social.match.some(m => lowercaseUrl.includes(m))) {
+            return { sourceType: social.sourceType, source: social.source };
+        }
     }
     return null;
+};
+
+/**
+ * Builds a static domain → publisher-name map from MEDIA_SOURCES so that
+ * pasting a known article URL auto-resolves the human-readable source name, sourceId, and country.
+ */
+const buildDomainToPublisherMap = (): Map<string, { name: string; id: string; country: string }> => {
+    const map = new Map<string, { name: string; id: string; country: string }>();
+    for (const src of MEDIA_SOURCES) {
+        if (src.domain) {
+            map.set(src.domain.toLowerCase(), { name: src.name, id: src.id, country: src.country });
+        }
+        for (const feed of src.feeds) {
+            try {
+                const feedUrl = new URL(feed.url);
+                let domain = feedUrl.hostname.toLowerCase();
+                if (domain.startsWith('www.')) domain = domain.substring(4);
+
+                // Google News proxy: extract the real site from ?q=site:xxx
+                if (domain === 'news.google.com') {
+                    const query = feedUrl.searchParams.get('q') || '';
+                    const siteMatch = query.match(/site:([^\s&]+)/);
+                    if (siteMatch) {
+                        domain = siteMatch[1].toLowerCase();
+                        if (domain.startsWith('www.')) domain = domain.substring(4);
+                    }
+                }
+
+                // Skip Twitter syndication entries (handled by detectSocialMedia)
+                if (domain === 'syndication.twitter.com') continue;
+
+                if (!map.has(domain)) {
+                    map.set(domain, { name: src.name, id: src.id, country: src.country });
+                }
+            } catch { /* malformed feed URL – skip */ }
+        }
+    }
+    return map;
+};
+
+/** Computed once at module level */
+const DOMAIN_TO_PUBLISHER = buildDomainToPublisherMap();
+
+/**
+ * Given an article URL, returns the publisher details from MEDIA_SOURCES
+ * or `null` if the domain is unknown.
+ */
+const lookupPublisher = (url: string): { name: string; id: string; country: string } | null => {
+    try {
+        const parsed = new URL(url);
+        let domain = parsed.hostname.toLowerCase();
+        if (domain.startsWith('www.')) domain = domain.substring(4);
+
+        if (DOMAIN_TO_PUBLISHER.has(domain)) return DOMAIN_TO_PUBLISHER.get(domain)!;
+
+        // Try stripping leading sub-domains (e.g. english.alarabiya.net → alarabiya.net)
+        const parts = domain.split('.');
+        for (let i = 1; i < parts.length - 1; i++) {
+            const parent = parts.slice(i).join('.');
+            if (DOMAIN_TO_PUBLISHER.has(parent)) return DOMAIN_TO_PUBLISHER.get(parent)!;
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
+};
+
+/**
+ * Infers the best matching sourceType based on URL and publisher name.
+ */
+const inferSourceType = (url: string, publisherName?: string | null): "Online News" | "Social Media" | "Blog" | "Print" | "Press Release" => {
+    if (!url) return 'Print';
+
+    // 1. Check social media first
+    const social = detectSocialMedia(url);
+    if (social) return 'Social Media';
+
+    // 2. Check known publisher name
+    if (publisherName) {
+        const lowerPub = publisherName.toLowerCase();
+        if (lowerPub.includes('blog')) return 'Blog';
+        if (lowerPub.includes('pr') || lowerPub.includes('newswire') || lowerPub.includes('press release')) return 'Press Release';
+    }
+
+    // 3. Check URL path / host keywords
+    try {
+        const parsed = new URL(url);
+        const lowerPath = parsed.pathname.toLowerCase();
+        const lowerHost = parsed.hostname.toLowerCase();
+        
+        if (lowerHost.includes('blog') || lowerPath.includes('blog')) return 'Blog';
+        if (
+            lowerHost.includes('newswire') || 
+            lowerHost.includes('prweb') || 
+            lowerHost.includes('businesswire') ||
+            lowerPath.includes('press-release') || 
+            lowerPath.includes('pressrelease') || 
+            lowerPath.includes('/pr/') ||
+            lowerPath.includes('news-release')
+        ) {
+            return 'Press Release';
+        }
+    } catch {}
+
+    // Default to Online News for any valid web URL
+    return 'Online News';
 };
 
 export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: ManualEntryModalProps) {
@@ -100,14 +195,21 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
     const settings = useQuery(api.settings.getSettings);
     const { isAuthenticated } = useConvexAuth();
 
-    const [mounted, setMounted] = useState(false);
+        const mounted = useMounted();
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
     const isSubmitting = isLoading;
 
+    const titleInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
-        setMounted(true);
-    }, []);
+        if (isOpen && mounted) {
+            const timer = setTimeout(() => {
+                titleInputRef.current?.focus();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, mounted]);
 
     // Keyboard: close on Escape
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -190,7 +292,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isAuthenticated) { alert(t('not_authenticated')); return; }
+        if (!isAuthenticated) { toast.error(t('not_authenticated')); return; }
         setIsLoading(true);
 
         try {
@@ -209,6 +311,9 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
             // Detect language
             const isArabic = /[\u0600-\u06FF]/.test(formData.title + formData.content);
 
+            const match = lookupPublisher(sanitizedUrl);
+            const sourceId = match?.id || undefined;
+
             if (articleToEdit) {
                 await updateArticle({
                     id: articleToEdit._id,
@@ -221,6 +326,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
                     sourceCountry: formData.sourceCountry,
                     source: formData.source || 'Manual Source',
+                    sourceId: sourceId,
                     reach: reachValue,
                     ave: ave,
                     imageUrl: formData.imageUrl || undefined,
@@ -242,6 +348,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     sourceType: formData.sourceType as "Online News" | "Social Media" | "Blog" | "Print" | "Press Release",
                     sourceCountry: formData.sourceCountry,
                     source: formData.source || 'Manual Source',
+                    sourceId: sourceId,
                     reach: reachValue,
                     ave: ave,
                     imageUrl: formData.imageUrl || undefined,
@@ -272,18 +379,19 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
             });
 
             onClose();
-        } catch (error: any) {
-            const dataMsg = typeof error.data === 'string' ? error.data : '';
+        } catch (error: unknown) {
+            const err = error as { data?: unknown; message?: string };
+            const dataMsg = typeof err.data === 'string' ? err.data : '';
             const errorMessage = error instanceof Error ? error.message : String(error);
 
             console.error("Mutation failed:", error);
 
             if (errorMessage.includes("DuplicateArticle") || dataMsg.includes("DuplicateArticle")) {
-                alert(t('duplicate_article_error'));
+                toast.error(t('duplicate_article_error'));
             } else if (errorMessage.includes("Type mismatch") || errorMessage.includes("Validator") || errorMessage.includes("Invalid")) {
-                alert(`Data Validation Error: Please check your inputs. Details: ${errorMessage}`);
+                toast.error(`Data Validation Error: Please check your inputs. Details: ${errorMessage}`);
             } else {
-                alert(`${t('save_failed')} (${errorMessage})`);
+                toast.error(`${t('save_failed')} (${errorMessage})`);
             }
         } finally {
             setIsLoading(false);
@@ -297,15 +405,20 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
         }
 
         if (sanitized) {
-            const detected = detectSocialMedia(sanitized);
-            if (detected) {
+            const match = lookupPublisher(sanitized);
+            const inferredType = inferSourceType(sanitized, match?.name);
+            try {
+                const parsedUrl = new URL(sanitized);
+                let host = parsedUrl.hostname.toLowerCase();
+                if (host.startsWith('www.')) host = host.substring(4);
                 setFormData(prev => ({
                     ...prev,
                     url: sanitized,
-                    sourceType: detected.sourceType,
-                    source: prev.source || detected.source
+                    sourceType: prev.sourceType === 'Print' ? inferredType : prev.sourceType,
+                    source: prev.source || match?.name || host,
+                    sourceCountry: prev.sourceCountry === 'AE' && match ? match.country : prev.sourceCountry
                 }));
-            }
+            } catch {}
         }
     };
 
@@ -325,7 +438,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                 sourceType: detected.sourceType,
                 source: prev.source || detected.source
             }));
-            alert(t('social_extract_warning'));
+            toast.warning(t('social_extract_warning'));
             return;
         }
 
@@ -347,6 +460,18 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     else if (s.includes("neutral")) parsedSentiment = "Neutral";
                 }
 
+                let parsedSource = '';
+                let knownPublisher = null;
+                try {
+                    const parsedUrl = new URL(sanitized);
+                    let host = parsedUrl.hostname.toLowerCase();
+                    if (host.startsWith('www.')) host = host.substring(4);
+                    knownPublisher = lookupPublisher(sanitized);
+                    parsedSource = knownPublisher ? knownPublisher.name : host;
+                } catch {}
+
+                const inferredType = inferSourceType(sanitized, knownPublisher?.name);
+
                 setFormData(prev => ({
                     ...prev,
                     title: data.title || prev.title,
@@ -354,13 +479,16 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     date: !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : prev.date,
                     imageUrl: data.image || prev.imageUrl,
                     sentiment: parsedSentiment,
+                    source: prev.source || parsedSource,
+                    sourceType: prev.sourceType === 'Print' ? inferredType : prev.sourceType,
+                    reach: data.reach || prev.reach,
                 }));
             } else {
-                alert(t('extract_failed'));
+                toast.error(t('extract_failed'));
             }
         } catch (error) {
             console.error("Extraction error:", error);
-            alert(t('extract_failed'));
+            toast.error(t('extract_failed'));
         } finally {
             setIsExtracting(false);
         }
@@ -441,6 +569,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                         <div>
                             <label htmlFor="article_title" className="block text-xs font-bold text-foreground/70 uppercase tracking-wider mb-2 transition-colors">{t('article_title')}</label>
                             <input
+                                ref={titleInputRef}
                                 id="article_title"
                                 name="article_title"
                                 required
@@ -583,7 +712,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 onChange={e => {
                                     const raw = e.target.value;
                                     if (raw === '') {
-                                        setFormData({ ...formData, reach: NaN as any });
+                                        setFormData({ ...formData, reach: NaN });
                                     } else {
                                         setFormData({ ...formData, reach: Number(raw) });
                                     }
@@ -686,7 +815,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                             />
                             {formData.imageUrl && (
                                 <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border shadow-sm">
-                                    <OptimizedImage src={formData.imageUrl} alt="" fill unoptimized className="object-cover" />
+                                    <OptimizedImage src={formData.imageUrl} alt="" fill sizes="48px" unoptimized className="object-cover" />
                                 </div>
                             )}
                         </div>

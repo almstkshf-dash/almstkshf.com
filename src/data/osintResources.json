@@ -1,0 +1,502 @@
+[
+  {
+    "id": "haveibeenpwned",
+    "name": "Have I Been Pwned",
+    "url": "https://haveibeenpwned.com",
+    "description": "Check if an email address has been exposed in a data breach.",
+    "categories": ["email", "security"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "emailrep",
+    "name": "EmailRep",
+    "url": "https://emailrep.io",
+    "description": "Assess email reputation and risk using social and breach signals.",
+    "categories": ["email", "security"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "hunter",
+    "name": "Hunter.io",
+    "url": "https://hunter.io",
+    "description": "Find and verify professional email addresses linked to a domain.",
+    "categories": ["email", "business"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "epieos",
+    "name": "Epieos",
+    "url": "https://epieos.com",
+    "description": "Reverse email lookup: discover linked Google / social accounts.",
+    "categories": ["email", "social"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "viewdns",
+    "name": "ViewDNS.info",
+    "url": "https://viewdns.info",
+    "description": "Comprehensive domain reconnaissance: WHOIS, reverse IP, DNS history.",
+    "categories": ["geolocation", "security", "search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "whois_domaintools",
+    "name": "DomainTools WHOIS",
+    "url": "https://whois.domaintools.com",
+    "description": "Detailed WHOIS records, registrar info, and domain history.",
+    "categories": ["geolocation", "business", "security"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "shodan",
+    "name": "Shodan",
+    "url": "https://www.shodan.io",
+    "description": "Search engine for internet-connected devices and open ports.",
+    "categories": ["security", "geolocation"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "censys",
+    "name": "Censys",
+    "url": "https://search.censys.io",
+    "description": "Internet-wide scanning for hosts, certificates, and services.",
+    "categories": ["security", "geolocation"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "ipinfo",
+    "name": "IPinfo",
+    "url": "https://ipinfo.io",
+    "description": "IP geolocation, ASN, carrier, and hostname data.",
+    "categories": ["geolocation", "security"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "abuseipdb",
+    "name": "AbuseIPDB",
+    "url": "https://www.abuseipdb.com",
+    "description": "Community-powered IP abuse reporting and threat intelligence.",
+    "categories": ["security", "geolocation"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "virustotal",
+    "name": "VirusTotal",
+    "url": "https://www.virustotal.com",
+    "description": "Analyze IPs, domains, URLs, and files for malware and threats.",
+    "categories": ["security"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "threatcrowd",
+    "name": "ThreatCrowd",
+    "url": "https://www.threatcrowd.org",
+    "description": "Open threat intelligence for IPs, domains, and email addresses.",
+    "categories": ["security"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "sherlock",
+    "name": "Sherlock (GitHub)",
+    "url": "https://github.com/sherlock-project/sherlock",
+    "description": "Hunt down social media accounts by username across 300+ platforms.",
+    "categories": ["social", "people"],
+    "labels": ["T"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "whatsmyname",
+    "name": "WhatsMyName",
+    "url": "https://whatsmyname.app",
+    "description": "Cross-platform username enumeration across hundreds of sites.",
+    "categories": ["social", "people"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "usersearch",
+    "name": "UserSearch.org",
+    "url": "https://usersearch.org",
+    "description": "Search for a username across 2,000+ social networks and websites.",
+    "categories": ["social", "people"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "socialcatfish",
+    "name": "Social Catfish",
+    "url": "https://socialcatfish.com",
+    "description": "Reverse image and username search to verify online identities.",
+    "categories": ["people", "dating", "social"],
+    "labels": ["R"],
+    "freeTier": false,
+    "language": "en"
+  },
+  {
+    "id": "spokeo",
+    "name": "Spokeo",
+    "url": "https://www.spokeo.com",
+    "description": "People search engine aggregating public records and social data.",
+    "categories": ["people", "public records"],
+    "labels": ["R"],
+    "freeTier": false,
+    "language": "en"
+  },
+  {
+    "id": "truecaller",
+    "name": "Truecaller",
+    "url": "https://www.truecaller.com",
+    "description": "Global phone number lookup with caller ID and spam detection.",
+    "categories": ["phone"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "numverify",
+    "name": "Numverify",
+    "url": "https://numverify.com",
+    "description": "Phone number validation and carrier lookup API for 232 countries.",
+    "categories": ["phone"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "sync_me",
+    "name": "Sync.me",
+    "url": "https://sync.me",
+    "description": "Reverse phone lookup using social media and public contact data.",
+    "categories": ["phone", "people"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "googlenews",
+    "name": "Google News",
+    "url": "https://news.google.com",
+    "description": "Aggregated news from thousands of sources worldwide.",
+    "categories": ["news", "search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "mediastack",
+    "name": "Mediastack",
+    "url": "https://mediastack.com",
+    "description": "Real-time news API covering 7,500+ sources in 50+ countries.",
+    "categories": ["news"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "gdelt",
+    "name": "GDELT Project",
+    "url": "https://www.gdeltproject.org",
+    "description": "Open global news monitoring and event database updated every 15 minutes.",
+    "categories": ["news", "misc"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "opencorporates",
+    "name": "OpenCorporates",
+    "url": "https://opencorporates.com",
+    "description": "World's largest open database of companies and corporate data.",
+    "categories": ["business", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "gleif",
+    "name": "GLEIF LEI Search",
+    "url": "https://search.gleif.org",
+    "description": "Search Legal Entity Identifiers (LEIs) for global businesses.",
+    "categories": ["business", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "companies_house",
+    "name": "Companies House (UK)",
+    "url": "https://find-and-update.company-information.service.gov.uk",
+    "description": "Official UK company registration, filing, and director records.",
+    "categories": ["business", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "openstreetmap",
+    "name": "OpenStreetMap",
+    "url": "https://www.openstreetmap.org",
+    "description": "Community-built free world map with detailed geospatial data.",
+    "categories": ["geolocation", "maps"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "google_maps",
+    "name": "Google Maps",
+    "url": "https://maps.google.com",
+    "description": "Satellite imagery, street view, and business location intelligence.",
+    "categories": ["geolocation", "maps"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "what3words",
+    "name": "what3words",
+    "url": "https://what3words.com",
+    "description": "Encode and decode precise 3-word addresses to GPS coordinates.",
+    "categories": ["geolocation", "maps"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "google",
+    "name": "Google Search",
+    "url": "https://www.google.com",
+    "description": "General-purpose search engine with powerful advanced operators.",
+    "categories": ["search"],
+    "labels": ["D"],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "duckduckgo",
+    "name": "DuckDuckGo",
+    "url": "https://duckduckgo.com",
+    "description": "Privacy-first search engine with no tracking or filter bubbles.",
+    "categories": ["search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "yandex",
+    "name": "Yandex",
+    "url": "https://yandex.com",
+    "description": "Russian search engine strong in CIS region content and reverse image search.",
+    "categories": ["search", "misc"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "wayback",
+    "name": "Wayback Machine",
+    "url": "https://web.archive.org",
+    "description": "Archive.org's snapshot of websites going back to 1996.",
+    "categories": ["search", "misc"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "pastebin_search",
+    "name": "Pastebin (via Google dork)",
+    "url": "https://www.google.com/search?q=site:pastebin.com",
+    "description": "Search Pastebin for exposed credentials and leaked data via dork.",
+    "categories": ["security", "misc"],
+    "labels": ["D"],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "pipl",
+    "name": "Pipl",
+    "url": "https://pipl.com",
+    "description": "Deep web people search for identity verification and fraud prevention.",
+    "categories": ["people", "directory"],
+    "labels": ["R"],
+    "freeTier": false,
+    "language": "en"
+  },
+  {
+    "id": "411",
+    "name": "411.com",
+    "url": "https://www.411.com",
+    "description": "US people finder, reverse phone, and address directory.",
+    "categories": ["people", "directory", "phone"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "tinder_osint",
+    "name": "SwipeHelper (Tinder OSINT)",
+    "url": "https://swipehelper.com/search",
+    "description": "Locate public Tinder profiles and dating activity signals.",
+    "categories": ["dating", "social"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "opensanctions",
+    "name": "OpenSanctions",
+    "url": "https://www.opensanctions.org",
+    "description": "Open database of sanctioned entities, PEPs, and watchlists worldwide.",
+    "categories": ["security", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "interpol_notices",
+    "name": "INTERPOL Red Notices",
+    "url": "https://www.interpol.int/How-we-work/Notices/Red-Notices/View-Red-Notices",
+    "description": "Search official INTERPOL Red Notices for wanted persons globally.",
+    "categories": ["security", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "ofac",
+    "name": "OFAC SDN List (US Treasury)",
+    "url": "https://sanctionssearch.ofac.treas.gov",
+    "description": "Search OFAC's Specially Designated Nationals sanctions database.",
+    "categories": ["security", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "unfccc_kyoto",
+    "name": "UN Sanctions (1267 Committee)",
+    "url": "https://www.un.org/securitycouncil/sanctions/1267/aq_sanctions_list",
+    "description": "UN Security Council Al-Qaida and associated entities sanctions list.",
+    "categories": ["security", "public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "worldcheck",
+    "name": "Refinitiv World-Check (LSEG)",
+    "url": "https://www.refinitiv.com/en/financial-crime-and-risk-management/financial-crime/world-check-one",
+    "description": "Premium risk intelligence database for AML/KYC screening.",
+    "categories": ["security", "public records", "business"],
+    "labels": ["R"],
+    "freeTier": false,
+    "language": "both"
+  },
+  {
+    "id": "wikipedia",
+    "name": "Wikipedia",
+    "url": "https://www.wikipedia.org",
+    "description": "Free encyclopedia covering people, places, events, and organisations.",
+    "categories": ["search", "misc"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "wikidata",
+    "name": "Wikidata",
+    "url": "https://www.wikidata.org",
+    "description": "Structured linked-data knowledge base underlying Wikipedia.",
+    "categories": ["search", "misc"],
+    "labels": [],
+    "freeTier": true,
+    "language": "both"
+  },
+  {
+    "id": "alef_arabic",
+    "name": "Alef (Arabic Search)",
+    "url": "https://www.alef.ae",
+    "description": "Arabic-language people and entity search oriented toward GCC region.",
+    "categories": ["people", "search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "ar"
+  },
+  {
+    "id": "zabasearch",
+    "name": "ZabaSearch",
+    "url": "https://www.zabasearch.com",
+    "description": "US public records search covering addresses and phone numbers.",
+    "categories": ["people", "public records", "directory"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "publicrecords_online",
+    "name": "Public Records Online",
+    "url": "https://publicrecords.online",
+    "description": "Aggregated US public records including court, property, and vital records.",
+    "categories": ["public records"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "builtwith",
+    "name": "BuiltWith",
+    "url": "https://builtwith.com",
+    "description": "Discover the technology stack behind any website or domain.",
+    "categories": ["business", "security", "search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "urlscan",
+    "name": "urlscan.io",
+    "url": "https://urlscan.io",
+    "description": "Scan and analyse websites, screenshots, resources, and DOM.",
+    "categories": ["security", "search"],
+    "labels": [],
+    "freeTier": true,
+    "language": "en"
+  },
+  {
+    "id": "spyse",
+    "name": "Spyse (by Intruder)",
+    "url": "https://spyse.com",
+    "description": "Internet assets search: subdomains, open ports, and SSL certificates.",
+    "categories": ["security", "geolocation"],
+    "labels": ["R"],
+    "freeTier": true,
+    "language": "en"
+  }
+]

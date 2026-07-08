@@ -9,6 +9,7 @@
 "use client";
 
 import { useEffect, useState, memo } from "react";
+import { useMounted } from "@/hooks/useMounted";
 import {
     Area,
     AreaChart,
@@ -29,16 +30,12 @@ interface ArticlesTrendChartProps {
 }
 
 const ArticlesTrendChart = memo(function ArticlesTrendChart({ data }: ArticlesTrendChartProps) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useMounted();
 
     if (!mounted) return <ChartSkeleton className="w-full h-full" />;
 
     return (
-        <div id="articles-trend-chart-container" className="relative w-full h-full flex items-center justify-center">
+        <div id="articles-trend-chart-container" className="relative w-full h-full min-h-[160px] flex items-center justify-center">
             {mounted && (
                 <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100} initialDimension={{ width: 10, height: 160 }}>
                     <AreaChart

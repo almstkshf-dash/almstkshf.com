@@ -16,9 +16,10 @@ import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useMounted } from "@/hooks/useMounted";
 
 export function NotificationBell() {
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const t = useTranslations("Notifications");
     const [open, setOpen] = useState(false);
     const [visibleCount, setVisibleCount] = useState(5);
@@ -26,10 +27,6 @@ export function NotificationBell() {
     const visibleNotifications = unreadNotifications.slice(0, visibleCount);
     const markAsRead = useMutation(api.monitoring.markNotificationAsRead);
     const ref = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     useEffect(() => {
         if (!open) {

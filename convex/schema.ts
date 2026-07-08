@@ -23,12 +23,14 @@ export default defineSchema({
         url: v.string(),
         resolvedUrl: v.optional(v.string()), // The tracked final URL
         publishedDate: v.string(), // Format: DD/MM/YYYY
+        publishedTimestamp: v.optional(v.number()), // Cached publication timestamp for fast queries
         title: v.string(),
         content: v.string(), // Short summary/snippet
         language: v.union(v.literal("EN"), v.literal("AR")),
         sentiment: v.union(v.literal("Positive"), v.literal("Neutral"), v.literal("Negative")),
         sourceType: v.union(v.literal("Online News"), v.literal("Social Media"), v.literal("Blog"), v.literal("Print"), v.literal("Press Release")),
         source: v.optional(v.string()),
+        sourceId: v.optional(v.string()), // Entity reference
         depth: v.optional(v.union(v.literal("standard"), v.literal("deep"))),
         ingestMethod: v.optional(v.union(v.literal("api"), v.literal("rss"), v.literal("headless"))),
         tone: v.optional(v.string()),
@@ -63,7 +65,8 @@ export default defineSchema({
       .index("by_keyword_and_createdAt", ["keyword", "createdAt"])
       .index("by_sourceType_and_createdAt", ["sourceType", "createdAt"])
       .index("by_sourceCountry_and_createdAt", ["sourceCountry", "createdAt"])
-      .index("by_depth_and_createdAt", ["depth", "createdAt"]),
+      .index("by_depth_and_createdAt", ["depth", "createdAt"])
+      .index("by_sourceId_and_createdAt", ["sourceId", "createdAt"]),
 
     rss_feed_articles: defineTable({
         url: v.string(),
@@ -72,12 +75,14 @@ export default defineSchema({
         publishedDate: v.string(), // Format: DD/MM/YYYY
         language: v.union(v.literal("EN"), v.literal("AR")),
         source: v.optional(v.string()),
+        sourceId: v.optional(v.string()), // Entity reference
         sourceCountry: v.string(),
         imageUrl: v.optional(v.string()),
         createdAt: v.number(),
     }).index("by_url", ["url"])
       .index("by_createdAt", ["createdAt"])
-      .index("by_source_and_createdAt", ["source", "createdAt"]),
+      .index("by_source_and_createdAt", ["source", "createdAt"])
+      .index("by_sourceId_and_createdAt", ["sourceId", "createdAt"]),
 
     ingestion_runs_deep: defineTable({
         startedAt: v.number(),
@@ -296,7 +301,7 @@ export default defineSchema({
         isRead: v.boolean(),
         createdAt: v.number(),
     }).index("by_userId", ["userId"])
-        .index("by_userId_and_isRead", ["userId", "isRead"]),
+        .index("by_userId_and_isRead_and_createdAt", ["userId", "isRead", "createdAt"]),
 
     local_terrorist_list: defineTable({
         type: v.union(v.literal("individual"), v.literal("organization"), v.literal("entity")),
@@ -362,7 +367,8 @@ export default defineSchema({
         keywords: v.array(v.string()),
         createdAt: v.number(),
         updatedAt: v.number(),
-    }).index("by_userId", ["userId"]),
+    }).index("by_userId", ["userId"])
+      .index("by_userId_updatedAt", ["userId", "updatedAt"]),
 
     scraper_queue: defineTable({
         url: v.string(),
@@ -373,11 +379,80 @@ export default defineSchema({
         createdAt: v.number(),
         updatedAt: v.number(),
     }).index("by_status_and_createdAt", ["status", "createdAt"])
-      .index("by_articleId", ["articleId"]),
+      .index("by_articleId", ["articleId"])
+      .index("by_status_and_updatedAt", ["status", "updatedAt"]),
 
     scraper_queue_state: defineTable({
         type: v.literal("global"),
         lockAcquiredAt: v.optional(v.number()),
         lockExpiry: v.optional(v.number()),
     }).index("by_type", ["type"]),
+
+    press_release_sync_jobs: defineTable({
+        userId: v.string(),
+        status: v.union(v.literal("pending"), v.literal("running"), v.literal("success"), v.literal("error")),
+        keyword: v.optional(v.string()),
+        limit: v.number(),
+        dateFrom: v.optional(v.string()),
+        dateTo: v.optional(v.string()),
+        totalSources: v.number(),
+        completedSources: v.number(),
+        totalSaved: v.number(),
+        totalErrors: v.number(),
+        feedResults: v.optional(v.array(v.object({
+            feed: v.string(),
+            name: v.optional(v.string()),
+            saved: v.optional(v.number()),
+            total: v.optional(v.number()),
+            error: v.optional(v.string()),
+            durationMs: v.optional(v.number()),
+        }))),
+        error: v.optional(v.string()),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    }).index("by_userId", ["userId"])
+      .index("by_status", ["status"]),
+
+    report_jobs: defineTable({
+        userId: v.string(),
+        reportType: v.string(),
+        format: v.union(v.literal("pdf"), v.literal("excel"), v.literal("csv")),
+        status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed")),
+        url: v.optional(v.string()),
+        error: v.optional(v.string()),
+        createdAt: v.number(),
+        completedAt: v.optional(v.number()),
+    }).index("by_userId_and_createdAt", ["userId", "createdAt"])
+      .index("by_status", ["status"]),
+
+    admin_actions: defineTable({
+        userId: v.string(),
+        action: v.string(),
+        timestamp: v.number(),
+        parameters: v.any(),
+        result: v.any(),
+    }).index("by_userId", ["userId"])
+      .index("by_timestamp", ["timestamp"]),
+
+    media_sources: defineTable({
+        sourceId: v.string(),
+        name: v.string(),
+        domain: v.string(),
+        country: v.string(),
+        languages: v.array(v.string()),
+        type: v.union(v.literal("newspaper"), v.literal("agency"), v.literal("blog"), v.literal("government"), v.literal("social")),
+        credibilityScore: v.number(),
+        tier: v.union(v.literal("premium"), v.literal("standard")),
+        isActive: v.boolean(),
+    }).index("by_sourceId", ["sourceId"]),
+
+    media_sources_health: defineTable({
+        sourceId: v.string(),
+        lastChecked: v.number(),
+        status: v.union(v.literal("active"), v.literal("slow"), v.literal("failed")),
+        responseTimeMs: v.number(),
+        articlesFound: v.number(),
+        failureMessage: v.optional(v.string()),
+    }).index("by_sourceId", ["sourceId"]),
 });
+

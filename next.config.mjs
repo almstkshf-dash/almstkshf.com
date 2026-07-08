@@ -65,12 +65,19 @@ const nextConfig = {
         ignoreBuildErrors: true,
     },
 
-    webpack: (config, { webpack }) => {
+    webpack: (config, { webpack, isServer }) => {
         config.plugins.push(
             new webpack.IgnorePlugin({
                 resourceRegExp: /^@aws-sdk\/client-s3$/,
             })
         );
+        if (!isServer) {
+            config.resolve.fallback = {
+                ...config.resolve.fallback,
+                fs: false,
+                path: false,
+            };
+        }
         return config;
     },
 

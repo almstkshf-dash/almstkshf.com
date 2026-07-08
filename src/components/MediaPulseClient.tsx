@@ -11,8 +11,17 @@
 import Container from "@/components/ui/Container";
 import { Header } from "./media-pulse/Header";
 import DashboardGrid from "./media-pulse/DashboardGrid";
-import { DetailedContent } from "./media-pulse/DetailedContent";
-import { AnalyticsStrategy } from "./media-pulse/AnalyticsStrategy";
+import dynamic from "next/dynamic";
+
+const DetailedContent = dynamic(() => import("./media-pulse/DetailedContent").then(m => m.DetailedContent), {
+    ssr: false,
+    loading: () => <div className="h-48 animate-pulse rounded-3xl bg-muted/5 border border-border/20" />
+});
+
+const AnalyticsStrategy = dynamic(() => import("./media-pulse/AnalyticsStrategy").then(m => m.AnalyticsStrategy), {
+    ssr: false,
+    loading: () => <div className="h-48 animate-pulse rounded-3xl bg-muted/5 border border-border/20" />
+});
 
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";

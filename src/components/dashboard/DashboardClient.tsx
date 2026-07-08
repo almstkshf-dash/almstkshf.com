@@ -18,7 +18,7 @@ import {
     Activity, BarChart3, Rss,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { MonitoringArticle } from '@/types/reports';
+import { MonitoringArticle, ReportTranslations } from '@/types/reports';
 import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -51,17 +51,16 @@ const DashboardGrid = dynamic(() => import('@/components/media-pulse/DashboardGr
 });
 const NewsGenerator = dynamic(() => import('@/components/media-pulse/NewsGenerator'), { ssr: false });
 const DarkWebTab = dynamic(() => import('@/components/media-pulse/DarkWebTab'), { ssr: false });
-const OsintTab = dynamic(() => import('@/components/media-pulse/OsintTab'), { ssr: false });
+const OsintTab = dynamic(() => import('@/components/osint/OsintTab'), { ssr: false });
 const TerroristListTab = dynamic(() => import('@/components/media-pulse/TerroristListTab'), { ssr: false });
 const AiInspectorTab = dynamic(() => import('@/components/media-pulse/AiInspectorTab'), { ssr: false });
-const DeepStatusPanel = dynamic(() => import('@/components/media-pulse/DeepStatusPanel'), { ssr: false });
 const ArticleTable = dynamic(() => import('@/components/media-pulse/ArticleTable'), { ssr: false });
 const PressReleasePanel = dynamic(() => import('@/components/media-pulse/PressReleasePanel'), { ssr: false });
 const ManualEntryModal = dynamic(() => import('@/components/media-pulse/ManualEntryModal'), { ssr: false });
 const RssFeeder = dynamic(() => import('@/components/dashboard/RssFeeder'), { ssr: false });
 
 // ── Types ────────────────────────────────────────────────────────────────────
-type ViewId = 'standard' | 'deep' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb';
+type ViewId = 'standard' | 'osint' | 'terrorist_list' | 'inspect' | 'darkweb';
 
 type ArticleItem = MonitoringArticle;
 
@@ -78,23 +77,7 @@ export default function DashboardClient() {
 
     // ── Derive active view directly from URL — sidebar owns navigation ───────
     const activeView = ((searchParams.get('view') as ViewId) || 'standard') satisfies ViewId;
-    const depthFilter: 'standard' | 'deep' = activeView === 'deep' ? 'deep' : 'standard';
     const viewDetails = useMemo(() => {
-        if (activeView === 'deep') {
-            return {
-                label: t('view.deep_label', { defaultValue: 'Deep Investigation' }),
-                title: t('view.deep_title', { defaultValue: 'Deep analysis mode' }),
-                description: t('view.deep_description', { defaultValue: 'Analyze deeper content and investigative signals with enriched scoring, deep-status tracking, and long-running insights.' }),
-                bullets: [
-                    t('view.deep_bullet_1', { defaultValue: 'Extended source depth with deep classification' }),
-                    t('view.deep_bullet_2', { defaultValue: 'Advanced risk and coverage intelligence' }),
-                    t('view.deep_bullet_3', { defaultValue: 'Includes Deep Status panel and analyst alerts' }),
-                ],
-                icon: Search,
-                badgeClass: 'bg-amber-500/10 text-amber-700 border-amber-500/20',
-            };
-        }
-
         return {
             label: t('view.standard_label', { defaultValue: 'Standard monitoring' }),
             title: t('view.standard_title', { defaultValue: 'Standard coverage mode' }),
@@ -107,11 +90,12 @@ export default function DashboardClient() {
             icon: Globe,
             badgeClass: 'bg-primary/10 text-primary border-primary/20',
         };
-    }, [activeView, t]);
+    }, [t]);
 
     // ── Local UI state ────────────────────────────────────────────────────────
     const [isManualModalOpen, setManualModalOpen] = useState(false);
     const [editingArticle, setEditingArticle] = useState<ArticleItem | null>(null);
+    const [engineTab, setEngineTab] = useState<'keyword' | 'pr'>('keyword');
     const [selectedType, setSelectedType] = useState('All');
     const [selectedCountry, setSelectedCountry] = useState('All');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -151,23 +135,19 @@ export default function DashboardClient() {
         skip,
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-        depth: depthFilter,
     }) as { items: ArticleItem[]; total: number; nextSkip: number | null } | undefined;
 
     const analyticsOverview = useQuery(api.monitoring.getAnalyticsOverview, {
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-        depth: depthFilter,
     });
     const emotionAggregates = useQuery(api.monitoring.getEmotionAggregates, {
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-        depth: depthFilter,
     });
     const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {
         sourceType: selectedType === 'All' ? undefined : selectedType,
         sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-        depth: depthFilter,
     });
 
     const analytics = useMemo(() => {
@@ -252,7 +232,7 @@ export default function DashboardClient() {
             return;
         }
 
-        const exportTranslations = {
+        const exportTranslations: ReportTranslations = {
             sheet_name: tExport('sheet_name'),
             date: tExport('date'),
             title: tExport('title'),
@@ -303,7 +283,6 @@ export default function DashboardClient() {
                     limit: 5000,
                     sourceType: selectedType === 'All' ? undefined : selectedType,
                     sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-                    depth: depthFilter,
                 });
 
                 let articlesToExport = allResult?.items || [];
@@ -326,7 +305,7 @@ export default function DashboardClient() {
                 // Pass format as the third argument to the new unified generator
                 await ReportGenerator.exportMediaMonitoringReport(
                     articlesToExport,
-                    exportTranslations as any,
+                    exportTranslations,
                     type,
                     appSettings?.logoUrl,
                     undefined,
@@ -495,7 +474,7 @@ export default function DashboardClient() {
                     </button>
 
                     {/* Export — only for article views, unified primary color */}
-                    {(activeView === 'standard' || activeView === 'deep') && (
+                    {activeView === 'standard' && (
                         <div className="flex items-center gap-1 p-1 bg-muted/40 rounded-xl border border-border/50">
                             <button
                                 onClick={() => handleExport('pdf')}
@@ -541,36 +520,6 @@ export default function DashboardClient() {
             </header>
 
             {/* ── MAIN CONTENT ─────────────────────────────────────────────── */}
-            {(activeView === 'standard' || activeView === 'deep') && (
-                <div className="mb-8 rounded-[2rem] border border-border/50 bg-muted/70 p-6 shadow-lg shadow-black/5">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-foreground/70 mb-2">
-                                {viewDetails.label}
-                            </p>
-                            <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-                                {viewDetails.title}
-                            </h2>
-                            <p className="mt-2 text-sm leading-6 text-foreground/80 max-w-2xl">
-                                {viewDetails.description}
-                            </p>
-                            <ul className="mt-4 grid gap-2 text-xs text-foreground/80 sm:grid-cols-2">
-                                {viewDetails.bullets.map((bullet, index) => (
-                                    <li key={index} className="inline-flex items-start gap-2">
-                                        <span className="mt-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-foreground/20" />
-                                        {bullet}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="mt-4 sm:mt-0 flex items-center gap-2">
-                            <span className={clsx('inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.3em]', viewDetails.badgeClass)}>
-                                {activeView === 'deep' ? t('view.deep_only_badge', { defaultValue: 'Deep only' }) : t('view.standard_badge', { defaultValue: 'Standard' })}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            )}
             <Suspense fallback={<TabSkeleton />}>
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -583,23 +532,46 @@ export default function DashboardClient() {
                         {/* ── STANDARD VIEW — Stacked Vertical Layout ─────────────── */}
                         {activeView === 'standard' && (
                             <div className="flex flex-col gap-8 w-full">
-                                {/* Section: Discovery */}
+                                {/* Section: Monitoring Engine */}
                                 <DashboardSection
-                                    id="discovery"
-                                    title={t('section.standard_discovery', { defaultValue: t('section.discovery') })}
+                                    id="monitoring-engine"
+                                    title={isAr ? "محرك المراقبة" : "Monitoring Engine"}
                                     icon={Globe}
-                                    headerSlot={<span className="inline-flex items-center rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-primary">{t('view.quick_access', { defaultValue: 'Quick access' })}</span>}
+                                    lazy={false}
                                 >
-                                    <NewsGenerator defaultSourceType="Online News" />
-                                </DashboardSection>
-
-                                {/* Section: Press Monitor */}
-                                <DashboardSection
-                                    id="press"
-                                    title={t('section.press')}
-                                    icon={FileDown}
-                                >
-                                    <PressReleasePanel />
+                                    <div className="glass-card rounded-[2.5rem] p-6 border border-border/50 bg-card/50 shadow-2xl relative overflow-visible">
+                                        <div className="flex border-b border-border mb-6">
+                                            <button
+                                                onClick={() => setEngineTab('keyword')}
+                                                className={clsx(
+                                                    "px-6 py-3 text-xs font-black uppercase tracking-widest border-b-2 transition-all duration-300",
+                                                    engineTab === 'keyword'
+                                                        ? "border-primary text-primary"
+                                                        : "border-transparent text-muted-foreground hover:text-foreground"
+                                                )}
+                                            >
+                                                {isAr ? "مراقبة الكلمة المفتاحية" : "Monitor Keyword"}
+                                            </button>
+                                            <button
+                                                onClick={() => setEngineTab('pr')}
+                                                className={clsx(
+                                                    "px-6 py-3 text-xs font-black uppercase tracking-widest border-b-2 transition-all duration-300",
+                                                    engineTab === 'pr'
+                                                        ? "border-primary text-primary"
+                                                        : "border-transparent text-muted-foreground hover:text-foreground"
+                                                )}
+                                            >
+                                                {isAr ? "مراقبة العلاقات العامة" : "PR Wire Monitoring"}
+                                            </button>
+                                        </div>
+                                        <div>
+                                            {engineTab === 'keyword' ? (
+                                                <NewsGenerator defaultSourceType="Online News" hideHeader={true} />
+                                            ) : (
+                                                <PressReleasePanel hideHeader={true} />
+                                            )}
+                                        </div>
+                                    </div>
                                 </DashboardSection>
 
                                 {/* Section: Coverage Log */}
@@ -644,40 +616,7 @@ export default function DashboardClient() {
                             </div>
                         )}
 
-                        {/* ── DEEP VIEW ────────────────────────────────────── */}
-                        {activeView === 'deep' && (
-                            <div className="flex flex-col gap-8">
-                                <DashboardSection
-                                    id="deep-discovery"
-                                    title={t('section.discovery')}
-                                    icon={Search}
-                                >
-                                    <NewsGenerator defaultSourceType="Online News" />
-                                </DashboardSection>
 
-                                <DashboardSection
-                                    id="deep-analytics"
-                                    title={t('section.deep_analytics', { defaultValue: t('section.analytics') })}
-                                    icon={BarChart3}
-                                    headerSlot={<span className="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-amber-700">{t('view.deep_only', { defaultValue: 'Deep-only' })}</span>}
-                                >
-                                    <DashboardGrid articles={filteredArticles} analytics={analytics} isLoading={isAnalyticsLoading} />
-                                </DashboardSection>
-
-                                <DashboardSection
-                                    id="deep-coverage"
-                                    title={t('section.coverage')}
-                                    icon={Filter}
-                                >
-                                    <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
-                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
-                                        {coverageFilterBar}
-                                        {articleListBody}
-                                    </div>
-                                    <DeepStatusPanel />
-                                </DashboardSection>
-                            </div>
-                        )}
 
                         {/* ── SPECIALISED VIEWS ────────────────────────────── */}
                         {activeView === 'darkweb' && <DarkWebTab />}

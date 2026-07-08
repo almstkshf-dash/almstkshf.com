@@ -15,7 +15,6 @@ const routes = [
     '',
     '/case-studies/lexcora',
     '/case-studies/styling-assistant',
-    '/technical-solutions/smart-media-assistant',
     '/technical-solutions/kyc',
     '/technical-solutions/integration',
     '/media-monitoring/tv-radio',

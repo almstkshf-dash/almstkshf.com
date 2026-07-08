@@ -9,11 +9,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { isSafeUrl } from '@/utils/ssrf';
+import { checkApiAuth } from '@/lib/api-auth';
 
 export async function GET(req: NextRequest) {
     try {
+        const auth = await checkApiAuth();
+        if (!auth.authorized) {
+            return auth.errorResponse!;
+        }
+
         // Apply rate limit
-        const rlKey = await getRateLimitKey(req, 'proxy-image');
+        const rlKey = await getRateLimitKey(req, 'proxy-image', auth.userId);
         const limitResult = await rateLimit(rlKey, 30, 60);
         if (!limitResult.allowed) {
             return new NextResponse('Rate limit exceeded', { 

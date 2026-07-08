@@ -9,8 +9,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useMounted } from "@/hooks/useMounted";
+import { parsePublishedDate } from "@/utils/date-utils";
 
 interface ReportsChartPoint {
     timestamp?: number;
@@ -23,43 +25,35 @@ interface ReportsChartProps {
 
 export default React.memo(function ReportsChart({ data }: ReportsChartProps) {
     const t = useTranslations("MediaMonitoring.dashboard");
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    const parsePublishedDate = (publishedDate?: string) => {
-        if (!publishedDate) return null;
-        const [day, month, year] = publishedDate.split("/");
-        if (!day || !month || !year) return null;
-
-        const parsed = new Date(Number(year), Number(month) - 1, Number(day));
-        if (Number.isNaN(parsed.getTime())) return null;
-
-        return parsed;
-    };
-
-    // Process data to group by date
+    // Process data to group by date in linear time O(N + d)
     const processedData = useMemo(() => {
-        return data?.reduce((acc: { date: string; count: number }[], report) => {
+        if (!data) return [];
+        const dateCounts = new Map<string, number>();
+        const dateList: string[] = [];
+
+        data.forEach((report) => {
             const reportDate = typeof report.timestamp === "number"
                 ? new Date(report.timestamp)
                 : parsePublishedDate(report.publishedDate);
 
             if (!reportDate || Number.isNaN(reportDate.getTime())) {
-                return acc;
+                return;
             }
 
             const date = reportDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-            const existing = acc.find(item => item.date === date);
-            if (existing) {
-                existing.count += 1;
-            } else {
-                acc.push({ date, count: 1 });
+            const count = dateCounts.get(date) || 0;
+            if (count === 0) {
+                dateList.push(date);
             }
-            return acc;
-        }, []) || [];
+            dateCounts.set(date, count + 1);
+        });
+
+        return dateList.map((date) => ({
+            date,
+            count: dateCounts.get(date) || 0,
+        }));
     }, [data]);
 
     // Sort by date (assuming rough chronological order or needing explicit sort)

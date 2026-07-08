@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { performSearch } from '@/lib/upstash';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
+import { checkApiAuth } from '@/lib/api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,12 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(req: Request) {
     try {
-        const rlKey = await getRateLimitKey(req, 'search');
+        const auth = await checkApiAuth();
+        if (!auth.authorized) {
+            return auth.errorResponse!;
+        }
+
+        const rlKey = await getRateLimitKey(req, 'search', auth.userId);
         const limit = await rateLimit(rlKey, 30, 60);
         if (!limit.allowed) {
             return NextResponse.json(

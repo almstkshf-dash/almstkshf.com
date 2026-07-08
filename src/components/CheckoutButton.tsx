@@ -14,6 +14,7 @@ import clsx from 'clsx';
 import { getStripe } from '@/lib/stripe-client';
 import { useAuth, useUser } from '@clerk/nextjs';
 import Button from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 interface CheckoutButtonProps {
     productId: string;
@@ -67,7 +68,7 @@ export default function CheckoutButton({
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            alert('An error occurred. Please try again.');
+            toast.error('An error occurred. Please try again.');
             setLoading(false);
         }
     };

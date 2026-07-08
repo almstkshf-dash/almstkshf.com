@@ -11,6 +11,8 @@ import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import { cn } from '@/utils/cn';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
     robots: {
@@ -81,52 +83,58 @@ function SidebarSkeleton() {
  * and handles all view-switching navigation internally via URL params.
  * This layout itself stays a Server Component.
  */
-export default function DashboardLayout({
+export default async function DashboardLayout({
     children,
-    }: {
-        children: React.ReactNode;
-    }) {
-        return (
-            <div className="min-h-screen bg-background/50 text-foreground relative overflow-hidden">
-                {/* Ambient background glows with GPU acceleration */}
-                <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full animate-pulse transform-gpu will-change-[transform,opacity]" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse [animation-delay:2s] transform-gpu will-change-[transform,opacity]" />
-                </div>
+    params,
+}: {
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
+}) {
+    const { userId } = await auth();
+    const { locale } = await params;
 
-                {/* Sidebar — needs Suspense because it uses useSearchParams() */}
-                <Suspense fallback={<SidebarSkeleton />}>
-                    <DashboardSidebar />
-                </Suspense>
-
-                {/*
-                 * Main content area
-                 * ltr:pl-0 → ltr:pl-16 (lg) → ltr:pl-60 (xl)
-                 * rtl mirrors via ltr:/rtl: variants
-                 * pb-20 on mobile reserves space for the bottom nav bar
-                 */}
-                <main
-                    className={cn(
-                        'min-h-screen',
-                        // LTR offsets
-                        'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
-                        // RTL offsets (sidebar is on the right)
-                        'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
-                        // Bottom space for mobile nav bar
-                        'pb-20 md:pb-0'
-                    )}
-                >
-                    <Suspense
-                        fallback={
-                            <div className="flex h-[80vh] items-center justify-center">
-                                <Loader2 className="w-10 h-10 text-primary animate-spin" />
-                            </div>
-                        }
-                    >
-                        {children}
-                    </Suspense>
-                </main>
-            </div>
-        );
+    if (!userId) {
+        redirect(`/${locale}/sign-in`);
     }
+
+    return (
+        <div className="min-h-screen bg-background/50 text-foreground relative overflow-x-hidden">
+            {/* Ambient background glows with optimized performance (no animation, lower blur radius) */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+                <div 
+                    className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu" 
+                />
+                <div 
+                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu" 
+                />
+            </div>
+
+            {/* Sidebar — needs Suspense because it uses useSearchParams() */}
+            <Suspense fallback={<SidebarSkeleton />}>
+                <DashboardSidebar />
+            </Suspense>
+
+            {/*
+             * Main content area
+             * ltr:pl-0 → ltr:pl-16 (lg) → ltr:pl-60 (xl)
+             * rtl mirrors via ltr:/rtl: variants
+             * pb-20 on mobile reserves space for the bottom nav bar
+             */}
+            <main
+                aria-label="Dashboard content"
+                className={cn(
+                    'min-h-screen',
+                    // LTR offsets
+                    'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
+                    // RTL offsets (sidebar is on the right)
+                    'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
+                    // Bottom space for mobile nav bar
+                    'pb-20 md:pb-0'
+                )}
+            >
+                {children}
+            </main>
+        </div>
+    );
+}
 

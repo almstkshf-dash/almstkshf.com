@@ -22,6 +22,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     noResultsText,
     selectedText,
     clearAllText,
+    selectAllText,
     "aria-labelledby": ariaLabelledBy,
     id,
 }: {
@@ -37,18 +38,27 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     noResultsText?: string;
     selectedText?: string;
     clearAllText?: string;
+    selectAllText?: string;
     "aria-labelledby"?: string;
     id?: string;
 }) {
+    const generatedId = React.useId();
+    const dropdownId = id ?? generatedId;
+
+    const itemMap = React.useMemo(
+        () => new Map(items.map(item => [item.id, item])),
+        [items]
+    );
+
     const defaultRenderItem = useCallback((item: { id: string; label: string }) => <span>{item.label}</span>, []);
     const defaultRenderTag = useCallback((id: string) => {
-        const item = items.find(i => i.id === id);
+        const item = itemMap.get(id);
         return <span>{item?.label || id}</span>;
-    }, [items]);
+    }, [itemMap]);
 
     const t = useTranslations('NewsGenerator');
-    const finalRenderItem = renderItem || defaultRenderItem;
-    const finalRenderTag = renderTag || defaultRenderTag;
+    const finalRenderItem = renderItem ?? defaultRenderItem;
+    const finalRenderTag = renderTag ?? defaultRenderTag;
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
     const ref = useRef<HTMLDivElement>(null);
@@ -58,12 +68,17 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
         ? { 'aria-labelledby': ariaLabelledById }
         : { 'aria-label': placeholder };
 
+    const selectedSet = React.useMemo(
+        () => new Set(selected),
+        [selected]
+    );
+
     useEffect(() => {
-        const handler = (e: MouseEvent) => {
+        const handler = (e: PointerEvent) => {
             if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
         };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
+        document.addEventListener('pointerdown', handler);
+        return () => document.removeEventListener('pointerdown', handler);
     }, []);
 
     useEffect(() => {
@@ -73,38 +88,27 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     }, [isOpen]);
 
     const filtered = React.useMemo(() => {
-        return (items || []).filter(
-            (item) => search.length === 0 || item.searchStr.toLowerCase().includes(search.toLowerCase())
+        const query = search.trim().toLowerCase();
+
+        if (!query) return items;
+
+        return items.filter((item) =>
+            item.searchStr?.toLowerCase().includes(query) ||
+            item.label.toLowerCase().includes(query)
         );
     }, [items, search]);
 
     const toggle = useCallback((id_to_toggle: string) => {
-        onChange(selected.includes(id_to_toggle) ? selected.filter((s) => s !== id_to_toggle) : [...selected, id_to_toggle]);
-    }, [selected, onChange]);
+        onChange(selectedSet.has(id_to_toggle) ? selected.filter((s) => s !== id_to_toggle) : [...selected, id_to_toggle]);
+    }, [selected, selectedSet, onChange]);
 
     return (
         <div ref={ref} className="relative">
             {/* Trigger Button */}
             <div
-                role="combobox"
-                tabIndex={0}
-                aria-haspopup="listbox"
-                aria-expanded={isOpen}
-                aria-controls={`${id || 'dropdown'}-listbox`}
-                {...comboboxLabelProps}
                 onClick={() => {
                     setIsOpen(true);
                     inputRef.current?.focus();
-                }}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setIsOpen(true);
-                        inputRef.current?.focus();
-                    }
-                    if (e.key === 'Escape' && isOpen) {
-                        setIsOpen(false);
-                    }
                 }}
                 className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-left transition-all border cursor-pointer ${error
                     ? 'border-destructive/60 ring-2 ring-destructive/20'
@@ -115,28 +119,79 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
             >
                 {icon && <span className="text-muted-foreground transition-colors flex-shrink-0">{icon}</span>}
                 <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px] items-center">
-                    {selected.map((selected_id) => (
+                    {items.length > 0 && selected.length === items.length ? (
                         <span
-                            key={selected_id}
-                            className="inline-flex items-center gap-1 bg-primary/15 text-primary-foreground border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                            className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors animate-fade-in"
                         >
-                            {finalRenderTag(selected_id)}
+                            {t('all_selected') || 'All Selected'}
                             <button
                                 type="button"
-                                aria-label={`${t('remove')} ${items.find(i => i.id === selected_id)?.label || selected_id}`}
-                                onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                aria-label={t('clear_all') || 'Clear All'}
+                                onClick={(e) => { e.stopPropagation(); onChange([]); }}
                                 className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
                             >
                                 <X className="w-3 h-3" aria-hidden="true" />
                             </button>
                         </span>
-                    ))}
+                    ) : selected.length > 3 ? (
+                        <>
+                            {selected.slice(0, 3).map((selected_id) => (
+                                <span
+                                    key={selected_id}
+                                    className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                                >
+                                    {finalRenderTag(selected_id)}
+                                    <button
+                                        type="button"
+                                        aria-label={`${t('remove')} ${itemMap.get(selected_id)?.label || selected_id}`}
+                                        onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                        className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
+                                    >
+                                        <X className="w-3 h-3" aria-hidden="true" />
+                                    </button>
+                                </span>
+                            ))}
+                            <span
+                                className="inline-flex items-center gap-1 bg-muted text-muted-foreground border border-border rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                            >
+                                +{selected.length - 3} {selectedText || t('selected') || 'selected'}
+                            </span>
+                        </>
+                    ) : (
+                        selected.map((selected_id) => (
+                            <span
+                                key={selected_id}
+                                className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
+                            >
+                                {finalRenderTag(selected_id)}
+                                <button
+                                    type="button"
+                                    aria-label={`${t('remove')} ${itemMap.get(selected_id)?.label || selected_id}`}
+                                    onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                    className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
+                                >
+                                    <X className="w-3 h-3" aria-hidden="true" />
+                                </button>
+                            </span>
+                        ))
+                    )}
                     
                     {/* Inline Filter Input */}
                     <input
                         ref={inputRef}
                         type="text"
-                        placeholder={selected.length === 0 ? placeholder : ''}
+                        role="combobox"
+                        aria-expanded={isOpen}
+                        aria-haspopup="listbox"
+                        aria-controls={`${dropdownId}-listbox`}
+                        aria-autocomplete="list"
+                        aria-describedby={error ? `${dropdownId}-error` : undefined}
+                        {...comboboxLabelProps}
+                        placeholder={
+                            selected.length === 0
+                                ? placeholder
+                                : searchPlaceholder
+                        }
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
@@ -155,6 +210,10 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 e.stopPropagation();
                                 setIsOpen(false);
                             }
+                            if (e.key === 'Enter' && !isOpen) {
+                                e.preventDefault();
+                                setIsOpen(true);
+                            }
                         }}
                         className="bg-transparent border-none outline-none text-sm text-foreground placeholder:text-foreground/40 min-w-[60px] flex-1 p-0 focus:ring-0 focus:outline-none"
                     />
@@ -164,7 +223,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
 
             {/* Error Message */}
             {error && (
-                <p className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-fade-in duration-300">
+                <p id={`${dropdownId}-error`} className="mt-1.5 text-xs text-destructive flex items-center gap-1 animate-fade-in duration-300">
                     <AlertTriangle className="w-3 h-3" aria-hidden="true" /> {error}
                 </p>
             )}
@@ -175,7 +234,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
 
                     {/* Items List */}
                     <div
-                        id={`${id || 'dropdown'}-listbox`}
+                        id={`${dropdownId}-listbox`}
                         role="listbox"
                         aria-multiselectable="true"
                         className="max-h-64 overflow-y-auto scrollbar-thin transition-colors"
@@ -190,24 +249,25 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 {filtered.map((item) => (
                                     <button
                                         key={item.id}
+                                        id={`${dropdownId}-option-${item.id}`}
                                         type="button"
                                         role="option"
-                                        aria-selected={selected.includes(item.id)}
+                                        aria-selected={selectedSet.has(item.id)}
                                         onClick={() => toggle(item.id)}
                                         className={clsx(
                                             "w-full flex justify-start items-center gap-3 px-3 py-2.5 text-sm rounded-lg shadow-none h-auto transition-colors focus:bg-muted focus:outline-none",
-                                            selected.includes(item.id)
-                                                ? 'bg-primary/10 text-primary-foreground font-semibold'
+                                            selectedSet.has(item.id)
+                                                ? 'bg-primary/10 text-primary font-semibold'
                                                 : 'text-foreground hover:bg-muted font-medium'
                                         )}
                                     >
                                         <div className={clsx(
                                             "w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all",
-                                            selected.includes(item.id)
+                                            selectedSet.has(item.id)
                                                 ? 'bg-primary border-primary shadow-lg shadow-primary/20'
                                                 : 'border-border bg-background'
                                         )}>
-                                            {selected.includes(item.id) && (
+                                            {selectedSet.has(item.id) && (
                                                 <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground stroke-[3]" aria-hidden="true" />
                                             )}
                                         </div>
@@ -223,17 +283,30 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                         <span className="text-[10px] text-foreground/70 font-bold uppercase tracking-widest transition-colors px-2">
                             {selected.length} {selectedText}
                         </span>
-                        {selected.length > 0 && (
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onChange([])}
-                                className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
-                            >
-                                {clearAllText}
-                            </Button>
-                        )}
+                        <div className="flex gap-1">
+                            {selected.length < items.length && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onChange(items.map((item) => item.id))}
+                                    className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
+                                >
+                                    {selectAllText || t('select_all') || 'Select All'}
+                                </Button>
+                            )}
+                            {selected.length > 0 && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onChange([])}
+                                    className="text-[10px] text-primary hover:text-primary/70 uppercase tracking-widest font-black px-2 py-1 rounded-lg hover:bg-primary/5 h-auto shadow-none"
+                                >
+                                    {clearAllText || t('clear_all') || 'Clear All'}
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

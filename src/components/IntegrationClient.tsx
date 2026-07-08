@@ -11,10 +11,14 @@
 import { useTranslations, useLocale } from "next-intl";
 import Container from "@/components/ui/Container";
 import { Key, Database, Zap, ArrowRight, Server, Globe, Slack, Webhook, Users, Mail } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from '@/i18n/routing';
+import { Integration } from "@/types/integration";
+import { defaultIntegrations } from "@/data/integrations";
+import clsx from "clsx";
 
-const iconMap: Record<string, React.ComponentType<any>> = {
+const iconMap: Record<string, LucideIcon> = {
     Slack,
     Webhook,
     Database,
@@ -25,71 +29,14 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 export default function IntegrationClient({
     initialIntegrations,
 }: {
-    initialIntegrations?: any[];
+    initialIntegrations?: Integration[];
 }) {
     const t = useTranslations("TechnicalSolutions.integration");
     const tNav = useTranslations("Navigation");
     const locale = useLocale();
 
-    const defaultIntegrations = [
-        {
-            id: "slack",
-            nameEn: "Slack",
-            nameAr: "سلاك",
-            descEn: "Receive real-time sentiment alerts and crisis notifications directly in your team's Slack channels.",
-            descAr: "تلقي تنبيهات المشاعر الفورية وإشعارات الأزمات مباشرة في قنوات Slack الخاصة بفريقك.",
-            categoryEn: "Messaging",
-            categoryAr: "المراسلة",
-            icon: "Slack",
-            active: true,
-        },
-        {
-            id: "webhooks",
-            nameEn: "Custom Webhooks",
-            nameAr: "خطافات الويب (Webhooks)",
-            descEn: "Trigger custom HTTP callbacks to your own systems whenever new media articles are analyzed.",
-            descAr: "قم بتشغيل استدعاءات HTTP مخصصة لأنظمتك الخاصة فور تحليل مقالات إعلامية جديدة.",
-            categoryEn: "Developer Tools",
-            categoryAr: "أدوات المطورين",
-            icon: "Webhook",
-            active: true,
-        },
-        {
-            id: "crm",
-            nameEn: "CRM Systems",
-            nameAr: "أنظمة إدارة العملاء (CRM)",
-            descEn: "Sync media insights and corporate reputation profiles directly with Salesforce, HubSpot, or Microsoft Dynamics.",
-            descAr: "مزامنة رؤى وسائل الإعلام وملفات السمعة المؤسسية مباشرة مع Salesforce أو HubSpot أو Microsoft Dynamics.",
-            categoryEn: "CRM & Sales",
-            categoryAr: "إدارة العملاء والمبيعات",
-            icon: "Database",
-            active: true,
-        },
-        {
-            id: "teams",
-            nameEn: "Microsoft Teams",
-            nameAr: "مايكروسوفت تيمز",
-            descEn: "Share automated media summary reports and broadcast intelligence inside Microsoft Teams spaces.",
-            descAr: "مشاركة تقارير ملخصات الإعلام التلقائية واستخبارات البث داخل مساحات Microsoft Teams.",
-            categoryEn: "Messaging",
-            categoryAr: "المراسلة",
-            icon: "Users",
-            active: true,
-        },
-        {
-            id: "email",
-            nameEn: "Email Digests",
-            nameAr: "ملخصات البريد الإلكتروني",
-            descEn: "Configure periodic custom digests and instant emergency notifications sent to your inbox.",
-            descAr: "تكوين ملخصات مخصصة دورية وإشعارات طوارئ فورية يتم إرسالها إلى بريدك الإلكتروني.",
-            categoryEn: "Notifications",
-            categoryAr: "الإشعارات",
-            icon: "Mail",
-            active: true,
-        }
-    ];
-
-    const integrations = initialIntegrations || defaultIntegrations;
+    const integrations = (initialIntegrations || defaultIntegrations)
+        .filter(item => item.active);
 
     const codeSnippet = `const almstkshf = require('almstkshf-sdk');
 
@@ -148,7 +95,8 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                             className="flex flex-wrap gap-4"
                         >
                             <Link
-                                href="/contact"                                className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/25 transition-all hover:-translate-y-1 flex items-center gap-2"
+                                href="/contact"
+                                className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/25 transition-all hover:-translate-y-1 flex items-center gap-2"
                             >
                                 {tNav("contact")}
                                 <ArrowRight className="w-5 h-5" />
@@ -230,11 +178,11 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {integrations.map((item: any, idx: number) => {
+                        {integrations.map((item: Integration, idx: number) => {
                             const IconComponent = iconMap[item.icon] || Globe;
-                            const name = locale === "ar" ? item.nameAr : item.nameEn;
-                            const desc = locale === "ar" ? item.descAr : item.descEn;
-                            const category = locale === "ar" ? item.categoryAr : item.categoryEn;
+                            const name = t(`list.${item.id}.name`);
+                            const desc = t(`list.${item.id}.desc`);
+                            const category = t(`list.${item.id}.category`);
 
                             return (
                                 <motion.div
@@ -261,10 +209,16 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                                             {desc}
                                         </p>
                                     </div>
-                                    <div className="flex items-center gap-2 text-primary font-semibold text-sm cursor-pointer group-hover:underline">
-                                        <span>{locale === "ar" ? "تفاصيل الربط" : "Integration details"}</span>
-                                        <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
-                                    </div>
+                                    <Link
+                                        href={`/contact?ref=integration_${item.id}`}
+                                        className="flex items-center gap-2 text-primary font-semibold text-sm group-hover:underline"
+                                    >
+                                        <span>{t("details")}</span>
+                                        <ArrowRight className={clsx(
+                                            "w-4 h-4 transition-transform duration-300",
+                                            locale === "ar" ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1"
+                                        )} />
+                                    </Link>
                                 </motion.div>
                             );
                         })}

@@ -1,11 +1,4 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
- */
-
+import { useState, useEffect, useRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -18,16 +11,15 @@ interface DashboardSectionProps {
     headerSlot?: ReactNode;
     /** Hide the divider line — useful when the section is the first visual element */
     noDivider?: boolean;
+    /** Defer mounting of children until section enters viewport */
+    lazy?: boolean;
 }
 
 /**
  * DashboardSection
  * ─────────────────
- * A named, anchor-able wrapper for dashboard content sections. Replaces the
- * undifferentiated `topLeftSlotMemo` blob. Each section has:
- *   • A stable `id` for deep-linking / scroll targeting
- *   • A section heading (h2) with an icon and gradient rule
- *   • `scroll-mt-24` so sticky-header doesn't obscure anchor jumps
+ * A named, wrapper for dashboard content sections. Support lazy rendering to defer
+ * mounting heavy queries, components, and hooks until the section is scrolled into view.
  */
 export function DashboardSection({
     id,
@@ -36,9 +28,48 @@ export function DashboardSection({
     children,
     headerSlot,
     noDivider = false,
+    lazy = true,
 }: DashboardSectionProps) {
+    const [hasBeenVisible, setHasBeenVisible] = useState(!lazy);
+    const elementRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!lazy) return;
+
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            setHasBeenVisible(true);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setHasBeenVisible(true);
+                    observer.disconnect();
+                }
+            },
+            {
+                rootMargin: '200px 0px',
+            }
+        );
+
+        const currentElement = elementRef.current;
+        if (currentElement) {
+            observer.observe(currentElement);
+        }
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [lazy]);
+
     return (
-        <section id={id} aria-labelledby={`section-heading-${id}`} className="scroll-mt-24">
+        <section 
+            id={id} 
+            aria-labelledby={`section-heading-${id}`} 
+            className="scroll-mt-24"
+            ref={elementRef}
+        >
             {/* Section heading row */}
             <div className="flex items-center gap-4 mb-5">
                 <div className="flex items-center gap-3 shrink-0">
@@ -62,7 +93,11 @@ export function DashboardSection({
                 )}
             </div>
 
-            {children}
+            {hasBeenVisible ? (
+                children
+            ) : (
+                <div className="w-full h-48 border border-border/40 rounded-[2rem] bg-muted/5 animate-pulse flex items-center justify-center text-muted-foreground/30 text-xs" />
+            )}
         </section>
     );
 }

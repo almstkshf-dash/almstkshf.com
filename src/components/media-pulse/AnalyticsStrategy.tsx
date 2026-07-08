@@ -74,14 +74,14 @@ export function AnalyticsStrategy() {
                                     <div className={clsx("p-3 rounded-xl bg-muted transition-colors", s.color)}>
                                         <s.icon className="w-6 h-6" aria-hidden="true" />
                                     </div>
-                                    <h3 className="text-3xl font-bold text-foreground tracking-tight transition-colors">{t(`${s.key}.title`)}</h3>
+                                    <h3 className="text-3xl font-bold text-foreground tracking-tight transition-colors">{t(`${s.key}.title` as any)}</h3>
                                 </div>
                                 <p className="text-foreground/80 leading-relaxed font-light transition-colors">
-                                    {t(`${s.key}.description`)}
+                                    {t(`${s.key}.description` as any)}
                                 </p>
                             </div>
                             <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {(t.raw(`${s.key}.items`) as StrategyItem[]).map((item, idx) => (
+                                {(t.raw(`${s.key}.items` as any) as StrategyItem[]).map((item, idx) => (
                                     <div key={idx} className="p-6 rounded-2xl bg-muted/30 border border-border space-y-3 group/item hover:bg-muted/50 transition-colors shadow-sm">
                                         <h4 className={clsx("font-bold text-sm uppercase tracking-wider transition-colors", s.color)}>
                                             {item.title}

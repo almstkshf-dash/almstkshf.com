@@ -17,7 +17,7 @@ export interface RateLimitResult {
     resetSeconds: number;
 }
 
-// In-memory fallback for rate limiting when Redis is unavailable
+// In-memory fallback for rate limiting when Redis is unavailable (dev only)
 const inMemoryStore = new Map<string, { count: number; expiresAt: number }>();
 
 function cleanInMemoryStore() {
@@ -57,19 +57,44 @@ export async function rateLimit(key: string, limit: number, windowSeconds: numbe
     try {
         const redis = getRedis();
         if (!redis) {
-            return runInMemoryRateLimit(key, limit, windowSeconds);
+            if (process.env.NODE_ENV !== 'production') {
+                return runInMemoryRateLimit(key, limit, windowSeconds);
+            }
+            // Fail open in production if Redis connection is not configured (to avoid downtime)
+            return { allowed: true, remaining: limit, resetSeconds: 0 };
         }
 
-        const count = await redis.incr(key);
-        if (count === 1) {
-            await redis.expire(key, windowSeconds);
-        }
+        // Atomic Lua script to INCR and EXPIRE in a single round-trip
+        const script = `
+            local current = redis.call("INCR", KEYS[1])
+            if current == 1 then
+                redis.call("EXPIRE", KEYS[1], ARGV[1])
+            end
+            return current
+        `;
+
+        const count = await redis.eval<number[], number>(script, [key], [windowSeconds]);
         const remaining = Math.max(0, limit - count);
         return { allowed: count <= limit, remaining, resetSeconds: windowSeconds };
     } catch (error) {
-        console.warn(`Upstash Redis rate limiting failed, falling back to in-memory:`, error);
-        return runInMemoryRateLimit(key, limit, windowSeconds);
+        console.warn(`Upstash Redis rate limiting failed, falling back:`, error);
+        if (process.env.NODE_ENV !== 'production') {
+            return runInMemoryRateLimit(key, limit, windowSeconds);
+        }
+        // Fail open in production on Redis failure
+        return { allowed: true, remaining: limit, resetSeconds: 0 };
     }
+}
+
+function getSafeClientIp(headersInstance: Headers): string {
+    const isDev = process.env.NODE_ENV !== 'production';
+    return (
+        headersInstance.get('cf-connecting-ip') ||
+        headersInstance.get('x-real-ip') ||
+        headersInstance.get('true-client-ip') ||
+        (isDev ? headersInstance.get('x-forwarded-for')?.split(',')[0]?.trim() : null) ||
+        'unknown'
+    );
 }
 
 export async function getRateLimitKey(
@@ -97,19 +122,12 @@ export async function getRateLimitKey(
         if ('ip' in req && req.ip) {
             ip = req.ip as string;
         } else {
-            const reqHeaders = req.headers;
-            ip = reqHeaders.get('cf-connecting-ip') ||
-                 reqHeaders.get('x-real-ip') ||
-                 reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-                 null;
+            ip = getSafeClientIp(req.headers);
         }
     } else {
         try {
             const reqHeaders = await headers();
-            ip = reqHeaders.get('cf-connecting-ip') ||
-                 reqHeaders.get('x-real-ip') ||
-                 reqHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-                 null;
+            ip = getSafeClientIp(reqHeaders);
         } catch {
             // fallback if headers() fails (e.g. outside next.js request context entirely)
         }

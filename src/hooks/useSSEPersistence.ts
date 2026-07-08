@@ -19,7 +19,14 @@ interface UseSSEPersistenceProps {
 
 export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersistenceProps) {
     const [status, setStatus] = useState<ConnectionStatus>("disconnected");
-    const [lastEventId, setLastEventId] = useState<number | null>(null);
+    const [lastEventId, setLastEventIdState] = useState<number | null>(null);
+    const lastEventIdRef = useRef<number | null>(null);
+
+    const setLastEventId = (val: number) => {
+        lastEventIdRef.current = val;
+        setLastEventIdState(val);
+    };
+
     const eventSourceRef = useRef<EventSource | null>(null);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const watchdogTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -30,26 +37,9 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
     onArticleRef.current = onArticle;
 
     // Use refs for the key functions to break circular dependencies & self-references
-    const connectRef = useRef<(sinceTime: number) => void>(() => {});
+    const connectRef = useRef<() => void>(() => {});
     const reconnectRef = useRef<() => void>(() => {});
     const resetWatchdogRef = useRef<() => void>(() => {});
-
-    // Read initial lastEventId on mount
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const saved = sessionStorage.getItem("almstkshf:sse:lastEventId");
-            if (saved) {
-                const parsed = parseInt(saved, 10);
-                if (!isNaN(parsed) && parsed > 0) {
-                    setLastEventId(parsed);
-                }
-            } else {
-                const now = Date.now();
-                setLastEventId(now);
-                sessionStorage.setItem("almstkshf:sse:lastEventId", String(now));
-            }
-        }
-    }, []);
 
     // Helper to disconnect cleanly
     const disconnect = () => {
@@ -80,7 +70,7 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
     };
 
     // Connect implementation
-    connectRef.current = (sinceTime: number) => {
+    connectRef.current = () => {
         disconnect();
 
         if (!enabled) {
@@ -91,6 +81,7 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
         setStatus(attemptRef.current > 0 ? "reconnecting" : "connecting");
 
         // Construct url with the 'since' parameter
+        const sinceTime = lastEventIdRef.current || Date.now();
         const url = `/api/monitor/stream?since=${sinceTime}`;
         console.log(`[SSE] Connecting to: ${url} (Attempt ${attemptRef.current + 1})`);
 
@@ -109,7 +100,7 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
             };
 
             es.onerror = (e) => {
-                console.error("[SSE] Connection error:", e);
+                console.error("[SSE] Connection error. EventSource readyState:", es.readyState, e);
                 es.close();
                 setStatus("reconnecting");
                 
@@ -119,7 +110,7 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
 
                 console.log(`[SSE] Reconnecting in ${delay}ms...`);
                 reconnectTimeoutRef.current = setTimeout(() => {
-                    connectRef.current(sinceTime);
+                    connectRef.current();
                 }, delay);
             };
 
@@ -155,17 +146,29 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
 
     // Reconnect implementation
     reconnectRef.current = () => {
-        // Fallback to Date.now() if no lastEventId exists
-        const sinceTime = lastEventId || Date.now();
         attemptRef.current = 0; // Manual reconnect resets attempts
-        connectRef.current(sinceTime);
+        connectRef.current();
     };
 
     // Handle connection lifecycle based on enabled/disabled states
     useEffect(() => {
-        if (enabled && lastEventId !== null) {
-            connectRef.current(lastEventId);
-        } else if (!enabled) {
+        // Read initial lastEventId on mount if not already loaded
+        if (lastEventIdRef.current === null && typeof window !== "undefined") {
+            const saved = sessionStorage.getItem("almstkshf:sse:lastEventId");
+            let initialId: number;
+            if (saved) {
+                const parsed = parseInt(saved, 10);
+                initialId = !isNaN(parsed) && parsed > 0 ? parsed : Date.now();
+            } else {
+                initialId = Date.now();
+                sessionStorage.setItem("almstkshf:sse:lastEventId", String(initialId));
+            }
+            setLastEventId(initialId);
+        }
+
+        if (enabled) {
+            connectRef.current();
+        } else {
             disconnect();
             setStatus("disconnected");
         }
@@ -173,7 +176,7 @@ export function useSSEPersistence({ onArticle, enabled = true }: UseSSEPersisten
         return () => {
             disconnect();
         };
-    }, [enabled, lastEventId]);
+    }, [enabled]);
 
     // Expose reconnect wrapper that calls the ref version
     const triggerReconnect = () => {

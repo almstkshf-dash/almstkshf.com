@@ -11,6 +11,7 @@ import { parseFeed } from '@/lib/rss-engine';
 import { FeedResponse } from '@/types/rss';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { isSafeUrl } from '@/utils/ssrf';
+import { checkApiAuth } from '@/lib/api-auth';
 
 // Pin to Node.js runtime — rss-parser requires xml2js which is not Edge-compatible
 export const runtime = 'nodejs';
@@ -23,8 +24,13 @@ export const runtime = 'nodejs';
 export const revalidate = 900;
 
 export async function GET(request: Request) {
+  const auth = await checkApiAuth();
+  if (!auth.authorized) {
+    return auth.errorResponse!;
+  }
+
   // Apply rate limit
-  const rlKey = await getRateLimitKey(request, 'proxy-rss');
+  const rlKey = await getRateLimitKey(request, 'proxy-rss', auth.userId);
   const limitResult = await rateLimit(rlKey, 15, 60);
   if (!limitResult.allowed) {
     return NextResponse.json<FeedResponse>({

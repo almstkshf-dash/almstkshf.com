@@ -27,56 +27,67 @@ export async function resolveApiKey(
 ): Promise<string | null> {
     const envKey = process.env[envVarName] || null;
     
+    let identity: any = null;
     try {
-        const identity = await ctx.auth.getUserIdentity();
-        let appSettings: any = null;
-        let userSettings: any = null;
+        if (ctx.auth) {
+            identity = await ctx.auth.getUserIdentity();
+        }
+    } catch (e) {
+        console.warn("[resolveApiKey] Error getting user identity:", e);
+    }
 
+    let appSettings: any = null;
+    try {
         if ("db" in ctx) {
-            // Context has direct DB access (Mutation or Query) â€” bypasses authorization checks in public queries
+            // Context has direct DB access (Mutation or Query) — bypasses authorization checks in public queries
             const dbRef = (ctx as QueryCtx | MutationCtx).db;
             appSettings = await dbRef
                 .query("app_settings")
                 .filter((q) => q.eq(q.field("type"), "global"))
                 .first();
-            
-            if (identity) {
+        } else {
+            // Action context — must use runQuery
+            // Using internal query to bypass redaction for server-side key resolution
+            appSettings = await ctx.runQuery(internal.settings.getSystemSettings, {});
+        }
+    } catch (error) {
+        console.warn(`[resolveApiKey] Error fetching global app settings for ${envVarName}:`, error);
+    }
+
+    let userSettings: any = null;
+    if (identity) {
+        try {
+            if ("db" in ctx) {
+                const dbRef = (ctx as QueryCtx | MutationCtx).db;
                 userSettings = await dbRef
                     .query("userSettings")
                     .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
                     .unique();
-            }
-        } else {
-            // Action context â€” must use runQuery
-            // Using internal query to bypass redaction for server-side key resolution
-            appSettings = await ctx.runQuery(internal.settings.getSystemSettings, {});
-            if (identity) {
+            } else {
                 userSettings = await ctx.runQuery(api.userSettings.get, { userId: identity.subject });
             }
+        } catch (error) {
+            console.warn(`[resolveApiKey] Error fetching user settings for ${identity.subject}:`, error);
         }
+    }
 
-        // 1. User Settings (BYOK) - Highest precedence
-        if (settingsField && userSettings?.apiKeys?.[settingsField]) {
-            const key = userSettings.apiKeys[settingsField];
-            if (key && key !== "None") return key;
-        }
-        
-        // Legacy fallback for gemini specifically if not in apiKeys object
-        if (settingsField === "gemini" && userSettings?.geminiApiKey && userSettings.geminiApiKey !== "None") {
-            return userSettings.geminiApiKey;
-        }
+    // 1. User Settings (BYOK) - Highest precedence
+    if (settingsField && userSettings?.apiKeys?.[settingsField]) {
+        const key = userSettings.apiKeys[settingsField];
+        if (key && key !== "None") return key;
+    }
+    
+    // Legacy fallback for gemini specifically if not in apiKeys object
+    if (settingsField === "gemini" && userSettings?.geminiApiKey && userSettings.geminiApiKey !== "None") {
+        return userSettings.geminiApiKey;
+    }
 
-        // 2. Global App Settings (System Keys)
-        if (settingsField && appSettings?.apiKeys?.[settingsField]) {
-            const key = appSettings.apiKeys[settingsField];
-            if (key && key !== "None") return key;
-        }
-
-    } catch (error) {
-        console.warn(`[resolveApiKey] Error fetching DB keys for ${envVarName}, falling back to process.env`, error);
+    // 2. Global App Settings (System Keys)
+    if (settingsField && appSettings?.apiKeys?.[settingsField]) {
+        const key = appSettings.apiKeys[settingsField];
+        if (key && key !== "None") return key;
     }
 
     // 3. Environment Variable - Final fallback
     return envKey;
 }
-

@@ -11,40 +11,46 @@ import clsx from "clsx";
 import { AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+export type CrisisPlanPriority = "Low" | "Medium" | "High";
+export type CrisisPlanStatus = "Active" | "Pending" | "Resolved" | string;
+
 interface CrisisPlanCardProps {
     title: string;
-    priority: "Low" | "Medium" | "High";
+    priority: CrisisPlanPriority;
     actions: string[];
-    status: string;
+    status: CrisisPlanStatus;
 }
+
+const PRIORITY_COLORS: Record<CrisisPlanPriority, string> = {
+    Low: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    Medium: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    High: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+};
+
+const PRIORITY_STATUS_ICONS: Record<CrisisPlanPriority, React.ComponentType<{ className?: string }>> = {
+    Low: CheckCircle,
+    Medium: Info,
+    High: AlertTriangle,
+};
 
 export default React.memo(function CrisisPlanCard({ title, priority, actions, status }: CrisisPlanCardProps) {
     const t = useTranslations("CrisisManagementDetail.card");
 
-    const priorityColors = {
-        Low: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-        Medium: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-        High: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
-    };
-
-    const statusIcons = {
-        Low: CheckCircle,
-        Medium: Info,
-        High: AlertTriangle,
-    };
-
-    const Icon = statusIcons[priority];
+    const Icon = PRIORITY_STATUS_ICONS[priority];
+    const priorityKey = `priority_${priority.toLowerCase()}`;
 
     return (
-        <div className={clsx("p-5 rounded-xl border transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md", priorityColors[priority])}>
+        <div className={clsx("p-5 rounded-xl border transition-[transform,box-shadow] duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md", PRIORITY_COLORS[priority])}>
             <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                    <div className={clsx("p-2 rounded-lg bg-background/30 backdrop-blur-sm transition-colors")}>
-                        <Icon className="w-5 h-5" />
+                    <div className="p-2 rounded-lg bg-background/30 backdrop-blur-sm transition-colors">
+                        <Icon aria-hidden="true" className="w-5 h-5" />
                     </div>
                     <div>
                         <h3 className="font-semibold text-lg text-foreground transition-colors">{title}</h3>
-                        <span className="text-xs font-mono uppercase tracking-wider opacity-80">{priority} {t('priority')}</span>
+                        <span className="text-xs font-mono uppercase tracking-wider opacity-80">
+                            {t(priorityKey as any) || `${priority} Priority`}
+                        </span>
                     </div>
                 </div>
                 <span className="px-2 py-1 text-xs rounded-full bg-muted text-foreground/70 border border-border transition-colors">
@@ -57,7 +63,7 @@ export default React.memo(function CrisisPlanCard({ title, priority, actions, st
                 <ul className="space-y-1">
                     {actions.map((action, idx) => (
                         <li key={idx} className="text-sm text-foreground/70 flex items-start gap-2 transition-colors">
-                            <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-50" />
+                            <span className="mt-1.5 w-1 h-1 rounded-full bg-current opacity-50" aria-hidden="true" />
                             {action}
                         </li>
                     ))}

@@ -11,390 +11,16 @@
 import { useTranslations } from 'next-intl';
 import { useMutation } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Loader2, ExternalLink, Image as ImageIcon, Trash2, ShieldCheck, AlertCircle, HelpCircle, Globe2, Newspaper, MessageSquare, BookOpen, Printer, Heart, Share2, MessageCircle, Edit, History, FolderPlus } from 'lucide-react';
+import { Trash2, FolderPlus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
-import { useState, useMemo, memo, useCallback, useEffect } from 'react';
-import clsx from 'clsx';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { MonitoringArticle } from '@/types/reports';
 import { Id } from '../../../convex/_generated/dataModel';
-import Skeleton from '@/components/ui/Skeleton';
-import OptimizedImage from '@/components/ui/OptimizedImage';
-
-/**
- * Pure helper for source type styling
- */
-const getSourceBadgeColor = (type: string) => {
-    switch (type) {
-        case 'Press Release': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
-        case 'Online News': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
-        case 'Social Media': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
-        case 'Blog': return 'bg-status-info-bg text-status-info-fg border-status-info-fg/20';
-        case 'Print': return 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20';
-        default: return 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20';
-    }
-};
-
-/**
- * Pure helper for source type icons
- */
-const getSourceIcon = (type: string) => {
-    switch (type) {
-        case 'Press Release': return <BookOpen className="w-3 h-3" aria-hidden="true" />;
-        case 'Online News': return <Newspaper className="w-3 h-3" aria-hidden="true" />;
-        case 'Social Media': return <MessageSquare className="w-3 h-3" aria-hidden="true" />;
-        case 'Blog': return <Globe2 className="w-3 h-3" aria-hidden="true" />;
-        case 'Print': return <Printer className="w-3 h-3" aria-hidden="true" />;
-        default: return <Newspaper className="w-3 h-3" aria-hidden="true" />;
-    }
-};
-
-/**
- * Granularly memoized row component to minimize re-render impact.
- */
-const ArticleRow = memo(({
-    article,
-    isSelected,
-    isDeleting,
-    isUpdating,
-    onToggleSelect,
-    onDeleteClick,
-    onEditClick,
-    onSaveClick,
-    onUpdateSentiment,
-    t
-}: {
-    article: MonitoringArticle,
-    isSelected: boolean,
-    isDeleting: boolean,
-    isUpdating: boolean,
-    onToggleSelect: (id: Id<"media_monitoring_articles">) => void,
-    onDeleteClick: (id: Id<"media_monitoring_articles">) => void,
-    onEditClick: (article: MonitoringArticle) => void,
-    onSaveClick: (article: MonitoringArticle) => void,
-    onUpdateSentiment: (id: Id<"media_monitoring_articles">, s: "Positive" | "Neutral" | "Negative") => void,
-    t: ReturnType<typeof import('next-intl').useTranslations>
-}) => {
-    const tCommon = useTranslations('Common');
-    const theme = getSourceBadgeColor(article.sourceType);
-
-    return (
-        <tr
-            className={clsx(
-                "hover:bg-muted/30 transition-colors group",
-                isSelected && "bg-primary/5"
-            )}
-        >
-            <td className="p-4">
-                <input
-                    id={`select-article-${article._id}`}
-                    name="select_article"
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => onToggleSelect(article._id)}
-                    aria-label={t('select_article', { title: article.title })}
-                    className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors"
-                />
-            </td>
-            <td className="p-4 whitespace-nowrap text-xs font-mono text-foreground/80 transition-colors">
-                {article.publishedDate}
-            </td>
-            <td className="p-4 max-w-sm">
-                <div className="flex items-center gap-3">
-                    {article.imageUrl && (
-                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-muted/40 border border-border group-hover:border-primary/30 transition-colors shadow-sm">
-                            <OptimizedImage
-                                src={article.imageUrl}
-                                alt={article.title}
-                                fill
-                                className="object-cover transition-transform group-hover:scale-105 duration-300"
-                            />
-                        </div>
-                    )}
-                    <div className="flex flex-col gap-1 items-start rtl:items-end flex-grow">
-                        <a
-                            href={article.resolvedUrl || article.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-semibold text-foreground hover:text-blue-800 transition-colors flex items-center gap-2 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform"
-                            dir="auto"
-                        >
-                            <span className="line-clamp-2 md:line-clamp-1">{article.title}</span>
-                            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" aria-hidden="true" />
-                        </a>
-                        <div className="flex items-center gap-2 flex-wrap" dir="auto">
-                            <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors ${theme}`}>
-                                {getSourceIcon(article.sourceType)}
-                                {article.sourceType === 'Press Release' ? t('types.press_release') :
-                                    article.sourceType === 'Online News' ? t('types.online_news') :
-                                        article.sourceType === 'Social Media' ? t('types.social_media') :
-                                            article.sourceType === 'Blog' ? t('types.blog') :
-                                                article.sourceType === 'Print' ? t('types.print') :
-                                                    article.sourceType}
-                            </span>
-                            <span className="text-[10px] text-foreground/80 dark:text-slate-200 font-bold uppercase tracking-widest flex items-center gap-1 transition-colors">
-                                <span className="w-1 h-1 rounded-full bg-border" aria-hidden="true" />
-                                {article.sourceCountry}
-                            </span>
-                            {article.isManual && (
-                                <span className="bg-status-warning-bg text-status-warning-fg border border-status-warning-fg/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter transition-colors shadow-sm">
-                                    {t('manual')}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </td>
-            <td className="p-4 text-sm text-foreground/80">
-                <div className="flex flex-col items-start gap-1 justify-center min-h-[40px]" dir="auto">
-                    <span className="font-semibold text-foreground">{article.source || article.sourceCountry || '—'}</span>
-                    {article.sourceType === 'Social Media' && !!article.publisherUsername && (
-                        <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full font-bold font-mono">
-                            @{String(article.publisherUsername)}
-                        </span>
-                    )}
-                </div>
-            </td>
-            <td className="p-4 text-center">
-                <div className="flex flex-col gap-1.5 items-center">
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${article.depth === 'deep'
-                        ? 'bg-status-info-bg text-status-info-fg border-status-info-fg/10'
-                        : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/10'}`}>
-                        {article.depth || 'standard'}
-                    </span>
-                    {article.relevancy_score !== undefined && (
-                        <div className="flex items-center gap-1 text-[9px] font-bold text-foreground/80 dark:text-slate-200 uppercase tracking-tighter" title={t('relevancy')}>
-                            <div className="w-12 h-1 bg-muted rounded-full overflow-hidden" aria-hidden="true">
-                                <div
-                                    className={clsx(
-                                        "h-full transition-all",
-                                        article.relevancy_score >= 90 ? "bg-status-success-fg" :
-                                            article.relevancy_score >= 70 ? "bg-status-info-fg" : "bg-status-warning-fg"
-                                    )}
-                                    style={{ width: `${article.relevancy_score}%` }}
-                                />
-                            </div>
-                            <span className="sr-only">{t('relevancy')}: </span>
-                            <span>{article.relevancy_score}%</span>
-                        </div>
-                    )}
-                </div>
-            </td>
-            <td className="p-4">
-                <div className="relative group/sentiment">
-                    <button 
-                        type="button"
-                        aria-haspopup="listbox"
-                        aria-label={t('sentiment')}
-                        className={clsx(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border cursor-pointer hover:ring-2 hover:ring-primary/20 focus:outline-none focus:ring-2 focus:ring-primary",
-                            article.sentiment === 'Positive'
-                                ? 'bg-status-success-bg text-status-success-fg border-status-success-fg/20'
-                                : article.sentiment === 'Negative'
-                                    ? 'bg-status-error-bg text-status-error-fg border-status-error-fg/20'
-                                    : 'bg-status-neutral-bg text-status-neutral-fg border-status-neutral-fg/20'
-                        )}
-                    >
-                        {article.sentiment === 'Positive' && <ShieldCheck className="w-3 h-3" aria-hidden="true" />}
-                        {article.sentiment === 'Negative' && <AlertCircle className="w-3 h-3" aria-hidden="true" />}
-                        {(!article.sentiment || article.sentiment === 'Neutral') && <HelpCircle className="w-3 h-3" aria-hidden="true" />}
-                        {article.sentiment === 'Positive' ? t('sentiments.positive') :
-                            article.sentiment === 'Negative' ? t('sentiments.negative') :
-                                t('sentiments.neutral')}
-
-                        {article.manualSentimentOverride && (
-                            <span title={`Original: ${article.originalSentiment}`}>
-                                <History className="w-2.5 h-2.5 opacity-60 ml-0.5" aria-hidden="true" />
-                            </span>
-                        )}
-                        <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 group-focus-within/sentiment:opacity-100 transition-opacity ml-1" aria-hidden="true" />
-                    </button>
-
-                    {/* Simple Sentiment Dropdown */}
-                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-zoom-in-95 duration-200">
-                        {(['Positive', 'Neutral', 'Negative'] as const).map((s) => (
-                            <button
-                                key={s}
-                                disabled={isUpdating}
-                                onClick={() => onUpdateSentiment(article._id, s)}
-                                className={clsx(
-                                    "w-full text-left rtl:text-right px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-between",
-                                    s === 'Positive' ? "hover:bg-status-success-bg/30 text-status-success-fg" :
-                                        s === 'Negative' ? "hover:bg-status-error-bg/30 text-status-error-fg" :
-                                            "hover:bg-status-neutral-bg/30 text-status-neutral-fg",
-                                    article.sentiment === s && "bg-primary/10 ring-1 ring-inset ring-primary/20",
-                                    isUpdating && "opacity-50 cursor-not-allowed"
-                                )}
-                            >
-                                {s === 'Positive' ? t('sentiments.positive') :
-                                    s === 'Negative' ? t('sentiments.negative') :
-                                        t('sentiments.neutral')}
-                                {isUpdating && <Loader2 className="w-2.5 h-2.5 animate-spin" />}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors" suppressHydrationWarning>
-                {article.reach?.toLocaleString() || 'â€”'}
-            </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors">
-                {article.likes !== undefined ? (
-                    <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
-                        <Heart className="w-3 h-3 text-status-error-fg/70" aria-hidden="true" />
-                    </div>
-                ) : 'â€”'}
-            </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
-                {article.retweets !== undefined ? (
-                    <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
-                        <Share2 className="w-3 h-3 text-status-success-fg/70" aria-hidden="true" />
-                    </div>
-                ) : 'â€”'}
-            </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
-                {article.replies !== undefined ? (
-                    <div className="flex items-center justify-end gap-1.5">
-                        <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
-                        <MessageCircle className="w-3 h-3 text-status-info-fg/70" aria-hidden="true" />
-                    </div>
-                ) : 'â€”'}
-            </td>
-            <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors" suppressHydrationWarning>
-                ${article.ave?.toLocaleString() || '0'}
-            </td>
-            <td className="p-4 text-center">
-                <span className={clsx(
-                    "inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.1em] border transition-all",
-                    article.analysisStatus === 'pending'
-                        ? 'bg-status-warning-bg text-status-warning-fg border-status-warning-fg/20'
-                        : 'bg-status-success-bg text-status-success-fg border-status-success-fg/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]'
-                )}>
-                    <span className={clsx(
-                        "w-1 h-1 rounded-full mr-1.5 transition-all animate-pulse",
-                        article.analysisStatus === 'pending' ? "bg-status-warning-fg" : "bg-status-success-fg"
-                    )} aria-hidden="true" />
-                    {article.analysisStatus === 'pending' ? t('status_in_progress') : t('status_live')}
-                </span>
-            </td>
-            <td className="p-4 text-center">
-                <div className="flex items-center justify-center gap-1">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onSaveClick(article)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-primary/10 text-foreground/70 hover:text-primary h-8 w-8 shadow-none"
-                        title={tCommon('save_to_collection') || 'Save to Collection'}
-                        aria-label={tCommon('save_to_collection') || 'Save to Collection'}
-                    >
-                        <FolderPlus className="w-3.5 h-3.5" aria-hidden="true" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEditClick(article)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-primary/10 text-foreground/70 hover:text-primary h-8 w-8 shadow-none"
-                        title={t('edit') || 'Edit'}
-                        aria-label={t('edit') || 'Edit'}
-                    >
-                        <Edit className="w-3.5 h-3.5" aria-hidden="true" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDeleteClick(article._id)}
-                        isLoading={isDeleting}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-destructive/10 text-foreground/70 hover:text-rose-600 dark:hover:text-rose-400 h-8 w-8 shadow-none"
-                        title={t('delete')}
-                        aria-label={t('delete')}
-                    >
-                        {!isDeleting && <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
-                    </Button>
-                </div>
-            </td>
-        </tr>
-    );
-});
-
-ArticleRow.displayName = 'ArticleRow';
-
-const ArticleRowSkeleton = () => {
-    return (
-        <tr className="hover:bg-muted/30 transition-colors border-b border-border/50">
-            {/* Checkbox */}
-            <td className="p-4 w-10">
-                <Skeleton className="w-4 h-4 rounded" />
-            </td>
-            {/* Date */}
-            <td className="p-4 whitespace-nowrap">
-                <Skeleton className="w-16 h-4" />
-            </td>
-            {/* Title & Badges */}
-            <td className="p-4 max-w-sm">
-                <div className="flex items-center gap-3">
-                    <Skeleton className="w-12 h-12 rounded-lg flex-shrink-0" />
-                    <div className="flex flex-col gap-2 items-start rtl:items-end flex-grow">
-                        <Skeleton className="w-48 h-4 rounded" />
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <Skeleton className="w-16 h-3.5 rounded-md" />
-                            <Skeleton className="w-12 h-3.5 rounded-md" />
-                        </div>
-                    </div>
-                </div>
-            </td>
-            {/* Source */}
-            <td className="p-4 text-sm">
-                <div className="flex flex-col items-start gap-1 justify-center min-h-[40px]">
-                    <Skeleton className="w-20 h-4 rounded" />
-                </div>
-            </td>
-            {/* Depth */}
-            <td className="p-4 text-center">
-                <div className="flex flex-col gap-1.5 items-center">
-                    <Skeleton className="w-12 h-4 rounded-full" />
-                </div>
-            </td>
-            {/* Sentiment */}
-            <td className="p-4">
-                <Skeleton className="w-16 h-6 rounded-full" />
-            </td>
-            {/* Reach */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-12 h-3 rounded ml-auto rtl:mr-auto" />
-            </td>
-            {/* Likes */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
-            </td>
-            {/* Retweets */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
-            </td>
-            {/* Replies */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
-            </td>
-            {/* AVE */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-10 h-3 rounded ml-auto rtl:mr-auto" />
-            </td>
-            {/* Status */}
-            <td className="p-4 text-center">
-                <Skeleton className="w-14 h-4 rounded-full mx-auto" />
-            </td>
-            {/* Actions */}
-            <td className="p-4 text-center w-12">
-                <div className="flex justify-center gap-1">
-                    <Skeleton className="w-7 h-7 rounded-lg" />
-                    <Skeleton className="w-7 h-7 rounded-lg" />
-                </div>
-            </td>
-        </tr>
-    );
-};
+import { toast } from 'sonner';
+import { ArticleRow, ArticleRowSkeleton } from './ArticleRow';
+import { useMounted } from '@/hooks/useMounted';
 
 const ArticleTable = memo(function ArticleTable({
     articles,
@@ -413,12 +39,8 @@ const ArticleTable = memo(function ArticleTable({
     const deleteArticles = useMutation(api.monitoring.deleteArticles);
     const updateSentiment = useMutation(api.monitoring.updateSentiment);
 
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const [deletingId, setDeletingId] = useState<Id<"media_monitoring_articles"> | null>(null);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
     const [updatingId, setUpdatingId] = useState<Id<"media_monitoring_articles"> | null>(null);
     const [selectedIds, setSelectedIds] = useState<Set<Id<"media_monitoring_articles">>>(new Set());
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
@@ -473,8 +95,10 @@ const ArticleTable = memo(function ArticleTable({
                 next.delete(articleId);
                 return next;
             });
+            toast.success(tCommon('success') || 'Article deleted successfully');
         } catch (error) {
             console.error("Failed to delete:", error);
+            toast.error(tCommon('error') || 'Failed to delete article');
         } finally {
             setDeletingId(null);
         }
@@ -487,8 +111,10 @@ const ArticleTable = memo(function ArticleTable({
         try {
             await deleteArticles({ ids: Array.from(selectedIds) });
             setSelectedIds(new Set());
+            toast.success(tCommon('success') || 'Articles deleted successfully');
         } catch (error) {
             console.error("Batch delete failed:", error);
+            toast.error(tCommon('error') || 'Failed to delete articles');
         } finally {
             setIsBatchDeleting(false);
         }
@@ -498,10 +124,14 @@ const ArticleTable = memo(function ArticleTable({
         setUpdatingId(id);
         try {
             await updateSentiment({ id, sentiment });
+            toast.success(tCommon('success') || 'Sentiment updated successfully');
+        } catch (error) {
+            console.error("Failed to update sentiment:", error);
+            toast.error(tCommon('error') || 'Failed to update sentiment');
         } finally {
             setUpdatingId(null);
         }
-    }, [updateSentiment]);
+    }, [updateSentiment, tCommon]);
 
     if (articles === undefined || isLoading) {
         return (

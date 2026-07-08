@@ -25,6 +25,8 @@ import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
 import html2canvas from "html2canvas-pro";
 import { useSSEPersistence } from "@/hooks/useSSEPersistence";
+import { useMounted } from "@/hooks/useMounted";
+import { ReportTranslations } from "@/types/reports";
 
 type LegacyFilter = "TV" | "Radio" | "Press";
 type ArticleFilter = "All" | "Online News" | "Social Media" | "Press Release" | "Blog" | "Print";
@@ -61,7 +63,7 @@ export default function MediaMonitoringDashboard({
     initialCrisisPlans
 }: DashboardProps) {
     const t = useTranslations("Navigation");
-    const tMedia = useTranslations("MediaMonitoring.dashboard");
+    const tDashboard = useTranslations("Dashboard");
     const tCommon = useTranslations("Common");
     const router = useRouter();
     const pathname = usePathname();
@@ -69,7 +71,7 @@ export default function MediaMonitoringDashboard({
     const locale = useLocale();
     const isRTL = locale === 'ar';
 
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
     const [itemToSave, setItemToSave] = useState<any>(null);
     const [editingItem, setEditingItem] = useState<any>(null);
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
@@ -115,9 +117,7 @@ export default function MediaMonitoringDashboard({
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+
 
     const reports = useQuery(api.queries.getMediaReports, { source: filter }) || initialReports;
     const crisisPlans = useQuery(api.queries.getCrisisPlans, {}) || initialCrisisPlans;
@@ -141,7 +141,7 @@ export default function MediaMonitoringDashboard({
 
     const tExport = useTranslations("Export");
 
-    const exportTranslations = {
+    const exportTranslations: ReportTranslations = {
         sheet_name: tExport('sheet_name'),
         date: tExport('date'),
         title: tExport('title'),
@@ -215,7 +215,7 @@ export default function MediaMonitoringDashboard({
             
             await ReportGenerator.exportMediaMonitoringReport(
                 reports as any,
-                exportTranslations as any,
+                exportTranslations,
                 format,
                 settings?.logoUrl || undefined,
                 chartImages,
@@ -389,7 +389,7 @@ export default function MediaMonitoringDashboard({
                     <div className="flex items-center gap-3">
                         <h2 className="text-2xl font-bold text-foreground flex items-center gap-2 transition-colors duration-300">
                             <span className="w-1 h-8 bg-primary rounded-full block"></span>
-                            {tMedia('coverage_log') || "Coverage Log"}
+                            {tDashboard('coverage_log') || "Coverage Log"}
                         </h2>
                         {/* SSE Live Connection Status Indicator */}
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-background/50 backdrop-blur-sm shadow-sm text-xs font-semibold select-none transition-all duration-300">
@@ -468,15 +468,15 @@ export default function MediaMonitoringDashboard({
                         <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mb-4">
                             <Newspaper className="w-8 h-8 text-muted-foreground/50" />
                         </div>
-                        <p className="text-muted-foreground font-medium">{tMedia('no_results') || "No articles match your criteria."}</p>
-                        <p className="text-sm text-muted-foreground/70 mt-1">{tMedia('no_results_hint') || "Try adjusting your filters or refining your search query."}</p>
+                        <p className="text-muted-foreground font-medium">{tDashboard('no_results') || "No articles match your criteria."}</p>
+                        <p className="text-sm text-muted-foreground/70 mt-1">{tDashboard('no_results_hint') || "Try adjusting your filters or refining your search query."}</p>
                         <Button 
                             variant="outline" 
                             size="sm" 
                             className="mt-6"
                             onClick={() => handleFilterChange("All")}
                         >
-                            {tMedia('reset_filters') || "Reset All Filters"}
+                            {tDashboard('reset_filters') || "Reset All Filters"}
                         </Button>
                     </div>
                 ) : (

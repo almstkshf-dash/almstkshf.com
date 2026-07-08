@@ -12,20 +12,20 @@ import { useState } from "react";
 import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+const maps = {
+    dubai: {
+        embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent("One Central Dubai")}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+    },
+    abudhabi: {
+        embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent("Al Khatem Tower Abu Dhabi")}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+    }
+};
+
+type Branch = keyof typeof maps;
+
 export default function InteractiveMap() {
     const t = useTranslations("Contact.channels");
-    const [activeBranch, setActiveBranch] = useState<"dubai" | "abudhabi">("dubai");
-
-    const maps = {
-        dubai: {
-            title: "Dubai One Central Office",
-            embedUrl: "https://maps.google.com/maps?q=One%20Central%20Dubai&t=&z=15&ie=UTF8&iwloc=&output=embed"
-        },
-        abudhabi: {
-            title: "Abu Dhabi Al Khatem Tower Office",
-            embedUrl: "https://maps.google.com/maps?q=Al%20Khatem%20Tower%20Abu%20Dhabi&t=&z=15&ie=UTF8&iwloc=&output=embed"
-        }
-    };
+    const [activeBranch, setActiveBranch] = useState<Branch>("dubai");
 
     return (
         <div className="space-y-4">
@@ -59,16 +59,16 @@ export default function InteractiveMap() {
             <div className="aspect-video w-full rounded-3xl bg-slate-950 border border-slate-800 overflow-hidden relative group">
                 <iframe
                     src={maps[activeBranch].embedUrl}
-                    title={maps[activeBranch].title}
+                    title={t("map_title")}
                     width="100%"
                     height="100%"
                     style={{
                         border: 0,
-                        filter: "invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%)",
                         opacity: 0.85,
                     }}
                     allowFullScreen={false}
                     loading="lazy"
+                    sandbox="allow-scripts allow-same-origin"
                     className="w-full h-full transition-opacity duration-500 group-hover:opacity-100"
                 ></iframe>
             </div>
