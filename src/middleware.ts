@@ -6,7 +6,7 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { clerkMiddleware, createRouteMatcher, getAuth } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
@@ -102,15 +102,6 @@ export default async function middleware(req: any, event: any) {
     // Apply Rate Limiting to /api/search and /api/monitor
     if (strippedPath === "/api/search" || strippedPath === "/api/monitor") {
         try {
-            // Get Clerk auth to find userId if authenticated
-            let userId: string | null = null;
-            try {
-                const authData = getAuth(req);
-                userId = authData?.userId || null;
-            } catch (authError) {
-                // Ignore auth retrieval errors in middleware and fallback to IP-based rate limiting
-            }
-
             const isSearch = strippedPath === "/api/search";
             const method = req.method;
             
@@ -148,7 +139,11 @@ export default async function middleware(req: any, event: any) {
                 }
             }
 
-            const rlKey = await getRateLimitKey(req, prefix, userId);
+            // userId is extracted from the JWT in the cookie/header by Clerk's own
+            // token-parsing logic (no headers() call), so it is safe here.
+            // We intentionally pass null and fall back to IP-based keying to avoid
+            // re-reading headers outside of clerkMiddleware context.
+            const rlKey = await getRateLimitKey(req, prefix, null);
             rlResult = await rateLimit(rlKey, limitCount, windowSeconds);
 
             if (!rlResult.allowed) {
@@ -183,14 +178,14 @@ export default async function middleware(req: any, event: any) {
 
         // Intercept Clerk proxy requests on Vercel preview/deployment domains to prevent them from hitting Clerk servers and returning 400
         if (req.nextUrl.pathname.startsWith("/__clerk") && isVercelPreview && isLiveKey) {
-            response = new NextResponse(JSON.stringify({ 
+            response = new NextResponse(JSON.stringify({
                 error: "clerk_proxy_disabled_on_preview",
-                message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys." 
+                message: "Clerk proxy is disabled on Vercel preview/deployment environments when using production keys."
             }), {
                 status: 200,
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
-                    "Cache-Control": "no-store" 
+                    "Cache-Control": "no-store"
                 }
             });
         } else {
