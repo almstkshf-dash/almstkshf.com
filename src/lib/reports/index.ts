@@ -32,6 +32,7 @@ async function callServerReportAPI(
     try {
         const res = await fetch('/api/reports', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
