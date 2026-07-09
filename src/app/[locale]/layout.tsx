@@ -7,6 +7,7 @@
  */
 
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cairo, Inter } from "next/font/google";
 import "../globals.css";
 import { routing, Locale } from '@/i18n/config';
@@ -164,6 +165,19 @@ export default async function RootLayout({
     return (
         <html lang={locale} dir={dir} className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
             <head>
+                {/* Google tag (gtag.js) */}
+                <Script
+                    async
+                    src="https://www.googletagmanager.com/gtag/js?id=G-C4QXHZG3CP"
+                    strategy="afterInteractive"
+                />
+                <Script id="google-tag" strategy="afterInteractive">{`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'G-C4QXHZG3CP');
+                `}</Script>
+
                 {/* 1. Theme and Transition scripts at the absolute top of the head to prevent visual flicker */}
                 <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');var d=document.documentElement;if(t==="dark"||(!t)){d.classList.add('dark');}else if(t==="light"){d.classList.remove('dark');}}catch(e){}})();` }} />
                 <script dangerouslySetInnerHTML={{ __html: `(function(){var s=document.createElement('style');s.id='no-transition';s.textContent='*,*::before,*::after{transition:none!important}';document.head.appendChild(s);window.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(function(){var el=document.getElementById('no-transition');if(el)el.remove();});});});})();` }} />
