@@ -390,21 +390,28 @@ export const addMatchingToCollection = mutation({
     }
 
     const excludedSet = new Set(args.excludedIds);
-    const currentItems = collection.items ? [...collection.items] : [];
     let addedCount = 0;
     let duplicateCount = 0;
 
     for (const doc of matching) {
       if (!excludedSet.has(doc._id)) {
-        if (currentItems.find(i => i.id === doc._id)) {
+        const existing = await ctx.db.query("collection_items")
+          .withIndex("by_collectionId_itemId_itemType", (q) =>
+            q.eq("collectionId", args.collectionId)
+             .eq("itemId", doc._id)
+             .eq("itemType", "watchlist")
+          )
+          .first();
+
+        if (existing) {
           duplicateCount++;
         } else {
-          currentItems.push({
-            id: doc._id,
-            type: "watchlist",
-            title: doc.nameArabic || doc.nameLatin || "Unknown",
-            data: doc,
+          await ctx.db.insert("collection_items", {
+            collectionId: args.collectionId,
+            itemId: doc._id,
+            itemType: "watchlist",
             addedAt: Date.now(),
+            addedBy: identity.name || identity.email,
           });
           addedCount++;
         }
@@ -413,7 +420,6 @@ export const addMatchingToCollection = mutation({
 
     if (addedCount > 0) {
       await ctx.db.patch(args.collectionId, {
-        items: currentItems,
         updatedAt: Date.now(),
       });
     }

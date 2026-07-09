@@ -329,24 +329,31 @@ export default defineSchema({
         userId: v.string(),
         name: v.string(),
         description: v.optional(v.string()),
-        items: v.array(v.object({
-            id: v.string(),
-            type: v.union(
-                v.literal("media_monitoring"),
-                v.literal("osint"),
-                v.literal("ai_inspector"),
-                v.literal("watchlist"),
-                v.literal("deep_web"),
-                v.literal("custom")
-            ),
-            title: v.string(),
-            sourceId: v.optional(v.string()),
-            data: v.any(),
-            addedAt: v.optional(v.number()),
-        })),
         createdAt: v.optional(v.number()),
         updatedAt: v.optional(v.number()),
     }).index("by_userId", ["userId"]),
+
+    collection_items: defineTable({
+        collectionId: v.id("collections"),
+        itemId: v.string(),
+        itemType: v.union(
+            v.literal("media_monitoring"),
+            v.literal("osint"),
+            v.literal("ai_inspector"),
+            v.literal("watchlist"),
+            v.literal("deep_web"),
+            v.literal("custom")
+        ),
+        title: v.optional(v.string()),
+        sourceId: v.optional(v.string()),
+        data: v.optional(v.any()),
+        addedAt: v.number(),
+        addedBy: v.optional(v.string()),
+        notes: v.optional(v.string()),
+    })
+        .index("by_collectionId", ["collectionId"])
+        .index("by_collectionId_and_itemType", ["collectionId", "itemType"])
+        .index("by_collectionId_itemId_itemType", ["collectionId", "itemId", "itemType"]),
 
     user_reports: defineTable({
         userId: v.string(),

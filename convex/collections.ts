@@ -8,6 +8,20 @@
 
 import { v, ConvexError } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { resolveCollectionItem } from "./utils/collectionItemResolver";
+
+const MAX_DATA_SIZE_BYTES = 100 * 1024; // 100 KB limit for unnormalized payloads
+
+function checkDataSizeLimit(data: any) {
+    if (data !== undefined && data !== null) {
+        const serialized = JSON.stringify(data);
+        if (serialized.length > MAX_DATA_SIZE_BYTES) {
+            throw new ConvexError(
+                `Saved item payload exceeds safety limit of 100KB (size: ${(serialized.length / 1024).toFixed(1)}KB)`
+            );
+        }
+    }
+}
 
 export const getCollections = query({
     args: {},
@@ -21,7 +35,39 @@ export const getCollections = query({
             .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
             .collect();
 
-        return collections.sort((a, b) => {
+        const results = [];
+        for (const col of collections) {
+            const rawItems = await ctx.db.query("collection_items")
+                .withIndex("by_collectionId", (q) => q.eq("collectionId", col._id))
+                .collect();
+
+            const resolvedItems = [];
+            for (const rawItem of rawItems) {
+                const resolved = await resolveCollectionItem(
+                    ctx,
+                    rawItem.itemType,
+                    rawItem.itemId,
+                    rawItem.title,
+                    rawItem.sourceId,
+                    rawItem.data
+                );
+                if (resolved) {
+                    resolvedItems.push({
+                        ...resolved,
+                        addedAt: rawItem.addedAt,
+                        addedBy: rawItem.addedBy,
+                        notes: rawItem.notes,
+                    });
+                }
+            }
+
+            results.push({
+                ...col,
+                items: resolvedItems.sort((a, b) => b.addedAt - a.addedAt),
+            });
+        }
+
+        return results.sort((a, b) => {
             const timeA = a.updatedAt ?? a.createdAt ?? a._creationTime;
             const timeB = b.updatedAt ?? b.createdAt ?? b._creationTime;
             return timeB - timeA;
@@ -42,7 +88,34 @@ export const getCollection = query({
             return null;
         }
 
-        return collection;
+        const rawItems = await ctx.db.query("collection_items")
+            .withIndex("by_collectionId", (q) => q.eq("collectionId", collection._id))
+            .collect();
+
+        const resolvedItems = [];
+        for (const rawItem of rawItems) {
+            const resolved = await resolveCollectionItem(
+                ctx,
+                rawItem.itemType,
+                rawItem.itemId,
+                rawItem.title,
+                rawItem.sourceId,
+                rawItem.data
+            );
+            if (resolved) {
+                resolvedItems.push({
+                    ...resolved,
+                    addedAt: rawItem.addedAt,
+                    addedBy: rawItem.addedBy,
+                    notes: rawItem.notes,
+                });
+            }
+        }
+
+        return {
+            ...collection,
+            items: resolvedItems.sort((a, b) => b.addedAt - a.addedAt),
+        };
     },
 });
 
@@ -61,7 +134,6 @@ export const createCollection = mutation({
             userId: identity.subject,
             name: args.name,
             description: args.description,
-            items: [],
             createdAt: Date.now(),
             updatedAt: Date.now(),
         });
@@ -85,6 +157,15 @@ export const deleteCollection = mutation({
             throw new ConvexError("Unauthorized");
         }
 
+        // Clean up associated items
+        const rawItems = await ctx.db.query("collection_items")
+            .withIndex("by_collectionId", (q) => q.eq("collectionId", args.id))
+            .collect();
+
+        for (const item of rawItems) {
+            await ctx.db.delete(item._id);
+        }
+
         await ctx.db.delete(args.id);
     }
 });
@@ -102,9 +183,9 @@ export const addToCollection = mutation({
                 v.literal("deep_web"),
                 v.literal("custom")
             ),
-            title: v.string(),
+            title: v.optional(v.string()),
             sourceId: v.optional(v.string()),
-            data: v.any(),
+            data: v.optional(v.any()),
         })
     },
     handler: async (ctx, args) => {
@@ -118,16 +199,33 @@ export const addToCollection = mutation({
             throw new ConvexError("Unauthorized");
         }
 
-        const items = collection.items ?? [];
-        // Avoid exact duplicates
-        if (items.find(i => i.id === args.item.id)) {
+        checkDataSizeLimit(args.item.data);
+
+        // Duplicate check using specific unique compound index
+        const existing = await ctx.db.query("collection_items")
+            .withIndex("by_collectionId_itemId_itemType", (q) =>
+                q.eq("collectionId", args.collectionId)
+                 .eq("itemId", args.item.id)
+                 .eq("itemType", args.item.type)
+            )
+            .first();
+
+        if (existing) {
             return { collectionId: collection._id, isDuplicate: true };
         }
 
-        const updatedItems = [...items, { ...args.item, addedAt: Date.now() }];
+        await ctx.db.insert("collection_items", {
+            collectionId: args.collectionId,
+            itemId: args.item.id,
+            itemType: args.item.type,
+            title: args.item.title,
+            sourceId: args.item.sourceId,
+            data: args.item.data,
+            addedAt: Date.now(),
+            addedBy: identity.name || identity.email,
+        });
 
         await ctx.db.patch(args.collectionId, {
-            items: updatedItems,
             updatedAt: Date.now()
         });
 
@@ -151,13 +249,18 @@ export const removeFromCollection = mutation({
             throw new ConvexError("Unauthorized");
         }
 
-        const items = collection.items ?? [];
-        const updatedItems = items.filter(i => i.id !== args.itemId);
+        // Locate item across any type
+        const existing = await ctx.db.query("collection_items")
+            .withIndex("by_collectionId", (q) => q.eq("collectionId", args.collectionId))
+            .filter((q) => q.eq(q.field("itemId"), args.itemId))
+            .first();
 
-        await ctx.db.patch(args.collectionId, {
-            items: updatedItems,
-            updatedAt: Date.now()
-        });
+        if (existing) {
+            await ctx.db.delete(existing._id);
+            await ctx.db.patch(args.collectionId, {
+                updatedAt: Date.now()
+            });
+        }
 
         return collection._id;
     }
@@ -179,14 +282,25 @@ export const removeMultipleFromCollection = mutation({
             throw new ConvexError("Unauthorized");
         }
 
-        const items = collection.items ?? [];
+        let deletedCount = 0;
         const toRemove = new Set(args.itemIds);
-        const updatedItems = items.filter(i => !toRemove.has(i.id));
 
-        await ctx.db.patch(args.collectionId, {
-            items: updatedItems,
-            updatedAt: Date.now()
-        });
+        const rawItems = await ctx.db.query("collection_items")
+            .withIndex("by_collectionId", (q) => q.eq("collectionId", args.collectionId))
+            .collect();
+
+        for (const item of rawItems) {
+            if (toRemove.has(item.itemId)) {
+                await ctx.db.delete(item._id);
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0) {
+            await ctx.db.patch(args.collectionId, {
+                updatedAt: Date.now()
+            });
+        }
 
         return collection._id;
     }
@@ -206,9 +320,9 @@ export const addMultipleToCollection = mutation({
                     v.literal("deep_web"),
                     v.literal("custom")
                 ),
-                title: v.string(),
+                title: v.optional(v.string()),
                 sourceId: v.optional(v.string()),
-                data: v.any(),
+                data: v.optional(v.any()),
             })
         )
     },
@@ -225,20 +339,37 @@ export const addMultipleToCollection = mutation({
 
         let addedCount = 0;
         let duplicateCount = 0;
-        const currentItems = collection.items ? [...collection.items] : [];
 
         for (const item of args.items) {
-            if (currentItems.find(i => i.id === item.id)) {
+            checkDataSizeLimit(item.data);
+
+            const existing = await ctx.db.query("collection_items")
+                .withIndex("by_collectionId_itemId_itemType", (q) =>
+                    q.eq("collectionId", args.collectionId)
+                     .eq("itemId", item.id)
+                     .eq("itemType", item.type)
+                )
+                .first();
+
+            if (existing) {
                 duplicateCount++;
             } else {
-                currentItems.push({ ...item, addedAt: Date.now() });
+                await ctx.db.insert("collection_items", {
+                    collectionId: args.collectionId,
+                    itemId: item.id,
+                    itemType: item.type,
+                    title: item.title,
+                    sourceId: item.sourceId,
+                    data: item.data,
+                    addedAt: Date.now(),
+                    addedBy: identity.name || identity.email,
+                });
                 addedCount++;
             }
         }
 
         if (addedCount > 0) {
             await ctx.db.patch(args.collectionId, {
-                items: currentItems,
                 updatedAt: Date.now()
             });
         }

@@ -19,6 +19,7 @@ import { decodeHtmlBuffer, hasMojibake, tryRecoverMojibake } from "./utils/encod
 
 // Import refactored modules
 import { logger } from "./utils/logger";
+import { MEDIA_SOURCES } from "../src/config/media-sources";
 import { resolveUrl, cleanUrl } from "./utils/urlResolver";
 import { callGeminiForAnalysis, callGeminiRelevancyScore } from "./utils/gemini";
 import { extractWithWorldNews, extractWithDirectScraper, extractWithPlaywrightScraper } from "./utils/scraper";
@@ -1305,52 +1306,14 @@ const PR_WIRE_FEEDS = [
     { name: "Al Arabiya (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AlArabiya", country: "SA", lang: "ar" },
     { name: "Al Jazeera Mubasher (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=AJMubasher", country: "QA", lang: "ar" },
     { name: "Al Kass TV (X)", url: "https://syndication.twitter.com/srv/timeline-profile/screen-name=alkass_tv", country: "QA", lang: "ar" },
-    { name: "Dubai PR Network", url: "https://www.dubaiprnetwork.com/rss_feed.asp", country: "AE", lang: "en" },
-    { name: "Arab News", url: "https://www.arabnews.com/rss.xml", country: "SA", lang: "en" },
-    { name: "Newswire_com", url: "https://www.newswire.com/newsroom/rss/all", country: "US", lang: "en" },
-    { name: "Asharq Al-Awsat", url: "https://aawsat.com/feed", country: "SA", lang: "ar" },
-    { name: "Hashtag Dubai", url: "https://hashtagdubai.org/index.php/feed/", country: "AE", lang: "en" },
-    { name: "My Dubai News", url: "https://www.mydubainews.com/feed/", country: "AE", lang: "en" },
-    { name: "Al Badia Magazine", url: "https://albadiamagazine.com/feed/", country: "AE", lang: "ar" },
-    { name: "Al Madar Magazine", url: "https://www.almadarmagazine.ae/feed/", country: "AE", lang: "ar" },
-    { name: "First Avenue Magazine", url: "https://firstavenuemagazine.com/feed/", country: "AE", lang: "en" },
-    { name: "Evision Worlds", url: "https://evisionworlds.com/?feed=rss2", country: "AE", lang: "en" },
-    { name: "Pan Time Arabia", url: "https://pantimearabia.com/rss/", country: "AE", lang: "en" },
-    { name: "Food Safety News", url: "https://www.foodsafetynews.com/rss/", country: "US", lang: "en" },
-    { name: "Energy Intel", url: "https://www.energyintel.com/rss-feed.rss", country: "US", lang: "en" },
-    { name: "Business Day", url: "https://www.businessday.co.za/arc/outboundfeeds/rss/", country: "ZA", lang: "en" },
-    { name: "India News Network", url: "https://www.indianewsnetwork.com/rss.xml", country: "IN", lang: "en" },
-    { name: "Al Wahda News", url: "https://alwahdanews.ae/feed/", country: "AE", lang: "ar" },
-    { name: "Nabd El Emirate", url: "https://nbdelemirate.com/feed/", country: "AE", lang: "ar" },
-    { name: "24.ae", url: "https://24.ae/rss.aspx", country: "AE", lang: "ar" },
-    { name: "UAE Barq", url: "https://www.uaebarq.ae/ar/feed/", country: "AE", lang: "ar" },
-    { name: "Gulf Time", url: "https://gulftime.online/feed/", country: "AE", lang: "ar" },
-    { name: "New Vora Group", url: "https://newvoragroup.com/feed/", country: "AE", lang: "ar" },
-    { name: "Ain Al Emirate", url: "https://www.ainalemirate.com/feed/", country: "AE", lang: "ar" },
-    { name: "Mena Scoop", url: "https://menascoop.com/feed/", country: "AE", lang: "ar" },
-    { name: "Provoke Media", url: "https://www.provokemedia.com/newsfeed/provoke-media-latest", country: "GB", lang: "en" },
-    { name: "The New Yorker", url: "https://www.newyorker.com/feed/the-lede/rss", country: "US", lang: "en" },
-    { name: "Wired", url: "https://www.wired.com/feed/category/business/latest/rss", country: "US", lang: "en" },
-    { name: "Emirates247", url: "https://www.emirates247.com/rss/mobile/v2/uae.rss", country: "AE", lang: "en" },
-    { name: "NPR", url: "http://www.npr.org/rss/rss.php?id=1004", country: "US", lang: "en" },
-    { name: "Fox News", url: "http://feeds.foxnews.com/foxnews/latest", country: "US", lang: "en" },
-    { name: "BBC News", url: "http://feeds.bbci.co.uk/news/world/rss.xml", country: "GB", lang: "en" },
-    { name: "Yahoo News", url: "http://rss.news.yahoo.com/rss/world", country: "US", lang: "en" },
-    { name: "LA Times", url: "http://www.latimes.com/world/rss2.0.xml", country: "US", lang: "en" },
-    { name: "CS Monitor", url: "http://rss.csmonitor.com/feeds/usa", country: "US", lang: "en" },
-    { name: "NBC News", url: "http://feeds.nbcnews.com/feeds/topstories", country: "US", lang: "en" },
-    { name: "The Guardian", url: "http://www.theguardian.com/world/usa/rss", country: "GB", lang: "en" },
-    { name: "ABC News", url: "http://feeds.abcnews.com/abcnews/usheadlines", country: "US", lang: "en" },
-    { name: "Deadline", url: "http://deadline.com/feed/", country: "US", lang: "en" },
-    { name: "Vulture", url: "http://feeds.feedburner.com/nymag/vulture", country: "US", lang: "en" },
-    { name: "CNN", url: "http://rss.cnn.com/rss/cnn_showbiz.rss", country: "US", lang: "en" },
-    { name: "Esquire", url: "http://www.esquire.com/blogs/culture/culture-rss", country: "US", lang: "en" },
-    { name: "CBS News", url: "http://www.cbsnews.com/latest/rss/entertainment", country: "US", lang: "en" },
-    { name: "TMZ", url: "http://www.tmz.com/rss.xml", country: "US", lang: "en" },
-    { name: "BuzzFeed", url: "http://www.buzzfeed.com/tvandmovies.xml", country: "US", lang: "en" },
-    { name: "Variety", url: "http://variety.com/feed/", country: "US", lang: "en" },
-    { name: "Yahoo News", url: "http://news.yahoo.com/rss/entertainment", country: "US", lang: "en" },
-    { name: "Huffington Post", url: "https://www.huffpost.com/dept/entertainment/feed", country: "US", lang: "en" },
+    ...MEDIA_SOURCES.flatMap(source =>
+        source.feeds.map(feed => ({
+            name: source.name,
+            url: feed.url,
+            country: source.country,
+            lang: source.languages[0] || "en"
+        }))
+    )
 ];
 
 export const fetchPressReleaseSources = action({

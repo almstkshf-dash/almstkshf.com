@@ -24,7 +24,8 @@ export const backfillCollections = mutation({
     args: {},
     handler: async (ctx) => {
         const collections = await ctx.db.query("collections").collect();
-        let updatedCount = 0;
+        let migratedItemsCount = 0;
+        let updatedCollectionsCount = 0;
 
         for (const col of collections) {
             let needsPatch = false;
@@ -40,39 +41,55 @@ export const backfillCollections = mutation({
                 needsPatch = true;
             }
 
-            // Clean up items if needed
-            const cleanedItems = [];
-            let itemsChanged = false;
-            if (Array.isArray(col.items)) {
-                for (const item of col.items) {
-                    if (item && typeof item === "object") {
-                        if (item.addedAt === undefined) {
-                            cleanedItems.push({
-                                ...item,
-                                addedAt: col._creationTime,
+            const oldItems = (col as any).items;
+            if (Array.isArray(oldItems) && oldItems.length > 0) {
+                for (const item of oldItems) {
+                    if (item && typeof item === "object" && item.id) {
+                        const existing = await ctx.db.query("collection_items")
+                            .withIndex("by_collectionId_itemId_itemType", (q) =>
+                                q.eq("collectionId", col._id)
+                                 .eq("itemId", item.id)
+                                 .eq("itemType", item.type)
+                            )
+                            .first();
+
+                        if (!existing) {
+                            const isNormalized = item.type === "media_monitoring" || 
+                                                 item.type === "watchlist" || 
+                                                 item.type === "deep_web" || 
+                                                 (item.type === "osint" && !item.id.startsWith("bulk_"));
+
+                            await ctx.db.insert("collection_items", {
+                                collectionId: col._id,
+                                itemId: item.id,
+                                itemType: item.type,
+                                title: isNormalized ? undefined : item.title,
+                                sourceId: isNormalized ? undefined : item.sourceId,
+                                data: isNormalized ? undefined : item.data,
+                                addedAt: item.addedAt ?? col._creationTime,
+                                addedBy: "System Migration",
                             });
-                            itemsChanged = true;
-                        } else {
-                            cleanedItems.push(item);
+                            migratedItemsCount++;
                         }
-                    } else {
-                        cleanedItems.push(item);
                     }
                 }
-            }
 
-            if (itemsChanged) {
-                patchData.items = cleanedItems;
+                // Remove the deprecated items array field
+                patchData.items = undefined;
                 needsPatch = true;
             }
 
             if (needsPatch) {
                 await ctx.db.patch(col._id, patchData);
-                updatedCount++;
+                updatedCollectionsCount++;
             }
         }
 
-        return { totalCollections: collections.length, updatedCollections: updatedCount };
+        return {
+            totalCollections: collections.length,
+            updatedCollections: updatedCollectionsCount,
+            migratedItemsCount,
+        };
     }
 });
 

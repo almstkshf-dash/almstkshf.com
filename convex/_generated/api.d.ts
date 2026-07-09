@@ -59,6 +59,7 @@ import type * as utils_aiRetry from "../utils/aiRetry.js";
 import type * as utils_auth from "../utils/auth.js";
 import type * as utils_booleanFilter from "../utils/booleanFilter.js";
 import type * as utils_checkAdmin from "../utils/checkAdmin.js";
+import type * as utils_collectionItemResolver from "../utils/collectionItemResolver.js";
 import type * as utils_constants from "../utils/constants.js";
 import type * as utils_date from "../utils/date.js";
 import type * as utils_dedup from "../utils/dedup.js";
@@ -132,6 +133,7 @@ declare const fullApi: ApiFromModules<{
   "utils/auth": typeof utils_auth;
   "utils/booleanFilter": typeof utils_booleanFilter;
   "utils/checkAdmin": typeof utils_checkAdmin;
+  "utils/collectionItemResolver": typeof utils_collectionItemResolver;
   "utils/constants": typeof utils_constants;
   "utils/date": typeof utils_date;
   "utils/dedup": typeof utils_dedup;

@@ -159,9 +159,25 @@ export default function SaveToCollectionModal({
         collectionId: Id<"collections">,
         onSuccessExtra?: () => void
     ): Promise<void> => {
+        const simplifiedItems = itemsToSave.map((item) => {
+            const isNormalizedType =
+                item.type === "media_monitoring" ||
+                item.type === "watchlist" ||
+                item.type === "deep_web" ||
+                (item.type === "osint" && !item.id.startsWith("bulk_"));
+
+            return {
+                id: item.id,
+                type: item.type,
+                title: isNormalizedType ? undefined : item.title,
+                sourceId: isNormalizedType ? undefined : item.sourceId,
+                data: isNormalizedType ? undefined : item.data,
+            };
+        });
+
         const result = await addMultipleToCollection({
             collectionId,
-            items: itemsToSave,
+            items: simplifiedItems,
         });
 
         if (result.addedCount === 0 && result.duplicateCount > 0) {
