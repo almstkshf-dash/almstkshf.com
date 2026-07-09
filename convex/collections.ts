@@ -7,7 +7,7 @@
  */
 
 import { v, ConvexError } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { resolveCollectionItem } from "./utils/collectionItemResolver";
 
 const MAX_DATA_SIZE_BYTES = 100 * 1024; // 100 KB limit for unnormalized payloads
@@ -376,4 +376,27 @@ export const addMultipleToCollection = mutation({
 
         return { collectionId: collection._id, addedCount, duplicateCount };
     }
+});
+
+/**
+ * One-shot migration: strips the legacy embedded `items` field from all
+ * collections documents that still carry it (old schema stored items inline).
+ * Run once via: npx convex run collections:migrateStripLegacyItems
+ * Safe to re-run — documents already clean are left untouched.
+ */
+export const migrateStripLegacyItems = internalMutation({
+    args: {},
+    handler: async (ctx) => {
+        const all = await ctx.db.query("collections").collect();
+        let patched = 0;
+        for (const col of all) {
+            if ((col as any).items !== undefined) {
+                // Replace the document without the items field
+                const { items: _dropped, ...rest } = col as any;
+                await ctx.db.replace(col._id, rest);
+                patched++;
+            }
+        }
+        return { patched };
+    },
 });

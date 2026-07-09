@@ -246,3 +246,25 @@ export const completePressReleaseSyncJob = mutation({
         });
     },
 });
+
+/**
+ * One-shot migration: strips the legacy embedded `feedResults` field from all
+ * press_release_sync_jobs documents that still carry it.
+ * Run once via: npx convex run pressReleaseJobs:migrateStripFeedResults
+ * Safe to re-run — documents already clean are left untouched.
+ */
+export const migrateStripFeedResults = internalMutation({
+    args: {},
+    handler: async (ctx) => {
+        const all = await ctx.db.query("press_release_sync_jobs").collect();
+        let patched = 0;
+        for (const job of all) {
+            if ((job as any).feedResults !== undefined) {
+                const { feedResults: _dropped, ...rest } = job as any;
+                await ctx.db.replace(job._id, rest);
+                patched++;
+            }
+        }
+        return { patched };
+    },
+});

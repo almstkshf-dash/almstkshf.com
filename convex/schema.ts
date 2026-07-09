@@ -331,6 +331,9 @@ export default defineSchema({
         description: v.optional(v.string()),
         createdAt: v.optional(v.number()),
         updatedAt: v.optional(v.number()),
+        // Legacy field: old schema embedded items directly; kept optional here so existing
+        // documents pass validation while the migration mutation strips them.
+        items: v.optional(v.any()),
     }).index("by_userId", ["userId"]),
 
     collection_items: defineTable({
@@ -411,6 +414,9 @@ export default defineSchema({
         error: v.optional(v.string()),
         createdAt: v.number(),
         updatedAt: v.number(),
+        // Legacy field: old schema embedded feedResults inline on the job document.
+        // Kept optional so existing documents pass validation until migration runs.
+        feedResults: v.optional(v.any()),
     }).index("by_userId", ["userId"])
       .index("by_status", ["status"]),
 
