@@ -231,8 +231,8 @@ export default function MediaMonitoringDashboard({
 
     return (
         <div className="space-y-8">
-            {/* Chart Section — maintains responsive aspect ratio to prevent layout shift */}
-            <div className="w-full aspect-[4/3] md:aspect-[2.5/1] mb-8">
+            {/* Chart Section — explicit height so Recharts never measures -1×-1 */}
+            <div className="w-full mb-8" style={{ minHeight: 280, height: 280 }}>
                 {mounted && chartData
                     ? <ReportsChart data={chartData} />
                     : <div className="w-full h-full bg-muted/10 rounded-2xl border border-dashed border-border animate-pulse" aria-hidden="true" />}

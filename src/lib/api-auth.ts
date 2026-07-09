@@ -32,17 +32,23 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
         };
     }
 
+    // Resolve admin status from Clerk claims alone — no Convex round-trip needed.
+    const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
+    const claims = sessionClaims as any;
+    const role = (claims?.metadata?.role || claims?.publicMetadata?.role || claims?.role || "").toString().toLowerCase();
+    const isAdmin = adminIds.includes(userId) || ["admin", "owner", "superadmin"].includes(role);
+    const isDevOrAdmin = process.env.NODE_ENV !== "production" || isAdmin;
+
+    // Admins and dev environments bypass the subscription check entirely.
+    if (isDevOrAdmin && !requiredPlan) {
+        return { authorized: true, userId };
+    }
+
     try {
         const client = await getAuthenticatedConvex();
         const userSettings = await client.query(api.userSettings.get, { userId });
         const isSubscribed = userSettings?.isSubscribed || false;
         const isTrialActive = userSettings?.isTrialActive && userSettings?.trialEndsAt && userSettings.trialEndsAt > Date.now();
-
-        const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-        const claims = sessionClaims as any;
-        const role = (claims?.metadata?.role || claims?.publicMetadata?.role || claims?.role || "").toString().toLowerCase();
-        const isAdmin = adminIds.includes(userId) || ["admin", "owner", "superadmin"].includes(role);
-        const isDevOrAdmin = process.env.NODE_ENV !== "production" || isAdmin;
 
         if (!isSubscribed && !isTrialActive && !isDevOrAdmin) {
             return {
@@ -59,8 +65,8 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
                 return {
                     authorized: false,
                     userId,
-                    errorResponse: NextResponse.json({ 
-                        error: `Plan upgrade required. This feature requires a ${requiredPlan} plan.` 
+                    errorResponse: NextResponse.json({
+                        error: `Plan upgrade required. This feature requires a ${requiredPlan} plan.`
                     }, { status: 403 })
                 };
             }
@@ -73,6 +79,10 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
         };
     } catch (e) {
         console.error('API auth check error:', e);
+        // If the Convex query fails but the user is an admin, still allow through.
+        if (isDevOrAdmin) {
+            return { authorized: true, userId };
+        }
         return {
             authorized: false,
             userId,
