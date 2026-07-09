@@ -228,7 +228,7 @@ const DashboardGrid = memo(({ articles, analytics, isLoading, aiSummary, isAiLoa
                             disabled={!!isExporting}
                             className="text-xs h-8 px-3 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                         >
-                            <FileText className="w-3.5 h-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+                            <FileText className="w-3.5 h-3.5 me-1.5" />
                             PDF
                         </Button>
                         <Button
@@ -238,7 +238,7 @@ const DashboardGrid = memo(({ articles, analytics, isLoading, aiSummary, isAiLoa
                             disabled={!!isExporting}
                             className="text-xs h-8 px-3 text-foreground bg-muted/10 hover:bg-muted/20 border border-border"
                         >
-                            <FileSpreadsheet className="w-3.5 h-3.5 ltr:mr-1.5 rtl:ml-1.5" />
+                            <FileSpreadsheet className="w-3.5 h-3.5 me-1.5" />
                             CSV
                         </Button>
                     </div>

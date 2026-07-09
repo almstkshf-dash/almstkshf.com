@@ -72,7 +72,7 @@ export default function ChatbotTrigger() {
                         initial={{ opacity: 0, y: 20, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                        className={`bg-background border border-border rounded-2xl p-4 shadow-2xl max-w-[200px] ${isRTL ? "mr-12 text-right" : "ml-12 text-left"}`}
+                        className={`bg-background border border-border rounded-2xl p-4 shadow-2xl max-w-[200px] ${isRTL ? "me-12 text-end" : "ms-12 text-start"}`}
                     >
                         <p className="text-xs font-medium text-foreground">
                             {t("greeting")}

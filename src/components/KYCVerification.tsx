@@ -42,7 +42,7 @@ export default function KYCVerification() {
                         <h3 className="text-foreground font-bold text-xl">Verification Status: Tier 1</h3>
                         <p className="text-foreground/70 text-sm">You are currently verified for basic platform features.</p>
                     </div>
-                    <div className="ml-auto px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-foreground/70">
+                    <div className="ms-auto px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-foreground/70">
                         PENDING FULL ACCESS
                     </div>
                 </div>

@@ -419,7 +419,7 @@ export default function RssFeeder({
                           }}
                           className="h-8 px-2 text-primary hover:bg-primary/5"
                         >
-                          <Eye size={14} className="mr-1 rtl:ml-1 rtl:mr-0" />
+                          <Eye size={14} className="me-1" />
                           {t('read_more')}
                         </Button>
                       </div>

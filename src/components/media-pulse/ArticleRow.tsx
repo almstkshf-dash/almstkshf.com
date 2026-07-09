@@ -201,21 +201,21 @@ export const ArticleRow = memo(({
 
                         {article.manualSentimentOverride && (
                             <span title={`Original: ${article.originalSentiment}`}>
-                                <History className="w-2.5 h-2.5 opacity-60 ml-0.5" aria-hidden="true" />
+                                <History className="w-2.5 h-2.5 opacity-60 ms-0.5" aria-hidden="true" />
                             </span>
                         )}
-                        <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 group-focus-within/sentiment:opacity-100 transition-opacity ml-1" aria-hidden="true" />
+                        <Edit className="w-2.5 h-2.5 opacity-0 group-hover/sentiment:opacity-100 group-focus-within/sentiment:opacity-100 transition-opacity ms-1" aria-hidden="true" />
                     </button>
 
                     {/* Simple Sentiment Dropdown */}
-                    <div className="absolute top-full left-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-zoom-in-95 duration-200">
+                    <div className="absolute top-full start-0 mt-1 hidden group-hover/sentiment:block group-focus-within/sentiment:block z-50 bg-background border border-border rounded-xl shadow-xl p-1 min-w-[120px] animate-zoom-in-95 duration-200">
                         {(['Positive', 'Neutral', 'Negative'] as const).map((s) => (
                             <button
                                 key={s}
                                 disabled={isUpdating}
                                 onClick={() => onUpdateSentiment(article._id, s)}
                                 className={clsx(
-                                    "w-full text-left rtl:text-right px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-between",
+                                    "w-full text-start px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-between",
                                     s === 'Positive' ? "hover:bg-status-success-bg/30 text-status-success-fg" :
                                         s === 'Negative' ? "hover:bg-status-error-bg/30 text-status-error-fg" :
                                             "hover:bg-status-neutral-bg/30 text-status-neutral-fg",
@@ -232,10 +232,10 @@ export const ArticleRow = memo(({
                     </div>
                 </div>
             </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors" suppressHydrationWarning>
+            <td className="p-4 text-end text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors" suppressHydrationWarning>
                 {article.reach?.toLocaleString() || '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors">
+            <td className="p-4 text-end text-xs font-mono text-foreground/80 dark:text-slate-200 transition-colors">
                 {article.likes !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.likes.toLocaleString()}</span>
@@ -243,7 +243,7 @@ export const ArticleRow = memo(({
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
+            <td className="p-4 text-end text-xs font-mono text-foreground/80 transition-colors">
                 {article.retweets !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.retweets.toLocaleString()}</span>
@@ -251,7 +251,7 @@ export const ArticleRow = memo(({
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono text-foreground/80 transition-colors">
+            <td className="p-4 text-end text-xs font-mono text-foreground/80 transition-colors">
                 {article.replies !== undefined ? (
                     <div className="flex items-center justify-end gap-1.5">
                         <span className="tabular-nums" suppressHydrationWarning>{article.replies.toLocaleString()}</span>
@@ -259,7 +259,7 @@ export const ArticleRow = memo(({
                     </div>
                 ) : '—'}
             </td>
-            <td className="p-4 text-right text-xs font-mono font-bold text-foreground transition-colors" suppressHydrationWarning>
+            <td className="p-4 text-end text-xs font-mono font-bold text-foreground transition-colors" suppressHydrationWarning>
                 ${article.ave?.toLocaleString() || '0'}
             </td>
             <td className="p-4 text-center">
@@ -270,7 +270,7 @@ export const ArticleRow = memo(({
                         : 'bg-status-success-bg text-status-success-fg border-status-success-fg/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]'
                 )}>
                     <span className={clsx(
-                        "w-1 h-1 rounded-full mr-1.5 transition-all animate-pulse",
+                        "w-1 h-1 rounded-full me-1.5 transition-all animate-pulse",
                         article.analysisStatus === 'pending' ? "bg-status-warning-fg" : "bg-status-success-fg"
                     )} aria-hidden="true" />
                     {article.analysisStatus === 'pending' ? t('status_in_progress') : t('status_live')}
@@ -358,24 +358,24 @@ export const ArticleRowSkeleton = () => {
                 <Skeleton className="w-16 h-6 rounded-full" />
             </td>
             {/* Reach */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-12 h-3 rounded ml-auto rtl:mr-auto" />
+            <td className="p-4 text-end">
+                <Skeleton className="w-12 h-3 rounded ms-auto" />
             </td>
             {/* Likes */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            <td className="p-4 text-end">
+                <Skeleton className="w-8 h-3 rounded ms-auto" />
             </td>
             {/* Retweets */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            <td className="p-4 text-end">
+                <Skeleton className="w-8 h-3 rounded ms-auto" />
             </td>
             {/* Replies */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-8 h-3 rounded ml-auto rtl:mr-auto" />
+            <td className="p-4 text-end">
+                <Skeleton className="w-8 h-3 rounded ms-auto" />
             </td>
             {/* AVE */}
-            <td className="p-4 text-right">
-                <Skeleton className="w-10 h-3 rounded ml-auto rtl:mr-auto" />
+            <td className="p-4 text-end">
+                <Skeleton className="w-10 h-3 rounded ms-auto" />
             </td>
             {/* Status */}
             <td className="p-4 text-center">

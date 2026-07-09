@@ -136,7 +136,7 @@ const ArticleTable = memo(function ArticleTable({
     if (articles === undefined || isLoading) {
         return (
             <div className="overflow-x-auto">
-                <table className="w-full text-left rtl:text-right border-collapse">
+                <table className="w-full text-start border-collapse">
                     <thead>
                         <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
                             <th scope="col" className="p-4 w-10">
@@ -153,11 +153,11 @@ const ArticleTable = memo(function ArticleTable({
                             <th scope="col" className="p-4 font-bold">{t('col_source')}</th>
                             <th scope="col" className="p-4 font-bold">{t('col_depth')}</th>
                             <th scope="col" className="p-4 font-bold">{t('col_sentiment')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_reach')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_likes')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_retweets')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_replies')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_ave')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_reach')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_likes')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_retweets')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_replies')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_ave')}</th>
                             <th scope="col" className="p-4 font-bold text-center">{t('col_status')}</th>
                             <th scope="col" className="p-4 font-bold text-center w-12">
                                 <span className="sr-only">Actions</span>
@@ -219,7 +219,7 @@ const ArticleTable = memo(function ArticleTable({
 
             {/* Data Table */}
             <div className="overflow-x-auto">
-                <table className="w-full text-left rtl:text-right border-collapse">
+                <table className="w-full text-start border-collapse">
                     <thead>
                         <tr className="border-b border-border text-foreground/80 text-[10px] uppercase tracking-[0.2em] bg-muted/50 transition-colors">
                             <th scope="col" className="p-4 w-10">
@@ -238,11 +238,11 @@ const ArticleTable = memo(function ArticleTable({
                             <th scope="col" className="p-4 font-bold">{t('col_source')}</th>
                             <th scope="col" className="p-4 font-bold">{t('col_depth')}</th>
                             <th scope="col" className="p-4 font-bold">{t('col_sentiment')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_reach')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_likes')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_retweets')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_replies')}</th>
-                            <th scope="col" className="p-4 font-bold text-right rtl:text-left">{t('col_ave')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_reach')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_likes')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_retweets')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_replies')}</th>
+                            <th scope="col" className="p-4 font-bold text-end">{t('col_ave')}</th>
                             <th scope="col" className="p-4 font-bold text-center">{t('col_status')}</th>
                             <th scope="col" className="p-4 font-bold text-center w-12">
                                 <span className="sr-only">Actions</span>

@@ -8,6 +8,7 @@
 
 import HeroSection from "@/components/HeroSection";
 import HomeClient from "@/components/HomeClient";
+import HomeSchema from "@/components/HomeSchema";
 import { Metadata } from "next";
 
 
@@ -21,11 +22,11 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             ? "الصفحة الرئيسية للمستكشف - رائد الحلول الاستراتيجية والتحليل الإعلامي والقانوني في الخليج."
             : "ALMSTKSHF Home - Leader in strategic solutions, media analysis, and legal tech in the Gulf.",
         alternates: {
-            canonical: `https://www.almstkshf.com/${locale}`,
+            canonical: `https://almstkshf.com/${locale}`,
             languages: {
-                'x-default': 'https://www.almstkshf.com',
-                en: 'https://www.almstkshf.com/en',
-                ar: 'https://www.almstkshf.com/ar',
+                'ar': 'https://almstkshf.com/ar',
+                'en': 'https://almstkshf.com/en',
+                'x-default': 'https://almstkshf.com/ar',
             }
         },
     };
@@ -42,9 +43,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  *
  * This ensures the LCP element is never blocked behind a JS bundle download.
  */
-export default function Home() {
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
+
     return (
         <main className="min-h-screen bg-background overflow-x-hidden">
+            {/* JSON-LD structured data for media tracking, sentiment diagnostics,
+                and automated media analysis — rendered server-side for crawlers */}
+            <HomeSchema locale={locale} />
+
             {/* Server-rendered hero — LCP element paints here */}
             <HeroSection />
 

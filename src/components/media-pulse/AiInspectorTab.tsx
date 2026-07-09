@@ -232,7 +232,7 @@ export default function AiInspectorTab() {
 
       {/* Header Info Banner */}
       <section className="glass-card p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-500/5 to-transparent border-blue-500/10 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none group-hover:scale-110 duration-700">
+        <div className="absolute top-0 end-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none group-hover:scale-110 duration-700">
           <Fingerprint className="w-48 h-48" aria-hidden="true" />
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -301,7 +301,7 @@ export default function AiInspectorTab() {
                       placeholder={t("text.placeholder")}
                       className="w-full h-80 bg-card border border-border rounded-[2.5rem] p-10 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/50 transition-all resize-none text-lg font-medium leading-relaxed shadow-sm transition-all"
                     />
-                    <div className="absolute bottom-10 right-10">
+                    <div className="absolute bottom-10 end-10">
                       <button
                         onClick={handleTextAnalyze}
                         disabled={loading || !textInput.trim()}
@@ -443,7 +443,7 @@ export default function AiInspectorTab() {
                       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                       <video src={previewUrl!} controls className="w-full h-full object-contain" crossOrigin="anonymous" />
                     </div>
-                    <div className="flex flex-col justify-center space-y-6 lg:pl-10">
+                    <div className="flex flex-col justify-center space-y-6 lg:ps-10">
                       <div className="space-y-3">
                         <div className="inline-block px-4 py-1 bg-primary/10 rounded-full border border-primary/20 text-[10px] font-black text-blue-800 dark:text-blue-300 tracking-widest uppercase">
                           {t("forensic_extraction")}

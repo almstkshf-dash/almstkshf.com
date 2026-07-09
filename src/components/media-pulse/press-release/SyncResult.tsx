@@ -77,7 +77,7 @@ export default function SyncResult({
             )}
 
             {/* Per-feed grid breakdown */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-60 overflow-y-auto pe-1">
                 {syncState.feedResults.map((f: FeedResult, index: number) => (
                     <div
                         key={`${f.name || f.feed || 'feed'}-${index}`}
@@ -88,7 +88,7 @@ export default function SyncResult({
                                 : 'bg-muted border-border text-foreground'
                         )}
                     >
-                        <span className="truncate mr-2 flex-1">{f.name || f.feed}</span>
+                        <span className="truncate me-2 flex-1">{f.name || f.feed}</span>
                         {f.error ? (
                             <span className="text-[10px] opacity-70 flex-shrink-0 bg-rose-500/10 px-1.5 py-0.5 rounded text-rose-600">
                                 {t('failed')}

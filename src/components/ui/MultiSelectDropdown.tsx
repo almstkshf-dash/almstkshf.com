@@ -110,7 +110,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     setIsOpen(true);
                     inputRef.current?.focus();
                 }}
-                className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-left transition-all border cursor-pointer ${error
+                className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-start transition-all border cursor-pointer ${error
                     ? 'border-destructive/60 ring-2 ring-destructive/20'
                     : isOpen
                         ? 'border-primary/50 ring-2 ring-primary/20 bg-card'

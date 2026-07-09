@@ -93,7 +93,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
 
         {/* Score card */}
         <div className={`lg:col-span-1 p-8 ${riskBg} rounded-3xl border flex flex-col items-center justify-center text-center relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+          <div className="absolute top-0 end-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
           <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">
@@ -117,7 +117,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               {/* Mini checklist summary */}
               <div className="mt-6 w-full space-y-1.5">
                 {rich.checklist.map((item) => (
-                  <div key={item.id} className="flex items-center gap-2 text-left">
+                  <div key={item.id} className="flex items-center gap-2 text-start">
                     {item.passed
                       ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       : <XCircle className="w-3.5 h-3.5 text-rose-500    shrink-0" />}
@@ -145,7 +145,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
 
         {/* Signals panel */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest ml-1 mb-2 flex items-center gap-2">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest ms-1 mb-2 flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
             {t("pixel_signals")}
           </h3>
@@ -349,7 +349,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             initial={{ top: "-100%" }}
             animate={{ top: "110%" }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 w-full h-px bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-20 pointer-events-none"
+            className="absolute start-0 w-full h-px bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-20 pointer-events-none"
           />
           <img
             src={originalImage}

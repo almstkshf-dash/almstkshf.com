@@ -147,7 +147,7 @@ export const UploadPanel = memo(function UploadPanel({
       </div>
 
       <div className="p-4 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
-        <div className="flex items-center gap-6 ml-6">
+        <div className="flex items-center gap-6 ms-6">
           <div className="hidden md:flex items-center gap-2 text-zinc-500">
             <Layers className="w-4 h-4" />
             <span className="text-[10px] font-black uppercase tracking-widest">Multi-Engine Forensic Mode</span>

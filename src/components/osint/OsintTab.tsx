@@ -422,7 +422,7 @@ export default function OsintTab() {
                         setExpandedHistory(expandedHistory === item._id ? null : item._id);
                       }
                     }}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-muted/10 hover:bg-muted/30 text-left text-sm transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full flex items-center justify-between px-4 py-3 bg-muted/10 hover:bg-muted/30 text-start text-sm transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-primary/20"
                     onClick={() => setExpandedHistory(expandedHistory === item._id ? null : item._id)}
                     aria-expanded={expandedHistory === item._id}
                   >

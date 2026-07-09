@@ -190,7 +190,7 @@ export default function ApiKeysClient() {
                                 variant="outline"
                                 className="h-8 py-0 px-3"
                             >
-                                <Save className="h-3.5 w-3.5 mr-1.5" /> {t('save')}
+                                <Save className="h-3.5 w-3.5 me-1.5" /> {t('save')}
                             </Button>
                         </div>
 
@@ -231,7 +231,7 @@ export default function ApiKeysClient() {
                                 size="sm"
                                 variant="outline"
                             >
-                                <Save className="h-4 w-4 mr-2" /> {t('save')}
+                                <Save className="h-4 w-4 me-2" /> {t('save')}
                             </Button>
                         </div>
 
@@ -277,7 +277,7 @@ export default function ApiKeysClient() {
                                 size="sm"
                                 variant="outline"
                             >
-                                <Save className="h-4 w-4 mr-2" /> {t('save')}
+                                <Save className="h-4 w-4 me-2" /> {t('save')}
                             </Button>
                         </div>
 

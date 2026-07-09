@@ -41,9 +41,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: route === '' ? 1 : 0.8,
             alternates: {
                 languages: {
-                    en: `${BASE_URL}/en${route}`,
                     ar: `${BASE_URL}/ar${route}`,
-                    'x-default': `${BASE_URL}/en${route}`,
+                    en: `${BASE_URL}/en${route}`,
+                    // x-default targets Arabic as the primary regional language
+                    'x-default': `${BASE_URL}/ar${route}`,
                 },
             },
         })
@@ -54,9 +55,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: route === '' ? 1 : 0.8,
             alternates: {
                 languages: {
-                    en: `${BASE_URL}/en${route}`,
                     ar: `${BASE_URL}/ar${route}`,
-                    'x-default': `${BASE_URL}/en${route}`,
+                    en: `${BASE_URL}/en${route}`,
+                    // x-default targets Arabic as the primary regional language
+                    'x-default': `${BASE_URL}/ar${route}`,
                 },
             },
         })

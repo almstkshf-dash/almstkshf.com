@@ -93,7 +93,7 @@ export function DetailedContent() {
                 {/* Media Monitoring & Social Listening */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div className="space-y-6">
-                        <h3 className="text-2xl font-bold text-foreground border-l-4 border-primary pl-4 transition-all">
+                        <h3 className="text-2xl font-bold text-foreground border-s-4 border-primary ps-4 transition-all">
                             {t("services.monitoring.title")}
                         </h3>
                         <p className={`${TEXT_MUTED} leading-relaxed text-sm transition-colors`}>
@@ -101,7 +101,7 @@ export function DetailedContent() {
                         </p>
                     </div>
                     <div className="space-y-6">
-                        <h3 className="text-2xl font-bold text-foreground border-l-4 border-emerald-500 pl-4 transition-all">
+                        <h3 className="text-2xl font-bold text-foreground border-s-4 border-emerald-500 ps-4 transition-all">
                             {t("services.listening.title")}
                         </h3>
                         <p className={`${TEXT_MUTED} leading-relaxed text-sm transition-colors`}>

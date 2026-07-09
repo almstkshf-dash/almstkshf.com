@@ -82,12 +82,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
     return {
         title: {
-            default: isAr ? "المستكشف - حلول إعلامية وقانونية متقدمة" : "ALMSTKSHF - Advanced Media & Legal Solutions",
-            template: `%s | ${isAr ? "المستكشف" : "ALMSTKSHF"}`
+            default: isAr ? "المستكشف - لخدمات الرصد إعلامي" : "Almstkshf - Media Monitoring Services",
+            template: `%s | ${isAr ? "المستكشف" : "Almstkshf"}`
         },
         description: isAr
-            ? "المستكشف هو شريكك الاستراتيجي للرصد الإعلامي الذكي والحلول القانونية المبنية على البيانات."
-            : "ALMSTKSHF is your strategic partner for intelligent media monitoring and data-driven legal solutions.",
+            ? "رواد تحليل البيانات، الرصد الإعلامي الاستباقي، وتحليل مشاعر الرأي العام بدعم كامل للغة العربية والإنجليزية."
+            : "Pioneers in data analysis, proactive media monitoring, and public opinion analysis with full support for Arabic and English.",
         keywords: ["AI", "Media Monitoring", "Legal Tech", "UAE", "Data Analysis", "Strategic Advisor", "Dubai", "Abu Dhabi"],
         openGraph: {
             type: "website",
@@ -115,11 +115,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         },
 
         alternates: {
-            canonical: `https://www.almstkshf.com/${locale}`,
+            canonical: `https://almstkshf.com/${locale}`,
             languages: {
-                'x-default': 'https://www.almstkshf.com',
-                en: 'https://www.almstkshf.com/en',
-                ar: 'https://www.almstkshf.com/ar',
+                // Region-specific hreflang tags — UAE and Saudi Arabia priority markets
+                'en-AE': 'https://almstkshf.com/en',
+                'ar-AE': 'https://almstkshf.com/ar',
+                'en-SA': 'https://almstkshf.com/en',
+                'ar-SA': 'https://almstkshf.com/ar',
+                // Fallback for users outside specified regions — defaults to Arabic
+                'x-default': 'https://almstkshf.com/ar',
             }
         },
         icons: {

@@ -517,7 +517,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                                                     {sentiment}
                                                     {item.data?.manualSentimentOverride && (
                                                         <span title={`Original: ${item.data.originalSentiment}`}>
-                                                            <History className="w-2.5 h-2.5 opacity-60 ml-0.5" aria-hidden="true" />
+                                                            <History className="w-2.5 h-2.5 opacity-60 ms-0.5" aria-hidden="true" />
                                                         </span>
                                                     )}
                                                 </span>

@@ -163,7 +163,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
 
         {/* Score card */}
         <div className={`p-8 ${risk.bg} rounded-3xl border ${risk.border} flex flex-col items-center justify-center text-center relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+          <div className="absolute top-0 end-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
           <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">
@@ -182,7 +182,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
           </p>
 
           {/* Mini stats */}
-          <div className="mt-6 w-full space-y-1.5 text-left">
+          <div className="mt-6 w-full space-y-1.5 text-start">
             {[
               { icon: Type, label: t('words'), value: String(result.wordCount), key: 'words' },
               { icon: AlignLeft, label: t('sentences'), value: String(result.sentences.length), key: 'sentences' },
@@ -201,7 +201,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
 
         {/* Aggregate metrics (2/3 cols) */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ms-1">
             <BarChart3 className="w-4 h-4" />
             {t('forensic_metrics')}
           </h3>
@@ -287,7 +287,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       {/* â”€â”€ Row 2 : Named signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {result.signals.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ms-1">
             <Info className="w-4 h-4" />
             {t('detailed_breakdown')}
           </h3>
@@ -326,7 +326,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
       {/* â”€â”€ Row 3 : Sentence timeline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       {result.sentences.length > 0 && (
         <div className="space-y-6">
-          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2 ms-1">
             <Activity className="w-4 h-4" />
             {t('sentence_breakdown')}
           </h3>
@@ -351,7 +351,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
           </div>
 
           {/* Sentence list */}
-          <div className="space-y-2 max-h-80 overflow-y-auto pr-1 scrollbar-hide">
+          <div className="space-y-2 max-h-80 overflow-y-auto pe-1 scrollbar-hide">
             {result.sentences.map((s, idx) => {
               const meta = sentenceMeta(s);
               const isSelected = selectedSentence === idx;
@@ -360,7 +360,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                   key={idx}
                   onClick={() => setSelectedSentence(isSelected ? null : idx)}
                   whileHover={{ x: 2 }}
-                  className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 ${isSelected ? `${meta.ring} bg-zinc-50 dark:bg-zinc-900` : 'border-zinc-100 dark:border-zinc-900 bg-card dark:bg-muted/50'}`}
+                  className={`w-full text-start p-3 rounded-xl border transition-all flex items-start gap-3 ${isSelected ? `${meta.ring} bg-zinc-50 dark:bg-zinc-900` : 'border-zinc-100 dark:border-zinc-900 bg-card dark:bg-muted/50'}`}
                 >
                   <span className={`flex-shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded font-mono mt-0.5 ${meta.badge}`}>
                     {s.score}%
@@ -368,7 +368,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                   <p className="text-xs text-zinc-600 dark:text-muted-foreground leading-snug line-clamp-2">
                     {s.text}
                   </p>
-                  <span className={`ml-auto flex-shrink-0 text-[9px] font-black uppercase tracking-wider ${meta.badge.replace('bg-', 'text-').replace(' text-white', '').replace(' text-black', '')}`}>
+                  <span className={`ms-auto flex-shrink-0 text-[9px] font-black uppercase tracking-wider ${meta.badge.replace('bg-', 'text-').replace(' text-white', '').replace(' text-black', '')}`}>
                     {t(`label_${s.label.toLowerCase()}`)}
                   </span>
                 </motion.button>
@@ -392,7 +392,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                     {t('sentence_detail', { num: String((selectedSentence ?? 0) + 1) })}
                   </span>
                 </div>
-                <blockquote className="text-sm text-zinc-700 dark:text-zinc-300 italic border-l-2 border-zinc-300 dark:border-zinc-700 pl-4 leading-relaxed">
+                <blockquote className="text-sm text-zinc-700 dark:text-zinc-300 italic border-s-2 border-zinc-300 dark:border-zinc-700 ps-4 leading-relaxed">
                   {sel.text}
                 </blockquote>
                 <div className="flex flex-wrap gap-2">
@@ -422,7 +422,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
 
       {/* â”€â”€ Row 4 : Forensic highlight view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="p-10 bg-card dark:bg-muted/50 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+        <div className="absolute top-0 end-0 p-4 opacity-5 pointer-events-none">
           <Search className="w-32 h-32" />
         </div>
 
@@ -431,7 +431,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
           initial={{ top: '-100%' }}
           animate={{ top: '110%' }}
           transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-          className="absolute left-0 w-full h-px bg-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.5)] z-20 pointer-events-none"
+          className="absolute start-0 w-full h-px bg-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.5)] z-20 pointer-events-none"
         />
 
         <div className="relative z-10 space-y-6">

@@ -443,7 +443,7 @@ export default function MediaMonitoringDashboard({
                             {sseStatus === "disconnected" && (
                                 <button
                                     onClick={sseReconnect}
-                                    className="text-[9px] text-primary hover:underline font-bold ltr:ml-1 rtl:mr-1 uppercase tracking-tight focus:outline-none"
+                                    className="text-[9px] text-primary hover:underline font-bold ms-1 uppercase tracking-tight focus:outline-none"
                                 >
                                     {isRTL ? "اتصال" : "Connect"}
                                 </button>

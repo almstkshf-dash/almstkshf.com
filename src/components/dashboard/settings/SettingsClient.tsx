@@ -628,7 +628,7 @@ export default function SettingsClient() {
                                 </h2>
 
                                 <div className="mb-8 p-6 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-6">
-                                    <div className="flex items-center gap-4 text-center md:text-left">
+                                    <div className="flex items-center gap-4 text-center md:text-start">
                                         <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/5">
                                             <Key className="h-6 w-6 text-primary" />
                                         </div>
@@ -801,7 +801,7 @@ export default function SettingsClient() {
                         <div className="space-y-8">
                             {/* Chatbase Integration */}
                             <section className="bg-card p-8 rounded-2xl border border-border shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-2xl -mr-6 -mt-6" />
+                                <div className="absolute top-0 end-0 w-24 h-24 bg-emerald-500/5 blur-2xl -me-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <MessageSquare className="h-5 w-5 text-emerald-500" />
                                     {t('section_chatbase')}
@@ -847,7 +847,7 @@ export default function SettingsClient() {
 
                             {/* Stripe Integration */}
                             <section className="bg-card p-8 rounded-2xl border border-border shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 blur-2xl -mr-6 -mt-6" />
+                                <div className="absolute top-0 end-0 w-24 h-24 bg-violet-500/5 blur-2xl -me-6 -mt-6" />
                                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                                     <CreditCard className="h-5 w-5 text-violet-500" />
                                     {t('section_stripe')}

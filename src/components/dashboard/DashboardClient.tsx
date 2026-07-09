@@ -335,13 +335,13 @@ export default function DashboardClient() {
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     {/* Country filter */}
                     <div className="relative">
-                        <Globe className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                        <Globe className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                         <select
                             id="dashboard-country-select"
                             aria-label={t('filters.country') || 'Select Country'}
                             value={selectedCountry}
                             onChange={(e) => startTransition(() => setSelectedCountry(e.target.value))}
-                            className="w-full sm:w-[200px] appearance-none bg-background border border-border/60 rounded-xl ltr:pl-9 rtl:pr-9 ltr:pr-8 rtl:pl-8 py-2.5 text-[11px] font-bold uppercase tracking-wide focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer"
+                            className="w-full sm:w-[200px] appearance-none bg-background border border-border/60 rounded-xl ps-9 pe-8 py-2.5 text-[11px] font-bold uppercase tracking-wide focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all text-foreground cursor-pointer"
                         >
                             <option value="All">{t('filters.all_countries')}</option>
                             {ALL_COUNTRIES.map((c) => (
@@ -350,7 +350,7 @@ export default function DashboardClient() {
                                 </option>
                             ))}
                         </select>
-                        <div className="absolute ltr:right-3 rtl:left-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                        <div className="absolute end-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -359,13 +359,13 @@ export default function DashboardClient() {
 
                     {/* Search */}
                     <div className="relative w-full sm:w-72">
-                        <Search className="absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                         <input
                             type="text"
                             placeholder={t('search_placeholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-background border border-border/60 rounded-xl ltr:pl-9 rtl:pr-9 ltr:pr-4 rtl:pl-4 py-2.5 text-[11px] font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/60 text-foreground"
+                            className="w-full bg-background border border-border/60 rounded-xl ps-9 pe-4 py-2.5 text-[11px] font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all placeholder:text-muted-foreground/60 text-foreground"
                         />
                     </div>
                 </div>
@@ -581,7 +581,7 @@ export default function DashboardClient() {
                                     icon={Filter}
                                 >
                                     <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border-primary/5 relative">
-                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
+                                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary/50 via-primary/10 to-primary/50" />
                                         {coverageFilterBar}
                                         {articleListBody}
                                     </div>
@@ -646,7 +646,7 @@ export default function DashboardClient() {
                     <div
                         role="status"
                         className={clsx(
-                            'fixed bottom-8 ltr:right-8 rtl:left-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-slide-in-from-bottom duration-500 border flex items-center gap-4 transition-all',
+                            'fixed bottom-8 end-8 z-[50] px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl animate-slide-in-from-bottom duration-500 border flex items-center gap-4 transition-all',
                             tst.type === 'success'
                                 ? 'bg-status-success-bg/90 text-status-success-fg border-status-success-fg/20'
                                 : 'bg-status-error-bg/90 text-status-error-fg border-status-error-fg/20'
@@ -662,7 +662,7 @@ export default function DashboardClient() {
                             <div className="font-bold text-sm tracking-tight leading-none mb-1">
                                 {tst.type === 'success' ? t('success') : t('error')}
                             </div>
-                            <div className="text-xs font-semibold opacity-90 leading-tight pr-4">
+                            <div className="text-xs font-semibold opacity-90 leading-tight pe-4">
                                 {tst.message}
                             </div>
                         </div>

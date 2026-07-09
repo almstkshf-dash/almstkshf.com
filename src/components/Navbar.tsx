@@ -253,7 +253,7 @@ const NavbarContent = memo(function NavbarContent() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.15, ease: "easeOut" }}
-                                className="absolute top-full left-0 right-0 bg-background/98 backdrop-blur-xl border-t border-border shadow-2xl z-[90]"
+                                className="absolute top-full inset-x-0 bg-background/98 backdrop-blur-xl border-t border-border shadow-2xl z-[90]"
                             >
                                 <div
                                     className="py-8"

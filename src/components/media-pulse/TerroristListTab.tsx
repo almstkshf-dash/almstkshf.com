@@ -640,7 +640,7 @@ export default function TerroristListTab() {
                   onClick={() => setIsBulkDeleteModalOpen(true)}
                   className="text-[10px] uppercase tracking-widest font-bold border-destructive/20 text-rose-600 hover:bg-destructive/10 dark:text-rose-400"
                 >
-                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  <Trash2 className="w-3.5 h-3.5 me-1" />
                   Delete
                 </Button>
               )}
@@ -661,10 +661,10 @@ export default function TerroristListTab() {
           {/* ─── Results Table (Desktop) ─── */}
           <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse min-w-[1400px]">
+              <table className="w-full text-sm text-start border-collapse min-w-[1400px]">
                 <thead>
                   <tr className="bg-muted/40 border-b border-border">
-                    <th scope="col" className="px-4 py-3 sticky left-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border z-10 w-[40px]">
+                    <th scope="col" className="px-4 py-3 sticky start-0 bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border z-10 w-[40px]">
                       <input
                         type="checkbox"
                         checked={!!entries && entries.length > 0 && (selectAllMode || selectedSet.size === entries.length)}
@@ -673,50 +673,50 @@ export default function TerroristListTab() {
                         className="rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
                       />
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center min-w-[80px] sticky left-[40px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border z-10">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center min-w-[80px] sticky start-[40px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border z-10">
                       {tCommon('status')}
                     </th>
-                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 sticky left-[120px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border min-w-[200px] z-10">
+                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 sticky start-[120px] bg-muted/40 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border min-w-[200px] z-10">
                       {t('fields.name_arabic')}
                     </th>
-                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[200px]">
+                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[200px]">
                       {t('fields.name_latin')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[120px]">
                       {t('fields.nationality')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[150px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[150px]">
                       {t('fields.doc_number')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[150px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[150px]">
                       {t('fields.category')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[120px]">
                       {t('fields.dob')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[120px]">
                       {t('fields.pob')}
                     </th>
-                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[250px]">
+                    <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[250px]">
                       {t('fields.address')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[180px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[180px]">
                       {t('fields.issuing_authority')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[120px]">
                       {t('fields.issue_date')}
                     </th>
-                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[120px]">
+                    <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[120px]">
                       {t('fields.expiry_date')}
                     </th>
-                    <th scope="col" className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-r border-border min-w-[300px]">
+                    <th scope="col" className="px-8 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 border-e border-border min-w-[300px]">
                       {t('fields.reasons')}
                     </th>
                     <th scope="col" className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[250px]">
                       {t('fields.other_info')}
                     </th>
                     {isAdmin && (
-                      <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center sticky right-0 bg-muted/40 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-border min-w-[100px]">
+                      <th scope="col" className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center sticky end-0 bg-muted/40 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-s border-border min-w-[100px]">
                         {t('actions')}
                       </th>
                     )}
@@ -730,7 +730,7 @@ export default function TerroristListTab() {
                         key={entry._id}
                         className="group hover:bg-muted/30 transition-colors border-b border-border/40"
                       >
-                        <td className="px-4 py-3 sticky left-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10 w-[40px]">
+                        <td className="px-4 py-3 sticky start-0 bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border/60 z-10 w-[40px]">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -739,7 +739,7 @@ export default function TerroristListTab() {
                             className="rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
                           />
                         </td>
-                        <td className="px-4 py-3 text-center sticky left-[40px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10">
+                        <td className="px-4 py-3 text-center sticky start-[40px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border/60 z-10">
                           <div className={clsx(
                             "inline-flex p-1.5 rounded-lg border",
                             entry.type === 'individual' ? "bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400" :
@@ -750,7 +750,7 @@ export default function TerroristListTab() {
                               entry.type === 'entity' ? <Building2 className="w-3.5 h-3.5" aria-hidden="true" /> : <Users className="w-3.5 h-3.5" aria-hidden="true" />}
                           </div>
                         </td>
-                        <td className="px-6 py-3 font-bold text-foreground sticky left-[120px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-border/60 z-10">
+                        <td className="px-6 py-3 font-bold text-foreground sticky start-[120px] bg-card group-hover:bg-muted/30 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-e border-border/60 z-10">
                           {entry.nameArabic}
                         </td>
                         <td className="px-6 py-3 text-xs font-semibold text-foreground/70 italic border-r border-border/40">
@@ -792,7 +792,7 @@ export default function TerroristListTab() {
                           {entry.otherInfo || '—'}
                         </td>
                         {isAdmin && (
-                          <td className="px-4 py-3 text-center sticky right-0 bg-card group-hover:bg-muted/30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-l border-border/60">
+                          <td className="px-4 py-3 text-center sticky end-0 bg-card group-hover:bg-muted/30 shadow-[-2px_0_5px_rgba(0,0,0,0.05)] border-s border-border/60">
                             <div className="flex items-center justify-center gap-1.5">
                               <button
                                 onClick={() => {
@@ -857,7 +857,7 @@ export default function TerroristListTab() {
                         entry.type === 'entity' ? <Building2 className="w-5 h-5" aria-hidden="true" /> : <Users className="w-5 h-5" aria-hidden="true" />}
                     </div>
                     <div>
-                      <h4 className="font-bold text-foreground pr-8 text-base">{entry.nameArabic}</h4>
+                      <h4 className="font-bold text-foreground pe-8 text-base">{entry.nameArabic}</h4>
                       <p className="text-sm text-foreground/70 italic mb-1">{entry.nameLatin || '—'}</p>
                       <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tight bg-destructive/10 border border-destructive/20 text-red-700 dark:text-red-400 inline-block">
                         {entry.category}
@@ -883,7 +883,7 @@ export default function TerroristListTab() {
                   </div>
 
                   {entry.reasons && (
-                    <div className="text-xs border-l-2 border-rose-500 pl-3 py-1 mb-4 bg-rose-500/5 rounded-r-lg pr-2">
+                    <div className="text-xs border-s-2 border-rose-500 ps-3 py-1 mb-4 bg-rose-500/5 rounded-e-lg pe-2">
                       <span className="block text-[10px] uppercase text-rose-700/70 font-bold mb-1">{t('fields.reasons')}</span>
                       <p className="text-rose-700 dark:text-rose-300 font-medium leading-relaxed">{entry.reasons}</p>
                     </div>
@@ -900,7 +900,7 @@ export default function TerroristListTab() {
                           setIsRecordModalOpen(true);
                         }}
                       >
-                        <Edit2 className="w-3.5 h-3.5 mr-1" />
+                        <Edit2 className="w-3.5 h-3.5 me-1" />
                         {t('edit_record')}
                       </Button>
                       <Button
@@ -911,7 +911,7 @@ export default function TerroristListTab() {
                           setDeleteConfirmationId(entry._id);
                         }}
                       >
-                        <Trash2 className="w-3.5 h-3.5 mr-1" />
+                        <Trash2 className="w-3.5 h-3.5 me-1" />
                         {tCommon('delete')}
                       </Button>
                     </div>
@@ -1177,7 +1177,7 @@ export default function TerroristListTab() {
                       value={editingRecord?.nameArabic || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, nameArabic: e.target.value })}
                       required
-                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-right"
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
                       dir="rtl"
                     />
                   </div>
@@ -1188,7 +1188,7 @@ export default function TerroristListTab() {
                       type="text"
                       value={editingRecord?.nameLatin || ''}
                       onChange={(e) => setEditingRecord({ ...editingRecord, nameLatin: e.target.value })}
-                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 text-left"
+                      className="w-full px-3 py-2 bg-muted/40 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20"
                       dir="ltr"
                     />
                   </div>

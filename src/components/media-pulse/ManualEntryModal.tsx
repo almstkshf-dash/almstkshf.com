@@ -807,7 +807,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                                 disabled={isSubmitting}
                                 onChange={handleImageUpload}
                                 className="block w-full text-sm text-foreground/60 transition-colors
-                    file:mr-4 file:py-2 file:px-4
+                    file:me-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
                     file:text-xs file:font-bold file:uppercase file:tracking-wider
                     file:bg-primary/10 file:text-primary

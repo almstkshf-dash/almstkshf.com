@@ -97,8 +97,8 @@ export default memo(function HomeClient() {
                     </motion.div>
 
                     {/* Gradient Fades for the edges */}
-                    <div className="absolute inset-y-0 left-0 w-32 bg-primary/10 z-10"></div>
-                    <div className="absolute inset-y-0 right-0 w-32 bg-primary/10 z-10"></div>
+                    <div className="absolute inset-y-0 start-0 w-32 bg-primary/10 z-10"></div>
+                    <div className="absolute inset-y-0 end-0 w-32 bg-primary/10 z-10"></div>
                 </div>
             </section>
 
@@ -197,7 +197,7 @@ export default memo(function HomeClient() {
                                     "bg-card hover:bg-card/80"
                                 )}
                             >
-                                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <div className="absolute top-0 end-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                                     <feature.icon className="w-32 h-32" />
                                 </div>
 

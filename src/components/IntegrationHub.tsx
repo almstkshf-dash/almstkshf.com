@@ -235,7 +235,7 @@ export default function IntegrationHub() {
                 <Button
                     type="button"
                     variant="outline"
-                    className="whitespace-nowrap ml-auto bg-card text-foreground border-border hover:bg-muted"
+                    className="whitespace-nowrap ms-auto bg-card text-foreground border-border hover:bg-muted"
                 >
                     Security Whitepaper
                 </Button>

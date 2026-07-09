@@ -155,7 +155,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
         <div
           className={`p-8 ${risk.bg} rounded-3xl border ${risk.border} flex flex-col items-center justify-center text-center relative overflow-hidden`}
         >
-          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+          <div className="absolute top-0 end-0 p-4 opacity-5 pointer-events-none">
             <Fingerprint className="w-24 h-24" />
           </div>
           <h3 className="text-sm font-bold text-foreground/60 uppercase tracking-widest mb-4">
@@ -178,7 +178,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
           </p>
 
           {/* Mini duration / frames info */}
-          <div className="mt-6 w-full space-y-1.5 text-left">
+          <div className="mt-6 w-full space-y-1.5 text-start">
             {[
               {
                 icon: Film,
@@ -205,7 +205,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
         {/* Aggregate metrics (2 cols) */}
         <div className="md:col-span-2 space-y-4">
-          <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ml-1">
+          <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ms-1">
             <BarChart3 className="w-4 h-4" />
             {t('temporal_metrics')}
           </h3>
@@ -330,7 +330,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
             </span>
           </div>
 
-          <p className="text-xs text-foreground/60 leading-relaxed mt-4 max-w-sm ml-auto text-right italic">
+          <p className="text-xs text-foreground/60 leading-relaxed mt-4 max-w-sm ms-auto text-end italic">
             {t('flicker_info')}
           </p>
         </div>
@@ -366,7 +366,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
 
       {/* â”€â”€ Row 3 : Frame thumbnail scrubber â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="space-y-4">
-        <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ml-1">
+        <h3 className="text-xs font-black text-foreground/60 uppercase tracking-widest flex items-center gap-2 ms-1">
           <History className="w-4 h-4" />
           {t('frame_timeline')}
         </h3>
@@ -459,7 +459,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
             <div>
               <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-tighter">
                 {t('analysis_report')}{' '}
-                <span className="text-foreground/60 opacity-50 ml-2">
+                <span className="text-foreground/60 opacity-50 ms-2">
                   #{String(selectedFrame + 1).padStart(2, '0')}
                 </span>
               </h4>
@@ -487,7 +487,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 initial={{ top: '-100%' }}
                 animate={{ top: '110%' }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'linear' }}
-                className="absolute left-0 w-full h-px bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-20 pointer-events-none"
+                className="absolute start-0 w-full h-px bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-20 pointer-events-none"
               />
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                 <Search className="w-12 h-12 text-white/50" />

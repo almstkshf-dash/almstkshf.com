@@ -37,7 +37,7 @@ function SidebarSkeleton() {
     return (
         <>
             {/* Desktop Skeleton (lg+) */}
-            <div className="hidden lg:flex flex-col fixed top-0 bottom-0 z-50 w-60 ltr:left-0 rtl:right-0 bg-background/95 backdrop-blur-xl border-border/60 ltr:border-r rtl:border-l pt-20 pb-6 px-4">
+            <div className="hidden lg:flex flex-col fixed top-0 bottom-0 z-50 w-60 start-0 bg-background/95 backdrop-blur-xl border-border/60 border-e pt-20 pb-6 px-4">
                 <div className="flex flex-col gap-4 flex-1">
                     {[...Array(6)].map((_, i) => (
                         <div key={i} className="w-full h-11 rounded-2xl bg-muted/40 animate-pulse" />
@@ -49,7 +49,7 @@ function SidebarSkeleton() {
             </div>
 
             {/* Tablet Skeleton (md to lg) */}
-            <div className="hidden md:flex lg:hidden flex-col items-center gap-4 fixed top-0 bottom-0 z-50 w-16 ltr:left-0 rtl:right-0 bg-background/95 backdrop-blur-xl ltr:border-r rtl:border-l border-border/60 pt-20 pb-6">
+            <div className="hidden md:flex lg:hidden flex-col items-center gap-4 fixed top-0 bottom-0 z-50 w-16 start-0 bg-background/95 backdrop-blur-xl border-e border-border/60 pt-20 pb-6">
                 {[...Array(6)].map((_, i) => (
                     <div key={i} className="w-10 h-10 rounded-2xl bg-muted/40 animate-pulse" />
                 ))}
@@ -102,10 +102,10 @@ export default async function DashboardLayout({
             {/* Ambient background glows with optimized performance (no animation, lower blur radius) */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
                 <div 
-                    className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu" 
+                    className="absolute top-[-10%] -start-[10%] w-[40%] h-[40%] bg-primary/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu"
                 />
                 <div 
-                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu" 
+                    className="absolute bottom-[-10%] -end-[10%] w-[40%] h-[40%] bg-blue-500/10 blur-[80px] rounded-full opacity-40 will-change-transform transform-gpu"
                 />
             </div>
 
@@ -116,18 +116,16 @@ export default async function DashboardLayout({
 
             {/*
              * Main content area
-             * ltr:pl-0 → ltr:pl-16 (lg) → ltr:pl-60 (xl)
-             * rtl mirrors via ltr:/rtl: variants
+             * ps-0 → ps-16 (md) → ps-60 (lg)
+             * Logical ps- auto-flips to pe- in RTL (sidebar moves to the end side)
              * pb-20 on mobile reserves space for the bottom nav bar
              */}
             <main
                 aria-label="Dashboard content"
                 className={cn(
                     'min-h-screen',
-                    // LTR offsets
-                    'ltr:pl-0 ltr:md:pl-16 ltr:lg:pl-60',
-                    // RTL offsets (sidebar is on the right)
-                    'rtl:pr-0 rtl:md:pr-16 rtl:lg:pr-60',
+                    // Logical inline-start offset mirrors sidebar width at each breakpoint
+                    'ps-0 md:ps-16 lg:ps-60',
                     // Bottom space for mobile nav bar
                     'pb-20 md:pb-0'
                 )}

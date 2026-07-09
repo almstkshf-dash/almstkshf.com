@@ -68,7 +68,7 @@ export default function LexcoraClient() {
 
                 <Container className="relative z-10">
                     <div className="flex flex-col lg:flex-row items-center gap-16">
-                        <div className="flex-1 space-y-8 text-center lg:text-left rtl:lg:text-right">
+                        <div className="flex-1 space-y-8 text-center lg:text-start">
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -220,7 +220,7 @@ export default function LexcoraClient() {
                                 transition={{ delay: idx * 0.1 }}
                                 className="p-8 bg-card border border-border rounded-[2.5rem] hover:bg-muted/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-xl"
                             >
-                                <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                                <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                                     <MessageSquare className="w-32 h-32 text-foreground" />
                                 </div>
 

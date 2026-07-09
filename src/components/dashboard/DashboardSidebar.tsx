@@ -158,15 +158,15 @@ export default function DashboardSidebar() {
                     'hidden lg:flex flex-col',
                     'fixed top-0 bottom-0 z-50',
                     'w-60',
-                    'ltr:left-0 rtl:right-0',
+                    'start-0',
                     'bg-background/95 backdrop-blur-xl border-border/60',
-                    'ltr:border-r rtl:border-l',
+                    'border-e',
                     'pt-20 pb-6 px-4',
                     'overflow-y-auto'
                 )}
             >
                 {/* Brand accent line */}
-                <div className="absolute top-0 ltr:left-0 rtl:right-0 h-full w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent pointer-events-none" />
+                <div className="absolute top-0 start-0 h-full w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent pointer-events-none" />
 
                 {/* Nav items */}
                 <nav className="flex flex-col gap-1.5 flex-1">
@@ -202,9 +202,9 @@ export default function DashboardSidebar() {
                 className={clsx(
                     'hidden md:flex lg:hidden flex-col items-center gap-2',
                     'fixed top-0 bottom-0 z-50 w-16',
-                    'ltr:left-0 rtl:right-0',
+                    'start-0',
                     'bg-background/95 backdrop-blur-xl',
-                    'ltr:border-r rtl:border-l border-border/60',
+                    'border-e border-border/60',
                     'pt-20 pb-6',
                     'overflow-y-auto'
                 )}
@@ -266,7 +266,7 @@ export default function DashboardSidebar() {
                 </HoverPrefetchLink>
 
                 {isPending && (
-                    <div className="absolute top-1 ltr:right-2 rtl:left-2">
+                    <div className="absolute top-1 end-2">
                         <Loader2 className="w-3 h-3 text-primary animate-spin" />
                     </div>
                 )}

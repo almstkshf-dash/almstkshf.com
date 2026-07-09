@@ -118,7 +118,7 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                                <span className="ml-2 text-xs text-muted-foreground font-mono">integration.js</span>
+                                <span className="ms-2 text-xs text-muted-foreground font-mono">integration.js</span>
                             </div>
                             <div className="p-6 overflow-x-auto">
                                 <pre className="font-mono text-sm text-foreground/80 leading-relaxed">

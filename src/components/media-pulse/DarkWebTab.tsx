@@ -93,8 +93,8 @@ function SkeletonRow() {
       <td className="px-6 py-4 text-center">
         <div className="h-6 w-16 bg-muted animate-pulse rounded-full mx-auto" />
       </td>
-      <td className="px-6 py-4 text-right">
-        <div className="h-6 w-8 bg-muted animate-pulse rounded-lg ml-auto" />
+      <td className="px-6 py-4 text-end">
+        <div className="h-6 w-8 bg-muted animate-pulse rounded-lg ms-auto" />
       </td>
     </tr>
   );
@@ -318,10 +318,10 @@ export default function DarkWebTab() {
           {results.length > 0 && (
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} className="h-9 px-3 text-xs text-foreground bg-muted/10 hover:bg-muted/20 border border-border">
-                <FileDown className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> PDF
+                <FileDown className="w-3.5 h-3.5 me-1.5" aria-hidden="true" /> PDF
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleExport('excel')} className="h-9 px-3 text-xs text-foreground bg-muted/10 hover:bg-muted/20 border border-border">
-                <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" /> Excel
+                <FileSpreadsheet className="w-3.5 h-3.5 me-1.5" aria-hidden="true" /> Excel
               </Button>
             </div>
           )}
@@ -357,7 +357,7 @@ export default function DarkWebTab() {
         <div className="relative flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <label htmlFor="darkweb-search-input" className="sr-only">{t('search_placeholder')}</label>
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
             <input
               id="darkweb-search-input"
               type="text"
@@ -372,7 +372,7 @@ export default function DarkWebTab() {
                   ? t('search_placeholder')
                   : t('url_placeholder')
               }
-              className="w-full pl-11 pr-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium"
+              className="w-full ps-11 pe-12 py-3 bg-muted/40 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-medium"
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               disabled={isLoading}
             />
@@ -384,7 +384,7 @@ export default function DarkWebTab() {
                 disabled={isOptimizing || !searchQuery.trim() || isLoading}
                 title={tOpt('button_tooltip')}
                 aria-label={tOpt('button_tooltip')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
+                className="absolute end-3 top-1/2 -translate-y-1/2 p-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all group"
               >
                 <Wand2 className={clsx('w-4 h-4', isOptimizing && 'animate-pulse')} aria-hidden="true" />
                 <Sparkles className="absolute -top-1 -right-1 w-2 h-2 text-purple-600 animate-bounce opacity-0 group-hover:opacity-100" aria-hidden="true" />
@@ -425,7 +425,7 @@ export default function DarkWebTab() {
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                className="absolute top-full left-0 right-0 z-30 mt-2 flex items-start gap-2 p-2.5 bg-purple-500/5 border border-purple-500/20 rounded-xl backdrop-blur-md shadow-lg"
+                className="absolute top-full inset-x-0 z-30 mt-2 flex items-start gap-2 p-2.5 bg-purple-500/5 border border-purple-500/20 rounded-xl backdrop-blur-md shadow-lg"
               >
                 <Sparkles className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div className="flex-1 min-w-0">
@@ -523,7 +523,7 @@ export default function DarkWebTab() {
       {/* ── Results Table ────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
+          <table className="w-full text-sm text-start border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-muted/40 border-b border-border">
                 <th scope="col" className="p-4 w-10">
@@ -549,7 +549,7 @@ export default function DarkWebTab() {
                 <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-center">
                   {t('col_risk')}
                 </th>
-                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-right">
+                <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 text-end">
                   {tCommon('actions')}
                 </th>
               </tr>
@@ -631,7 +631,7 @@ export default function DarkWebTab() {
                         {t(`risk_${entry.risk_level || 'low'}`)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-end">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setEditingItem(entry)}

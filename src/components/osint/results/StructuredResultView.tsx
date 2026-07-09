@@ -382,7 +382,7 @@ export const StructuredResultView = ({
                     onClick={onSaveSelected}
                     className="px-3 py-1.5 text-xs h-auto bg-emerald-600 hover:bg-emerald-700"
                   >
-                    <FolderPlus className="w-3.5 h-3.5 mr-1" />
+                    <FolderPlus className="w-3.5 h-3.5 me-1" />
                     {t('result_view.fields.save_selected')} ({selectedMatches.size})
                   </Button>
                 )}
@@ -392,7 +392,7 @@ export const StructuredResultView = ({
                 return (
                   <div
                     key={i}
-                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-l-4 border-l-destructive/50 flex gap-3"
+                    className="block p-3 rounded-xl border border-border bg-card/50 col-span-1 sm:col-span-2 border-s-4 border-s-destructive/50 flex gap-3"
                   >
                     {onToggleMatch && (
                       <div className="pt-1">
