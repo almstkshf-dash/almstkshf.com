@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useState, useEffect, Suspense, memo } from "react";
+import { useState, useCallback, Suspense, memo } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
@@ -25,6 +25,7 @@ import { HoverPrefetchLink } from "@/components/ui/HoverPrefetchLink";
 import Button from "@/components/ui/Button";
 import dynamic from "next/dynamic";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useCommandMenu } from "@/components/providers/KeyboardShortcutsProvider";
 
 // Lazy-load all Clerk UI — keeps the ~186 KiB Clerk bundle out of the initial page load
 const NavbarAuthSection = dynamic(
@@ -46,6 +47,9 @@ const NavbarContent = memo(function NavbarContent() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const mounted = useMounted();
+    const { setOpen: setCommandMenuOpen } = useCommandMenu();
+
+    const openCommandMenu = useCallback(() => setCommandMenuOpen(true), [setCommandMenuOpen]);
 
     const loginLabel = (t as any).has?.('login') ? t('login' as any) : "Sign In";
 
@@ -118,6 +122,17 @@ const NavbarContent = memo(function NavbarContent() {
                                                 )}
                                                 aria-expanded={activeDropdown === item.label}
                                                 aria-haspopup="true"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter" || e.key === " ") {
+                                                        e.preventDefault();
+                                                        setActiveDropdown(
+                                                            activeDropdown === item.label ? null : item.label
+                                                        );
+                                                    }
+                                                    if (e.key === "Escape") {
+                                                        setActiveDropdown(null);
+                                                    }
+                                                }}
                                             >
                                                 {item.icon && (
                                                     <item.icon className={clsx(ICON_MD, "shrink-0")} aria-hidden="true" />
@@ -162,9 +177,10 @@ const NavbarContent = memo(function NavbarContent() {
                             {/* Search */}
                             <Button
                                 variant="outline"
-                                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }))}
+                                onClick={openCommandMenu}
                                 className="px-2 py-1.5 bg-muted/50 hover:bg-muted border-border rounded-full flex items-center gap-3 transition-all group shadow-none h-auto"
                                 aria-label={`${t('search')} - Press ⌘K to search`}
+                                aria-keyshortcuts="Control+k Meta+k"
                             >
                                 <Search className={ICON_SM} aria-hidden="true" />
                                 <span className="hidden xl:flex items-center gap-1 text-xs text-foreground/85">

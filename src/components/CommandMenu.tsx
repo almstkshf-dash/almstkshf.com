@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { NAVIGATION_ITEMS } from "@/lib/navigation";
+import { useCommandMenu } from "@/components/providers/KeyboardShortcutsProvider";
 
 const ITEM_CLASS = "relative flex cursor-pointer select-none items-center rounded-xl px-3 py-3 text-sm outline-none aria-selected:bg-primary/10 aria-selected:text-primary hover:bg-muted transition-colors group";
 const ICON_CONTAINER_CLASS = "me-3 flex h-8 w-8 items-center justify-center rounded-lg bg-muted group-aria-selected:bg-primary/20 transition-colors";
@@ -172,18 +173,13 @@ function NavigationCommandItems({ runCommand, router, tNav }: NavigationCommandI
 }
 
 export function CommandMenu() {
-    const [open, setOpen] = React.useState(false);
+    const { open, setOpen } = useCommandMenu();
     const router = useRouter();
     const t = useTranslations("Common");
     const tNav = useTranslations("Navigation");
 
     const previousFocus = React.useRef<HTMLElement | null>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const openRef = React.useRef(open);
-
-    React.useEffect(() => {
-        openRef.current = open;
-    }, [open]);
 
     // Handle focus preservation and auto focus input
     React.useEffect(() => {
@@ -198,25 +194,10 @@ export function CommandMenu() {
         }
     }, [open]);
 
-    React.useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                setOpen((prev) => !prev);
-            }
-            if (e.key === "Escape" && openRef.current) {
-                setOpen(false);
-            }
-        };
-
-        document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
-    }, []);
-
     const runCommand = React.useCallback((command: () => unknown) => {
         setOpen(false);
         command();
-    }, []);
+    }, [setOpen]);
 
     if (!open) return null;
 

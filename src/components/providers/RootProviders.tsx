@@ -13,6 +13,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ConvexClientProvider } from "@/app/ConvexClientProvider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { KeyboardShortcutsProvider } from "@/components/providers/KeyboardShortcutsProvider";
 
 
 interface RootProvidersProps {
@@ -28,6 +29,17 @@ interface RootProvidersProps {
  */
 export function RootProviders({ children, locale, messages }: RootProvidersProps) {
 
-    return (<ClerkProvider telemetry={false}><NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC"><ConvexClientProvider><ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>{children}</ThemeProvider></ConvexClientProvider></NextIntlClientProvider></ClerkProvider>
+    return (
+        <ClerkProvider telemetry={false}>
+            <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
+                <ConvexClientProvider>
+                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+                        <KeyboardShortcutsProvider>
+                            {children}
+                        </KeyboardShortcutsProvider>
+                    </ThemeProvider>
+                </ConvexClientProvider>
+            </NextIntlClientProvider>
+        </ClerkProvider>
     );
 }
