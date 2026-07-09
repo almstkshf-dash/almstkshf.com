@@ -48,10 +48,32 @@ export default function RssFeeder({
   const t = useTranslations('RssFeeder');
   const tSources = useTranslations('RssSources');
   const format = useFormatter();
-  const [activeUrl, setActiveUrl] = useState(initialFeedUrl);
-  const [activeName, setActiveName] = useState(initialSourceName);
-  const [activeCountry, setActiveCountry] = useState<string>(categories.find((c: RSSCategory) => c.url === initialFeedUrl)?.country || 'UAE');
-  const [activePublisher, setActivePublisher] = useState<string | null>(Object.keys(allSources).find((p: string) => allSources[p].some((c: RSSCategory) => c.url === initialFeedUrl)) || null);
+  const firstPublisher = Object.keys(allSources)[0] || null;
+  const firstPubFeed = firstPublisher ? allSources[firstPublisher]?.[0] : null;
+
+  const [activeUrl, setActiveUrl] = useState(() => {
+    const found = Object.keys(allSources).find((p: string) => allSources[p].some((c: RSSCategory) => c.url === initialFeedUrl));
+    if (found) return initialFeedUrl;
+    return firstPubFeed ? firstPubFeed.url : initialFeedUrl;
+  });
+
+  const [activeName, setActiveName] = useState(() => {
+    const found = Object.keys(allSources).find((p: string) => allSources[p].some((c: RSSCategory) => c.url === initialFeedUrl));
+    if (found) return initialSourceName;
+    return firstPubFeed ? firstPubFeed.name : initialSourceName;
+  });
+
+  const [activeCountry, setActiveCountry] = useState<string>(() => {
+    const foundCat = categories.find((c: RSSCategory) => c.url === initialFeedUrl);
+    if (foundCat) return foundCat.country || 'UAE';
+    return firstPubFeed?.country || 'UAE';
+  });
+
+  const [activePublisher, setActivePublisher] = useState<string | null>(() => {
+    const found = Object.keys(allSources).find((p: string) => allSources[p].some((c: RSSCategory) => c.url === initialFeedUrl));
+    return found || firstPublisher;
+  });
+
   const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [items, setItems] = useState<FeedItem[]>([]);
@@ -63,7 +85,7 @@ export default function RssFeeder({
     api.monitoring.getRssArticles,
     isAuthenticated ? {
       sourceId: activeSourceId || undefined,
-      source: activeSourceId ? undefined : (activePublisher || undefined)
+      source: activePublisher || undefined
     } : 'skip',
     { initialNumItems: maxItems }
   );

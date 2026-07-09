@@ -607,8 +607,8 @@ export default function DashboardClient() {
                                     icon={Rss}
                                 >
                                     <RssFeeder
-                                        initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'https://www.gulftoday.ae/rssFeed/0/'}
-                                        initialSourceName={isAr ? 'News' : 'Latest News (Feed)'}
+                                        initialFeedUrl={isAr ? 'https://aawsat.com/feed' : 'http://feeds.bbci.co.uk/news/world/rss.xml'}
+                                        initialSourceName={isAr ? 'News' : 'World'}
                                         allSources={PREMIUM_SOURCES}
                                         maxItems={10}
                                     />

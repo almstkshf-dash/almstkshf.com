@@ -10,8 +10,8 @@ import Link from "next/link";
 
 export default function NotFound() {
     return (
-        <html lang="en" dir="ltr">
-            <body className="bg-background text-foreground flex items-center justify-center min-h-screen">
+        <html lang="en" dir="ltr" suppressHydrationWarning>
+            <body className="bg-background text-foreground flex items-center justify-center min-h-screen" suppressHydrationWarning>
                 <div className="text-center">
                     <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
                     <p className="text-foreground/60">The page you are looking for does not exist.</p>

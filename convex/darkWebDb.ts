@@ -161,6 +161,21 @@ export const deleteById = mutation({
     },
 });
 
+export const deleteByIds = mutation({
+    args: { ids: v.array(v.id("darkweb_results")) },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new ConvexError("Not authenticated");
+
+        for (const id of args.ids) {
+            const result = await ctx.db.get(id);
+            if (!result) continue;
+            if (result.user_id !== identity.subject) throw new ConvexError("Not authorized");
+            await ctx.db.delete(id);
+        }
+    },
+});
+
 // ─── Update a single Dark Web result ──────────────────────────────
 export const updateDarkWebResult = mutation({
     args: {

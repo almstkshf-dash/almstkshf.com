@@ -33,6 +33,7 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
     
     const collection = useQuery(api.collections.getCollection, { id: collectionId });
     const removeFromCollection = useMutation(api.collections.removeFromCollection);
+    const removeMultipleFromCollection = useMutation(api.collections.removeMultipleFromCollection);
     const deleteCollection = useMutation(api.collections.deleteCollection);
     const settings = useQuery(api.settings.getSettings);
 
@@ -40,10 +41,16 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
     const [removingItemId, setRemovingItemId] = useState<string | null>(null);
     const [isDeletingCollection, setIsDeletingCollection] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
+    const [isRemovingMultiple, setIsRemovingMultiple] = useState(false);
     const overlayRef = useRef<HTMLDivElement>(null);
 
     // Apply `inert` to background content when modal is open
     useInertBackground(isOpen, overlayRef);
+
+    React.useEffect(() => {
+        setSelectedItemIds(new Set());
+    }, [isOpen, collectionId]);
 
     if (!isOpen) return null;
 
@@ -52,6 +59,41 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.data && typeof item.data.content === "string" && item.data.content.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+    const toggleSelectItem = (id: string) => {
+        setSelectedItemIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const toggleSelectAllItems = () => {
+        if (selectedItemIds.size === filteredItems.length) {
+            setSelectedItemIds(new Set());
+        } else {
+            setSelectedItemIds(new Set(filteredItems.map(item => item.id)));
+        }
+    };
+
+    const handleRemoveMultipleItems = async () => {
+        if (selectedItemIds.size === 0) return;
+        setIsRemovingMultiple(true);
+        try {
+            await removeMultipleFromCollection({
+                collectionId,
+                itemIds: Array.from(selectedItemIds)
+            });
+            toast.success(tCommon("success") || "Items removed successfully");
+            setSelectedItemIds(new Set());
+        } catch (error) {
+            console.error("Failed to remove items", error);
+            toast.error(tCommon("error") || "Failed to remove items");
+        } finally {
+            setIsRemovingMultiple(false);
+        }
+    };
 
     const handleRemoveItem = async (itemId: string) => {
         setRemovingItemId(itemId);
@@ -130,26 +172,67 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
             return;
         }
 
-        const monitoringItems = collection.items
-            .filter((i: any) => i.type === "media_monitoring")
-            .map((i: any) => i.data);
+        const itemsByType = collection.items.reduce((acc: any, item: any) => {
+            acc[item.type] = acc[item.type] || [];
+            if (item.type === 'watchlist' && item.data.items) {
+                acc[item.type].push(...item.data.items);
+            } else if (item.type === 'watchlist' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else if (item.type === 'osint' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else {
+                acc[item.type].push(item.data);
+            }
+            return acc;
+        }, {});
 
-        if (monitoringItems.length === 0) {
+        const exportableTypes = ['media_monitoring', 'osint', 'watchlist', 'dark_web'];
+        const hasExportableItems = exportableTypes.some(type => itemsByType[type]?.length > 0);
+
+        if (!hasExportableItems) {
             toast.error(tLibrary('no_exportable_items'));
             return;
         }
 
         try {
             toast.loading(tCommon('downloading'), { id: 'download-collection' });
-            await ReportGenerator.exportMediaMonitoringReport(
-                monitoringItems,
-                exportTranslations,
-                'pdf',
-                settings?.logoUrl || undefined,
-                undefined,
-                collection?.name || undefined,
-                collection?.name || undefined
-            );
+            
+            if (itemsByType['media_monitoring']?.length > 0) {
+                await ReportGenerator.exportMediaMonitoringReport(
+                    itemsByType['media_monitoring'],
+                    exportTranslations,
+                    'pdf',
+                    settings?.logoUrl || undefined,
+                    undefined,
+                    collection?.name || undefined,
+                    collection?.name || undefined
+                );
+            }
+            
+            if (itemsByType['osint']?.length > 0) {
+                await ReportGenerator.exportOsintReport(
+                    itemsByType['osint'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+            
+            if (itemsByType['watchlist']?.length > 0) {
+                await ReportGenerator.exportTerroristListReport(
+                    itemsByType['watchlist'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+            
+            if (itemsByType['dark_web']?.length > 0) {
+                await ReportGenerator.exportDarkWebReport(
+                    itemsByType['dark_web'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+
             toast.success(tCommon('success'), { id: 'download-collection' });
         } catch (error) {
             console.error('Download failed', error);
@@ -163,26 +246,67 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
             return;
         }
 
-        const monitoringItems = collection.items
-            .filter((i: any) => i.type === "media_monitoring")
-            .map((i: any) => i.data);
+        const itemsByType = collection.items.reduce((acc: any, item: any) => {
+            acc[item.type] = acc[item.type] || [];
+            if (item.type === 'watchlist' && item.data.items) {
+                acc[item.type].push(...item.data.items);
+            } else if (item.type === 'watchlist' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else if (item.type === 'osint' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else {
+                acc[item.type].push(item.data);
+            }
+            return acc;
+        }, {});
 
-        if (monitoringItems.length === 0) {
+        const exportableTypes = ['media_monitoring', 'osint', 'watchlist', 'dark_web'];
+        const hasExportableItems = exportableTypes.some(type => itemsByType[type]?.length > 0);
+
+        if (!hasExportableItems) {
             toast.error(tLibrary('no_exportable_items'));
             return;
         }
 
         try {
             toast.loading(tCommon('downloading'), { id: 'download-collection-excel' });
-            await ReportGenerator.exportMediaMonitoringReport(
-                monitoringItems,
-                exportTranslations,
-                'excel',
-                settings?.logoUrl || undefined,
-                undefined,
-                collection?.name || undefined,
-                collection?.name || undefined
-            );
+            
+            if (itemsByType['media_monitoring']?.length > 0) {
+                await ReportGenerator.exportMediaMonitoringReport(
+                    itemsByType['media_monitoring'],
+                    exportTranslations,
+                    'excel',
+                    settings?.logoUrl || undefined,
+                    undefined,
+                    collection?.name || undefined,
+                    collection?.name || undefined
+                );
+            }
+            
+            if (itemsByType['osint']?.length > 0) {
+                await ReportGenerator.exportOsintReport(
+                    itemsByType['osint'],
+                    exportTranslations,
+                    'excel'
+                );
+            }
+            
+            if (itemsByType['watchlist']?.length > 0) {
+                await ReportGenerator.exportTerroristListReport(
+                    itemsByType['watchlist'],
+                    exportTranslations,
+                    'excel'
+                );
+            }
+            
+            if (itemsByType['dark_web']?.length > 0) {
+                await ReportGenerator.exportDarkWebReport(
+                    itemsByType['dark_web'],
+                    exportTranslations,
+                    'excel'
+                );
+            }
+
             toast.success(tCommon('success'), { id: 'download-collection-excel' });
         } catch (error) {
             console.error('Download failed', error);
@@ -232,20 +356,45 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                 {/* Sub-Header Actions */}
                 {collection && (
                     <div className="p-4 border-b border-border bg-muted/10 shrink-0 flex flex-col sm:flex-row gap-3 items-center justify-between">
-                        {/* Search */}
-                        <div className="relative w-full sm:max-w-xs">
-                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
-                            <input
-                                type="text"
-                                placeholder={tCommon("search_placeholder") || "Search items..."}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-background border border-border rounded-xl py-1.5 ps-10 pe-4 text-xs text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
-                            />
+                        {/* Search and Select All */}
+                        <div className="flex items-center gap-3 w-full sm:max-w-md">
+                            <div className="relative flex-1">
+                                <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/60" aria-hidden="true" />
+                                <input
+                                    type="text"
+                                    placeholder={tCommon("search_placeholder") || "Search items..."}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-background border border-border rounded-xl py-1.5 ps-10 pe-4 text-xs text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-primary transition-colors"
+                                />
+                            </div>
+                            {filteredItems.length > 0 && (
+                                <label className="flex items-center gap-1.5 text-xs text-foreground/70 cursor-pointer font-bold uppercase tracking-wider select-none shrink-0 bg-background/50 hover:bg-background border border-border rounded-xl px-3 py-1.5 transition-all">
+                                    <input
+                                        type="checkbox"
+                                        checked={filteredItems.length > 0 && selectedItemIds.size === filteredItems.length}
+                                        onChange={toggleSelectAllItems}
+                                        className="w-3.5 h-3.5 rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                                    />
+                                    {tCommon("select_all") || "Select All"}
+                                </label>
+                            )}
                         </div>
 
-                        {/* General Actions */}
-                        <div className="flex gap-2 w-full sm:w-auto justify-end">
+                        <div className="flex gap-2 flex-wrap justify-end">
+                            {selectedItemIds.size > 0 && (
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    leftIcon={isRemovingMultiple ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                                    onClick={handleRemoveMultipleItems}
+                                    disabled={isRemovingMultiple}
+                                    className="text-xs py-1.5 h-auto bg-rose-600 hover:bg-rose-500 text-white border-0"
+                                >
+                                    {tCommon("delete") || "Remove Selected"} ({selectedItemIds.size})
+                                </Button>
+                            )}
+                            
                             <Button 
                                 variant="outline" 
                                 size="sm" 
@@ -333,8 +482,17 @@ export default function CollectionDetailsModal({ isOpen, onClose, collectionId }
                                 return (
                                     <div 
                                         key={item.id}
-                                        className="p-4 rounded-2xl bg-muted/20 border border-border/80 flex items-start justify-between gap-4 hover:border-primary/20 hover:bg-muted/40 transition-all group"
+                                        className="p-4 rounded-2xl bg-muted/20 border border-border/80 flex items-start gap-4 hover:border-primary/20 hover:bg-muted/40 transition-all group"
                                     >
+                                        <div className="pt-1 shrink-0">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedItemIds.has(item.id)}
+                                                onChange={() => toggleSelectItem(item.id)}
+                                                aria-label={`Select ${item.title}`}
+                                                className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                                            />
+                                        </div>
                                         <div className="min-w-0 flex-1 space-y-2">
                                             <h4 className="font-bold text-sm text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-2">
                                                 {item.title}

@@ -103,26 +103,67 @@ export default function ReportLibrary({
             return;
         }
 
-        const monitoringItems = collection.items
-            .filter((i: any) => i.type === "media_monitoring")
-            .map((i: any) => i.data);
+        const itemsByType = collection.items.reduce((acc: any, item: any) => {
+            acc[item.type] = acc[item.type] || [];
+            if (item.type === 'watchlist' && item.data.items) {
+                acc[item.type].push(...item.data.items);
+            } else if (item.type === 'watchlist' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else if (item.type === 'osint' && item.data.matches) {
+                acc[item.type].push(...item.data.matches);
+            } else {
+                acc[item.type].push(item.data);
+            }
+            return acc;
+        }, {});
 
-        if (monitoringItems.length === 0) {
+        const exportableTypes = ['media_monitoring', 'osint', 'watchlist', 'dark_web'];
+        const hasExportableItems = exportableTypes.some(type => itemsByType[type]?.length > 0);
+
+        if (!hasExportableItems) {
             toast.error(t('no_exportable_items'));
             return;
         }
 
         try {
             toast.loading(tCommon('downloading'), { id: 'download-report' });
-            await ReportGenerator.exportMediaMonitoringReport(
-                monitoringItems,
-                exportTranslations,
-                'pdf',
-                settings?.logoUrl || undefined,
-                undefined,
-                collection?.name || undefined,
-                collection?.name || undefined
-            );
+            
+            if (itemsByType['media_monitoring']?.length > 0) {
+                await ReportGenerator.exportMediaMonitoringReport(
+                    itemsByType['media_monitoring'],
+                    exportTranslations,
+                    'pdf',
+                    settings?.logoUrl || undefined,
+                    undefined,
+                    collection?.name || undefined,
+                    collection?.name || undefined
+                );
+            }
+            
+            if (itemsByType['osint']?.length > 0) {
+                await ReportGenerator.exportOsintReport(
+                    itemsByType['osint'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+            
+            if (itemsByType['watchlist']?.length > 0) {
+                await ReportGenerator.exportTerroristListReport(
+                    itemsByType['watchlist'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+            
+            if (itemsByType['dark_web']?.length > 0) {
+                await ReportGenerator.exportDarkWebReport(
+                    itemsByType['dark_web'],
+                    exportTranslations,
+                    'pdf'
+                );
+            }
+
             toast.success(tCommon('success'), { id: 'download-report' });
         } catch (error) {
             console.error('Download failed', error);

@@ -163,6 +163,35 @@ export const removeFromCollection = mutation({
     }
 });
 
+export const removeMultipleFromCollection = mutation({
+    args: {
+        collectionId: v.id("collections"),
+        itemIds: v.array(v.string())
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) {
+            throw new ConvexError("Unauthenticated");
+        }
+
+        const collection = await ctx.db.get(args.collectionId);
+        if (!collection || collection.userId !== identity.subject) {
+            throw new ConvexError("Unauthorized");
+        }
+
+        const items = collection.items ?? [];
+        const toRemove = new Set(args.itemIds);
+        const updatedItems = items.filter(i => !toRemove.has(i.id));
+
+        await ctx.db.patch(args.collectionId, {
+            items: updatedItems,
+            updatedAt: Date.now()
+        });
+
+        return collection._id;
+    }
+});
+
 export const addMultipleToCollection = mutation({
     args: {
         collectionId: v.id("collections"),

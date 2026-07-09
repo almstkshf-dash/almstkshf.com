@@ -286,7 +286,7 @@ export class ExcelGenerators {
             data.sentenceBreakdown?.forEach((s) => {
                 sheet.addRow([
                     s.text,
-                    s.flags.join(', ') || translations.AiInspector?.none || 'None',
+                    (s.flags || []).join(', ') || translations.AiInspector?.none || 'None',
                     `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
                 ]);
             });

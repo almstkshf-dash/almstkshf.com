@@ -162,13 +162,8 @@ export default function OsintTab() {
 
   // Convex actions & hooks
   const { performLookup, optimizeQuery } = useOsintLookup();
-  const { history, settings, deleteResult, updateResult, handleExport, isExporting } =
+  const { history, settings, isAdmin, deleteResult, updateResult, handleExport, isExporting } =
     useOsintHistory(isAuthenticated);
-
-  const isAdmin = useMemo(() => {
-    // If not loaded yet, default to false
-    return settings ? true : false;
-  }, [settings]);
 
   // Modal UI States
   const [expandedHistory, setExpandedHistory] = useState<string | null>(null);
@@ -185,6 +180,19 @@ export default function OsintTab() {
     if (newSet.has(matchId)) newSet.delete(matchId);
     else newSet.add(matchId);
     setSelectedMatches(newSet);
+  };
+
+  const toggleAllMatches = (matchIds: string[]) => {
+    setSelectedMatches(prev => {
+      const allSelected = matchIds.every(id => prev.has(id));
+      const next = new Set(prev);
+      if (allSelected) {
+        matchIds.forEach(id => next.delete(id));
+      } else {
+        matchIds.forEach(id => next.add(id));
+      }
+      return next;
+    });
   };
 
   const handleOptimize = async () => {
@@ -222,14 +230,13 @@ export default function OsintTab() {
 
     const validationError = validateInput(state.activeType, state.query);
     if (validationError) {
-      const localizedError = t(`validation.${validationError}`, {
-        defaultValue:
-          validationError === 'empty'
-            ? 'Input query cannot be empty'
-            : validationError === 'too_short'
-              ? 'Query is too short'
-              : 'Invalid query format',
-      });
+      const localizedError = t(`validation.${validationError}` as any) || (
+        validationError === 'empty'
+          ? 'Input query cannot be empty'
+          : validationError === 'too_short'
+            ? 'Query is too short'
+            : 'Invalid query format'
+      );
       toast.error(localizedError);
       dispatch({ type: 'LOOKUP_FAILURE', payload: localizedError });
       return;
@@ -299,6 +306,7 @@ export default function OsintTab() {
       wikipedia: { placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
       gleif: { placeholder: t('panels.gleif.placeholder'), hint: t('panels.gleif.desc') },
       watchlist: { placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
+      gdelt: { placeholder: t('panels.gdelt.placeholder'), hint: t('panels.gdelt.desc') },
     };
     return mappings[state.activeType];
   }, [state.activeType, t]);
@@ -324,7 +332,7 @@ export default function OsintTab() {
           </div>
 
           {/* Type Grid Selector */}
-          <LookupSelector activeType={state.activeType} onTypeChange={handleTypeChange} t={t} />
+          <LookupSelector activeType={state.activeType} onTypeChange={handleTypeChange} t={t as any} />
 
           {/* Search Row Input */}
           <LookupInput
@@ -335,12 +343,12 @@ export default function OsintTab() {
             loading={state.loading}
             isOptimizing={state.isOptimizing}
             isAuthenticated={isAuthenticated}
-            isAdmin={isAdmin}
+            isAdmin={!!isAdmin}
             placeholder={lookupMetadata.placeholder}
             hint={lookupMetadata.hint}
-            tCommon={tCommon}
-            tOpt={tOpt}
-            t={t}
+            tCommon={tCommon as any}
+            tOpt={tOpt as any}
+            t={t as any}
             optimizationInfo={state.optimizationInfo}
             onClearOptimization={() => dispatch({ type: 'CLEAR_OPTIMIZATION' })}
           />
@@ -352,11 +360,12 @@ export default function OsintTab() {
             loading={state.loading}
             activeType={state.activeType}
             query={state.query}
-            t={t}
-            tCommon={tCommon}
-            tDashboard={tDashboard}
+            t={t as any}
+            tCommon={tCommon as any}
+            tDashboard={tDashboard as any}
             selectedMatches={selectedMatches}
             onToggleMatch={toggleMatchSelection}
+            onToggleAllMatches={toggleAllMatches}
             onSaveSelected={() => setIsBulkCollectionModalOpen(true)}
             isCollectionModalOpen={isCollectionModalOpen}
             onSetCollectionModalOpen={setIsCollectionModalOpen}
@@ -505,9 +514,10 @@ export default function OsintTab() {
                       <StructuredResultView
                         type={item.type as LookupType}
                         data={item.result as OsintResult}
-                        t={t}
+                        t={t as any}
                         selectedMatches={selectedMatches}
                         onToggleMatch={toggleMatchSelection}
+                        onToggleAllMatches={toggleAllMatches}
                         onSaveSelected={() => setIsBulkCollectionModalOpen(true)}
                       />
                     </div>
@@ -589,7 +599,7 @@ export default function OsintTab() {
                     type: 'watchlist',
                     matches: (expandedHistory
                       ? history?.find((h) => h._id === expandedHistory)?.result?.matches
-                      : state.result?.matches || []
+                      : (state.result as any)?.matches || []
                     ).filter((m: any) => selectedMatches.has(m.id || m.caption)),
                   },
                 }}
@@ -654,7 +664,7 @@ export default function OsintTab() {
       <ResourceDirectory
         isOpen={dirOpen}
         onClose={() => setDirOpen(false)}
-        tOsint={tOsint}
+        tOsint={tOsint as any}
         resources={resources as Resource[]}
       />
     </div>

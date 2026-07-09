@@ -167,20 +167,20 @@ const inferSourceType = (url: string, publisherName?: string | null): "Online Ne
         const parsed = new URL(url);
         const lowerPath = parsed.pathname.toLowerCase();
         const lowerHost = parsed.hostname.toLowerCase();
-        
+
         if (lowerHost.includes('blog') || lowerPath.includes('blog')) return 'Blog';
         if (
-            lowerHost.includes('newswire') || 
-            lowerHost.includes('prweb') || 
+            lowerHost.includes('newswire') ||
+            lowerHost.includes('prweb') ||
             lowerHost.includes('businesswire') ||
-            lowerPath.includes('press-release') || 
-            lowerPath.includes('pressrelease') || 
+            lowerPath.includes('press-release') ||
+            lowerPath.includes('pressrelease') ||
             lowerPath.includes('/pr/') ||
             lowerPath.includes('news-release')
         ) {
             return 'Press Release';
         }
-    } catch {}
+    } catch { }
 
     // Default to Online News for any valid web URL
     return 'Online News';
@@ -195,7 +195,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
     const settings = useQuery(api.settings.getSettings);
     const { isAuthenticated } = useConvexAuth();
 
-        const mounted = useMounted();
+    const mounted = useMounted();
     const [isLoading, setIsLoading] = useState(false);
     const [isExtracting, setIsExtracting] = useState(false);
     const isSubmitting = isLoading;
@@ -418,7 +418,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     source: prev.source || match?.name || host,
                     sourceCountry: prev.sourceCountry === 'AE' && match ? match.country : prev.sourceCountry
                 }));
-            } catch {}
+            } catch { }
         }
     };
 
@@ -468,7 +468,7 @@ export default function ManualEntryModal({ isOpen, onClose, articleToEdit }: Man
                     if (host.startsWith('www.')) host = host.substring(4);
                     knownPublisher = lookupPublisher(sanitized);
                     parsedSource = knownPublisher ? knownPublisher.name : host;
-                } catch {}
+                } catch { }
 
                 const inferredType = inferSourceType(sanitized, knownPublisher?.name);
 

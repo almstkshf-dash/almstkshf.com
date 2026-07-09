@@ -195,7 +195,7 @@ export const searchAhmia = action({
                 console.warn(`[DarkWeb] Direct JSON fetch status: ${resp.status}`);
             }
         } catch (error) {
-            console.warn("[DarkWeb] Direct JSON fetch failed, moving to ZenRows fallback.");
+            console.warn("[DarkWeb] Direct JSON fetch failed, moving to ZenRows fallback.", error);
         }
 
         // --- Tier 2: ZenRows JSON API ---
@@ -295,6 +295,10 @@ HTML: ${html.substring(0, 15000)}
 
         if (!results) {
             console.error("[DarkWeb] All tiers failed after", (Date.now() - startTime) / 1000, "seconds");
+            const zenrowsKey = await resolveApiKey(ctx, "ZENROWS_API_KEY", "zenrows");
+            if (!zenrowsKey) {
+                 throw new ConvexError("Ahmia search failed. Please configure ZenRows API key in settings for reliable OSINT access.");
+            }
             throw new ConvexError("search_failed");
         }
 

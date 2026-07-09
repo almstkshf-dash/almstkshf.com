@@ -31,12 +31,14 @@ import {
   AlertCircle,
   CheckCircle2,
   ShieldCheck,
+  FolderPlus,
 } from 'lucide-react';
 import clsx from 'clsx';
 import Button from '@/components/ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
 import { toast } from 'sonner';
+import SaveToCollectionModal, { CollectionItem } from '@/components/ui/SaveToCollectionModal';
 
 // Types
 import { DarkWebResult, ReportTranslations } from '@/types/reports';
@@ -69,6 +71,9 @@ const GEO_COUNTRIES = [
 function SkeletonRow() {
   return (
     <tr className="border-b border-border/40">
+      <td className="p-4 w-10">
+        <div className="w-4 h-4 rounded bg-muted animate-pulse opacity-50" />
+      </td>
       <td className="px-6 py-4">
         <div className="flex items-start gap-3">
           <div className="w-4 h-4 rounded bg-muted animate-pulse mt-1 flex-shrink-0" />
@@ -132,21 +137,72 @@ export default function DarkWebTab() {
   const updateResult = useMutation(api.darkWebDb.updateDarkWebResult);
 
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
   const results = useQuery(
     api.darkWebDb.getByUserId,
     isAuthenticated ? { limit: 50 } : 'skip'
   ) || [];
   const settings = useQuery(api.settings.getSettings);
+  const deleteByIds = useMutation(api.darkWebDb.deleteByIds);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === results.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(results.map(r => r._id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsBatchDeleting(true);
+    try {
+      await deleteByIds({ ids: Array.from(selectedIds) as any });
+      setSelectedIds(new Set());
+      toast.success('Selected records deleted successfully');
+    } catch (error) {
+      console.error("Batch delete failed:", error);
+      toast.error('Failed to delete selected records');
+    } finally {
+      setIsBatchDeleting(false);
+    }
+  };
+
+  const mapDarkWebToCollectionItem = (entry: any): CollectionItem => ({
+    id: entry._id,
+    type: "deep_web",
+    title: entry.title,
+    sourceId: entry.source_type,
+    data: {
+      title: entry.title,
+      url: entry.url,
+      snippet: entry.snippet,
+      risk_level: entry.risk_level,
+      source_type: entry.source_type,
+      tags: entry.tags,
+    }
+  });
 
   // â”€â”€ Risk badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const getRiskBadgeStyles = (risk: string) => {
     switch (risk) {
       case 'critical': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      case 'high':     return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
-      case 'medium':   return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
-      case 'low':      return 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border-emerald-500/20';
-      default:         return 'bg-muted text-foreground/70 border-border';
+      case 'high': return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+      case 'medium': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+      case 'low': return 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 border-emerald-500/20';
+      default: return 'bg-muted text-foreground/70 border-border';
     }
   };
 
@@ -181,8 +237,8 @@ export default function DarkWebTab() {
           setFetchResult({ title: res.title, text: res.text?.slice(0, 400), source: 'zenrows' });
         }
       }
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Search failed';
+    } catch (error: any) {
+      const msg = typeof error.data === 'string' ? error.data : (error instanceof Error ? error.message : 'Search failed');
       // Attempt to translate the message if it's a known key
       if (msg === 'search_failed') {
         setSearchError(t('search_failed'));
@@ -222,7 +278,7 @@ export default function DarkWebTab() {
         brand_tagline: settings?.brandTagline || 'MEDIA MONITORING & DEVELOPMENT',
         footer_url: settings?.footerUrl || 'www.almstkshf.com',
         logo_url: settings?.logoUrl || undefined,
-        DarkWeb: { 
+        DarkWeb: {
           tab_label: t('tab_label'),
           col_risk: t('col_risk'),   // مستوى الخطورة
         },
@@ -348,7 +404,7 @@ export default function DarkWebTab() {
                 className="bg-muted/40 border border-border rounded-xl px-3 py-3 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-purple-500/20 text-foreground"
               >
                 {GEO_COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>{t(c.labelKey)}</option>
+                  <option key={c.code} value={c.code}>{t(c.labelKey as any)}</option>
                 ))}
               </select>
             </div>
@@ -432,12 +488,55 @@ export default function DarkWebTab() {
         </AnimatePresence>
       </div>
 
-      {/* â”€â”€ Results Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Batch Actions Bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center justify-between px-6 py-3 bg-primary/10 border border-primary/20 backdrop-blur-md rounded-2xl animate-slide-in-from-top duration-300">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-bold text-blue-800 dark:text-blue-300">
+              {selectedIds.size === results.length ? 'All selected' : `${selectedIds.size} selected`}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsCollectionModalOpen(true)}
+              className="gap-2 px-4 py-2 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl text-xs font-bold shadow-lg shadow-primary/25 h-auto transition-all"
+              leftIcon={<FolderPlus className="w-3.5 h-3.5" />}
+            >
+              {tCommon('save_to_collection')}
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleBatchDelete}
+              isLoading={isBatchDeleting}
+              className="gap-2 px-4 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-xl text-xs font-bold shadow-lg shadow-destructive/25 h-auto transition-all"
+              leftIcon={!isBatchDeleting && <Trash2 className="w-3.5 h-3.5" />}
+            >
+              {tCommon('delete')}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Results Table ────────────────────────────────────── */}
       <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="bg-muted/40 border-b border-border">
+                <th scope="col" className="p-4 w-10">
+                  <input
+                    id="select-all-darkweb"
+                    name="select_all_darkweb"
+                    type="checkbox"
+                    checked={results.length > 0 && selectedIds.size === results.length}
+                    onChange={toggleSelectAll}
+                    aria-label="Select all"
+                    className="rounded border-input bg-background text-primary focus:ring-primary focus:ring-offset-background transition-colors cursor-pointer"
+                  />
+                </th>
                 <th scope="col" className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/70 min-w-[300px]">
                   {t('col_title')}
                 </th>
@@ -475,6 +574,15 @@ export default function DarkWebTab() {
                     exit={{ opacity: 0 }}
                     className="group hover:bg-muted/30 transition-colors border-b border-border/40"
                   >
+                    <td className="p-4 w-10">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(entry._id)}
+                        onChange={() => toggleSelect(entry._id)}
+                        aria-label={`Select ${entry.title}`}
+                        className="rounded border-input bg-background text-primary focus:ring-primary/20 transition-colors cursor-pointer"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-start gap-3">
                         <div className="mt-1 flex-shrink-0">
@@ -614,7 +722,7 @@ export default function DarkWebTab() {
                     snippet: editingItem.snippet,
                   });
                   setEditingItem(null);
-                } catch(e) {
+                } catch (e) {
                   console.error(e);
                   toast.error("Failed to update result.");
                 }
@@ -623,6 +731,14 @@ export default function DarkWebTab() {
           </div>
         </div>
       )}
+      <SaveToCollectionModal
+        isOpen={isCollectionModalOpen}
+        onClose={() => {
+          setIsCollectionModalOpen(false);
+          setSelectedIds(new Set());
+        }}
+        items={results.filter(r => selectedIds.has(r._id)).map(mapDarkWebToCollectionItem)}
+      />
     </div>
   );
 }

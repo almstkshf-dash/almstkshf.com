@@ -185,7 +185,7 @@ export type DarkWebResult = Doc<"darkweb_results">;
 
 export type TerroristListItem = Doc<"local_terrorist_list">;
 
-export type OsintLookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist' | 'gdelt';
+export type OsintLookupType = 'email' | 'domain' | 'ip' | 'username' | 'phone' | 'news' | 'corporate' | 'location' | 'wikipedia' | 'gleif' | 'watchlist';
 
 export type OsintHistoryItem = Doc<"osint_results">;
 

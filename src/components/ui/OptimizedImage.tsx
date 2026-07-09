@@ -68,7 +68,11 @@ export default function OptimizedImage({
 
     return (
         <div
-            className={clsx("relative overflow-hidden", containerClassName)}
+            className={clsx(
+                "overflow-hidden", 
+                fill ? "absolute inset-0 w-full h-full" : "relative", 
+                containerClassName
+            )}
             style={containerStyle}
         >
             {/* Fix #10 – skeleton respects prefers-reduced-motion via motion-safe utility */}

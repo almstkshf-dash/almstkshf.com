@@ -26,6 +26,7 @@ export function useOsintHistory(isAuthenticated: boolean) {
     isAuthenticated ? { limit: 20 } : 'skip'
   );
   const settings = useQuery(api.settings.getSettings);
+  const isAdmin = useQuery(api.authQueries.checkIsAdmin, isAuthenticated ? {} : 'skip');
 
   const deleteResult = async (id: string) => {
     await deleteResultMutation({ id: id as Id<'osint_results'> });
@@ -57,6 +58,7 @@ export function useOsintHistory(isAuthenticated: boolean) {
   return {
     history,
     settings,
+    isAdmin,
     deleteResult,
     updateResult,
     handleExport,

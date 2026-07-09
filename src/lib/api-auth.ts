@@ -23,7 +23,7 @@ export interface AuthCheckResult {
  * Optionally validates a minimum required plan tier (standard, professional, enterprise).
  */
 export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 'enterprise'): Promise<AuthCheckResult> {
-    const { userId } = await auth();
+    const { userId, sessionClaims } = await auth();
     if (!userId) {
         return {
             authorized: false,
@@ -39,7 +39,9 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
         const isTrialActive = userSettings?.isTrialActive && userSettings?.trialEndsAt && userSettings.trialEndsAt > Date.now();
 
         const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
-        const isAdmin = adminIds.includes(userId);
+        const claims = sessionClaims as any;
+        const role = (claims?.metadata?.role || claims?.publicMetadata?.role || claims?.role || "").toString().toLowerCase();
+        const isAdmin = adminIds.includes(userId) || ["admin", "owner", "superadmin"].includes(role);
         const isDevOrAdmin = process.env.NODE_ENV !== "production" || isAdmin;
 
         if (!isSubscribed && !isTrialActive && !isDevOrAdmin) {
@@ -50,7 +52,7 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
             };
         }
 
-        if (requiredPlan) {
+        if (requiredPlan && !isDevOrAdmin) {
             const userPlan = userSettings?.plan || 'standard';
             const plans = ['standard', 'professional', 'enterprise'];
             if (plans.indexOf(userPlan) < plans.indexOf(requiredPlan)) {

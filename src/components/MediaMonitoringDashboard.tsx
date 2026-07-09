@@ -261,12 +261,36 @@ export default function MediaMonitoringDashboard({
             <SaveToCollectionModal 
                 isOpen={!!itemToSave} 
                 onClose={() => setItemToSave(null)}
-                item={{
-                    id: itemToSave?._id,
+                item={itemToSave ? {
+                    id: itemToSave._id,
                     type: "media_monitoring",
-                    title: itemToSave?.reportName || itemToSave?.title || "",
-                    data: itemToSave
-                }}
+                    title: itemToSave.reportName || itemToSave.title || "",
+                    data: {
+                        _id: itemToSave._id,
+                        _creationTime: itemToSave._creationTime,
+                        title: itemToSave.title,
+                        publishedDate: itemToSave.publishedDate,
+                        url: itemToSave.url,
+                        resolvedUrl: itemToSave.resolvedUrl,
+                        imageUrl: itemToSave.imageUrl,
+                        source: itemToSave.source,
+                        sourceType: itemToSave.sourceType,
+                        publisherUsername: itemToSave.publisherUsername,
+                        sentiment: itemToSave.sentiment,
+                        reach: itemToSave.reach,
+                        ave: itemToSave.ave,
+                        likes: itemToSave.likes,
+                        retweets: itemToSave.retweets,
+                        replies: itemToSave.replies,
+                        depth: itemToSave.depth,
+                        sourceCountry: itemToSave.sourceCountry,
+                        status: itemToSave.analysisStatus,
+                        analysisStatus: itemToSave.analysisStatus,
+                        relevancy_score: itemToSave.relevancy_score,
+                        hashtags: itemToSave.hashtags,
+                        content: itemToSave.content ? itemToSave.content.substring(0, 500) : undefined
+                    }
+                } : undefined}
             />
 
             {/* Edit Modal */}

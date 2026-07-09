@@ -34,6 +34,7 @@ interface StructuredResultViewProps {
   t: (key: string, values?: Record<string, string | number>) => string;
   selectedMatches?: Set<string>;
   onToggleMatch?: (id: string) => void;
+  onToggleAllMatches?: (ids: string[]) => void;
   onSaveSelected?: () => void;
 }
 
@@ -43,6 +44,7 @@ export const StructuredResultView = ({
   t,
   selectedMatches,
   onToggleMatch,
+  onToggleAllMatches,
   onSaveSelected,
 }: StructuredResultViewProps) => {
   const [showRaw, setShowRaw] = useState(false);
@@ -359,7 +361,21 @@ export const StructuredResultView = ({
           <div className="space-y-6">
             <DataSection title={t('result_view.sections.sanctions_matches')} icon={Shield}>
               <div className="col-span-1 sm:col-span-2 flex justify-between items-center mb-2">
-                <span className="text-xs text-muted-foreground">{t('result_view.sections.sanctions_matches')}</span>
+                <div className="flex items-center gap-2">
+                  {onToggleAllMatches && get(data, 'matches')?.length > 0 && (
+                    <input
+                      type="checkbox"
+                      checked={!!selectedMatches && selectedMatches.size === get(data, 'matches')?.length}
+                      onChange={() => {
+                        const matchesList = (get(data, 'matches') as WatchlistMatch[] | undefined) || [];
+                        onToggleAllMatches(matchesList.map(m => m.id || m.caption));
+                      }}
+                      aria-label="Select all matches"
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 bg-card cursor-pointer"
+                    />
+                  )}
+                  <span className="text-xs text-muted-foreground">{t('result_view.sections.sanctions_matches')}</span>
+                </div>
                 {selectedMatches && selectedMatches.size > 0 && onSaveSelected && (
                   <Button
                     variant="primary"

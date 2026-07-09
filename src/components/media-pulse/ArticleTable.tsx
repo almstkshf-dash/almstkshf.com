@@ -57,7 +57,31 @@ const ArticleTable = memo(function ArticleTable({
         type: "media_monitoring" as const,
         title: article.title,
         sourceId: article.sourceCountry,
-        data: article as unknown as Record<string, unknown>
+        data: {
+            _id: article._id,
+            _creationTime: article._creationTime,
+            title: article.title,
+            publishedDate: article.publishedDate,
+            url: article.url,
+            resolvedUrl: article.resolvedUrl,
+            imageUrl: article.imageUrl,
+            source: article.source,
+            sourceType: article.sourceType,
+            publisherUsername: article.publisherUsername,
+            sentiment: article.sentiment,
+            reach: article.reach,
+            ave: article.ave,
+            likes: article.likes,
+            retweets: article.retweets,
+            replies: article.replies,
+            depth: article.depth,
+            sourceCountry: article.sourceCountry,
+            status: article.analysisStatus,
+            analysisStatus: article.analysisStatus,
+            relevancy_score: article.relevancy_score,
+            hashtags: article.hashtags,
+            content: article.content ? article.content.substring(0, 500) : undefined
+        }
     }), []);
 
     const displayedArticles = useMemo(() => {
@@ -259,7 +283,7 @@ const ArticleTable = memo(function ArticleTable({
                                 isUpdating={updatingId === article._id}
                                 onToggleSelect={toggleSelect}
                                 onDeleteClick={(id) => setSingleDeleteId(id)}
-                                onEditClick={onEditClick || (() => {})}
+                                onEditClick={onEditClick || (() => { })}
                                 onSaveClick={(art) => {
                                     setItemToSave(mapArticleToCollectionItem(art));
                                     setItemsToSave([]);

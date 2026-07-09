@@ -206,6 +206,7 @@
     "clear_search": "Clear Search",
     "no_results": "No results found",
     "save_to_collection": "Save to Collection",
+    "select_all": "Select All",
     "search": "Search",
     "date": "Date",
     "actions": "Actions",
@@ -1668,6 +1669,11 @@
         "title": "Watchlist Screening",
         "desc": "Screen entities against UN, OFAC, and global sanctions lists.",
         "placeholder": "Enter name or entity keyword..."
+      },
+      "gdelt": {
+        "title": "GDELT Monitor",
+        "desc": "Query global events database for risk indicators and tone.",
+        "placeholder": "Enter keyword or actor..."
       }
     },
     "result_view": {
@@ -2339,7 +2345,8 @@
     "geo_fr": "France",
     "geo_nl": "Netherlands",
     "geo_ru": "Russia",
-    "geo_ir": "Iran"
+    "geo_ir": "Iran",
+    "col_date": "Date"
   },
   "RssSources": {
     "global_intel_bbc": "Global Intelligence (BBC)",

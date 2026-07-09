@@ -9,6 +9,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useInertBackground } from "@/hooks/useInertBackground";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -245,7 +246,9 @@ export default function SaveToCollectionModal({
     const isLocked = loading || isSuccess;
 
     // ─── Render ───────────────────────────────────────────────────────────────
-    return (
+    if (typeof document === "undefined") return null;
+
+    return createPortal(
         /* Overlay — purely visual, no ARIA role */
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
@@ -467,6 +470,7 @@ export default function SaveToCollectionModal({
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

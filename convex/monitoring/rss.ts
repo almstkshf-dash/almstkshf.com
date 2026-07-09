@@ -21,7 +21,18 @@ export const getRssArticles = query({
         sourceId: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
+        let useSourceId = false;
         if (args.sourceId) {
+            const hasArticle = await ctx.db
+                .query("rss_feed_articles")
+                .withIndex("by_sourceId_and_createdAt", (q) => q.eq("sourceId", args.sourceId))
+                .first();
+            if (hasArticle) {
+                useSourceId = true;
+            }
+        }
+
+        if (useSourceId && args.sourceId) {
             return ctx.db
                 .query("rss_feed_articles")
                 .withIndex("by_sourceId_and_createdAt", (q) => q.eq("sourceId", args.sourceId))

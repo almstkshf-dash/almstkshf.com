@@ -187,13 +187,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Report generation failed', details: String(genErr) }, { status: 500 });
         }
 
-        // Upload output file to Vercel Blob
+        // Upload output file to Vercel Blob (or fallback to base64 data URL if token is missing)
         try {
-            const filename = `reports/${auth.userId}/${reportType}-${Date.now()}.${extension}`;
-            const { url } = await put(filename, fileBuffer, {
-                access: 'public',
-                contentType,
-            });
+            let url: string;
+
+            if (process.env.BLOB_READ_WRITE_TOKEN) {
+                const filename = `reports/${auth.userId}/${reportType}-${Date.now()}.${extension}`;
+                const blobResult = await put(filename, fileBuffer, {
+                    access: 'public',
+                    contentType,
+                });
+                url = blobResult.url;
+            } else {
+                console.warn('⚠️ [Reports API] BLOB_READ_WRITE_TOKEN is not configured. Falling back to base64 Data URL.');
+                const base64 = fileBuffer.toString('base64');
+                url = `data:${contentType};base64,${base64}`;
+            }
 
             // Mark Convex background job as completed
             if (jobId) {

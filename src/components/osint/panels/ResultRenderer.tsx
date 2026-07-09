@@ -25,6 +25,7 @@ interface ResultRendererProps {
   tDashboard: (key: string) => string;
   selectedMatches: Set<string>;
   onToggleMatch: (id: string) => void;
+  onToggleAllMatches: (ids: string[]) => void;
   onSaveSelected: () => void;
   isCollectionModalOpen: boolean;
   onSetCollectionModalOpen: (open: boolean) => void;
@@ -41,6 +42,7 @@ export const ResultRenderer = ({
   tDashboard,
   selectedMatches,
   onToggleMatch,
+  onToggleAllMatches,
   onSaveSelected,
   isCollectionModalOpen,
   onSetCollectionModalOpen,
@@ -124,7 +126,7 @@ export const ResultRenderer = ({
                 id: Math.random().toString(36).substring(7),
                 type: 'osint',
                 title: `OSINT: ${activeType} lookup for ${query}`,
-                data: result,
+                data: result as any,
               }}
             />
 
@@ -134,6 +136,7 @@ export const ResultRenderer = ({
               t={t}
               selectedMatches={selectedMatches}
               onToggleMatch={onToggleMatch}
+              onToggleAllMatches={onToggleAllMatches}
               onSaveSelected={onSaveSelected}
             />
           </div>

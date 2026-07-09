@@ -9,13 +9,13 @@
 import { fixArabic, isArabic, isArabicReport, fixArabicForPDF } from '../utils/arabic';
 import { fetchImageAsBase64 } from '../utils/images';
 import { PdfBase, AutoTablejsPDF } from './PdfBase';
-import { 
-    ReportTranslations, 
-    AiInspectorData, 
-    DarkWebResult, 
-    TerroristListItem, 
-    DeepWebRun, 
-    OsintResult, 
+import {
+    ReportTranslations,
+    AiInspectorData,
+    DarkWebResult,
+    TerroristListItem,
+    DeepWebRun,
+    OsintResult,
     ReportArticle,
     BRAND_DARK,
     BRAND_AMBER
@@ -23,8 +23,8 @@ import {
 
 export class PdfGenerators {
     public static async generateWatchlistPDF(
-        items: TerroristListItem[], 
-        translations: ReportTranslations, 
+        items: TerroristListItem[],
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -72,8 +72,8 @@ export class PdfGenerators {
     }
 
     public static async generateDarkWebPDF(
-        results: DarkWebResult[], 
-        translations: ReportTranslations, 
+        results: DarkWebResult[],
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -282,9 +282,9 @@ export class PdfGenerators {
     }
 
     public static async generateDeepWebPDF(
-        runs: DeepWebRun[], 
-        threats: ReportArticle[], 
-        translations: ReportTranslations, 
+        runs: DeepWebRun[],
+        threats: ReportArticle[],
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -347,8 +347,8 @@ export class PdfGenerators {
     }
 
     public static async generateOsintHistoryPDF(
-        items: OsintResult[], 
-        translations: ReportTranslations, 
+        items: OsintResult[],
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -394,8 +394,8 @@ export class PdfGenerators {
     }
 
     public static async generateOsintPDF(
-        data: OsintResult, 
-        translations: ReportTranslations, 
+        data: OsintResult,
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -413,7 +413,7 @@ export class PdfGenerators {
         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
         doc.setFontSize(14);
         doc.setTextColor(...BRAND_AMBER);
-        
+
         const processedQuery = fixArabic(data.query);
         if (isArabic(data.query)) {
             doc.text(processedQuery, pageWidth - 20, y, { align: 'right' });
@@ -421,10 +421,10 @@ export class PdfGenerators {
             doc.text(processedQuery, 20, y);
         }
         y += 8;
-        
+
         doc.setFontSize(9);
         doc.setTextColor(100);
-        
+
         const typeText = `${translations.Reports?.investigation_type || 'Type'}: ${data.type.toUpperCase()}`;
         const processedType = fixArabic(typeText);
         if (isArabic(typeText)) {
@@ -488,9 +488,9 @@ export class PdfGenerators {
     }
 
     public static async generateAiInspectorPDF(
-        mode: string, 
-        data: AiInspectorData, 
-        translations: ReportTranslations, 
+        mode: string,
+        data: AiInspectorData,
+        translations: ReportTranslations,
         title: string,
         returnOnly = false
     ) {
@@ -540,7 +540,7 @@ export class PdfGenerators {
                 ]],
                 body: data.sentenceBreakdown?.map(s => [
                     s.text,
-                    s.flags.join(', ') || translations.AiInspector?.none || 'None',
+                    (s.flags || []).join(', ') || translations.AiInspector?.none || 'None',
                     `${((s.aiProbability ?? 0) * 100).toFixed(1)}%`
                 ]) || [],
                 startY: y + 8,
@@ -910,24 +910,24 @@ export class PdfGenerators {
 
         let recommendation = '';
         if (negRatio > 0.25) {
-            recommendation = translations.rec_high_neg || (isArabicMode 
-                ? 'تم رصد نسبة عالية من التغطية السلبية. نوصي بتفعيل بروتوكولات إدارة الأزمات فوراً.' 
+            recommendation = translations.rec_high_neg || (isArabicMode
+                ? 'تم رصد نسبة عالية من التغطية السلبية. نوصي بتفعيل بروتوكولات إدارة الأزمات فوراً.'
                 : 'High negative sentiment detected. Recommend activating crisis management protocols immediately.');
         } else if (negRatio > 0.1) {
-            recommendation = translations.rec_mod_neg || (isArabicMode 
-                ? 'تم رصد تغطية سلبية متوسطة. يوصى بالمتابعة الدقيقة وإعداد رسائل إعلامية استباقية.' 
+            recommendation = translations.rec_mod_neg || (isArabicMode
+                ? 'تم رصد تغطية سلبية متوسطة. يوصى بالمتابعة الدقيقة وإعداد رسائل إعلامية استباقية.'
                 : 'Moderate negative coverage. Monitor closely and prepare proactive messaging.');
         } else if (posRatio > 0.35) {
-            recommendation = (translations.rec_positive as string | undefined) || (isArabicMode 
-                ? 'تم رصد اتجاه إيجابي قوي في التغطية. نوصي باستغلال هذا الزخم للإعلانات الاستراتيجية والتفاعل الإعلامي.' 
+            recommendation = (translations.rec_positive as string | undefined) || (isArabicMode
+                ? 'تم رصد اتجاه إيجابي قوي في التغطية. نوصي باستغلال هذا الزخم للإعلانات الاستراتيجية والتفاعل الإعلامي.'
                 : 'Positive sentiment trend detected. Leverage this momentum for strategic announcements and media engagement.');
         } else if (neuRatio > 0.6) {
-            recommendation = (translations.rec_neutral as string | undefined) || (isArabicMode 
-                ? 'التغطية الإعلامية محايدة في الغالب. يوصى بالاستمرار في رصد الأخبار لتحديد الاتجاهات الناشئة.' 
+            recommendation = (translations.rec_neutral as string | undefined) || (isArabicMode
+                ? 'التغطية الإعلامية محايدة في الغالب. يوصى بالاستمرار في رصد الأخبار لتحديد الاتجاهات الناشئة.'
                 : 'Coverage is predominantly neutral. Continue current media monitoring to spot emerging trends.');
         } else {
-            recommendation = translations.rec_healthy || (isArabicMode 
-                ? 'نبرة التغطية متوازنة وصحية. استمر في الاستراتيجية الإعلامية الحالية.' 
+            recommendation = translations.rec_healthy || (isArabicMode
+                ? 'نبرة التغطية متوازنة وصحية. استمر في الاستراتيجية الإعلامية الحالية.'
                 : 'Coverage sentiment is balanced and healthy. Continue current media strategy.');
         }
 
@@ -1033,7 +1033,7 @@ export class PdfGenerators {
                     const titleText = a.title ?? '';
                     const hashStr = Array.isArray(a.hashtags) && a.hashtags.length > 0 ? `\n#${a.hashtags.join(' #')}` : '';
                     const fullText = titleText + hashStr;
-                    
+
                     if (isArabic(fullText)) {
                         doc.setFont(fontLoaded ? 'Amiri' : 'helvetica', 'normal');
                         doc.setFontSize(7.5);

@@ -72,7 +72,7 @@ export default function AiInspectorTab() {
             (videoResults?.overallScore ?? 0),
         sentenceBreakdown: textResults?.sentences?.map(s => ({
           text: s.text,
-          flags: s.signals,
+          flags: s.signals || [],
           aiProbability: s.score / 100
         })),
         pixelLogicSignals: imageResults?.pixelLogicSignals?.map(s => ({
@@ -94,7 +94,7 @@ export default function AiInspectorTab() {
           timestamp: String(f.timestamp),
           type: f.label,
           severity: f.score / 100,
-          description: f.signals.map(s => s.name).join(', ')
+          description: f.signals?.map(s => s.name).join(', ') || ""
         }))
       };
 

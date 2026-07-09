@@ -86,7 +86,7 @@ const SentimentDonutChart = memo(function SentimentDonutChart({ data, nssIndex }
                 negative: data.negative
             })}
         >
-            <ResponsiveContainer width="100%" height="100%" minWidth={10} debounce={100}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={10} minHeight={10} debounce={100}>
                 <PieChart>
                     <Pie
                         data={chartData}
