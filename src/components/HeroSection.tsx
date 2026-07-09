@@ -42,19 +42,41 @@ export default async function HeroSection() {
             />
 
             <div className="container relative z-10 mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                {/* Content Side */}
+                {/* Content Side — logical alignment: text-start flips automatically with dir=rtl */}
                 <div className="text-start order-2 lg:order-1 flex flex-col items-start">
+                    {/*
+                     * App name badge — truncates with ellipsis if locale title overflows.
+                     * max-w-full + truncate prevent bounding-box collision with sibling elements.
+                     * ps-0 pe-2 gives the reading-start edge a clean flush while the
+                     * inward (end) side gets a small breathing pad before it clips.
+                     */}
                     <h1
-                        className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight text-foreground inline-block leading-none"
+                        className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight text-foreground
+                                   w-full max-w-full truncate leading-none
+                                   ps-0 pe-2"
+                        title={t("Common.app_name")}
                     >
                         {t("Common.app_name")}
                     </h1>
 
-                    <h2 className="text-sm md:text-lg font-bold text-primary mb-6 uppercase tracking-[0.4em] opacity-90">
+                    {/*
+                     * Slogan badge — same truncation contract.
+                     * Uses text-start (logical) rather than text-left/text-right so
+                     * the label always reads from the outer container edge inward.
+                     */}
+                    <h2
+                        className="text-sm md:text-lg font-bold text-primary mb-6 uppercase tracking-[0.4em] opacity-90
+                                   w-full max-w-full truncate text-start"
+                        title={t("Common.slogan")}
+                    >
                         {t("Common.slogan")}
                     </h2>
 
-                    <div className="w-20 h-1 bg-gradient-to-r from-primary to-transparent rtl:bg-gradient-to-l mb-8" />
+                    {/*
+                     * Decorative rule — hero-rule class handles the gradient direction
+                     * via [dir=rtl] selector in globals.css so no JS locale check needed.
+                     */}
+                    <div className="hero-rule w-20 h-1 mb-8 rounded-full" />
 
                     <p
                         id="hero-description"
@@ -106,13 +128,13 @@ export default async function HeroSection() {
                 </div>
             </div>
 
-            {/* Decorative background elements */}
-            <div className="absolute top-1/4 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute bottom-1/4 -left-20 w-72 h-72 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+            {/* Decorative background elements — use logical inset-inline-end / inset-inline-start */}
+            <div className="absolute top-1/4 end-[-5rem] w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-1/4 start-[-5rem] w-72 h-72 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
 
             <div
                 aria-hidden="true"
-                className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-background to-transparent pointer-events-none"
+                className="absolute bottom-0 inset-x-0 h-[200px] bg-gradient-to-t from-background to-transparent pointer-events-none"
             />
         </section>
     );

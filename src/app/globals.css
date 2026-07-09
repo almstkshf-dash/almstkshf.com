@@ -687,6 +687,38 @@ svg.lucide-moon {
 }
 
 /*
+ * ─── hero-rule ────────────────────────────────────────────────────────────
+ * Decorative horizontal rule used in HeroSection.
+ * LTR: gradient flows left → right (start → transparent).
+ * RTL: gradient flows right → left (start → transparent) — [dir=rtl] flips it.
+ * No JS locale check needed; pure CSS bidirectional handling.
+ */
+.hero-rule {
+  background: linear-gradient(to right, var(--color-primary, #1d4ed8), transparent);
+}
+
+[dir="rtl"] .hero-rule {
+  background: linear-gradient(to left, var(--color-primary, #1d4ed8), transparent);
+}
+
+/*
+ * ─── custom-dropdown-arrow ───────────────────────────────────────────────
+ * Injects DropDown-arrow.png as the select indicator.
+ * Positioned on the inline-end side so it auto-flips with [dir=rtl].
+ * The native arrow is hidden via appearance-none on the element itself.
+ */
+.custom-dropdown-arrow {
+  background-image: url('/blocks/ui/DropDown-arrow.png');
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  background-position: right 0.5rem center;
+}
+
+[dir="rtl"] .custom-dropdown-arrow {
+  background-position: left 0.5rem center;
+}
+
+/*
  * ─── Search input helper ──────────────────────────────────────────────────
  * Utility for inputs that have an icon on the leading side.
  * Uses CSS logical properties so the icon always appears on the reading-start
@@ -728,6 +760,79 @@ svg.lucide-moon {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.5);
+}
+
+/*
+ * ─── Custom asset-driven scrollbar ───────────────────────────────────────
+ *
+ * Apply `.scrollbar-custom` to any sidebar or scroll container that should
+ * use the sprite-based scrollbar from the BLOCKS asset pack.
+ *
+ * Asset paths:
+ *   /blocks/scrollbar/scrollbar_start.png   — top arrow track
+ *   /blocks/scrollbar/scrollbar_middle.png  — connecting rail (repeat-y)
+ *   /blocks/scrollbar/scrollbar_end.png     — bottom arrow track
+ *   /blocks/scrollbar/scrollbar_tracker.png — draggable thumb handle
+ *
+ * scrollbar-width: none hides the native Firefox scrollbar so the
+ * WebKit custom scrollbar is the only visible one in Chromium/Safari.
+ * Firefox does not support ::-webkit-scrollbar; users there see no
+ * scrollbar chrome (content is still scrollable).
+ */
+.scrollbar-custom {
+  /* Firefox: hide native bar — scrollable but no visible track */
+  scrollbar-width: none;
+  overflow-y: auto;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 16px;     /* Wide enough to render the sprite art cleanly */
+}
+
+/* ── Track: top arrow cap ─────────────────────────────────────────────── */
+.scrollbar-custom::-webkit-scrollbar-button:single-button:vertical:decrement {
+  height: 16px;
+  background-image: url('/blocks/scrollbar/scrollbar_start.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: block;
+}
+
+/* ── Track: bottom arrow cap ──────────────────────────────────────────── */
+.scrollbar-custom::-webkit-scrollbar-button:single-button:vertical:increment {
+  height: 16px;
+  background-image: url('/blocks/scrollbar/scrollbar_end.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: block;
+}
+
+/* ── Track: connecting rail (repeating middle) ────────────────────────── */
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-image: url('/blocks/scrollbar/scrollbar_middle.png');
+  background-repeat: repeat-y;
+  background-size: 100% auto;
+}
+
+/* ── Thumb: draggable handle ──────────────────────────────────────────── */
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-image: url('/blocks/scrollbar/scrollbar_tracker.png');
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* Transparent bg so the asset sprite is the only visible element */
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  /* Slight brightness boost on hover for visual feedback */
+  filter: brightness(1.15);
+}
+
+/* ── Corner (intersection of horizontal + vertical scrollbars) ─────────── */
+.scrollbar-custom::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* ─── Premium Dashboard Utilities ──────────────────────────────────────── */
