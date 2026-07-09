@@ -403,22 +403,29 @@ export default defineSchema({
         dateFrom: v.optional(v.string()),
         dateTo: v.optional(v.string()),
         totalSources: v.number(),
+        // completedSources / totalSaved / totalErrors are now derived from press_release_job_events
+        // kept here as a cached summary written once at completion to avoid repeated aggregation queries
         completedSources: v.number(),
         totalSaved: v.number(),
         totalErrors: v.number(),
-        feedResults: v.optional(v.array(v.object({
-            feed: v.string(),
-            name: v.optional(v.string()),
-            saved: v.optional(v.number()),
-            total: v.optional(v.number()),
-            error: v.optional(v.string()),
-            durationMs: v.optional(v.number()),
-        }))),
         error: v.optional(v.string()),
         createdAt: v.number(),
         updatedAt: v.number(),
     }).index("by_userId", ["userId"])
       .index("by_status", ["status"]),
+
+    // One row per completed feed/batch — inserted by workers instead of patching the hot job document.
+    // Eliminates OCC write conflicts on press_release_sync_jobs.
+    press_release_job_events: defineTable({
+        jobId: v.id("press_release_sync_jobs"),
+        feedName: v.string(),
+        saved: v.number(),
+        total: v.number(),
+        error: v.optional(v.string()),
+        durationMs: v.optional(v.number()),
+        createdAt: v.number(),
+    }).index("by_jobId", ["jobId"])
+      .index("by_jobId_and_createdAt", ["jobId", "createdAt"]),
 
     report_jobs: defineTable({
         userId: v.string(),

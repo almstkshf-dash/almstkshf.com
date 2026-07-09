@@ -1331,23 +1331,17 @@ export const fetchPressReleaseSources = action({
                 await ctx.runMutation(api.pressReleaseJobs.startPressReleaseSyncJob, { jobId: args.jobId });
             }
 
-            let completedSources = 0;
+            // updateProgress inserts one event row per completed feed/batch.
+            // No read-modify-write on the job document → eliminates OCC write conflicts.
             const updateProgress = async (name: string, saved: number, total: number, error?: string, durationMs?: number) => {
                 if (args.jobId) {
-                    completedSources++;
-                    await ctx.runMutation(api.pressReleaseJobs.updatePressReleaseSyncJobProgress, {
+                    await ctx.runMutation(internal.pressReleaseJobs.insertPressReleaseJobEvent, {
                         jobId: args.jobId,
-                        completedSources,
-                        totalSaved: saved,
-                        totalErrors: error ? 1 : 0,
-                        feedResult: {
-                            feed: name,
-                            name,
-                            saved,
-                            total,
-                            error,
-                            durationMs
-                        }
+                        feedName: name,
+                        saved,
+                        total,
+                        error,
+                        durationMs,
                     });
                 }
             };

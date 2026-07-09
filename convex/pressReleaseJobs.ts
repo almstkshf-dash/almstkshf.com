@@ -7,7 +7,7 @@
  */
 
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { requireAdmin } from "./utils/auth";
 import { api } from "./_generated/api";
 
@@ -40,6 +40,59 @@ export const getActivePressReleaseSyncJob = query({
             return latestJob[0];
         }
         return null;
+    },
+});
+
+/**
+ * Returns live progress for a running job by aggregating its event rows.
+ * Safe to poll frequently — only reads, no writes.
+ */
+export const getJobProgress = query({
+    args: { jobId: v.id("press_release_sync_jobs") },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return null;
+
+        const job = await ctx.db.get(args.jobId);
+        if (!job) return null;
+
+        const events = await ctx.db
+            .query("press_release_job_events")
+            .withIndex("by_jobId_and_createdAt", (q) => q.eq("jobId", args.jobId))
+            .order("asc")
+            .take(8192); // schema limit for arrays
+
+        let totalSaved = 0;
+        let totalErrors = 0;
+        const feedResults: Array<{
+            feed: string;
+            name: string;
+            saved: number;
+            total: number;
+            error?: string;
+            durationMs?: number;
+        }> = [];
+
+        for (const ev of events) {
+            totalSaved += ev.saved;
+            if (ev.error) totalErrors++;
+            feedResults.push({
+                feed: ev.feedName,
+                name: ev.feedName,
+                saved: ev.saved,
+                total: ev.total,
+                error: ev.error,
+                durationMs: ev.durationMs,
+            });
+        }
+
+        return {
+            ...job,
+            completedSources: events.length,
+            totalSaved,
+            totalErrors,
+            feedResults,
+        };
     },
 });
 
@@ -86,7 +139,6 @@ export const createPressReleaseSyncJob = mutation({
             completedSources: 0,
             totalSaved: 0,
             totalErrors: 0,
-            feedResults: [],
             createdAt: Date.now(),
             updatedAt: Date.now(),
         });
@@ -118,33 +170,29 @@ export const startPressReleaseSyncJob = mutation({
     },
 });
 
-export const updatePressReleaseSyncJobProgress = mutation({
+/**
+ * Replaces the old updatePressReleaseSyncJobProgress.
+ * Each worker inserts ONE new event row — no read-modify-write on the job document.
+ * This eliminates OCC write conflicts entirely.
+ */
+export const insertPressReleaseJobEvent = internalMutation({
     args: {
         jobId: v.id("press_release_sync_jobs"),
-        completedSources: v.number(),
-        totalSaved: v.number(),
-        totalErrors: v.number(),
-        feedResult: v.object({
-            feed: v.string(),
-            name: v.optional(v.string()),
-            saved: v.optional(v.number()),
-            total: v.optional(v.number()),
-            error: v.optional(v.string()),
-            durationMs: v.optional(v.number()),
-        }),
+        feedName: v.string(),
+        saved: v.number(),
+        total: v.number(),
+        error: v.optional(v.string()),
+        durationMs: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
-        const job = await ctx.db.get(args.jobId);
-        if (!job) {
-            throw new Error("Job not found");
-        }
-        const currentResults = job.feedResults || [];
-        await ctx.db.patch(args.jobId, {
-            completedSources: args.completedSources,
-            totalSaved: job.totalSaved + args.totalSaved,
-            totalErrors: job.totalErrors + args.totalErrors,
-            feedResults: [...currentResults, args.feedResult],
-            updatedAt: Date.now(),
+        await ctx.db.insert("press_release_job_events", {
+            jobId: args.jobId,
+            feedName: args.feedName,
+            saved: args.saved,
+            total: args.total,
+            error: args.error,
+            durationMs: args.durationMs,
+            createdAt: Date.now(),
         });
     },
 });
@@ -161,6 +209,19 @@ export const completePressReleaseSyncJob = mutation({
             throw new Error("Job not found");
         }
 
+        // Aggregate event rows for the final summary written to the job document.
+        const events = await ctx.db
+            .query("press_release_job_events")
+            .withIndex("by_jobId", (q) => q.eq("jobId", args.jobId))
+            .take(8192);
+
+        let totalSaved = 0;
+        let totalErrors = 0;
+        for (const ev of events) {
+            totalSaved += ev.saved;
+            if (ev.error) totalErrors++;
+        }
+
         // Security Review: Audit Log completion
         await ctx.db.insert("admin_actions", {
             userId: job.userId,
@@ -168,9 +229,9 @@ export const completePressReleaseSyncJob = mutation({
             timestamp: Date.now(),
             parameters: { jobId: args.jobId },
             result: {
-                totalSaved: job.totalSaved,
-                totalErrors: job.totalErrors,
-                completedSources: job.completedSources,
+                totalSaved,
+                totalErrors,
+                completedSources: events.length,
                 error: args.error,
             },
         });
@@ -178,6 +239,9 @@ export const completePressReleaseSyncJob = mutation({
         await ctx.db.patch(args.jobId, {
             status: args.status,
             error: args.error,
+            completedSources: events.length,
+            totalSaved,
+            totalErrors,
             updatedAt: Date.now(),
         });
     },

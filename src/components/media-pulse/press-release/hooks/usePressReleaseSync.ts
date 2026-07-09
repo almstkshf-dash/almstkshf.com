@@ -57,8 +57,10 @@ export function usePressReleaseSync(t: (key: string, options?: any) => string) {
         }
     }, [activeJobFromQuery]);
 
+    // getJobProgress aggregates press_release_job_events into a live summary that includes feedResults.
+    // This replaces getPressReleaseSyncJob for in-progress polling.
     const job = useQuery(
-        api.pressReleaseJobs.getPressReleaseSyncJob,
+        api.pressReleaseJobs.getJobProgress,
         activeJobId ? { jobId: activeJobId } : 'skip'
     );
 
@@ -74,7 +76,7 @@ export function usePressReleaseSync(t: (key: string, options?: any) => string) {
                 totalSources: job.totalSources,
                 totalSaved: job.totalSaved,
                 totalErrors: job.totalErrors,
-                feedResults: (job.feedResults as FeedResult[]) || [],
+                feedResults: (job.feedResults as FeedResult[] | undefined) || [],
                 error: job.error,
             };
 
