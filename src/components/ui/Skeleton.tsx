@@ -9,7 +9,7 @@
 import type { HTMLAttributes, CSSProperties } from "react";
 import { cn } from "@/utils/cn";
 
-export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {}
+export type SkeletonProps = HTMLAttributes<HTMLDivElement>;
 
 export default function Skeleton({ className, ...props }: SkeletonProps) {
     return (

@@ -51,9 +51,15 @@ const MOCK_STATS = {
 const MOCK_VISUAL_BARS = [40, 70, 45, 90, 65, 80, 55, 95, 75, 60];
 
 // Static Data Structures
+type FeatureKey =
+    | "intelligence_sentiment"
+    | "trend_anomaly"
+    | "audience_mapping"
+    | "benchmarking";
+
 interface Feature {
     icon: React.ComponentType<{ className?: string }>;
-    key: string;
+    key: FeatureKey;
     color: string;
     bg: string;
 }
@@ -269,6 +275,8 @@ interface InfrastructureCardProps {
 
 function InfrastructureCard({ item, index }: InfrastructureCardProps) {
     const t = useTranslations("CrisisManagementDetail");
+    const infraItems = t.raw("advanced_infrastructure" as any).items as Record<string, { title?: string; desc?: string; sub?: string }>;
+    const translation = infraItems[item.key] ?? {};
     return (
         <motion.div
             initial="hidden"
@@ -280,11 +288,11 @@ function InfrastructureCard({ item, index }: InfrastructureCardProps) {
             <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${item.color} mb-6 border border-border group-hover:scale-110 transition-transform`}>
                 <item.icon aria-hidden="true" className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-4">{t(`advanced_infrastructure.items.${item.key}.title`)}</h3>
-            <p className="text-foreground/70 text-sm leading-relaxed mb-6">{t(`advanced_infrastructure.items.${item.key}.desc`)}</p>
+            <h3 className="text-xl font-bold text-foreground mb-4">{translation.title ?? ""}</h3>
+            <p className="text-foreground/70 text-sm leading-relaxed mb-6">{translation.desc ?? ""}</p>
             <div className="pt-4 border-t border-border flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{t(`advanced_infrastructure.items.${item.key}.sub`)}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/70">{translation.sub ?? ""}</span>
             </div>
         </motion.div>
     );
@@ -362,11 +370,18 @@ function InfrastructureSection() {
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
-                                {['social', 'tv_radio', 'forums'].map((tag) => (
-                                    <div key={tag} className="px-3 py-2 rounded-lg bg-card border border-border text-[10px] font-bold text-foreground/70 uppercase tracking-tighter">
-                                        {t(`visual_data.tags.${tag}`)}
-                                    </div>
-                                ))}
+                                {['social', 'tv_radio', 'forums'].map((tag) => {
+                                    const tagKeys: Record<string, any> = {
+                                        social: 'visual_data.tags.social',
+                                        tv_radio: 'visual_data.tags.tv_radio',
+                                        forums: 'visual_data.tags.forums'
+                                    };
+                                    return (
+                                        <div key={tag} className="px-3 py-2 rounded-lg bg-card border border-border text-[10px] font-bold text-foreground/70 uppercase tracking-tighter">
+                                            {t(tagKeys[tag])}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </motion.div>

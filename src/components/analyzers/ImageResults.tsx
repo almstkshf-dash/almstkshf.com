@@ -111,7 +111,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                 {rich.overallScore}%
               </motion.div>
               <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${riskBg} ${riskText}`}>
-                {t(rich.verdictKey)}
+                {t(rich.verdictKey as Parameters<typeof t>[0])}
               </p>
 
               {/* Mini checklist summary */}
@@ -121,7 +121,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                     {item.passed
                       ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                       : <XCircle className="w-3.5 h-3.5 text-rose-500    shrink-0" />}
-                    <span className="text-[10px] text-zinc-500 truncate">{t(`check_${item.id}_label`)}</span>
+                    <span className="text-[10px] text-zinc-500 truncate">{t(`check_${item.id}_label` as Parameters<typeof t>[0])}</span>
                   </div>
                 ))}
               </div>
@@ -137,7 +137,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                 {report.confidenceScore}%
               </motion.div>
               <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${riskBg} ${riskText}`}>
-                {t(riskLabelKey)}
+                {t(riskLabelKey as Parameters<typeof t>[0])}
               </p>
             </>
           )}
@@ -168,7 +168,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                         <Icon className={`w-3.5 h-3.5 text-${meta.color}-500`} />
                       </div>
                       <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
-                        {t(meta.labelKey)}
+                        {t(meta.labelKey as Parameters<typeof t>[0])}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -181,8 +181,8 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                             ? <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                             : <ShieldCheck className="w-3.5 h-3.5 shrink-0 mt-0.5" />}
                           <div className="flex-1">
-                            <p className="font-bold leading-tight decoration-current/30">{t(`signal_${sig.id}_name`)}</p>
-                            <p className="opacity-80 mt-1 leading-snug font-medium">{t(`signal_${sig.id}_desc`)}</p>
+                            <p className="font-bold leading-tight decoration-current/30">{t(`signal_${sig.id}_name` as Parameters<typeof t>[0])}</p>
+                            <p className="opacity-80 mt-1 leading-snug font-medium">{t(`signal_${sig.id}_desc` as Parameters<typeof t>[0])}</p>
                           </div>
                         </div>
                       ))}
@@ -256,7 +256,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                       ([...(rich.deepMl.biometrics?.faceAnomalies || []), ...(rich.deepMl.biometrics?.handAnomalies || [])] as any[]).map((anomaly, idx) => (
                         <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] font-bold text-rose-600 dark:text-rose-400">
                           <AlertTriangle className="w-3 h-3" />
-                          {tCommon.has(`anomalies.${anomaly.id}`) ? tCommon(`anomalies.${anomaly.id}`) : anomaly.name}
+                          {tCommon.has(`anomalies.${anomaly.id}` as Parameters<typeof tCommon>[0]) ? tCommon(`anomalies.${anomaly.id}` as Parameters<typeof tCommon>[0]) : anomaly.name}
                         </div>
                       ))
                     ) : (
@@ -297,7 +297,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
                       {t("detected_ai_signature")}{" "}
                       <span className="font-black italic">
                         {rich.deepMl.watermarks
-                          ?.map((w) => (tCommon.has(`watermarks.${w.id}`) ? tCommon(`watermarks.${w.id}`) : w.name))
+                          ?.map((w) => (tCommon.has(`watermarks.${w.id}` as Parameters<typeof tCommon>[0]) ? tCommon(`watermarks.${w.id}` as Parameters<typeof tCommon>[0]) : w.name))
                           .join(", ")}
                       </span>
                     </span>
@@ -323,7 +323,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
             { labelKey: "stat_megapix", value: (rich.stats.megapixels ?? 0).toFixed(2), unit: "MP" },
           ].map(({ labelKey, value, unit }) => (
             <div key={labelKey} className="p-4 bg-card dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-center">
-              <span className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{t(labelKey)}</span>
+              <span className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1">{t(labelKey as Parameters<typeof t>[0])}</span>
               <span className="block font-mono text-lg font-bold text-zinc-900 dark:text-zinc-100">{value}{unit}</span>
             </div>
           ))}
@@ -374,7 +374,7 @@ export default function ImageResults({ report, originalImage }: ImageResultsProp
               </span>
               <span className="block font-mono text-xl">
                 {rich
-                  ? t(rich.verdictKey)
+                  ? t(rich.verdictKey as Parameters<typeof t>[0])
                   : report.pixelLogicSignals.find((s) => s.id === "low_entropy")?.detectedValue ?? "0.00"}
               </span>
             </div>

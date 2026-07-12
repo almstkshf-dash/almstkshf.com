@@ -306,7 +306,6 @@ export default function OsintTab() {
       wikipedia: { placeholder: t('panels.wikipedia.placeholder'), hint: t('panels.wikipedia.desc') },
       gleif: { placeholder: t('panels.gleif.placeholder'), hint: t('panels.gleif.desc') },
       watchlist: { placeholder: t('panels.watchlist.placeholder'), hint: t('panels.watchlist.desc') },
-      gdelt: { placeholder: t('panels.gdelt.placeholder'), hint: t('panels.gdelt.desc') },
     };
     return mappings[state.activeType];
   }, [state.activeType, t]);

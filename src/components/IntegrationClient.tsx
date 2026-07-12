@@ -147,9 +147,9 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                             <div className={`w-14 h-14 rounded-2xl ${feature.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                                 <feature.icon className={`w-7 h-7 ${feature.color}`} />
                             </div>
-                            <h3 className="text-xl font-bold text-foreground mb-4">{t(`features.${feature.id}.title`)}</h3>
+                            <h3 className="text-xl font-bold text-foreground mb-4">{t((`features.${feature.id}.title`) as any)}</h3>
                             <p className="text-muted-foreground leading-relaxed">
-                                {t(`features.${feature.id}.desc`)}
+                                {t((`features.${feature.id}.desc`) as any)}
                             </p>
                         </motion.div>
                     ))}
@@ -180,9 +180,9 @@ console.log(sentiment.score); // 0.85 (Positive)`;
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {integrations.map((item: Integration, idx: number) => {
                             const IconComponent = iconMap[item.icon] || Globe;
-                            const name = t(`list.${item.id}.name`);
-                            const desc = t(`list.${item.id}.desc`);
-                            const category = t(`list.${item.id}.category`);
+                            const name = t(`list.${item.id}.name` as any);
+                            const desc = t(`list.${item.id}.desc` as any);
+                            const category = t(`list.${item.id}.category` as any);
 
                             return (
                                 <motion.div

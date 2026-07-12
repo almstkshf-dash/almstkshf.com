@@ -105,10 +105,18 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
     return (
         <div ref={ref} className="relative">
             {/* Trigger Button */}
-            <div
+            <button
+                type="button"
                 onClick={() => {
                     setIsOpen(true);
                     inputRef.current?.focus();
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setIsOpen(true);
+                        inputRef.current?.focus();
+                    }
                 }}
                 className={`w-full flex items-center gap-2 bg-muted/50 rounded-xl px-4 py-3 text-start transition-all border cursor-pointer ${error
                     ? 'border-destructive/60 ring-2 ring-destructive/20'
@@ -219,7 +227,7 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                     />
                 </div>
                 <ChevronDown className={`w-4 h-4 text-foreground/70 transition-all flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-            </div>
+            </button>
 
             {/* Error Message */}
             {error && (

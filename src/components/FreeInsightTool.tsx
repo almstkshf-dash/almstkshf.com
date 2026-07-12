@@ -203,7 +203,7 @@ export default function FreeInsightTool() {
                                                     result.sentiment.toLowerCase() === "positive" ? "text-emerald-600 dark:text-emerald-400" :
                                                         result.sentiment.toLowerCase() === "neutral" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )}>
-                                                    {t(`sentiments.${result.sentiment.toLowerCase()}`)}
+                                                    {t(`sentiments.${result.sentiment.toLowerCase()}` as Parameters<typeof t>[0])}
                                                 </span>
                                             </div>
                                             <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden transition-colors">
@@ -235,7 +235,7 @@ export default function FreeInsightTool() {
                                                     result.risk.toLowerCase() === "low" ? "text-emerald-600 dark:text-emerald-400" :
                                                         result.risk.toLowerCase() === "medium" ? "text-amber-600 dark:text-amber-400" : "text-rose-600 dark:text-rose-400"
                                                 )}>
-                                                    {t(`risk_labels.${result.risk.toLowerCase()}`)}
+                                                    {t(`risk_labels.${result.risk.toLowerCase()}` as Parameters<typeof t>[0])}
                                                 </p>
                                                 <span className="text-xs font-bold bg-muted px-2 py-1 rounded-md">{result.riskScore}%</span>
                                             </div>

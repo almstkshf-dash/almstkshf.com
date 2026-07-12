@@ -178,7 +178,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
             {result.score}%
           </motion.div>
           <p className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${risk.bg} ${risk.border} ${risk.text}`}>
-            {result.verdictKey ? t(result.verdictKey) : t(risk.labelKey)}
+            {result.verdictKey ? t(result.verdictKey as Parameters<typeof t>[0]) : t(risk.labelKey as Parameters<typeof t>[0])}
           </p>
 
           {/* Mini stats */}
@@ -303,10 +303,10 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                    {sig.labelKey ? t(sig.labelKey) : sig.label}
+                    {sig.labelKey ? t(sig.labelKey as Parameters<typeof t>[0]) : sig.label}
                   </p>
                   <p className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
-                    {sig.descKey ? t(sig.descKey) : sig.description}
+                    {sig.descKey ? t(sig.descKey as Parameters<typeof t>[0]) : sig.description}
                   </p>
                 </div>
               </motion.div>
@@ -369,7 +369,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                     {s.text}
                   </p>
                   <span className={`ms-auto flex-shrink-0 text-[9px] font-black uppercase tracking-wider ${meta.badge.replace('bg-', 'text-').replace(' text-white', '').replace(' text-black', '')}`}>
-                    {t(`label_${s.label.toLowerCase()}`)}
+                    {t(`label_${s.label.toLowerCase()}` as Parameters<typeof t>[0])}
                   </span>
                 </motion.button>
               );
@@ -400,7 +400,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
                     const clean = sig === 'No strong signals';
                     // Try to resolve via i18n using the signal string as a key stub
                     const sigKey = `signal_${sig.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_label`;
-                    const displayLabel = !clean && t.has(sigKey) ? t(sigKey) : sig;
+                    const displayLabel = !clean && t.has(sigKey as Parameters<typeof t>[0]) ? t(sigKey as Parameters<typeof t>[0]) : sig;
                     return (
                       <span
                         key={sig}
@@ -457,7 +457,7 @@ export default function TextResults({ result, rawText }: TextResultsProps) {
             ].map(({ type, labelKey, color }) => (
               <span key={type} className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-zinc-500">
                 <span className={`w-2 h-2 rounded-full ${color}`} />
-                {t(labelKey)}
+                {t(labelKey as Parameters<typeof t>[0])}
               </span>
             ))}
           </div>

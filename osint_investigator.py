@@ -376,7 +376,7 @@ class InvestigativeTool:
         joint_articles = self.news.search_two_persons(name1, name2)
         if joint_articles:
             for a in joint_articles[:5]:
-                print(f"  📰 {a.get('seendate','')[:8]} | {a.get('domain','')}")
+                print(f"  📰 {a.get('date','')[:8]} | {a.get('source','')}")
                 print(f"     {a.get('title','')[:100]}")
                 print(f"     {a.get('url','')}")
                 connections.append({
@@ -387,6 +387,8 @@ class InvestigativeTool:
                 })
         else:
             print("  لا يوجد ذكر مشترك في الأخبار")
+
+        time.sleep(1)
 
         # مواقع مشتركة
         locs1 = person1.get("known_locations", [])

@@ -146,11 +146,11 @@ export default function LexcoraClient() {
                             <div key={cat.id} className="space-y-12">
                                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-12 transition-colors duration-300">
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-3 text-primary font-bold uppercase tracking-[0.2em] text-sm">
+                                            <div className="flex items-center gap-3 text-primary font-bold uppercase tracking-[0.2em] text-sm">
                                             <cat.icon className="w-5 h-5" />
-                                            <span>{t(`sections.${cat.id}.title`)}</span>
+                                            <span>{t((`sections.${cat.id}.title`) as any)}</span>
                                         </div>
-                                        <h2 className="text-4xl md:text-5xl font-bold text-foreground transition-colors duration-300">{t(`sections.${cat.id}.subtitle`)}</h2>
+                                        <h2 className="text-4xl md:text-5xl font-bold text-foreground transition-colors duration-300">{t((`sections.${cat.id}.subtitle`) as any)}</h2>
                                     </div>
                                 </div>
 
@@ -186,10 +186,10 @@ export default function LexcoraClient() {
                                                 </div>
                                             </div>
                                             <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                                                {t(`sections.${cat.id}.items.${item}.title`)}
+                                                {t((`sections.${cat.id}.items.${item}.title`) as any)}
                                             </h3>
                                             <p className="text-foreground/70 text-sm leading-relaxed transition-colors duration-300">
-                                                {t(`sections.${cat.id}.items.${item}.desc`)}
+                                                {t((`sections.${cat.id}.items.${item}.desc`) as any)}
                                             </p>
                                         </motion.div>
                                     ))}
@@ -211,71 +211,74 @@ export default function LexcoraClient() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {["what_is", "deadlines", "database", "customization", "financials", "permissions"].map((key, idx) => (
-                            <motion.div
-                                key={key}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="p-8 bg-card border border-border rounded-[2.5rem] hover:bg-muted/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-xl"
-                            >
-                                <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
-                                    <MessageSquare className="w-32 h-32 text-foreground" />
-                                </div>
+                        {(() => {
+                            const keys = ["what_is", "deadlines", "database", "customization", "financials", "permissions"] as const;
+                            return keys.map((key, idx) => (
+                                <motion.div
+                                    key={key}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="p-8 bg-card border border-border rounded-[2.5rem] hover:bg-muted/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-xl"
+                                >
+                                    <div className="absolute top-0 end-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                                        <MessageSquare className="w-32 h-32 text-foreground" />
+                                    </div>
 
-                                <div className="space-y-6 relative z-10">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary font-bold text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                            0{idx + 1}
+                                    <div className="space-y-6 relative z-10">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 text-primary font-bold text-sm group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                                0{idx + 1}
+                                            </div>
+                                            <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                                                {t((`faq.items.${key}.q`) as any)}
+                                            </h3>
                                         </div>
-                                        <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                            {t(`faq.items.${key}.q`)}
-                                        </h3>
-                                    </div>
-                                    <p className="text-foreground/70 text-sm leading-relaxed font-light transition-colors duration-300">
-                                        {t(`faq.items.${key}.a`)}
-                                    </p>
+                                        <p className="text-foreground/70 text-sm leading-relaxed font-light transition-colors duration-300">
+                                            {t((`faq.items.${key}.a`) as any)}
+                                        </p>
 
-                                    {/* Visual "Sign/Chart" placeholders per item */}
-                                    <div className="pt-4 border-t border-border transition-colors duration-300">
-                                        {key === "deadlines" && (
-                                            <div className="flex gap-1">
-                                                {[1, 2, 3, 4, 5].map(i => (
-                                                    <div key={i} className={clsx("h-1 flex-1 rounded-full", i < 4 ? "bg-primary" : "bg-muted")}></div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {key === "permissions" && (
-                                            <div className="flex -space-x-2">
-                                                {[1, 2, 3].map(i => (
-                                                    <div key={i} className="w-6 h-6 rounded-full border-2 border-background bg-muted"></div>
-                                                ))}
-                                                <div className="w-6 h-6 rounded-full border-2 border-background bg-primary flex items-center justify-center text-[8px] font-bold text-primary-foreground">+5</div>
-                                            </div>
-                                        )}
-                                        {key === "customization" && (
-                                            <div className="flex gap-2">
-                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
-                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
-                                                <div className="w-4 h-4 rounded-full bg-primary"></div>
-                                            </div>
-                                        )}
-                                        {key === "financials" && (
-                                            <div className="h-4 w-full bg-muted rounded overflow-hidden">
-                                                <div className="h-full bg-primary/50 w-2/3"></div>
-                                            </div>
-                                        )}
-                                        {(key === "what_is" || key === "database") && (
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/70 uppercase tracking-widest">
-                                                <TrendingUp className="w-3 h-3 text-primary" />
-                                                <span className="group-hover:text-primary transition-colors">Optimized System</span>
-                                            </div>
-                                        )}
+                                        {/* Visual "Sign/Chart" placeholders per item */}
+                                        <div className="pt-4 border-t border-border transition-colors duration-300">
+                                            {key === "deadlines" && (
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map(i => (
+                                                        <div key={i} className={clsx("h-1 flex-1 rounded-full", i < 4 ? "bg-primary" : "bg-muted")}></div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {key === "permissions" && (
+                                                <div className="flex -space-x-2">
+                                                    {[1, 2, 3].map(i => (
+                                                        <div key={i} className="w-6 h-6 rounded-full border-2 border-background bg-muted"></div>
+                                                    ))}
+                                                    <div className="w-6 h-6 rounded-full border-2 border-background bg-primary flex items-center justify-center text-[8px] font-bold text-primary-foreground">+5</div>
+                                                </div>
+                                            )}
+                                            {key === "customization" && (
+                                                <div className="flex gap-2">
+                                                    <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                                    <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                                    <div className="w-4 h-4 rounded-full bg-primary"></div>
+                                                </div>
+                                            )}
+                                            {key === "financials" && (
+                                                <div className="h-4 w-full bg-muted rounded overflow-hidden">
+                                                    <div className="h-full bg-primary/50 w-2/3"></div>
+                                                </div>
+                                            )}
+                                            {(key === "what_is" || key === "database") && (
+                                                <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/70 uppercase tracking-widest">
+                                                    <TrendingUp className="w-3 h-3 text-primary" />
+                                                    <span className="group-hover:text-primary transition-colors">Optimized System</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ));
+                        })()}
                     </div>
                 </Container>
             </section>

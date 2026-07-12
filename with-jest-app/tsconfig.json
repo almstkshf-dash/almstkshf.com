@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -18,19 +18,18 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
     "types": [
       "@testing-library/jest-dom"
     ],
     "paths": {
       "@/components/*": [
-        "components/*"
+        "./components/*"
       ],
       "@/pages/*": [
-        "pages/*"
+        "./pages/*"
       ],
       "@/styles/*": [
-        "styles/*"
+        "./styles/*"
       ]
     },
     "plugins": [
@@ -43,9 +42,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "types.d.ts",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    "types.d.ts"
   ],
   "exclude": [
     "node_modules"

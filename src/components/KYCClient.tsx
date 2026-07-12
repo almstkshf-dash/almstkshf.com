@@ -95,10 +95,10 @@ export default function KYCClient() {
                                 <feature.icon className={`w-7 h-7 ${feature.color}`} />
                             </div>
                             <h3 className="text-2xl font-bold text-foreground mb-4">
-                                {t(`features.${feature.key}.title`)}
+                                {t(`features.${feature.key as string}.title` as any)}
                             </h3>
                             <p className="text-muted-foreground leading-relaxed text-lg font-light">
-                                {t(`features.${feature.key}.desc`)}
+                                {t(`features.${feature.key as string}.desc` as any)}
                             </p>
                         </motion.div>
                     ))}

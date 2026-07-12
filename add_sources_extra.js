@@ -69,12 +69,12 @@ const newSources = urls.map(url => {
 });
 
 const file = path.join(process.cwd(), 'src/config/media-sources.ts');
-let content = fs.readFileSync(file, 'utf8');
+const content = fs.readFileSync(file, 'utf8');
 
 // A safer regex that handles any amount of whitespace
 const regex = /];\s*export const SOURCES_BY_COUNTRY/;
 if (regex.test(content)) {
-  let newContent = content.replace(regex, (match) => {
+  const newContent = content.replace(regex, (match) => {
     return ',\n' + newSources.join(',\n') + '\n' + match;
   });
   fs.writeFileSync(file, newContent);

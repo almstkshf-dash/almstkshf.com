@@ -26,33 +26,6 @@ export default function TvRadioClient({
 }) {
     const t = useTranslations("MediaMonitoring.tv_radio");
 
-    const features = [
-        {
-            icon: Globe,
-            titleKey: "analytics", // This text is long, I'll use it as a title or split it
-            color: "text-primary",
-            bg: "bg-primary/10",
-        },
-        {
-            icon: Bell,
-            titleKey: "alerts",
-            color: "text-primary",
-            bg: "bg-primary/10",
-        },
-        {
-            icon: Scissors,
-            titleKey: "clips",
-            color: "text-primary",
-            bg: "bg-primary/10",
-        },
-        {
-            icon: Target,
-            titleKey: "custom_profiles",
-            color: "text-primary",
-            bg: "bg-primary/10",
-        }
-    ];
-
     return (
         <div className="space-y-20 pb-20 bg-background text-foreground transition-colors duration-300">
             {/* Hero Section */}
@@ -245,14 +218,23 @@ export default function TvRadioClient({
                                 <div className="space-y-6 relative z-10">
                                     <div className="space-y-2">
                                         <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                            {t(`use_cases.items.${caseId}.title`)}
+                                            {caseId === "case1" && t("use_cases.items.case1.title")}
+                                            {caseId === "case2" && t("use_cases.items.case2.title")}
+                                            {caseId === "case3" && t("use_cases.items.case3.title")}
+                                            {caseId === "case4" && t("use_cases.items.case4.title")}
                                         </h3>
                                         <p className="inline-block px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
-                                            {t(`use_cases.items.${caseId}.role`)}
+                                            {caseId === "case1" && t("use_cases.items.case1.role")}
+                                            {caseId === "case2" && t("use_cases.items.case2.role")}
+                                            {caseId === "case3" && t("use_cases.items.case3.role")}
+                                            {caseId === "case4" && t("use_cases.items.case4.role")}
                                         </p>
                                     </div>
                                     <p className="text-foreground/70 leading-relaxed text-sm transition-colors">
-                                        {t(`use_cases.items.${caseId}.scenario`)}
+                                        {caseId === "case1" && t("use_cases.items.case1.scenario")}
+                                        {caseId === "case2" && t("use_cases.items.case2.scenario")}
+                                        {caseId === "case3" && t("use_cases.items.case3.scenario")}
+                                        {caseId === "case4" && t("use_cases.items.case4.scenario")}
                                     </p>
                                 </div>
                             </motion.div>

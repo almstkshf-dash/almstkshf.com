@@ -62,10 +62,10 @@ export function DetailedContent() {
                                 </div>
                                 <div className="space-y-3">
                                     <h3 className="text-xl font-bold text-foreground uppercase tracking-wider text-sm transition-colors">
-                                        {t(`features.${f.key}.title`)}
+                                        {t((`features.${f.key}.title`) as any)}
                                     </h3>
                                     <p className={`${TEXT_MUTED} text-sm leading-relaxed transition-colors`}>
-                                        {t(`features.${f.key}.description`)}
+                                        {t((`features.${f.key}.description`) as any)}
                                     </p>
                                 </div>
                             </div>
@@ -123,10 +123,10 @@ export function DetailedContent() {
                         {["multi_platform", "sentiment", "keywords", "competitor"].map((fKey) => (
                             <div key={fKey} className="p-6 rounded-2xl bg-muted/50 border border-border space-y-4 transition-colors">
                                 <h4 className="font-bold text-primary uppercase tracking-widest text-[10px] transition-colors">
-                                    {t(`services.web.features.${fKey}.title`)}
+                                    {t((`services.web.features.${fKey}.title`) as any)}
                                 </h4>
                                 <p className={`${TEXT_MUTED} text-xs leading-relaxed transition-colors`}>
-                                    {t(`services.web.features.${fKey}.description`)}
+                                    {t((`services.web.features.${fKey}.description`) as any)}
                                 </p>
                             </div>
                         ))}

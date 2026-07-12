@@ -174,7 +174,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
           <p
             className={`mt-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${risk.bg} ${risk.border} ${risk.text}`}
           >
-            {result.verdictKey ? t(result.verdictKey) : (result.verdict ?? t(risk.labelKey))}
+            {result.verdictKey ? t(result.verdictKey as Parameters<typeof t>[0]) : (result.verdict ?? t(risk.labelKey as Parameters<typeof t>[0]))}
           </p>
 
           {/* Mini duration / frames info */}
@@ -428,7 +428,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                           : 'bg-emerald-500 text-white'
                         }`}
                     >
-                      {t(`label_${frame.label.toLowerCase()}`)} {frame.score}%
+                      {t(`label_${frame.label.toLowerCase()}` as Parameters<typeof t>[0])} {frame.score}%
                     </span>
                   )}
                   <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
@@ -507,7 +507,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                       {t('overlay_label')}
                     </span>
                     <span className="block font-mono text-lg font-black">
-                      {t(`label_${currentFrame.label.toLowerCase()}`)}
+                      {t(`label_${currentFrame.label.toLowerCase()}` as Parameters<typeof t>[0])}
                     </span>
                   </div>
                   <div>
@@ -538,7 +538,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                       >
                         <AlertCircle className="w-3.5 h-3.5" />
                         {/* Try to translate the ID, fall back to name provided by engine */}
-                        {t.has(`signal_${sig.id}_name`) ? t(`signal_${sig.id}_name`) : sig.name}
+                        {t.has(`signal_${sig.id}_name` as Parameters<typeof t>[0]) ? t(`signal_${sig.id}_name` as Parameters<typeof t>[0]) : sig.name}
                       </span>
                     ))}
                     {currentFrame.signals.every(s => !s.detected) && (
@@ -638,7 +638,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                     ].map(({ labelKey, value, unit = '', warn }) => (
                       <StatPill
                         key={labelKey}
-                        label={t(labelKey)}
+                        label={t(labelKey as Parameters<typeof t>[0])}
                         value={value}
                         unit={unit}
                         warn={warn}
@@ -693,7 +693,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                   ([...(result.deepMl.biometrics?.faceAnomalies || []), ...(result.deepMl.biometrics?.handAnomalies || [])] as ForensicAnomaly[]).map((anomaly: ForensicAnomaly, idx) => (
                     <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-rose-500/15 border border-rose-500/30 rounded-xl text-[11px] font-black text-rose-500 dark:text-rose-400 shadow-sm">
                       <AlertTriangle className="w-3.5 h-3.5" />
-                      {t.has(`anomaly_${anomaly.id}_name`) ? t(`anomaly_${anomaly.id}_name`) : anomaly.name}
+                      {t.has(`anomaly_${anomaly.id}_name` as Parameters<typeof t>[0]) ? t(`anomaly_${anomaly.id}_name` as Parameters<typeof t>[0]) : anomaly.name}
                     </div>
                   ))
                 ) : (
@@ -732,7 +732,7 @@ export default function VideoResults({ result }: VideoResultsProps) {
                 <Layers className="w-4 h-4 text-amber-600" />
                 <span className="text-xs font-bold text-amber-700 dark:text-amber-500">
                   {t('detected_ai_signature')}: <span className="font-black italic">
-                    {(result.deepMl.watermarks as ForensicAnomaly[]).map((w: ForensicAnomaly) => t.has(`watermark_${w.id}_name`) ? t(`watermark_${w.id}_name`) : w.name).join(', ')}
+                    {(result.deepMl.watermarks as ForensicAnomaly[]).map((w: ForensicAnomaly) => t.has(`watermark_${w.id}_name` as Parameters<typeof t>[0]) ? t(`watermark_${w.id}_name` as Parameters<typeof t>[0]) : w.name).join(', ')}
                   </span>
                 </span>
               </div>

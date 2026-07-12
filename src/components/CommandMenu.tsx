@@ -67,7 +67,7 @@ function CommandMenuItem({
     );
 }
 
-function ThemeCommandItems({ runCommand, t }: { runCommand: (cmd: () => void) => void; t: (key: string) => string }) {
+function ThemeCommandItems({ runCommand, t }: { runCommand: (cmd: () => void) => void; t: ReturnType<typeof useTranslations<"Common">> }) {
     const { setTheme } = useTheme();
     return (
         <>
@@ -110,7 +110,7 @@ function ThemeCommandItems({ runCommand, t }: { runCommand: (cmd: () => void) =>
 interface NavigationCommandItemsProps {
     runCommand: (cmd: () => void) => void;
     router: ReturnType<typeof useRouter>;
-    tNav: (key: string) => string;
+    tNav: ReturnType<typeof useTranslations<"Navigation">>;
 }
 
 function NavigationCommandItems({ runCommand, router, tNav }: NavigationCommandItemsProps) {

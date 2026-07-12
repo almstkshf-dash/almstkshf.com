@@ -24,8 +24,16 @@ const COMPANY_INFO = {
     linkedin: "https://www.linkedin.com/company/almstkshf/"
 };
 
+type NavigationLinkKey =
+    | "landing_page"
+    | "about_us"
+    | "pricing"
+    | "lexcora"
+    | "contact"
+    | "faq";
+
 interface FooterLinkItem {
-    labelKey: string;
+    labelKey: NavigationLinkKey;
     href: string;
 }
 

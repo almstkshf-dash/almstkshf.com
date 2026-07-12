@@ -372,10 +372,10 @@ export default function CentralMediaRepositoryClient({
                                                 <feature.icon aria-hidden="true" className="w-7 h-7" />
                                             </div>
                                             <h3 className="text-xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
-                                                {t(feature.titleKey)}
+                                                {t(feature.titleKey as any)}
                                             </h3>
                                             <p className="text-foreground/70 leading-relaxed text-sm">
-                                                {t(feature.descKey)}
+                                                {t(feature.descKey as any)}
                                             </p>
                                         </motion.div>
                                     ))}
