@@ -19,12 +19,8 @@ const nextConfig = {
         ],
     },
     experimental: {
-        /*
-         * optimizeCss (using `critters`) is disabled because it converts blocking stylesheets into 
-         * `<link rel="preload" as="style" onload="this.rel='stylesheet'">` tags. In modern browsers, 
-         * this triggers persistent "preload but not used within a few seconds" warnings in the console, 
-         * cluttering the dev logs and confusing testing suites, especially when inline JS is blocked by CSP.
-         */
+        cpus: 1,
+        workerThreads: false,
         optimizeCss: false,
 
         optimizePackageImports: [
