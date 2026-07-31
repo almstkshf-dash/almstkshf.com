@@ -1,0 +1,353 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Language {
+  EN
+  AR
+}
+
+enum Sentiment {
+  Positive
+  Neutral
+  Negative
+}
+
+enum SourceType {
+  OnlineNews @map("Online News")
+  SocialMedia @map("Social Media")
+  Blog
+  Print
+  PressRelease @map("Press Release")
+}
+
+enum Depth {
+  standard
+  deep
+}
+
+enum IngestMethod {
+  api
+  rss
+  headless
+}
+
+enum AnalysisStatus {
+  pending
+  completed
+  failed
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+model CaseStudy {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String
+  imageUrl    String?
+  content     String?
+  createdAt   DateTime @default(now())
+
+  @@map("case_studies")
+}
+
+model MediaMonitoringArticle {
+  id                      String          @id @default(uuid())
+  keyword                 String
+  url                     String
+  resolvedUrl             String?
+  publishedDate           String
+  publishedTimestamp      Float?
+  title                   String
+  content                 String
+  language                Language        @default(EN)
+  sentiment               Sentiment       @default(Neutral)
+  sourceType              SourceType      @default(OnlineNews)
+  source                  String?
+  sourceId                String?
+  depth                   Depth?
+  ingestMethod            IngestMethod?
+  tone                    String?
+  risk                    String?
+  sourceCountry           String
+  reach                   Int             @default(0)
+  ave                     Float           @default(0.0)
+  imageUrl                String?
+  isManual                Boolean?        @default(false)
+  manualSentimentOverride Boolean?        @default(false)
+  originalSentiment       String?
+  hashtags                String[]        @default([])
+  likes                   Int?            @default(0)
+  retweets                Int?            @default(0)
+  replies                 Int?            @default(0)
+  relevancyScore          Float?          @default(0.0)
+  emotions                Json?
+  publisherUsername       String?
+  createdAt               BigInt          @default(0)
+  analysisStatus          AnalysisStatus? @default(completed)
+
+  crisisPlans CrisisPlan[]
+
+  @@index([publishedDate])
+  @@index([url])
+  @@index([createdAt])
+  @@index([keyword, createdAt])
+  @@index([sourceType, createdAt])
+  @@map("media_monitoring_articles")
+}
+
+model RssFeedArticle {
+  id            String   @id @default(uuid())
+  url           String
+  title         String
+  content       String
+  publishedDate String
+  language      Language @default(EN)
+  source        String?
+  sourceId      String?
+  sourceCountry String
+  imageUrl      String?
+  createdAt     BigInt   @default(0)
+
+  @@index([url])
+  @@index([createdAt])
+  @@map("rss_feed_articles")
+}
+
+model AppSettings {
+  id           String  @id @default(uuid())
+  type         String  @unique @default("global")
+  logoUrl      String?
+  brandName    String?
+  brandTagline String?
+  footerUrl    String?
+  apiKeys      Json?
+  defaults     Json?
+
+  @@map("app_settings")
+}
+
+model SystemSettings {
+  id               String   @id @default(uuid())
+  type             String   @unique @default("global")
+  systemName       String   @default("ALMSTKSHF")
+  maintenanceMode  Boolean  @default(false)
+  allowedFileTypes String[]
+  maxFileSize      Int      @default(10485760)
+
+  @@map("system_settings")
+}
+
+model CrisisPlan {
+  id        String   @id @default(uuid())
+  title     String
+  priority  Priority @default(Medium)
+  actions   String[]
+  status    String   @default("Active")
+  monitorId String?  @map("monitor_id")
+
+  monitorArticle MediaMonitoringArticle? @relation(fields: [monitorId], references: [id], onDelete: SetNull)
+
+  @@map("crisis_plans")
+}
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  timestamp BigInt   @default(0)
+
+  @@map("contact_submissions")
+}
+
+model FreeAnalysis {
+  id             String   @id @default(uuid())
+  inputText      String
+  sentiment      String
+  score          Float
+  risk           String
+  riskScore      Float?
+  tone           String
+  emotions       Json?
+  topics         String[]
+  entities       String[]
+  recommendation String
+  timestamp      BigInt   @default(0)
+  status         String?  @default("completed")
+  error          String?
+
+  @@map("free_analyses")
+}
+
+model Waitlist {
+  id          String @id @default(uuid())
+  email       String
+  name        String?
+  service     String
+  timestamp   BigInt @default(0)
+  timestampMs BigInt?
+
+  @@index([email])
+  @@map("waitlist")
+}
+
+model OsintResult {
+  id        String   @id @default(uuid())
+  type      String
+  query     String
+  result    Json
+  userId    String
+  createdAt BigInt   @default(0)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("osint_results")
+}
+
+model DarkwebResult {
+  id            String   @id @default(uuid())
+  query         String
+  sourceType    String   @map("source_type")
+  url           String
+  title         String
+  snippet       String
+  riskLevel     String   @map("risk_level")
+  countryOrigin String?  @map("country_origin")
+  discoveredAt  BigInt   @map("discovered_at")
+  userId        String   @map("user_id")
+  summary       String?
+  tags          String[]
+
+  @@index([userId])
+  @@map("darkweb_results")
+}
+
+model Payment {
+  id              String   @id @default(uuid())
+  stripeSessionId String
+  userId          String?
+  amount          Float
+  currency        String
+  status          String
+  productName     String
+  customerEmail   String?
+  createdAt       BigInt   @default(0)
+
+  @@index([stripeSessionId])
+  @@index([userId])
+  @@map("payments")
+}
+
+model Subscription {
+  id                   String  @id @default(uuid())
+  userId               String
+  stripeSubscriptionId String  @unique
+  stripePriceId        String
+  stripeCustomerId     String
+  status               String
+  currentPeriodEnd     BigInt
+  cancelAtPeriodEnd    Boolean @default(false)
+  updatedAt            BigInt
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+model UserSettings {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  geminiApiKey String?
+  apiKeys      Json?
+  isSubscribed Boolean? @default(false)
+  plan         String?
+  isTrialActive Boolean? @default(false)
+  trialEndsAt  BigInt?
+  kycStatus    String?  @default("Pending")
+  createdAt    BigInt   @default(0)
+  updatedAt    BigInt   @default(0)
+
+  @@map("user_settings")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt BigInt   @default(0)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Collection {
+  id          String           @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   BigInt?
+  updatedAt   BigInt?
+  items       CollectionItem[]
+
+  @@index([userId])
+  @@map("collections")
+}
+
+model CollectionItem {
+  id           String     @id @default(uuid())
+  collectionId String
+  itemId       String
+  itemType     String
+  title        String?
+  sourceId     String?
+  data         Json?
+  addedAt      BigInt     @default(0)
+  addedBy      String?
+  notes        String?
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId])
+  @@map("collection_items")
+}
+
+model KeywordCollection {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  keywords  String[]
+  createdAt BigInt   @default(0)
+  updatedAt BigInt   @default(0)
+
+  @@index([userId])
+  @@map("keyword_collections")
+}
+
+model MediaSource {
+  id               String   @id @default(uuid())
+  sourceId         String   @unique
+  name             String
+  domain           String
+  country          String
+  languages        String[]
+  type             String
+  credibilityScore Float    @default(1.0)
+  tier             String   @default("standard")
+  isActive         Boolean  @default(true)
+
+  @@map("media_sources")
+}

@@ -7,9 +7,8 @@
  */
 
 import { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/../convex/_generated/api";
 import TvRadioClient from "@/components/TvRadioClient";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
@@ -34,30 +33,33 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default async function TvRadioPage() {
     let initialReports: any[] = [];
-    let initialSettings: any = {};
     let initialCrisisPlans: any[] = [];
 
     try {
-        const [reports, settings, crisisPlans] = await Promise.all([
-            fetchQuery(api.queries.getMediaReports, { source: "All" }),
-            fetchQuery(api.settings.getSettings, {}),
-            fetchQuery(api.queries.getCrisisPlans, {})
+        const [rawArticles, crisisPlans] = await Promise.all([
+            prisma.mediaMonitoringArticle.findMany({
+                take: 50,
+                orderBy: { createdAt: "desc" }
+            }),
+            prisma.crisisPlan.findMany()
         ]);
-        initialReports = reports ?? [];
-        initialSettings = settings ?? {};
-        initialCrisisPlans = crisisPlans ?? [];
-    } catch (err) {
-        console.error("Error pre-fetching TvRadio data on server:", err);
-        initialReports = [];
-        initialSettings = {};
-        initialCrisisPlans = [];
+        initialReports = rawArticles.map((a: any) => ({
+            ...a,
+            createdAt: Number(a.createdAt),
+            status: "Published"
+        }));
+        initialCrisisPlans = crisisPlans;
+    } catch (e) {
+        console.error("Server query error on TvRadioPage:", e);
     }
 
     return (
         <TvRadioClient 
             initialReports={initialReports}
-            initialSettings={initialSettings}
+            initialSettings={{}}
             initialCrisisPlans={initialCrisisPlans}
         />
     );
 }
+
+

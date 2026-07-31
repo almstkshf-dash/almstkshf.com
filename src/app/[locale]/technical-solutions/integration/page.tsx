@@ -8,8 +8,6 @@
 
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { fetchQuery } from 'convex/nextjs';
-import { api } from '@/../convex/_generated/api';
 import IntegrationClient from '@/components/IntegrationClient';
 
 export const dynamic = 'force-dynamic';
@@ -32,11 +30,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function IntegrationPage() {
-    let initialIntegrations = null;
-    try {
-        initialIntegrations = await fetchQuery(api.integrations.getAvailable, {});
-    } catch (err) {
-        console.error("Error pre-fetching available integrations on server:", err);
-    }
-    return <IntegrationClient initialIntegrations={initialIntegrations ?? undefined} />;
+    // TODO: Replace with new backend API calls when Railway backend is ready
+    return <IntegrationClient />;
 }

@@ -7,8 +7,6 @@
  */
 
 import { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/../convex/_generated/api";
 import CrisisManagementClient from "@/components/CrisisManagementClient";
 
 export const dynamic = 'force-dynamic';
@@ -33,31 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function CrisisManagementPage() {
-    let initialReports: any[] = [];
-    let initialSettings: any = {};
-    let initialCrisisPlans: any[] = [];
-
-    try {
-        const [reports, settings, crisisPlans] = await Promise.all([
-            fetchQuery(api.queries.getMediaReports, { source: "All" }),
-            fetchQuery(api.settings.getSettings, {}),
-            fetchQuery(api.queries.getCrisisPlans, {})
-        ]);
-        initialReports = reports ?? [];
-        initialSettings = settings ?? {};
-        initialCrisisPlans = crisisPlans ?? [];
-    } catch (err) {
-        console.error("Error pre-fetching CrisisManagement data on server:", err);
-        initialReports = [];
-        initialSettings = {};
-        initialCrisisPlans = [];
-    }
-
+    // TODO: Replace with new backend API calls when Railway backend is ready
     return (
         <CrisisManagementClient 
-            initialReports={initialReports}
-            initialSettings={initialSettings}
-            initialCrisisPlans={initialCrisisPlans}
+            initialReports={[]}
+            initialSettings={{}}
+            initialCrisisPlans={[]}
         />
     );
 }
+

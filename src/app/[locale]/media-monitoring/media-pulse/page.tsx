@@ -8,9 +8,8 @@
 
 import MediaPulseClient from "@/components/MediaPulseClient";
 import { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/../convex/_generated/api";
 import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,36 +32,28 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function MediaPulsePage() {
-    let initialArticles: any = [];
-    let initialAnalytics: any = {};
-    let initialEmotions: any = {};
-    let initialGeography: any = [];
-
+    let initialArticles: any[] = [];
     try {
-        const [articles, analytics, emotions, geography] = await Promise.all([
-            fetchQuery(api.monitoring.getArticles, { limit: 50 }),
-            fetchQuery(api.monitoring.getAnalyticsOverview, {}),
-            fetchQuery(api.monitoring.getEmotionAggregates, {}),
-            fetchQuery(api.monitoring.getGeographyAggregates, {})
-        ]);
-        initialArticles = articles ?? [];
-        initialAnalytics = analytics ?? {};
-        initialEmotions = emotions ?? {};
-        initialGeography = geography ?? [];
-    } catch (err) {
-        console.error("Error pre-fetching MediaPulse data on server:", err);
-        initialArticles = [];
-        initialAnalytics = {};
-        initialEmotions = {};
-        initialGeography = [];
+        const rawArticles = await prisma.mediaMonitoringArticle.findMany({
+            take: 50,
+            orderBy: { createdAt: "desc" }
+        });
+        initialArticles = rawArticles.map((a: any) => ({
+            ...a,
+            createdAt: Number(a.createdAt),
+            status: "Published"
+        }));
+    } catch (e) {
+        console.error("Server query error on MediaPulsePage:", e);
     }
 
     return (
         <MediaPulseClient
             initialArticles={initialArticles}
-            initialAnalytics={initialAnalytics}
-            initialEmotions={initialEmotions}
-            initialGeography={initialGeography}
+            initialAnalytics={{}}
+            initialEmotions={{}}
+            initialGeography={[]}
         />
     );
 }
+

@@ -7,8 +7,6 @@
  */
 
 import { Metadata } from "next";
-import { fetchQuery } from "convex/nextjs";
-import { api } from "@/../convex/_generated/api";
 import CentralMediaRepositoryClient from "@/components/CentralMediaRepositoryClient";
 
 export const dynamic = 'force-dynamic';
@@ -33,26 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function CentralMediaRepositoryPage() {
-    let initialCollections: any[] = [];
-    let initialSettings: any = {};
-
-    try {
-        const [collections, settings] = await Promise.all([
-            fetchQuery(api.collections.getCollections, {}),
-            fetchQuery(api.settings.getSettings, {})
-        ]);
-        initialCollections = collections ?? [];
-        initialSettings = settings ?? {};
-    } catch (err) {
-        console.error("Error pre-fetching CentralMediaRepository data on server:", err);
-        initialCollections = [];
-        initialSettings = {};
-    }
-
+    // TODO: Replace with new backend API calls when Railway backend is ready
     return (
         <CentralMediaRepositoryClient
-            initialCollections={initialCollections}
-            initialSettings={initialSettings}
+            initialCollections={[]}
+            initialSettings={{}}
         />
     );
 }
+
