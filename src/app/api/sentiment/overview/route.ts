@@ -8,13 +8,11 @@
 
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexClient } from "@/lib/convex-client";
 import { api } from "../../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { checkApiAuth } from "@/lib/api-auth";
 import { unstable_cache } from "next/cache";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
     try {
@@ -37,6 +35,8 @@ export async function GET(req: NextRequest) {
         const sourceCountry = searchParams.get("sourceCountry") || undefined;
         const depth = searchParams.get("depth") || undefined;
 
+        const convex = getConvexClient();
+
         // Use unstable_cache to cache this query on-demand
         const getCachedAnalyticsOverview = (
             keyword?: string,
@@ -46,6 +46,9 @@ export async function GET(req: NextRequest) {
         ) => {
             return unstable_cache(
                 async () => {
+                    if (!convex) {
+                        return null;
+                    }
                     return await convex.query(api.monitoring.getAnalyticsOverview, {
                         keyword,
                         sourceType: sourceType === 'All' ? undefined : sourceType,

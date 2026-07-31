@@ -10,14 +10,12 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUrl } from "@/utils/linkResolver";
 import { calculateMetrics } from "@/lib/metrics";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexClient } from "@/lib/convex-client";
 import { api } from "../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { checkApiAuth } from "@/lib/api-auth";
 import { unstable_cache } from "next/cache";
 import { triggerOnDemandRevalidation } from "@/utils/revalidation";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: NextRequest) {
     try {
@@ -96,13 +94,16 @@ export async function POST(req: NextRequest) {
 
         // Fetch AVE Multiplier from Settings
         let aveMultiplier = 0.005;
-        try {
-            const settings = await convex.query(api.settings.getSettings);
-            if (settings?.defaults?.aveMultiplier) {
-                aveMultiplier = settings.defaults.aveMultiplier;
+        const convex = getConvexClient();
+        if (convex) {
+            try {
+                const settings = await convex.query(api.settings.getSettings);
+                if (settings?.defaults?.aveMultiplier) {
+                    aveMultiplier = settings.defaults.aveMultiplier;
+                }
+            } catch (e) {
+                console.warn("Failed to fetch settings, using default AVE multiplier", e);
             }
-        } catch (e) {
-            console.warn("Failed to fetch settings, using default AVE multiplier", e);
         }
 
         const metrics = calculateMetrics(publisherName, manualData?.reach, aveMultiplier);
@@ -142,7 +143,9 @@ export async function POST(req: NextRequest) {
 
         }
 
-        await convex.mutation(api.monitoring.saveArticle, articleData as any);
+        if (convex) {
+            await convex.mutation(api.monitoring.saveArticle, articleData as any);
+        }
 
         // Trigger cache revalidation on-demand
         triggerOnDemandRevalidation();
@@ -179,6 +182,8 @@ export async function GET(req: NextRequest) {
     const depth = searchParams.get("depth") || undefined;
 
     try {
+        const convex = getConvexClient();
+
         const getCachedArticles = (
             limit: number,
             skip: number,
@@ -188,6 +193,7 @@ export async function GET(req: NextRequest) {
         ) => {
             return unstable_cache(
                 async () => {
+                    if (!convex) return { items: [], total: 0, nextSkip: null };
                     return await convex.query(api.monitoring.getArticles, {
                         limit,
                         skip,

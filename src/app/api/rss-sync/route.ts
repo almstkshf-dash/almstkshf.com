@@ -7,12 +7,10 @@
  */
 
 import { NextResponse } from 'next/server';
-import { ConvexHttpClient } from 'convex/browser';
+import { getConvexClient } from '@/lib/convex-client';
 import { api } from '../../../../convex/_generated/api';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { isSafeUrl } from '@/utils/ssrf';
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(request: Request) {
     try {
@@ -36,6 +34,14 @@ export async function POST(request: Request) {
         // SSRF validation
         if (!(await isSafeUrl(url, { allowHttp: true }))) {
             return NextResponse.json({ success: false, error: 'Invalid or forbidden URL' }, { status: 400 });
+        }
+
+        const convex = getConvexClient();
+        if (!convex) {
+            return NextResponse.json({
+                success: false,
+                error: 'Convex backend is not configured'
+            }, { status: 503 });
         }
 
         // Schedule the background sync task in Convex

@@ -6,17 +6,18 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
+import { getConvexClient } from "@/lib/convex-client";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 /**
- * Returns an authenticated ConvexHttpClient for the current user session.
+ * Returns an authenticated ConvexHttpClient for the current user session, or null if Convex URL is invalid.
  * Uses Clerk JWT with the "convex" template for Convex auth.
  */
-export async function getAuthenticatedConvex(): Promise<ConvexHttpClient> {
+export async function getAuthenticatedConvex(): Promise<ConvexHttpClient | null> {
+    const convex = getConvexClient();
+    if (!convex) return null;
     try {
         const { getToken } = await auth();
         const token = await getToken({ template: "convex" });
@@ -49,6 +50,9 @@ export async function resolveGeminiKey(): Promise<{ key: string | null; error?: 
 
     try {
         const client = await getAuthenticatedConvex();
+        if (!client) {
+            return { key: envKey };
+        }
         const userSettings = await client.query(api.userSettings.get, { userId });
         const appSettings = await client.query(api.settings.getSettings, {});
         

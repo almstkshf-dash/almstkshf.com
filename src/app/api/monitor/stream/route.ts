@@ -8,12 +8,10 @@
 
 export const dynamic = 'force-dynamic';
 import { NextRequest } from "next/server";
-import { ConvexHttpClient } from "convex/browser";
+import { getConvexClient } from "@/lib/convex-client";
 import { api } from "../../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { checkApiAuth } from "@/lib/api-auth";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: NextRequest) {
     const auth = await checkApiAuth();
@@ -97,10 +95,11 @@ export async function GET(req: NextRequest) {
             }
 
             // Fetch new articles since our last timestamp
-            const newArticles = await convex.query(api.monitoring.getArticlesSince, {
+            const convex = getConvexClient();
+            const newArticles = convex ? await convex.query(api.monitoring.getArticlesSince, {
                 since,
                 limit: 30
-            });
+            }) : [];
 
             if (newArticles && newArticles.length > 0) {
                 for (const article of newArticles) {

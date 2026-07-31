@@ -11,10 +11,8 @@ import { checkApiAuth } from '@/lib/api-auth';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { ReportGenerator } from '@/lib/reports';
 import { put } from '@vercel/blob';
-import { ConvexHttpClient } from 'convex/browser';
+import { getConvexClient } from '@/lib/convex-client';
 import { api } from '../../../../convex/_generated/api';
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export const dynamic = 'force-dynamic';
 
@@ -48,8 +46,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
         }
 
+        const convex = getConvexClient();
+
         // Set Convex background job status to processing
-        if (jobId) {
+        if (jobId && convex) {
             await convex.mutation(api.reportJobs.updateReportJobStatus, {
                 jobId,
                 status: 'processing'
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
             }
         } catch (genErr) {
             console.error('Report generation error:', genErr);
-            if (jobId) {
+            if (jobId && convex) {
                 await convex.mutation(api.reportJobs.updateReportJobStatus, {
                     jobId,
                     status: 'failed',
@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
             }
 
             // Mark Convex background job as completed
-            if (jobId) {
+            if (jobId && convex) {
                 await convex.mutation(api.reportJobs.updateReportJobStatus, {
                     jobId,
                     status: 'completed',
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: true, url });
         } catch (uploadErr) {
             console.error('Vercel Blob upload error:', uploadErr);
-            if (jobId) {
+            if (jobId && convex) {
                 await convex.mutation(api.reportJobs.updateReportJobStatus, {
                     jobId,
                     status: 'failed',

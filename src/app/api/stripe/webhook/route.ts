@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '../../../../lib/stripe';
 import Stripe from 'stripe';
-import { ConvexHttpClient } from 'convex/browser';
+import { getConvexClient } from '@/lib/convex-client';
 import { api } from '../../../../../convex/_generated/api';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 
@@ -74,18 +74,18 @@ export async function POST(request: NextRequest) {
                 console.log('✅ Payment successful:', session.id);
 
                 // Initialize Convex Client
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-                // Record the payment in Convex
-                await convex.mutation(api.payments.recordPayment, {
-                    stripeSessionId: session.id,
-                    userId: session.client_reference_id || session.metadata?.userId,
-                    amount: (session.amount_total || 0) / 100, // Convert back from cents
-                    currency: session.currency || 'usd',
-                    status: 'paid',
-                    productName: session.metadata?.productName || 'Default Product',
-                    customerEmail: session.customer_details?.email || undefined,
-                });
+                const convex = getConvexClient();
+                if (convex) {
+                    await convex.mutation(api.payments.recordPayment, {
+                        stripeSessionId: session.id,
+                        userId: session.client_reference_id || session.metadata?.userId,
+                        amount: (session.amount_total || 0) / 100, // Convert back from cents
+                        currency: session.currency || 'usd',
+                        status: 'paid',
+                        productName: session.metadata?.productName || 'Default Product',
+                        customerEmail: session.customer_details?.email || undefined,
+                    });
+                }
 
                 break;
             }
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('📋 Subscription updated:', subscription.id);
 
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+                const convex = getConvexClient();
 
                 const userId = subscription.metadata?.userId;
                 if (!userId) {
@@ -105,20 +105,22 @@ export async function POST(request: NextRequest) {
 
                 const plan = subscription.metadata?.planId as "standard" | "professional" | "enterprise" | undefined;
 
-                await convex.mutation(api.payments.syncSubscription, {
-                    userId,
-                    stripeSubscriptionId: subscription.id,
-                    stripePriceId: subscription.items.data[0].price.id,
-                    stripeCustomerId: subscription.customer as string,
-                    status: subscription.status,
-                    currentPeriodEnd: ((subscription as unknown as { current_period_end?: number }).current_period_end ?? 0) * 1000,
-                    cancelAtPeriodEnd: subscription.cancel_at_period_end,
-                    plan: plan,
-                });
+                if (convex) {
+                    await convex.mutation(api.payments.syncSubscription, {
+                        userId,
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: subscription.items.data[0].price.id,
+                        stripeCustomerId: subscription.customer as string,
+                        status: subscription.status,
+                        currentPeriodEnd: ((subscription as unknown as { current_period_end?: number }).current_period_end ?? 0) * 1000,
+                        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+                        plan: plan,
+                    });
+                }
 
                 // Trigger email notification via Convex Action
                 try {
-                    if (subscription.status === 'active' || subscription.status === 'trialing') {
+                    if (convex && (subscription.status === 'active' || subscription.status === 'trialing')) {
                         let customerEmail = "";
                         try {
                             const customer = await stripe.customers.retrieve(subscription.customer as string);
@@ -148,10 +150,10 @@ export async function POST(request: NextRequest) {
                 const subscription = event.data.object as Stripe.Subscription;
                 console.log('🗑️ Subscription cancelled:', subscription.id);
 
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+                const convex = getConvexClient();
 
                 const userId = subscription.metadata?.userId;
-                if (userId) {
+                if (userId && convex) {
                     await convex.mutation(api.payments.syncSubscription, {
                         userId,
                         stripeSubscriptionId: subscription.id,
@@ -170,7 +172,7 @@ export async function POST(request: NextRequest) {
                 const invoice = event.data.object as Stripe.Invoice;
                 console.log('❌ Invoice payment failed:', invoice.id);
 
-                const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+                const convex = getConvexClient();
 
                 let userId = invoice.metadata?.userId;
 
@@ -183,7 +185,7 @@ export async function POST(request: NextRequest) {
                     }
                 }
 
-                if (userId) {
+                if (userId && convex) {
                     await convex.mutation(api.payments.createBillingNotification, {
                         userId: userId as string,
                         title: "Payment Failed",

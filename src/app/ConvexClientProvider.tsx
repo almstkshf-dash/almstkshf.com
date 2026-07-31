@@ -13,24 +13,17 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ReactNode, useEffect } from "react";
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const rawConvexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+const isValidUrl = rawConvexUrl && !rawConvexUrl.includes("<your-convex-deployment-url>") && (rawConvexUrl.startsWith("http://") || rawConvexUrl.startsWith("https://"));
 
-if (!convexUrl) {
-    if (process.env.NODE_ENV === "production") {
-        // Hard fail in production â€” a missing URL means all Convex queries will silently return undefined.
-        throw new Error(
-            "[ConvexClientProvider] NEXT_PUBLIC_CONVEX_URL is not set. " +
-            "Add it to your Vercel environment variables (Settings â†’ Environment Variables)."
-        );
-    } else {
-        console.warn(
-            "[ConvexClientProvider] NEXT_PUBLIC_CONVEX_URL is missing. " +
-            "Falling back to http://127.0.0.1:3210 for local development."
-        );
-    }
+if (!isValidUrl) {
+    console.warn(
+        "[ConvexClientProvider] NEXT_PUBLIC_CONVEX_URL is missing or invalid. " +
+        "Falling back to http://127.0.0.1:3210."
+    );
 }
 
-const convex = new ConvexReactClient(convexUrl || "http://127.0.0.1:3210");
+const convex = new ConvexReactClient(isValidUrl ? rawConvexUrl! : "http://127.0.0.1:3210");
 
 /**
  * Provides the Convex client with Clerk auth integration.

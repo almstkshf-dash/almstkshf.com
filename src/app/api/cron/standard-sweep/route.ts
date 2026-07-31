@@ -17,8 +17,7 @@ import { MEDIA_SOURCES } from '@/config/media-sources';
 import { uploadImageToBlob } from '@/lib/blob-storage';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { checkAndSetSeenNextjs } from '@/lib/dedup';
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { getConvexClient } from '@/lib/convex-client';
 
 // ── KEYWORD ALIASES & NORMALIZATION ─────────────────────────────────────────
 
@@ -103,6 +102,7 @@ async function limitConcurrency<T, R>(
 
 export async function GET(request: Request) {
     try {
+        const convex = getConvexClient();
         // Apply rate limit
         const rlKey = await getRateLimitKey(request, 'cron-standard-sweep');
         const limitResult = await rateLimit(rlKey, 5, 60);
@@ -126,11 +126,13 @@ export async function GET(request: Request) {
         console.log('[Vercel Cron] Starting Standard Monitoring Sweep...');
 
         // 2. Seed/Update sources list in Convex from configuration on every sweep
-        console.log('[Vercel Cron] Syncing media sources config to Convex...');
-        await convex.mutation(api.sources.seedSources, { sources: MEDIA_SOURCES });
+        if (convex) {
+            console.log('[Vercel Cron] Syncing media sources config to Convex...');
+            await convex.mutation(api.sources.seedSources, { sources: MEDIA_SOURCES });
+        }
 
         // 3. Fetch Settings from Convex
-        const settings = await convex.query(api.settings.getSettings);
+        const settings = convex ? await convex.query(api.settings.getSettings) : null;
         const keywords = settings?.defaults?.standardKeywords || ['UAE', 'Saudi Arabia'];
         const targetCountries = settings?.defaults?.targetCountries || ['ae', 'sa'];
 
@@ -157,12 +159,14 @@ export async function GET(request: Request) {
                 const duration = Date.now() - startTime;
 
                 // Log health info to Convex
-                await convex.mutation(api.sources.updateSourceHealth, {
-                    sourceId: feed.sourceId,
-                    status: 'active',
-                    responseTimeMs: duration,
-                    articlesFound: items.length,
-                });
+                if (convex) {
+                    await convex.mutation(api.sources.updateSourceHealth, {
+                        sourceId: feed.sourceId,
+                        status: 'active',
+                        responseTimeMs: duration,
+                        articlesFound: items.length,
+                    });
+                }
 
                 return { feed, items, success: true };
             } catch (err: any) {
@@ -170,13 +174,15 @@ export async function GET(request: Request) {
                 console.error(`[Vercel Cron] Fetch failed for ${feed.publisher} (${feed.url}):`, err.message || String(err));
 
                 // Log failed status to Convex
-                await convex.mutation(api.sources.updateSourceHealth, {
-                    sourceId: feed.sourceId,
-                    status: 'failed',
-                    responseTimeMs: duration,
-                    articlesFound: 0,
-                    failureMessage: err.message || String(err),
-                });
+                if (convex) {
+                    await convex.mutation(api.sources.updateSourceHealth, {
+                        sourceId: feed.sourceId,
+                        status: 'failed',
+                        responseTimeMs: duration,
+                        articlesFound: 0,
+                        failureMessage: err.message || String(err),
+                    });
+                }
 
                 return { feed, items: [], success: false };
             }
@@ -226,7 +232,7 @@ export async function GET(request: Request) {
                 if (isSeenInRedis) continue;
 
                 // Then check Convex DB duplicates as a secondary guard
-                const isDuplicate = await convex.query(api.monitoring.checkDuplicate, { url: item.link });
+                const isDuplicate = convex ? await convex.query(api.monitoring.checkDuplicate, { url: item.link }) : false;
                 if (isDuplicate) continue;
 
                 // Upload image once
@@ -276,19 +282,21 @@ export async function GET(request: Request) {
         }
 
         // 8. Trigger Convex action for generic APIs (newsapi, newsdata, etc. for deep scanning)
-        for (const keyword of keywords) {
-            try {
-                const apiRes = await convex.action(api.monitoringAction.fetchNews, {
-                    keyword: keyword,
-                    countries: targetCountries.join(','),
-                    languages: 'en,ar',
-                    sourceTypes: 'Online News,Social Media,Blog'
-                });
-                if (apiRes.success) {
-                    totalApiSaved += (apiRes.count || 0);
+        if (convex) {
+            for (const keyword of keywords) {
+                try {
+                    const apiRes = await convex.action(api.monitoringAction.fetchNews, {
+                        keyword: keyword,
+                        countries: targetCountries.join(','),
+                        languages: 'en,ar',
+                        sourceTypes: 'Online News,Social Media,Blog'
+                    });
+                    if (apiRes.success) {
+                        totalApiSaved += (apiRes.count || 0);
+                    }
+                } catch (apiErr) {
+                    console.error(`[Vercel Cron] Convex fetchNews failed for keyword ${keyword}:`, apiErr);
                 }
-            } catch (apiErr) {
-                console.error(`[Vercel Cron] Convex fetchNews failed for keyword ${keyword}:`, apiErr);
             }
         }
 
