@@ -1,5 +1,5 @@
 {
-    "buildCommand": "npx convex deploy --yes && next build",
+    "buildCommand": "next build",
     "installCommand": "npm install",
     "headers": [
         {
