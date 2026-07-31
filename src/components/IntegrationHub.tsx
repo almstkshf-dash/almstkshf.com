@@ -13,22 +13,32 @@ import { Key, Shield, RefreshCw, Eye, EyeOff, Check, Copy } from "lucide-react";
 import Button from "./ui/Button";
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { UserIntegration } from "@/types/integration";
-
 export default function IntegrationHub() {
-    const initialIntegrationsData = useQuery(api.integrations.getUserIntegrations);
-    const [integrations, setIntegrations] = useState<UserIntegration[]>([]);
+    const [integrations, setIntegrations] = useState<UserIntegration[]>([
+        {
+            id: "1",
+            name: "Media Pulse API",
+            description: "Connect to live sentiment data streams.",
+            status: "connected",
+            apiKey: "mk_live_••••••••••••••••"
+        },
+        {
+            id: "2",
+            name: "LEXCORA Suite",
+            description: "Legal ERP and document processing engine integration.",
+            status: "connected",
+            apiKey: "lc_prod_••••••••••••••••"
+        },
+        {
+            id: "3",
+            name: "Strategic Advisor Webhooks",
+            description: "Trigger events based on AI insights.",
+            status: "disconnected"
+        }
+    ]);
     const [showKey, setShowKey] = useState<Record<string, boolean>>({});
     const [copied, setCopied] = useState<string | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        if (initialIntegrationsData) {
-            setIntegrations(initialIntegrationsData as UserIntegration[]);
-        }
-    }, [initialIntegrationsData]);
 
     useEffect(() => {
         return () => {

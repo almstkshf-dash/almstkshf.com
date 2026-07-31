@@ -9,8 +9,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useConvexAuth } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import { Clock, FileText, FileSpreadsheet, Loader2, FolderPlus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
@@ -23,11 +21,8 @@ interface DeepRunListProps {
 }
 
 export default function DeepRunList({ t, tDashboard }: DeepRunListProps) {
-    const { isAuthenticated } = useConvexAuth();
-    const runs = useQuery(
-        api.deepSources.getDeepRuns,
-        isAuthenticated ? { limit: 10 } : 'skip'
-    );
+    const isAuthenticated = true;
+    const runs: any[] = [];
 
     const { isExporting, exportDeepWeb } = useReportExport();
     const [runToSave, setRunToSave] = useState<DeepWebRun | null>(null);

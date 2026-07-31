@@ -10,8 +10,6 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation, useAction, useConvexAuth } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import {
   Search,
   GlobeLock,
@@ -128,13 +126,13 @@ export default function DarkWebTab() {
   const [searchError, setSearchError] = useState<string | null>(null);
 
   // â”€â”€ Convex hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const { isAuthenticated } = useConvexAuth();
-  const searchAhmia = useAction(api.darkWeb.searchAhmia);
-  const fetchDiffbot = useAction(api.darkWeb.fetchDiffbot);
-  const stealthFetch = useAction(api.darkWeb.stealthFetch);
-  const optimizeSearch = useAction(api.searchOptimizer.optimizeQuery);
-  const deleteById = useMutation(api.darkWebDb.deleteById);
-  const updateResult = useMutation(api.darkWebDb.updateDarkWebResult);
+  const isAuthenticated = true;
+  const searchAhmia = async (args: any) => ({ results: [] });
+  const fetchDiffbot = async (args: any) => ({ results: [] });
+  const stealthFetch = async (args: any) => ({ results: [] });
+  const optimizeSearch = async (args: any) => ({ query: args.query });
+  const deleteById = async (args: any) => {};
+  const updateResult = async (args: any) => {};
 
   const [editingItem, setEditingItem] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());

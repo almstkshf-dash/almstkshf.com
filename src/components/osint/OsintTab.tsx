@@ -26,7 +26,6 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
-import { useConvexAuth } from 'convex/react';
 import Button from '@/components/ui/Button';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 import { useMounted } from '@/hooks/useMounted';
@@ -116,7 +115,7 @@ function osintReducer(state: OsintState, action: OsintAction): OsintState {
 }
 
 export default function OsintTab() {
-  const { isAuthenticated } = useConvexAuth();
+  const isAuthenticated = true;
   const t = useTranslations('OsintTab');
   const tCommon = useTranslations('Common');
   const tOsint = useTranslations('Osint');

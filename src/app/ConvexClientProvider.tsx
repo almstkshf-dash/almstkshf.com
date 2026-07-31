@@ -32,6 +32,10 @@ const convex = new ConvexReactClient(isValidUrl ? rawConvexUrl! : "http://127.0.
  * a single, top-level Clerk initialisation before any useAuth() calls.
  */
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
+    if (!isValidUrl) {
+        return <>{children}</>;
+    }
+
     return (
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             {children}

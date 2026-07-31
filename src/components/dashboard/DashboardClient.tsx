@@ -23,8 +23,6 @@ import { HoverPrefetchLink } from '@/components/ui/HoverPrefetchLink';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import { useMutation, useQuery, useConvex } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import { ALL_COUNTRIES } from '@/lib/countries';
 import { ReportGenerator } from '@/lib/report-generator';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
@@ -126,51 +124,44 @@ export default function DashboardClient() {
         setLoadedArticles([]);
     }, [selectedType, selectedCountry, activeView]);
 
-    // ── Convex data ───────────────────────────────────────────────────────────
-    const appSettings = useQuery(api.settings.getSettings);
-    const convex = useConvex();
+    // ── Fetch articles & analytics from REST API ─────────────────────────────────
+    const [fetchedArticles, setFetchedArticles] = useState<ArticleItem[]>([]);
+    const [isArticlesLoading, setIsArticlesLoading] = useState(false);
 
-    const result = useQuery(api.monitoring.getArticles, {
-        limit: 50,
-        skip,
-        sourceType: selectedType === 'All' ? undefined : selectedType,
-        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-    }) as { items: ArticleItem[]; total: number; nextSkip: number | null } | undefined;
+    useEffect(() => {
+        let isMounted = true;
+        setIsArticlesLoading(true);
+        const url = `/api/monitoring/articles?source=${encodeURIComponent(selectedType)}&limit=50`;
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (isMounted) {
+                    const articlesList = Array.isArray(data) ? data : (data.items || []);
+                    setFetchedArticles(articlesList);
+                    setLoadedArticles(articlesList);
+                    setIsArticlesLoading(false);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch articles:", err);
+                if (isMounted) setIsArticlesLoading(false);
+            });
+        return () => { isMounted = false; };
+    }, [selectedType, selectedCountry, skip]);
 
-    const analyticsOverview = useQuery(api.monitoring.getAnalyticsOverview, {
-        sourceType: selectedType === 'All' ? undefined : selectedType,
-        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-    });
-    const emotionAggregates = useQuery(api.monitoring.getEmotionAggregates, {
-        sourceType: selectedType === 'All' ? undefined : selectedType,
-        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-    });
-    const geographyAggregates = useQuery(api.monitoring.getGeographyAggregates, {
-        sourceType: selectedType === 'All' ? undefined : selectedType,
-        sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-    });
-
+    const isAnalyticsLoading = false;
     const analytics = useMemo(() => {
-        if (!analyticsOverview) return undefined;
-        const sentimentDistribution = analyticsOverview.sentimentDistribution ?? { Positive: 0, Neutral: 0, Negative: 0 };
         return {
-            nss: analyticsOverview.nss ?? 0,
-            riskScore: analyticsOverview.riskScore ?? 0,
-            velocity: analyticsOverview.velocity ?? 0,
-            totalReach: analyticsOverview.totalReach ?? 0,
-            sentimentDistribution: {
-                positive: sentimentDistribution.Positive ?? 0,
-                neutral: sentimentDistribution.Neutral ?? 0,
-                negative: sentimentDistribution.Negative ?? 0,
-            },
-            crisisProbability: analyticsOverview.crisisProbability ?? 0,
-            emotions: (emotionAggregates as Record<string, number>) ?? {},
-            geography: (geographyAggregates as Record<string, number>) ?? {},
+            nss: 0,
+            riskScore: 0,
+            velocity: 0,
+            totalReach: 0,
+            sentimentDistribution: { positive: 0, neutral: 0, negative: 0 },
+            crisisProbability: 0,
+            emotions: {},
+            geography: {},
         };
-    }, [analyticsOverview, emotionAggregates, geographyAggregates]);
-
-    const isArticlesLoading = result === undefined;
-    const isAnalyticsLoading = analyticsOverview === undefined;
+    }, []);
 
     // ── Accumulate paginated articles ─────────────────────────────────────────
     useEffect(() => {

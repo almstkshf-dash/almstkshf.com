@@ -8,34 +8,29 @@
 
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 import { FileText, Download, Calendar, Search, Filter } from "lucide-react";
 import Button from "./ui/Button";
 import { SkeletonReportRow } from "./ui/Skeleton";
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
-
 import { useTranslations } from "next-intl";
 import { ReportGenerator } from "@/lib/report-generator";
 import { toast } from "sonner";
 import { ReportTranslations } from "@/types/reports";
 import CollectionDetailsModal from "./ui/CollectionDetailsModal";
-import { Doc } from "@/../convex/_generated/dataModel";
 
 export default function ReportLibrary({
     initialCollections,
     initialSettings,
 }: {
-    initialCollections?: Doc<"collections">[];
-    initialSettings?: Doc<"app_settings"> | null;
+    initialCollections?: any[];
+    initialSettings?: any;
 }) {
     const t = useTranslations("MediaMonitoring.central_media_repository.library");
     const tCommon = useTranslations("Common");
     const [selectedCollectionId, setSelectedCollectionId] = useState<any>(null);
-    const collectionsResult = useQuery(api.collections.getCollections);
-    const collections = collectionsResult || initialCollections;
-    const settings = useQuery(api.settings.getSettings) || initialSettings;
+    const collections = initialCollections || [];
+    const settings = initialSettings || null;
     const [inputValue, setInputValue] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 

@@ -33,8 +33,6 @@ const ArticlesTrendChart = dynamic(() => import("./ArticlesTrendChart"), {
 
 import Button from "@/components/ui/Button";
 import html2canvas from "html2canvas-pro";
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { MonitoringArticle } from "@/types/reports";
 import { useReportExport } from "@/hooks/useReportExport";
 import { parsePublishedDate } from "@/utils/date-utils";
@@ -62,7 +60,7 @@ interface DashboardGridProps {
 const DashboardGrid = memo(({ articles, analytics, isLoading, aiSummary, isAiLoading, topLeftSlot, topRightSlot }: DashboardGridProps) => {
     const t = useTranslations("MediaPulseDetail.dashboard_grid");
     const [trendRange, setTrendRange] = useState<7 | 30>(7);
-    const saveReport = useMutation(api.userActions.saveReport);
+    const saveReport = async (args: any) => {};
 
     const { isExporting, exportPressRelease } = useReportExport();
 

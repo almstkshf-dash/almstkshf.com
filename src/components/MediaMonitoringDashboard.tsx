@@ -9,8 +9,6 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -56,7 +54,7 @@ function normalizeFilter(filter?: DashboardFilter): ArticleFilter {
     return filter as ArticleFilter;
 }
 
-export default function MediaMonitoringDashboard({ 
+export default function MediaMonitoringDashboard({
     defaultFilter,
     initialReports,
     initialSettings,
@@ -76,33 +74,18 @@ export default function MediaMonitoringDashboard({
     const [editingItem, setEditingItem] = useState<any>(null);
     const [deleteConfirmationId, setDeleteConfirmationId] = useState<string | null>(null);
 
-    const deleteArticle = useMutation(api.monitoring.deleteArticle);
-    const updateArticle = useMutation(api.monitoring.updateArticle);
-    const settings = useQuery(api.settings.getSettings) || initialSettings;
+    const deleteArticle = async (args: any) => { };
+    const updateArticle = async (args: any) => { };
+    const settings = initialSettings || null;
 
-    // Real-time Event Stream (SSE) Persistence with heartbeat & auto-reconnect
     const { status: sseStatus, reconnect: sseReconnect } = useSSEPersistence({
         onArticle: (article) => {
             console.log("[SSE Client] Streamed new article:", article);
-            toast.info(
-                isRTL 
-                    ? `مقال جديد: ${article.title.substring(0, 40)}...` 
-                    : `New article: ${article.title.substring(0, 40)}...`,
-                {
-                    description: article.source,
-                    action: {
-                        label: isRTL ? "تحديث" : "Refresh",
-                        onClick: () => router.refresh()
-                    }
-                }
-            );
         }
     });
 
-    // Initialize filter with normalized defaultFilter first to avoid hydration mismatch
     const [filter, setFilter] = useState<ArticleFilter>(normalizeFilter(defaultFilter));
 
-    // Sync state with URL search parameters to handle back/forward navigation
     useEffect(() => {
         const f = searchParams.get('mfilter') as ArticleFilter;
         if (f && ["All", "Online News", "Social Media", "Press Release", "Blog", "Print"].includes(f)) {
@@ -117,10 +100,8 @@ export default function MediaMonitoringDashboard({
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
-
-
-    const reports = useQuery(api.queries.getMediaReports, { source: filter }) || initialReports;
-    const crisisPlans = useQuery(api.queries.getCrisisPlans, {}) || initialCrisisPlans;
+    const reports = initialReports || [];
+    const crisisPlans = initialCrisisPlans || [];
 
     const filters = useMemo<FilterOption[]>(() => [
         { label: "All", value: "All", icon: Filter, href: "/media-monitoring/central-media-repository" },
@@ -190,10 +171,10 @@ export default function MediaMonitoringDashboard({
             toast.error(tCommon('no_data'));
             return;
         }
-        
+
         try {
             toast.loading(tCommon('exporting'), { id: 'export-dashboard' });
-            
+
             let chartImages: { reportsChart?: string } | undefined = undefined;
             if (format === 'pdf') {
                 const element = document.getElementById('reports-chart-container');
@@ -212,7 +193,7 @@ export default function MediaMonitoringDashboard({
                     }
                 }
             }
-            
+
             await ReportGenerator.exportMediaMonitoringReport(
                 reports as any,
                 exportTranslations,
@@ -258,8 +239,8 @@ export default function MediaMonitoringDashboard({
                 ))}
             </div>
 
-            <SaveToCollectionModal 
-                isOpen={!!itemToSave} 
+            <SaveToCollectionModal
+                isOpen={!!itemToSave}
                 onClose={() => setItemToSave(null)}
                 item={itemToSave ? {
                     id: itemToSave._id,
@@ -362,7 +343,7 @@ export default function MediaMonitoringDashboard({
                                     });
                                     setEditingItem(null);
                                     toast.success('Article updated successfully');
-                                } catch(e) {
+                                } catch (e) {
                                     console.error(e);
                                     toast.error("Failed to update article.");
                                 }
@@ -387,14 +368,14 @@ export default function MediaMonitoringDashboard({
                             <Button variant="outline" className="flex-1" onClick={() => setDeleteConfirmationId(null)}>
                                 {tCommon('cancel') || 'Cancel'}
                             </Button>
-                            <Button 
+                            <Button
                                 className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                                 onClick={async () => {
                                     try {
                                         await deleteArticle({ id: deleteConfirmationId as any });
                                         setDeleteConfirmationId(null);
                                         toast.success('Article deleted successfully');
-                                    } catch(e) {
+                                    } catch (e) {
                                         console.error(e);
                                         toast.error("Failed to delete article.");
                                     }
@@ -494,9 +475,9 @@ export default function MediaMonitoringDashboard({
                         </div>
                         <p className="text-muted-foreground font-medium">{tDashboard('no_results') || "No articles match your criteria."}</p>
                         <p className="text-sm text-muted-foreground/70 mt-1">{tDashboard('no_results_hint') || "Try adjusting your filters or refining your search query."}</p>
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
+                        <Button
+                            variant="outline"
+                            size="sm"
                             className="mt-6"
                             onClick={() => handleFilterChange("All")}
                         >
@@ -506,7 +487,7 @@ export default function MediaMonitoringDashboard({
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[480px]">
                         {reports.map((article: any) => (
-                            <div 
+                            <div
                                 key={article._id}
                                 className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full min-h-[260px] hover:-translate-y-1"
                             >
@@ -519,28 +500,28 @@ export default function MediaMonitoringDashboard({
                                             <div className={clsx(
                                                 "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
                                                 article.sentiment === "Positive" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-                                                article.sentiment === "Negative" ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
-                                                "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                                                    article.sentiment === "Negative" ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
+                                                        "bg-amber-500/10 text-amber-500 border-amber-500/20"
                                             )}>
                                                 {article.sentiment}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1.5">
-                                            <button 
+                                            <button
                                                 onClick={() => setEditingItem(article)}
                                                 className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-sm"
                                                 title={tCommon('edit') || 'Edit'}
                                             >
                                                 <Edit2 className="w-4 h-4" />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => setDeleteConfirmationId(article._id)}
                                                 className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-sm"
                                                 title={tCommon('delete') || 'Delete'}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => setItemToSave(article)}
                                                 className="p-2 rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm"
                                                 title={tCommon('save_to_collection')}

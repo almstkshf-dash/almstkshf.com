@@ -23,9 +23,6 @@ const AnalyticsStrategy = dynamic(() => import("./media-pulse/AnalyticsStrategy"
     loading: () => <div className="h-48 animate-pulse rounded-3xl bg-muted/5 border border-border/20" />
 });
 
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-
 export default function MediaPulseClient({
     initialArticles,
     initialAnalytics,
@@ -37,10 +34,8 @@ export default function MediaPulseClient({
     initialEmotions?: any;
     initialGeography?: any;
 }) {
-    const articlesResult = useQuery(api.monitoring.getArticles, { limit: 50 });
-    const articles = articlesResult?.items || initialArticles?.items || [];
-    const rawAnalytics = useQuery(api.monitoring.getAnalyticsOverview, {});
-    const analytics = rawAnalytics || initialAnalytics || {
+    const articles = Array.isArray(initialArticles) ? initialArticles : (initialArticles?.items || []);
+    const analytics = initialAnalytics && Object.keys(initialAnalytics).length > 0 ? initialAnalytics : {
         nss: 0,
         riskScore: 0,
         velocity: 0,
@@ -49,11 +44,11 @@ export default function MediaPulseClient({
         crisisProbability: 0,
     };
 
-    const emotions = useQuery(api.monitoring.getEmotionAggregates, {}) || initialEmotions || {};
-    const geography = useQuery(api.monitoring.getGeographyAggregates, {}) || initialGeography || {};
+    const emotions = initialEmotions || {};
+    const geography = initialGeography || {};
 
-    const isLoading = (articlesResult === undefined && !initialArticles) || 
-                      (rawAnalytics === undefined && !initialAnalytics);
+    const isLoading = false;
+
 
     return (
         <main className="min-h-screen pt-32 pb-20 bg-background transition-colors">

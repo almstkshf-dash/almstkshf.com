@@ -8,9 +8,6 @@
 
 "use client";
 
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
 import { Bell } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
@@ -23,9 +20,9 @@ export function NotificationBell() {
     const t = useTranslations("Notifications");
     const [open, setOpen] = useState(false);
     const [visibleCount, setVisibleCount] = useState(5);
-    const unreadNotifications = useQuery(api.monitoring.getUnreadNotifications) || [];
+    const unreadNotifications: any[] = [];
     const visibleNotifications = unreadNotifications.slice(0, visibleCount);
-    const markAsRead = useMutation(api.monitoring.markNotificationAsRead);
+    const markAsRead = async (id: any) => {};
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

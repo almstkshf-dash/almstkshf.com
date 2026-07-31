@@ -10,8 +10,6 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
 import { Save, Upload, Loader2, CreditCard, Settings, Key, Share2, MessageSquare, Shield, Zap, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@clerk/nextjs';
@@ -26,10 +24,20 @@ import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 export default function SettingsClient() {
     const t = useTranslations('Settings');
     const { userId } = useAuth();
-    const settings = useQuery(api.settings.getSettings);
-    const updateSettings = useMutation(api.settings.updateSettings);
-    const systemConfig = useQuery(api.settings.getSystemConfig);
-    const updateSystemConfig = useMutation(api.settings.updateSystemConfig);
+    
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data && !data.error) {
+                    setBrandName(data.brandName || '');
+                    setBrandTagline(data.brandTagline || '');
+                    setLogoUrl(data.logoUrl || '');
+                    setFooterUrl(data.footerUrl || '');
+                }
+            })
+            .catch(console.error);
+    }, []);
 
     const [isLoading, setIsLoading] = useState(false);
     const [logoUrl, setLogoUrl] = useState('');

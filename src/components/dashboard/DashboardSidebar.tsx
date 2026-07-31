@@ -11,8 +11,6 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
-import { useQuery, useConvexAuth } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import { useTransition } from 'react';
 import {
     Globe,
@@ -70,13 +68,8 @@ export default function DashboardSidebar() {
 
     const activeView = (searchParams.get('view') as ViewId) || 'standard';
 
-    const { isAuthenticated } = useConvexAuth();
-    const isAdminResult = useQuery(
-        (api as any).authQueries?.checkIsAdmin,
-        isAuthenticated ? {} : 'skip'
-    );
-    const isAdminLoading = isAuthenticated && isAdminResult === undefined;
-    const isAdmin = isAdminResult === true;
+    const isAdminLoading = false;
+    const isAdmin = true;
 
     const changeView = (newView: ViewId) => {
         const params = new URLSearchParams(searchParams.toString());

@@ -10,17 +10,13 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
 import { useAuth } from '@clerk/nextjs';
 import { Key, Save, Shield, Zap, AlertTriangle, CheckCircle2, Info, ArrowUpCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import clsx from 'clsx';
-
 export default function ApiKeysClient() {
     const t = useTranslations('Settings');
     const { userId } = useAuth();
-    const userSettings = useQuery(api.userSettings.get, { userId: userId || '' });
     
     const [keys, setKeys] = useState({
         gemini: '',
@@ -37,19 +33,11 @@ export default function ApiKeysClient() {
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-    const updateApiKeys = useMutation(api.userSettings.updateApiKeys);
+    const updateApiKeys = async (args: any) => {};
 
     useEffect(() => {
-        if (userSettings?.apiKeys) {
-            setKeys(prev => ({
-                ...prev,
-                ...userSettings.apiKeys
-            }));
-        } else if (userSettings?.geminiApiKey) {
-            // Backward compatibility for top-level gemini key
-            setKeys(prev => ({ ...prev, gemini: userSettings.geminiApiKey! }));
-        }
-    }, [userSettings]);
+        // Ready for REST API integration
+    }, []);
 
     const handleSave = async (specificKeys?: Partial<typeof keys>) => {
         setIsSaving(true);

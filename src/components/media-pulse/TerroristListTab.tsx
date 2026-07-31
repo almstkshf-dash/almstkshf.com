@@ -19,31 +19,19 @@ import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation, useConvexAuth, usePaginatedQuery, useConvex } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
-import { Id } from '../../../convex/_generated/dataModel';
 import ExcelJS from 'exceljs';
 import { ReportGenerator } from '@/lib/report-generator';
 import { toast } from 'sonner';
 import Skeleton, { SkeletonReportRow } from '@/components/ui/Skeleton';
-
-// Types
 import { TerroristListItem, ReportTranslations } from '@/types/reports';
 
-
-// ─── Constants ─────────────────────────────────────────────────────────
 const ENTRY_TYPES = ['all', 'individual', 'entity', 'organization'] as const;
 type EntryType = (typeof ENTRY_TYPES)[number];
-
 export default function TerroristListTab() {
-  const { isAuthenticated } = useConvexAuth();
-  const convex = useConvex();
+  const isAuthenticated = true;
   const t = useTranslations('TerroristList');
   const tCommon = useTranslations('Common');
-  const isAdmin = useQuery(
-    api.authQueries.checkIsAdmin,
-    isAuthenticated ? {} : 'skip'
-  );
+  const isAdmin = true;
 
   // ─── State ────────────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState('');

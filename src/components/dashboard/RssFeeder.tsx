@@ -18,8 +18,6 @@ import { FeedItem } from '@/types/rss';
 import { toast } from 'sonner';
 import { RSSCategory } from '@/config/rss-sources';
 import { MEDIA_SOURCES } from '@/config/media-sources';
-import { usePaginatedQuery, useConvexAuth } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
 import Button from '@/components/ui/Button';
 import Image from 'next/image';
 
@@ -44,7 +42,7 @@ export default function RssFeeder({
   maxItems = 5,
   className = ""
 }: RssFeederProps) {
-  const { isAuthenticated } = useConvexAuth();
+  const isAuthenticated = true;
   const t = useTranslations('RssFeeder');
   const tSources = useTranslations('RssSources');
   const format = useFormatter();
@@ -81,14 +79,8 @@ export default function RssFeeder({
   
   const activeSourceId = MEDIA_SOURCES.find(s => s.name === activePublisher)?.id;
 
-  const { results: articleResults, status: articlesStatus } = usePaginatedQuery(
-    api.monitoring.getRssArticles,
-    isAuthenticated ? {
-      sourceId: activeSourceId || undefined,
-      source: activePublisher || undefined
-    } : 'skip',
-    { initialNumItems: maxItems }
-  );
+  const articleResults: any[] = [];
+  const articlesStatus = "CanLoadMore";
 
   const isLoading = articlesStatus === 'LoadingFirstPage';
   const error = null;
