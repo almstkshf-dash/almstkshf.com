@@ -108,8 +108,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             site: "@almstkshf",
             creator: "@tameryounes",
             title: isAr ? "المستكشف - حلول إعلامية وقانونية" : "ALMSTKSHF - Media & Legal Solutions",
-            description: isAr 
-                ? "شريكك الاستراتيجي للرصد الإعلامي والتحليل الذكي." 
+            description: isAr
+                ? "شريكك الاستراتيجي للرصد الإعلامي والتحليل الذكي."
                 : "Your strategic partner for intelligent media monitoring.",
             images: ["/logo.png"],
         },
@@ -156,7 +156,7 @@ export default async function RootLayout({
     const { locale } = await params;
 
     // Validate that the incoming `locale` parameter is valid
-     
+
     if (!routing.locales.includes(locale as Locale)) {
         notFound();
     }
@@ -195,7 +195,7 @@ export default async function RootLayout({
                 )}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                {process.env.NEXT_PUBLIC_CONVEX_URL && (
+                {process.env.NEXT_PUBLIC_CONVEX_URL && (process.env.NEXT_PUBLIC_CONVEX_URL.startsWith("http://") || process.env.NEXT_PUBLIC_CONVEX_URL.startsWith("https://")) && (
                     <link rel="preconnect" href={new URL(process.env.NEXT_PUBLIC_CONVEX_URL).origin} />
                 )}
             </head>
