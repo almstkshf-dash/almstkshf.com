@@ -67,7 +67,7 @@ export default memo(function HomeClient() {
                 style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
             >
                 <div className="mb-10 text-center">
-                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/70">{t('Clients.title')}</p>
+                    <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-foreground/70">{t('Clients.title')}</h2>
                 </div>
 
                 <div className="relative flex overflow-x-hidden">

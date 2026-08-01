@@ -20,9 +20,9 @@ import React from 'react';
  */
 export default function HomeSchema({ locale }: { locale: string }) {
     const isAr = locale === 'ar';
-    const baseUrl = 'https://almstkshf.com';
+    const baseUrl = 'https://www.almstkshf.com';
 
-    const schemas = [
+    const schemas: Record<string, any>[] = [
         // ── 1. SoftwareApplication — the media monitoring platform itself ──
         {
             '@context': 'https://schema.org',
@@ -99,6 +99,65 @@ export default function HomeSchema({ locale }: { locale: string }) {
             'url': `${baseUrl}/${locale}/media-monitoring/tv-radio`,
             'serviceType': isAr ? 'رصد إعلامي' : 'Media Monitoring',
         },
+
+        // ── 4. FAQPage — Rich Snippets for Search ──
+        {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': isAr
+                ? [
+                    {
+                        '@type': 'Question',
+                        'name': 'ما هي منصة المستكشف للرصد الإعلامي؟',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'المستكشف هي منصة ذكاء اصطناعي متخصصة في رصد البث التلفزيوني والإذاعي والصحافة المطبوعة والرقمية وتحليل مشاعر الرأي العام في الإمارات والسعودية والخليج.'
+                        }
+                    },
+                    {
+                        '@type': 'Question',
+                        'name': 'كيف يتم تحليل المشاعر والنبرة الإعلامية؟',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'تستخدم المنصة خوارزميات معالجة اللغة الطبيعية (NLP) المتطورة لتحليل التغطيات الإعلامية باللغتين العربية والإنجليزية وتحديد المشاعر (إيجابي، محايد، سلبي) بدقة عالية.'
+                        }
+                    },
+                    {
+                        '@type': 'Question',
+                        'name': 'هل يوفر المستكشف تنبيهات فورية للأزمات الإعلامية؟',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'نعم، المنصة ترسل تنبيهات فتكية وفورية عبر الواتساب والبريد الإلكتروني عند اكتشاف نبرة سلبية أو مؤشرات أزمة سمعة إعلامية.'
+                        }
+                    }
+                ]
+                : [
+                    {
+                        '@type': 'Question',
+                        'name': 'What is the ALMSTKSHF Media Monitoring Platform?',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'ALMSTKSHF is an AI-powered media intelligence platform that monitors TV, radio broadcasts, print, and digital press, offering sentiment analysis across the UAE, Saudi Arabia, and the Gulf.'
+                        }
+                    },
+                    {
+                        '@type': 'Question',
+                        'name': 'How does ALMSTKSHF perform Arabic sentiment analysis?',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'The platform uses advanced Natural Language Processing (NLP) models specifically trained on Arabic dialects and news contexts to evaluate sentiment (positive, neutral, negative) accurately.'
+                        }
+                    },
+                    {
+                        '@type': 'Question',
+                        'name': 'Does ALMSTKSHF support real-time crisis alerts?',
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': 'Yes, ALMSTKSHF provides instant WhatsApp and email notifications whenever negative sentiment spikes or potential reputation risks are detected.'
+                        }
+                    }
+                ]
+        }
     ];
 
     return (

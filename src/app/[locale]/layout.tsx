@@ -82,24 +82,40 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
     return {
         title: {
-            default: isAr ? "المستكشف - لخدمات الرصد إعلامي" : "Almstkshf - Media Monitoring Services",
-            template: `%s | ${isAr ? "المستكشف" : "Almstkshf"}`
+            default: isAr
+                ? "المستكشف — رصد إعلامي وتحليل مشاعر بالذكاء الاصطناعي في الإمارات والسعودية"
+                : "ALMSTKSHF — AI Media Monitoring & Sentiment Analysis | UAE & Saudi Arabia",
+            template: `%s | ${isAr ? "المستكشف - رصد إعلامي" : "ALMSTKSHF Media Monitoring"}`
         },
         description: isAr
-            ? "رواد تحليل البيانات، الرصد الإعلامي الاستباقي، وتحليل مشاعر الرأي العام بدعم كامل للغة العربية والإنجليزية."
-            : "Pioneers in data analysis, proactive media monitoring, and public opinion analysis with full support for Arabic and English.",
-        keywords: ["AI", "Media Monitoring", "Legal Tech", "UAE", "Data Analysis", "Strategic Advisor", "Dubai", "Abu Dhabi"],
+            ? "منصة رصد إعلامي وتحليل مشاعر الرأي العام بالذكاء الاصطناعي في الإمارات والسعودية والخليج. تتبع البث التلفزيوني والإذاعي والصحافة الرقمية مع تقارير فورية وتنبيهات الأزمات."
+            : "AI-powered media monitoring and sentiment analysis platform serving UAE, Saudi Arabia & the Gulf. Track TV, radio, print and digital press with real-time reports and crisis alerts.",
+        keywords: [
+            "رصد إعلامي", "تحليل مشاعر", "media monitoring UAE", "media monitoring Saudi Arabia",
+            "sentiment analysis Arabic", "رصد الأخبار", "تحليل الإعلام", "crisis management",
+            "إدارة الأزمات", "press monitoring Gulf", "رصد البث", "OSINT", "media intelligence",
+            "AI media analysis", "رصد تلفزيوني", "رصد إذاعي", "Dubai", "Abu Dhabi",
+            "مراقبة وسائل الإعلام", "brand reputation monitoring", "تحليل الرأي العام",
+        ],
         openGraph: {
             type: "website",
             locale: locale === "ar" ? "ar_AE" : "en_US",
             url: `https://www.almstkshf.com/${locale}`,
-            siteName: "ALMSTKSHF",
+            siteName: isAr ? "المستكشف" : "ALMSTKSHF",
+            title: isAr
+                ? "المستكشف — منصة رصد إعلامي وتحليل مشاعر الرأي العام"
+                : "ALMSTKSHF — Media Monitoring & Sentiment Analysis Platform",
+            description: isAr
+                ? "رصد فوري لأكثر من 3400 قناة تلفزيونية وإذاعية مع تحليل مشاعر بالذكاء الاصطناعي في الإمارات والسعودية."
+                : "Real-time monitoring of 3,400+ TV & radio channels with AI sentiment analysis across UAE and Saudi Arabia.",
             images: [
                 {
                     url: "/logo.png",
                     width: 1200,
                     height: 630,
-                    alt: "ALMSTKSHF - Advanced Media & Legal Solutions",
+                    alt: isAr
+                        ? "المستكشف — منصة رصد إعلامي وتحليل مشاعر في الإمارات والسعودية"
+                        : "ALMSTKSHF — Media Monitoring & Sentiment Analysis Platform for UAE & Saudi Arabia",
                 }
             ],
         },
@@ -107,23 +123,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
             card: "summary_large_image",
             site: "@almstkshf",
             creator: "@tameryounes",
-            title: isAr ? "المستكشف - حلول إعلامية وقانونية" : "ALMSTKSHF - Media & Legal Solutions",
+            title: isAr
+                ? "المستكشف — رصد إعلامي وتحليل مشاعر بالذكاء الاصطناعي"
+                : "ALMSTKSHF — AI Media Monitoring & Sentiment Analysis",
             description: isAr
-                ? "شريكك الاستراتيجي للرصد الإعلامي والتحليل الذكي."
-                : "Your strategic partner for intelligent media monitoring.",
+                ? "شريكك الاستراتيجي لرصد الإعلام وتحليل الرأي العام في الإمارات والسعودية والخليج."
+                : "Your strategic partner for media monitoring and public opinion analysis across UAE, Saudi Arabia & the Gulf.",
             images: ["/logo.png"],
         },
 
         alternates: {
-            canonical: `https://almstkshf.com/${locale}`,
+            canonical: `https://www.almstkshf.com/${locale}`,
             languages: {
                 // Region-specific hreflang tags — UAE and Saudi Arabia priority markets
-                'en-AE': 'https://almstkshf.com/en',
-                'ar-AE': 'https://almstkshf.com/ar',
-                'en-SA': 'https://almstkshf.com/en',
-                'ar-SA': 'https://almstkshf.com/ar',
+                'en-AE': 'https://www.almstkshf.com/en',
+                'ar-AE': 'https://www.almstkshf.com/ar',
+                'en-SA': 'https://www.almstkshf.com/en',
+                'ar-SA': 'https://www.almstkshf.com/ar',
                 // Fallback for users outside specified regions — defaults to Arabic
-                'x-default': 'https://almstkshf.com/ar',
+                'x-default': 'https://www.almstkshf.com/ar',
             }
         },
         icons: {

@@ -52,14 +52,18 @@ const FEATURES_STRUCTURE = [
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
     const { locale } = await params;
-    const t = await getTranslations({ locale, namespace: 'AboutUs' });
+    const isAr = locale === "ar";
     return {
-        title: t('title'),
-        description: t('subtitle'),
+        title: isAr
+            ? "من نحن — شركة رصد إعلامي رائدة في الإمارات والسعودية"
+            : "About Us — Leading Media Monitoring Company in UAE & Saudi Arabia",
+        description: isAr
+            ? "تعرف على المستكشف — شركة تكنولوجيا إعلامية متخصصة في الرصد الإعلامي وتحليل مشاعر الرأي العام بالذكاء الاصطناعي. مقرنا في دبي وأبوظبي ونخدم المؤسسات في الإمارات والسعودية والخليج."
+            : "Learn about ALMSTKSHF — a media technology company specializing in media monitoring and AI-powered sentiment analysis. Headquartered in Dubai and Abu Dhabi, serving enterprises across the UAE, Saudi Arabia, and the Gulf.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/about-us`,
             languages: {
-                'x-default': 'https://www.almstkshf.com/about-us',
+                'x-default': 'https://www.almstkshf.com/ar/about-us',
                 en: 'https://www.almstkshf.com/en/about-us',
                 ar: 'https://www.almstkshf.com/ar/about-us',
             }
@@ -141,8 +145,8 @@ export default async function AboutUsPage({ params }: { params: Promise<{ locale
                     {/* Capabilities & Core Features */}
                     <div className="space-y-12">
                         <div className="text-center space-y-4 max-w-2xl mx-auto">
-                            <h2 id="about-us-capabilities-title" className="text-3xl font-bold text-white tracking-tight">{t('features_title')}</h2>
-                            <p className="text-slate-400 text-sm leading-relaxed">
+                            <h2 id="about-us-capabilities-title" className="text-3xl font-bold text-foreground tracking-tight">{t('features_title')}</h2>
+                            <p className="text-muted-foreground text-sm leading-relaxed">
                                 {t('features_desc')}
                             </p>
                         </div>

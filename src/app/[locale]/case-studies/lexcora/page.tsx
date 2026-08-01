@@ -14,14 +14,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     const isAr = locale === "ar";
 
     return {
-        title: isAr ? "ليكسكورا | جناح ERP القانوني المتقدم" : "LEXCORA | Advanced Legal ERP Suite",
+        title: isAr
+            ? "ليكسكورا — نظام ERP للمحاماة بالذكاء الاصطناعي | المستكشف"
+            : "LEXCORA — AI-Powered Legal ERP for Law Firms | ALMSTKSHF",
         description: isAr
-            ? "اكتشف كيف يغير ليكسكورا العمل القانوني لشركات المحاماة الكبرى باستخدام الذكاء الاصطناعي والأتمتة."
-            : "Discover how LEXCORA transforms legal workflows for high-net-worth law firms with AI and automation.",
+            ? "اكتشف كيف يحول ليكسكورا العمل القانوني لشركات المحاماة الكبرى في الإمارات والسعودية. نظام ERP قانوني متكامل بالذكاء الاصطناعي لإدارة القضايا والعقود والفواتير."
+            : "Discover how LEXCORA transforms legal workflows for high-net-worth law firms in UAE and Saudi Arabia. AI-powered legal ERP for case management, contracts, and billing.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/case-studies/lexcora`,
             languages: {
-                'x-default': 'https://www.almstkshf.com/case-studies/lexcora',
+                'x-default': 'https://www.almstkshf.com/ar/case-studies/lexcora',
                 en: 'https://www.almstkshf.com/en/case-studies/lexcora',
                 ar: 'https://www.almstkshf.com/ar/case-studies/lexcora',
             }

@@ -13,6 +13,7 @@ const BASE_URL = 'https://www.almstkshf.com'
 // Public routes only — private/authenticated routes must never appear in the sitemap
 const routes = [
     '',
+    '/about-us',
     '/case-studies/lexcora',
     '/case-studies/styling-assistant',
     '/technical-solutions/kyc',

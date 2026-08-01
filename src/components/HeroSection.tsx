@@ -51,12 +51,15 @@ export default async function HeroSection() {
                      * inward (end) side gets a small breathing pad before it clips.
                      */}
                     <h1
-                        className="text-4xl md:text-5xl lg:text-6xl font-black mb-4 tracking-tight text-foreground
-                                   w-full max-w-full truncate leading-none
+                        className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 tracking-tight text-foreground
+                                   w-full max-w-full leading-tight
                                    ps-0 pe-2"
-                        title={t("Common.app_name")}
+                        title={`${t("Common.app_name")} - ${t("Common.hero_h1")}`}
                     >
-                        {t("Common.app_name")}
+                        <span className="text-primary block text-lg md:text-xl font-bold uppercase tracking-widest mb-1">
+                            {t("Common.app_name")}
+                        </span>
+                        {t("Common.hero_h1")}
                     </h1>
 
                     {/*

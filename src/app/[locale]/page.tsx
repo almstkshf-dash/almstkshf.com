@@ -17,16 +17,18 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     const isAr = locale === "ar";
 
     return {
-        title: isAr ? "المستكشف | الحلول الإعلامية والقانونية المتقدمة" : "ALMSTKSHF | Advanced Media & Legal Solutions",
+        title: isAr
+            ? "رصد إعلامي وتحليل مشاعر بالذكاء الاصطناعي | المستكشف"
+            : "AI Media Monitoring & Sentiment Analysis Platform | ALMSTKSHF",
         description: isAr
-            ? "الصفحة الرئيسية للمستكشف - رائد الحلول الاستراتيجية والتحليل الإعلامي والقانوني في الخليج."
-            : "ALMSTKSHF Home - Leader in strategic solutions, media analysis, and legal tech in the Gulf.",
+            ? "المستكشف — المنصة الرائدة لرصد الإعلام وتحليل الرأي العام في الإمارات والسعودية. رصد فوري لأكثر من 3400 قناة تلفزيونية وإذاعية، تحليل المشاعر، إدارة الأزمات، وتقارير ذكية."
+            : "ALMSTKSHF — The leading media monitoring and public opinion analysis platform in the UAE & Saudi Arabia. Real-time tracking of 3,400+ TV and radio channels, AI sentiment analysis, crisis management, and intelligent reporting.",
         alternates: {
-            canonical: `https://almstkshf.com/${locale}`,
+            canonical: `https://www.almstkshf.com/${locale}`,
             languages: {
-                'ar': 'https://almstkshf.com/ar',
-                'en': 'https://almstkshf.com/en',
-                'x-default': 'https://almstkshf.com/ar',
+                'ar': 'https://www.almstkshf.com/ar',
+                'en': 'https://www.almstkshf.com/en',
+                'x-default': 'https://www.almstkshf.com/ar',
             }
         },
     };

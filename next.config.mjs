@@ -109,6 +109,10 @@ const nextConfig = {
                 source: '/:locale/robots.txt',
                 destination: '/robots.txt',
             },
+            {
+                source: '/.well-known/llms.txt',
+                destination: '/llms.txt',
+            },
         ];
     },
 };

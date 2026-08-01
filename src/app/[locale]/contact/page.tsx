@@ -66,14 +66,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     const { locale } = await params;
     const isAr = locale === "ar";
     return {
-        title: isAr ? "اتصل بنا | المستكشف" : "Contact Us | ALMSTKSHF",
+        title: isAr
+            ? "تواصل معنا — مكاتب دبي وأبوظبي | المستكشف للرصد الإعلامي"
+            : "Contact Us — Dubai & Abu Dhabi Offices | ALMSTKSHF Media Monitoring",
         description: isAr
-            ? "تواصل مع المستكشف للحصول على حلول إعلامية وقانونية متقدمة."
-            : "Get in touch with ALMSTKSHF for advanced media and legal solutions.",
+            ? "تواصل مع المستكشف لخدمات الرصد الإعلامي وتحليل المشاعر في الإمارات والسعودية. مكاتبنا في دبي (ون سنترال) وأبوظبي (برج الخاتم). دعم فني على مدار الساعة."
+            : "Contact ALMSTKSHF for media monitoring and sentiment analysis services in UAE and Saudi Arabia. Offices in Dubai (One Central) and Abu Dhabi (Al Khatem Tower). 24/7 technical support.",
         alternates: {
             canonical: `https://www.almstkshf.com/${locale}/contact`,
             languages: {
-                'x-default': 'https://www.almstkshf.com/contact',
+                'x-default': 'https://www.almstkshf.com/ar/contact',
                 en: 'https://www.almstkshf.com/en/contact',
                 ar: 'https://www.almstkshf.com/ar/contact',
             }
@@ -91,10 +93,10 @@ export default function ContactPage() {
                     {/* Info Side */}
                     <div className="space-y-12">
                         <div className="space-y-4">
-                            <h1 className="text-5xl font-bold text-white tracking-tight">
+                            <h1 className="text-5xl font-bold text-foreground tracking-tight">
                                 {t("title")}
                             </h1>
-                            <p className="text-slate-400 text-lg leading-relaxed max-w-lg">
+                            <p className="text-muted-foreground text-lg leading-relaxed max-w-lg">
                                 {t("subtitle")}
                             </p>
                         </div>
@@ -102,14 +104,14 @@ export default function ContactPage() {
                         <div className="grid grid-cols-1 gap-6">
                             {CONTACT_CHANNELS.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-5 group">
-                                    <div className={`w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center transition-all group-hover:border-slate-600 ${item.color}`}>
+                                    <div className={`w-12 h-12 rounded-2xl bg-card border border-border flex items-center justify-center transition-all group-hover:border-primary/50 ${item.color}`}>
                                         <item.icon className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                                             {t(item.labelKey)}
                                         </p>
-                                        <p className="text-white font-medium text-sm">
+                                        <p className="text-foreground font-medium text-sm">
                                             {"value" in item ? item.value : t(item.valueKey)}
                                         </p>
                                     </div>

@@ -132,7 +132,7 @@ export default function Footer() {
 
                     {/* Column 2: Quick Links */}
                     <FooterSection title={t('links')} id="footer-quick-links-title" isNav>
-                        <ul className="space-y-4">
+                        <ul className="space-y-3">
                             {QUICK_LINKS.map((item) => (
                                 <li key={item.labelKey}>
                                     <Link
@@ -147,7 +147,43 @@ export default function Footer() {
                         </ul>
                     </FooterSection>
 
-                    {/* Column 3: Contact Info */}
+                    {/* Column 3: Media Services Internal Links */}
+                    <FooterSection title={t('services')} id="footer-services-title" isNav>
+                        <ul className="space-y-3">
+                            <li>
+                                <Link href="/media-monitoring/tv-radio" className={NAV_LINK_STYLE}>
+                                    <FooterBullet />
+                                    {tNav('tv_radio_monitoring')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/media-monitoring/press" className={NAV_LINK_STYLE}>
+                                    <FooterBullet />
+                                    {tNav('press_monitoring')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/media-monitoring/media-pulse" className={NAV_LINK_STYLE}>
+                                    <FooterBullet />
+                                    {tNav('media_pulse')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/media-monitoring/crisis-management" className={NAV_LINK_STYLE}>
+                                    <FooterBullet />
+                                    {tNav('crisis_management')}
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/media-monitoring/central-media-repository" className={NAV_LINK_STYLE}>
+                                    <FooterBullet />
+                                    {tNav('central_media_repository')}
+                                </Link>
+                            </li>
+                        </ul>
+                    </FooterSection>
+
+                    {/* Column 4: Contact & Legal */}
                     <FooterSection title={tCommon('try_ai')} id="footer-contact-title">
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3 text-muted-foreground text-sm hover:text-foreground transition-colors">
