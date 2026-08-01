@@ -47,6 +47,7 @@ All of the following must be set in `.env.local` for local development and in **
 
 | Variable | Required | Description |
 |---|---|---|
+| `DATABASE_URL` | ✅ | Local PostgreSQL connection string for Prisma |
 | `NEXT_PUBLIC_CONVEX_URL` | ✅ | Convex deployment URL |
 | `CONVEX_DEPLOY_KEY` | ✅ | Convex deploy key (CI/CD only) |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | ✅ | Clerk publishable key |

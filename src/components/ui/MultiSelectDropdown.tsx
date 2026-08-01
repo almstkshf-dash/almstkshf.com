@@ -132,14 +132,22 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                             className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors animate-fade-in"
                         >
                             {t('all_selected') || 'All Selected'}
-                            <button
-                                type="button"
+                            <span
+                                role="button"
+                                tabIndex={0}
                                 aria-label={t('clear_all') || 'Clear All'}
                                 onClick={(e) => { e.stopPropagation(); onChange([]); }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onChange([]);
+                                    }
+                                }}
                                 className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
                             >
                                 <X className="w-3 h-3" aria-hidden="true" />
-                            </button>
+                            </span>
                         </span>
                     ) : selected.length > 3 ? (
                         <>
@@ -149,14 +157,22 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                     className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                                 >
                                     {finalRenderTag(selected_id)}
-                                    <button
-                                        type="button"
+                                    <span
+                                        role="button"
+                                        tabIndex={0}
                                         aria-label={`${t('remove')} ${itemMap.get(selected_id)?.label || selected_id}`}
                                         onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                toggle(selected_id);
+                                            }
+                                        }}
                                         className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
                                     >
                                         <X className="w-3 h-3" aria-hidden="true" />
-                                    </button>
+                                    </span>
                                 </span>
                             ))}
                             <span
@@ -172,14 +188,22 @@ export const MultiSelectDropdown = React.memo(function MultiSelectDropdown({
                                 className="inline-flex items-center gap-1 bg-primary/15 text-primary border border-primary/20 rounded-lg px-2 py-0.5 text-xs font-bold transition-colors"
                             >
                                 {finalRenderTag(selected_id)}
-                                <button
-                                    type="button"
+                                <span
+                                    role="button"
+                                    tabIndex={0}
                                     aria-label={`${t('remove')} ${itemMap.get(selected_id)?.label || selected_id}`}
                                     onClick={(e) => { e.stopPropagation(); toggle(selected_id); }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            toggle(selected_id);
+                                        }
+                                    }}
                                     className="hover:text-primary/70 ms-0.5 cursor-pointer transition-colors"
                                 >
                                     <X className="w-3 h-3" aria-hidden="true" />
-                                </button>
+                                </span>
                             </span>
                         ))
                     )}

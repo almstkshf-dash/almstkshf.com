@@ -88,21 +88,21 @@ export default function RssFeeder({
   const lastSyncTimesRef = useRef<Record<string, number>>({});
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Filter and map articles to match the FeedItem interface
+  // Filter and map articles to match the FeedItem interface.
+  // Keep this effect idempotent so it doesn't create a state loop.
   useEffect(() => {
-    if (!articleResults) return;
+    if (!articleResults || articleResults.length === 0) {
+      setItems([]);
+      return;
+    }
 
     let filtered = articleResults;
-    
-    // Filter by publisher/source name if active (server already filters by source,
-    // this narrows further by the specific feed name within the publisher)
+
     if (activeName) {
       filtered = filtered.filter(a => a.source === activeName || a.source === activePublisher);
     }
 
-    // Map to FeedItem format
     const mappedItems: FeedItem[] = filtered.map(a => {
-      // Convert DD/MM/YYYY to ISO for the component's existing logic
       let isoDate = new Date().toISOString();
       if (a.publishedDate) {
         const parts = a.publishedDate.split('/');
@@ -115,7 +115,7 @@ export default function RssFeeder({
         title: a.title,
         link: a.url,
         description: a.content,
-        isoDate: isoDate,
+        isoDate,
         pubDate: a.publishedDate,
         image: a.imageUrl,
         source: a.source || 'RSS',
@@ -125,9 +125,10 @@ export default function RssFeeder({
       };
     });
 
-    setItems(mappedItems.slice(0, maxItems));
-    setLastSynced(new Date());
-  }, [articleResults, activeName, activePublisher, maxItems]);
+    const nextItems = mappedItems.slice(0, maxItems);
+    setItems((prev) => (prev.length === nextItems.length && prev.every((item, index) => item.guid === nextItems[index]?.guid) ? prev : nextItems));
+    setLastSynced((prev) => prev ? prev : new Date());
+  }, [activeName, activePublisher, maxItems]);
 
   const triggerSync = useCallback(async (force = false) => {
     if (!isAuthenticated || !activeUrl || !activePublisher) return;

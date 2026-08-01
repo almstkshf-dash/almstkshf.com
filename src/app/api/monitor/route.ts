@@ -16,6 +16,7 @@ import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { checkApiAuth } from "@/lib/api-auth";
 import { unstable_cache } from "next/cache";
 import { triggerOnDemandRevalidation } from "@/utils/revalidation";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
     try {
@@ -144,7 +145,37 @@ export async function POST(req: NextRequest) {
         }
 
         if (convex) {
-            await convex.mutation(api.monitoring.saveArticle, articleData as any);
+            try {
+                await convex.mutation(api.monitoring.saveArticle, articleData as any);
+            } catch (convexError) {
+                console.warn("Convex save failed, falling back to Prisma", convexError);
+            }
+        }
+
+        try {
+            await prisma.mediaMonitoringArticle.create({
+                data: {
+                    keyword: articleData.keyword,
+                    url: articleData.url,
+                    resolvedUrl: articleData.resolvedUrl,
+                    publishedDate: articleData.publishedDate,
+                    title: articleData.title,
+                    content: articleData.content,
+                    language: articleData.language === "AR" ? "AR" : "EN",
+                    sentiment: articleData.sentiment === "Positive" ? "Positive" : articleData.sentiment === "Negative" ? "Negative" : "Neutral",
+                    sourceType: articleData.sourceType === "Social Media" ? "SocialMedia" : articleData.sourceType === "Press Release" ? "PressRelease" : articleData.sourceType === "Blog" ? "Blog" : articleData.sourceType === "Print" ? "Print" : "OnlineNews",
+                    source: articleData.source,
+                    sourceCountry: articleData.sourceCountry,
+                    reach: articleData.reach,
+                    ave: articleData.ave,
+                    imageUrl: articleData.imageUrl,
+                    isManual: articleData.isManual,
+                    createdAt: BigInt(Date.now()),
+                    analysisStatus: articleData.analysisStatus === "pending" ? "pending" : "completed",
+                }
+            });
+        } catch (dbError) {
+            console.warn("Prisma article save failed; continuing without persistence", dbError);
         }
 
         // Trigger cache revalidation on-demand

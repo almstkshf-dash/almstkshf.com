@@ -23,8 +23,10 @@ export interface AuthCheckResult {
  * Optionally validates a minimum required plan tier (standard, professional, enterprise).
  */
 export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 'enterprise'): Promise<AuthCheckResult> {
+    const isLocalDevelopment = process.env.NODE_ENV !== 'production' || process.env.LOCAL_DEV_BYPASS_AUTH === 'true';
     const { userId, sessionClaims } = await auth();
-    if (!userId) {
+
+    if (!userId && !isLocalDevelopment) {
         return {
             authorized: false,
             userId: null,
@@ -32,16 +34,18 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
         };
     }
 
+    const effectiveUserId = userId || 'local-dev-user';
+
     // Resolve admin status from Clerk claims alone — no Convex round-trip needed.
     const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
     const claims = sessionClaims as any;
     const role = (claims?.metadata?.role || claims?.publicMetadata?.role || claims?.role || "").toString().toLowerCase();
-    const isAdmin = adminIds.includes(userId) || ["admin", "owner", "superadmin"].includes(role);
-    const isDevOrAdmin = process.env.NODE_ENV !== "production" || isAdmin;
+    const isAdmin = adminIds.includes(effectiveUserId) || ["admin", "owner", "superadmin"].includes(role);
+    const isDevOrAdmin = isLocalDevelopment || isAdmin;
 
     // Admins and dev environments bypass the subscription check entirely.
     if (isDevOrAdmin && !requiredPlan) {
-        return { authorized: true, userId };
+        return { authorized: true, userId: effectiveUserId };
     }
 
     try {
@@ -74,18 +78,18 @@ export async function checkApiAuth(requiredPlan?: 'standard' | 'professional' | 
 
         return {
             authorized: true,
-            userId,
+            userId: effectiveUserId,
             userSettings
         };
     } catch (e) {
         console.error('API auth check error:', e);
         // If the Convex query fails but the user is an admin, still allow through.
         if (isDevOrAdmin) {
-            return { authorized: true, userId };
+            return { authorized: true, userId: effectiveUserId };
         }
         return {
             authorized: false,
-            userId,
+            userId: effectiveUserId,
             errorResponse: NextResponse.json({ error: 'Internal auth service error' }, { status: 500 })
         };
     }

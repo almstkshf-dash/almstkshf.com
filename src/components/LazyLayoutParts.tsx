@@ -53,4 +53,4 @@ export default memo(function LazyLayoutParts() {
             <ChatbaseWidget />
         </>
     );
-});
+}, () => true);

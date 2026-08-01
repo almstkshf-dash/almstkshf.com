@@ -49,12 +49,17 @@ export async function GET(req: NextRequest) {
                     if (!convex) {
                         return null;
                     }
-                    return await convex.query(api.monitoring.getAnalyticsOverview, {
-                        keyword,
-                        sourceType: sourceType === 'All' ? undefined : sourceType,
-                        sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
-                        depth: depth === 'All' ? undefined : depth,
-                    });
+                    try {
+                        return await convex.query(api.monitoring.getAnalyticsOverview, {
+                            keyword,
+                            sourceType: sourceType === 'All' ? undefined : sourceType,
+                            sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
+                            depth: depth === 'All' ? undefined : depth,
+                        });
+                    } catch (error) {
+                        console.warn('Convex overview query failed, returning fallback analytics', error);
+                        return null;
+                    }
                 },
                 [
                     "sentiment-overview",
@@ -75,7 +80,15 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             success: true,
             timestamp: Date.now(),
-            data
+            data: data ?? {
+                totalArticles: 0,
+                positive: 0,
+                neutral: 0,
+                negative: 0,
+                riskScore: 0,
+                crisisProbability: 0,
+                velocity: 0,
+            }
         }, {
             headers: {
                 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'

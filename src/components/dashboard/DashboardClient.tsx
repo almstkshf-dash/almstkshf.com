@@ -29,6 +29,7 @@ import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
 import { PREMIUM_SOURCES } from '@/config/rss-sources';
 import { DashboardSection } from '@/components/dashboard/DashboardSection';
+import { api, useMutation } from '@/lib/convex-compat';
 
 // ── Lazy-load heavy components ───────────────────────────────────────────────
 function TabSkeleton() {
@@ -165,12 +166,16 @@ export default function DashboardClient() {
 
     // ── Accumulate paginated articles ─────────────────────────────────────────
     useEffect(() => {
-        if (result?.items) {
-            setLoadedArticles(prev => skip === 0 ? result.items : [...prev, ...result.items]);
-        }
-    }, [result?.items, skip]);
+        if (!fetchedArticles.length) return;
+        setLoadedArticles(prev => {
+            if (skip === 0) return fetchedArticles;
+            const existingIds = new Set(prev.map(article => article.id));
+            const newArticles = fetchedArticles.filter(article => !existingIds.has(article.id));
+            return newArticles.length ? [...prev, ...newArticles] : prev;
+        });
+    }, [fetchedArticles, skip]);
 
-    const totalArticles = result?.total || 0;
+    const totalArticles = fetchedArticles.length;
 
     const filteredArticles = useMemo(() => {
         const query = searchQuery.toLowerCase().trim();
@@ -269,24 +274,8 @@ export default function DashboardClient() {
         setIsExporting(true);
         setTimeout(async () => {
             try {
-                // Fetch all matching articles from the database (up to 5000) for the current filters
-                const allResult = await convex.query(api.monitoring.getArticles, {
-                    limit: 5000,
-                    sourceType: selectedType === 'All' ? undefined : selectedType,
-                    sourceCountry: selectedCountry === 'All' ? undefined : selectedCountry,
-                });
-
-                let articlesToExport = allResult?.items || [];
-
-                // Filter by keyword locally if search query exists
-                const query = searchQuery.toLowerCase().trim();
-                if (query) {
-                    articlesToExport = articlesToExport.filter((a: ArticleItem) =>
-                        a.title.toLowerCase().includes(query) ||
-                        (a.keyword && a.keyword.toLowerCase().includes(query)) ||
-                        (a.sourceType && a.sourceType.toLowerCase().includes(query))
-                    );
-                }
+                // Export the currently loaded and filtered articles from the local dashboard state.
+                let articlesToExport = filteredArticles.slice(0, 5000);
 
                 if (articlesToExport.length === 0) {
                     showToast('error', t('export_empty'));
@@ -395,10 +384,10 @@ export default function DashboardClient() {
                             setManualModalOpen(true);
                         }}
                     />
-                    {result?.nextSkip !== null && !isArticlesLoading && (
+                    {filteredArticles.length >= 50 && !isArticlesLoading && (
                         <div className="flex justify-center p-12 bg-gradient-to-t from-background via-transparent to-transparent">
                             <button
-                                onClick={() => setSkip(result?.nextSkip || 0)}
+                                onClick={() => setSkip(prev => prev + 50)}
                                 className="inline-flex items-center h-14 px-10 bg-primary shadow-xl shadow-primary/30 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] text-primary-foreground hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-primary/20"
                             >
                                 {t('filters.load_more')}

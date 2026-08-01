@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+function isDatabaseUnavailableError(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return (
+        message.includes("Can't reach database server") ||
+        message.includes("PrismaClientInitializationError") ||
+        message.includes("ECONNREFUSED") ||
+        message.includes("does not exist in the current database") ||
+        message.includes("relation") && message.includes("does not exist") ||
+        message.includes("Undefined table")
+    );
+}
+
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
@@ -31,7 +43,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(serialized);
     } catch (error: any) {
         console.error("API /api/monitoring/articles GET error:", error);
-        return NextResponse.json({ error: error.message || "Failed to fetch articles" }, { status: 500 });
+        const message = error?.message || "Failed to fetch articles";
+        if (isDatabaseUnavailableError(error)) {
+            return NextResponse.json([], { status: 200 });
+        }
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 
@@ -59,6 +75,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ...article, createdAt: Number(article.createdAt) });
     } catch (error: any) {
         console.error("API /api/monitoring/articles POST error:", error);
-        return NextResponse.json({ error: error.message || "Failed to create article" }, { status: 500 });
+        const message = error?.message || "Failed to create article";
+        if (isDatabaseUnavailableError(error)) {
+            return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+        }
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

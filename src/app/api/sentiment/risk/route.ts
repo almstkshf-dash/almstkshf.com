@@ -49,12 +49,17 @@ export async function GET(req: NextRequest) {
                     if (!convex) {
                         return { riskScore: 0, crisisProbability: 0, velocity: 0 };
                     }
-                    return await convex.query(api.monitoring.getAnalyticsOverview, {
-                        keyword,
-                        sourceType: sourceType === 'All' ? undefined : sourceType,
-                        sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
-                        depth: depth === 'All' ? undefined : depth,
-                    });
+                    try {
+                        return await convex.query(api.monitoring.getAnalyticsOverview, {
+                            keyword,
+                            sourceType: sourceType === 'All' ? undefined : sourceType,
+                            sourceCountry: sourceCountry === 'All' ? undefined : sourceCountry,
+                            depth: depth === 'All' ? undefined : depth,
+                        });
+                    } catch (error) {
+                        console.warn('Convex risk query failed, returning fallback analytics', error);
+                        return { riskScore: 0, crisisProbability: 0, velocity: 0 };
+                    }
                 },
                 [
                     "sentiment-risk",
@@ -74,10 +79,10 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            riskScore: data.riskScore,
-            crisisProbability: data.crisisProbability,
-            velocity: data.velocity,
-            status: data.riskScore > 70 ? "High Risk" : data.riskScore > 40 ? "Elevated" : "Stable"
+            riskScore: data?.riskScore ?? 0,
+            crisisProbability: data?.crisisProbability ?? 0,
+            velocity: data?.velocity ?? 0,
+            status: (data?.riskScore ?? 0) > 70 ? "High Risk" : (data?.riskScore ?? 0) > 40 ? "Elevated" : "Stable"
         });
     } catch (error: unknown) {
         const err = error as Error;

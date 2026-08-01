@@ -12,6 +12,7 @@ import { getConvexClient } from "@/lib/convex-client";
 import { api } from "../../../../../convex/_generated/api";
 import { rateLimit, getRateLimitKey } from "@/lib/rateLimit";
 import { checkApiAuth } from "@/lib/api-auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
     const auth = await checkApiAuth();
@@ -96,10 +97,35 @@ export async function GET(req: NextRequest) {
 
             // Fetch new articles since our last timestamp
             const convex = getConvexClient();
-            const newArticles = convex ? await convex.query(api.monitoring.getArticlesSince, {
-                since,
-                limit: 30
-            }) : [];
+            let newArticles: Array<Record<string, any>> = [];
+
+            if (convex) {
+                try {
+                    newArticles = await convex.query(api.monitoring.getArticlesSince, {
+                        since,
+                        limit: 30
+                    }) || [];
+                } catch (convexError) {
+                    console.warn("Convex stream fallback engaged", convexError);
+                }
+            }
+
+            if (!newArticles.length) {
+                try {
+                    const prismaArticles = await prisma.mediaMonitoringArticle.findMany({
+                        where: { createdAt: { gt: BigInt(since) } },
+                        take: 30,
+                        orderBy: { createdAt: "asc" }
+                    });
+                    newArticles = prismaArticles.map(article => ({
+                        ...article,
+                        createdAt: Number(article.createdAt),
+                    }));
+                } catch (dbError) {
+                    console.warn("Prisma stream fallback failed", dbError);
+                    newArticles = [];
+                }
+            }
 
             if (newArticles && newArticles.length > 0) {
                 for (const article of newArticles) {

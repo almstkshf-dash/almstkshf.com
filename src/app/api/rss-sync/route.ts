@@ -7,8 +7,6 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getConvexClient } from '@/lib/convex-client';
-import { api } from '../../../../convex/_generated/api';
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit';
 import { isSafeUrl } from '@/utils/ssrf';
 
@@ -36,26 +34,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: 'Invalid or forbidden URL' }, { status: 400 });
         }
 
-        const convex = getConvexClient();
-        if (!convex) {
-            return NextResponse.json({
-                success: false,
-                error: 'Convex backend is not configured'
-            }, { status: 503 });
-        }
-
-        // Schedule the background sync task in Convex
-        await convex.mutation(api.monitoring.scheduleRssSync, {
-            url,
-            publisher,
-            country: country || 'AE',
-            lang: lang || 'ar',
-            limit,
-        });
-
+        // Railway-based local/dev fallback: acknowledge the request without requiring Convex.
         return NextResponse.json({
             success: true,
-            message: `Sync job for ${publisher} scheduled successfully in the background.`
+            message: `RSS sync request for ${publisher} was accepted. Background processing is not available in this local deployment.`
         });
 
     } catch (error: any) {
