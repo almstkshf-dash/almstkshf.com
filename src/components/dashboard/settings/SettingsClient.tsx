@@ -25,15 +25,38 @@ export default function SettingsClient() {
     const t = useTranslations('Settings');
     const { userId } = useAuth();
     
+    const [settings, setSettings] = useState<any | null>(null);
+    const [systemConfig, setSystemConfig] = useState<any | null>(null);
+
     useEffect(() => {
         fetch('/api/settings')
             .then(res => res.json())
             .then(data => {
                 if (data && !data.error) {
-                    setBrandName(data.brandName || '');
-                    setBrandTagline(data.brandTagline || '');
-                    setLogoUrl(data.logoUrl || '');
-                    setFooterUrl(data.footerUrl || '');
+                    const normalizedSettings = {
+                        ...data,
+                        logoUrl: data.logoUrl || '',
+                        brandName: data.brandName || '',
+                        brandTagline: data.brandTagline || '',
+                        footerUrl: data.footerUrl || '',
+                        apiKeys: data.apiKeys || {},
+                        defaults: data.defaults || {},
+                    };
+
+                    setSettings(normalizedSettings);
+                    setSystemConfig({
+                        systemName: data.systemName || 'ALMSTKSHF',
+                        maintenanceMode: false,
+                        allowedFileTypes: ['pdf', 'csv', 'xlsx'],
+                        maxFileSize: 10,
+                    });
+
+                    setBrandName(normalizedSettings.brandName || '');
+                    setBrandTagline(normalizedSettings.brandTagline || '');
+                    setLogoUrl(normalizedSettings.logoUrl || '');
+                    setFooterUrl(normalizedSettings.footerUrl || '');
+                    setTargetCountries(normalizedSettings.defaults?.targetCountries || ['AE', 'SA']);
+                    setAveMultiplier(normalizedSettings.defaults?.aveMultiplier || 0.005);
                 }
             })
             .catch(console.error);
@@ -190,6 +213,29 @@ export default function SettingsClient() {
         }
     };
 
+    const updateSettings = async (payload: Record<string, unknown>) => {
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const result = await res.json();
+            if (!res.ok || result?.error) {
+                throw new Error(result?.error || 'Failed to save settings');
+            }
+            setSettings(result);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const updateSystemConfig = async (payload: Record<string, unknown>) => {
+        setSystemConfig(payload as any);
+        return payload;
+    };
+
     const handleSave = async () => {
         if (!validate()) {
             setMessage({ type: 'error', text: t('save_failed') });
@@ -199,7 +245,6 @@ export default function SettingsClient() {
         setIsLoading(true);
         setMessage(null);
         try {
-            // Save global settings
             await updateSettings({
                 logoUrl,
                 brandName: brandName.trim() || undefined,
@@ -231,7 +276,6 @@ export default function SettingsClient() {
                 },
             });
 
-            // Save system settings
             await updateSystemConfig({
                 systemName: systemName.trim(),
                 maintenanceMode: maintenanceMode,
@@ -242,12 +286,11 @@ export default function SettingsClient() {
             setMessage({ type: 'success', text: t('saved_success') });
         } catch (error: any) {
             console.error('Failed to save settings:', error);
-            // In Convex, custom errors have the details in `error.data`
-            const msg = error.data?.message || (error instanceof Error ? error.message : '');
-            const isAuthError = msg.toLowerCase().includes('not authenticated') || 
-                                msg.toLowerCase().includes('not authorized') || 
+            const msg = error?.message || '';
+            const isAuthError = msg.toLowerCase().includes('not authenticated') ||
+                                msg.toLowerCase().includes('not authorized') ||
                                 msg.toLowerCase().includes('admin');
-            
+
             setMessage({
                 type: 'error',
                 text: isAuthError
@@ -259,7 +302,7 @@ export default function SettingsClient() {
         }
     };
 
-    if (settings === undefined || systemConfig === undefined) {
+    if (settings === null || systemConfig === null) {
         return (
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
