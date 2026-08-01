@@ -37,6 +37,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ReportGenerator } from '@/lib/report-generator';
 import { toast } from 'sonner';
 import SaveToCollectionModal, { CollectionItem } from '@/components/ui/SaveToCollectionModal';
+import { useQuery, useMutation, api } from '@/lib/convex-compat';
 
 // Types
 import { DarkWebResult, ReportTranslations } from '@/types/reports';

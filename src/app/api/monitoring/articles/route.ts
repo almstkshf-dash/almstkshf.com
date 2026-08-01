@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+function normalizeSourceType(sourceType?: string | null) {
+    if (!sourceType) return undefined;
+
+    const value = sourceType.trim();
+    const mapping: Record<string, string> = {
+        "Online News": "OnlineNews",
+        "OnlineNews": "OnlineNews",
+        "Social Media": "SocialMedia",
+        "SocialMedia": "SocialMedia",
+        "Press Release": "PressRelease",
+        "PressRelease": "PressRelease",
+        "Blog": "Blog",
+        "Print": "Print",
+    };
+
+    return mapping[value] || value;
+}
+
 function isDatabaseUnavailableError(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return (
@@ -21,8 +39,9 @@ export async function GET(req: NextRequest) {
         const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
         const where: any = {};
-        if (source && source !== "All") {
-            where.sourceType = source;
+        const normalizedSource = normalizeSourceType(source);
+        if (normalizedSource && normalizedSource !== "All") {
+            where.sourceType = normalizedSource;
         }
 
         const articles = await prisma.mediaMonitoringArticle.findMany({
@@ -63,7 +82,7 @@ export async function POST(req: NextRequest) {
                 publishedDate: body.publishedDate || new Date().toISOString(),
                 language: body.language === "AR" ? "AR" : "EN",
                 sentiment: body.sentiment || "Neutral",
-                sourceType: body.sourceType || "OnlineNews",
+                sourceType: normalizeSourceType(body.sourceType) || "OnlineNews",
                 source: body.source,
                 sourceCountry: body.sourceCountry || "US",
                 reach: body.reach || 0,

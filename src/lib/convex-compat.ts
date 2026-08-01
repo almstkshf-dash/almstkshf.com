@@ -34,6 +34,7 @@ export class ConvexError extends Error {
 export function useMutation(_ref: unknown) {
     return async (_args?: unknown) => ({
         success: true,
+        deleted: 0,
     });
 }
 
@@ -45,7 +46,10 @@ export function useAction(_ref: unknown) {
 }
 
 export function useQuery(_ref: unknown, _args?: unknown) {
-    return undefined;
+    if (typeof _args === 'string' && _args === 'skip') {
+        return [];
+    }
+    return [];
 }
 
 export function useConvexAuth() {
