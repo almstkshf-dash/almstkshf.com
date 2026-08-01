@@ -6,8 +6,7 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { useAction } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
+import { useAction, api } from '@/lib/convex-compat';
 import { LookupType, OsintResult } from '../types';
 
 export function useOsintLookup() {

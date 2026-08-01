@@ -11,8 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { useTranslations } from 'next-intl';
-import { useMutation, useAction, useQuery, useConvexAuth } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { useMutation, useAction, useQuery, useConvexAuth, api } from '@/lib/convex-compat';
 import { X, Plus, Wand2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { toast } from 'sonner';

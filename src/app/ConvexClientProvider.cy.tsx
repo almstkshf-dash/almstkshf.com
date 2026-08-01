@@ -7,11 +7,23 @@
  */
 
 import React from 'react'
+import { useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import { ConvexClientProvider } from './ConvexClientProvider'
 
+function HookConsumer() {
+  const joinWaitlist = useMutation(api.waitlist.joinWaitlist)
+  return <div data-cy="hook-consumer">{joinWaitlist ? 'ready' : 'not-ready'}</div>
+}
+
 describe('<ConvexClientProvider />', () => {
-  it('renders', () => {
-    // see: https://on.cypress.io/mounting-react
-    cy.mount(<ConvexClientProvider><div>Test</div></ConvexClientProvider>)
+  it('renders children that use Convex hooks even without a configured deployment URL', () => {
+    cy.mount(
+      <ConvexClientProvider>
+        <HookConsumer />
+      </ConvexClientProvider>
+    )
+
+    cy.get('[data-cy="hook-consumer"]').should('contain.text', 'ready')
   })
 })

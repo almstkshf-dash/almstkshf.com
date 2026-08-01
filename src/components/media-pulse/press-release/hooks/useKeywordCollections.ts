@@ -7,9 +7,7 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../../../../convex/_generated/api';
-import { Id, Doc } from '../../../../../convex/_generated/dataModel';
+import { useQuery, useMutation, api, type Id, type Doc } from '@/lib/convex-compat';
 import { toast } from 'sonner';
 
 export type KeywordCollection = Doc<"keyword_collections">;

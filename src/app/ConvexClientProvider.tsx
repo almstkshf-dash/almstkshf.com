@@ -15,15 +15,16 @@ import { ReactNode, useEffect } from "react";
 
 const rawConvexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 const isValidUrl = rawConvexUrl && !rawConvexUrl.includes("<your-convex-deployment-url>") && (rawConvexUrl.startsWith("http://") || rawConvexUrl.startsWith("https://"));
+const fallbackConvexUrl = "https://example.invalid";
 
 if (!isValidUrl) {
     console.warn(
         "[ConvexClientProvider] NEXT_PUBLIC_CONVEX_URL is missing or invalid. " +
-        "Falling back to http://127.0.0.1:3210."
+        "Convex-backed features will be unavailable until a valid deployment URL is configured."
     );
 }
 
-const convex = new ConvexReactClient(isValidUrl ? rawConvexUrl! : "http://127.0.0.1:3210");
+const convex = new ConvexReactClient(isValidUrl ? rawConvexUrl! : fallbackConvexUrl);
 
 /**
  * Provides the Convex client with Clerk auth integration.
@@ -32,10 +33,6 @@ const convex = new ConvexReactClient(isValidUrl ? rawConvexUrl! : "http://127.0.
  * a single, top-level Clerk initialisation before any useAuth() calls.
  */
 export function ConvexClientProvider({ children }: { children: ReactNode }) {
-    if (!isValidUrl) {
-        return <>{children}</>;
-    }
-
     return (
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
             {children}

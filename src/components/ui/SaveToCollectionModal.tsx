@@ -11,10 +11,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useInertBackground } from "@/hooks/useInertBackground";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { ConvexError } from "convex/values";
-import { Id } from "../../../convex/_generated/dataModel";
+import { useQuery, useMutation, api, type Id, ConvexError } from "@/lib/convex-compat";
 import { X, Plus, FolderPlus, Loader2, Check } from "lucide-react";
 import Button from "./Button";
 import { useTranslations } from "next-intl";

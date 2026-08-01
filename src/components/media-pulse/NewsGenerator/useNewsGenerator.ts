@@ -9,8 +9,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useAction, useConvexAuth } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
+import { useAction, useConvexAuth, api } from '@/lib/convex-compat';
 import { useLocale, useTranslations } from 'next-intl';
 import { ALL_COUNTRIES, LANGUAGES } from '@/lib/countries';
 import { FetchNewsSchema, OptimizeQuerySchema, NewsGeneratorFormSchema } from './validation';

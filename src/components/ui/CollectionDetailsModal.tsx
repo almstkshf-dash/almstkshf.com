@@ -9,9 +9,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
-import { Id } from "../../../convex/_generated/dataModel";
+import { useQuery, useMutation, api, type Id } from "@/lib/convex-compat";
 import { X, Trash2, ExternalLink, Download, Search, FileText, Calendar, Loader2, AlertCircle, History, FileSpreadsheet } from "lucide-react";
 import Button from "./Button";
 import { useTranslations } from "next-intl";

@@ -7,9 +7,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useQuery, useMutation, useConvexAuth } from 'convex/react';
-import { api } from '../../../../../convex/_generated/api';
-import { Id } from '../../../../../convex/_generated/dataModel';
+import { useQuery, useMutation, useConvexAuth, api, type Id } from '@/lib/convex-compat';
 import { toast } from 'sonner';
 import { MEDIA_SOURCES } from '@/config/media-sources';
 

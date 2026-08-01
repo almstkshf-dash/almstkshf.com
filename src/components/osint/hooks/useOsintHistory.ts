@@ -6,9 +6,7 @@
  * Copyright (c) 2026 [Tamer Younes/Almstkshf for media monitoring]. All rights reserved.
  */
 
-import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../../../convex/_generated/api';
-import { Id } from '../../../../convex/_generated/dataModel';
+import { useQuery, useMutation, api, type Id } from '@/lib/convex-compat';
 import { useState } from 'react';
 import { ReportGenerator } from '@/lib/report-generator';
 import { ReportTranslations, OsintHistoryItem } from '@/types/reports';

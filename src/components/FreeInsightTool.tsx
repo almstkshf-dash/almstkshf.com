@@ -17,8 +17,7 @@ import Container from "./ui/Container";
 import Button from "./ui/Button";
 import { Link } from "@/i18n/routing";
 import clsx from "clsx";
-import { useAction, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useAction, useQuery, api } from "@/lib/convex-compat";
 
 export default function FreeInsightTool() {
     const t = useTranslations("FreeTool");

@@ -9,15 +9,14 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useMutation } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
+import { useMutation, api } from '@/lib/convex-compat';
 import { Trash2, FolderPlus } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import SaveToCollectionModal from '@/components/ui/SaveToCollectionModal';
 import { useState, useMemo, memo, useCallback } from 'react';
 import { MonitoringArticle } from '@/types/reports';
-import { Id } from '../../../convex/_generated/dataModel';
+import { Id } from '@/lib/convex-compat';
 import { toast } from 'sonner';
 import { ArticleRow, ArticleRowSkeleton } from './ArticleRow';
 import { useMounted } from '@/hooks/useMounted';

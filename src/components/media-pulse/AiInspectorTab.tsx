@@ -19,8 +19,7 @@ import {
 
 import { ReportGenerator } from "@/lib/report-generator";
 import SaveToCollectionModal from "@/components/ui/SaveToCollectionModal";
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+import { useQuery, api } from "@/lib/convex-compat";
 import { FolderPlus } from "lucide-react";
 import { toast } from 'sonner';
 
