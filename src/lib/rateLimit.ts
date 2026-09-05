@@ -7,7 +7,6 @@
  */
 
 import { getRedis } from '@/lib/redis';
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest } from 'next/server';
 import { headers } from 'next/headers';
 
@@ -92,6 +91,7 @@ function getSafeClientIp(headersInstance: Headers): string {
         headersInstance.get('cf-connecting-ip') ||
         headersInstance.get('x-real-ip') ||
         headersInstance.get('true-client-ip') ||
+        headersInstance.get('x-nf-client-connection-ip') ||
         (isDev ? headersInstance.get('x-forwarded-for')?.split(',')[0]?.trim() : null) ||
         'unknown'
     );
@@ -104,7 +104,8 @@ export async function getRateLimitKey(
 ): Promise<string> {
     if (!userId) {
         try {
-            // Retrieve Clerk authentication data to restrict rate limiting by User ID
+            // Retrieve Clerk authentication data dynamically only if needed on the server
+            const { auth } = await import('@clerk/nextjs/server');
             const authData = await auth();
             userId = authData?.userId || null;
         } catch {

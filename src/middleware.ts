@@ -10,7 +10,6 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/config";
-import { rateLimit, getRateLimitKey } from "./lib/rateLimit";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -96,75 +95,6 @@ export default async function middleware(req: any, event: any) {
         strippedPath = pathname.replace(/^\/(ar|en)/, "");
     }
 
-    let rlResult: any = null;
-    let limitCount = 0;
-
-    // Apply Rate Limiting to /api/search and /api/monitor
-    if (strippedPath === "/api/search" || strippedPath === "/api/monitor") {
-        try {
-            const isSearch = strippedPath === "/api/search";
-            const method = req.method;
-            
-            limitCount = 60;
-            let windowSeconds = 60;
-            let prefix = "";
-
-            if (isSearch) {
-                // /api/search only accepts POST requests
-                if (method === "POST") {
-                    limitCount = 30;
-                    windowSeconds = 60;
-                    prefix = "search";
-                } else {
-                    return new NextResponse(JSON.stringify({ error: "Method not allowed" }), {
-                        status: 405,
-                        headers: { "Content-Type": "application/json" }
-                    });
-                }
-            } else {
-                // /api/monitor has GET and POST
-                if (method === "POST") {
-                    limitCount = 15;
-                    windowSeconds = 60;
-                    prefix = "monitor:post";
-                } else if (method === "GET") {
-                    limitCount = 60;
-                    windowSeconds = 60;
-                    prefix = "monitor:get";
-                } else {
-                    return new NextResponse(JSON.stringify({ error: "Method not allowed" }), {
-                        status: 405,
-                        headers: { "Content-Type": "application/json" }
-                    });
-                }
-            }
-
-            // userId is extracted from the JWT in the cookie/header by Clerk's own
-            // token-parsing logic (no headers() call), so it is safe here.
-            // We intentionally pass null and fall back to IP-based keying to avoid
-            // re-reading headers outside of clerkMiddleware context.
-            const rlKey = await getRateLimitKey(req, prefix, null);
-            rlResult = await rateLimit(rlKey, limitCount, windowSeconds);
-
-            if (!rlResult.allowed) {
-                return new NextResponse(
-                    JSON.stringify({ error: "Rate limit exceeded" }),
-                    {
-                        status: 429,
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-RateLimit-Limit": String(limitCount),
-                            "X-RateLimit-Remaining": String(rlResult.remaining),
-                            "Retry-After": String(rlResult.resetSeconds)
-                        }
-                    }
-                );
-            }
-        } catch (rlError) {
-            console.error("Middleware rate limiting error:", rlError);
-        }
-    }
-
     let response: any;
 
     if (localeApiRegex.test(pathname)) {
@@ -191,13 +121,6 @@ export default async function middleware(req: any, event: any) {
         } else {
             response = await clerk(req, event);
         }
-    }
-
-    // Attach rate limit headers to successful responses if rate limiting was evaluated
-    if (rlResult && response) {
-        response.headers.set("X-RateLimit-Limit", String(limitCount));
-        response.headers.set("X-RateLimit-Remaining", String(rlResult.remaining));
-        response.headers.set("X-RateLimit-Reset", String(rlResult.resetSeconds));
     }
 
     return response;
